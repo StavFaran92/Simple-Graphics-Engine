@@ -9,6 +9,27 @@
 #include "Mesh.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "Physics.h"
+#include "cereal/types/optional.hpp"
+
+#define SERIALIZED_MEMBER(name, member)	archive(cereal::make_nvp(name, member));
+
+#define SERIALIZED_MEMBER_OPTIONAL(name, member, value)	\
+	try {												\
+		archive(cereal::make_nvp(name, member));		\
+	}													\
+	catch (const cereal::Exception&) {					\
+		member = value;									\
+	}
+
+/**
+HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
+	- Add component that inherit from component
+	- Add component GUI display
+	- Add component GUI add option
+	- Add component to Serialized Entity (in Archiver.h)
+	- Add component serialize in Archiver::serializeEntity
+	- Add component deseralize in Archiver::deserializeEntity
+*/
 
 class Scene;
 class Mesh;
@@ -371,4 +392,18 @@ struct CharacterController : public Component
 	CharacterController() = default;
 
 
+};
+
+struct TestComp : public Component
+{
+	TestComp() = default;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER("test", test);
+		SERIALIZED_MEMBER_OPTIONAL("test2", test2, 0);
+	}
+
+	int test = 0;
+	int test2 = 0;
 };

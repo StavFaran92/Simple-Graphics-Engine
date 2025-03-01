@@ -78,6 +78,7 @@ struct SerializedEntity
 	std::optional<ImageComponent> image;
 	std::optional<Animator> animator;
 	std::optional<Terrain> terrain;
+	std::optional<TestComp> testComponent;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -98,7 +99,8 @@ struct SerializedEntity
 			skybox,
 			image,
 			animator,
-			terrain);
+			terrain,
+			testComponent);
 	}
 };
 

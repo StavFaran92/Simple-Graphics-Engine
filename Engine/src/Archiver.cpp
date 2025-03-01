@@ -25,6 +25,7 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	serializedEntity.transform = getComponentIfExists<Transformation>(e);
 	serializedEntity.animator = getComponentIfExists<Animator>(e);
 	serializedEntity.terrain = getComponentIfExists<Terrain>(e);
+	serializedEntity.testComponent = getComponentIfExists<TestComp>(e);
 
 	return serializedEntity;
 }
@@ -132,6 +133,11 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 	if (serializedEnt.terrain)
 	{
 		entityHandler.addComponent<Terrain>(serializedEnt.terrain.value());
+	}
+
+	if (serializedEnt.testComponent)
+	{
+		entityHandler.addComponent<TestComp>(serializedEnt.testComponent.value());
 	}
 }
 

@@ -1648,6 +1648,9 @@ void RenderInspectorWindow(float width, float height)
 			}
 		});
 
+		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
+			});
+
 		if (ImGui::Button("Add Component", ImVec2(windowWidth, 0)))
 		{
 			ImGui::OpenPopup("AddComponentPopup");
@@ -1737,6 +1740,12 @@ void RenderInspectorWindow(float width, float height)
 			if (ImGui::MenuItem("Skybox"))
 			{
 				auto& skybox = selectedEntity.addComponent<SkyboxComponent>();
+			}
+
+			//Todo REMOVE
+			if (ImGui::MenuItem("TestComponent"))
+			{
+				auto& testComp = selectedEntity.addComponent<TestComp>();
 			}
 
 			ImGui::EndPopup();
