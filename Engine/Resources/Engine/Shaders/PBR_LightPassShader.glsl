@@ -280,7 +280,7 @@ void main()
 	}
 
 	// generate Kd to accomodate only for diffuse (exclude specular)
-	vec3 F = fresnelSchlickRoughness(max(0.0, dot(N, V)), F0, roughness);
+	vec3 F = fresnelSchlickRoughness(max(0.0, dot(H, V)), F0, roughness);
 	
 	vec3 prefilterColor = textureLod(gPrefilterEnvMap, R, roughness * MAX_REFLECTION_LOD).rgb;
 	vec2 envBRDF = texture(gBRDFIntegrationLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;

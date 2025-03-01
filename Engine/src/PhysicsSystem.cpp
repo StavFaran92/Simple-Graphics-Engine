@@ -224,7 +224,7 @@ void PhysicsSystem::createTerrainActor(Scene* scene, entt::entity entity)
 
     float terrainColScale = (float)terrain.getWidth() / (PxReal)heightFieldDesc.nbColumns;
     float terrainRowScale = (float)terrain.getHeight() / (PxReal)heightFieldDesc.nbRows;
-    float terrainHeightScale = terrain.getScale() / pow(2,8);
+    float terrainHeightScale = terrain.getScale() / 255.f;
 
     PxTransform pose(PxVec3(-terrain.getHeight() / 2.f,
         0.0f, 
@@ -319,7 +319,14 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     else if (e.HasComponent<CollisionSphereComponent>())
     {
         auto& collider = e.getComponent<CollisionSphereComponent>();
+        if (collider.radius <= 0)
+        {
+            logWarning("Invalid collider radius: " + std::to_string(collider.radius));
+            return;
+        }
         shape = createSphereShape(collider.radius * std::max(std::max(scale.x, scale.y), scale.z));
+
+        assert(shape);
 
         Physics::LayerMask mask = collider.layerMask;
 
