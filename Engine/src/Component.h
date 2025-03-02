@@ -53,7 +53,8 @@ struct EngineAPI SkyboxComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(originalImage);
+		SERIALIZED_MEMBER("originalImage", originalImage);
+
 	}
 
 	Resource<Texture> skyboxImage;
@@ -66,7 +67,7 @@ struct EngineAPI RenderableComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(renderTechnique);
+		SERIALIZED_MEMBER("renderTechnique", renderTechnique);
 	}
 
 	enum class RenderTechnique : int
@@ -107,7 +108,8 @@ struct EngineAPI NativeScriptComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(entity, script);
+		SERIALIZED_MEMBER("entity", entity);
+		SERIALIZED_MEMBER("script", script);
 	}
 };
 
@@ -124,7 +126,8 @@ struct EngineAPI RigidBodyComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(type, mass);
+		SERIALIZED_MEMBER("type", type);
+		SERIALIZED_MEMBER("mass", mass);
 	}
 
 	bool isLockedLinearX = false;
@@ -148,7 +151,8 @@ struct EngineAPI CollisionBoxComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(halfExtent, layerMask);
+		SERIALIZED_MEMBER("halfExtent", halfExtent);
+		SERIALIZED_MEMBER("layerMask", layerMask);
 	}
 
 	float halfExtent = 0;
@@ -162,7 +166,8 @@ struct EngineAPI CollisionSphereComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(radius, layerMask);
+		SERIALIZED_MEMBER("radius", radius);
+		SERIALIZED_MEMBER("layerMask", layerMask);
 	}
 
 	float radius = 0;
@@ -175,7 +180,8 @@ struct EngineAPI CollisionMeshComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(isConvex, layerMask);
+		SERIALIZED_MEMBER("isConvex", isConvex);
+		SERIALIZED_MEMBER("layerMask", layerMask);
 	}
 
 	bool isConvex = false;
@@ -189,7 +195,7 @@ struct EngineAPI CollisionTerrainComponent : Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(layerMask);
+		SERIALIZED_MEMBER("layerMask", layerMask);
 	}
 
 	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
@@ -201,7 +207,8 @@ struct EngineAPI CameraComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(center, up);
+		SERIALIZED_MEMBER("center", center);
+		SERIALIZED_MEMBER("up", up);
 	}
 
 	static CameraComponent createPerspectiveCamera(float fovy, float aspect, float znear, float zfar)
@@ -243,7 +250,9 @@ struct EngineAPI MeshComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(mesh, materialSlot);
+		SERIALIZED_MEMBER("mesh", mesh);
+		SERIALIZED_MEMBER("materialSlot", materialSlot);
+
 	}
 
 	float materialSlot = 0; // todo this will be used (probably as a list) to support multi material models
@@ -299,7 +308,7 @@ struct EngineAPI MaterialComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(materials);
+		SERIALIZED_MEMBER("materials", materials);
 	}
 
 	std::map<int, std::shared_ptr<Material>> materials;
@@ -313,7 +322,8 @@ struct EngineAPI ObjectComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(name, e);
+		SERIALIZED_MEMBER("name", name);
+		SERIALIZED_MEMBER("e", e);
 	}
 
 	std::string name;
@@ -377,7 +387,10 @@ struct EngineAPI ImageComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(image, size, position, rotate);
+		SERIALIZED_MEMBER("image", image);
+		SERIALIZED_MEMBER("size", size);
+		SERIALIZED_MEMBER("position", position);
+		SERIALIZED_MEMBER("rotate", rotate);
 	}
 
 	glm::vec2 size;
