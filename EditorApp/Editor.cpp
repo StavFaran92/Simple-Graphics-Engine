@@ -104,6 +104,40 @@ static void displayComponent(const std::string& componentName, std::function<voi
 	}
 }
 
+void focusOnEntity(Entity e)
+{
+	// get camera forward
+	auto& camera = g_editorCamera.getComponent<CameraComponent>();
+	auto front = camera.front;
+
+	// get entity location
+	auto& targetTransform = e.getComponent<Transformation>();
+		
+	glm::vec3 targetLocation = targetTransform.getWorldPosition() - front * 5.f;
+
+	auto targetMesh = e.tryGetComponent<MeshComponent>();
+	if (targetMesh)
+	{
+		auto& targetAABB = targetMesh->mesh.get()->getPrimaryMesh()->getAABB();
+
+		// set destination to location + forward
+		targetLocation = targetTransform.getWorldPosition() - front * 5.f + targetAABB.extents * .5f;
+
+		// create fake frustum
+		Frustum fakeFrustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
+
+		// we start at the target object location and step back until the object AABB is inside the frustum.
+		while (!targetAABB.isOnFrustum(fakeFrustum))
+		{
+			targetLocation -= front;
+			fakeFrustum = Frustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
+		}
+	}
+
+	auto& transform = g_editorCamera.getComponent<Transformation>();
+	transform.setLocalPosition(targetLocation);
+}
+
 void RenderSimulationControlView(float width, float height)
 {
 	float windowWidth = width * 0.7f - 10;
@@ -734,6 +768,11 @@ void displayEntity(Entity& e)
 
 	if (selectedEntity == e)
 	{
+		if (ImGui::IsMouseDoubleClicked(0))
+		{
+			focusOnEntity(e);
+		}
+
 		if (selectedEntityRename)
 		{
 			// Editable text field
