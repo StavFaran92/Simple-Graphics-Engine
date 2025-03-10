@@ -104,6 +104,11 @@ static void displayComponent(const std::string& componentName, std::function<voi
 	}
 }
 
+/**
+This is a WIP,
+Ideally I should check if the object is entirly inside the frustum using some dedicated function,
+the current solution will work for most cases but will probably break with large models..
+*/
 void focusOnEntity(Entity e)
 {
 	// get camera forward
