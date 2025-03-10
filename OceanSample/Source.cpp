@@ -12,9 +12,10 @@ public:
 	{
 		ImGui::SetCurrentContext((ImGuiContext*)Engine::get()->getImguiHandler()->getCurrentContext());
 
-		auto importer = getContext()->getModelImporter();
-		auto quad = importer->loadModelFromFile("C:/Users/Stav/Documents/blender/plane_v2.fbx", getContext()->getActiveScene().get());
+		auto quad = Engine::get()->getContext()->getActiveScene()->createEntity("quad");
+		auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import("C:/Users/Stav/Documents/blender/plane_v2.fbx");
 
+		quad.addComponent<MeshComponent>(quadModel.mesh);
 		auto& planeTransform = quad.getComponent<Transformation>();
 		planeTransform.rotate({ 1,0,0 }, 90);
 		planeTransform.rotate({ 0,1,0 }, 90);
@@ -34,7 +35,7 @@ private:
 
 		quad.addComponent<ShaderComponent>(shader);
 
-		quad.getComponent<MaterialComponent>().materials[0]->setTexture(Texture::Type::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
+		//quad.getComponent<MaterialComponent>().materials[0]->setTexture(Texture::TextureType::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
 
 		auto gui = new GUIHandler(shader.m_vertexShader);
 		Engine::get()->getImguiHandler()->addGUI(gui);
@@ -52,7 +53,7 @@ private:
 		shader.m_vertexShader->setUniformValue("waveSpeed", 1.0f);
 		shader.m_vertexShader->setUniformValue("steepness", .5f);
 
-		quad.getComponent<MaterialComponent>().materials[0]->setTexture(Texture::Type::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
+		//quad.getComponent<MaterialComponent>().materials[0]->setTexture(Texture::TextureType::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
 	}
 
 };
