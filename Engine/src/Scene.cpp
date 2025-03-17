@@ -300,7 +300,7 @@ void Scene::draw(float deltaTime)
 
 		m_deferredRenderer->renderScene(this);
 
-		m_deferredRenderer->renderSceneUsingCustomShader(this);
+		//m_deferredRenderer->renderSceneUsingCustomShader(this);
 
 		unsigned int srcID = m_deferredRenderer->getGBuffer().getID();
 		unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
