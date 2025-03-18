@@ -12,6 +12,27 @@ static Color getPixel(int i, int j)
 	return { r, g, 0 };
 }
 
+class ShaderToyScript : public ScriptableEntity
+{
+	virtual void onCreate() override
+	{
+		int width = Engine::get()->getWindow()->getWidth();
+		int height = Engine::get()->getWindow()->getHeight();
+
+		auto& image = entity.getComponent<ImageComponent>();
+		image.image = Texture::createEmptyTexture(width, height);
+		image.size = glm::vec2(width, height);
+		image.position = glm::vec2(0, 0);
+
+	}
+
+	virtual void onUpdate(float deltaTime) {
+	};
+
+};
+
+
+
 class ShaderToy : public Application
 {
 public:
@@ -19,27 +40,42 @@ public:
 	void start() override
 	{
 		auto ent = Engine::get()->getContext()->getActiveScene()->createEntity();
+		ent.addComponent<ImageComponent>();
+		ent.addComponent<NativeScriptComponent>().bind<ShaderToyScript>();
+		ent.addComponent<ShaderComponent>();
 
-		int width = Engine::get()->getWindow()->getWidth();
-		int height = Engine::get()->getWindow()->getHeight();
+		auto& shader = ShaderBuilder::create("Resources/Content/Shaders/BasicShader.glsl").build();
+		ent.addComponent<ShaderComponent>(shader);
 
-		auto tex = Texture::createEmptyTexture(width, height);
+		// I need the shader to write into the texture I created,
+		// si I need to have a FBO / RenderView, 
+		// set it up
+		// bind it 
+		// render using the specified shader (maybe override the image pixel shader?)
+		// 
+		// basically what I want is to be able to draw onto a texture
+		// and then use that texture to render 
+		// what i can do is use 2 objects
+		// one render into a texture
+		// the other is using that texture
+		// the second I have implemented
+		// also I need types of shaders overrides, i dont need the base shader here
+		// shader needs 2 more things: 
+		// override type and projection target
+		// think about override type more.. need to see current functionality.
+		
 
-		auto& img = ent.addComponent<ImageComponent>(tex);
-		img.size = glm::vec2(width, height);
-		img.position = glm::vec2(0, 0);
+		//int* pixels = new int[width * height];
+		//for (int i = 0; i < height; i++)
+		//{
+		//	for (int j = 0; j < width; j++)
+		//	{
+		//		auto pixel = getPixel(i, j);
+		//		pixels[i * width + j] = 0xFF << 24 | (pixel.b << 16) | (pixel.g << 8) | pixel.r;
+		//	}
+		//}
 
-		int* pixels = new int[width * height];
-		for (int i = 0; i < height; i++)
-		{
-			for (int j = 0; j < width; j++)
-			{
-				auto pixel = getPixel(i, j);
-				pixels[i * width + j] = 0xFF << 24 | (pixel.b << 16) | (pixel.g << 8) | pixel.r;
-			}
-		}
-
-		tex.get()->setData(0, 0, width, height, pixels);
+		//tex.get()->setData(0, 0, width, height, pixels);
 	}
 
 };
