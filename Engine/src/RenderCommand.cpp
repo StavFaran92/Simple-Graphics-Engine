@@ -53,7 +53,7 @@ void RenderCommand::setViewport(int x, int y, int w, int h)
 	glViewport(x, y, w, h);
 }
 
-void RenderCommand::copyFrameBufferData(unsigned int src, unsigned int dst)
+void RenderCommand::copyFrameBufferData(unsigned int src, unsigned int dst, int bufferBit)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
@@ -72,7 +72,7 @@ void RenderCommand::copyFrameBufferData(unsigned int src, unsigned int dst)
 	// Copy src to dest
 	glBlitFramebuffer(0, 0, viewport.w, viewport.h,
 		0, 0, viewport.w, viewport.h,
-		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		bufferBit, GL_NEAREST);
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, dst);
