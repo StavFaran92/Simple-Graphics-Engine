@@ -6,6 +6,7 @@
 
 #include "ScriptableEntity.h"
 #include "Configurations.h"
+#include "RenderView.h"
 #include "Mesh.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "Physics.h"
@@ -332,13 +333,21 @@ struct EngineAPI ObjectComponent : public Component
 
 struct EngineAPI ShaderComponent : public Component
 {
-	ShaderComponent() = default;
-	ShaderComponent(Shader* vertexShader, Shader* fragmentShader) : m_vertexShader(vertexShader), m_fragmentShader(fragmentShader) {};
+	enum ProjectionType : int
+	{
+		DefaultProjection = 0,
+		Texture2D = 1
+	};
+
+	ShaderComponent();
+	ShaderComponent(Shader* vertexShader, Shader* fragmentShader);
 
 	void addTexture(const std::string& name, Resource<Texture> texture)
 	{
 		customTextures[name] = texture;
 	}
+
+	void setProjectionTexture(Resource<Texture> texture);
 
 	//template <class Archive>
 	//void serialize(Archive& archive) {
@@ -349,6 +358,10 @@ struct EngineAPI ShaderComponent : public Component
 	Shader* m_fragmentShader = nullptr;
 
 	std::map<std::string, Resource<Texture>> customTextures;
+
+	ProjectionType projection = ProjectionType::DefaultProjection;
+	Resource<Texture> projectionTexture;
+	std::shared_ptr<RenderView> renderViewProjection;
 };
 
 struct EngineAPI InstanceBatch : public Component

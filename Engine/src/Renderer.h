@@ -24,6 +24,8 @@ public:
 
 	void render();
 
+	void renderSceneUsingCustomShader(Scene* scene);
+
 	void enableWireframeMode(bool enable);
 	// Inherited via IRenderer
 	void renderScene(Scene*) override;
@@ -34,4 +36,8 @@ protected:
 	bool m_wireFrameMode = false;
 
 	Scene* m_scene = nullptr;
+
+	std::shared_ptr<Shader> m_pbrShader = nullptr;
+	Entity m_quad;
+
 };

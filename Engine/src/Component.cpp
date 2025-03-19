@@ -108,3 +108,16 @@ glm::mat4 CameraComponent::getProjection() const
 	if (type == CamType::PERSPECTIVE) return glm::perspective(fovy, aspect, znear, zfar);
 	if (type == CamType::ORTHOGRAPHIC) return glm::ortho(-100, 100, -100, 100);
 }
+
+ShaderComponent::ShaderComponent(Shader* vertexShader, Shader* fragmentShader)
+	: m_vertexShader(vertexShader), m_fragmentShader(fragmentShader)
+{
+	RenderView::Viewport v{ 0, 0, 1280, 720 }; // TODO fixx
+
+	renderViewProjection = std::make_shared<RenderView>(v, Entity::EmptyEntity);
+};
+
+void ShaderComponent::setProjectionTexture(Resource<Texture> texture)
+{
+	renderViewProjection->setTexture(texture);
+};

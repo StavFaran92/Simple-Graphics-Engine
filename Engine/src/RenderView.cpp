@@ -49,6 +49,12 @@ unsigned int RenderView::getRenderTargetFrameBufferID() const
 	return m_renderTargetFBO->getID();
 }
 
+void RenderView::setTexture(Resource<Texture> texture)
+{
+	// TODO Is this OK??
+	m_renderTargetFBO->attachTexture(texture.get()->getID(), GL_COLOR_ATTACHMENT0);
+}
+
 void RenderView::bind()
 {
 	m_renderTargetFBO->bind();

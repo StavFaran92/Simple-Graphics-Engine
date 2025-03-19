@@ -26,6 +26,8 @@ public:
 
 	unsigned int getRenderTargetFrameBufferID() const;
 
+	void setTexture(Resource<Texture> texture);
+
 	void bind();
 	void unbind();
 

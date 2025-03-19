@@ -12,24 +12,24 @@ static Color getPixel(int i, int j)
 	return { r, g, 0 };
 }
 
-class ShaderToyScript : public ScriptableEntity
-{
-	virtual void onCreate() override
-	{
-		int width = Engine::get()->getWindow()->getWidth();
-		int height = Engine::get()->getWindow()->getHeight();
-
-		auto& image = entity.getComponent<ImageComponent>();
-		image.image = Texture::createEmptyTexture(width, height);
-		image.size = glm::vec2(width, height);
-		image.position = glm::vec2(0, 0);
-
-	}
-
-	virtual void onUpdate(float deltaTime) {
-	};
-
-};
+//class ShaderToyScript : public ScriptableEntity
+//{
+//	virtual void onCreate() override
+//	{
+//		int width = Engine::get()->getWindow()->getWidth();
+//		int height = Engine::get()->getWindow()->getHeight();
+//
+//		auto& image = entity.getComponent<ImageComponent>();
+//		image.image = Texture::createEmptyTexture(width, height);
+//		image.size = glm::vec2(width, height);
+//		image.position = glm::vec2(0, 0);
+//
+//	}
+//
+//	virtual void onUpdate(float deltaTime) {
+//	};
+//
+//};
 
 
 
@@ -39,13 +39,22 @@ public:
 
 	void start() override
 	{
-		auto ent = Engine::get()->getContext()->getActiveScene()->createEntity();
-		ent.addComponent<ImageComponent>();
-		ent.addComponent<NativeScriptComponent>().bind<ShaderToyScript>();
-		ent.addComponent<ShaderComponent>();
+		auto projectionEnt = Engine::get()->getContext()->getActiveScene()->createEntity();
+		auto displayEnt = Engine::get()->getContext()->getActiveScene()->createEntity();
+
+		int width = Engine::get()->getWindow()->getWidth();
+		int height = Engine::get()->getWindow()->getHeight();
+		auto projectionTexture = Texture::createEmptyTexture(width, height);
 
 		auto& shader = ShaderBuilder::create("Resources/Content/Shaders/BasicShader.glsl").build();
-		ent.addComponent<ShaderComponent>(shader);
+		shader.setProjectionTexture(projectionTexture);
+		shader.projection = ShaderComponent::ProjectionType::Texture2D;
+		projectionEnt.addComponent<ShaderComponent>(shader);
+
+		auto& image = displayEnt.addComponent<ImageComponent>();
+		image.image = projectionTexture;
+		image.size = { width, height };
+
 
 		// I need the shader to write into the texture I created,
 		// si I need to have a FBO / RenderView, 
@@ -63,6 +72,7 @@ public:
 		// shader needs 2 more things: 
 		// override type and projection target
 		// think about override type more.. need to see current functionality.
+		//shader component will have projection and allow to project to texture
 		
 
 		//int* pixels = new int[width * height];
