@@ -300,14 +300,14 @@ void Scene::draw(float deltaTime)
 
 		m_deferredRenderer->renderScene(this);
 
-		m_deferredRenderer->renderSceneUsingCustomShader(this);
-
 		unsigned int srcID = m_deferredRenderer->getGBuffer().getID();
 		unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
 
 		RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
 
 		m_forwardRenderer->renderScene(this);
+
+		m_forwardRenderer->renderSceneUsingCustomShader(this);
 
 		// Render skybox
 		glDepthMask(GL_FALSE);

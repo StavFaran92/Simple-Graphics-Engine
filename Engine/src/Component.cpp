@@ -111,20 +111,17 @@ glm::mat4 CameraComponent::getProjection() const
 
 ShaderComponent::ShaderComponent()
 {
-	RenderView::Viewport v{ 0, 0, 1280, 720 }; // TODO fixx
-
-	renderViewProjection = std::make_shared<RenderView>(v, Entity::EmptyEntity);
+	renderViewProjection = std::make_shared<RenderView>(RenderView::Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
 };
 
 ShaderComponent::ShaderComponent(Shader* vertexShader, Shader* fragmentShader)
 	: m_vertexShader(vertexShader), m_fragmentShader(fragmentShader)
 {
-	RenderView::Viewport v{ 0, 0, 1280, 720 }; // TODO fixx
-
-	renderViewProjection = std::make_shared<RenderView>(v, Entity::EmptyEntity);
+	renderViewProjection = std::make_shared<RenderView>(RenderView::Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
 };
 
 void ShaderComponent::setProjectionTexture(Resource<Texture> texture)
 {
+	renderViewProjection->bind();
 	renderViewProjection->setTexture(texture);
 };
