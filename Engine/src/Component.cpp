@@ -111,6 +111,9 @@ glm::mat4 CameraComponent::getProjection() const
 
 ShaderComponent::ShaderComponent()
 {
+	RenderView::Viewport v{ 0, 0, 1280, 720 }; // TODO fixx
+
+	renderViewProjection = std::make_shared<RenderView>(v, Entity::EmptyEntity);
 };
 
 ShaderComponent::ShaderComponent(Shader* vertexShader, Shader* fragmentShader)

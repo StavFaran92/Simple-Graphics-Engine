@@ -29,13 +29,7 @@ out VS_OUT {
 
 // ----- Uniforms ----- //
 
-uniform mat4 projection;
-uniform mat4 view;
-uniform mat4 model;
 uniform mat4 finalBonesMatrices[MAX_BONES];
-
-uniform bool isAnimated;
-uniform bool isGpuInstanced;
 
 #ifdef CUSTOM_SHADER
 #custom_vert
@@ -205,6 +199,32 @@ vec3 PointLightRadiance(PointLight pLight, Surface s)
     float cosTheta = max(0.0, dot(s.N, s.L));
 
     return calculateBRDF(s) * radiance * cosTheta;
+}
+
+#define CHANNEL_NONE 0
+#define CHANNEL_R 1
+#define CHANNEL_G 2
+#define CHANNEL_B 3
+#define CHANNEL_A 4
+
+float extractChannel(vec4 inputColor, int channelMask) 
+{
+    if (channelMask == CHANNEL_NONE) return 0.f;
+    if (channelMask == CHANNEL_R) return inputColor.r;
+    if (channelMask == CHANNEL_G) return inputColor.g;
+    if (channelMask == CHANNEL_B) return inputColor.b;
+    if (channelMask == CHANNEL_A) return inputColor.a;
+
+    return 0;
+}
+
+vec4 getPBRTexture(PBR_Sampler s)
+{
+	vec4 color = texture(s.texture, fs_in.texCoord * vec2(s.xScale, s.yScale) + vec2(s.xOffset, s.yOffset)).rgba;
+	return vec4(extractChannel(color, s.channelMaskR), 
+				extractChannel(color, s.channelMaskG), 
+				extractChannel(color, s.channelMaskB), 
+				extractChannel(color, s.channelMaskA));
 }
 
 void main()
