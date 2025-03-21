@@ -109,6 +109,10 @@ glm::mat4 CameraComponent::getProjection() const
 	if (type == CamType::ORTHOGRAPHIC) return glm::ortho(-100, 100, -100, 100);
 }
 
+ShaderComponent::ShaderComponent()
+{
+};
+
 ShaderComponent::ShaderComponent(Shader* vertexShader, Shader* fragmentShader)
 	: m_vertexShader(vertexShader), m_fragmentShader(fragmentShader)
 {

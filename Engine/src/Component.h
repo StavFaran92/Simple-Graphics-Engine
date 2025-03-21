@@ -340,6 +340,7 @@ struct EngineAPI ShaderComponent : public Component
 	};
 
 	ShaderComponent();
+	
 	ShaderComponent(Shader* vertexShader, Shader* fragmentShader);
 
 	void addTexture(const std::string& name, Resource<Texture> texture)
