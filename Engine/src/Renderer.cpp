@@ -212,10 +212,12 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
         // bind shader
         auto& shaderComponent = graphics->entity->getComponent<ShaderComponent>();
-        Shader* fragmentShader = shaderComponent.m_fragmentShader ?
+        Shader* shader = shaderComponent.m_fragmentShader ?
             shaderComponent.m_fragmentShader : m_pbrShader.get();
         fragmentShader->use();
         graphics->shader = fragmentShader;
+
+
 
         // Bind mesh
         Resource<MeshCollection> meshCollecton;

@@ -7,15 +7,21 @@
 #include "Shader.h"
 #include "Component.h"
 
-class EngineAPI ShaderBuilder
+class EngineAPI CustomShaderBuilder
 {
 public:
-	static ShaderBuilder& create(const std::string& filePath);
+	enum class ShaderOverride
+	{
+		PBR,
+		Pixel
+	};
+
+	static CustomShaderBuilder& create(const std::string& filePath, ShaderOverride shaderOverride);
 
 	ShaderComponent build();
 
 private:
-	ShaderBuilder(const std::string& filePath);
+	CustomShaderBuilder(const std::string& filePath, ShaderOverride shaderOverride);
 
 private:
 	std::string m_filepath;

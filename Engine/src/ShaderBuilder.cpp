@@ -107,18 +107,18 @@ std::string embedCustomShaderInUberShader(std::string& customShaderSource, std::
 
 
 
-ShaderBuilder& ShaderBuilder::create(const std::string& filePath)
+CustomShaderBuilder& CustomShaderBuilder::create(const std::string& filePath, ShaderOverride shaderOverride)
 {
-	ShaderBuilder* shaderBuilder = new ShaderBuilder(filePath);
+	CustomShaderBuilder* shaderBuilder = new CustomShaderBuilder(filePath, shaderOverride);
 
 
 
 	return *shaderBuilder;
 }
 
-ShaderBuilder::ShaderBuilder(const std::string& filePath) : m_filepath(filePath) { }
+CustomShaderBuilder::CustomShaderBuilder(const std::string& filePath, ShaderOverride shaderOverride) : m_filepath(filePath) { }
 
-ShaderComponent ShaderBuilder::build()
+ShaderComponent CustomShaderBuilder::build()
 {
 	ShaderComponent shaderComponent;
 

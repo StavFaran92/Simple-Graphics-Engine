@@ -95,7 +95,7 @@ private:
 	void setMat3(const std::string& name, const glm::mat3& v);
 	void setMat4(const std::string& name, const glm::mat4& v);
 
-	friend class ShaderBuilder;
+	friend class CustomShaderBuilder;
 
 protected:
 	unsigned int m_id;

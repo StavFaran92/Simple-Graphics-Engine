@@ -4,12 +4,12 @@
                                                                                     
 layout (location = 0) in vec3 aPos;                                              
 
-out vec2 fragPos;
+out vec2 uv;
                                                                                     
 void main()                                                                         
 {
     vec3 pos = aPos;
-    //fragPos = (pos.xy + 1.0) / 2.0; // Transform from [-1, 1] to [0, 1] range
+    uv = (pos.xy + 1.0) / 2.0; // Transform from [-1, 1] to [0, 1] range
     gl_Position = vec4(pos.xy, 1.0, 1.0);                                       
 }
 
@@ -19,13 +19,16 @@ void main()
 
 // ----- In ----- //
 
-out vec3 fragPos;
+// UV [0,1]
+in vec2 uv;
 
 // ----- Out ----- //
 
 out vec4 FragColor;
 
 // ----- Uniforms ----- //
+uniform vec3 cameraPos;
+uniform vec3 cameraLookAt;
 
 // ----- Methods ----- //
 
