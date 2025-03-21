@@ -28,6 +28,7 @@
 #include "RenderView.h"
 #include "ScreenQuad.h"
 #include "RenderCommand.h"
+#include "ShapeFactory.h"
 
 
 Renderer::Renderer(Scene* scene)
@@ -201,12 +202,31 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 	glEnable(GL_DEPTH_TEST);
 
 	// Filter objects to acquire only custom shader objects
-	for (auto&& [entity, mesh, transform, renderable, shader] :
-		scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent, ShaderComponent>().each())
+	for (auto&& [entity/*, mesh*/, transform, renderable, shader] :
+		scene->getRegistry().getRegistry().view</*MeshComponent, */Transformation, RenderableComponent, ShaderComponent>().each())
 	{
 		Entity entityHandler{ entity, &scene->getRegistry() };
 
-		Resource<MeshCollection> meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
+        graphics->entity = &entityHandler;
+
+        // bind shader
+        auto& shaderComponent = graphics->entity->getComponent<ShaderComponent>();
+        Shader* fragmentShader = shaderComponent.m_fragmentShader ?
+            shaderComponent.m_fragmentShader : m_pbrShader.get();
+        fragmentShader->use();
+        graphics->shader = fragmentShader;
+
+        // Bind mesh
+        Resource<MeshCollection> meshCollecton;
+
+        if (shader.projection == ShaderComponent::DefaultProjection)
+        {
+            meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
+        }
+        else if (shader.projection == ShaderComponent::Texture2D)
+        {
+            meshCollecton = m_quad.getComponent<MeshComponent>().mesh;
+        }
 
 		// fill bone animation data
 		auto animator = entityHandler.tryGetComponent<Animator>();
@@ -226,20 +246,13 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 			graphics->shader->setUniformValue("isAnimated", true);
 		}
 
-		// bind shader
-		auto& shaderComponent = graphics->entity->getComponent<ShaderComponent>();
-		Shader* fragmentShader = shaderComponent.m_fragmentShader ?
-			shaderComponent.m_fragmentShader : m_pbrShader.get();
-		fragmentShader->use();
+		
 
 		for (auto mesh : meshCollecton.get()->getMeshes())
 		{
-
-			graphics->entity = graphics->entity;
 			graphics->mesh = mesh.get();
 			auto& transform = graphics->entity->getComponent<Transformation>();
 			graphics->model = &transform.getWorldTransformation();
-			graphics->shader = fragmentShader;
 
 			// TODO get this to work
 			AABB& aabb = mesh.get()->getAABB();
@@ -257,12 +270,19 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             fragmentShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
 
 			auto matIndex = mesh->getMaterialIndex();
-			auto& materialComponent = graphics->entity->getComponent<MaterialComponent>();
-			graphics->material = materialComponent.at(matIndex).get();
-			if (!graphics->material)
-			{
-				graphics->material = Engine::get()->getDefaultMaterial().get();
-			}
+			auto materialComponent = graphics->entity->tryGetComponent<MaterialComponent>();
+            if (!materialComponent)
+            {
+                graphics->material = Engine::get()->getDefaultMaterial().get();
+            }
+            else
+            {
+                graphics->material = materialComponent->at(matIndex).get();
+                if (!graphics->material)
+                {
+                    graphics->material = Engine::get()->getDefaultMaterial().get();
+                }
+            }
 
 			{
 				int currentSlot = 8;

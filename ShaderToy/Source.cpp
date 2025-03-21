@@ -50,6 +50,7 @@ public:
 		shader.setProjectionTexture(projectionTexture);
 		shader.projection = ShaderComponent::ProjectionType::Texture2D;
 		projectionEnt.addComponent<ShaderComponent>(shader);
+		projectionEnt.addComponent<RenderableComponent>(); // todo reevaluate
 
 		auto& image = displayEnt.addComponent<ImageComponent>();
 		image.image = projectionTexture;
