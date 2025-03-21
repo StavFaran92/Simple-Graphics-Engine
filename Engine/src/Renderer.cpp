@@ -200,7 +200,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 
 	// Filter objects to acquire only custom shader objects
 	for (auto&& [entity/*, mesh*/, transform, renderable, shader] :

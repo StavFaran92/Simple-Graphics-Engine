@@ -1,20 +1,16 @@
 #vert
 
-#version 330
+#version 330                                                                        
+                                                                                    
+layout (location = 0) in vec3 aPos;                                              
 
-layout (location = 0) in vec3 pos;
-
-// ----- Out ----- //
-
-out vec3 fragPos;
-
-// ----- Uniforms ----- //
-
-void main()
+out vec2 fragPos;
+                                                                                    
+void main()                                                                         
 {
-    fragPos = pos;
-
-    gl_Position = vec4(pos, 1.0);
+    vec3 pos = aPos;
+    //fragPos = (pos.xy + 1.0) / 2.0; // Transform from [-1, 1] to [0, 1] range
+    gl_Position = vec4(pos.xy, 1.0, 1.0);                                       
 }
 
 #frag
