@@ -390,26 +390,26 @@ void Scene::draw(float deltaTime)
 		m_UIShader->setProjectionMatrix(m_defaultUIProjection);
 		auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
 
-		for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
-		{
-			Entity entityhandler{ entity, m_registry.get() };
-			graphics->entity = &entityhandler;
-			image.image.get()->bind();
-			image.image.get()->setSlot(0);
+		//for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
+		//{
+		//	Entity entityhandler{ entity, m_registry.get() };
+		//	graphics->entity = &entityhandler;
+		//	image.image.get()->bind();
+		//	image.image.get()->setSlot(0);
 
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(image.position, 0.0f));
+		//	glm::mat4 model = glm::mat4(1.0f);
+		//	model = glm::translate(model, glm::vec3(image.position, 0.0f));
 
-			model = glm::translate(model, glm::vec3(0.5f * image.size.x, 0.5f * image.size.y, 0.0f));
-			model = glm::rotate(model, glm::radians(image.rotate), glm::vec3(0.0f, 0.0f, 1.0f));
-			model = glm::translate(model, glm::vec3(-0.5f * image.size.x, -0.5f * image.size.y, 0.0f));
+		//	model = glm::translate(model, glm::vec3(0.5f * image.size.x, 0.5f * image.size.y, 0.0f));
+		//	model = glm::rotate(model, glm::radians(image.rotate), glm::vec3(0.0f, 0.0f, 1.0f));
+		//	model = glm::translate(model, glm::vec3(-0.5f * image.size.x, -0.5f * image.size.y, 0.0f));
 
-			model = glm::scale(model, glm::vec3(image.size, 1.0f));
+		//	model = glm::scale(model, glm::vec3(image.size, 1.0f));
 
-			m_UIShader->setUniformValue("model", model);
+		//	m_UIShader->setUniformValue("model", model);
 
-			RenderCommand::draw(vao);
-		}
+		//	RenderCommand::draw(vao);
+		//}
 
 		glDisable(GL_BLEND);
 

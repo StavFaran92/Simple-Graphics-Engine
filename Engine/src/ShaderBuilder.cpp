@@ -148,7 +148,7 @@ ShaderComponent ShaderBuilder::build()
 
 	if (!customShaders.fragmentCode.empty())
 	{
-		std::string& lightPassShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+		std::string& lightPassShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl");
 
 		ShadersInfo shaders;
 		Engine::get()->getShaderLoader()->parseGLSLShader(lightPassShaderSources, shaders);
