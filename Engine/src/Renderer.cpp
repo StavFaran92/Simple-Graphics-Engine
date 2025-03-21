@@ -203,7 +203,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 	//glEnable(GL_DEPTH_TEST);
 
 	// Filter objects to acquire only custom shader objects
-	for (auto&& [entity/*, mesh*/, transform, renderable, shader] :
+	for (auto&& [entity/*, mesh*/, transform, renderable, shaderComponent] :
 		scene->getRegistry().getRegistry().view</*MeshComponent, */Transformation, RenderableComponent, ShaderComponent>().each())
 	{
 		Entity entityHandler{ entity, &scene->getRegistry() };
@@ -212,108 +212,175 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
         // bind shader
         auto& shaderComponent = graphics->entity->getComponent<ShaderComponent>();
-        Shader* shader = shaderComponent.m_fragmentShader ?
-            shaderComponent.m_fragmentShader : m_pbrShader.get();
-        fragmentShader->use();
-        graphics->shader = fragmentShader;
+        Shader* shader = shaderComponent.m_customShader ? shaderComponent.m_customShader : m_pbrShader.get();
+        shader->use();
+        graphics->shader = shader;
 
-
-
-        // Bind mesh
-        Resource<MeshCollection> meshCollecton;
-
-        if (shader.projection == ShaderComponent::DefaultProjection)
+        if (shaderComponent.shaderOverride == ShaderOverride::PBR)
         {
-            meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
-        }
-        else if (shader.projection == ShaderComponent::Texture2D)
-        {
-            meshCollecton = m_quad.getComponent<MeshComponent>().mesh;
-        }
+            // Bind mesh
+            Resource<MeshCollection> meshCollecton;
 
-		// fill bone animation data
-		auto animator = entityHandler.tryGetComponent<Animator>();
-		if (!animator || animator->m_currentAnimation.isEmpty())
-		{
-			graphics->shader->setUniformValue("isAnimated", false);
-		}
-		else
-		{
-			std::vector<glm::mat4> finalBoneMatrices;
-			animator->getFinalBoneMatrices(meshCollecton.get(), finalBoneMatrices);
-			for (int i = 0; i < finalBoneMatrices.size(); ++i)
-			{
-				graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
-			}
-
-			graphics->shader->setUniformValue("isAnimated", true);
-		}
-
-		
-
-		for (auto mesh : meshCollecton.get()->getMeshes())
-		{
-			graphics->mesh = mesh.get();
-			auto& transform = graphics->entity->getComponent<Transformation>();
-			graphics->model = &transform.getWorldTransformation();
-
-			// TODO get this to work
-			AABB& aabb = mesh.get()->getAABB();
-			aabb.adjustToTransform(transform);
-
-			if (!aabb.isOnFrustum(*graphics->frustum))
-			{
-				//continue; todo fix
-			}
-
-            fragmentShader->bindUniformBlockToBindPoint("Time", 0);
-            fragmentShader->bindUniformBlockToBindPoint("Lights", 1);
-
-            fragmentShader->setUniformValue("cameraPos", graphics->cameraPos);
-            fragmentShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
-
-			auto matIndex = mesh->getMaterialIndex();
-			auto materialComponent = graphics->entity->tryGetComponent<MaterialComponent>();
-            if (!materialComponent)
+            if (shaderComponent.projection == ShaderComponent::DefaultProjection)
             {
-                graphics->material = Engine::get()->getDefaultMaterial().get();
+                meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
+            }
+            else if (shaderComponent.projection == ShaderComponent::Texture2D)
+            {
+                meshCollecton = m_quad.getComponent<MeshComponent>().mesh;
+            }
+
+            // fill bone animation data
+            auto animator = entityHandler.tryGetComponent<Animator>();
+            if (!animator || animator->m_currentAnimation.isEmpty())
+            {
+                graphics->shader->setUniformValue("isAnimated", false);
             }
             else
             {
-                graphics->material = materialComponent->at(matIndex).get();
-                if (!graphics->material)
+                std::vector<glm::mat4> finalBoneMatrices;
+                animator->getFinalBoneMatrices(meshCollecton.get(), finalBoneMatrices);
+                for (int i = 0; i < finalBoneMatrices.size(); ++i)
+                {
+                    graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
+                }
+
+                graphics->shader->setUniformValue("isAnimated", true);
+            }
+
+
+
+            for (auto mesh : meshCollecton.get()->getMeshes())
+            {
+                graphics->mesh = mesh.get();
+                auto& transform = graphics->entity->getComponent<Transformation>();
+                graphics->model = &transform.getWorldTransformation();
+
+                // TODO get this to work
+                AABB& aabb = mesh.get()->getAABB();
+                aabb.adjustToTransform(transform);
+
+                if (!aabb.isOnFrustum(*graphics->frustum))
+                {
+                    //continue; todo fix
+                }
+
+                graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+                graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+
+                graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+                graphics->shader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
+
+                auto matIndex = mesh->getMaterialIndex();
+                auto materialComponent = graphics->entity->tryGetComponent<MaterialComponent>();
+                if (!materialComponent)
                 {
                     graphics->material = Engine::get()->getDefaultMaterial().get();
                 }
+                else
+                {
+                    graphics->material = materialComponent->at(matIndex).get();
+                    if (!graphics->material)
+                    {
+                        graphics->material = Engine::get()->getDefaultMaterial().get();
+                    }
+                }
+
+                {
+                    int currentSlot = 8;
+                    for (const auto& [texName, texture] : shaderComponent.customTextures)
+                    {
+                        texture.get()->setSlot(currentSlot);
+                        texture.get()->bind();
+                        graphics->shader->setUniformValue(texName, currentSlot);
+                        currentSlot++;
+                    }
+                }
+
+                // if texture projection is enabled bind to custom FBO
+                if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
+                {
+                    graphics->renderView = shaderComponent.renderViewProjection;
+                }
+
+                graphics->renderView->bind();
+
+                {
+                    // render to quad
+                    auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
+                    RenderCommand::draw(mesh->getVAO());
+                }
+
+                graphics->renderView->unbind();
             }
+        }
 
-			{
-				int currentSlot = 8;
-				for (const auto& [texName, texture] : shaderComponent.customTextures)
-				{
-					texture.get()->setSlot(currentSlot);
-					texture.get()->bind();
-					fragmentShader->setUniformValue(texName, currentSlot);
-					currentSlot++;
-				}
-			}
+        else if (shaderComponent.shaderOverride == ShaderOverride::Pixel)
+        {
+            // Bind mesh
+            Resource<MeshCollection> meshCollecton;
 
-			// if texture projection is enabled bind to custom FBO
-            if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
+            if (shaderComponent.projection == ShaderComponent::DefaultProjection)
             {
-                graphics->renderView = shaderComponent.renderViewProjection;
+                meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
+            }
+            else if (shaderComponent.projection == ShaderComponent::Texture2D)
+            {
+                meshCollecton = m_quad.getComponent<MeshComponent>().mesh;
             }
 
-            graphics->renderView->bind();
+            for (auto mesh : meshCollecton.get()->getMeshes())
+            {
+                graphics->mesh = mesh.get();
+                auto& transform = graphics->entity->getComponent<Transformation>();
+                graphics->model = &transform.getWorldTransformation();
 
-			{
-				// render to quad
-				auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
-				RenderCommand::draw(mesh->getVAO());
-			}
+                // TODO get this to work
+                AABB& aabb = mesh.get()->getAABB();
+                aabb.adjustToTransform(transform);
 
-			graphics->renderView->unbind();
-		}
+                if (!aabb.isOnFrustum(*graphics->frustum))
+                {
+                    //continue; todo fix
+                }
+
+                graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+
+                graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
+                glm::vec3 camView = {};// todo get cam view from view matrix
+                graphics->shader->setUniformValue("cameraLookAt", camView);
+
+                {
+                    int currentSlot = 8;
+                    for (const auto& [texName, texture] : shaderComponent.customTextures)
+                    {
+                        texture.get()->setSlot(currentSlot);
+                        texture.get()->bind();
+                        graphics->shader->setUniformValue(texName, currentSlot);
+                        currentSlot++;
+                    }
+                }
+
+                // if texture projection is enabled bind to custom FBO
+                if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
+                {
+                    graphics->renderView = shaderComponent.renderViewProjection;
+                }
+
+                graphics->renderView->bind();
+
+                {
+                    // render to quad
+                    auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
+                    RenderCommand::draw(mesh->getVAO());
+                }
+
+                graphics->renderView->unbind();
+            }
+        }
+
+        
 	}
 
 }

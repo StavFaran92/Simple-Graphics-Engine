@@ -10,11 +10,6 @@
 class EngineAPI CustomShaderBuilder
 {
 public:
-	enum class ShaderOverride
-	{
-		PBR,
-		Pixel
-	};
 
 	static CustomShaderBuilder& create(const std::string& filePath, ShaderOverride shaderOverride);
 
@@ -25,4 +20,5 @@ private:
 
 private:
 	std::string m_filepath;
+	ShaderOverride m_shaderOverride;
 };

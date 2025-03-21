@@ -331,6 +331,12 @@ struct EngineAPI ObjectComponent : public Component
 	Entity e = Entity::EmptyEntity;
 };
 
+enum class ShaderOverride
+{
+	PBR,
+	Pixel
+};
+
 struct EngineAPI ShaderComponent : public Component
 {
 	enum ProjectionType : int
@@ -357,6 +363,11 @@ struct EngineAPI ShaderComponent : public Component
 
 	Shader* m_vertexShader = nullptr;
 	Shader* m_fragmentShader = nullptr;
+
+	// This will only be used by forward renderer, ignored by deffered
+	Shader* m_customShader = nullptr;
+
+	ShaderOverride shaderOverride;
 
 	std::map<std::string, Resource<Texture>> customTextures;
 

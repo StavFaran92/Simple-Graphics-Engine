@@ -46,7 +46,7 @@ public:
 		int height = Engine::get()->getWindow()->getHeight();
 		auto projectionTexture = Texture::createEmptyTexture(width, height);
 
-		auto& shader = ShaderBuilder::create("Resources/Content/Shaders/BasicShader.glsl").build();
+		auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/BasicShader.glsl", ShaderOverride::Pixel).build();
 		shader.setProjectionTexture(projectionTexture);
 		shader.projection = ShaderComponent::ProjectionType::Texture2D;
 		projectionEnt.addComponent<ShaderComponent>(shader);
