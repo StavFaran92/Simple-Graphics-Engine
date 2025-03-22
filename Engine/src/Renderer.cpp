@@ -90,7 +90,6 @@ void Renderer::renderScene(Scene* scene)
     }
 
     glEnable(GL_DEPTH_TEST);
-    SetDrawType(Renderer::DrawType::Triangles);
 
     graphics->renderView->bind();
 
