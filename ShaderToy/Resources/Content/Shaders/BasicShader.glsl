@@ -1,6 +1,10 @@
 #frag
 
+// i need UV
+// camera access
+// 
+
 void frag(inout vec3 color)
 {
-	color = vec3(0.023497, 0.451692, 1.0);
+	color = vec3(uv.xy, 0.0);
 }

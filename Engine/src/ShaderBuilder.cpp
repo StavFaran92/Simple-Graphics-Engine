@@ -165,6 +165,7 @@ ShaderComponent CustomShaderBuilder::build()
 			shader->BuildShaders(shaders);
 
 			shaderComponent.m_fragmentShader = shader;
+			shaderComponent.shaderOverride = ShaderOverride::PBR;
 		}
 	}
 	else if (m_shaderOverride == ShaderOverride::Pixel)
@@ -188,6 +189,7 @@ ShaderComponent CustomShaderBuilder::build()
 			shader->BuildShaders(shaders);
 
 			shaderComponent.m_customShader = shader;
+			shaderComponent.shaderOverride = ShaderOverride::Pixel;
 		}
 	}
 
