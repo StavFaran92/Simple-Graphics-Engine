@@ -305,7 +305,7 @@ void Scene::draw(float deltaTime)
 
 		RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
 
-		//m_forwardRenderer->renderScene(this);
+		m_forwardRenderer->renderScene(this);
 
 		m_forwardRenderer->renderSceneUsingCustomShader(this);
 

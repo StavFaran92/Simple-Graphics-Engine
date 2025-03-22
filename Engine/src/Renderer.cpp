@@ -199,8 +199,6 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-	//glEnable(GL_DEPTH_TEST);
-
 	// Filter objects to acquire only custom shader objects
 	for (auto&& [entity/*, mesh*/, transform, renderable, shaderComponent] :
 		scene->getRegistry().getRegistry().view</*MeshComponent, */Transformation, RenderableComponent, ShaderComponent>().each())
@@ -364,6 +362,8 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 // if texture projection is enabled bind to custom FBO
                 if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
                 {
+                    glDisable(GL_DEPTH_TEST);
+
                     graphics->renderView = shaderComponent.renderViewProjection;
                 }
 
