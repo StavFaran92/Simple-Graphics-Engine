@@ -13,7 +13,7 @@ public:
 		ImGui::SetCurrentContext((ImGuiContext*)Engine::get()->getImguiHandler()->getCurrentContext());
 
 		auto quad = Engine::get()->getContext()->getActiveScene()->createEntity();
-		auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import("C:/Users/Stav/Documents/blender/plane_v2.fbx");
+		auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import("Resources/Content/Meshes/sd_plane.fbx");
 
 		quad.addComponent<MeshComponent>(quadModel.mesh);
 
@@ -29,7 +29,7 @@ public:
 private:
 	void createPool(Entity quad)
 	{
-		auto& shader = ShaderBuilder::create("Resources/Content/Shaders/WaterShader.glsl").build();
+		auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/WaterShader.glsl", ShaderOverride::PBR).build();
 
 		auto brickTexture = Engine::get()->getSubSystem<Assets>()->importTexture2D("Resources/Content/Textures/water_new_height.png");
 		shader.addTexture("waterNormalSampler", brickTexture);
@@ -44,7 +44,7 @@ private:
 
 	void createOcean(Entity quad)
 	{
-		auto& shader = ShaderBuilder::create("Resources/Content/Shaders/OceanShader.glsl").build();
+		auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/OceanShader.glsl", ShaderOverride::PBR).build();
 
 		quad.addComponent<ShaderComponent>(shader);
 
