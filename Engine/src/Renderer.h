@@ -22,8 +22,6 @@ public:
 
 	bool init() override;
 
-	void render();
-
 	void renderSceneUsingCustomShader(Scene* scene);
 
 	void enableWireframeMode(bool enable);

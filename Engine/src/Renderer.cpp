@@ -38,35 +38,13 @@ Renderer::Renderer(Scene* scene)
 
 bool Renderer::init()
 {
-	m_pbrShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl");
-	//m_pbrShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
+	m_pbrShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
 
     m_quad = ScreenQuad::GenerateScreenQuad(&Engine::get()->getContext()->getRegistry());
     m_quad.RemoveComponent<RenderableComponent>();
     m_quad.RemoveComponent<ObjectComponent>();
 
     return true;
-}
-
-void Renderer::render()
-{
-    auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-    // Setup
-    graphics->shader->use();
-    setUniforms();
-
-    // Draw
-    draw(*graphics->mesh->getVAO());
-
-
-    // Release
-    if (graphics->material)
-    {
-        graphics->material->release();
-    }
-
-    graphics->shader->release();
 }
 
 void Renderer::enableWireframeMode(bool enable)
@@ -78,53 +56,41 @@ void Renderer::renderScene(Scene* scene)
 {
     auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-    graphics->entityGroup.clear();
+    glEnable(GL_DEPTH_TEST);
+    graphics->renderView->bind();
+
     for (auto&& [entity, mesh, transform, renderable] :
         scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent>().each())
     {
         if (renderable.renderTechnique == RenderableComponent::RenderTechnique::Forward)
         {
-            Entity entityhandler{ entity, &scene->getRegistry() };
-            graphics->entityGroup.push_back(entityhandler);
+            Entity entityHandler{ entity, &scene->getRegistry() };
+
+            graphics->entity = &entityHandler;
+            for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
+            {
+
+                auto tempModel = entityHandler.getComponent<Transformation>().getWorldTransformation();
+                graphics->model = &tempModel;
+                graphics->shader = m_pbrShader.get();
+                graphics->mesh = mesh.get();
+
+                Material* mat = graphics->entity->tryGetComponentInParent<Material>();
+
+                if (mat)
+                {
+                    graphics->material = mat;
+                }
+
+                // draw model
+                graphics->shader->use();
+                setUniforms();
+
+                // Draw
+                draw(*graphics->mesh->getVAO());
+            }
         }
     }
-
-    glEnable(GL_DEPTH_TEST);
-
-    graphics->renderView->bind();
-
-    // Render Phase
-    for (auto& entityHandler : graphics->entityGroup)
-	{
-        graphics->entity = &entityHandler;
-        for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
-        {
-
-            auto tempModel = entityHandler.getComponent<Transformation>().getWorldTransformation();
-            graphics->model = &tempModel;
-            graphics->shader = Engine::get()->getCommonShaders()->getShader(CommonShaders::ShaderType::PHONG_SHADER).get();
-            graphics->mesh = mesh.get();
-
-            // TODO rethink this feature
-            Shader* attachedShader = graphics->entity->tryGetComponentInParent<Shader>();
-            if (attachedShader)
-            {
-                graphics->shader = attachedShader;
-            }
-
-            Material* mat = graphics->entity->tryGetComponentInParent<Material>();
-
-            if (mat)
-            {
-                graphics->material = mat;
-            }
-
-            // draw model
-            render();
-        }
-    };
-
-    //graphics->renderView->unbind();
 }
 
 void Renderer::setUniforms()
@@ -200,8 +166,8 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
 	// Filter objects to acquire only custom shader objects
-	for (auto&& [entity/*, mesh*/, transform, renderable, shaderComponent] :
-		scene->getRegistry().getRegistry().view</*MeshComponent, */Transformation, RenderableComponent, ShaderComponent>().each())
+	for (auto&& [entity, transform, renderable, shaderComponent] :
+		scene->getRegistry().getRegistry().view<Transformation, RenderableComponent, ShaderComponent>().each())
 	{
 		Entity entityHandler{ entity, &scene->getRegistry() };
 
@@ -209,7 +175,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
         // bind shader
         auto& shaderComponent = graphics->entity->getComponent<ShaderComponent>();
-        Shader* shader = shaderComponent.m_customShader ? shaderComponent.m_customShader : m_pbrShader.get();
+        Shader* shader = shaderComponent.m_customShader;
         shader->use();
         graphics->shader = shader;
 
