@@ -422,12 +422,13 @@ void DeferredRenderer::renderScene(Scene* scene)
 				//continue; todo fix
 			}
 
+			graphics->material = Engine::get()->getDefaultMaterial().get();
+
 			auto matIndex = mesh->getMaterialIndex();
-			auto& materialComponent = graphics->entity->getComponent<MaterialComponent>();
-			graphics->material = materialComponent.at(matIndex).get();
-			if (!graphics->material)
+			auto materialComponent = graphics->entity->tryGetComponent<MaterialComponent>();
+			if (materialComponent)
 			{
-				graphics->material = Engine::get()->getDefaultMaterial().get();
+				graphics->material = materialComponent->at(matIndex).get();
 			}
 
 			// draw model

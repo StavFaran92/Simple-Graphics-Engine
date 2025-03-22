@@ -16,6 +16,7 @@ public:
 		auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import("Resources/Content/Meshes/sd_plane.fbx");
 
 		quad.addComponent<MeshComponent>(quadModel.mesh);
+		quad.addComponent<RenderableComponent>();
 
 		auto& planeTransform = quad.getComponent<Transformation>();
 		planeTransform.rotate({ 1,0,0 }, 90);
