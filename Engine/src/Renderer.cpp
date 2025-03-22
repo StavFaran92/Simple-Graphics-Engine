@@ -161,6 +161,10 @@ void Renderer::setUniforms()
 
 }
 
+void Renderer::render()
+{
+}
+
 void Renderer::renderSceneUsingCustomShader(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();

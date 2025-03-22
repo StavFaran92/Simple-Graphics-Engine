@@ -38,4 +38,8 @@ protected:
 	std::shared_ptr<Shader> m_pbrShader = nullptr;
 	Entity m_quad;
 
+
+	// Inherited via RendererIntermediate
+	void render() override;
+
 };
