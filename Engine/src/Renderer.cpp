@@ -277,6 +277,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 if (shaderComponent.projection == ShaderComponent::ProjectionType::DefaultProjection)
                 {
                     graphics->renderView->bind();
+                    setUniforms();
                     RenderCommand::draw(mesh->getVAO());
                 }
             }

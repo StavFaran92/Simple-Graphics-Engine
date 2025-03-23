@@ -12,6 +12,11 @@ public:
 	{
 		ImGui::SetCurrentContext((ImGuiContext*)Engine::get()->getImguiHandler()->getCurrentContext());
 
+		//auto editorCamera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
+		//editorCamera.addComponent<CameraComponent>();
+		//editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
+		//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
+
 		auto quad = Engine::get()->getContext()->getActiveScene()->createEntity();
 		auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import("Resources/Content/Meshes/sd_plane.fbx");
 
@@ -39,7 +44,7 @@ private:
 
 		//quad.getComponent<MaterialComponent>().materials[0]->setTexture(Texture::Type::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
 
-		auto gui = new GUIHandler(shader.m_vertexShader);
+		auto gui = new GUIHandler(shader.m_customShader);
 		Engine::get()->getImguiHandler()->addGUI(gui);
 	}
 
@@ -49,11 +54,11 @@ private:
 
 		quad.addComponent<ShaderComponent>(shader);
 
-		shader.m_vertexShader->setUniformValue("amplitude", 0.5f);
-		shader.m_vertexShader->setUniformValue("waveDirection", glm::vec2(1, 0));
-		shader.m_vertexShader->setUniformValue("waveLength", 2.0f);
-		shader.m_vertexShader->setUniformValue("waveSpeed", 1.0f);
-		shader.m_vertexShader->setUniformValue("steepness", .5f);
+		shader.m_customShader->setUniformValue("amplitude", 0.5f);
+		shader.m_customShader->setUniformValue("waveDirection", glm::vec2(1, 0));
+		shader.m_customShader->setUniformValue("waveLength", 2.0f);
+		shader.m_customShader->setUniformValue("waveSpeed", 1.0f);
+		shader.m_customShader->setUniformValue("steepness", .5f);
 
 		//std::shared_ptr<Material> mat = std::make_shared<Material>();
 		//quad.addComponent<MaterialComponent>().addMaterial().materials[0]->setTexture(Texture::Type::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
