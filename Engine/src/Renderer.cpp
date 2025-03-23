@@ -60,7 +60,7 @@ void Renderer::renderScene(Scene* scene)
     graphics->renderView->bind();
 
     for (auto&& [entity, mesh, transform, renderable] :
-        scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent>().each())
+        scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent>(entt::exclude<ShaderComponent>).each())
     {
         if (renderable.renderTechnique == RenderableComponent::RenderTechnique::Forward)
         {
@@ -268,17 +268,17 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
                 {
                     graphics->renderView = shaderComponent.renderViewProjection;
-                }
-
-                graphics->renderView->bind();
-
-                {
-                    // render to quad
+                    graphics->renderView->bind();
                     auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
                     RenderCommand::draw(mesh->getVAO());
                 }
 
-                graphics->renderView->unbind();
+
+                if (shaderComponent.projection == ShaderComponent::ProjectionType::DefaultProjection)
+                {
+                    graphics->renderView->bind();
+                    RenderCommand::draw(mesh->getVAO());
+                }
             }
         }
 

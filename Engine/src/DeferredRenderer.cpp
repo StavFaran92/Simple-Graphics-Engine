@@ -359,7 +359,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	graphics->entityGroup.clear();
 	for (auto&& [entity, mesh, transform, renderable] :
-		scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent>().each())
+		scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent>(entt::exclude<ShaderComponent>).each())
 	{
 		if (renderable.renderTechnique == RenderableComponent::RenderTechnique::Deferred)
 		{

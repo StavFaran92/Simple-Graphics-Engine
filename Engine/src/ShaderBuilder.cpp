@@ -127,52 +127,64 @@ ShaderComponent CustomShaderBuilder::build()
 	ShadersInfo customShaders;
 	Engine::get()->getShaderLoader()->parseGLSLShader(customShaderSource, customShaders);
 	
-	if (m_shaderOverride == ShaderOverride::PBR)
+	//if (m_shaderOverride == ShaderOverride::PBR)
+	//{
+	//	if (!customShaders.vertexCode.empty())
+	//	{
+	//		std::string& geomPassShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
+
+	//		ShadersInfo shaders;
+	//		Engine::get()->getShaderLoader()->parseGLSLShader(geomPassShaderSources, shaders);
+
+	//		std::string macro = "CUSTOM_SHADER";
+	//		addMacro(shaders.vertexCode, macro);
+
+	//		replaceDirective(shaders.vertexCode, "#custom_vert", customShaders.vertexCode);
+
+	//		// build shader geom
+	//		Shader* shader = new Shader();
+	//		shader->BuildShaders(shaders);
+
+	//		shaderComponent.m_vertexShader = shader;
+	//	}
+
+	//	if (!customShaders.fragmentCode.empty())
+	//	{
+	//		std::string& lightPassShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+
+	//		ShadersInfo shaders;
+	//		Engine::get()->getShaderLoader()->parseGLSLShader(lightPassShaderSources, shaders);
+
+	//		std::string macro = "CUSTOM_SHADER";
+	//		addMacro(shaders.fragmentCode, macro);
+
+	//		replaceDirective(shaders.fragmentCode, "#custom_frag", customShaders.fragmentCode);
+
+	//		// build shader light
+	//		Shader* shader = new Shader();
+	//		shader->BuildShaders(shaders);
+
+	//		shaderComponent.m_fragmentShader = shader;
+	//		shaderComponent.shaderOverride = ShaderOverride::PBR;
+	//	}
+	//}
+	//else if (m_shaderOverride == ShaderOverride::Pixel)
+
+	
 	{
-		if (!customShaders.vertexCode.empty())
+		std::string shaderPath;
+		if (m_shaderOverride == ShaderOverride::PBR)
 		{
-			std::string& geomPassShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
-
-			ShadersInfo shaders;
-			Engine::get()->getShaderLoader()->parseGLSLShader(geomPassShaderSources, shaders);
-
-			std::string macro = "CUSTOM_SHADER";
-			addMacro(shaders.vertexCode, macro);
-
-			replaceDirective(shaders.vertexCode, "#custom_vert", customShaders.vertexCode);
-
-			// build shader geom
-			Shader* shader = new Shader();
-			shader->BuildShaders(shaders);
-
-			shaderComponent.m_vertexShader = shader;
+			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl";
+		}
+		else if (m_shaderOverride == ShaderOverride::Pixel)
+		{
+			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl";
 		}
 
-		if (!customShaders.fragmentCode.empty())
-		{
-			std::string& lightPassShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
-
-			ShadersInfo shaders;
-			Engine::get()->getShaderLoader()->parseGLSLShader(lightPassShaderSources, shaders);
-
-			std::string macro = "CUSTOM_SHADER";
-			addMacro(shaders.fragmentCode, macro);
-
-			replaceDirective(shaders.fragmentCode, "#custom_frag", customShaders.fragmentCode);
-
-			// build shader light
-			Shader* shader = new Shader();
-			shader->BuildShaders(shaders);
-
-			shaderComponent.m_fragmentShader = shader;
-			shaderComponent.shaderOverride = ShaderOverride::PBR;
-		}
-	}
-	else if (m_shaderOverride == ShaderOverride::Pixel)
-	{
 		if (!customShaders.vertexCode.empty() || !customShaders.fragmentCode.empty())
 		{
-			std::string& pixelShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl");
+			std::string& pixelShaderSources = Engine::get()->getShaderLoader()->readShader(shaderPath);
 
 			ShadersInfo shaders;
 			Engine::get()->getShaderLoader()->parseGLSLShader(pixelShaderSources, shaders);
@@ -189,7 +201,7 @@ ShaderComponent CustomShaderBuilder::build()
 			shader->BuildShaders(shaders);
 
 			shaderComponent.m_customShader = shader;
-			shaderComponent.shaderOverride = ShaderOverride::Pixel;
+			shaderComponent.shaderOverride = m_shaderOverride;
 		}
 	}
 

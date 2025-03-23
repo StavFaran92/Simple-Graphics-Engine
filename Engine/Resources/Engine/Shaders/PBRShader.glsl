@@ -31,6 +31,11 @@ out VS_OUT {
 
 uniform mat4 finalBonesMatrices[MAX_BONES];
 
+float getTime()
+{
+	return time;
+}
+
 #ifdef CUSTOM_SHADER
 #custom_vert
 #endif
@@ -226,6 +231,45 @@ vec4 getPBRTexture(PBR_Sampler s)
 				extractChannel(color, s.channelMaskB), 
 				extractChannel(color, s.channelMaskA));
 }
+
+float getPixelDepth()
+{
+	return length(cameraPos - fs_in.fragPos);
+}
+
+//vec2 getScreenUV()
+//{
+//	return ScreenUV;
+//}
+
+vec3 getPixelPosition()
+{
+	return fs_in.fragPos;
+}
+
+vec3 getPixelNormal()
+{
+	return fs_in.normal;
+}
+
+vec3 getCameraPosition()
+{
+	return cameraPos;
+}
+
+vec2 getTexCoords()
+{
+	return fs_in.texCoord;
+}
+
+float getTime()
+{
+	return time;
+}
+
+#ifdef CUSTOM_SHADER
+#custom_frag
+#endif
 
 void main()
 {
