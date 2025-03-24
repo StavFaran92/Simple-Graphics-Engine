@@ -30,10 +30,11 @@ out VS_OUT {
 // ----- Uniforms ----- //
 
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform float Time2;
 
 float getTime()
 {
-	return time;
+	return Time2;
 }
 
 #ifdef CUSTOM_SHADER
@@ -206,6 +207,20 @@ vec3 PointLightRadiance(PointLight pLight, Surface s)
     return calculateBRDF(s) * radiance * cosTheta;
 }
 
+vec3 DirLightRadiance(DirLight dLight, Surface s)
+{
+	s.L = normalize(-dLight.direction.xyz);
+	s.H = normalize(s.V + s.L);
+
+	// Calculate Li
+	vec3 radiance = dLight.color.rgb;
+
+	// Calculate cosTheta
+	float cosTheta = max(0.0, dot(s.N, s.L));
+
+	return calculateBRDF(s) * radiance * cosTheta;
+}
+
 #define CHANNEL_NONE 0
 #define CHANNEL_R 1
 #define CHANNEL_G 2
@@ -261,10 +276,10 @@ vec2 getTexCoords()
 {
 	return fs_in.texCoord;
 }
-
+uniform float Time2;
 float getTime()
 {
-	return time;
+	return Time2;
 }
 
 #ifdef CUSTOM_SHADER
@@ -298,6 +313,11 @@ void main()
     {
         L0 += PointLightRadiance(pointLights[i], s);
     }
+
+    for(int i = 0; i < dirLightCount; ++i)
+	{
+		L0 += DirLightRadiance(dirLight[i], s);
+	}
 
     vec3 color = L0;
 

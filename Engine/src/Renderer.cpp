@@ -155,8 +155,10 @@ void Renderer::setUniforms()
         graphics->material->use(*graphics->shader);
     }
 
-    graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+    graphics->shader->bindUniformBlockToBindPoint("Time", 2);
     graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+
+    graphics->shader->setUniformValue("Time2", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 
 
 }
@@ -232,8 +234,8 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                     //continue; todo fix
                 }
 
-                graphics->shader->bindUniformBlockToBindPoint("Time", 0);
                 graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+                graphics->shader->bindUniformBlockToBindPoint("Time", 2);
 
                 graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
                 graphics->shader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
