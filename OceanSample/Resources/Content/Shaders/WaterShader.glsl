@@ -38,6 +38,7 @@ void frag(inout vec3 color)
 	vec3 colorA = vec3(0.023497, 0.451692, 1.0);
     vec3 colorB = vec3(0.0, 0.05938, 0.135417);
 
-	color = vec3(1.0,0.0,0.0);
+	//color = vec3(1.0,0.0,0.0);
 	//color = mix(colorA, colorB, pixelDistance) * color;
+	color = mix(colorA, colorB, pixelDistance);
 }

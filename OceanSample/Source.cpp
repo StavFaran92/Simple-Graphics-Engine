@@ -3,7 +3,7 @@
 
 #include "GUIHandler.h"
 
-
+Entity camera;
 
 class Sandbox : public Application
 {
@@ -12,10 +12,10 @@ public:
 	{
 		ImGui::SetCurrentContext((ImGuiContext*)Engine::get()->getImguiHandler()->getCurrentContext());
 
-		auto editorCamera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
-		editorCamera.addComponent<CameraComponent>();
-		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
-		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
+		camera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
+		camera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
+		camera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
+		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(camera);
 
 		auto quad = Engine::get()->getContext()->getActiveScene()->createEntity();
 		auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import("Resources/Content/Meshes/sd_plane.fbx");
@@ -30,6 +30,11 @@ public:
 		planeTransform.scale({ 100, 100, 1 });
 
 		createPool(quad);
+	}
+
+	void update(float deltaTime) override
+	{
+		camera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
 	}
 
 private:

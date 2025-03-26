@@ -8,6 +8,7 @@ struct NativeScriptComponent;
 class Scene;
 class SceneSerializer;
 class EditorApp;
+class Sandbox; // TODO fix this hack!
 
 class EngineAPI ScriptableEntity
 {
@@ -47,4 +48,5 @@ protected:
 	friend Scene;
 	friend SceneSerializer;
 	friend EditorApp;
+	friend Sandbox;
 };

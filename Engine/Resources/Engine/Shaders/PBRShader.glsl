@@ -80,7 +80,7 @@ void main()
 #ifdef CUSTOM_SHADER
     vert(totalPosition.xyz, aNorm);
 #endif
-    totalPosition += vec4(0.0, 0.0,  10, 0.0); 
+    //totalPosition += vec4(0.0, 0.0,  10, 0.0); 
 
     vs_out.texCoord = tex;
     vs_out.normal = aNorm;
