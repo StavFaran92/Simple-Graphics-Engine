@@ -242,6 +242,9 @@ void Scene::draw(float deltaTime)
 	{
 		auto viewport = renderView->getViewport();
 
+		renderView->bind();
+		RenderCommand::clear();
+
 		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 
 		const Entity& camera = renderView->getCamera();

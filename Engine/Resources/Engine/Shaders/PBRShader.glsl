@@ -78,8 +78,9 @@ void main()
     vec3 aNorm = mat3(transpose(inverse(aModel))) * totalNormal;
 
 #ifdef CUSTOM_SHADER
-    vert(totalPosition.xyz, aNorm);
+    totalPosition = vec4(totalPosition.xyz, 1.0);
 #endif
+    //totalPosition += vec4(0.0, 0.0,  10, 0.0); 
 
     vs_out.texCoord = tex;
     vs_out.normal = aNorm;

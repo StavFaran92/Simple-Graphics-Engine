@@ -12,10 +12,10 @@ public:
 	{
 		ImGui::SetCurrentContext((ImGuiContext*)Engine::get()->getImguiHandler()->getCurrentContext());
 
-		//auto editorCamera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
-		//editorCamera.addComponent<CameraComponent>();
-		//editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
-		//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
+		auto editorCamera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
+		editorCamera.addComponent<CameraComponent>();
+		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
+		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
 
 		auto quad = Engine::get()->getContext()->getActiveScene()->createEntity();
 		auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import("Resources/Content/Meshes/sd_plane.fbx");

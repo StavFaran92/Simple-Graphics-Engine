@@ -40,5 +40,5 @@ void frag(inout vec3 color)
     vec3 colorB = vec3(0.0, 0.05938, 0.135417);
 
 	color = mix(colorA, colorB, pixelDistance) * color;
-	// color = getPixelNormal() *;
+	color = vec3(1.0, 0.0, 0.0);
 }
