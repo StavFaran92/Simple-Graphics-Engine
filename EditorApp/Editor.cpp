@@ -1688,70 +1688,74 @@ void RenderInspectorWindow(float width, float height)
 		});
 
 		displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {
-				static char shaderFilePath[256] = "";
-				static int overrideType = 0;
-				static int projectionType = 0;
-				static std::vector<TextureSampler> customTextures;
-				static TextureSampler projectionTexture;
+			static char shaderFilePath[256] = "";
+			static int overrideType = 0;
+			static int projectionType = 0;
+			static std::vector<char [256]> customTextureNames { 8 };
+			static std::vector<Resource<Texture>> customTextures{ 8 };
+			static Resource<Texture> projectionTexture;
 
-				// Shader File Path
-				ImGui::Text("Filepath");
-				ImGui::InputText("##ShaderFilePath", shaderFilePath, IM_ARRAYSIZE(shaderFilePath), ImGuiInputTextFlags_EnterReturnsTrue);
+			// Shader File Path
+			ImGui::Text("Filepath");
+			ImGui::InputText("##ShaderFilePath", shaderFilePath, IM_ARRAYSIZE(shaderFilePath), ImGuiInputTextFlags_EnterReturnsTrue);
 
-				// Override Type Drop-down
-				const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader"};
-				ImGui::Text("Override Type");
-				ImGui::Combo("##ShaderOverrideType", &overrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
+			// Override Type Drop-down
+			const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader" };
+			ImGui::Text("Override Type");
+			ImGui::Combo("##ShaderOverrideType", &overrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
 
-				// Compile Button
-				if (ImGui::Button("Compile"))
+			// Compile Button
+			if (ImGui::Button("Compile"))
+			{
+				ShaderOverride actualOverrideType = ShaderOverride::PBR;
+				if (overrideType == 0)
 				{
-					ShaderOverride actualOverrideType = ShaderOverride::PBR;
-					if (overrideType == 0)
-					{
-						actualOverrideType = ShaderOverride::PBR;
-					}
-					else if (overrideType == 1)
-					{
-						actualOverrideType = ShaderOverride::Pixel;
-					}
-					ShaderComponent& newShader = CustomShaderBuilder::create(shaderFilePath, actualOverrideType).build();
-
-					selectedEntity.RemoveComponent<ShaderComponent>();
-					selectedEntity.addComponent<ShaderComponent>(newShader);
+					actualOverrideType = ShaderOverride::PBR;
 				}
+				else if (overrideType == 1)
+				{
+					actualOverrideType = ShaderOverride::Pixel;
+				}
+				ShaderComponent& newShader = CustomShaderBuilder::create(shaderFilePath, actualOverrideType).build();
 
-				// Custom Textures Array
-				ImGui::Text("Custom Textures:");
-				//for (size_t i = 0; i < customTextures.size(); ++i)
-				//{
-				//	ImGui::PushID(static_cast<int>(i));
-				//	// Render texture UI (assuming TextureSampler has a UI function)
-				//	customTextures[i].RenderUI();
-				//	if (ImGui::Button("Remove"))
-				//	{
-				//		customTextures.erase(customTextures.begin() + i);
-				//		ImGui::PopID();
-				//		break;
-				//	}
-				//	ImGui::PopID();
-				//}
-				//if (ImGui::Button("Add Texture"))
-				//{
-				//	customTextures.emplace_back(); // Assuming TextureSampler has a default constructor
-				//}
+				selectedEntity.RemoveComponent<ShaderComponent>();
+				selectedEntity.addComponent<ShaderComponent>(newShader);
+			}
 
-				// Projection Type Drop-down
-				const char* projectionTypes[] = { "Default", "Texture2D"}; 
-				ImGui::Combo("Projection Type", &projectionType, projectionTypes, IM_ARRAYSIZE(projectionTypes));
+			ImGui::Separator();
 
+			// Projection Type Drop-down
+			const char* projectionTypes[] = { "Default", "Texture2D" };
+			ImGui::Combo("Projection Type", &projectionType, projectionTypes, IM_ARRAYSIZE(projectionTypes));
+
+			if (projectionType == 1)
+			{
 				// Projection Texture
 				ImGui::Text("Projection Texture:");
-				//projectionTexture.RenderUI(); // Assuming a method to render its UI
+				addTextureEditWidget(projectionTexture, { 50,50 }, [](std::string uuid) {});
+			}
+
+			// Custom Textures Array
+			ImGui::Text("Custom Textures:");
+			if (ImGui::CollapsingHeader("Textures"))
+			{
+				for (size_t i = 0; i < customTextures.size(); ++i)
+				{
+					ImGui::PushID(static_cast<int>(i));
+					ImGui::Text(("Texture " + std::to_string(i)).c_str());
+					ImGui::InputText(("##Texture" + std::to_string(i)).c_str(), customTextureNames[i], IM_ARRAYSIZE(shaderFilePath));
+					addTextureEditWidget(customTextures[i], { 100,100 }, [](std::string uuid) {});
+					ImGui::PopID();
+				}
+				
+			}
+				
+
+				
 
 				// Placeholder for Uniform Fields
-				ImGui::Text("Uniforms: (Placeholder for now)");
-			});
+			ImGui::Text("Uniforms: (Placeholder for now)");
+		});
 
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
 			});
