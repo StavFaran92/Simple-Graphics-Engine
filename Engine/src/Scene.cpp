@@ -265,10 +265,10 @@ void Scene::draw(float deltaTime)
 		graphics->brdfLUT = m_BRDFIntegrationLUT;
 		graphics->renderView = renderView;
 
-		//m_shadowSystem->renderToDepthMap();
+		m_shadowSystem->renderToDepthMap();
 
-		//graphics->lightSpaceMatrix = m_shadowSystem->getLightSpaceMat();
-		//graphics->shadowMap = m_shadowSystem->getShadowMap();
+		graphics->lightSpaceMatrix = m_shadowSystem->getLightSpaceMat();
+		graphics->shadowMap = m_shadowSystem->getShadowMap();
 
 		// PRE Render Phase
 		for (const auto& cb : m_renderCallbacks[RenderPhase::PRE_RENDER_BEGIN])
@@ -301,14 +301,14 @@ void Scene::draw(float deltaTime)
 
 		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 
-		//m_deferredRenderer->renderScene(this);
+		m_deferredRenderer->renderScene(this);
 
-		//unsigned int srcID = m_deferredRenderer->getGBuffer().getID();
-		//unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
+		unsigned int srcID = m_deferredRenderer->getGBuffer().getID();
+		unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
 
-		//RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
+		RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
 
-		//m_forwardRenderer->renderScene(this);
+		m_forwardRenderer->renderScene(this);
 
 		m_forwardRenderer->renderSceneUsingCustomShader(this);
 
