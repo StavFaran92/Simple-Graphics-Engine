@@ -181,6 +181,11 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
         // bind shader
         auto& shaderComponent = graphics->entity->getComponent<ShaderComponent>();
+        if (!shaderComponent.isValid)
+        {
+            continue;
+
+        }
         Shader* shader = shaderComponent.m_customShader;
         shader->use();
         graphics->shader = shader;

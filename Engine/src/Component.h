@@ -374,6 +374,8 @@ struct EngineAPI ShaderComponent : public Component
 	ProjectionType projection = ProjectionType::DefaultProjection;
 	Resource<Texture> projectionTexture;
 	std::shared_ptr<RenderView> renderViewProjection;
+
+	bool isValid = false;
 };
 
 struct EngineAPI InstanceBatch : public Component

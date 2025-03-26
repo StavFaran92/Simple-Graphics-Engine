@@ -202,6 +202,7 @@ ShaderComponent CustomShaderBuilder::build()
 
 			shaderComponent.m_customShader = shader;
 			shaderComponent.shaderOverride = m_shaderOverride;
+			shaderComponent.isValid = true;
 		}
 	}
 
