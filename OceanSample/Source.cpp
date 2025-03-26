@@ -29,7 +29,7 @@ public:
 		//planeTransform.rotate({ 1,0,0 }, 180);
 		planeTransform.scale({ 100, 100, 1 });
 
-		createPool(quad);
+		createOcean(quad);
 	}
 
 	void update(float deltaTime) override

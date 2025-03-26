@@ -14,7 +14,7 @@ void vert(inout vec3 aPos, inout vec3 aNorm)
 	
 	vec2 dir = normalize(waveDirection);
 
-	float a = dot(vec2(pos.x, pos.y),dir) * w + time * pSpeed;
+	float a = dot(vec2(pos.x, pos.y),dir) * w + getTime() * pSpeed;
 
 	aPos.x = pos.x + q * amplitude * dir.x * cos(a);
 	aPos.y = pos.y + q * amplitude * dir.y * cos(a);
@@ -39,6 +39,6 @@ void frag(inout vec3 color)
 	vec3 colorA = vec3(0.023497, 0.451692, 1.0);
     vec3 colorB = vec3(0.0, 0.05938, 0.135417);
 
-	color = mix(colorA, colorB, pixelDistance) * color;
-	color = vec3(1.0, 0.0, 0.0);
+	color = mix(colorA, colorB, pixelDistance) * color * 10;
+	//color = vec3(1.0, 0.0, 0.0);
 }
