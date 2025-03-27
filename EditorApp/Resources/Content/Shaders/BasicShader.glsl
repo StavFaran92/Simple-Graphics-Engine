@@ -6,7 +6,9 @@ void vert(inout vec3 aPos, inout vec3 aNorm)
 
 #frag
 
+uniform vec3 a;
+
 void frag(inout vec3 color)
 {
-	color = vec3(0.0, 0.0, 1.0);
+	color = a;
 }

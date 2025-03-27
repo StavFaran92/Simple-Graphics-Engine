@@ -375,6 +375,8 @@ struct EngineAPI ShaderComponent : public Component
 	Resource<Texture> projectionTexture;
 	std::shared_ptr<RenderView> renderViewProjection;
 
+	std::unordered_map<std::string, Value> m_uniformProperties;
+
 	bool isValid = false;
 };
 

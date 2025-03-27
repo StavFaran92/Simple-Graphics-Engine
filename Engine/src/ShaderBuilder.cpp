@@ -116,6 +116,50 @@ CustomShaderBuilder& CustomShaderBuilder::create(const std::string& filePath, Sh
 	return *shaderBuilder;
 }
 
+#include <regex>
+
+void CustomShaderBuilder::parseUniforms(const std::string& shaderSource, std::unordered_map<std::string, Value>& uniformProperties) 
+{
+	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
+	std::smatch match;
+	std::string::const_iterator searchStart(shaderSource.cbegin());
+
+	while (std::regex_search(searchStart, shaderSource.cend(), match, uniformRegex)) {
+		std::string type = match[1].str();
+		std::string name = match[2].str();
+
+		if (type == "float") {
+			uniformProperties[name] = 0.0f;
+		}
+		else if (type == "vec2") {
+			uniformProperties[name] = glm::vec2(0.0f);
+		}
+		else if (type == "vec3") {
+			uniformProperties[name] = glm::vec3(0.0f);
+		}
+		else if (type == "vec4") {
+			uniformProperties[name] = glm::vec4(0.0f);
+		}
+		else if (type == "int") {
+			uniformProperties[name] = 0;
+		}
+		else if (type == "uint") {
+			uniformProperties[name] = 0u;
+		}
+		else if (type == "mat3") {
+			uniformProperties[name] = glm::mat3(1.0f);
+		}
+		else if (type == "mat4") {
+			uniformProperties[name] = glm::mat4(1.0f);
+		}
+		else if (type == "sampler2D") {
+			uniformProperties[name] = 0; //TODO fix - this is intresting
+		}
+
+		searchStart = match.suffix().first;
+	}
+}
+
 CustomShaderBuilder::CustomShaderBuilder(const std::string& filePath, ShaderOverride shaderOverride) : m_filepath(filePath) , m_shaderOverride(shaderOverride){ }
 
 ShaderComponent CustomShaderBuilder::build()
@@ -126,84 +170,47 @@ ShaderComponent CustomShaderBuilder::build()
 
 	ShadersInfo customShaders;
 	Engine::get()->getShaderLoader()->parseGLSLShader(customShaderSource, customShaders);
+
+	parseUniforms(customShaderSource, shaderComponent.m_uniformProperties);
 	
-	//if (m_shaderOverride == ShaderOverride::PBR)
-	//{
-	//	if (!customShaders.vertexCode.empty())
-	//	{
-	//		std::string& geomPassShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
-
-	//		ShadersInfo shaders;
-	//		Engine::get()->getShaderLoader()->parseGLSLShader(geomPassShaderSources, shaders);
-
-	//		std::string macro = "CUSTOM_SHADER";
-	//		addMacro(shaders.vertexCode, macro);
-
-	//		replaceDirective(shaders.vertexCode, "#custom_vert", customShaders.vertexCode);
-
-	//		// build shader geom
-	//		Shader* shader = new Shader();
-	//		shader->BuildShaders(shaders);
-
-	//		shaderComponent.m_vertexShader = shader;
-	//	}
-
-	//	if (!customShaders.fragmentCode.empty())
-	//	{
-	//		std::string& lightPassShaderSources = Engine::get()->getShaderLoader()->readShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
-
-	//		ShadersInfo shaders;
-	//		Engine::get()->getShaderLoader()->parseGLSLShader(lightPassShaderSources, shaders);
-
-	//		std::string macro = "CUSTOM_SHADER";
-	//		addMacro(shaders.fragmentCode, macro);
-
-	//		replaceDirective(shaders.fragmentCode, "#custom_frag", customShaders.fragmentCode);
-
-	//		// build shader light
-	//		Shader* shader = new Shader();
-	//		shader->BuildShaders(shaders);
-
-	//		shaderComponent.m_fragmentShader = shader;
-	//		shaderComponent.shaderOverride = ShaderOverride::PBR;
-	//	}
-	//}
-	//else if (m_shaderOverride == ShaderOverride::Pixel)
-
-	
+	std::string shaderPath;
+	if (m_shaderOverride == ShaderOverride::PBR)
 	{
-		std::string shaderPath;
-		if (m_shaderOverride == ShaderOverride::PBR)
-		{
-			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl";
-		}
-		else if (m_shaderOverride == ShaderOverride::Pixel)
-		{
-			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl";
-		}
+		shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl";
+	}
+	else if (m_shaderOverride == ShaderOverride::Pixel)
+	{
+		shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl";
+	}
 
-		if (!customShaders.vertexCode.empty() || !customShaders.fragmentCode.empty())
+	if (!customShaders.vertexCode.empty() || !customShaders.fragmentCode.empty())
+	{
+		std::string& pixelShaderSources = Engine::get()->getShaderLoader()->readShader(shaderPath);
+
+		ShadersInfo shaders;
+		Engine::get()->getShaderLoader()->parseGLSLShader(pixelShaderSources, shaders);
+
+		std::string macro = "CUSTOM_SHADER";
+
+		if (!shaders.vertexCode.empty())
 		{
-			std::string& pixelShaderSources = Engine::get()->getShaderLoader()->readShader(shaderPath);
-
-			ShadersInfo shaders;
-			Engine::get()->getShaderLoader()->parseGLSLShader(pixelShaderSources, shaders);
-
-			std::string macro = "CUSTOM_SHADER";
 			addMacro(shaders.vertexCode, macro);
-			addMacro(shaders.fragmentCode, macro);
-
-			replaceDirective(shaders.vertexCode, "#custom_vert", customShaders.vertexCode);			
-			replaceDirective(shaders.fragmentCode, "#custom_frag", customShaders.fragmentCode);
-
-			// build shader light
-			Shader* shader = new Shader();
-			shader->BuildShaders(shaders);
-
-			shaderComponent.m_customShader = shader;
-			shaderComponent.shaderOverride = m_shaderOverride;
-			shaderComponent.isValid = true;
+			replaceDirective(shaders.vertexCode, "#custom_vert", customShaders.vertexCode);
 		}
+
+		if (!shaders.fragmentCode.empty())
+		{
+			addMacro(shaders.fragmentCode, macro);
+			replaceDirective(shaders.fragmentCode, "#custom_frag", customShaders.fragmentCode);
+		}
+
+		// build shader light
+		Shader* shader = new Shader();
+		shader->BuildShaders(shaders);
+
+		shaderComponent.m_customShader = shader;
+		shaderComponent.shaderOverride = m_shaderOverride;
+		shaderComponent.isValid = true;
 	}
 
 
