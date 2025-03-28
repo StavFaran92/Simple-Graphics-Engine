@@ -1780,9 +1780,7 @@ void RenderInspectorWindow(float width, float height)
 				// Projection Texture
 				ImGui::Text("Projection Texture:");
 				addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](std::string uuid) {
-					auto tempTex = Texture::createEmptyTexture(1920, 1080);
-					Engine::get()->getSubSystem<Assets>()->addTexture2D(tempTex);
-					shaderComponent.setProjectionTexture(tempTex);
+					shaderComponent.setProjectionTexture(Resource<Texture>(uuid));
 				});
 			}
 
