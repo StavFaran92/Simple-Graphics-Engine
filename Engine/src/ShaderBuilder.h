@@ -18,7 +18,7 @@ public:
 private:
 	CustomShaderBuilder(const std::string& filePath, ShaderOverride shaderOverride);
 
-	void parseUniforms(const std::string& shaderSource, std::unordered_map<std::string, Value>& uniformProperties);
+	void parseUniforms(const std::string& shaderSource, ShaderComponent& uniformProperties);
 
 private:
 	std::string m_filepath;

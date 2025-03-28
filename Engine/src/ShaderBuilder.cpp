@@ -6,6 +6,7 @@
 #include "ShaderLoader.h"
 
 #include "Utils.h"
+#include "CommonTextures.h"
 
 //enum class DirectiveType
 //{
@@ -118,11 +119,13 @@ CustomShaderBuilder& CustomShaderBuilder::create(const std::string& filePath, Sh
 
 #include <regex>
 
-void CustomShaderBuilder::parseUniforms(const std::string& shaderSource, std::unordered_map<std::string, Value>& uniformProperties) 
+void CustomShaderBuilder::parseUniforms(const std::string& shaderSource, ShaderComponent& shader)
 {
 	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
 	std::smatch match;
 	std::string::const_iterator searchStart(shaderSource.cbegin());
+
+	auto& uniformProperties = shader.m_uniformProperties;
 
 	while (std::regex_search(searchStart, shaderSource.cend(), match, uniformRegex)) {
 		std::string type = match[1].str();
@@ -153,7 +156,7 @@ void CustomShaderBuilder::parseUniforms(const std::string& shaderSource, std::un
 			uniformProperties[name] = glm::mat4(1.0f);
 		}
 		else if (type == "sampler2D") {
-			uniformProperties[name] = 0; //TODO fix - this is intresting
+			shader.addTexture(name, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1));
 		}
 
 		searchStart = match.suffix().first;
@@ -165,13 +168,14 @@ CustomShaderBuilder::CustomShaderBuilder(const std::string& filePath, ShaderOver
 ShaderComponent CustomShaderBuilder::build()
 {
 	ShaderComponent shaderComponent;
+	
 
 	std::string& customShaderSource = Engine::get()->getShaderLoader()->readShader(m_filepath);
 
 	ShadersInfo customShaders;
 	Engine::get()->getShaderLoader()->parseGLSLShader(customShaderSource, customShaders);
 
-	parseUniforms(customShaderSource, shaderComponent.m_uniformProperties);
+	parseUniforms(customShaderSource, shaderComponent);
 	
 	std::string shaderPath;
 	if (m_shaderOverride == ShaderOverride::PBR)

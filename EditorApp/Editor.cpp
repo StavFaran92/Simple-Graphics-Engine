@@ -1691,8 +1691,8 @@ void RenderInspectorWindow(float width, float height)
 			static char shaderFilePath[256] = "";
 			static int overrideType = 0;
 			static int projectionType = 0;
-			static std::vector<char [256]> customTextureNames { 8 };
-			static std::vector<Resource<Texture>> customTextures{ 8 };
+			//static std::vector<char [256]> customTextureNames { 8 };
+			//static std::vector<Resource<Texture>> customTextures{ 8 };
 			static Resource<Texture> projectionTexture;
 
 			// Shader File Path
@@ -1736,74 +1736,76 @@ void RenderInspectorWindow(float width, float height)
 			}
 
 			// Custom Textures Array
-			ImGui::Text("Custom Textures:");
 			if (ImGui::CollapsingHeader("Textures"))
 			{
-				for (size_t i = 0; i < customTextures.size(); ++i)
+				for (auto& [name, texture] : shaderComponent.customTextures)
 				{
-					ImGui::PushID(static_cast<int>(i));
-					ImGui::Text(("Texture " + std::to_string(i)).c_str());
-					ImGui::InputText(("##Texture" + std::to_string(i)).c_str(), customTextureNames[i], IM_ARRAYSIZE(shaderFilePath));
-					addTextureEditWidget(customTextures[i], { 100,100 }, [](std::string uuid) {});
+					ImGui::PushID(name.c_str());
+					ImGui::Text(name.c_str());
+					addTextureEditWidget(texture, { 100,100 }, [&](std::string uuid) {
+						texture = Resource<Texture>(uuid);
+						});
 					ImGui::PopID();
 				}
 				
 			}
 
 			// Display Uniforms and Update Shader
-			ImGui::Text("Uniforms:");
-			for (auto& [name, value] : shaderComponent.m_uniformProperties)
+			if (ImGui::CollapsingHeader("Uniforms"))
 			{
-				ImGui::PushID(name.c_str());
-				bool updated = false; // Track if the value was changed
-				std::visit([&](auto& v)
-					{
-						using T = std::decay_t<decltype(v)>;
-						ImGui::Text("%s:", name.c_str());
-
-						if constexpr (std::is_same_v<T, float>)
-						{
-							updated = ImGui::DragFloat(("##" + name).c_str(), &v, 0.1f);
-						}
-						else if constexpr (std::is_same_v<T, glm::vec2>)
-						{
-							updated = ImGui::DragFloat2(("##" + name).c_str(), &v[0], 0.1f);
-						}
-						else if constexpr (std::is_same_v<T, glm::vec3>)
-						{
-							updated = ImGui::DragFloat3(("##" + name).c_str(), &v[0], 0.1f);
-						}
-						else if constexpr (std::is_same_v<T, glm::vec4>)
-						{
-							updated = ImGui::DragFloat4(("##" + name).c_str(), &v[0], 0.1f);
-						}
-						else if constexpr (std::is_same_v<T, int>)
-						{
-							updated = ImGui::InputInt(("##" + name).c_str(), &v);
-						}
-						else if constexpr (std::is_same_v<T, unsigned int>)
-						{
-							updated = ImGui::InputScalar(("##" + name).c_str(), ImGuiDataType_U32, &v);
-						}
-						else if constexpr (std::is_same_v<T, glm::mat3>)
-						{
-							for (int i = 0; i < 3; ++i)
-								updated |= ImGui::DragFloat3((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
-						}
-						else if constexpr (std::is_same_v<T, glm::mat4>)
-						{
-							for (int i = 0; i < 4; ++i)
-								updated |= ImGui::DragFloat4((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
-						}
-					}, value);
-
-				// If the value changed, update the shader
-				if (updated)
+				for (auto& [name, value] : shaderComponent.m_uniformProperties)
 				{
-					shaderComponent.m_customShader->setUniformValue(name, value);
-				}
+					ImGui::PushID(name.c_str());
+					bool updated = false; // Track if the value was changed
+					std::visit([&](auto& v)
+						{
+							using T = std::decay_t<decltype(v)>;
+							ImGui::Text("%s:", name.c_str());
 
-				ImGui::PopID();
+							if constexpr (std::is_same_v<T, float>)
+							{
+								updated = ImGui::DragFloat(("##" + name).c_str(), &v, 0.1f);
+							}
+							else if constexpr (std::is_same_v<T, glm::vec2>)
+							{
+								updated = ImGui::DragFloat2(("##" + name).c_str(), &v[0], 0.1f);
+							}
+							else if constexpr (std::is_same_v<T, glm::vec3>)
+							{
+								updated = ImGui::DragFloat3(("##" + name).c_str(), &v[0], 0.1f);
+							}
+							else if constexpr (std::is_same_v<T, glm::vec4>)
+							{
+								updated = ImGui::DragFloat4(("##" + name).c_str(), &v[0], 0.1f);
+							}
+							else if constexpr (std::is_same_v<T, int>)
+							{
+								updated = ImGui::InputInt(("##" + name).c_str(), &v);
+							}
+							else if constexpr (std::is_same_v<T, unsigned int>)
+							{
+								updated = ImGui::InputScalar(("##" + name).c_str(), ImGuiDataType_U32, &v);
+							}
+							else if constexpr (std::is_same_v<T, glm::mat3>)
+							{
+								for (int i = 0; i < 3; ++i)
+									updated |= ImGui::DragFloat3((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
+							}
+							else if constexpr (std::is_same_v<T, glm::mat4>)
+							{
+								for (int i = 0; i < 4; ++i)
+									updated |= ImGui::DragFloat4((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
+							}
+						}, value);
+
+					// If the value changed, update the shader
+					if (updated)
+					{
+						shaderComponent.m_customShader->setUniformValue(name, value);
+					}
+
+					ImGui::PopID();
+				}
 			}
 		});
 
