@@ -24,6 +24,7 @@ static bool showAnimationSelector = false;
 static bool selectedEntityRename = false;
 static bool showScriptSelector = false;
 static bool showSamplerEditWindow = false;
+static bool showTextureCreateWindow = false;
 
 static bool startButtonPressed = false;
 
@@ -608,6 +609,43 @@ static void addAssetLoadWidget(const std::string& name, ImGuiTextBuffer& textBuf
 	}
 	ImGui::SameLine();
 	ImGui::TextUnformatted(textBuffer.begin(), textBuffer.end());
+}
+
+void ShowTextureCreatorWindow()
+{
+	if (showTextureCreateWindow)
+	{
+		ImGui::OpenPopup("CreateEmptyTexture");
+		showTextureCreateWindow = false;
+	}
+	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		static int width = 512;
+		static int height = 512;
+		static char textureName[256] = "NewTexture";
+
+		ImGui::InputInt("Width", &width);
+		ImGui::InputInt("Height", &height);
+		ImGui::InputText("Name", textureName, IM_ARRAYSIZE(textureName));
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			auto texture = Texture::createEmptyTexture(width, height);
+			Engine::get()->getSubSystem<Assets>()->addTexture2D(texture);
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
 }
 
 void ShowTextureImportWindow()
@@ -2063,7 +2101,13 @@ class GUI_Helper : public GuiMenu {
 					ImGui::EndMenu(); // End of File dropdown
 				}
 				if (ImGui::BeginMenu("Edit")) {
-					// Edit menu items
+					if (ImGui::BeginMenu("Create")) {
+						if (ImGui::MenuItem("Empty Texture")) {
+							showTextureCreateWindow = true;
+							
+						}
+						ImGui::EndMenu();
+					}
 					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu("Help")) {
@@ -2075,13 +2119,14 @@ class GUI_Helper : public GuiMenu {
 			
 			ImGui::EndMainMenuBar();
 		}
-
+		
 		// Render UI
 		RenderSimulationControlView(screenWidth, screenHeight);
 		RenderViewWindow(screenWidth, screenHeight);
 		RenderSceneHierarchyWindow(screenWidth, screenHeight);
 		RenderInspectorWindow(screenWidth, screenHeight);
 		RenderAssetViewWindow(screenWidth, screenHeight); // Add the Asset View window
+		ShowTextureCreatorWindow();
 
 		DisplayDebugInfoWindow();
 		
