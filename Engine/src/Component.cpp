@@ -124,4 +124,6 @@ void ShaderComponent::setProjectionTexture(Resource<Texture> texture)
 {
 	renderViewProjection->bind();
 	renderViewProjection->setTexture(texture);
+	projectionTexture = texture;
+	
 };

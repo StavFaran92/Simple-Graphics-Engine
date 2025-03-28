@@ -1253,6 +1253,17 @@ static void displayChannelSelectWidget(int*& currentChannel)
 	}
 }
 
+static void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(std::string uuid)> callback)
+{
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureID), size))
+	{
+		ImGui::OpenPopup("EditTexturePopup");
+		assetTextureSelectCB = callback;
+	}
+
+	displayAssetTextureSelectPopup();
+}
+
 static void addTextureEditWidget(Resource<Texture> texture, ImVec2 size, std::function<void(std::string uuid)> callback)
 {
 	int texID = 0;
@@ -1689,11 +1700,18 @@ void RenderInspectorWindow(float width, float height)
 
 		displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {
 			static char shaderFilePath[256] = "";
-			static int overrideType = 0;
-			static int projectionType = 0;
+			static ShaderOverride overrideType = ShaderOverride::PBR;
+			//static int projectionType = 0;
 			//static std::vector<char [256]> customTextureNames { 8 };
 			//static std::vector<Resource<Texture>> customTextures{ 8 };
-			static Resource<Texture> projectionTexture;
+
+			if (ImGui::IsWindowAppearing())
+			{
+				std::strncpy(shaderFilePath, shaderComponent.m_shaderFilePath, sizeof(shaderFilePath));
+				shaderFilePath[sizeof(shaderFilePath) - 1] = '\0'; // Make sure it's null-terminated
+
+				overrideType = shaderComponent.shaderOverride;
+			}
 
 			// Shader File Path
 			ImGui::Text("Filepath");
@@ -1702,21 +1720,12 @@ void RenderInspectorWindow(float width, float height)
 			// Override Type Drop-down
 			const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader" };
 			ImGui::Text("Override Type");
-			ImGui::Combo("##ShaderOverrideType", &overrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
+			ImGui::Combo("##ShaderOverrideType", (int*)&overrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
 
 			// Compile Button
 			if (ImGui::Button("Compile"))
 			{
-				ShaderOverride actualOverrideType = ShaderOverride::PBR;
-				if (overrideType == 0)
-				{
-					actualOverrideType = ShaderOverride::PBR;
-				}
-				else if (overrideType == 1)
-				{
-					actualOverrideType = ShaderOverride::Pixel;
-				}
-				ShaderComponent& newShader = CustomShaderBuilder::create(shaderFilePath, actualOverrideType).build();
+				ShaderComponent& newShader = CustomShaderBuilder::create(shaderFilePath, overrideType).build();
 
 				selectedEntity.RemoveComponent<ShaderComponent>();
 				selectedEntity.addComponent<ShaderComponent>(newShader);
@@ -1726,13 +1735,17 @@ void RenderInspectorWindow(float width, float height)
 
 			// Projection Type Drop-down
 			const char* projectionTypes[] = { "Default", "Texture2D" };
-			ImGui::Combo("Projection Type", &projectionType, projectionTypes, IM_ARRAYSIZE(projectionTypes));
+			ImGui::Combo("Projection Type", (int*)&shaderComponent.projection, projectionTypes, IM_ARRAYSIZE(projectionTypes));
 
-			if (projectionType == 1)
+			if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
 			{
 				// Projection Texture
 				ImGui::Text("Projection Texture:");
-				addTextureEditWidget(projectionTexture, { 50,50 }, [](std::string uuid) {});
+				addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](std::string uuid) {
+					auto tempTex = Texture::createEmptyTexture(1920, 1080);
+					Engine::get()->getSubSystem<Assets>()->addTexture2D(tempTex);
+					shaderComponent.setProjectionTexture(tempTex);
+				});
 			}
 
 			// Custom Textures Array

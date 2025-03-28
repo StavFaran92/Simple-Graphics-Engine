@@ -331,7 +331,7 @@ struct EngineAPI ObjectComponent : public Component
 	Entity e = Entity::EmptyEntity;
 };
 
-enum class ShaderOverride
+enum class ShaderOverride : int
 {
 	PBR,
 	Pixel
@@ -376,6 +376,8 @@ struct EngineAPI ShaderComponent : public Component
 	std::shared_ptr<RenderView> renderViewProjection;
 
 	std::unordered_map<std::string, Value> m_uniformProperties;
+
+	char m_shaderFilePath[256] = "";
 
 	bool isValid = false;
 };

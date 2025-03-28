@@ -99,6 +99,20 @@ void Shader::BuildShaders(const ShadersInfo& shaderCode)
 	// Validate shader program link
 	ValidateProgramLink();
 
+	GLint activeUniforms = 0;
+	glGetProgramiv(m_id, GL_ACTIVE_UNIFORMS, &activeUniforms);
+
+	for (GLint i = 0; i < activeUniforms; ++i)
+	{
+		char name[256];
+		GLsizei length;
+		GLint size;
+		GLenum type;
+		glGetActiveUniform(m_id, i, sizeof(name), &length, &size, &type, name);
+		GLint location = glGetUniformLocation(m_id, name);
+		m_uniformLocationCache[name] = location;
+	}
+
 	// Delete shaders
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragShader);
@@ -221,16 +235,7 @@ int Shader::getUniformLocation(const std::string& name)
 	if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
 		return m_uniformLocationCache[name];
 
-	int location = glGetUniformLocation(m_id, name.c_str());
-
-	if (location == -1) {
-		logWarning("Uniform {} doesn't exists!", name.c_str());
-		return -1;
-	}
-
-	m_uniformLocationCache[name] = location;
-
-	return location;
+	return -1;
 }
 
 int Shader::getUniformBlockLocation(const std::string& name)
@@ -260,6 +265,11 @@ void Shader::setUniformValue(const std::string& name, const Value& v)
 	if (s_activeShader != m_id)
 	{
 		m_delayedProperties[name] = v;
+		return;
+	}
+
+	if (m_uniformLocationCache.find(name) == m_uniformLocationCache.end())
+	{
 		return;
 	}
 
