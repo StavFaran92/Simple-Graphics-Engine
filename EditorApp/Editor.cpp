@@ -633,7 +633,7 @@ void ShowTextureCreatorWindow()
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
 			auto texture = Texture::createEmptyTexture(width, height);
-			Engine::get()->getSubSystem<Assets>()->addTexture2D(texture);
+			Engine::get()->getSubSystem<Assets>()->addTexture2D(textureName, texture);
 			ImGui::CloseCurrentPopup();
 		}
 

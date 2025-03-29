@@ -183,8 +183,13 @@ Resource<Texture> Assets::loadTexture2D(UUID uid, const std::string& path)
 
 void Assets::addTexture2D(Resource<Texture> texture)
 {
-	Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(texture);
+	addTexture2D("Texture_" + texture.getUID().substr(4), texture);
+}
 
+void Assets::addTexture2D(const std::string& name, Resource<Texture> texture)
+{
+	Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(texture);
+	Engine::get()->getMemoryManagementSystem()->addAssociation(name, texture.getUID());
 	m_textures[texture.getUID()] = texture;
 }
 
