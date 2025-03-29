@@ -316,7 +316,7 @@ void Scene::draw(float deltaTime)
 		glDepthMask(GL_FALSE);
 		glDepthFunc(GL_LEQUAL);
 		m_skyboxShader->use();
-		graphics->renderView->bind();
+		renderView->bind();
 
 		m_skyboxShader->setViewMatrix(*graphics->view);
 		m_skyboxShader->setProjectionMatrix(*graphics->projection);
