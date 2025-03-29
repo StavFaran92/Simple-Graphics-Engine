@@ -105,3 +105,15 @@ std::vector<Resource<Texture>> Material::getAllTextures() const
 	}
 	return res;
 }
+
+std::shared_ptr<Material> Material::clone() const
+{
+	auto newMaterial = std::make_shared<Material>();
+
+	for (const auto& sampler : m_samplers)
+	{
+		newMaterial->setSampler(sampler.first, std::make_shared<TextureSampler>(*sampler.second.get()));
+	}
+
+	return newMaterial;
+}

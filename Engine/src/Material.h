@@ -33,6 +33,8 @@ public:
 
 	std::vector<Resource<Texture>> getAllTextures() const;
 
+	std::shared_ptr<Material> clone() const;
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		archive(m_samplers);
@@ -44,6 +46,4 @@ protected:
 
 protected:
 	std::map<Texture::TextureType, std::shared_ptr<TextureSampler>> m_samplers;
-
-	std::shared_ptr<TextureSampler> m_defaultSampler;
 };
