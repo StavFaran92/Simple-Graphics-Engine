@@ -356,6 +356,14 @@ struct EngineAPI ShaderComponent : public Component
 
 	void setProjectionTexture(Resource<Texture> texture);
 
+	void update()
+	{
+		for (const auto& [name, value] :m_uniformProperties)
+		{
+			m_customShader->setUniformValue(name, value);
+		}
+	}
+
 	//template <class Archive>
 	//void serialize(Archive& archive) {
 	//	archive(m_shader);
@@ -377,7 +385,7 @@ struct EngineAPI ShaderComponent : public Component
 
 	std::unordered_map<std::string, Value> m_uniformProperties;
 
-	char m_shaderFilePath[256] = "";
+	std::string m_shaderFilePath;
 
 	bool isValid = false;
 };

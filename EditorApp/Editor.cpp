@@ -44,6 +44,14 @@ void AddColoredLabel(const char* label);
 static void displayTransformation(Transformation& transform, bool& isChanged);
 static void displaySelectMeshWindow();
 
+struct EntityState
+{
+	char shaderFilePath[256];
+	ShaderOverride shaderOverrideType;
+};
+
+std::unordered_map<entity_id, EntityState> g_states;
+
 static void stopSimulation()
 {
 	startButtonPressed = false; // Toggle the state
@@ -1737,33 +1745,53 @@ void RenderInspectorWindow(float width, float height)
 		});
 
 		displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {
-			static char shaderFilePath[256] = "";
-			static ShaderOverride overrideType = ShaderOverride::PBR;
-			//static int projectionType = 0;
-			//static std::vector<char [256]> customTextureNames { 8 };
-			//static std::vector<Resource<Texture>> customTextures{ 8 };
-
-			if (ImGui::IsWindowAppearing())
-			{
-				std::strncpy(shaderFilePath, shaderComponent.m_shaderFilePath, sizeof(shaderFilePath));
-				shaderFilePath[sizeof(shaderFilePath) - 1] = '\0'; // Make sure it's null-terminated
-
-				overrideType = shaderComponent.shaderOverride;
-			}
+			auto& state = g_states[selectedEntity.handlerID()];
 
 			// Shader File Path
 			ImGui::Text("Filepath");
-			ImGui::InputText("##ShaderFilePath", shaderFilePath, IM_ARRAYSIZE(shaderFilePath), ImGuiInputTextFlags_EnterReturnsTrue);
+			ImGui::InputText("##ShaderFilePath", state.shaderFilePath, IM_ARRAYSIZE(state.shaderFilePath), ImGuiInputTextFlags_EnterReturnsTrue);
 
 			// Override Type Drop-down
 			const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader" };
 			ImGui::Text("Override Type");
-			ImGui::Combo("##ShaderOverrideType", (int*)&overrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
+			ImGui::Combo("##ShaderOverrideType", (int*)&state.shaderOverrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
 
 			// Compile Button
 			if (ImGui::Button("Compile"))
 			{
-				ShaderComponent& newShader = CustomShaderBuilder::create(shaderFilePath, overrideType).build();
+				ShaderComponent& newShader = CustomShaderBuilder::create(state.shaderFilePath, state.shaderOverrideType).build();
+				auto& oldShader = shaderComponent;
+
+				// If shader type did not change pass assigned values to new shader
+				if (oldShader.shaderOverride == newShader.shaderOverride &&
+					oldShader.m_shaderFilePath == newShader.m_shaderFilePath)
+				{
+					auto& newTextures = newShader.customTextures;
+					for (const auto [name, texture] : oldShader.customTextures)
+					{
+						auto iter = newTextures.find(name);
+						if (iter != newTextures.end())
+						{
+							iter->second = texture;
+						}
+					}
+
+					auto& newUniforms = newShader.m_uniformProperties;
+					for (const auto [name, value] : oldShader.m_uniformProperties)
+					{
+						auto iter = newUniforms.find(name);
+						if (iter != newUniforms.end())
+						{
+							iter->second = value;
+						}
+					}
+
+					newShader.projection = oldShader.projection;
+					newShader.projectionTexture = oldShader.projectionTexture;
+					newShader.renderViewProjection = oldShader.renderViewProjection;
+
+					newShader.update();
+				}
 
 				selectedEntity.RemoveComponent<ShaderComponent>();
 				selectedEntity.addComponent<ShaderComponent>(newShader);

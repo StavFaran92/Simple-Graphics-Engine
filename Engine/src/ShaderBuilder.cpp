@@ -214,6 +214,7 @@ ShaderComponent CustomShaderBuilder::build()
 
 		shaderComponent.m_customShader = shader;
 		shaderComponent.shaderOverride = m_shaderOverride;
+		shaderComponent.m_shaderFilePath = m_filepath;
 		shaderComponent.isValid = true;
 	}
 
