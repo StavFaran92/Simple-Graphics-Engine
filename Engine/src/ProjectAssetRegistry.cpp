@@ -114,6 +114,12 @@ void ProjectAssetRegistry::addAnimation(UUID uuid)
     sync();
 }
 
+void ProjectAssetRegistry::addShader(UUID uuid)
+{
+    m_assetRegistry["shaders"].push_back(uuid);
+    sync();
+}
+
 void ProjectAssetRegistry::addAssociation(std::string name, UUID uuid)
 {
     m_assetRegistry["association"].push_back({ name, uuid });

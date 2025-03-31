@@ -104,6 +104,7 @@ bool Engine::init(const InitParams& initParams)
     m_memoryPoolTexture = std::make_shared<MemoryPool<Texture>>();
     m_memoryPoolMeshCollection = std::make_shared<MemoryPool<MeshCollection>>();
     m_memoryPoolAnimation = std::make_shared<MemoryPool<Animation>>();
+    m_memoryPoolShader = std::make_shared<MemoryPool<Shader>>();
 
     m_resourceManager = std::make_shared<ResourceManager>();
 

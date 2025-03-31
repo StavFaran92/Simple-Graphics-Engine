@@ -8,6 +8,7 @@
 #include "AnimationLoader.h"
 #include "CacheSystem.h"
 #include "ModelImporter.h"
+#include "Factory.h"
 
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -232,6 +233,107 @@ std::vector<std::string> Assets::getAllAnimations() const
 		result.push_back(uuid);
 	}
 	return result;
+}
+
+enum class AssetType
+{
+	NONE,
+	TEXTURE,
+	MESH,
+	ANIMATION,
+	SHADER
+};
+
+template<typename T>
+AssetType getAssetType()
+{
+	if constexpr (std::is_same_v<T, Mesh>) return AssetType::MESH;
+	if constexpr (std::is_same_v<T, Texture>) return AssetType::TEXTURE;
+	if constexpr (std::is_same_v<T, Animation>) return AssetType::ANIMATION;
+	if constexpr (std::is_same_v<T, Shader>) return AssetType::SHADER;
+	return AssetType::NONE;
+}
+
+template<typename T>
+Resource<T> loadAsset(UUID uid, const std::string& path)
+{
+	// create asset in memory
+	T::load(path);
+
+	// add asset to memory pool
+	Engine::get()->getMemoryPool<Texture>()->add(uid, texture);
+
+	auto& res = Resource<T>(uid);
+
+	m_animations[uid] = res;
+
+	return res;
+}
+
+template<typename T> 
+Resource<T> importAsset(const std::string& path)
+{
+	// Validate
+	if (!std::filesystem::exists(path))
+	{
+		logError("File doesn't exists: " + path);
+		return Resource<T>::empty;
+	}
+
+	// Process asset
+	if (!T::preprocess(path))
+	{
+		logError("Asset import failed, Asset path: " + path );
+		return Resource<T>::empty;
+	}
+
+	Resource<T> asset = Factory<T>::create(path); //maybe need to seperate
+
+	std::string fullName = std::filesystem::path(path).filename().string();
+	std::string name = fullName.substr(0, fullName.find_first_of('.'));
+	std::string ext = name.substr(name.find_first_of('.'));
+
+	// Save asset in resource folder
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	const std::string savedFilePath = projectDir + "/" + asset.getUID() + ext;
+	std::filesystem::copy_file(path, savedFilePath);
+
+	Engine::get()->getContext()->getProjectAssetRegistry()->addShader(asset.getUID());
+	Engine::get()->getMemoryManagementSystem()->addAssociation(path, asset.getUID());
+
+	return loadAsset(asset.getUID(), path);
+}
+
+Resource<Shader> Assets::importShader(const std::string& path)
+{
+	if (!std::filesystem::exists(path))
+	{
+		logError("File doesn't exists: " + path);
+		return Resource<Shader>::empty;
+	}
+
+	auto shader = Factory<Shader>::create(path);
+
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	const std::string savedFilePath = projectDir + "/" + shader.getUID() + ".glsl";
+	std::filesystem::copy_file(path, savedFilePath);
+
+	Engine::get()->getContext()->getProjectAssetRegistry()->addShader(shader.getUID());
+	Engine::get()->getMemoryManagementSystem()->addAssociation(path, shader.getUID());
+	m_shaders[shader.getUID()] = shader;
+
+	return shader;
+
+}
+
+Resource<Shader> Assets::loadShader(UUID uid, const std::string& path)
+{
+	return Resource<Shader>();
+}
+
+std::vector<std::string> Assets::getAllShaders() const
+{
+	return std::vector<std::string>();
 }
 
 std::string Assets::getAlias(UUID uid) const

@@ -24,12 +24,7 @@ public:
 	template<typename T, typename... _Types>
 	static T* create(_Types&&... _Args)
 	{
-		static_assert(std::is_base_of<Shader, T>::value, "T must be a type derived from Shader");
-
-		auto shader = new T(std::forward<_Types>(_Args)...);
-		//shader->init();
-
-		return shader;
+		return new T(std::forward<_Types>(_Args)...);
 	}
 
 	template<typename T, typename... _Types>
@@ -69,11 +64,13 @@ public:
 	/** Copy Assignemnt operator */
 	Shader& operator=(const Shader & other) = default;
 
-protected:
 	Shader();
 
 	/** Constructor */
 	Shader(const std::string& glslFilePath);
+
+protected:
+	
 
 
 
