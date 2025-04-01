@@ -16,6 +16,6 @@
 //		//m_shader = std::make_shared < Shader >("Resources\\Shaders\\shader.vert", "Resources\\Shaders\\shader.frag");
 //	}
 //	static std::shared_ptr<Grid> GenerateGrid(int slices);
-//	void draw(std::shared_ptr<IRenderer> renderer, std::shared_ptr<Shader> shader = nullptr) override;
+//	void draw(std::shared_ptr<IRenderer> renderer, Resource<Shader> shader = nullptr) override;
 //};
 //

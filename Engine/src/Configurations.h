@@ -81,3 +81,12 @@ struct Color
 	unsigned char g;
 	unsigned char b;
 };
+
+enum class AssetType
+{
+	NONE,
+	TEXTURE,
+	MESH,
+	ANIMATION,
+	SHADER
+};

@@ -35,7 +35,7 @@ private:
 
 	FrameBufferObject m_fbo;
 	Scene* m_scene = nullptr;
-	std::shared_ptr<Shader> m_simpleDepthShader = nullptr;
+	Resource<Shader> m_simpleDepthShader = nullptr;
 	Resource<Texture> m_depthMapTexture = nullptr;
 
 	std::shared_ptr<ScreenBufferDisplay> m_bufferDisplay;

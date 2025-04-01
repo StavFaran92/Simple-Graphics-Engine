@@ -13,6 +13,7 @@ class Sphere;
 class Object3D;
 class Context;
 template<typename> class ObjectHandler;
+template<typename> class Resource;
 
 class EngineAPI Application
 {
@@ -25,7 +26,7 @@ protected:
 	/** API */
 	Box* createBoxEntity();
 	Quad* createQuad();
-	void postProcess(Shader*);
+	void postProcess(Resource<Shader>);
 	void skybox(std::shared_ptr<Skybox> skybox);
 
 	Context* getContext() const;

@@ -38,7 +38,7 @@ Renderer::Renderer(Scene* scene)
 
 bool Renderer::init()
 {
-	m_pbrShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
+	m_pbrShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
 
     m_quad = ScreenQuad::GenerateScreenQuad(&Engine::get()->getContext()->getRegistry());
     m_quad.RemoveComponent<RenderableComponent>();
@@ -72,7 +72,7 @@ void Renderer::renderScene(Scene* scene)
 
                 auto tempModel = entityHandler.getComponent<Transformation>().getWorldTransformation();
                 graphics->model = &tempModel;
-                graphics->shader = m_pbrShader.get();
+                graphics->shader = m_pbrShader;
                 graphics->mesh = mesh.get();
 
                 Material* mat = graphics->entity->tryGetComponentInParent<Material>();
@@ -152,7 +152,7 @@ void Renderer::setUniforms()
 
     if (graphics->material)
     {
-        graphics->material->use(*graphics->shader);
+        graphics->material->use(graphics->shader);
     }
 
     graphics->shader->bindUniformBlockToBindPoint("Time", 2);
@@ -186,7 +186,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             continue;
 
         }
-        Shader* shader = shaderComponent.m_customShader;
+        Resource<Shader> shader = shaderComponent.m_customShader;
         shader->use();
         graphics->shader = shader;
 

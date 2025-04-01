@@ -60,7 +60,7 @@ bool ShadowSystem::init()
 
 	m_fbo.unbind();
 
-	m_simpleDepthShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/SimpleDepthShader.glsl");
+	m_simpleDepthShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/SimpleDepthShader.glsl");
 
 	//m_bufferDisplay = std::make_shared<ScreenBufferDisplay>(m_scene);
 	//m_bufferDisplay->init(Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight());

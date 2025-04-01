@@ -3,6 +3,7 @@
 #include "Logger.h"
 
 
+
 #include <filesystem>
 #include <fstream>
 
@@ -117,6 +118,22 @@ void ProjectAssetRegistry::addAnimation(UUID uuid)
 void ProjectAssetRegistry::addShader(UUID uuid)
 {
     m_assetRegistry["shaders"].push_back(uuid);
+    sync();
+}
+
+std::string getAssetTypeAsStr(AssetType aType)
+{
+    if (aType == AssetType::MESH) return "meshes";
+    if (aType == AssetType::TEXTURE) return "texture";
+    if (aType == AssetType::SHADER) return "shaders";
+    if (aType == AssetType::ANIMATION) return "animations";
+    return "N/A";
+}
+
+void ProjectAssetRegistry::addAssetRegistry(UUID uuid, AssetType aType)
+{
+    std::string assetTypeName = getAssetTypeAsStr(aType);
+    m_assetRegistry[assetTypeName].push_back(uuid);
     sync();
 }
 

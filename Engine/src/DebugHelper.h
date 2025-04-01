@@ -4,6 +4,7 @@
 
 #include "Engine.h"
 #include "Core.h"
+#include "Resource.h"
 
 #include <glm/glm.hpp>
 
@@ -41,6 +42,6 @@ private:
 
     std::shared_ptr<VertexArrayObject> m_vao;
     std::shared_ptr<VertexBufferObject> m_pointVBO;
-    std::shared_ptr<Shader> m_pointShader;
-    std::shared_ptr<Shader> m_lineShader;
+    Resource<Shader> m_pointShader;
+    Resource<Shader> m_lineShader;
 };

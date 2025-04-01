@@ -28,7 +28,7 @@ bool ScreenBufferDisplay::init(int windowWidth, int windowHeight)
 	m_quad = ScreenQuad::GenerateScreenQuad(&m_scene->getRegistry());
 	
 	// Generate screen shader
-	m_screenShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/ScreenBufferDisplayShader.glsl");
+	m_screenShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/ScreenBufferDisplayShader.glsl");
 
 	// Generate screen renderer
 	m_renderer = std::make_shared<Renderer2D>();
@@ -53,7 +53,7 @@ void ScreenBufferDisplay::draw(Resource<Texture> textureHandler)
 	auto mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh().get();
 
 	graphics->mesh = mesh;
-	graphics->shader = m_screenShader.get();
+	graphics->shader = m_screenShader;
 	m_renderer->render();
 
 	//mesh.mesh->render(*m_screenShader, *m_renderer);

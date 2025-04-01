@@ -74,7 +74,7 @@ public:
 	Scene(Context* context);
 
 	void setPostProcess(bool value);
-	bool setPostProcessShader(Shader* shader);
+	bool setPostProcessShader(Resource<Shader> shader);
 
 	void addCoroutine(const std::function<bool(float)>& coroutine);
 	void removeCoroutine(std::function<bool(float)> coroutine);
@@ -160,7 +160,7 @@ private:
 
 	bool m_isSimulationActive = false;
 
-	Shader* m_tempOutlineShader = nullptr;
+	Resource<Shader> m_tempOutlineShader = nullptr;
 
 	//CameraComponent* m_activeCamera = nullptr;
 
@@ -176,9 +176,9 @@ private:
 	Resource<Texture> m_irradianceMap;
 	Resource<Texture> m_prefilterEnvMap;
 	Resource<Texture> m_BRDFIntegrationLUT;
-	std::shared_ptr<Shader> m_skyboxShader;
-	std::shared_ptr<Shader> m_UIShader;
-	std::shared_ptr<Shader> m_terrainShader;
+	Resource<Shader> m_skyboxShader;
+	Resource<Shader> m_UIShader;
+	Resource<Shader> m_terrainShader;
 
 	Resource<MeshCollection> m_basicBox;
 

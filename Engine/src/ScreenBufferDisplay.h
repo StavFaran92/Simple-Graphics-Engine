@@ -22,7 +22,7 @@ public:
 
 private:
 	Entity m_quad;
-	std::shared_ptr<Shader> m_screenShader = nullptr;
+	Resource<Shader> m_screenShader = nullptr;
 	std::shared_ptr<IRenderer> m_renderer = nullptr;
 	Scene* m_scene = nullptr;
 };

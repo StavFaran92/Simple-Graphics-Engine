@@ -24,6 +24,6 @@ protected:
 	//Resource<Texture> m_renderTargetTexture = nullptr;
 	//Entity m_quad;
 	//std::shared_ptr<IRenderer> m_2DRenderer;
-	//std::shared_ptr<Shader> m_screenShader;
+	//Resource<Shader> m_screenShader;
 };
 

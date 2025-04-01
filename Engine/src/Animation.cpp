@@ -77,3 +77,15 @@ void Animation::build(const std::string& name, float duration, float ticksPerSec
 	m_rootNode = rootNode;
 	m_bones = bones;
 }
+
+bool Animation::preprocess(const std::string& path)
+{
+	return true;
+}
+
+#include "AnimationLoader.h"
+void Animation::load(UUID uid, const std::string& path)
+{
+	Engine::get()->getSubSystem<AnimationLoader>()->load(path, Resource<Animation>(uid));
+
+}

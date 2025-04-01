@@ -43,24 +43,24 @@ private:
 
 
 	Entity m_quad;
-	std::shared_ptr<Shader> m_screenShader;
+	Resource<Shader> m_screenShader;
 	
 	
-	std::shared_ptr<Shader> m_gBufferShader;
-	std::shared_ptr<Shader> m_lightPassShader;
+	Resource<Shader> m_gBufferShader;
+	Resource<Shader> m_lightPassShader;
 
 	// SSAO
 	FrameBufferObject m_ssaoFBO;
 	RenderBufferObject m_ssaoRenderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
 	Resource<Texture> m_ssaoNoiseTexture = nullptr;
 	Resource<Texture> m_ssaoColorBuffer = nullptr;
-	std::shared_ptr<Shader> m_ssaoPassShader;
+	Resource<Shader> m_ssaoPassShader;
 	std::vector<glm::vec3> m_ssaoKernel;
 	
 	FrameBufferObject m_ssaoBlurFBO;
 	RenderBufferObject m_ssaoBlurRenderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
 	Resource<Texture> m_ssaoBlurColorBuffer = nullptr;
-	std::shared_ptr<Shader> m_ssaoBlurPassShader;
+	Resource<Shader> m_ssaoBlurPassShader;
 
 };
 

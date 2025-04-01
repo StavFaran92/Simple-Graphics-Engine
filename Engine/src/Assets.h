@@ -13,6 +13,18 @@
 class EngineAPI Assets
 {
 public:
+	struct AssetInfo
+	{
+		std::string origFilePath;
+		std::string filePath;
+		AssetType aType;
+		bool isValid = false;
+		//bool isClient = false
+		//timestamp
+		//size
+		//etc..
+	};
+
 	Assets();
 
 	ModelImporter::ModelInfo importMesh(const std::string& path);
@@ -30,16 +42,27 @@ public:
 	Resource<Animation> loadAnimation(UUID uid, const std::string& path);
 	std::vector<std::string> getAllAnimations() const;
 
-	Resource<Shader> importShader(const std::string& path);
-	Resource<Shader> loadShader(UUID uid, const std::string& path);
 	std::vector<std::string> getAllShaders() const;
 
 	std::string getAlias(UUID uid) const;
+
+	//void addAsset(AssetType aType, UUID uid);
+
+	template<typename T>
+	Resource<T> loadAsset(UUID uid, const std::string& path);
+
+	AssetInfo importAsset(UUID uid, const std::string& path, AssetType aType);
+
+	AssetInfo addAsset(UUID uid, AssetType aType);
+
+	//template<typename T>
+	//AssetType getAssetType();
 
 private:
 	Texture::TextureData extractTextureDataFromFile(const std::string& fileLocation);
 
 private:
+	std::map<AssetType, std::unordered_set<UUID>> m_assets;
 	std::unordered_map<UUID, Resource<MeshCollection>> m_meshes;
 	std::unordered_map<UUID, Resource<Texture>> m_textures;
 	std::unordered_map<UUID, Resource<Animation>> m_animations;

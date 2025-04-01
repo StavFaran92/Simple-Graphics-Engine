@@ -56,6 +56,8 @@ public:
 
 	bool build();
 
+	static Resource<Shader> import(const std::string& filepath);
+
 	virtual ~Shader();
 
 	/** Copy Constructor */

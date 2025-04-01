@@ -209,13 +209,17 @@ ShaderComponent CustomShaderBuilder::build()
 		}
 
 		// build shader light
-		Shader* shader = new Shader();
-		shader->BuildShaders(shaders);
+		//Shader* shader = new Shader();
+		Resource<Shader> shader = Shader::import(m_filepath);
+		shader.get()->BuildShaders(shaders);
 
 		shaderComponent.m_customShader = shader;
 		shaderComponent.shaderOverride = m_shaderOverride;
 		shaderComponent.m_shaderFilePath = m_filepath;
 		shaderComponent.isValid = true;
+
+		// Save asset
+
 	}
 
 

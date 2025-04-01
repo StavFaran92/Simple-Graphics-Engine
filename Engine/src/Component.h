@@ -360,7 +360,7 @@ struct EngineAPI ShaderComponent : public Component
 	{
 		for (const auto& [name, value] :m_uniformProperties)
 		{
-			m_customShader->setUniformValue(name, value);
+			m_customShader.get()->setUniformValue(name, value);
 		}
 	}
 
@@ -373,7 +373,7 @@ struct EngineAPI ShaderComponent : public Component
 	Shader* m_fragmentShader = nullptr;
 
 	// This will only be used by forward renderer, ignored by deffered
-	Shader* m_customShader = nullptr;
+	Resource<Shader> m_customShader;
 
 	ShaderOverride shaderOverride;
 

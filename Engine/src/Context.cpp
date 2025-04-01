@@ -47,7 +47,7 @@ bool Context::removeScene(std::shared_ptr<Scene> scene)
 	return false;
 }
 
-bool Context::AddShader(std::shared_ptr<Shader> shader)
+bool Context::AddShader(Resource<Shader> shader)
 {
 	m_shaderCounter += 1;
 	shader->SetID(m_shaderCounter);
@@ -58,7 +58,7 @@ bool Context::AddShader(std::shared_ptr<Shader> shader)
 	return true;
 }
 
-bool Context::RemoveShader(std::shared_ptr<Shader> shader)
+bool Context::RemoveShader(Resource<Shader> shader)
 {
 	uint32_t uid = shader->getID();
 	auto iter = m_shaders.find(uid);

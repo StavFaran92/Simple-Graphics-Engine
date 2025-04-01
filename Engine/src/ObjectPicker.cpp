@@ -31,7 +31,7 @@ ObjectPicker::ObjectPicker()
 
 bool ObjectPicker::init()
 {
-	m_pickingShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl");
+	m_pickingShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl");
 
 	// Bind FBO
 	m_frameBuffer.bind();

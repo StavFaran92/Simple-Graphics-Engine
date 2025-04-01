@@ -73,7 +73,7 @@ bool PostProcessProjector::init(int windowWidth, int windowHeight)
 	m_quad = ScreenQuad::GenerateScreenQuad(&m_scene->getRegistry());
 	
 	// Generate screen shader
-	m_screenShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_default.glsl");
+	m_screenShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_default.glsl");
 
 	// Generate screen renderer
 	m_renderer = std::make_shared<Renderer2D>();
@@ -113,13 +113,13 @@ void PostProcessProjector::draw()
 	auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
 
 	graphics->mesh = mesh.get();
-	graphics->shader = m_screenShader.get();
+	graphics->shader = m_screenShader;
 	m_renderer->render();
 
 	m_textureHandler.get()->unbind();
 }
 
-void PostProcessProjector::setPostProcessShader(std::shared_ptr<Shader> shader)
+void PostProcessProjector::setPostProcessShader(Resource<Shader> shader)
 {
 	m_screenShader = shader;
 }

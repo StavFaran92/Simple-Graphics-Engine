@@ -16,7 +16,7 @@ Material::Material()
 	m_samplers[Texture::TextureType::AmbientOcclusion] = std::make_shared<TextureSampler>(1);
 }
 
-void Material::use(Shader& shader)
+void Material::use(Resource<Shader> shader)
 {
 	setTexturesInShader(shader);
 }
@@ -46,7 +46,7 @@ bool Material::hasTexture(Texture::TextureType textureType) const
 	return iter != m_samplers.end() && iter->second->texture.get();
 }
 
-void Material::setTextureInShader(Shader& shader, Texture::TextureType ttype, int slot)
+void Material::setTextureInShader(Resource<Shader> shader, Texture::TextureType ttype, int slot)
 {
 	auto sampler = getSampler(ttype);
 
@@ -64,18 +64,18 @@ void Material::setTextureInShader(Shader& shader, Texture::TextureType ttype, in
 	glBindTexture(GL_TEXTURE_2D, texture.get()->getID());
 
 	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".texture", slot);
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".xOffset", sampler->xOffset);
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".yOffset", sampler->yOffset);
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".xScale", sampler->xScale);
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".yScale", sampler->yScale);
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskR", sampler->channelMaskR);
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskG", sampler->channelCount > 1 ? sampler->channelMaskG : 0);
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskB", sampler->channelCount > 2 ? sampler->channelMaskB : 0);
-	shader.setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".texture", slot);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".xOffset", sampler->xOffset);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".yOffset", sampler->yOffset);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".xScale", sampler->xScale);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".yScale", sampler->yScale);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskR", sampler->channelMaskR);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskG", sampler->channelCount > 1 ? sampler->channelMaskG : 0);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskB", sampler->channelCount > 2 ? sampler->channelMaskB : 0);
+	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
 }
 
-void Material::setTexturesInShader(Shader& shader)
+void Material::setTexturesInShader(Resource<Shader> shader)
 {
 	// It either has diffuse or albedo
 	//setTextureInShader(shader, Texture::Type::Diffuse, 0);

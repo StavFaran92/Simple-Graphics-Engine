@@ -35,7 +35,7 @@ protected:
 
 	Scene* m_scene = nullptr;
 
-	std::shared_ptr<Shader> m_pbrShader = nullptr;
+	Resource<Shader> m_pbrShader = nullptr;
 	Entity m_quad;
 
 

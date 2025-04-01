@@ -42,6 +42,7 @@ public:
 	void addTexture(Resource<Texture> texture);
 	void addAnimation(UUID uuid);
 	void addShader(UUID uuid);
+	void addAssetRegistry(UUID uuid, AssetType aType);
 	void addAssociation(std::string name, UUID uuid);
 	std::vector<UUID> getMeshList() const;
 	std::vector<TextureAsset> getTextureList() const;

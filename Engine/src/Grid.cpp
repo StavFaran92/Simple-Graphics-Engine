@@ -54,7 +54,7 @@
 //    return grid;
 //}
 //
-//void Grid::Draw(std::shared_ptr<IRenderer> renderer, std::shared_ptr<Shader> shader)
+//void Grid::Draw(std::shared_ptr<IRenderer> renderer, Resource<Shader> shader)
 //{
 //    auto currShader = m_shader;
 //

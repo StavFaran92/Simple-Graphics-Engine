@@ -31,6 +31,6 @@ public:
 private:
 	FrameBufferObject m_frameBuffer;
 	Resource<Texture> m_targetTexture;
-	std::shared_ptr<Shader> m_pickingShader;
+	Resource<Shader> m_pickingShader;
 };
 

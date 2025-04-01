@@ -63,6 +63,11 @@ public:
 		return *this;
 	};
 
+	T* operator->()
+	{
+		return get();
+	}
+
 	inline T* get() const
 	{
 		m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);

@@ -37,7 +37,7 @@ public:
 
 	Entity* entity = nullptr;
 	Mesh* mesh = nullptr;
-	Shader* shader = nullptr;
+	Resource<Shader> shader = nullptr;
 	Material* material = nullptr;
 
 	// MVP

@@ -68,9 +68,9 @@ bool DeferredRenderer::setupGBuffer()
 
 	m_gBuffer.unbind();
 
-	m_gBufferShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
+	m_gBufferShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
 
-	m_lightPassShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+	m_lightPassShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
 
 	return true;
 }
@@ -138,7 +138,7 @@ bool DeferredRenderer::setupSSAO()
 
 	m_ssaoFBO.unbind();
 
-	m_ssaoPassShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
+	m_ssaoPassShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
 
 	// Initialize SSAO Blur
 	m_ssaoBlurFBO.bind();
@@ -157,7 +157,7 @@ bool DeferredRenderer::setupSSAO()
 
 	m_ssaoBlurFBO.unbind();
 
-	m_ssaoBlurPassShader = Shader::createShared<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOBlurPassShader.glsl");
+	m_ssaoBlurPassShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOBlurPassShader.glsl");
 
 	return true;
 }
@@ -188,7 +188,7 @@ void DeferredRenderer::render()
 
     if (graphics->material)
     {
-        graphics->material->use(*graphics->shader);
+        graphics->material->use(graphics->shader);
     }
 
 	// Draw
@@ -203,154 +203,6 @@ void DeferredRenderer::render()
 		graphics->shader->setUniformValue("isGpuInstanced", true);
 		RenderCommand::drawInstanced(graphics->mesh->getVAO(), instanceBatch->getCount());
 	}
-}
-
-void DeferredRenderer::renderSceneUsingCustomShader(Scene* scene)
-{
-	auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-	// Filter objects to acquire only custom shader objects
-	graphics->entityGroup.clear();
-	for (auto&& [entity, mesh, transform, renderable, shader] :
-		scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent, ShaderComponent>().each())
-	{
-		if (renderable.renderTechnique == RenderableComponent::RenderTechnique::Deferred)
-		{
-			Entity entityhandler{ entity, &scene->getRegistry() };
-			graphics->entityGroup.push_back(entityhandler);
-		}
-	}
-
-	m_gBuffer.bind();
-
-	glEnable(GL_DEPTH_TEST);
-
-	// Render all objects
-	for (auto& entityHandler : graphics->entityGroup)
-	{
-		Resource<MeshCollection> meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
-
-		// fill bone animation data
-		auto animator = entityHandler.tryGetComponent<Animator>();
-		if (!animator || animator->m_currentAnimation.isEmpty())
-		{
-			graphics->shader->setUniformValue("isAnimated", false);
-		}
-		else
-		{
-			std::vector<glm::mat4> finalBoneMatrices;
-			animator->getFinalBoneMatrices(meshCollecton.get(), finalBoneMatrices);
-			for (int i = 0; i < finalBoneMatrices.size(); ++i)
-			{
-				graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
-			}
-
-			graphics->shader->setUniformValue("isAnimated", true);
-		}
-
-		// bind vertex shader
-		auto& shaderComponent = graphics->entity->getComponent<ShaderComponent>();
-		Shader* vertexShader = shaderComponent.m_vertexShader ? shaderComponent.m_vertexShader : m_gBufferShader.get();
-		Shader* fragmentShader = shaderComponent.m_fragmentShader ? shaderComponent.m_fragmentShader : m_lightPassShader.get();
-		vertexShader->use();
-
-		for (auto mesh : meshCollecton.get()->getMeshes())
-		{
-
-			graphics->entity = graphics->entity;
-			graphics->mesh = mesh.get();
-			auto& transform = graphics->entity->getComponent<Transformation>();
-			graphics->model = &transform.getWorldTransformation();
-			graphics->shader = vertexShader;
-
-			// TODO get this to work
-			AABB& aabb = mesh.get()->getAABB();
-			aabb.adjustToTransform(transform);
-
-			if (!aabb.isOnFrustum(*graphics->frustum))
-			{
-				//continue; todo fix
-			}
-
-			auto matIndex = mesh->getMaterialIndex();
-			auto& materialComponent = graphics->entity->getComponent<MaterialComponent>();
-			graphics->material = materialComponent.at(matIndex).get();
-			if (!graphics->material)
-			{
-				graphics->material = Engine::get()->getDefaultMaterial().get();
-			}
-
-			{
-				int currentSlot = 8;
-				for (const auto& [texName, texture] : shaderComponent.customTextures)
-				{
-					texture.get()->setSlot(currentSlot);
-					texture.get()->bind();
-					vertexShader->setUniformValue(texName, currentSlot);
-					currentSlot++;
-				}
-			}
-
-			// draw model
-			render();
-
-			// unbind gBuffer
-			m_gBuffer.unbind();
-
-
-			glDisable(GL_DEPTH_TEST);
-
-			// bind textures
-			// Todo solve slots issue
-			fragmentShader->setTextureInShader(m_positionTexture, "gPosition", 0);
-			fragmentShader->setTextureInShader(m_normalTexture, "gNormal", 1);
-			fragmentShader->setTextureInShader(m_albedoTexture, "gAlbedo", 2);
-			fragmentShader->setTextureInShader(m_MRATexture, "gMRA", 3);
-			fragmentShader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 4);
-			fragmentShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 5);
-			fragmentShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
-			fragmentShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
-
-			//{
-			//	// This needs to be fixed since the texture limit will might eventually reached.
-			//	int currentSlot = 8;
-			//	for (const auto& [texName, texture] : shaderComponent.customTextures)
-			//	{
-			//		texture.get()->setSlot(currentSlot);
-			//		texture.get()->bind();
-			//		fragmentShader->setUniformValue(texName, currentSlot);
-			//		currentSlot++;
-			//	}
-			//}
-
-
-#if 0
-			m_ssaoBlurColorBuffer->setSlot(3);
-			m_ssaoBlurColorBuffer->bind();
-			m_lightPassShader->setValue("gSSAOColorBuffer", 3);
-#endif
-
-			graphics->renderView->bind();
-
-			// bind fShader
-			fragmentShader->use();
-
-			fragmentShader->bindUniformBlockToBindPoint("Time", 0);
-			fragmentShader->bindUniformBlockToBindPoint("Lights", 1);
-
-			fragmentShader->setUniformValue("cameraPos", graphics->cameraPos);
-			fragmentShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
-
-			{
-				// render to quad
-				auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
-				RenderCommand::draw(mesh->getVAO());
-			}
-
-			graphics->renderView->unbind();
-		}
-	}
-
 }
 
 void DeferredRenderer::renderScene(Scene* scene)
@@ -381,7 +233,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 		glLineWidth(1); // Size in pixels
 	}
 
-	graphics->shader = m_gBufferShader.get();
+	graphics->shader = m_gBufferShader;
 	graphics->shader->use();
 
 	// Render all objects

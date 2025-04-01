@@ -10,6 +10,8 @@
 #include "Engine.h"
 #include "Texture.h"
 #include "Resource.h"
+#include "Factory.h"
+#include "Assets.h"
 
 uint32_t Shader::s_activeShader = 0;
 
@@ -352,6 +354,13 @@ void Shader::setProjectionMatrix(glm::mat4 projection)
 void Shader::setTime(float time)
 {
 	setFloat("time", time);
+}
+
+Resource<Shader> Shader::import(const std::string& filepath)
+{
+	Resource<Shader> shader = Factory<Shader>::create(filepath);
+	Engine::get()->getSubSystem<Assets>()->importAsset(shader.getUID(), filepath, AssetType::SHADER); // this is a hack, we should load the copied shader.
+	return shader;
 }
 
 Shader::~Shader() {

@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include "Shader.h"
+#include "Resource.h"
 
 class CommonShaders
 {
@@ -20,12 +21,12 @@ public:
 
     void close();
 
-    std::shared_ptr<Shader> getShader(ShaderType sType) const;
+    Resource<Shader> getShader(ShaderType sType) const;
 
     CommonShaders(const CommonShaders& other) = delete;
     CommonShaders& operator=(const CommonShaders& other) = delete;
 
 private:
-    std::map<ShaderType, std::shared_ptr<Shader>> m_shaders;
+    std::map<ShaderType, Resource<Shader>> m_shaders;
     
 };
