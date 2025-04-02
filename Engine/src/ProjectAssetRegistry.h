@@ -8,6 +8,8 @@
 #include "Resource.h"
 #include "Texture.h"
 
+struct AssetInfo;
+
 class ProjectAssetRegistry
 {
 public:
@@ -41,8 +43,7 @@ public:
 	void addMesh(UUID uuid);
 	void addTexture(Resource<Texture> texture);
 	void addAnimation(UUID uuid);
-	void addShader(UUID uuid);
-	void addAssetRegistry(UUID uuid, AssetType aType);
+	void addAssetRegistry(AssetInfo asset);
 	void addAssociation(std::string name, UUID uuid);
 	std::vector<UUID> getMeshList() const;
 	std::vector<TextureAsset> getTextureList() const;

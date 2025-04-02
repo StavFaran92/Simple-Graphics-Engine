@@ -10,20 +10,24 @@
 
 #include <functional>
 
+struct AssetInfo
+{
+	UUID uuid;
+	std::string origFilePath;
+	std::string filePath;
+	AssetType aType;
+	bool isValid = false;
+	std::map<std::string, std::string> attributes;
+	//bool isClient = false
+	//timestamp
+	//size
+	//etc..
+};
+
 class EngineAPI Assets
 {
 public:
-	struct AssetInfo
-	{
-		std::string origFilePath;
-		std::string filePath;
-		AssetType aType;
-		bool isValid = false;
-		//bool isClient = false
-		//timestamp
-		//size
-		//etc..
-	};
+	
 
 	Assets();
 
@@ -42,7 +46,6 @@ public:
 	Resource<Animation> loadAnimation(UUID uid, const std::string& path);
 	std::vector<std::string> getAllAnimations() const;
 
-	std::vector<std::string> getAllShaders() const;
 
 	std::string getAlias(UUID uid) const;
 
@@ -51,9 +54,11 @@ public:
 	template<typename T>
 	Resource<T> loadAsset(UUID uid, const std::string& path);
 
-	AssetInfo importAsset(UUID uid, const std::string& path, AssetType aType);
+	AssetInfo importAsset(AssetInfo assetInfo);
 
-	AssetInfo addAsset(UUID uid, AssetType aType, const std::string& savedFilepath);
+	AssetInfo addAsset(AssetInfo assetInfo);
+
+	std::vector<std::string> getAllAssetsOfType(AssetType aType) const;
 
 	//template<typename T>
 	//AssetType getAssetType();

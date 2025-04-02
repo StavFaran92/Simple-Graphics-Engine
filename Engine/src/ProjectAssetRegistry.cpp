@@ -7,9 +7,33 @@
 #include <filesystem>
 #include <fstream>
 
-
+#include "Assets.h"
 
 using json = nlohmann::json;
+
+// Serialization (to JSON)
+void to_json(nlohmann::json& j, const AssetInfo& asset)
+{
+    j = nlohmann::json{
+        {"uuid", asset.uuid}, // Assuming UUID has a valid to_json
+        {"origFilePath", asset.origFilePath},
+        {"filePath", asset.filePath},
+        {"type", asset.aType}, // Assuming AssetType supports JSON conversion
+        {"isValid", asset.isValid},
+        {"attributes", asset.attributes}
+    };
+}
+
+// Deserialization (from JSON)
+void from_json(const nlohmann::json& j, AssetInfo& asset)
+{
+    j.at("uuid").get_to(asset.uuid); // Assuming UUID has a valid from_json
+    j.at("origFilePath").get_to(asset.origFilePath);
+    j.at("filePath").get_to(asset.filePath);
+    j.at("type").get_to(asset.aType); // Assuming AssetType supports JSON conversion
+    j.at("isValid").get_to(asset.isValid);
+    j.at("attributes").get_to(asset.attributes);
+}
 
 ProjectAssetRegistry::ProjectAssetRegistry(const std::string& filename)
     : m_filename(filename)
@@ -26,6 +50,8 @@ std::shared_ptr<ProjectAssetRegistry> ProjectAssetRegistry::create(const std::st
     // Create JSON object with empty arrays for meshes and textures
     par->m_assetRegistry["meshes"] = nlohmann::json::array();
     par->m_assetRegistry["textures"] = nlohmann::json::array();
+    par->m_assetRegistry["animations"] = nlohmann::json::array();
+    par->m_assetRegistry["shaders"] = nlohmann::json::array();
     par->m_assetRegistry["association"] = nlohmann::json::array();
 
     // Write JSON data to file
@@ -115,12 +141,6 @@ void ProjectAssetRegistry::addAnimation(UUID uuid)
     sync();
 }
 
-void ProjectAssetRegistry::addShader(UUID uuid)
-{
-    m_assetRegistry["shaders"].push_back(uuid);
-    sync();
-}
-
 std::string getAssetTypeAsStr(AssetType aType)
 {
     if (aType == AssetType::MESH) return "meshes";
@@ -130,10 +150,12 @@ std::string getAssetTypeAsStr(AssetType aType)
     return "N/A";
 }
 
-void ProjectAssetRegistry::addAssetRegistry(UUID uuid, AssetType aType)
+void ProjectAssetRegistry::addAssetRegistry(AssetInfo asset)
 {
-    std::string assetTypeName = getAssetTypeAsStr(aType);
-    m_assetRegistry[assetTypeName].push_back(uuid);
+    std::string assetTypeName = getAssetTypeAsStr(asset.aType);
+    json j;
+    to_json(j, asset);
+    m_assetRegistry[assetTypeName].push_back(j);
     sync();
 }
 

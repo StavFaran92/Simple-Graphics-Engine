@@ -26,7 +26,11 @@ Assets::Assets()
 ModelImporter::ModelInfo Assets::importMesh(const std::string& fileLocation)
 {
 	auto modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(fileLocation);
-	importAsset(modelInfo.mesh.getUID(), fileLocation, AssetType::MESH);
+	AssetInfo aInfo;
+	aInfo.uuid = modelInfo.mesh.getUID();
+	aInfo.origFilePath = fileLocation;
+	aInfo.aType = AssetType::MESH;
+	importAsset(aInfo);
 	//m_meshes[modelInfo.mesh.getUID()] = modelInfo.mesh;
 	return modelInfo;
 }
@@ -253,8 +257,12 @@ Resource<T> Assets::loadAsset(UUID uid, const std::string& path)
 	return res;
 }
 
-Assets::AssetInfo Assets::importAsset(UUID uid, const std::string& path, AssetType aType)
+AssetInfo Assets::importAsset(AssetInfo aInfo)
 {
+	auto& path = aInfo.origFilePath;
+	auto& uid = aInfo.uuid;
+	auto& aType = aInfo.aType;
+
 	// Validate
 	if (!std::filesystem::exists(path))
 	{
@@ -271,25 +279,28 @@ Assets::AssetInfo Assets::importAsset(UUID uid, const std::string& path, AssetTy
 	const std::string savedFilePath = projectDir + "/" + uid + ext;
 	std::filesystem::copy_file(path, savedFilePath);
 
-	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(uid, aType);
+	
 	Engine::get()->getMemoryManagementSystem()->addAssociation(path, uid);
 
 	m_assets[aType].insert(uid);
 
-	AssetInfo aInfo;
 	aInfo.filePath = savedFilePath;
-	aInfo.origFilePath = path;
 	aInfo.isValid = true;
-	aInfo.aType = aType;
+
+	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 
 	logInfo("Successfully imported asset: [" + path + "] into: [" + savedFilePath + "].");
 
 	return aInfo;
 }
 
-Assets::AssetInfo Assets::addAsset(UUID uid, AssetType aType, const std::string& savedFilepath)
+AssetInfo Assets::addAsset(AssetInfo assetInfo)
 {
-	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(uid, aType);
+	auto& path = assetInfo.origFilePath;
+	auto& uid = assetInfo.uuid;
+	auto& aType = assetInfo.aType;
+	auto& savedFilepath = assetInfo.filePath;
+	
 	//Engine::get()->getMemoryManagementSystem()->addAssociation(path, uid); //TODO maybe use some naming convention here?
 
 	m_assets[aType].insert(uid);
@@ -299,25 +310,19 @@ Assets::AssetInfo Assets::addAsset(UUID uid, AssetType aType, const std::string&
 	aInfo.isValid = true;
 	aInfo.aType = aType;
 
+	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
+
 	return aInfo;
 }
 
-//Resource<Shader> Assets::importShader(const std::string& path)
-//{
-//	Resource<Shader> shader = Factory<Shader>::create(path);
-//	std::string assetPath = importAsset(shader.getUID(), path); // this is a hack, we should load the copied shader.
-//	m_shaders[shader.getUID()] = shader;
-//	return shader;
-//}
-
-//Resource<Shader> Assets::loadShader(UUID uid, const std::string& path)
-//{
-//	return Resource<Shader>();
-//}
-
-std::vector<std::string> Assets::getAllShaders() const
+std::vector<std::string> Assets::getAllAssetsOfType(AssetType aType) const
 {
-	return std::vector<std::string>();
+	std::vector<std::string> result;
+	for (auto uuid : m_assets.at(aType))
+	{
+		result.push_back(uuid);
+	}
+	return result;
 }
 
 std::string Assets::getAlias(UUID uid) const

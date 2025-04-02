@@ -213,7 +213,12 @@ ShaderComponent CustomShaderBuilder::build()
 
 		//Shader* shader = new Shader();
 		Resource<Shader> shader = Factory<Shader>::create();
-		Engine::get()->getSubSystem<Assets>()->importAsset(shader.getUID(), m_filepath, AssetType::SHADER);
+
+		AssetInfo aInfo;
+		aInfo.uuid = shader.getUID();
+		aInfo.origFilePath = m_filepath;
+		aInfo.aType = AssetType::SHADER;
+		Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
 		//Engine::get()->getSubSystem<Assets>()->addAsset(shader.getUID(), AssetType::SHADER); // this is a hack, we should load the copied shader.
 		shader->BuildShaders(shaders);
 

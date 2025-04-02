@@ -364,7 +364,12 @@ Resource<Shader> Shader::create(const std::string& filepath)
 Resource<Shader> Shader::import(const std::string& filepath)
 {
 	Resource<Shader> shader = Factory<Shader>::create(filepath);
-	Engine::get()->getSubSystem<Assets>()->importAsset(shader.getUID(), filepath, AssetType::SHADER); // this is a hack, we should load the copied shader.
+
+	AssetInfo aInfo;
+	aInfo.uuid = shader.getUID();
+	aInfo.origFilePath = filepath;
+	aInfo.aType = AssetType::SHADER;
+	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo); // this is a hack, we should load the copied shader.
 	return shader;
 }
 
