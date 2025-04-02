@@ -73,7 +73,9 @@ static const unsigned int indices[] = {
 
 Resource<MeshCollection> Box::createMesh()
 {
-    return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/cube.gltf").mesh;
+    ModelImporter::ModelImportSettings settings;
+    settings.name = "SGE_BOX_MESH";
+    return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/cube.gltf", settings).mesh;
     //VertexLayout layout;
     //layout.numOfVertices = 36;
     //layout.attribs.emplace_back(LayoutAttribute::Positions);

@@ -67,7 +67,7 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-ModelImporter::ModelInfo ModelImporter::import(const std::string& path)
+ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const ModelImportSettings& settings)
 {
 	if (!std::filesystem::exists(path))
 	{
@@ -102,6 +102,7 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path)
 	aInfo.uuid = mInfo.mesh.getUID();
 	aInfo.aType = AssetType::MESH;
 	aInfo.filePath = savedFilePath;
+	aInfo.name = settings.name;
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 	if (scene->HasMaterials())

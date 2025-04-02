@@ -39,7 +39,7 @@ public:
 		Resource<T>& resource = creationCallback();
 		m_associations[resourceName] = resource.getUID();
 
-		Engine::get()->getContext()->getProjectAssetRegistry()->addAssociation(resourceName, resource.getUID());
+		//Engine::get()->getContext()->getProjectAssetRegistry()->addAssociation(resourceName, resource.getUID());
 
 		return resource;
 	}

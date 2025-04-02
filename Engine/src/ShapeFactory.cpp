@@ -31,6 +31,8 @@ Entity ShapeFactory::createBoxEntity(SGE_Regsitry* registry)
 {
 	
 	auto entity = createEntity(registry, "Box_" + std::to_string(createdBoxCount++));
+
+
 	auto memoryManager = Engine::get()->getMemoryManagementSystem();
 	Resource<MeshCollection> mesh = memoryManager->createOrGetCached<MeshCollection>("SGE_BOX_MESH", []() {return Box::createMesh(); });
 	entity.getComponent<MeshComponent>().mesh = mesh;

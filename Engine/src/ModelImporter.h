@@ -45,6 +45,11 @@ public:
 		Resource<MeshCollection> mesh;
 	};
 
+	struct ModelImportSettings
+	{
+		std::string name;
+	};
+
 	struct ModelInfo
 	{
 		Resource<MeshCollection> mesh;
@@ -62,7 +67,7 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	ModelImporter::ModelInfo import(const std::string& path);
+	ModelImporter::ModelInfo import(const std::string& path, const ModelImportSettings& settings = {});
 
 	/**
 	 * Import a model from a file.
