@@ -53,7 +53,7 @@ aiScene* generateScene(const std::vector<float>& vertices, const std::vector<uns
 
 Terrain Terrain::generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath)
 {
-	auto heightMap = Engine::get()->getSubSystem<Assets>()->importTexture2D(heightMapFilepath);
+	auto heightMap = Texture::importTexture2D(heightMapFilepath);
 
 	return generateTerrain(width, height, scale, heightMap);
 }

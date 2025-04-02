@@ -182,6 +182,14 @@ public:
 		return m_data;
 	}
 
+	static Texture::TextureData extractTextureDataFromFile(const std::string& fileLocation);
+
+	static Resource<Texture> importTexture2D(const std::string& assetName, std::function<Resource<Texture>()> func);
+	static Resource<Texture> importTexture2D(const std::string& fileLocation, bool flip = false);
+	static Resource<Texture> loadTexture2D(UUID uid, const std::string& path);
+	static void addTexture2D(Resource<Texture> texture);
+	static void addTexture2D(const std::string& name, Resource<Texture> texture);
+
 	/**  Destructor */
 	~Texture();
 private:

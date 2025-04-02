@@ -33,11 +33,11 @@ public:
 
 			auto albedoMap = Engine::get()->getSubSystem<Assets>()->::importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-albedo.png", false);
 			rockMat->setTexture(Texture::Type::Albedo, Resource<Texture>(albedoMap));
-			auto roughnessMap = Engine::get()->getSubSystem<Assets>()->importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-roughness.png", false);
+			auto roughnessMap = Texture::importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-roughness.png", false);
 			rockMat->setTexture(Texture::Type::Roughness, Resource<Texture>(roughnessMap));
-			auto normalMap = Engine::get()->getSubSystem<Assets>()->importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-normal_dx.png", false);
+			auto normalMap = Texture::importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-normal_dx.png", false);
 			rockMat->setTexture(Texture::Type::Normal, Resource<Texture>(normalMap));
-			auto metallicMap = Engine::get()->getSubSystem<Assets>()->importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-metallic.png", false);
+			auto metallicMap = Texture::importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-metallic.png", false);
 			rockMat->setTexture(Texture::Type::Metallic, Resource<Texture>(metallicMap));
 			auto aoMap = Assets::importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-ao.png", false);
 			rockMat->setTexture(Texture::Type::AmbientOcclusion, Resource<Texture>(aoMap));

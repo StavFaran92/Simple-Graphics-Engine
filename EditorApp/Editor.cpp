@@ -641,7 +641,7 @@ void ShowTextureCreatorWindow()
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
 			auto texture = Texture::createEmptyTexture(width, height);
-			Engine::get()->getSubSystem<Assets>()->addTexture2D(textureName, texture);
+			Texture::addTexture2D(textureName, texture);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -682,7 +682,7 @@ void ShowTextureImportWindow()
 		return;
 	}
 
-	Engine::get()->getSubSystem<Assets>()->importTexture2D(texturePathBuffer.c_str(), true);
+	Texture::importTexture2D(texturePathBuffer.c_str(), true);
 
 	texturePathBuffer.clear();
 }

@@ -95,6 +95,8 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path)
 
 	ModelImporter::ModelInfo mInfo;
 	mInfo.mesh = Factory<MeshCollection>::create();
+
+	// TODO I should probably copy the file instead of export (issue with GLTF and bin)
 	auto savedFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
 	AssetInfo aInfo;
 	aInfo.uuid = mInfo.mesh.getUID();
@@ -406,7 +408,7 @@ Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiText
 		return Resource<Texture>::empty;
 	}
 
-	auto texture = Engine::get()->getSubSystem<Assets>()->importTexture2D(path, false);
+	auto texture = Texture::importTexture2D(path, false);
 	return texture;
 }
 

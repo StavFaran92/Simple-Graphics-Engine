@@ -38,7 +38,7 @@ Texture::TextureData Cubemap::extractCubemapDataFromEquirectangularFile(const st
 {
 
 
-	auto equirectangularMap = Engine::get()->getSubSystem<Assets>()->importTexture2D(fileLocation);
+	auto equirectangularMap = Texture::importTexture2D(fileLocation);
 	
 
 	Texture::TextureData cubemapData;
@@ -73,7 +73,7 @@ Resource<Texture> Cubemap::createCubemapFromEquirectangularFile(const std::strin
 
 		//open equirect file
 		//create equirect texture
-		auto equirectangularMap = Engine::get()->getSubSystem<Assets>()->importTexture2D(fileLocation);
+		auto equirectangularMap = Texture::importTexture2D(fileLocation);
 		//convert equirect to cubemap
 		auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(equirectangularMap);
 

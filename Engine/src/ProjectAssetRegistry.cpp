@@ -114,12 +114,6 @@ void ProjectAssetRegistry::save()
     sync();
 }
 
-void ProjectAssetRegistry::addMesh(UUID uuid)
-{
-    m_assetRegistry["meshes"].push_back(uuid);
-    sync();
-}
-
 void ProjectAssetRegistry::addTexture(Resource<Texture> texture)
 {
     // Create a JSON object with UUID and format fields

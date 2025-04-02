@@ -40,7 +40,6 @@ public:
 	void reset();
 	void load(); //????
 	void save();
-	void addMesh(UUID uuid);
 	void addTexture(Resource<Texture> texture);
 	void addAnimation(UUID uuid);
 	void addAssetRegistry(AssetInfo asset);
