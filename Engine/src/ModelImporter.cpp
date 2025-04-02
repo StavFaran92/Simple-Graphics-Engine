@@ -96,6 +96,11 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path)
 	ModelImporter::ModelInfo mInfo;
 	mInfo.mesh = Factory<MeshCollection>::create();
 	auto savedFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
+	AssetInfo aInfo;
+	aInfo.uuid = mInfo.mesh.getUID();
+	aInfo.aType = AssetType::MESH;
+	aInfo.filePath = savedFilePath;
+	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 	if (scene->HasMaterials())
 	{

@@ -10,7 +10,6 @@ std::string MeshExporter::exportMesh(Resource<MeshCollection> mesh, const aiScen
 	Assimp::Exporter exporter;
 	const std::string savedFilePath = projectDir + "/" + mesh.getUID() + ".dae";
 	exporter.Export(scene, "collada", savedFilePath);
-	Engine::get()->getContext()->getProjectAssetRegistry()->addMesh(mesh.getUID());
 	return savedFilePath;
 }
 

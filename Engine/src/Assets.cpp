@@ -294,18 +294,17 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 	return aInfo;
 }
 
-AssetInfo Assets::addAsset(AssetInfo assetInfo)
+AssetInfo Assets::addAsset(AssetInfo aInfo)
 {
-	auto& path = assetInfo.origFilePath;
-	auto& uid = assetInfo.uuid;
-	auto& aType = assetInfo.aType;
-	auto& savedFilepath = assetInfo.filePath;
+	auto& path = aInfo.origFilePath;
+	auto& uid = aInfo.uuid;
+	auto& aType = aInfo.aType;
+	auto& savedFilepath = aInfo.filePath;
 	
 	//Engine::get()->getMemoryManagementSystem()->addAssociation(path, uid); //TODO maybe use some naming convention here?
 
 	m_assets[aType].insert(uid);
 
-	AssetInfo aInfo;
 	aInfo.filePath = savedFilepath;
 	aInfo.isValid = true;
 	aInfo.aType = aType;
