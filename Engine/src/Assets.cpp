@@ -282,6 +282,8 @@ Assets::AssetInfo Assets::importAsset(UUID uid, const std::string& path, AssetTy
 	aInfo.isValid = true;
 	aInfo.aType = aType;
 
+	logInfo("Successfully imported asset: [" + path + "] into: [" + savedFilePath + "].");
+
 	return aInfo;
 }
 
