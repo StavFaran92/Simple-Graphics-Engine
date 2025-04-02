@@ -53,7 +53,7 @@ public:
 
 	AssetInfo importAsset(UUID uid, const std::string& path, AssetType aType);
 
-	AssetInfo addAsset(UUID uid, AssetType aType);
+	AssetInfo addAsset(UUID uid, AssetType aType, const std::string& savedFilepath);
 
 	//template<typename T>
 	//AssetType getAssetType();

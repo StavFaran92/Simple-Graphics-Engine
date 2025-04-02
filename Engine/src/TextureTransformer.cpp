@@ -23,7 +23,7 @@ Resource<Texture> TextureTransformer::flipVertical(Resource<Texture> srcTexture)
 
 void TextureTransformer::flipVertical(Resource<Texture> srcTexture, Resource<Texture>& dstTexture)
 {
-	auto shader = Shader::create<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/TextureTransformShader.glsl");
+	auto shader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/TextureTransformShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;

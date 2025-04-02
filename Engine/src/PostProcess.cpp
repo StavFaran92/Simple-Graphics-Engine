@@ -4,11 +4,11 @@
 
 #include "Shader.h"
 
-Shader* PostProcess::inversion()
+Resource<Shader> PostProcess::inversion()
 { 
-	return Shader::create<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_inversion.glsl");
+	return Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_inversion.glsl");
 }
-Shader* PostProcess::grayscale()
+Resource<Shader> PostProcess::grayscale()
 {
-	return Shader::create<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_grayscale.glsl");
+	return Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_grayscale.glsl");
 }

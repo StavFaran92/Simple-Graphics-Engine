@@ -21,17 +21,6 @@ using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned
 class EngineAPI Shader : public std::enable_shared_from_this<Shader>
 {
 public:
-	template<typename T, typename... _Types>
-	static T* create(_Types&&... _Args)
-	{
-		return new T(std::forward<_Types>(_Args)...);
-	}
-
-	template<typename T, typename... _Types>
-	static std::shared_ptr<T> createShared(_Types&&... _Args)
-	{
-		return std::shared_ptr<T>(create<T>(std::forward<_Types>(_Args)...));
-	}
 
 	void use();
 	void release() const;
@@ -57,6 +46,7 @@ public:
 	bool build();
 
 	static Resource<Shader> import(const std::string& filepath);
+	static Resource<Shader> create(const std::string& filepath);
 
 	virtual ~Shader();
 

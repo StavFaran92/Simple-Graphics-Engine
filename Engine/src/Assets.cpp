@@ -285,21 +285,20 @@ Assets::AssetInfo Assets::importAsset(UUID uid, const std::string& path, AssetTy
 	return aInfo;
 }
 
-//Assets::AssetInfo Assets::addAsset(UUID uid, AssetType aType)
-//{
-//	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(uid, aType);
-//	Engine::get()->getMemoryManagementSystem()->addAssociation(path, uid);
-//
-//	m_assets[aType].insert(uid);
-//
-//	AssetInfo aInfo;
-//	aInfo.filePath = savedFilePath;
-//	aInfo.origFilePath = path;
-//	aInfo.isValid = true;
-//	aInfo.aType = aType;
-//
-//	return aInfo;
-//}
+Assets::AssetInfo Assets::addAsset(UUID uid, AssetType aType, const std::string& savedFilepath)
+{
+	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(uid, aType);
+	//Engine::get()->getMemoryManagementSystem()->addAssociation(path, uid); //TODO maybe use some naming convention here?
+
+	m_assets[aType].insert(uid);
+
+	AssetInfo aInfo;
+	aInfo.filePath = savedFilepath;
+	aInfo.isValid = true;
+	aInfo.aType = aType;
+
+	return aInfo;
+}
 
 //Resource<Shader> Assets::importShader(const std::string& path)
 //{

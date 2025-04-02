@@ -23,7 +23,7 @@
 
 Resource<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(Resource<Texture> equirectangularTexture)
 {
-	auto equirectangularShader = Shader::create<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/EquirectangularToCubemap.glsl");
+	auto equirectangularShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/EquirectangularToCubemap.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -94,7 +94,7 @@ Resource<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubema
 
 Resource<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirectangular(Resource<Texture> cubemapTexture)
 {
-	auto cubemapToEquirectangularShader = Shader::create<Shader>(SGE_ROOT_DIR + "Resources/Engine/Shaders/CubemapToEquirectangular.glsl");
+	auto cubemapToEquirectangularShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/CubemapToEquirectangular.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;

@@ -116,12 +116,6 @@ ShaderComponent::ShaderComponent()
 	renderViewProjection = std::make_shared<RenderView>(RenderView::Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
 };
 
-ShaderComponent::ShaderComponent(Shader* vertexShader, Shader* fragmentShader)
-	: m_vertexShader(vertexShader), m_fragmentShader(fragmentShader)
-{
-	renderViewProjection = std::make_shared<RenderView>(RenderView::Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
-};
-
 void ShaderComponent::setProjectionTexture(Resource<Texture> texture)
 {
 	renderViewProjection->bind();

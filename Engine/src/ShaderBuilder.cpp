@@ -7,6 +7,9 @@
 
 #include "Utils.h"
 #include "CommonTextures.h"
+#include "Factory.h"
+
+#include "Assets.h"
 
 //enum class DirectiveType
 //{
@@ -208,10 +211,11 @@ ShaderComponent CustomShaderBuilder::build()
 			replaceDirective(shaders.fragmentCode, "#custom_frag", customShaders.fragmentCode);
 		}
 
-		// build shader light
 		//Shader* shader = new Shader();
-		Resource<Shader> shader = Shader::import(m_filepath);
-		shader.get()->BuildShaders(shaders);
+		Resource<Shader> shader = Factory<Shader>::create();
+		Engine::get()->getSubSystem<Assets>()->importAsset(shader.getUID(), m_filepath, AssetType::SHADER);
+		//Engine::get()->getSubSystem<Assets>()->addAsset(shader.getUID(), AssetType::SHADER); // this is a hack, we should load the copied shader.
+		shader->BuildShaders(shaders);
 
 		shaderComponent.m_customShader = shader;
 		shaderComponent.shaderOverride = m_shaderOverride;

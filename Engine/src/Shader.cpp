@@ -356,6 +356,11 @@ void Shader::setTime(float time)
 	setFloat("time", time);
 }
 
+Resource<Shader> Shader::create(const std::string& filepath)
+{
+	return Factory<Shader>::create(filepath);
+}
+
 Resource<Shader> Shader::import(const std::string& filepath)
 {
 	Resource<Shader> shader = Factory<Shader>::create(filepath);
