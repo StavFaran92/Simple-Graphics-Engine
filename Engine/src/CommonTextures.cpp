@@ -24,19 +24,31 @@ CommonTextures* CommonTextures::create()
 {
 	auto instance = new CommonTextures();
 
-	Texture::importTexture2D("SGE_TEXTURE_WHITE", [&]() {
-		static unsigned char* whiteColor = new unsigned char[3]{ 255, 255, 255 }; // todo rethink this
+	{
+		static unsigned char* whiteColor = new unsigned char[3] { 255, 255, 255 }; // todo rethink this
 		auto texture = Texture::createDummyTexture(whiteColor);
 		instance->m_textures[TextureType::WHITE_1X1] = texture;
-		return texture;
-		});
 
-	Texture::importTexture2D("SGE_TEXTURE_BLACK", [&]() {
-		static unsigned char* blackColor = new unsigned char[3]{ 0, 0, 0};
+		AssetInfo aInfo;
+		aInfo.uuid = texture.getUID();
+		aInfo.aType = AssetType::TEXTURE;
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+
+		Texture::writeTexture2D("SGE_TEXTURE_WHITE", texture);
+	}
+
+	{
+		static unsigned char* blackColor = new unsigned char[3] { 0, 0, 0};
 		auto texture = Texture::createDummyTexture(blackColor);
 		instance->m_textures[TextureType::BLACK_1X1] = texture;
-		return texture;
-		});
+
+		AssetInfo aInfo;
+		aInfo.uuid = texture.getUID();
+		aInfo.aType = AssetType::TEXTURE;
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+
+		Texture::writeTexture2D("SGE_TEXTURE_BLACK", texture);
+	}
 
 	//Engine::get()->getSubSystem<Assets>()->importTexture2D("SGE_CUBEMAP_WHITE", [&]() {
 	//	auto cubemap = Cubemap::createDefaultCubemap();

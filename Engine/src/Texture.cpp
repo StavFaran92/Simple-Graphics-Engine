@@ -19,6 +19,8 @@
 //#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "Assets.h"
+
 Texture::Texture()
 	:m_id(0), m_slot(0)
 {
@@ -261,50 +263,43 @@ Texture::TextureData Texture::extractTextureDataFromFile(const std::string& file
 	return textureData;
 }
 
-Resource<Texture> Texture::importTexture2D(const std::string& assetName, std::function<Resource<Texture>()> func)
+void Texture::writeTexture2D(const std::string& assetName, Resource<Texture> texture)
 {
-	return Engine::get()->getMemoryManagementSystem()->createOrGetCached<Texture>(assetName, [&]() {
-		Resource<Texture> res = func();
-		Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(res);
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		stbi_write_png((projectDir + "/" + res.getUID() + ".png").c_str(),
-			res.get()->getWidth(),
-			res.get()->getHeight(),
-			res.get()->getBitDepth(),
-			res.get()->getData().data,
-			res.get()->getBitDepth());
-		return res;
-		});
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	stbi_write_png((projectDir + "/" + texture.getUID() + ".png").c_str(),
+		texture.get()->getWidth(),
+		texture.get()->getHeight(),
+		texture.get()->getBitDepth(),
+		texture.get()->getData().data,
+		texture.get()->getBitDepth());
 }
 
-Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, bool flip)
+Resource<Texture> Texture::importTexture2D(const std::string& fileLocation)
 {
-	// Check if texture is already cached to optimize the load process
-	auto memoryManagementSystem = Engine::get()->getMemoryManagementSystem();
-	std::filesystem::path path(fileLocation);
-	return memoryManagementSystem->createOrGetCached<Texture>(path.filename().string(), [&]() {
+	
+	Texture::TextureData textureData = extractTextureDataFromFile(fileLocation);
+	Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
 
-		// todo use RAII
-		//stbi_set_flip_vertically_on_load(flip);
-		Texture::TextureData textureData = extractTextureDataFromFile(fileLocation);
+	AssetInfo aInfo;
+	aInfo.origFilePath = fileLocation;
+	aInfo.uuid = texture.getUID();
+	aInfo.aType = AssetType::TEXTURE;
+	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
 
-		Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
+	//auto& projectDir = Engine::get()->getProjectDirectory();
+	//if (textureData.isHDR)
+	//{
+	//	stbi_write_hdr((projectDir + "/" + texture.getUID() + ".hdr").c_str(), textureData.width, textureData.height, textureData.bpp, (float*)textureData.data);
+	//}
+	//else
+	//{
+	//	stbi_write_png((projectDir + "/" + texture.getUID() + ".png").c_str(), textureData.width, textureData.height, textureData.bpp, textureData.data, textureData.width * textureData.bpp);
+	//}
+	//Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(texture);
 
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		if (textureData.isHDR)
-		{
-			stbi_write_hdr((projectDir + "/" + texture.getUID() + ".hdr").c_str(), textureData.width, textureData.height, textureData.bpp, (float*)textureData.data);
-		}
-		else
-		{
-			stbi_write_png((projectDir + "/" + texture.getUID() + ".png").c_str(), textureData.width, textureData.height, textureData.bpp, textureData.data, textureData.width * textureData.bpp);
-		}
-		Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(texture);
+	//stbi_image_free(textureData.data); // todo check if im not cleaning neede memory here
 
-		//stbi_image_free(textureData.data); // todo check if im not cleaning neede memory here
-
-		return texture;
-		});
+	return texture;
 }
 
 Resource<Texture> Texture::loadTexture2D(UUID uid, const std::string& path)
