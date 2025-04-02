@@ -31,7 +31,7 @@ Entity Skybox::CreateSkyboxFromEquirectangularMap(const std::string& equirectnag
         scene = Engine::get()->getContext()->getActiveScene().get();
     }
 
-    auto equirectnagularMap = Texture::importTexture2D(equirectnagularMapPath, true);
+    auto equirectnagularMap = Texture::importTexture2D(equirectnagularMapPath);
 
     //texture = TextureTransformer::flipVertical(texture);
 

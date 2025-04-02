@@ -138,7 +138,7 @@ void ProjectAssetRegistry::addAnimation(UUID uuid)
 std::string getAssetTypeAsStr(AssetType aType)
 {
     if (aType == AssetType::MESH) return "meshes";
-    if (aType == AssetType::TEXTURE) return "texture";
+    if (aType == AssetType::TEXTURE) return "textures";
     if (aType == AssetType::SHADER) return "shaders";
     if (aType == AssetType::ANIMATION) return "animations";
     return "N/A";

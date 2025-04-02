@@ -184,7 +184,7 @@ public:
 
 	static Texture::TextureData extractTextureDataFromFile(const std::string& fileLocation);
 
-	static void writeTexture2D(const std::string& assetName, Resource<Texture> texture);
+	static void writeTexture2D(Resource<Texture> texture);
 	static Resource<Texture> importTexture2D(const std::string& fileLocation);
 	static Resource<Texture> loadTexture2D(UUID uid, const std::string& path);
 	static void addTexture2D(Resource<Texture> texture);

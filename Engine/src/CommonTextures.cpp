@@ -32,9 +32,10 @@ CommonTextures* CommonTextures::create()
 		AssetInfo aInfo;
 		aInfo.uuid = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
+		aInfo.name = "SGE_TEXTURE_WHITE";
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
-		Texture::writeTexture2D("SGE_TEXTURE_WHITE", texture);
+		Texture::writeTexture2D(texture);
 	}
 
 	{
@@ -45,9 +46,10 @@ CommonTextures* CommonTextures::create()
 		AssetInfo aInfo;
 		aInfo.uuid = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
+		aInfo.name = "SGE_TEXTURE_BLACK";
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
-		Texture::writeTexture2D("SGE_TEXTURE_BLACK", texture);
+		Texture::writeTexture2D(texture);
 	}
 
 	//Engine::get()->getSubSystem<Assets>()->importTexture2D("SGE_CUBEMAP_WHITE", [&]() {

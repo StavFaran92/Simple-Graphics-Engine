@@ -682,7 +682,7 @@ void ShowTextureImportWindow()
 		return;
 	}
 
-	Texture::importTexture2D(texturePathBuffer.c_str(), true);
+	Texture::importTexture2D(texturePathBuffer.c_str());
 
 	texturePathBuffer.clear();
 }

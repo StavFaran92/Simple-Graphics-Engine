@@ -408,7 +408,7 @@ Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiText
 		return Resource<Texture>::empty;
 	}
 
-	auto texture = Texture::importTexture2D(path, false);
+	auto texture = Texture::importTexture2D(path);
 	return texture;
 }
 

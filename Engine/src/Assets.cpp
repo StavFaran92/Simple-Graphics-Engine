@@ -150,7 +150,7 @@ AssetInfo Assets::addAsset(AssetInfo aInfo)
 	auto& aType = aInfo.aType;
 	auto& savedFilepath = aInfo.filePath;
 	
-	//Engine::get()->getMemoryManagementSystem()->addAssociation(path, uid); //TODO maybe use some naming convention here?
+	Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.name, uid); //TODO maybe use some naming convention here?
 
 	m_assets[aType].insert(uid);
 
