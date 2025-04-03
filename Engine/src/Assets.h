@@ -31,20 +31,12 @@ public:
 
 	Assets();
 
-	//ModelImporter::ModelInfo importMesh(const std::string& path);
-	Resource<MeshCollection> loadMesh(UUID uid, const std::string& path);
-	std::vector<std::string> getAllMeshes() const;
-
-	std::vector<std::string> getAllTextures() const;
-
 	Resource<Animation> importAnimation(const std::string& path);
 	Resource<Animation> loadAnimation(UUID uid, const std::string& path);
 	std::vector<std::string> getAllAnimations() const;
 
 
 	std::string getAlias(UUID uid) const;
-
-	//void addAsset(AssetType aType, UUID uid);
 
 	template<typename T>
 	Resource<T> loadAsset(UUID uid, const std::string& path);
@@ -55,8 +47,6 @@ public:
 
 	std::vector<std::string> getAllAssetsOfType(AssetType aType) const;
 
-	//template<typename T>
-	//AssetType getAssetType();
 private:
 	std::map<AssetType, std::unordered_set<UUID>> m_assets;
 	std::unordered_map<UUID, Resource<MeshCollection>> m_meshes;

@@ -17,38 +17,6 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
-//ModelImporter::ModelInfo Assets::importMesh(const std::string& fileLocation)
-//{
-//	auto modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(fileLocation);
-//	AssetInfo aInfo;
-//	aInfo.uuid = modelInfo.mesh.getUID();
-//	aInfo.origFilePath = fileLocation;
-//	aInfo.aType = AssetType::MESH;
-//	importAsset(aInfo);
-//	//m_meshes[modelInfo.mesh.getUID()] = modelInfo.mesh;
-//	return modelInfo;
-//}
-
-std::vector<std::string> Assets::getAllMeshes() const
-{
-	std::vector<std::string> result;
-	for (auto [uuid, _] : m_meshes)
-	{
-		result.push_back(uuid);
-	}
-	return result;
-}
-
-std::vector<std::string> Assets::getAllTextures() const
-{
-	std::vector<std::string> result;
-	for (auto [uuid, _] : m_textures)
-	{
-		result.push_back(uuid);
-	}
-	return result;
-}
-
 Resource<Animation> Assets::importAnimation(const std::string& fileLocation)
 {
 	auto memoryManagementSystem = Engine::get()->getMemoryManagementSystem();

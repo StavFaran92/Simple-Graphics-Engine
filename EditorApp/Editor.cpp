@@ -221,7 +221,7 @@ static void displayAssetTextureSelectPopup()
 
 		static int selectedTextureIndex = -1;
 
-		auto& textureList = assets->getAllTextures();
+		auto& textureList = assets->getAllAssetsOfType(AssetType::TEXTURE);
 
 		if (selectedTextureIndex != -1)
 		{
@@ -2021,7 +2021,7 @@ void RenderAssetViewWindow(float width, float height) {
 		ImGui::TreePop();
 	}
 
-	auto& textureList = assets->getAllTextures();
+	auto& textureList = assets->getAllAssetsOfType(AssetType::TEXTURE);
 
 	if (ImGui::TreeNode("Textures")) {
 		for (int i = 0; i < textureList.size(); i++) {
