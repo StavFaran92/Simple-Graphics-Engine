@@ -341,7 +341,7 @@ static void displaySelectAnimationWindow(std::string& uuid)
 
 		static int selectedAnimationIndex = -1;
 
-		auto& animationList = Engine::get()->getSubSystem<Assets>()->getAllAnimations();
+		auto& animationList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(AssetType::ANIMATION);
 
 		for (int i = 0; i < animationList.size(); i++)
 		{
@@ -713,7 +713,7 @@ void ShowAnimationImportWindow()
 		return;
 	}
 
-	Engine::get()->getSubSystem<Assets>()->importAnimation(animationPathBuffer.c_str());
+	Engine::get()->getSubSystem<AnimationLoader>()->import(animationPathBuffer.c_str());
 
 	animationPathBuffer.clear();
 }

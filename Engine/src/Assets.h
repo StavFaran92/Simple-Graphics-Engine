@@ -2,12 +2,10 @@
 
 #include "Engine.h"
 #include "Resource.h"
-#include "Animation.h"
-#include "Shader.h"
-#include "ModelImporter.h"
 #include "Core.h"
+#include "Configurations.h"
 
-#include <functional>
+#include <unordered_set>
 
 struct AssetInfo
 {
@@ -27,14 +25,7 @@ struct AssetInfo
 class EngineAPI Assets
 {
 public:
-	
-
 	Assets();
-
-	Resource<Animation> importAnimation(const std::string& path);
-	Resource<Animation> loadAnimation(UUID uid, const std::string& path);
-	std::vector<std::string> getAllAnimations() const;
-
 
 	std::string getAlias(UUID uid) const;
 
@@ -49,8 +40,4 @@ public:
 
 private:
 	std::map<AssetType, std::unordered_set<UUID>> m_assets;
-	std::unordered_map<UUID, Resource<MeshCollection>> m_meshes;
-	std::unordered_map<UUID, Resource<Texture>> m_textures;
-	std::unordered_map<UUID, Resource<Animation>> m_animations;
-	std::unordered_map<UUID, Resource<Shader>> m_shaders;
 };

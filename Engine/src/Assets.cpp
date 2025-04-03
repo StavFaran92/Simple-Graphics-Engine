@@ -17,36 +17,36 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
-Resource<Animation> Assets::importAnimation(const std::string& fileLocation)
-{
-	auto memoryManagementSystem = Engine::get()->getMemoryManagementSystem();
-	std::filesystem::path path(fileLocation);
-	return memoryManagementSystem->createOrGetCached<Animation>(path.filename().string(), [&]() {
-
-		auto animation = Engine::get()->getSubSystem<AnimationLoader>()->import(fileLocation);
-
-		Engine::get()->getContext()->getProjectAssetRegistry()->addAnimation(animation.getUID());
-
-		m_animations[animation.getUID()] = animation;
-
-		return animation;
-		});
-}
-
-Resource<Animation> Assets::loadAnimation(UUID uid, const std::string& path)
-{
-	return Resource<Animation>();
-}
-
-std::vector<std::string> Assets::getAllAnimations() const
-{
-	std::vector<std::string> result;
-	for (auto [uuid, _] : m_animations)
-	{
-		result.push_back(uuid);
-	}
-	return result;
-}
+//Resource<Animation> Assets::importAnimation(const std::string& fileLocation)
+//{
+//	auto memoryManagementSystem = Engine::get()->getMemoryManagementSystem();
+//	std::filesystem::path path(fileLocation);
+//	return memoryManagementSystem->createOrGetCached<Animation>(path.filename().string(), [&]() {
+//
+//		auto animation = Engine::get()->getSubSystem<AnimationLoader>()->import(fileLocation);
+//
+//		Engine::get()->getContext()->getProjectAssetRegistry()->addAnimation(animation.getUID());
+//
+//		m_animations[animation.getUID()] = animation;
+//
+//		return animation;
+//		});
+//}
+//
+//Resource<Animation> Assets::loadAnimation(UUID uid, const std::string& path)
+//{
+//	return Resource<Animation>();
+//}
+//
+//std::vector<std::string> Assets::getAllAnimations() const
+//{
+//	std::vector<std::string> result;
+//	for (auto [uuid, _] : m_animations)
+//	{
+//		result.push_back(uuid);
+//	}
+//	return result;
+//}
 
 
 

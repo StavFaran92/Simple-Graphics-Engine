@@ -5,6 +5,7 @@
 #include "Context.h"
 #include "ProjectAssetRegistry.h"
 #include "Bone.h"
+#include "Assets.h"
 #include <filesystem>
 
 AnimationLoader::AnimationLoader()
@@ -101,7 +102,7 @@ Resource<Animation> AnimationLoader::load(const std::string & path, Resource<Ani
     return animation;
 }
 
-Resource<Animation> AnimationLoader::import(const std::string& path)
+Resource<Animation> AnimationLoader::import(const std::string& path, const AnimationImportSettings& settings)
 {
     if (!std::filesystem::exists(path))
     {
@@ -126,7 +127,17 @@ Resource<Animation> AnimationLoader::import(const std::string& path)
     Assimp::Exporter exporter;
     const std::string savedFilePath = projectDir + "/" + animation.getUID() + ".dae";
     exporter.Export(scene, "collada", savedFilePath);
-    Engine::get()->getContext()->getProjectAssetRegistry()->addAnimation(animation.getUID());
+
+    AssetInfo aInfo;
+    aInfo.uuid = animation.getUID();
+    aInfo.aType = AssetType::ANIMATION;
+    aInfo.filePath = savedFilePath;
+    aInfo.name = settings.name;
+    if (aInfo.name.empty())
+    {
+        aInfo.name = std::filesystem::path(path).filename().string();
+    }
+    Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
     load(savedFilePath, animation);
 
