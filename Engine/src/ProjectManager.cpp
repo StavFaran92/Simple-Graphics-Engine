@@ -56,9 +56,9 @@ void ProjectManager::loadProject(const std::string& filePath, std::shared_ptr<Co
 
     auto par = context->getProjectAssetRegistry();
 
-    std::vector<std::string> meshNameList = par->getMeshList();
-    auto textureAssetList = par->getTextureList();
-    std::vector<std::string> animationNameList = par->getAnimationList();
+    std::vector<AssetInfo> meshNameList = par->getAllAssetsOfType(AssetType::MESH);
+    std::vector<AssetInfo> textureAssetList = par->getAllAssetsOfType(AssetType::TEXTURE);
+    std::vector<AssetInfo> animationNameList = par->getAllAssetsOfType(AssetType::ANIMATION);
 
     // Create meshes
     for (const auto& meshUID : meshNameList) 

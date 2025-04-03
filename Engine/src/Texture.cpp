@@ -324,6 +324,12 @@ void Texture::addTexture2D(Resource<Texture> texture)
 
 void Texture::addTexture2D(const std::string& name, Resource<Texture> texture)
 {
-	Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(texture);
+	//Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(texture);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::TEXTURE;
+	aInfo.uuid = texture.getUID();
+	aInfo.name = name;
+	aInfo.attributes["isHDR"] = "false";
+	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 	Engine::get()->getMemoryManagementSystem()->addAssociation(name, texture.getUID());
 }

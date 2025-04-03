@@ -114,27 +114,6 @@ void ProjectAssetRegistry::save()
     sync();
 }
 
-void ProjectAssetRegistry::addTexture(Resource<Texture> texture)
-{
-    // Create a JSON object with UUID and format fields
-    TextureAsset tMetadata = { 
-        texture.getUID(), 
-        texture.get()->getData().isHDR ? "hdr" : "png"
-    };
-
-    // Add the metadata to the textures array
-    m_assetRegistry["textures"].push_back(tMetadata);
-
-    // Sync the registry
-    sync();
-}
-
-void ProjectAssetRegistry::addAnimation(UUID uuid)
-{
-    m_assetRegistry["animations"].push_back(uuid);
-    sync();
-}
-
 std::string getAssetTypeAsStr(AssetType aType)
 {
     if (aType == AssetType::MESH) return "meshes";
@@ -159,32 +138,42 @@ void ProjectAssetRegistry::addAssociation(std::string name, UUID uuid)
     sync();
 }
 
-std::vector<UUID> ProjectAssetRegistry::getMeshList() const
+std::vector<AssetInfo> ProjectAssetRegistry::getAllAssetsOfType(AssetType aType) const
 {
-    if (!m_assetRegistry.contains("meshes"))
+    std::string aTypeStr = getAssetTypeAsStr(aType);
+    if (!m_assetRegistry.contains(aTypeStr))
     {
         return {};
     }
-    return m_assetRegistry["meshes"].get<const std::vector<UUID>>();
+    return m_assetRegistry[aTypeStr].get<const std::vector<AssetInfo>>();
 }
 
-std::vector<ProjectAssetRegistry::TextureAsset> ProjectAssetRegistry::getTextureList() const
-{
-    if (!m_assetRegistry.contains("textures"))
-    {
-        return {};
-    }
-	return m_assetRegistry["textures"].get<std::vector<ProjectAssetRegistry::TextureAsset>>();
-}
-
-std::vector<UUID> ProjectAssetRegistry::getAnimationList() const
-{
-    if (!m_assetRegistry.contains("animations"))
-    {
-        return {};
-    }
-    return m_assetRegistry["animations"].get<std::vector<std::string>>();
-}
+//std::vector<UUID> ProjectAssetRegistry::getMeshList() const
+//{
+//    if (!m_assetRegistry.contains("meshes"))
+//    {
+//        return {};
+//    }
+//    return m_assetRegistry["meshes"].get<const std::vector<UUID>>();
+//}
+//
+//std::vector<UUID> ProjectAssetRegistry::getTextureList() const
+//{
+//    if (!m_assetRegistry.contains("textures"))
+//    {
+//        return {};
+//    }
+//	return m_assetRegistry["textures"].get<std::vector<ProjectAssetRegistry::TextureAsset>>();
+//}
+//
+//std::vector<UUID> ProjectAssetRegistry::getAnimationList() const
+//{
+//    if (!m_assetRegistry.contains("animations"))
+//    {
+//        return {};
+//    }
+//    return m_assetRegistry["animations"].get<std::vector<std::string>>();
+//}
 
 std::unordered_map<std::string, UUID> ProjectAssetRegistry::getAssociations() const
 {

@@ -64,41 +64,46 @@ Texture::TextureData Cubemap::extractCubemapDataFromEquirectangularFile(const st
 	//return {};
 }
 
-Resource<Texture> Cubemap::createCubemapFromEquirectangularFile(const std::string& fileLocation)
-{
-	// Check if texture is already cached to optimize the load process
-	auto memoryManagementSystem = Engine::get()->getMemoryManagementSystem();
-	std::filesystem::path path(fileLocation);
-	return memoryManagementSystem->createOrGetCached<Texture>(path.filename().string(), [&]() {
-
-		//open equirect file
-		//create equirect texture
-		auto equirectangularMap = Texture::importTexture2D(fileLocation);
-		//convert equirect to cubemap
-		auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(equirectangularMap);
-
-		// todo use RAII
-		//CubemapData cubemapData = extractCubemapDataFromEquirectangularFile(fileLocation);
-
-		//Resource<Texture> cubemap = createCubemapFromBuffer(cubemapData);
-
-		equirectangularMap.get()->bind();
-
-		// Allocate memory for the pixels
-		void* pixels = malloc(equirectangularMap.get()->getWidth() * equirectangularMap.get()->getHeight() * equirectangularMap.get()->getBitDepth());
-
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		stbi_write_png((projectDir + "/" + cubemap.getUID() + ".png").c_str(), equirectangularMap.get()->getWidth(), equirectangularMap.get()->getHeight(), equirectangularMap.get()->getBitDepth(), pixels,
-			equirectangularMap.get()->getWidth() * equirectangularMap.get()->getBitDepth());
-		Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(cubemap.getUID());
-
-		free(pixels);
-
-		return cubemap;
-	});
-}
+//Resource<Texture> Cubemap::createCubemapFromEquirectangularFile(const std::string& fileLocation)
+//{
+//	//open equirect file
+//		//create equirect texture
+//	Texture::TextureData textureData = Texture::extractTextureDataFromFile(fileLocation);
+//	Resource<Texture> equirectangularMap = Texture::create2DTextureFromBuffer(textureData);
+//
+//	//convert equirect to cubemap
+//	auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(equirectangularMap);
+//
+//	// todo use RAII
+//	//CubemapData cubemapData = extractCubemapDataFromEquirectangularFile(fileLocation);
+//
+//	//Resource<Texture> cubemap = createCubemapFromBuffer(cubemapData);
+//
+//	equirectangularMap.get()->bind();
+//
+//	// Allocate memory for the pixels
+//	void* pixels = malloc(equirectangularMap.get()->getWidth() * equirectangularMap.get()->getHeight() * equirectangularMap.get()->getBitDepth());
+//
+//	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+//
+//	auto& projectDir = Engine::get()->getProjectDirectory();
+//	stbi_write_png((projectDir + "/" + cubemap.getUID() + ".png").c_str(), equirectangularMap.get()->getWidth(), equirectangularMap.get()->getHeight(), equirectangularMap.get()->getBitDepth(), pixels,
+//		equirectangularMap.get()->getWidth() * equirectangularMap.get()->getBitDepth());
+//
+//	AssetInfo aInfo;
+//	aInfo.aType = AssetType::TEXTURE;
+//	aInfo.isValid = true;
+//	aInfo.origFilePath = fileLocation;
+//	aInfo.uuid = cubemap.getUID();
+//	aInfo.attributes["cubemap"] = "True";
+//	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+//
+//	
+//
+//	free(pixels);
+//
+//	return cubemap;
+//}
 
 Resource<Texture> Cubemap::createCubemapFromBuffer(const Texture::TextureData& cubemapData)
 {
@@ -234,7 +239,14 @@ void Cubemap::saveEquirectangularMap(Resource<Texture> equirectangularMap)
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
 	auto& projectDir = Engine::get()->getProjectDirectory();
-	stbi_write_png((projectDir + "/" + equirectangularMap.getUID() + ".png").c_str(), equirectangularMap.get()->getWidth(), equirectangularMap.get()->getHeight(), 3, pixels,
+	std::string savedFilepath = projectDir + "/" + equirectangularMap.getUID() + ".png";
+	stbi_write_png(savedFilepath.c_str(), equirectangularMap.get()->getWidth(), equirectangularMap.get()->getHeight(), 3, pixels,
 		equirectangularMap.get()->getWidth() * 3);
-	Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(equirectangularMap.getUID());
+
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::TEXTURE;
+	aInfo.isValid = true;
+	aInfo.filePath = savedFilepath;
+	aInfo.uuid = equirectangularMap.getUID();
+	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }

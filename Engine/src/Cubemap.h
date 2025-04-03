@@ -15,7 +15,7 @@ class EngineAPI Cubemap
 {
 public:
 	static Resource<Texture> createCubemapFromCubemapFiles(const std::vector<std::string>& fileLocations);
-	static Resource<Texture> createCubemapFromEquirectangularFile(const std::string& fileLocation);
+	//static Resource<Texture> createCubemapFromEquirectangularFile(const std::string& fileLocation);
 
 	static Resource<Texture> createCubemapFromBuffer(const Texture::TextureData& cubemapData);
 
