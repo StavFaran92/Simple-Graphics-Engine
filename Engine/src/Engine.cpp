@@ -501,7 +501,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
 
-    auto modelInfo = Engine::get()->getSubSystem<Assets>()->importMesh(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj");
+    auto modelInfo = getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj");
     mainCamera.addComponent<MeshComponent>().mesh = modelInfo.mesh;
     mainCamera.addComponent<RenderableComponent>();
 

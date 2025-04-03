@@ -17,17 +17,17 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
-ModelImporter::ModelInfo Assets::importMesh(const std::string& fileLocation)
-{
-	auto modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(fileLocation);
-	AssetInfo aInfo;
-	aInfo.uuid = modelInfo.mesh.getUID();
-	aInfo.origFilePath = fileLocation;
-	aInfo.aType = AssetType::MESH;
-	importAsset(aInfo);
-	//m_meshes[modelInfo.mesh.getUID()] = modelInfo.mesh;
-	return modelInfo;
-}
+//ModelImporter::ModelInfo Assets::importMesh(const std::string& fileLocation)
+//{
+//	auto modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(fileLocation);
+//	AssetInfo aInfo;
+//	aInfo.uuid = modelInfo.mesh.getUID();
+//	aInfo.origFilePath = fileLocation;
+//	aInfo.aType = AssetType::MESH;
+//	importAsset(aInfo);
+//	//m_meshes[modelInfo.mesh.getUID()] = modelInfo.mesh;
+//	return modelInfo;
+//}
 
 std::vector<std::string> Assets::getAllMeshes() const
 {
@@ -138,7 +138,7 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 
 	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 
-	logInfo("Successfully imported asset: [" + path + "] into: [" + savedFilePath + "].");
+	logInfo("Successfully imported asset: '" + path + "' into: '" + savedFilePath + "'.");
 
 	return aInfo;
 }
@@ -159,6 +159,8 @@ AssetInfo Assets::addAsset(AssetInfo aInfo)
 	aInfo.aType = aType;
 
 	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
+
+	logInfo("Successfully Added asset: '" + savedFilepath + "'.");
 
 	return aInfo;
 }

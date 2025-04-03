@@ -31,7 +31,7 @@ public:
 
 	Assets();
 
-	ModelImporter::ModelInfo importMesh(const std::string& path);
+	//ModelImporter::ModelInfo importMesh(const std::string& path);
 	Resource<MeshCollection> loadMesh(UUID uid, const std::string& path);
 	std::vector<std::string> getAllMeshes() const;
 

@@ -749,7 +749,7 @@ void ShowModelCreatorWindow()
 	auto entity = Engine::get()->getContext()->getActiveScene()->createEntity(modelName);
 	entity.addComponent<RenderableComponent>();
 
-	auto modelInfo = Engine::get()->getSubSystem<Assets>()->importMesh(modelPathBuffer.c_str());
+	auto modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(modelPathBuffer.c_str());
 	entity.addComponent<MeshComponent>().mesh = modelInfo.mesh;
 
 	auto& materialComponent = entity.addComponent<MaterialComponent>();

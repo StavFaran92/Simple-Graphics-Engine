@@ -103,6 +103,10 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 	aInfo.aType = AssetType::MESH;
 	aInfo.filePath = savedFilePath;
 	aInfo.name = settings.name;
+	if (aInfo.name.empty())
+	{
+		aInfo.name = std::filesystem::path(path).filename().string();
+	}
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 	if (scene->HasMaterials())
