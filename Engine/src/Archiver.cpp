@@ -26,6 +26,7 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	serializedEntity.animator = getComponentIfExists<Animator>(e);
 	serializedEntity.terrain = getComponentIfExists<Terrain>(e);
 	serializedEntity.testComponent = getComponentIfExists<TestComp>(e);
+	serializedEntity.shader = getComponentIfExists<ShaderComponent>(e);
 
 	return serializedEntity;
 }
@@ -138,6 +139,11 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 	if (serializedEnt.testComponent)
 	{
 		entityHandler.addComponent<TestComp>(serializedEnt.testComponent.value());
+	}
+
+	if (serializedEnt.testComponent)
+	{
+		entityHandler.addComponent<ShaderComponent>(serializedEnt.shader.value());
 	}
 }
 

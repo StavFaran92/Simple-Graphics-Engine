@@ -38,6 +38,8 @@ public:
 
 	std::vector<std::string> getAllAssetsOfType(AssetType aType) const;
 
+	void load();
+
 private:
 	std::map<AssetType, std::unordered_set<UUID>> m_assets;
 };

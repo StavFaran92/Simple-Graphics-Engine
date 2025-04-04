@@ -9,11 +9,16 @@
 #include "CacheSystem.h"
 #include "ModelImporter.h"
 #include "Factory.h"
+#include "ShaderBuilder.h"
 
 #include <filesystem>
 
 Assets::Assets()
 {
+	m_assets[AssetType::MESH] = {};
+	m_assets[AssetType::ANIMATION] = {};
+	m_assets[AssetType::TEXTURE] = {};
+	m_assets[AssetType::SHADER] = {};
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
@@ -117,6 +122,9 @@ AssetInfo Assets::addAsset(AssetInfo aInfo)
 	auto& uid = aInfo.uuid;
 	auto& aType = aInfo.aType;
 	auto& savedFilepath = aInfo.filePath;
+
+	assert(!savedFilepath.empty());
+	assert(!uid.empty());
 	
 	Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.name, uid); //TODO maybe use some naming convention here?
 
@@ -141,6 +149,67 @@ std::vector<std::string> Assets::getAllAssetsOfType(AssetType aType) const
 		result.push_back(uuid);
 	}
 	return result;
+}
+
+void Assets::load()
+{
+	auto par = Engine::get()->getContext()->getProjectAssetRegistry();
+
+	// Load meshes
+	std::vector<AssetInfo> meshAssets = par->getAllAssetsOfType(AssetType::MESH);
+	for (const auto& asset : meshAssets)
+	{
+		UUID uuid = asset.uuid;
+		ModelImporter::ModelInfo mInfo;
+		MeshCollection* meshPtr = new MeshCollection();
+		Resource<MeshCollection> generatedMesh(uuid);
+		mInfo.mesh = generatedMesh;
+		Engine::get()->getMemoryPool<MeshCollection>()->add(uuid, meshPtr);
+		Engine::get()->getResourceManager()->incRef(uuid);
+		Engine::get()->getSubSystem<ModelImporter>()->load(asset.filePath, mInfo);
+		m_assets[AssetType::MESH].insert(uuid);
+	}
+
+	// Load textures
+	std::vector<AssetInfo> textureAssets = par->getAllAssetsOfType(AssetType::TEXTURE);
+	for (const auto& asset : textureAssets)
+	{
+		UUID uuid = asset.uuid;
+		Engine::get()->getResourceManager()->incRef(uuid);
+		Texture::loadTexture2D(uuid, asset.filePath);
+		m_assets[AssetType::TEXTURE].insert(uuid);
+	}
+
+	// Load animations
+	std::vector<AssetInfo> animationNameList = par->getAllAssetsOfType(AssetType::ANIMATION);
+	for (const auto& asset : animationNameList)
+	{
+		UUID uuid = asset.uuid;
+		Animation* animPtr = new Animation();
+		Resource<Animation> anim(uuid);
+		Engine::get()->getMemoryPool<Animation>()->add(uuid, animPtr);
+		Engine::get()->getResourceManager()->incRef(uuid);
+		Engine::get()->getSubSystem<AnimationLoader>()->load(asset.filePath, anim);
+		m_assets[AssetType::ANIMATION].insert(uuid);
+	}
+
+	// Load Shaders
+	std::vector<AssetInfo> shaderAssets = par->getAllAssetsOfType(AssetType::SHADER);
+	for (const auto& asset : shaderAssets)
+	{
+		UUID uuid = asset.uuid;
+
+		Shader* shader = new Shader();
+		
+		Engine::get()->getMemoryPool<Shader>()->add(uuid, shader);
+		Engine::get()->getResourceManager()->incRef(uuid);
+
+		// Should load shader here
+		//CustomShaderBuilder::create()
+		//shader->create(asset.)
+
+		m_assets[AssetType::SHADER].insert(uuid);
+	}
 }
 
 std::string Assets::getAlias(UUID uid) const

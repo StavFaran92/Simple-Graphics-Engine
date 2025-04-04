@@ -366,8 +366,8 @@ struct EngineAPI ShaderComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(m_customShader, shaderOverride, customTextures, projection, projectionTexture, renderViewProjection
-			m_uniformProperties, m_shaderFilePath, isValid);
+		archive(m_customShader, shaderOverride, customTextures, projection, projectionTexture/*, renderViewProjection*/,
+			/*m_uniformProperties,*/ m_shaderFilePath, isValid);
 	}
 
 	// This will only be used by forward renderer, ignored by deffered

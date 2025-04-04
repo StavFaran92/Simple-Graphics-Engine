@@ -29,13 +29,16 @@ CommonTextures* CommonTextures::create()
 		auto texture = Texture::createDummyTexture(whiteColor);
 		instance->m_textures[TextureType::WHITE_1X1] = texture;
 
+		auto& projectDir = Engine::get()->getProjectDirectory();
+		std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
+		Texture::writeTexture2D(savedFileLocation, texture);
+
 		AssetInfo aInfo;
 		aInfo.uuid = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_WHITE";
+		aInfo.filePath = savedFileLocation;
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-
-		Texture::writeTexture2D(texture);
 	}
 
 	{
@@ -43,13 +46,16 @@ CommonTextures* CommonTextures::create()
 		auto texture = Texture::createDummyTexture(blackColor);
 		instance->m_textures[TextureType::BLACK_1X1] = texture;
 
+		auto& projectDir = Engine::get()->getProjectDirectory();
+		std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
+		Texture::writeTexture2D(savedFileLocation, texture);
+
 		AssetInfo aInfo;
 		aInfo.uuid = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_BLACK";
+		aInfo.filePath = savedFileLocation;
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-
-		Texture::writeTexture2D(texture);
 	}
 
 	//Engine::get()->getSubSystem<Assets>()->importTexture2D("SGE_CUBEMAP_WHITE", [&]() {

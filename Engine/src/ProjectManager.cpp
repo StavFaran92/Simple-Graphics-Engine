@@ -23,78 +23,8 @@ namespace fs = std::filesystem;
 
 void ProjectManager::loadProject(const std::string& filePath, std::shared_ptr<Context>& context)
 {
-    
-    // Check if the file exists
-    if (!fs::exists(filePath)) 
-    {
-        logError("File not found: " + filePath);
-        return;
-    }
-
-    // Open file
-    std::ifstream projectFile(filePath);
-    if (!projectFile.is_open())
-    {
-        logError("Failed to open file: " + filePath);
-        return ;
-    }
-
-    // Get file directory
-    fs::path projectDir = fs::path(filePath).parent_path();
-
-    // Parse JSON
-    json resourceFileJSON;
-    try 
-    {
-        resourceFileJSON = json::parse(projectFile);
-    }
-    catch (const std::exception& e) 
-    {
-        logError("Failed to parse JSON: " + std::string(e.what()));
-        return ;
-    }
-
-    auto par = context->getProjectAssetRegistry();
-
-    std::vector<AssetInfo> meshNameList = par->getAllAssetsOfType(AssetType::MESH);
-    std::vector<AssetInfo> textureAssetList = par->getAllAssetsOfType(AssetType::TEXTURE);
-    std::vector<AssetInfo> animationNameList = par->getAllAssetsOfType(AssetType::ANIMATION);
-
-    // Create meshes
-    for (const auto& meshUID : meshNameList) 
-    {
-        // TODO fix
-        ModelImporter::ModelInfo mInfo;
-        std::string binFilePath = (projectDir / meshUID).string() + ".dae";
-        MeshCollection* meshPtr = new MeshCollection();
-        Resource<MeshCollection> mesh(meshUID);
-        mInfo.mesh = mesh;
-        Engine::get()->getMemoryPool<MeshCollection>()->add(meshUID, meshPtr);
-        Engine::get()->getResourceManager()->incRef(meshUID);
-        Engine::get()->getSubSystem<ModelImporter>()->load(binFilePath, mInfo);
-    }
-
-    // Create textures
-    for (const auto& textureAsset : textureAssetList)
-    {
-        UUID uid = textureAsset.uuid;
-        // Open bin file
-        fs::path imageFilePath = (projectDir / uid).string() + "." + textureAsset.ext;
-        Texture::loadTexture2D(uid, imageFilePath.string());
-    }
-
-    // Create animations
-    for (const auto& animUID : animationNameList)
-    {
-        std::string binFilePath = (projectDir / animUID).string() + ".dae";
-        Animation* animPtr = new Animation();
-        Resource<Animation> anim(animUID);
-        Engine::get()->getMemoryPool<Animation>()->add(animUID, animPtr);
-        Engine::get()->getResourceManager()->incRef(animUID);
-        Engine::get()->getSubSystem<AnimationLoader>()->load(binFilePath, anim);
-    }
-
-    Archiver::load();
+    Engine::get()->getSubSystem<Assets>()->load();
+    Archiver::load();    
 }
 
 void ProjectManager::saveProject()

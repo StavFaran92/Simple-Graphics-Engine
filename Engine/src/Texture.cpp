@@ -263,10 +263,9 @@ Texture::TextureData Texture::extractTextureDataFromFile(const std::string& file
 	return textureData;
 }
 
-void Texture::writeTexture2D(Resource<Texture> texture)
+void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> texture)
 {
-	auto& projectDir = Engine::get()->getProjectDirectory();
-	stbi_write_png((projectDir + "/" + texture.getUID() + ".png").c_str(),
+	stbi_write_png(fileLocation.c_str(),
 		texture.get()->getWidth(),
 		texture.get()->getHeight(),
 		texture.get()->getBitDepth(),
