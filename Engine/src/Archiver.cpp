@@ -141,7 +141,7 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 		entityHandler.addComponent<TestComp>(serializedEnt.testComponent.value());
 	}
 
-	if (serializedEnt.testComponent)
+	if (serializedEnt.shader)
 	{
 		entityHandler.addComponent<ShaderComponent>(serializedEnt.shader.value());
 	}
