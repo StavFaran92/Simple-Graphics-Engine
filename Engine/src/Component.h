@@ -331,12 +331,6 @@ struct EngineAPI ObjectComponent : public Component
 	Entity e = Entity::EmptyEntity;
 };
 
-enum class ShaderOverride : int
-{
-	PBR,
-	Pixel
-};
-
 struct EngineAPI ShaderComponent : public Component
 {
 	enum ProjectionType : int
@@ -356,13 +350,11 @@ struct EngineAPI ShaderComponent : public Component
 
 	void setProjectionTexture(Resource<Texture> texture);
 
-	void update()
-	{
-		for (const auto& [name, value] :m_uniformProperties)
-		{
-			m_customShader.get()->setUniformValue(name, value);
-		}
-	}
+	void update();
+
+	void parseUniforms(const std::string& sourceCode);
+
+	void setShader(Resource<Shader> shader);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -373,8 +365,6 @@ struct EngineAPI ShaderComponent : public Component
 	// This will only be used by forward renderer, ignored by deffered
 	Resource<Shader> m_customShader;
 
-	ShaderOverride shaderOverride;
-
 	std::map<std::string, Resource<Texture>> customTextures;
 
 	ProjectionType projection = ProjectionType::DefaultProjection;
@@ -384,6 +374,7 @@ struct EngineAPI ShaderComponent : public Component
 	std::unordered_map<std::string, Value> m_uniformProperties;
 
 	std::string m_shaderFilePath;
+	ShaderOverride shaderOverride;
 
 	bool isValid = false;
 };

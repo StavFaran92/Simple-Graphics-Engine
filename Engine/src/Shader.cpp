@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include <regex>
+
 #include "glm/glm.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
@@ -12,6 +14,7 @@
 #include "Resource.h"
 #include "Factory.h"
 #include "Assets.h"
+#include "CommonTextures.h"
 
 uint32_t Shader::s_activeShader = 0;
 
@@ -23,13 +26,7 @@ Shader::Shader(const std::string& glslFilePath) :
 	m_id(0),
 	m_glslFilePath(glslFilePath)
 {
-	std::string& fullShaderCode = Engine::get()->getShaderLoader()->readShader(glslFilePath);
-
-	ShadersInfo shaders;
-	Engine::get()->getShaderLoader()->parseGLSLShader(fullShaderCode, shaders);
-
-	// Build shaders
-	BuildShaders(shaders);
+	recompile();
 }
 
 void Shader::init()
@@ -50,6 +47,50 @@ void Shader::setTextureInShader(Resource<Texture> texture, const std::string& un
 	texture.get()->bind();
 	setUniformValue(uniform, slot);
 }
+
+//void Shader::parseUniforms()
+//{
+//	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
+//	std::smatch match;
+//	std::string::const_iterator searchStart(m_sourceCode.cbegin());
+//
+//	auto& uniformProperties = m_uniformProperties;
+//
+//	while (std::regex_search(searchStart, m_sourceCode.cend(), match, uniformRegex)) {
+//		std::string type = match[1].str();
+//		std::string name = match[2].str();
+//
+//		if (type == "float") {
+//			uniformProperties[name] = 0.0f;
+//		}
+//		else if (type == "vec2") {
+//			uniformProperties[name] = glm::vec2(0.0f);
+//		}
+//		else if (type == "vec3") {
+//			uniformProperties[name] = glm::vec3(0.0f);
+//		}
+//		else if (type == "vec4") {
+//			uniformProperties[name] = glm::vec4(0.0f);
+//		}
+//		else if (type == "int") {
+//			uniformProperties[name] = 0;
+//		}
+//		else if (type == "uint") {
+//			uniformProperties[name] = 0u;
+//		}
+//		else if (type == "mat3") {
+//			uniformProperties[name] = glm::mat3(1.0f);
+//		}
+//		else if (type == "mat4") {
+//			uniformProperties[name] = glm::mat4(1.0f);
+//		}
+//		else if (type == "sampler2D") {
+//			m_textures[name] = Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1);
+//		}
+//
+//		searchStart = match.suffix().first;
+//	}
+//}
 
 void Shader::BuildShaders(const ShadersInfo& shaderCode)
 {
@@ -127,6 +168,8 @@ void Shader::BuildShaders(const ShadersInfo& shaderCode)
 
 	if (tessEvalShader)
 		glDeleteShader(tessEvalShader);
+
+	//parseUniforms();
 }
 
 bool Shader::ValidateProgramLink()
@@ -359,6 +402,111 @@ void Shader::setTime(float time)
 Resource<Shader> Shader::create(const std::string& filepath)
 {
 	return Factory<Shader>::create(filepath);
+}
+
+void addMacro(std::string& source, const std::string& macro) {
+	std::string macroDefinition = "#define " + macro + "\n";
+	size_t versionPos = source.find("#version");
+
+	if (versionPos != std::string::npos) {
+		// Find the end of the #version line
+		size_t lineEnd = source.find("\n", versionPos);
+		if (lineEnd != std::string::npos) {
+			// Insert the macro definition after the #version line
+			source.insert(lineEnd + 1, macroDefinition);
+		}
+		else {
+			// If no newline after #version, append the macro definition at the end
+			source.append(macroDefinition);
+		}
+	}
+	else {
+		// If no #version directive, prepend the macro definition
+		source = macroDefinition + source;
+	}
+}
+
+void replaceDirective(std::string& source, const std::string& directive, const std::string& replacement)
+{
+	size_t pos = source.find(directive);
+	if (pos != std::string::npos)
+	{
+		source.replace(pos, directive.length(), replacement);
+	}
+}
+
+Resource<Shader> Shader::createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride)
+{
+	Resource<Shader> shader = Factory<Shader>::create();
+	shader->m_isShaderOverride = true;
+	shader->shaderOverride = shaderOverride;
+	shader->m_glslFilePath = filepath;
+	shader->recompile();
+
+	AssetInfo aInfo;
+	aInfo.uuid = shader.getUID();
+	aInfo.origFilePath = filepath;
+	aInfo.aType = AssetType::SHADER;
+	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
+
+	return shader;
+}
+
+void embeddOverrideShaderInUberShader(ShadersInfo& shaderInfo, ShaderOverride shaderOverride)
+{
+	std::string shaderPath;
+	if (shaderOverride == ShaderOverride::PBR)
+	{
+		shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl";
+	}
+	else if (shaderOverride == ShaderOverride::Pixel)
+	{
+		shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl";
+	}
+
+	if (!shaderInfo.vertexCode.empty() || !shaderInfo.fragmentCode.empty())
+	{
+		std::string& pixelShaderSources = Engine::get()->getShaderLoader()->readShader(shaderPath);
+
+		ShadersInfo shaderInfo;
+		Engine::get()->getShaderLoader()->parseGLSLShader(pixelShaderSources, shaderInfo);
+
+		std::string macro = "CUSTOM_SHADER";
+
+		if (!shaderInfo.vertexCode.empty())
+		{
+			addMacro(shaderInfo.vertexCode, macro);
+			replaceDirective(shaderInfo.vertexCode, "#custom_vert", shaderInfo.vertexCode);
+		}
+
+		if (!shaderInfo.fragmentCode.empty())
+		{
+			addMacro(shaderInfo.fragmentCode, macro);
+			replaceDirective(shaderInfo.fragmentCode, "#custom_frag", shaderInfo.fragmentCode);
+		}
+	}
+}
+
+bool Shader::recompile()
+{
+	ShadersInfo shadersInfo;
+
+	std::string& fullShaderCode = Engine::get()->getShaderLoader()->readShader(m_glslFilePath);
+	Engine::get()->getShaderLoader()->parseGLSLShader(fullShaderCode, shadersInfo);
+
+	if (m_isShaderOverride)
+	{
+		embeddOverrideShaderInUberShader(shadersInfo, shaderOverride);
+	}
+	
+	BuildShaders(shadersInfo);
+
+	return true;
+}
+
+const std::string& Shader::getSourceCode() const
+{
+	return m_sourceCode;
 }
 
 Resource<Shader> Shader::import(const std::string& filepath)

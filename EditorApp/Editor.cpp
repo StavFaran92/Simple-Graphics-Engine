@@ -23,8 +23,10 @@ static bool showMeshSelector = false;
 static bool showAnimationSelector = false;
 static bool selectedEntityRename = false;
 static bool showScriptSelector = false;
+static bool showShaderSelector = false;
 static bool showSamplerEditWindow = false;
 static bool showTextureCreateWindow = false;
+static bool showShaderCreateWindow = false;
 
 static bool startButtonPressed = false;
 
@@ -46,8 +48,7 @@ static void displaySelectMeshWindow();
 
 struct EntityState
 {
-	char shaderFilePath[256];
-	ShaderOverride shaderOverrideType;
+	Resource<Shader> shader;
 };
 
 std::unordered_map<entity_id, EntityState> g_states;
@@ -430,6 +431,53 @@ static void displaySelectScriptWindow(std::string& scriptName)
 	}
 }
 
+static void displaySelectShaderWindow(std::string& uuid)
+{
+	if (showShaderSelector)
+	{
+		ImGui::Begin("Select Shader", &showShaderSelector, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Text("Available Shaders:");
+		ImGui::Separator();
+
+		static int selectedShaderIndex = -1;
+
+		auto& shaderList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(AssetType::SHADER);
+
+
+		for (int i = 0; i < shaderList.size(); i++)
+		{
+			bool isSelected = (selectedShaderIndex == i);
+
+			if (ImGui::Selectable(shaderList[i].c_str(), &isSelected))
+			{
+				selectedShaderIndex = i;
+			}
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK"))
+		{
+			if (selectedShaderIndex >= 0 && selectedShaderIndex < shaderList.size())
+			{
+				uuid = shaderList[selectedShaderIndex];
+
+			}
+			showShaderSelector = false;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
+		{
+			showShaderSelector = false;
+		}
+
+		ImGui::End();
+	}
+}
+
+
 // Define a structure to represent an object in the scene hierarchy
 struct SceneObject {
 	std::string name;
@@ -642,6 +690,51 @@ void ShowTextureCreatorWindow()
 		{
 			auto texture = Texture::createEmptyTexture(width, height);
 			Texture::addTexture2D(textureName, texture);
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void ShowShaderCreatorWindow()
+{
+	if (showShaderCreateWindow)
+	{
+		ImGui::OpenPopup("CreateShader");
+		showShaderCreateWindow = false;
+	}
+	if (ImGui::BeginPopupModal("CreateShader", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		static char shaderName[256] = "New Shader";
+		static char filepath[256] = "";
+		static int shaderOverrideType = 0;
+
+		// Shader Name
+		ImGui::Text("Name");
+		ImGui::InputText("##ShaderName", shaderName, IM_ARRAYSIZE(shaderName), ImGuiInputTextFlags_EnterReturnsTrue);
+
+		// Shader File Path
+		ImGui::Text("Filepath");
+		ImGui::InputText("##ShaderFilePath", filepath, IM_ARRAYSIZE(filepath), ImGuiInputTextFlags_EnterReturnsTrue);
+
+		// Override Type Drop-down
+		const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader" };
+		ImGui::Text("Override Type");
+		ImGui::Combo("##ShaderOverrideType", (int*)&shaderOverrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			auto& shader = Shader::createOverrideShader(filepath, (ShaderOverride)shaderOverrideType);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -1745,56 +1838,26 @@ void RenderInspectorWindow(float width, float height)
 		});
 
 		displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {
-			auto& state = g_states[selectedEntity.handlerID()];
+			//auto& state = g_states[selectedEntity.handlerID()];
 
-			// Shader File Path
-			ImGui::Text("Filepath");
-			ImGui::InputText("##ShaderFilePath", state.shaderFilePath, IM_ARRAYSIZE(state.shaderFilePath), ImGuiInputTextFlags_EnterReturnsTrue);
-
-			// Override Type Drop-down
-			const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader" };
-			ImGui::Text("Override Type");
-			ImGui::Combo("##ShaderOverrideType", (int*)&state.shaderOverrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
-
-			// Compile Button
-			if (ImGui::Button("Compile"))
+			if (ImGui::Button("Select Shader"))
 			{
-				ShaderComponent& newShader = CustomShaderBuilder::create(state.shaderFilePath, state.shaderOverrideType).build();
-				auto& oldShader = shaderComponent;
+				showShaderSelector = true;
+			}
 
-				// If shader type did not change pass assigned values to new shader
-				if (oldShader.shaderOverride == newShader.shaderOverride &&
-					oldShader.m_shaderFilePath == newShader.m_shaderFilePath)
-				{
-					auto& newTextures = newShader.customTextures;
-					for (const auto [name, texture] : oldShader.customTextures)
-					{
-						auto iter = newTextures.find(name);
-						if (iter != newTextures.end())
-						{
-							iter->second = texture;
-						}
-					}
+			std::string selectedShaderUID;
+			displaySelectShaderWindow(selectedShaderUID);
 
-					auto& newUniforms = newShader.m_uniformProperties;
-					for (const auto [name, value] : oldShader.m_uniformProperties)
-					{
-						auto iter = newUniforms.find(name);
-						if (iter != newUniforms.end())
-						{
-							iter->second = value;
-						}
-					}
-
-					newShader.projection = oldShader.projection;
-					newShader.projectionTexture = oldShader.projectionTexture;
-					newShader.renderViewProjection = oldShader.renderViewProjection;
-
-					newShader.update();
-				}
-
-				selectedEntity.RemoveComponent<ShaderComponent>();
-				selectedEntity.addComponent<ShaderComponent>(newShader);
+			if (!selectedShaderUID.empty())
+			{
+				shaderComponent.m_customShader = Resource<Shader>(selectedShaderUID);
+			}
+			
+			// Compile Button
+			if (ImGui::Button("recompile"))
+			{
+				shaderComponent.m_customShader->recompile();
+				shaderComponent.update();
 			}
 
 			ImGui::Separator();
@@ -2132,6 +2195,10 @@ class GUI_Helper : public GuiMenu {
 							showTextureCreateWindow = true;
 							
 						}
+						if (ImGui::MenuItem("Shader Override")) {
+							showShaderCreateWindow = true;
+
+						}
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenu();
@@ -2153,6 +2220,7 @@ class GUI_Helper : public GuiMenu {
 		RenderInspectorWindow(screenWidth, screenHeight);
 		RenderAssetViewWindow(screenWidth, screenHeight); // Add the Asset View window
 		ShowTextureCreatorWindow();
+		ShowShaderCreatorWindow();
 
 		DisplayDebugInfoWindow();
 		

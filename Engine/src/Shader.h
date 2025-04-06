@@ -12,6 +12,12 @@
 
 #include "glm/glm.hpp"
 
+enum class ShaderOverride : int
+{
+	PBR,
+	Pixel
+};
+
 struct ShadersInfo;
 template<typename> class Resource;
 class Texture;
@@ -45,8 +51,19 @@ public:
 
 	bool build();
 
+	//void parseUniforms();
+
+	ShaderOverride getShaderOverride() const { return shaderOverride; };
+
+	//const std::unordered_map<std::string, int>& getAvailableUniforms() const
+
+	bool recompile();
+
+	const std::string& getSourceCode() const;
+
 	static Resource<Shader> import(const std::string& filepath);
 	static Resource<Shader> create(const std::string& filepath);
+	static Resource<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride);
 
 	virtual ~Shader();
 
@@ -97,4 +114,13 @@ protected:
 	static uint32_t s_activeShader;
 
 	std::unordered_map<std::string, Value> m_delayedProperties;
+
+	ShaderOverride shaderOverride;
+	bool m_isShaderOverride = false;
+
+	//std::unordered_map<std::string, Value> m_uniformProperties;
+	//std::unordered_map<std::string, Resource<Texture>> m_textures;
+
+	std::string m_sourceCode;
+	std::string origSourceCode;
 };
