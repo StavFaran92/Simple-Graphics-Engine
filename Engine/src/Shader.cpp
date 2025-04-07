@@ -452,39 +452,43 @@ Resource<Shader> Shader::createOverrideShader(const std::string& filepath, Shade
 	return shader;
 }
 
-void embeddOverrideShaderInUberShader(ShadersInfo& shaderInfo, ShaderOverride shaderOverride)
+void embeddOverrideShaderInUberShader(ShadersInfo& shaderOverrideInfo, ShaderOverride shaderOverride)
 {
-	std::string shaderPath;
-	if (shaderOverride == ShaderOverride::PBR)
+	if (!shaderOverrideInfo.vertexCode.empty() || !shaderOverrideInfo.fragmentCode.empty())
 	{
-		shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl";
-	}
-	else if (shaderOverride == ShaderOverride::Pixel)
-	{
-		shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl";
-	}
+		std::string shaderPath;
+		if (shaderOverride == ShaderOverride::PBR)
+		{
+			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl";
+		}
+		else if (shaderOverride == ShaderOverride::Pixel)
+		{
+			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl";
+		}
 
-	if (!shaderInfo.vertexCode.empty() || !shaderInfo.fragmentCode.empty())
-	{
 		std::string& pixelShaderSources = Engine::get()->getShaderLoader()->readShader(shaderPath);
 
-		ShadersInfo shaderInfo;
-		Engine::get()->getShaderLoader()->parseGLSLShader(pixelShaderSources, shaderInfo);
+		ShadersInfo pixelShaderInfo;
+		Engine::get()->getShaderLoader()->parseGLSLShader(pixelShaderSources, pixelShaderInfo);
 
 		std::string macro = "CUSTOM_SHADER";
 
-		if (!shaderInfo.vertexCode.empty())
+		if (!pixelShaderInfo.vertexCode.empty())
 		{
-			addMacro(shaderInfo.vertexCode, macro);
-			replaceDirective(shaderInfo.vertexCode, "#custom_vert", shaderInfo.vertexCode);
+			addMacro(pixelShaderInfo.vertexCode, macro);
+			replaceDirective(pixelShaderInfo.vertexCode, "#custom_vert", shaderOverrideInfo.vertexCode);
 		}
 
-		if (!shaderInfo.fragmentCode.empty())
+		if (!pixelShaderInfo.fragmentCode.empty())
 		{
-			addMacro(shaderInfo.fragmentCode, macro);
-			replaceDirective(shaderInfo.fragmentCode, "#custom_frag", shaderInfo.fragmentCode);
+			addMacro(pixelShaderInfo.fragmentCode, macro);
+			replaceDirective(pixelShaderInfo.fragmentCode, "#custom_frag", shaderOverrideInfo.fragmentCode);
 		}
+
+		shaderOverrideInfo = pixelShaderInfo;
 	}
+
+	
 }
 
 bool Shader::recompile()
@@ -500,6 +504,8 @@ bool Shader::recompile()
 	}
 	
 	BuildShaders(shadersInfo);
+
+	m_sourceCode = fullShaderCode;
 
 	return true;
 }

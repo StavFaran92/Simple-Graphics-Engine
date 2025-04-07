@@ -1850,7 +1850,7 @@ void RenderInspectorWindow(float width, float height)
 
 			if (!selectedShaderUID.empty())
 			{
-				shaderComponent.m_customShader = Resource<Shader>(selectedShaderUID);
+				shaderComponent.setShader(Resource<Shader>(selectedShaderUID));
 			}
 			
 			// Compile Button
