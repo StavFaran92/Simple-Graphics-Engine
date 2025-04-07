@@ -226,7 +226,7 @@ static void displayAssetTextureSelectPopup()
 
 		if (selectedTextureIndex != -1)
 		{
-			Resource<Texture> displayTexture(textureList.at(selectedTextureIndex));
+			Resource<Texture> displayTexture(textureList.at(selectedTextureIndex).uuid);
 			ImVec2 imageSize(150, 150);
 			ImGui::Image(reinterpret_cast<ImTextureID>(displayTexture.get()->getID()), imageSize, ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
 		}
@@ -245,7 +245,7 @@ static void displayAssetTextureSelectPopup()
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
 			}
 
-			if (ImGui::Selectable(assets->getAlias(textureList[i]).c_str(), false, ImGuiSelectableFlags_DontClosePopups))
+			if (ImGui::Selectable(textureList[i].name.c_str(), false, ImGuiSelectableFlags_DontClosePopups))
 			{
 				selectedTextureIndex = i;
 			}
@@ -258,7 +258,7 @@ static void displayAssetTextureSelectPopup()
 		if (ImGui::Button("OK")) {
 			if (selectedTextureIndex >= 0 && selectedTextureIndex < textureList.size())
 			{
-				assetTextureSelectCB(textureList[selectedTextureIndex]);
+				assetTextureSelectCB(textureList[selectedTextureIndex].uuid);
 
 			}
 			ImGui::CloseCurrentPopup();
@@ -289,7 +289,7 @@ static void displaySelectMeshWindow(std::string& uuid)
 
 		static int selectedMeshIndex = -1;
 
-		auto& meshList = Engine::get()->getMemoryPool<MeshCollection>()->getAll(); // todo fix
+		auto& meshList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(AssetType::MESH); // todo fix
 
 		for (int i = 0; i < meshList.size(); i++) 
 		{
@@ -303,7 +303,7 @@ static void displaySelectMeshWindow(std::string& uuid)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
 			}
 
-			if (ImGui::Selectable(Engine::get()->getSubSystem<Assets>()->getAlias(meshList[i]).c_str()))
+			if (ImGui::Selectable(meshList[i].name.c_str()))
 			{
 				selectedMeshIndex = i;
 			}
@@ -316,7 +316,7 @@ static void displaySelectMeshWindow(std::string& uuid)
 		if (ImGui::Button("OK")) {
 			if (selectedMeshIndex >= 0 && selectedMeshIndex < meshList.size()) 
 			{
-				uuid = meshList[selectedMeshIndex];
+				uuid = meshList[selectedMeshIndex].uuid;
 				
 			}
 			showMeshSelector = false;
@@ -356,7 +356,7 @@ static void displaySelectAnimationWindow(std::string& uuid)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
 			}
 
-			if (ImGui::Selectable(animationList[i].c_str()))
+			if (ImGui::Selectable(animationList[i].name.c_str()))
 			{
 				selectedAnimationIndex = i;
 			}
@@ -369,7 +369,7 @@ static void displaySelectAnimationWindow(std::string& uuid)
 		if (ImGui::Button("OK")) {
 			if (selectedAnimationIndex >= 0 && selectedAnimationIndex < animationList.size())
 			{
-				uuid = animationList[selectedAnimationIndex];
+				uuid = animationList[selectedAnimationIndex].uuid;
 
 			}
 			showAnimationSelector = false;
@@ -448,7 +448,7 @@ static void displaySelectShaderWindow(std::string& uuid)
 		{
 			bool isSelected = (selectedShaderIndex == i);
 
-			if (ImGui::Selectable(shaderList[i].c_str(), &isSelected))
+			if (ImGui::Selectable(shaderList[i].name.c_str(), &isSelected))
 			{
 				selectedShaderIndex = i;
 			}
@@ -460,7 +460,7 @@ static void displaySelectShaderWindow(std::string& uuid)
 		{
 			if (selectedShaderIndex >= 0 && selectedShaderIndex < shaderList.size())
 			{
-				uuid = shaderList[selectedShaderIndex];
+				uuid = shaderList[selectedShaderIndex].uuid;
 
 			}
 			showShaderSelector = false;
@@ -2094,7 +2094,7 @@ void RenderAssetViewWindow(float width, float height) {
 
 	if (ImGui::TreeNode("Textures")) {
 		for (int i = 0; i < textureList.size(); i++) {
-			if (ImGui::Selectable(assets->getAlias(textureList[i]).c_str())) {
+			if (ImGui::Selectable(assets->getAlias(textureList[i].uuid).c_str())) {
 				// Do something when a mesh is selected
 			}
 		}

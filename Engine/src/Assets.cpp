@@ -15,10 +15,11 @@
 
 Assets::Assets()
 {
-	m_assets[AssetType::MESH] = {};
-	m_assets[AssetType::ANIMATION] = {};
-	m_assets[AssetType::TEXTURE] = {};
-	m_assets[AssetType::SHADER] = {};
+	m_assets = {};
+	//m_assets[AssetType::MESH] = {};
+	//m_assets[AssetType::ANIMATION] = {};
+	//m_assets[AssetType::TEXTURE] = {};
+	//m_assets[AssetType::SHADER] = {};
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
@@ -104,12 +105,12 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 	
 	Engine::get()->getMemoryManagementSystem()->addAssociation(path, uid);
 
-	m_assets[aType].insert(uid);
-
 	aInfo.filePath = savedFilePath;
 	aInfo.isValid = true;
 
 	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
+
+	m_assets[uid] = aInfo;
 
 	logInfo("Successfully imported asset: '" + path + "' into: '" + savedFilePath + "'.");
 
@@ -128,25 +129,28 @@ AssetInfo Assets::addAsset(AssetInfo aInfo)
 	
 	Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.name, uid); //TODO maybe use some naming convention here?
 
-	m_assets[aType].insert(uid);
-
 	aInfo.filePath = savedFilepath;
 	aInfo.isValid = true;
 	aInfo.aType = aType;
 
 	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 
+	m_assets[uid] = aInfo;
+
 	logInfo("Successfully Added asset: '" + savedFilepath + "'.");
 
 	return aInfo;
 }
 
-std::vector<std::string> Assets::getAllAssetsOfType(AssetType aType) const
+std::vector<AssetInfo> Assets::getAllAssetsOfType(AssetType aType) const
 {
-	std::vector<std::string> result;
-	for (auto uuid : m_assets.at(aType))
+	std::vector<AssetInfo> result;
+	for (const auto& asset : m_assets)
 	{
-		result.push_back(uuid);
+		if (asset.second.aType == aType)
+		{
+			result.push_back(asset.second);
+		}
 	}
 	return result;
 }
@@ -167,7 +171,7 @@ void Assets::load()
 		Engine::get()->getMemoryPool<MeshCollection>()->add(uuid, meshPtr);
 		Engine::get()->getResourceManager()->incRef(uuid);
 		Engine::get()->getSubSystem<ModelImporter>()->load(asset.filePath, mInfo);
-		m_assets[AssetType::MESH].insert(uuid);
+		m_assets[uuid] = asset;
 	}
 
 	// Load textures
@@ -177,7 +181,7 @@ void Assets::load()
 		UUID uuid = asset.uuid;
 		Engine::get()->getResourceManager()->incRef(uuid);
 		Texture::loadTexture2D(uuid, asset.filePath);
-		m_assets[AssetType::TEXTURE].insert(uuid);
+		m_assets[uuid] = asset;
 	}
 
 	// Load animations
@@ -190,7 +194,7 @@ void Assets::load()
 		Engine::get()->getMemoryPool<Animation>()->add(uuid, animPtr);
 		Engine::get()->getResourceManager()->incRef(uuid);
 		Engine::get()->getSubSystem<AnimationLoader>()->load(asset.filePath, anim);
-		m_assets[AssetType::ANIMATION].insert(uuid);
+		m_assets[uuid] = asset;
 	}
 
 	// Load Shaders
@@ -208,11 +212,17 @@ void Assets::load()
 		//CustomShaderBuilder::create()
 		//shader->create(asset.)
 
-		m_assets[AssetType::SHADER].insert(uuid);
+		m_assets[uuid] = asset;
 	}
 }
 
 std::string Assets::getAlias(UUID uid) const
 {
-	return Engine::get()->getMemoryManagementSystem()->getName(uid);
+	auto iter = m_assets.find(uid);
+	if (iter != m_assets.end())
+	{
+		return iter->second.name;
+	}
+	return "N/A";
+
 }

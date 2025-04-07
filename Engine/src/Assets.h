@@ -36,10 +36,12 @@ public:
 
 	AssetInfo addAsset(AssetInfo assetInfo);
 
-	std::vector<std::string> getAllAssetsOfType(AssetType aType) const;
+	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 
 	void load();
 
 private:
-	std::map<AssetType, std::unordered_set<UUID>> m_assets;
+	//std::map<AssetType, std::unordered_set<AssetInfo>> m_assets;
+
+	std::unordered_map<UUID, AssetInfo> m_assets;
 };
