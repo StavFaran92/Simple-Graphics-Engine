@@ -426,7 +426,7 @@ void addMacro(std::string& source, const std::string& macro) {
 	}
 }
 
-void replaceDirective(std::string& source, const std::string& directive, const std::string& replacement)
+void replaceDirective(std::string& source, const std::string& directive, std::string replacement)
 {
 	size_t pos = source.find(directive);
 	if (pos != std::string::npos)
@@ -448,9 +448,39 @@ Resource<Shader> Shader::createOverrideShader(const std::string& name, const std
 	aInfo.origFilePath = filepath;
 	aInfo.aType = AssetType::SHADER;
 	aInfo.name = name;
+	aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
 	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
 
 	return shader;
+}
+
+Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)
+{
+	shader->m_isShaderOverride = true;
+	shader->shaderOverride = shaderOverride;
+	shader->m_glslFilePath = filepath;
+	shader->recompile();
+
+	return shader;
+}
+
+ShaderOverride Shader::getShaderOverrideFromStr(const std::string& shaderOverride)
+{
+	if (shaderOverride == "PBR") return ShaderOverride::PBR;
+	if (shaderOverride == "Pixel") return ShaderOverride::Pixel;
+	return ShaderOverride::PBR;
+}
+
+std::string Shader::getShaderOverrideAsStr(ShaderOverride shaderOverride)
+{
+	switch (shaderOverride)
+	{
+	case ShaderOverride::PBR:
+		return "PBR";
+	case ShaderOverride::Pixel:
+		return "Pixel";
+	}
+	return "N/A";
 }
 
 void embeddOverrideShaderInUberShader(ShadersInfo& shaderOverrideInfo, ShaderOverride shaderOverride)

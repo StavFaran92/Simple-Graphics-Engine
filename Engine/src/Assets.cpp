@@ -202,11 +202,14 @@ void Assets::load()
 	for (const auto& asset : shaderAssets)
 	{
 		UUID uuid = asset.uuid;
+		std::string shaderOverrideStr = asset.attributes.at("shader_override");
+		ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
+		Shader* shaderPtr = new Shader();
+		Resource<Shader> shader(uuid);
+		Engine::get()->getMemoryPool<Shader>()->add(uuid, shaderPtr);
+		Engine::get()->getResourceManager()->incRef(uuid);
+		Shader::load(shader, asset.filePath, shaderOverride);
 
-		// TODO Fix
-		//Resource<Shader> shader = Shader::createOverrideShader(asset.name, asset.filePath, asset.attributes.at("shader_override"));
-		//Engine::get()->getMemoryPool<Shader>()->add(uuid, shader.get());
-		//Engine::get()->getResourceManager()->incRef(uuid);
 		m_assets[uuid] = asset;
 	}
 }
