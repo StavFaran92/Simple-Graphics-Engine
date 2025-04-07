@@ -323,10 +323,25 @@ void Texture::addTexture2D(Resource<Texture> texture)
 
 void Texture::addTexture2D(const std::string& name, Resource<Texture> texture)
 {
+	texture.get()->bind();
+
+	// Allocate memory for the pixels
+	void* pixels = malloc(texture.get()->getWidth() * texture.get()->getHeight() * 3);
+
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	texture->m_data.data = pixels;
+	texture->m_data.bpp = 3;
+
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
+	writeTexture2D(savedFileLocation, texture);
+
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::TEXTURE;
 	aInfo.uuid = texture.getUID();
 	aInfo.name = name;
+	aInfo.filePath = savedFileLocation;
 	aInfo.attributes["isHDR"] = "false";
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }
