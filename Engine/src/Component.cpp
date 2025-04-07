@@ -183,6 +183,8 @@ void ShaderComponent::setShader(Resource<Shader> shader)
 	const std::string& sourceCode = shader->getSourceCode();
 
 	parseUniforms(sourceCode);
+
+	isValid = true;
 }
 
 void ShaderComponent::update()
