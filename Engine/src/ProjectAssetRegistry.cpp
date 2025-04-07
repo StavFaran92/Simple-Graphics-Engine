@@ -20,7 +20,8 @@ void to_json(nlohmann::json& j, const AssetInfo& asset)
         {"filePath", asset.filePath},
         {"type", asset.aType}, // Assuming AssetType supports JSON conversion
         {"isValid", asset.isValid},
-        {"attributes", asset.attributes}
+        {"attributes", asset.attributes},
+        {"name", asset.name}
     };
 }
 
@@ -33,6 +34,7 @@ void from_json(const nlohmann::json& j, AssetInfo& asset)
     j.at("type").get_to(asset.aType); // Assuming AssetType supports JSON conversion
     j.at("isValid").get_to(asset.isValid);
     j.at("attributes").get_to(asset.attributes);
+    j.at("name").get_to(asset.name);
 }
 
 ProjectAssetRegistry::ProjectAssetRegistry(const std::string& filename)

@@ -734,7 +734,7 @@ void ShowShaderCreatorWindow()
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			auto& shader = Shader::createOverrideShader(filepath, (ShaderOverride)shaderOverrideType);
+			auto& shader = Shader::createOverrideShader(shaderName, filepath, (ShaderOverride)shaderOverrideType);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -1851,6 +1851,12 @@ void RenderInspectorWindow(float width, float height)
 			if (!selectedShaderUID.empty())
 			{
 				shaderComponent.setShader(Resource<Shader>(selectedShaderUID));
+			}
+
+			if (!shaderComponent.m_customShader.isEmpty())
+			{
+				auto name = Engine::get()->getSubSystem<Assets>()->getAlias(shaderComponent.m_customShader.getUID());
+				ImGui::Text(name.c_str());
 			}
 			
 			// Compile Button

@@ -435,7 +435,7 @@ void replaceDirective(std::string& source, const std::string& directive, const s
 	}
 }
 
-Resource<Shader> Shader::createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride)
+Resource<Shader> Shader::createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride)
 {
 	Resource<Shader> shader = Factory<Shader>::create();
 	shader->m_isShaderOverride = true;
@@ -447,6 +447,7 @@ Resource<Shader> Shader::createOverrideShader(const std::string& filepath, Shade
 	aInfo.uuid = shader.getUID();
 	aInfo.origFilePath = filepath;
 	aInfo.aType = AssetType::SHADER;
+	aInfo.name = name;
 	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
 
 	return shader;
