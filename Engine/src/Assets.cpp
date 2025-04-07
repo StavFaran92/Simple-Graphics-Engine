@@ -203,15 +203,10 @@ void Assets::load()
 	{
 		UUID uuid = asset.uuid;
 
-		Shader* shader = new Shader();
-		
-		Engine::get()->getMemoryPool<Shader>()->add(uuid, shader);
-		Engine::get()->getResourceManager()->incRef(uuid);
-
-		// Should load shader here
-		//CustomShaderBuilder::create()
-		//shader->create(asset.)
-
+		// TODO Fix
+		//Resource<Shader> shader = Shader::createOverrideShader(asset.name, asset.filePath, asset.attributes.at("shader_override"));
+		//Engine::get()->getMemoryPool<Shader>()->add(uuid, shader.get());
+		//Engine::get()->getResourceManager()->incRef(uuid);
 		m_assets[uuid] = asset;
 	}
 }
