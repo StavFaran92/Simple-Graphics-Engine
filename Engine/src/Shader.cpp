@@ -507,13 +507,13 @@ void embeddOverrideShaderInUberShader(ShadersInfo& shaderOverrideInfo, ShaderOve
 		if (!pixelShaderInfo.vertexCode.empty())
 		{
 			addMacro(pixelShaderInfo.vertexCode, macro);
-			replaceDirective(pixelShaderInfo.vertexCode, "#custom_vert", shaderOverrideInfo.vertexCode);
+			replaceDirective(pixelShaderInfo.vertexCode, "#custom_vert", shaderOverrideInfo.vertexCode.c_str());
 		}
 
 		if (!pixelShaderInfo.fragmentCode.empty())
 		{
 			addMacro(pixelShaderInfo.fragmentCode, macro);
-			replaceDirective(pixelShaderInfo.fragmentCode, "#custom_frag", shaderOverrideInfo.fragmentCode);
+			replaceDirective(pixelShaderInfo.fragmentCode, "#custom_frag", shaderOverrideInfo.fragmentCode.c_str()); // I have no idea why but casting it to cstring fix the overwrite issue
 		}
 
 		shaderOverrideInfo = pixelShaderInfo;
