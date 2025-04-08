@@ -10,7 +10,7 @@
 #include "Configurations.h"
 #include "Resource.h"
 
-
+struct AssetInfo;
 
 class EngineAPI Texture
 {
@@ -105,6 +105,44 @@ public:
 		void* facesData[6]{ nullptr }; //only apply to Cubemap
 	};
 
+	struct TextureImportSettings
+	{
+		std::string name;
+		bool genMipMap = false;
+		bool flip = false;
+	};
+
+	struct TextureAssetAttributes
+	{
+		TextureAssetAttributes()
+		{
+		}
+
+		TextureAssetAttributes(const std::map<std::string, std::string>& in)
+		{
+			genMipMap = in.at("gen_mip_map") == "true";
+			flip = in.at("flip") == "true";
+			isHDR = in.at("is_hdr") == "true";
+		}
+
+		std::map<std::string, std::string> toMap() const
+		{
+			return {
+				{ "gen_mip_map", genMipMap ? "true" : "false" },
+				{ "flip", flip ? "true" : "false" },
+				{ "is_hdr", isHDR ? "true" : "false" },
+			};
+		}
+
+		bool genMipMap = false;
+		bool flip = false;
+		bool isHDR = false;
+
+		
+
+		
+	};
+
 	/** Constructor */
 	Texture();
 
@@ -182,11 +220,13 @@ public:
 		return m_data;
 	}
 
+	TextureAssetAttributes getTextureAssetAttributes();
+
 	static Texture::TextureData extractTextureDataFromFile(const std::string& fileLocation);
 
 	static void writeTexture2D(const std::string& fileLocation, Resource<Texture> texture);
-	static Resource<Texture> importTexture2D(const std::string& fileLocation);
-	static Resource<Texture> loadTexture2D(UUID uid, const std::string& path);
+	static Resource<Texture> importTexture2D(const std::string& fileLocation, const TextureImportSettings & = {});
+	static Resource<Texture> loadTexture2D(AssetInfo aInfo);
 	static void addTexture2D(Resource<Texture> texture);
 	static void addTexture2D(const std::string& name, Resource<Texture> texture);
 
@@ -201,4 +241,6 @@ private:
 	int m_slot = 0;
 	
 	TextureData m_data;
+
+	TextureAssetAttributes m_attributes;
 };

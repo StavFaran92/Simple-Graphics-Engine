@@ -38,6 +38,7 @@ CommonTextures* CommonTextures::create()
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_WHITE";
 		aInfo.filePath = savedFileLocation;
+		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 	}
 
@@ -55,6 +56,7 @@ CommonTextures* CommonTextures::create()
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_BLACK";
 		aInfo.filePath = savedFileLocation;
+		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 	}
 

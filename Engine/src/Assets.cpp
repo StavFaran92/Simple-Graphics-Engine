@@ -180,7 +180,7 @@ void Assets::load()
 	{
 		UUID uuid = asset.uuid;
 		Engine::get()->getResourceManager()->incRef(uuid);
-		Texture::loadTexture2D(uuid, asset.filePath);
+		Texture::loadTexture2D(asset);
 		m_assets[uuid] = asset;
 	}
 

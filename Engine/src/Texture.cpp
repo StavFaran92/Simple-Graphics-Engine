@@ -200,6 +200,11 @@ bool isHDRImage(const std::string& filename) {
 	return stbi_is_hdr(filename.c_str());
 }
 
+Texture::TextureAssetAttributes Texture::getTextureAssetAttributes()
+{
+	return m_attributes;;
+}
+
 Texture::TextureData Texture::extractTextureDataFromFile(const std::string& fileLocation)
 {
 	Texture::TextureData textureData;
@@ -251,15 +256,6 @@ Texture::TextureData Texture::extractTextureDataFromFile(const std::string& file
 
 	textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
 
-	textureData.params = {
-		{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-		{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-		{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
-		{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
-	};
-
-	textureData.genMipMap = false; // todo fix we dont always want to generate mipmaps for loaded textures
-
 	return textureData;
 }
 
@@ -273,44 +269,86 @@ void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> 
 		texture.get()->getBitDepth());
 }
 
-Resource<Texture> Texture::importTexture2D(const std::string& fileLocation)
+Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, const TextureImportSettings& settings)
 {
 	
 	Texture::TextureData textureData = extractTextureDataFromFile(fileLocation);
+
+	if (settings.genMipMap)
+	{
+		textureData.params = {
+			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+		};
+
+		textureData.genMipMap = true;
+	}
+	else
+	{
+		textureData.params = {
+			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
+			{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
+		};
+
+		textureData.genMipMap = false;
+	}
 	Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
+
+	texture->m_attributes.flip = settings.flip;
+	texture->m_attributes.genMipMap = settings.genMipMap;
+	texture->m_attributes.isHDR = textureData.isHDR;
 
 	AssetInfo aInfo;
 	aInfo.origFilePath = fileLocation;
 	aInfo.uuid = texture.getUID();
 	aInfo.aType = AssetType::TEXTURE;
+	aInfo.name = settings.name;
+	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
-
-	//auto& projectDir = Engine::get()->getProjectDirectory();
-	//if (textureData.isHDR)
-	//{
-	//	stbi_write_hdr((projectDir + "/" + texture.getUID() + ".hdr").c_str(), textureData.width, textureData.height, textureData.bpp, (float*)textureData.data);
-	//}
-	//else
-	//{
-	//	stbi_write_png((projectDir + "/" + texture.getUID() + ".png").c_str(), textureData.width, textureData.height, textureData.bpp, textureData.data, textureData.width * textureData.bpp);
-	//}
-	//Engine::get()->getContext()->getProjectAssetRegistry()->addTexture(texture);
-
-	//stbi_image_free(textureData.data); // todo check if im not cleaning neede memory here
 
 	return texture;
 }
 
-Resource<Texture> Texture::loadTexture2D(UUID uid, const std::string& path)
+Resource<Texture> Texture::loadTexture2D(AssetInfo aInfo)
 {
-	Texture::TextureData textureData = extractTextureDataFromFile(path);
+	Texture::TextureData textureData = extractTextureDataFromFile(aInfo.filePath);
+
+	TextureAssetAttributes attributes(aInfo.attributes);
+	if (attributes.genMipMap)
+	{
+		textureData.params = {
+			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+		};
+
+		textureData.genMipMap = true;
+	}
+	else
+	{
+		textureData.params = {
+			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
+			{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
+		};
+
+		textureData.genMipMap = false;
+	}
 
 	// Create texture
 	Texture* texture = new Texture();
 	texture->build(textureData);
-	Engine::get()->getMemoryPool<Texture>()->add(uid, texture);
+	Engine::get()->getMemoryPool<Texture>()->add(aInfo.uuid, texture);
 
-	auto& res = Resource<Texture>(uid);
+	texture->m_attributes = attributes;
+
+	auto& res = Resource<Texture>(aInfo.uuid);
 
 
 	return res;
@@ -342,6 +380,6 @@ void Texture::addTexture2D(const std::string& name, Resource<Texture> texture)
 	aInfo.uuid = texture.getUID();
 	aInfo.name = name;
 	aInfo.filePath = savedFileLocation;
-	aInfo.attributes["isHDR"] = "false";
+	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }
