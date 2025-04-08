@@ -101,6 +101,7 @@ public:
 		bool genMipMap = false;
 		void* data = nullptr;
 		bool isHDR = false;
+		bool flip = false;
 
 		void* facesData[6]{ nullptr }; //only apply to Cubemap
 	};
@@ -222,7 +223,9 @@ public:
 
 	TextureAssetAttributes getTextureAssetAttributes();
 
-	static Texture::TextureData extractTextureDataFromFile(const std::string& fileLocation);
+	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
+	static void extractTextureDataFromSettings(const TextureImportSettings& settings, Texture::TextureData& textureData);
+	static void extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData);
 
 	static void writeTexture2D(const std::string& fileLocation, Resource<Texture> texture);
 	static Resource<Texture> importTexture2D(const std::string& fileLocation, const TextureImportSettings & = {});

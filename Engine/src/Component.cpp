@@ -215,13 +215,11 @@ void ShaderComponent::update()
 		}
 	}
 
-	//newShader.projection = oldShader.projection;
-	//newShader.projectionTexture = oldShader.projectionTexture;
-	//newShader.renderViewProjection = oldShader.renderViewProjection;
-
 	for (const auto& [name, value] : m_uniformProperties)
 	{
 		m_customShader.get()->setUniformValue(name, value);
 	}
+
+	setProjectionTexture(projectionTexture);
 }
 

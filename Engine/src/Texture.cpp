@@ -101,6 +101,10 @@ void Texture::build(const TextureData& textureData)
 {
 	m_data = textureData;
 
+	m_attributes.flip = textureData.flip;
+	m_attributes.genMipMap = textureData.genMipMap;
+	m_attributes.isHDR = textureData.isHDR;
+
 	// generate texture
 	glGenTextures(1, &m_id);
 	bind();
@@ -205,11 +209,8 @@ Texture::TextureAssetAttributes Texture::getTextureAssetAttributes()
 	return m_attributes;;
 }
 
-Texture::TextureData Texture::extractTextureDataFromFile(const std::string& fileLocation)
+void Texture::extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
 {
-	Texture::TextureData textureData;
-	textureData.target = GL_TEXTURE_2D;
-
 	// Determine if the image is HDR
 	if (isHDRImage(fileLocation))
 	{
@@ -231,7 +232,6 @@ Texture::TextureData Texture::extractTextureDataFromFile(const std::string& file
 	if (!textureData.data)
 	{
 		logError("Failed to find: {}", fileLocation.c_str());
-		return {};
 	}
 
 	// Determine format based on bits per pixel (bpp)
@@ -255,8 +255,6 @@ Texture::TextureData Texture::extractTextureDataFromFile(const std::string& file
 	}
 
 	textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
-
-	return textureData;
 }
 
 void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> texture)
@@ -271,36 +269,14 @@ void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> 
 
 Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, const TextureImportSettings& settings)
 {
-	
-	Texture::TextureData textureData = extractTextureDataFromFile(fileLocation);
+	Texture::TextureData textureData;
 
-	if (settings.genMipMap)
-	{
-		textureData.params = {
-			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-		};
+	textureData.target = GL_TEXTURE_2D;
 
-		textureData.genMipMap = true;
-	}
-	else
-	{
-		textureData.params = {
-			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
-			{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
-		};
-
-		textureData.genMipMap = false;
-	}
+	// extract texture build data
+	extractTextureDataFromSettings(settings, textureData);
+	extractTextureDataFromFile(fileLocation, textureData);
 	Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
-
-	texture->m_attributes.flip = settings.flip;
-	texture->m_attributes.genMipMap = settings.genMipMap;
-	texture->m_attributes.isHDR = textureData.isHDR;
 
 	AssetInfo aInfo;
 	aInfo.origFilePath = fileLocation;
@@ -315,31 +291,14 @@ Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, cons
 
 Resource<Texture> Texture::loadTexture2D(AssetInfo aInfo)
 {
-	Texture::TextureData textureData = extractTextureDataFromFile(aInfo.filePath);
+	Texture::TextureData textureData;
 
+	textureData.target = GL_TEXTURE_2D;
+
+	// extract texture build data
 	TextureAssetAttributes attributes(aInfo.attributes);
-	if (attributes.genMipMap)
-	{
-		textureData.params = {
-			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-		};
-
-		textureData.genMipMap = true;
-	}
-	else
-	{
-		textureData.params = {
-			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
-			{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
-		};
-
-		textureData.genMipMap = false;
-	}
+	extractTextureDataFromAttributes(attributes, textureData);
+	extractTextureDataFromFile(aInfo.filePath, textureData);
 
 	// Create texture
 	Texture* texture = new Texture();
@@ -382,4 +341,60 @@ void Texture::addTexture2D(const std::string& name, Resource<Texture> texture)
 	aInfo.filePath = savedFileLocation;
 	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+}
+
+void Texture::extractTextureDataFromSettings(const TextureImportSettings& settings, Texture::TextureData& textureData)
+{
+	if (settings.genMipMap)
+	{
+		textureData.params = {
+			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+		};
+
+		textureData.genMipMap = true;
+	}
+	else
+	{
+		textureData.params = {
+			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
+			{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
+		};
+
+		textureData.genMipMap = false;
+	}
+
+	textureData.flip = settings.flip;
+}
+
+void Texture::extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData)
+{
+	if (attributes.genMipMap)
+	{
+		textureData.params = {
+			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+		};
+
+		textureData.genMipMap = true;
+	}
+	else
+	{
+		textureData.params = {
+			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
+			{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
+		};
+
+		textureData.genMipMap = false;
+	}
+
+	textureData.flip = attributes.flip;
 }

@@ -143,7 +143,8 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 
 	if (serializedEnt.shader)
 	{
-		entityHandler.addComponent<ShaderComponent>(serializedEnt.shader.value());
+		auto& shader = entityHandler.addComponent<ShaderComponent>(serializedEnt.shader.value());
+		shader.update();
 	}
 }
 
