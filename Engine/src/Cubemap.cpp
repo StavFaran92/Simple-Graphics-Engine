@@ -250,3 +250,5 @@ void Cubemap::saveEquirectangularMap(Resource<Texture> equirectangularMap)
 	aInfo.uuid = equirectangularMap.getUID();
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }
+
+// adi loves you
