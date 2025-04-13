@@ -46,10 +46,11 @@ public:
 		int height = Engine::get()->getWindow()->getHeight();
 		auto projectionTexture = Texture::createEmptyTexture(width, height);
 
-		auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/BasicShader.glsl", ShaderOverride::Pixel).build();
-		shader.setProjectionTexture(projectionTexture);
-		shader.projection = ShaderComponent::ProjectionType::Texture2D;
-		projectionEnt.addComponent<ShaderComponent>(shader);
+		auto& shader = Shader::createOverrideShader("RayMarchSample", "Resources/Content/Shaders/BasicShader.glsl", ShaderOverride::Pixel);
+		auto& shaderComponent = projectionEnt.addComponent<ShaderComponent>();
+		shaderComponent.setProjectionTexture(projectionTexture);
+		shaderComponent.projection = ShaderComponent::ProjectionType::Texture2D;
+		shaderComponent.setShader(shader);
 		projectionEnt.addComponent<RenderableComponent>(); // todo reevaluate
 
 		auto& image = displayEnt.addComponent<ImageComponent>();
