@@ -1,0 +1,164 @@
+#frag
+
+const int MAX_MARCHING_STEPS = 255;
+const float MIN_DIST = 0.0;
+const float MAX_DIST = 100.0;
+const float EPSILON = 0.0001;
+
+// Taken from https://iquilezles.org/www/articles/distfunctions/distfunctions.htm
+float sdSmoothUnion( float d1, float d2, float k ) 
+{
+    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
+    return mix( d2, d1, h ) - k*h*(1.0-h); 
+}
+
+// --------------------------------------------//
+//               Noise Functions
+// --------------------------------------------//
+// Taken from Inigo Quilez's Rainforest ShaderToy:
+// https://www.shadertoy.com/view/4ttSWf
+float hash1( float n )
+{
+    return fract( n*17.0*fract( n*0.3183099 ) );
+}
+
+// Taken from Inigo Quilez's Rainforest ShaderToy:
+// https://www.shadertoy.com/view/4ttSWf
+float noise( in vec3 x )
+{
+    vec3 p = floor(x);
+    vec3 w = fract(x);
+    
+    vec3 u = w*w*w*(w*(w*6.0-15.0)+10.0);
+    
+    float n = p.x + 317.0*p.y + 157.0*p.z;
+    
+    float a = hash1(n+0.0);
+    float b = hash1(n+1.0);
+    float c = hash1(n+317.0);
+    float d = hash1(n+318.0);
+    float e = hash1(n+157.0);
+	float f = hash1(n+158.0);
+    float g = hash1(n+474.0);
+    float h = hash1(n+475.0);
+
+    float k0 =   a;
+    float k1 =   b - a;
+    float k2 =   c - a;
+    float k3 =   e - a;
+    float k4 =   a - b - c + d;
+    float k5 =   a - c - e + g;
+    float k6 =   a - b - e + f;
+    float k7 = - a + b + c - d + e - f - g + h;
+
+    return -1.0+2.0*(k0 + k1*u.x + k2*u.y + k3*u.z + k4*u.x*u.y + k5*u.y*u.z + k6*u.z*u.x + k7*u.x*u.y*u.z);
+}
+
+const mat3 m3  = mat3( 0.00,  0.80,  0.60,
+                      -0.80,  0.36, -0.48,
+                      -0.60, -0.48,  0.64 );
+
+// Taken from Inigo Quilez's Rainforest ShaderToy:
+// https://www.shadertoy.com/view/4ttSWf
+float fbm_4( in vec3 x )
+{
+    float f = 2.0;
+    float s = 0.5;
+    float a = 0.0;
+    float b = 0.5;
+    for( int i=0; i<4; i++ )
+    {
+        float n = noise(x);
+        a += b*n;
+        b *= s;
+        x = f*m3*x;
+    }
+	return a;
+}
+
+float sphereSDF(vec3 samplePoint, vec3 origin, float r) {
+    return length(samplePoint - origin) - r;
+}
+
+float planeSDF(vec3 samplePoint) {
+    return samplePoint.y;
+}
+
+float sceneSDF(vec3 samplePoint) {
+	
+    float sdfValue = sphereSDF(samplePoint, vec3(0, 1, 6), 1);
+	sdfValue = sdSmoothUnion(sdfValue, sphereSDF(samplePoint, vec3(1, 2, 6), .7), .3);
+
+	vec3 fbmCoord = (samplePoint + 2.0 * vec3(iTime, 0.0, iTime)) / 1.5f;
+	sdfValue += 7.0 * fbm_4(fbmCoord / 3.2);
+	
+	sdfValue = sdSmoothUnion(sdfValue, planeSDF(samplePoint), .3);
+
+    return sdfValue;
+}
+
+float rayMarch(vec3 ro, vec3 rd)
+{
+    float d = 0.;
+    for(int i=0; i<MAX_MARCHING_STEPS; i++)
+    {
+        float ds = sceneSDF(ro + rd * d);
+        d += ds;
+        if(ds < EPSILON || d > MAX_DIST) break;
+    } 
+
+    return d;
+}
+
+vec3 getNormal(vec3 p)
+{
+    float dist = sceneSDF(p);
+    vec2 e = vec2(.01, 0);
+
+    vec3 n = vec3(
+        dist - sceneSDF(p-e.xyy),
+        dist - sceneSDF(p-e.yxy),
+        dist - sceneSDF(p-e.yyx)
+    );
+
+    return normalize(n);
+}
+
+vec3 getLight(vec3 p)
+{
+    vec3 lightPos = vec3(cos(iTime) * 10, 5, sin(iTime)* 10);
+    vec3 lightColor = vec3(1,0,0);
+    vec3 ld = normalize(lightPos - p);
+    vec3 n = getNormal(p);
+
+    float diff = clamp(dot(n, ld), 0., 1.);
+
+    float distToLight = rayMarch(p + n * 0.1, ld);
+    if(distToLight < length(lightPos - p))
+    {
+        diff *= .1;
+    }
+
+    
+    return lightColor * diff;
+}
+
+uniform vec2 a; 
+
+void frag(inout vec3 color)
+{
+    vec2 xy = uv - .5;
+    xy *= vec2(1, -1); // hack
+    vec3 ro = vec3(0.0, 5.0, -5.0);
+    vec3 rd = normalize(vec3(xy, 1));
+    float dist = rayMarch(ro, rd);
+    
+    if (dist > MAX_DIST - EPSILON) {
+        // Didn't hit anything
+        color = vec3(0.0, 0.0, 0.0);
+		return;
+    }
+    
+    vec3 p = ro + rd * dist;
+    color = getLight(p);
+}

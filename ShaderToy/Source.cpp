@@ -46,7 +46,7 @@ public:
 		int height = Engine::get()->getWindow()->getHeight();
 		auto projectionTexture = Texture::createEmptyTexture(width, height);
 
-		auto& shader = Shader::createOverrideShader("RayMarchSample", "../../ShaderToy/Resources/Content/Shaders/BasicShader.glsl", ShaderOverride::Pixel);
+		auto& shader = Shader::createOverrideShader("RayMarchSample", "../../ShaderToy/Resources/Content/Shaders/VolumetricClouds.glsl", ShaderOverride::Pixel);
 		auto& shaderComponent = projectionEnt.addComponent<ShaderComponent>();
 		shaderComponent.setProjectionTexture(projectionTexture);
 		shaderComponent.projection = ShaderComponent::ProjectionType::Texture2D;
