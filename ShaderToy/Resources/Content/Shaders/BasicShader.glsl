@@ -52,7 +52,7 @@ vec3 getNormal(vec3 p)
 
 vec3 getLight(vec3 p)
 {
-    vec3 lightPos = vec3(0, 5, 0);
+    vec3 lightPos = vec3(cos(iTime) * 10, 5, sin(iTime)* 10);
     vec3 lightColor = vec3(1,0,0);
     vec3 ld = normalize(lightPos - p);
     vec3 n = getNormal(p);

@@ -2,7 +2,7 @@
 
 layout (std140) uniform Time
 {
-    float time;
+    float iTime;
 };
 
 layout (std140) uniform Lights

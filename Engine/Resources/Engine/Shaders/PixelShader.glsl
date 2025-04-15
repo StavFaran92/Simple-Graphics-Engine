@@ -1,6 +1,13 @@
 #vert
 
-#version 330                                                                        
+#version 330 
+
+// ----- Definitions ----- //
+
+#include ../../../../Engine/Resources/Engine/Shaders/include/defines.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
                                                                                     
 layout (location = 0) in vec3 aPos;                                              
 
@@ -16,6 +23,13 @@ void main()
 #frag
 
 #version 330
+
+// ----- Definitions ----- //
+
+#include ../../../../Engine/Resources/Engine/Shaders/include/defines.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
 
 // ----- In ----- //
 

@@ -229,7 +229,7 @@ vec2 getTexCoords()
 
 float getTime()
 {
-	return time;
+	return iTime;
 }
 
 #ifdef CUSTOM_SHADER

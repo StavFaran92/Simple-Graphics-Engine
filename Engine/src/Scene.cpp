@@ -172,7 +172,7 @@ void Scene::init(Context* context)
 	m_tempOutlineShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl");
 
 	m_uboTime = std::make_shared<UniformBufferObject>(sizeof(float));
-	m_uboTime->attachToBindPoint(2);
+	m_uboTime->attachToBindPoint(0);
 
 	// Create irradiance map using created cubemap
 	m_irradianceMap = Cubemap::createDefaultCubemap();

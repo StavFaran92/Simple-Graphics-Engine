@@ -30,11 +30,11 @@ out VS_OUT {
 // ----- Uniforms ----- //
 
 uniform mat4 finalBonesMatrices[MAX_BONES];
-uniform float Time2;
+
 
 float getTime()
 {
-	return Time2;
+	return iTime;
 }
 
 #ifdef CUSTOM_SHADER
@@ -276,10 +276,10 @@ vec2 getTexCoords()
 {
 	return fs_in.texCoord;
 }
-uniform float Time2;
+
 float getTime()
 {
-	return Time2;
+	return iTime;
 }
 
 #ifdef CUSTOM_SHADER

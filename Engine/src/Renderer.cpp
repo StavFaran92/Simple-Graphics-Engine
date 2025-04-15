@@ -155,12 +155,8 @@ void Renderer::setUniforms()
         graphics->material->use(graphics->shader);
     }
 
-    graphics->shader->bindUniformBlockToBindPoint("Time", 2);
+    graphics->shader->bindUniformBlockToBindPoint("Time", 0);
     graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
-
-    graphics->shader->setUniformValue("Time2", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
-
-
 }
 
 void Renderer::render()
@@ -239,8 +235,8 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                     //continue; todo fix
                 }
 
+                graphics->shader->bindUniformBlockToBindPoint("Time", 0);
                 graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
-                graphics->shader->bindUniformBlockToBindPoint("Time", 2);
 
                 graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
                 graphics->shader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
@@ -292,6 +288,22 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
         else if (shaderComponent.shaderOverride == ShaderOverride::Pixel)
         {
+            graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+            graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+            glm::vec3 camView = {};// todo get cam view from view matrix
+            graphics->shader->setUniformValue("cameraLookAt", camView);
+
+            {
+                int currentSlot = 8;
+                for (const auto& [texName, texture] : shaderComponent.customTextures)
+                {
+                    texture.get()->setSlot(currentSlot);
+                    texture.get()->bind();
+                    graphics->shader->setUniformValue(texName, currentSlot);
+                    currentSlot++;
+                }
+            }
+
             // Bind mesh
             Resource<MeshCollection> meshCollecton;
 
@@ -317,24 +329,6 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 if (!aabb.isOnFrustum(*graphics->frustum))
                 {
                     //continue; todo fix
-                }
-
-                graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-
-                graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
-
-                glm::vec3 camView = {};// todo get cam view from view matrix
-                graphics->shader->setUniformValue("cameraLookAt", camView);
-
-                {
-                    int currentSlot = 8;
-                    for (const auto& [texName, texture] : shaderComponent.customTextures)
-                    {
-                        texture.get()->setSlot(currentSlot);
-                        texture.get()->bind();
-                        graphics->shader->setUniformValue(texName, currentSlot);
-                        currentSlot++;
-                    }
                 }
 
                 // if texture projection is enabled bind to custom FBO

@@ -40,7 +40,7 @@ uniform mat4 finalBonesMatrices[MAX_BONES];
 
 float getTime()
 {
-	return time;
+	return iTime;
 }
 
 #ifdef CUSTOM_SHADER
