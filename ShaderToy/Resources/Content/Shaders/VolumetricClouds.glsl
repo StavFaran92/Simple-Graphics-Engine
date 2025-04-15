@@ -96,8 +96,8 @@ float planeSDF(vec3 samplePoint) {
 
 float queryVolumetricDistanceField(vec3 samplePoint) {
 	
-    float sdfValue = sphereSDF(samplePoint, vec3(0, 1, 6), 1);
-	sdfValue = sdSmoothUnion(sdfValue, sphereSDF(samplePoint, vec3(1, 2, 6), .7), .3);
+    float sdfValue = sphereSDF(samplePoint, vec3(0, 1, 0), 1);
+	sdfValue = sdSmoothUnion(sdfValue, sphereSDF(samplePoint, vec3(1, 2, 0), .7), .3);
 
 	vec3 fbmCoord = (samplePoint + 2.0 * vec3(iTime, 0.0, iTime)) / 1.5f;
 	sdfValue += 7.0 * fbm_4(fbmCoord / 3.2);
@@ -182,16 +182,31 @@ float getLightAttenuation(float distanceToLight)
 
 uniform vec2 a; 
 
+vec3 GetAmbientLight()
+{
+	return 1.2 * vec3(0.03, 0.018, 0.018);
+}
+
+mat3 lookAt(vec3 ro, vec3 target) {
+    vec3 f = normalize(target - ro);
+    vec3 r = normalize(cross(vec3(0,1,0), f));
+    vec3 u = cross(f, r);
+    return mat3(r, u, f);
+}
+
 void frag(inout vec3 color)
 {
     vec2 xy = uv - .5;
     xy *= vec2(1, -1); // hack
-    vec3 ro = vec3(0.0, 1.0, -5.0);
+    vec3 ro = vec3(0.0, 15.0, -15.0);
     vec3 rd = normalize(vec3(xy, 1));
 
+    vec3 target = vec3(0.0);
+    rd = lookAt(ro, target) * rd;
+
     Light sunLight;
-    sunLight.pos = vec3(cos(iTime) * 1, 4, 6 + sin(iTime)* 1);
-    sunLight.color = vec3(1,0,0);
+    sunLight.pos = vec3(cos(iTime) * 1, 3, sin(iTime)* 1);
+    sunLight.color = vec3(1,1,1);
 
     float volumeDepth = intersectVolumetric(ro, rd);
 
@@ -200,6 +215,7 @@ void frag(inout vec3 color)
     {
         float opaqueVisiblity = 1.0f;
         const float marchSize = 0.1f;
+        const vec3 volumeAlbedo = vec3(0.8);
         for(int i=0; i<MAX_VOLUME_MARCH_STEPS; i++)
         {
             volumeDepth += marchSize;
@@ -207,15 +223,17 @@ void frag(inout vec3 color)
             bool isInVolume = queryVolumetricDistanceField(pos) < 0.0;
             if(isInVolume)
             {
+                //color = vec3(1,0,0);
                 float previousOpaqueVisiblity = opaqueVisiblity;
                 opaqueVisiblity *= beerLambert(ABSORPTION_COEFFICIENT, marchSize);
                 float absorptionFromMarch = previousOpaqueVisiblity - opaqueVisiblity;
 
                 float distanceToLight = length((sunLight.pos - pos));
-                volumetricColor += absorptionFromMarch * getLightAttenuation(distanceToLight) ;
+                volumetricColor += absorptionFromMarch * volumeAlbedo * (getLightAttenuation(distanceToLight) * sunLight.color);
             }
+            
         }
     }
 
-    color = volumetricColor;
+    color = volumetricColor + GetAmbientLight();;
 }
