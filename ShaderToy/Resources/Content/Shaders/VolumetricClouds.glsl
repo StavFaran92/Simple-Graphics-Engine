@@ -102,7 +102,7 @@ float queryVolumetricDistanceField(vec3 samplePoint) {
 	vec3 fbmCoord = (samplePoint + 2.0 * vec3(iTime, 0.0, iTime)) / 1.5f;
 	sdfValue += 7.0 * fbm_4(fbmCoord / 3.2);
 	
-	//sdfValue = sdSmoothUnion(sdfValue, planeSDF(samplePoint), .3);
+	sdfValue = sdSmoothUnion(sdfValue, planeSDF(samplePoint), .3);
 
     return sdfValue;
 }
@@ -199,7 +199,7 @@ void frag(inout vec3 color)
     if(volumeDepth > 0.0)
     {
         float opaqueVisiblity = 1.0f;
-        const float marchSize = 0.6f;
+        const float marchSize = 0.1f;
         for(int i=0; i<MAX_VOLUME_MARCH_STEPS; i++)
         {
             volumeDepth += marchSize;
