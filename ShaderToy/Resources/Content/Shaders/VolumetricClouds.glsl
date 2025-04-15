@@ -1,9 +1,19 @@
 #frag
 
 const int MAX_MARCHING_STEPS = 255;
+const int MAX_SDF_SPHERE_STEPS = 15;
+const int MAX_VOLUME_MARCH_STEPS = 50;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 100.0;
 const float EPSILON = 0.0001;
+const float ABSORPTION_COEFFICIENT = 0.5;
+const float LIGHT_ATTENUATION_FACTOR = 2.0;
+
+struct Light
+{
+    vec3 pos;
+    vec3 color;
+};
 
 // Taken from https://iquilezles.org/www/articles/distfunctions/distfunctions.htm
 float sdSmoothUnion( float d1, float d2, float k ) 
@@ -84,7 +94,7 @@ float planeSDF(vec3 samplePoint) {
     return samplePoint.y;
 }
 
-float sceneSDF(vec3 samplePoint) {
+float queryVolumetricDistanceField(vec3 samplePoint) {
 	
     float sdfValue = sphereSDF(samplePoint, vec3(0, 1, 6), 1);
 	sdfValue = sdSmoothUnion(sdfValue, sphereSDF(samplePoint, vec3(1, 2, 6), .7), .3);
@@ -92,7 +102,7 @@ float sceneSDF(vec3 samplePoint) {
 	vec3 fbmCoord = (samplePoint + 2.0 * vec3(iTime, 0.0, iTime)) / 1.5f;
 	sdfValue += 7.0 * fbm_4(fbmCoord / 3.2);
 	
-	sdfValue = sdSmoothUnion(sdfValue, planeSDF(samplePoint), .3);
+	//sdfValue = sdSmoothUnion(sdfValue, planeSDF(samplePoint), .3);
 
     return sdfValue;
 }
@@ -102,7 +112,7 @@ float rayMarch(vec3 ro, vec3 rd)
     float d = 0.;
     for(int i=0; i<MAX_MARCHING_STEPS; i++)
     {
-        float ds = sceneSDF(ro + rd * d);
+        float ds = queryVolumetricDistanceField(ro + rd * d);
         d += ds;
         if(ds < EPSILON || d > MAX_DIST) break;
     } 
@@ -112,35 +122,62 @@ float rayMarch(vec3 ro, vec3 rd)
 
 vec3 getNormal(vec3 p)
 {
-    float dist = sceneSDF(p);
+    float dist = queryVolumetricDistanceField(p);
     vec2 e = vec2(.01, 0);
 
     vec3 n = vec3(
-        dist - sceneSDF(p-e.xyy),
-        dist - sceneSDF(p-e.yxy),
-        dist - sceneSDF(p-e.yyx)
+        dist - queryVolumetricDistanceField(p-e.xyy),
+        dist - queryVolumetricDistanceField(p-e.yxy),
+        dist - queryVolumetricDistanceField(p-e.yyx)
     );
 
     return normalize(n);
 }
 
-vec3 getLight(vec3 p)
-{
-    vec3 lightPos = vec3(cos(iTime) * 10, 5, sin(iTime)* 10);
-    vec3 lightColor = vec3(1,0,0);
-    vec3 ld = normalize(lightPos - p);
-    vec3 n = getNormal(p);
 
-    float diff = clamp(dot(n, ld), 0., 1.);
 
-    float distToLight = rayMarch(p + n * 0.1, ld);
-    if(distToLight < length(lightPos - p))
-    {
-        diff *= .1;
-    }
+// vec3 getLight(vec3 p)
+// {
+//     sunLight.pos = vec3(cos(iTime) * 1, 0, sin(iTime)* 1);
+//     sunLight.color = vec3(1,0,0);
+//     vec3 ld = normalize(sunLight.pos - p);
+//     vec3 n = getNormal(p);
+
+//     float diff = clamp(dot(n, ld), 0., 1.);
+
+//     float distToLight = rayMarch(p + n * 0.1, ld);
+//     if(distToLight < length(sunLight.pos - p))
+//     {
+//         diff *= .1;
+//     }
 
     
-    return lightColor * diff;
+//     return sunLight.color * diff;
+// }
+
+float intersectVolumetric(vec3 ro, vec3 rd)
+{
+    // Precision isn't super important, just want a decent starting point before 
+    // ray marching with fixed steps
+	float precis = 0.5; 
+    float t = 0.0f;
+    for(int i=0; i<MAX_SDF_SPHERE_STEPS; i++ )
+    {
+	    float result = queryVolumetricDistanceField( ro+rd*t);
+        if( result < (precis) || t>MAX_DIST ) break;
+        t += result;
+    }
+    return ( t>=MAX_DIST ) ? -1.0 : t;
+}
+
+float beerLambert(float absorptionCoefficient, float distanceTraveled)
+{
+    return exp(-absorptionCoefficient * distanceTraveled);
+}
+
+float getLightAttenuation(float distanceToLight)
+{
+    return 1.0 / pow(distanceToLight, LIGHT_ATTENUATION_FACTOR);
 }
 
 uniform vec2 a; 
@@ -149,16 +186,36 @@ void frag(inout vec3 color)
 {
     vec2 xy = uv - .5;
     xy *= vec2(1, -1); // hack
-    vec3 ro = vec3(0.0, 5.0, -5.0);
+    vec3 ro = vec3(0.0, 1.0, -5.0);
     vec3 rd = normalize(vec3(xy, 1));
-    float dist = rayMarch(ro, rd);
-    
-    if (dist > MAX_DIST - EPSILON) {
-        // Didn't hit anything
-        color = vec3(0.0, 0.0, 0.0);
-		return;
+
+    Light sunLight;
+    sunLight.pos = vec3(cos(iTime) * 1, 4, 6 + sin(iTime)* 1);
+    sunLight.color = vec3(1,0,0);
+
+    float volumeDepth = intersectVolumetric(ro, rd);
+
+    vec3 volumetricColor = vec3(0.0f);
+    if(volumeDepth > 0.0)
+    {
+        float opaqueVisiblity = 1.0f;
+        const float marchSize = 0.6f;
+        for(int i=0; i<MAX_VOLUME_MARCH_STEPS; i++)
+        {
+            volumeDepth += marchSize;
+            vec3 pos = ro + rd * volumeDepth;
+            bool isInVolume = queryVolumetricDistanceField(pos) < 0.0;
+            if(isInVolume)
+            {
+                float previousOpaqueVisiblity = opaqueVisiblity;
+                opaqueVisiblity *= beerLambert(ABSORPTION_COEFFICIENT, marchSize);
+                float absorptionFromMarch = previousOpaqueVisiblity - opaqueVisiblity;
+
+                float distanceToLight = length((sunLight.pos - pos));
+                volumetricColor += absorptionFromMarch * getLightAttenuation(distanceToLight) ;
+            }
+        }
     }
-    
-    vec3 p = ro + rd * dist;
-    color = getLight(p);
+
+    color = volumetricColor;
 }
