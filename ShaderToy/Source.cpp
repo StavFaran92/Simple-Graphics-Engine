@@ -46,11 +46,16 @@ public:
 		int height = Engine::get()->getWindow()->getHeight();
 		auto projectionTexture = Texture::createEmptyTexture(width, height);
 
-		auto& shader = Shader::createOverrideShader("RayMarchSample", "../../ShaderToy/Resources/Content/Shaders/VolumetricClouds.glsl", ShaderOverride::Pixel);
+		auto& shader = Shader::createOverrideShader("RayMarchSample", "../../ShaderToy/Resources/Content/Shaders/VolumetricClouds_v2.glsl", ShaderOverride::Pixel);
 		auto& shaderComponent = projectionEnt.addComponent<ShaderComponent>();
 		shaderComponent.setProjectionTexture(projectionTexture);
 		shaderComponent.projection = ShaderComponent::ProjectionType::Texture2D;
 		shaderComponent.setShader(shader);
+
+		Texture::TextureImportSettings settings;
+		settings.genMipMap = true;
+		auto& noiseTexture = Texture::importTexture2D("C:/Users/Stav/Downloads/noise2.png", settings);
+		shaderComponent.addTexture("uNoise", noiseTexture);
 		projectionEnt.addComponent<RenderableComponent>(); // todo reevaluate
 
 		auto& image = displayEnt.addComponent<ImageComponent>();

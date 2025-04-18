@@ -194,6 +194,11 @@ mat3 lookAt(vec3 ro, vec3 target) {
     return mat3(r, u, f);
 }
 
+vec3 GammaCorrect(vec3 color) 
+{
+    return pow(color, vec3(1.0/2.2));
+}
+
 void frag(inout vec3 color)
 {
     vec2 xy = uv - .5;
@@ -205,7 +210,7 @@ void frag(inout vec3 color)
     rd = lookAt(ro, target) * rd;
 
     Light sunLight;
-    sunLight.pos = vec3(cos(iTime) * 1, 3, sin(iTime)* 1);
+    sunLight.pos = vec3(cos(iTime) * 1, 10, sin(iTime)* 1);
     sunLight.color = vec3(1,1,1);
 
     float volumeDepth = intersectVolumetric(ro, rd);
@@ -229,11 +234,12 @@ void frag(inout vec3 color)
                 float absorptionFromMarch = previousOpaqueVisiblity - opaqueVisiblity;
 
                 float distanceToLight = length((sunLight.pos - pos));
-                volumetricColor += absorptionFromMarch * volumeAlbedo * (getLightAttenuation(distanceToLight) * sunLight.color);
+                volumetricColor += absorptionFromMarch * volumeAlbedo * getLightAttenuation(distanceToLight) * sunLight.color;
             }
             
         }
     }
 
-    color = volumetricColor + GetAmbientLight();;
+    color = volumetricColor + GetAmbientLight();
+    color = vec3(GammaCorrect(clamp(color, 0.0, 1.0)));
 }
