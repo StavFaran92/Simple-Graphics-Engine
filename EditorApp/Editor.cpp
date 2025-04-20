@@ -14,6 +14,8 @@
 
 #include "NativeScriptsLoader.h"
 
+#include "ImGuiFileDialog.h"
+
 namespace fs = std::filesystem;
 
 static bool ShowLightCreatorWindow = false;
@@ -52,6 +54,22 @@ struct EntityState
 };
 
 std::unordered_map<entity_id, EntityState> g_states;
+
+void drawGui() {
+	// open Dialog Simple
+	
+	// display
+	if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+		//if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
+		//	std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+		//	std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+		//	// action
+		//}
+
+		//// close
+		//ImGuiFileDialog::Instance()->Close();
+	}
+}
 
 static void stopSimulation()
 {
@@ -2079,6 +2097,8 @@ void RenderAssetViewWindow(float width, float height) {
 	ImGui::Begin("Asset View", nullptr, style);
 	ImVec2 listBoxSize(windowWidth, height * 0.3f - 35);
 
+	drawGui();
+
 	auto& meshList = Engine::get()->getMemoryPool<MeshCollection>()->getAll();
 
 	if (ImGui::TreeNode("Meshes")) {
@@ -2277,6 +2297,20 @@ public:
 
 		auto gui = new GUI_Helper();
 		Engine::get()->getImguiHandler()->addGUI(gui);
+
+		std::map<std::string, std::string> filters;
+		filters["Assets"] = ".glsl,.png,.dae";
+
+		IGFD::FileDialogConfig config;
+		config.path = Engine::get()->getProjectDirectory();
+		config.flags = ImGuiFileDialogFlags_ConfirmOverwrite |
+			ImGuiFileDialogFlags_NoDialog |
+			ImGuiFileDialogFlags_DisableCreateDirectoryButton |
+			//ImGuiFileDialogFlags_ReadOnlyFileNameField | 
+			//ImGuiFileDialogFlags_DisableQuickPathSelection | 
+			//ImGuiFileDialogFlags_DisablePlaceMode |
+			ImGuiFileDialogFlags_HideColumnType;
+		ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", filters, config);
 	}
 
 	void update(float deltaTime) override

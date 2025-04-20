@@ -1,6 +1,7 @@
 add_subdirectory(imgui)
 add_subdirectory(ImGuizmo)
 add_subdirectory(tinyfiledialogs)
+add_subdirectory(ImGuiFileDialog)
 
 target_include_directories(Engine PUBLIC 	
 	assimp/include
@@ -19,6 +20,7 @@ target_include_directories(Engine PUBLIC
 	tinyfiledialogs
 	physx/PhysX/include
 	physx/PxShared/include
+	ImGuiFileDialog
 )
 
 target_link_directories(Engine PUBLIC 
@@ -49,6 +51,7 @@ target_link_libraries(Engine PUBLIC
 	nfd
 	ImGuizmo
 	tinyfiledialogs
+	ImGuiFileDialog
 )
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR})
