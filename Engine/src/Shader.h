@@ -91,7 +91,7 @@ protected:
 	virtual void BuildShaders(const ShadersInfo& shader);
 	uint32_t AddShader(const std::string& shaderCode, unsigned int shaderType);
 	bool ValidateProgramLink();
-	bool validateCompilation(const unsigned int& theShader, const unsigned int& shaderType);
+	bool validateCompilation(unsigned int shaderID, unsigned int shaderType, const std::string& shaderCode);
 private:
 	friend class Context;
 	inline void SetID(uint32_t id) { m_id = id; }

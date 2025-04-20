@@ -17,7 +17,7 @@ float noise(vec3 x ) {
 }
 
 float fbm(vec3 p) {
-  vec3 q = p + iTime * 0.5 * vec3(1.0, -0.2, -1.0);
+  vec3 q = p + iTime * 0.5 * vec3(1.0, -0.2, -1.0)
   float g = noise(q);
 
   float f = 0.0;

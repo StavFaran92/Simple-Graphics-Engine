@@ -52,10 +52,10 @@ public:
 		shaderComponent.projection = ShaderComponent::ProjectionType::Texture2D;
 		shaderComponent.setShader(shader);
 
-		Texture::TextureImportSettings settings;
-		settings.genMipMap = true;
-		auto& noiseTexture = Texture::importTexture2D("C:/Users/Stav/Downloads/noise2.png", settings);
-		shaderComponent.addTexture("uNoise", noiseTexture);
+		//Texture::TextureImportSettings settings;
+		//settings.genMipMap = true;
+		//auto& noiseTexture = Texture::importTexture2D("C:/Users/Stav/Downloads/noise2.png", settings);
+		//shaderComponent.addTexture("uNoise", noiseTexture);
 		projectionEnt.addComponent<RenderableComponent>(); // todo reevaluate
 
 		auto& image = displayEnt.addComponent<ImageComponent>();

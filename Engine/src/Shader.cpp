@@ -16,6 +16,59 @@
 #include "Assets.h"
 #include "CommonTextures.h"
 
+enum ShaderType
+{
+	FRAGMENT_SHADER = 0x8B30,
+	VERTEX_SHADER = 0x8B31,
+	GEOMETRY_SHADER = 0x8DD9,
+	TESS_CONTROL_SHADER = 0x8E88,
+	TESS_EVALUATION_SHADER = 0x8E87
+
+
+};
+
+int extractErrorLineNumberFromLog(const std::string& log)
+{
+	// Try matching 0(<number>)
+	size_t pos0 = log.find("0(");
+	if (pos0 != std::string::npos)
+	{
+		size_t openParen = log.find('(', pos0);
+		size_t closeParen = log.find(')', openParen);
+		if (openParen != std::string::npos && closeParen != std::string::npos)
+		{
+			std::string numStr = log.substr(openParen + 1, closeParen - openParen - 1);
+			try { return std::stoi(numStr); }
+			catch (...) { return -1; }
+		}
+	}
+
+	// Try matching 0:<number> (colon format)
+	size_t colon = log.find("0:");
+	if (colon != std::string::npos)
+	{
+		size_t start = colon + 2;
+		size_t end = log.find(':', start);
+		std::string numStr = (end == std::string::npos) ? log.substr(start) : log.substr(start, end - start);
+		try { return std::stoi(numStr); }
+		catch (...) { return -1; }
+	}
+
+	return -1; // failed to find
+}
+
+std::string shaderTypeToStr(ShaderType sType)
+{
+	switch (sType)
+	{
+	case ShaderType::FRAGMENT_SHADER: return "Fragment Shader";
+	case ShaderType::VERTEX_SHADER: return "Vertex Shader";
+	case ShaderType::GEOMETRY_SHADER: return "Geometry Shader";
+	case ShaderType::TESS_CONTROL_SHADER: return "Tesselation Control Shader";
+	case ShaderType::TESS_EVALUATION_SHADER: return "Tesselation Eval Shader";
+	}
+}
+
 uint32_t Shader::s_activeShader = 0;
 
 Shader::Shader()
@@ -238,21 +291,48 @@ uint32_t Shader::AddShader(const std::string& shaderCode, unsigned int shaderTyp
 	glShaderSource(shader, 1, code, length);
 	glCompileShader(shader);
 
-	if (!validateCompilation(shader, shaderType))
+	if (!validateCompilation(shader, shaderType, shaderCode))
+	{
 		return -1;
+	}
 
 	return shader;
 }
 
-bool Shader::validateCompilation(const unsigned int& shader, const unsigned int& shaderType)
+bool Shader::validateCompilation(unsigned int shaderID, unsigned int shaderType, const std::string& shaderCode)
 {
 	GLint result = 0;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		GLchar eLog[1024] = { 0 };
-		glGetShaderInfoLog(shader, 1024, NULL, eLog);
-		logError("Error compiling the {} shader: {}", shaderType, eLog);
+		glGetShaderInfoLog(shaderID, 1024, NULL, eLog);
+
+		int lineNumber = extractErrorLineNumberFromLog(eLog);
+
+		// Now split shaderCode by lines
+		std::vector<std::string> lines;
+		std::stringstream ss(shaderCode);
+		std::string line;
+		while (std::getline(ss, line))
+		{
+			lines.push_back(line);
+		}
+
+		lineNumber -= 2; // offset
+
+		// Print error and line
+		if (lineNumber >= 0 && lineNumber < lines.size())
+		{
+			logError("Error compiling shader {}, shader type: {}, {}. line: {} : {}",
+				std::to_string(shaderID),
+				shaderTypeToStr((ShaderType)shaderType),
+				eLog,
+				lineNumber,
+				lines[lineNumber]);
+		}
+
+		
 		return false;
 	}
 	return true;
