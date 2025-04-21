@@ -1,7 +1,7 @@
 #frag
 
 #define MAX_STEPS 100
-#define MAX_LIGHT_STEPS 40
+#define MAX_LIGHT_STEPS 6
 const float MARCH_SIZE = 0.08;
 
 vec3 sunDirection = vec3(0, 1, 0);
@@ -94,12 +94,11 @@ float beerLambert(float absorptionCoefficient, float distanceTraveled)
     return exp(-absorptionCoefficient * distanceTraveled);
 }
 
-const float ABSORPTION_COEFFICIENT = 0.5;
+const float ABSORPTION_COEFFICIENT = 0.9;
 
 float lightMarch(vec3 p0)
 {
     vec3 rd = normalize(sunDirection);
-    float lightTrasmittance = 1.0;
     float marchSize = 0.03;
     float totalDensity = 0.0;
     float d = marchSize;
@@ -107,13 +106,12 @@ float lightMarch(vec3 p0)
     {
         vec3 p = p0 + rd * d;
         float density = sceneSDF(p);
-        totalDensity += density * marchSize;
+        totalDensity += density;// * marchSize;
         d += marchSize;
     } 
 
     float transmittance = beerLambert(ABSORPTION_COEFFICIENT, totalDensity);
-    lightTrasmittance *= transmittance;
-    return lightTrasmittance;
+    return transmittance;
 }
 
 float rayMarch(vec3 ro, vec3 rd)
