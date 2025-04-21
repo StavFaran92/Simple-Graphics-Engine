@@ -1,6 +1,7 @@
 #frag
 
 #define MAX_STEPS 100
+#define MAX_LIGHT_STEPS 40
 const float MARCH_SIZE = 0.08;
 
 vec3 sunDirection = vec3(0, 1, 0);
@@ -88,27 +89,62 @@ float sceneSDF(vec3 pos)
     return -distance + f;
 }
 
-vec4 rayMarch(vec3 ro, vec3 rd)
+float beerLambert(float absorptionCoefficient, float distanceTraveled)
+{
+    return exp(-absorptionCoefficient * distanceTraveled);
+}
+
+const float ABSORPTION_COEFFICIENT = 0.5;
+
+float lightMarch(vec3 p0)
+{
+    vec3 rd = normalize(sunDirection);
+    float lightTrasmittance = 1.0;
+    float marchSize = 0.03;
+    float totalDensity = 0.0;
+    float d = marchSize;
+    for(int i=0; i<MAX_LIGHT_STEPS; i++)
+    {
+        vec3 p = p0 + rd * d;
+        float density = sceneSDF(p);
+        totalDensity += density * marchSize;
+        d += marchSize;
+    } 
+
+    float transmittance = beerLambert(ABSORPTION_COEFFICIENT, totalDensity);
+    lightTrasmittance *= transmittance;
+    return lightTrasmittance;
+}
+
+float rayMarch(vec3 ro, vec3 rd)
 {
     float d = 0.;
     vec4 res = vec4(0.0);
+
+    float totalTransmittance = 1.0;
+    float lightEnergy = 0.0;
+
     for(int i=0; i<MAX_STEPS; i++)
     {
         vec3 p = ro + rd * d;
         float density = sceneSDF(p);
         if(density > 0.0)
         {
+            float transmittance = lightMarch(p);
+            totalTransmittance *= transmittance;
+            float luminance = density;
+            lightEnergy += totalTransmittance * luminance;
 
             // Directional derivative for fast diffuse lighting
-            float diffuse = clamp((density - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
-            vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
-            vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
-            color.rgb *= lin * color.a;
-            res += color * (1.0 - res.a);
+            //float diffuse = clamp((density - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
+            //vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
+            //vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
+            //color.rgb *= lin * color.a;
+            //res += color * (1.0 - res.a);
         }
         d += MARCH_SIZE;
     } 
-    return res;
+    return lightEnergy;
 }
 
 mat3 lookAt(vec3 ro, vec3 target) {
@@ -125,8 +161,8 @@ void frag(inout vec3 color)
     vec3 ro = vec3(0.0, 0.0, 5.0);
     vec3 rd = normalize(vec3(xy, -1));
 
-    vec4 res = rayMarch(ro, rd);
-    color = res.rgb;
+    float res = rayMarch(ro, rd);
+    color = vec3(res);
 
 
 }
