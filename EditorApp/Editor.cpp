@@ -2298,9 +2298,6 @@ public:
 		auto gui = new GUI_Helper();
 		Engine::get()->getImguiHandler()->addGUI(gui);
 
-		std::map<std::string, std::string> filters;
-		filters["Assets"] = ".glsl,.png,.dae";
-
 		IGFD::FileDialogConfig config;
 		config.path = Engine::get()->getProjectDirectory();
 		config.flags = ImGuiFileDialogFlags_ConfirmOverwrite |
@@ -2310,7 +2307,7 @@ public:
 			//ImGuiFileDialogFlags_DisableQuickPathSelection | 
 			//ImGuiFileDialogFlags_DisablePlaceMode |
 			ImGuiFileDialogFlags_HideColumnType;
-		ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", filters, config);
+		ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", "Assets{.glsl,.png,.dae}", config);
 	}
 
 	void update(float deltaTime) override
