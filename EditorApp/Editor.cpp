@@ -1,3 +1,4 @@
+#include "filewatch/FileWatch.hpp"
 #include "Menu.h"
 #include "EntryPoint.h"
 #include "sge.h"
@@ -13,6 +14,10 @@
 #include "tinyfiledialogs.h"
 
 #include "NativeScriptsLoader.h"
+
+
+
+static std::shared_ptr<filewatch::FileWatch<std::string>> watch;
 
 namespace fs = std::filesystem;
 
@@ -2070,6 +2075,30 @@ void RenderInspectorWindow(float width, float height)
 }
 
 void RenderAssetViewWindow(float width, float height) {
+	watch = std::make_shared<filewatch::FileWatch<std::string>>(
+		Engine::get()->getProjectDirectory(),
+		[](const std::string& path, const filewatch::Event change_type) {
+			switch (change_type)
+			{
+			case filewatch::Event::added:
+				std::cout << "The file was added to the directory." << '\n';
+				break;
+			case filewatch::Event::removed:
+				std::cout << "The file was removed from the directory." << '\n';
+				break;
+			case filewatch::Event::modified:
+				std::cout << "The file was modified. This can be a change in the time stamp or attributes." << '\n';
+				break;
+			case filewatch::Event::renamed_old:
+				std::cout << "The file was renamed and this is the old name." << '\n';
+				break;
+			case filewatch::Event::renamed_new:
+				std::cout << "The file was renamed and this is the new name." << '\n';
+				break;
+			};
+		}
+	);
+
 	auto assets = Engine::get()->getSubSystem<Assets>();
 	float windowWidth = width - 10;
 	float startX = 5; // Add a gap of 5 pixels
@@ -2284,6 +2313,8 @@ public:
 		g_editorCamera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
+
+	
 };
 
 Application* CreateApplication()

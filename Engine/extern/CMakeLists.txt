@@ -19,6 +19,7 @@ target_include_directories(Engine PUBLIC
 	tinyfiledialogs
 	physx/PhysX/include
 	physx/PxShared/include
+	FileWatch
 )
 
 target_link_directories(Engine PUBLIC 
