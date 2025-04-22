@@ -2075,30 +2075,6 @@ void RenderInspectorWindow(float width, float height)
 }
 
 void RenderAssetViewWindow(float width, float height) {
-	watch = std::make_shared<filewatch::FileWatch<std::string>>(
-		Engine::get()->getProjectDirectory(),
-		[](const std::string& path, const filewatch::Event change_type) {
-			switch (change_type)
-			{
-			case filewatch::Event::added:
-				std::cout << "The file was added to the directory." << '\n';
-				break;
-			case filewatch::Event::removed:
-				std::cout << "The file was removed from the directory." << '\n';
-				break;
-			case filewatch::Event::modified:
-				std::cout << "The file was modified. This can be a change in the time stamp or attributes." << '\n';
-				break;
-			case filewatch::Event::renamed_old:
-				std::cout << "The file was renamed and this is the old name." << '\n';
-				break;
-			case filewatch::Event::renamed_new:
-				std::cout << "The file was renamed and this is the new name." << '\n';
-				break;
-			};
-		}
-	);
-
 	auto assets = Engine::get()->getSubSystem<Assets>();
 	float windowWidth = width - 10;
 	float startX = 5; // Add a gap of 5 pixels
@@ -2108,11 +2084,11 @@ void RenderAssetViewWindow(float width, float height) {
 	ImGui::Begin("Asset View", nullptr, style);
 	ImVec2 listBoxSize(windowWidth, height * 0.3f - 35);
 
-	auto& meshList = Engine::get()->getMemoryPool<MeshCollection>()->getAll();
+	auto& meshList = assets->getAllAssetsOfType(AssetType::MESH);
 
 	if (ImGui::TreeNode("Meshes")) {
 		for (int i = 0; i < meshList.size(); i++) {
-			if (ImGui::Selectable(Engine::get()->getSubSystem<Assets>()->getAlias(meshList[i]).c_str())) {
+			if (ImGui::Selectable(meshList[i].name.c_str())) {
 				// Do something when a mesh is selected
 			}
 		}
@@ -2123,12 +2099,36 @@ void RenderAssetViewWindow(float width, float height) {
 
 	if (ImGui::TreeNode("Textures")) {
 		for (int i = 0; i < textureList.size(); i++) {
-			if (ImGui::Selectable(assets->getAlias(textureList[i].uuid).c_str())) {
+			if (ImGui::Selectable(textureList[i].name.c_str())) {
 				// Do something when a mesh is selected
 			}
 		}
 		ImGui::TreePop();
 	}
+
+	auto& animations = assets->getAllAssetsOfType(AssetType::ANIMATION);
+
+	if (ImGui::TreeNode("Animations")) {
+		for (int i = 0; i < animations.size(); i++) {
+			if (ImGui::Selectable(animations[i].name.c_str())) {
+				// Do something when a mesh is selected
+			}
+		}
+		ImGui::TreePop();
+	}
+
+	auto& shaders = assets->getAllAssetsOfType(AssetType::SHADER);
+
+	if (ImGui::TreeNode("Shaders")) {
+		for (int i = 0; i < shaders.size(); i++) {
+			if (ImGui::Selectable(shaders[i].name.c_str())) {
+				// Do something when a mesh is selected
+			}
+		}
+		ImGui::TreePop();
+	}
+
+
 	// Render asset view content here
 	ImGui::End();
 }
@@ -2306,6 +2306,30 @@ public:
 
 		auto gui = new GUI_Helper();
 		Engine::get()->getImguiHandler()->addGUI(gui);
+
+		watch = std::make_shared<filewatch::FileWatch<std::string>>(
+			Engine::get()->getProjectDirectory(),
+			[](const std::string& path, const filewatch::Event change_type) {
+				switch (change_type)
+				{
+				case filewatch::Event::added:
+					std::cout << "The file was added to the directory." << '\n';
+					break;
+				case filewatch::Event::removed:
+					std::cout << "The file was removed from the directory." << '\n';
+					break;
+				case filewatch::Event::modified:
+					std::cout << "The file was modified. This can be a change in the time stamp or attributes." << '\n';
+					break;
+				case filewatch::Event::renamed_old:
+					std::cout << "The file was renamed and this is the old name." << '\n';
+					break;
+				case filewatch::Event::renamed_new:
+					std::cout << "The file was renamed and this is the new name." << '\n';
+					break;
+				};
+			}
+		);
 	}
 
 	void update(float deltaTime) override
