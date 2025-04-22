@@ -2084,49 +2084,70 @@ void RenderAssetViewWindow(float width, float height) {
 	ImGui::Begin("Asset View", nullptr, style);
 	ImVec2 listBoxSize(windowWidth, height * 0.3f - 35);
 
-	auto& meshList = assets->getAllAssetsOfType(AssetType::MESH);
+	try {
+		for (const auto& entry : fs::directory_iterator(Engine::get()->getProjectDirectory())) {
 
-	if (ImGui::TreeNode("Meshes")) {
-		for (int i = 0; i < meshList.size(); i++) {
-			if (ImGui::Selectable(meshList[i].name.c_str())) {
-				// Do something when a mesh is selected
+			const std::string filenameFull = entry.path().filename().string();
+
+			if (filenameFull == "entities.json" || filenameFull == "ProjectAssetRegistry.json")
+				continue; // Skip unwanted files
+
+			std::string filename = entry.path().stem().string();
+			const AssetInfo& aInfo = assets->getAsset(filename);
+
+			// todo check if not an asset
+
+			if (ImGui::Selectable(aInfo.name.c_str())) {
 			}
 		}
-		ImGui::TreePop();
+	}
+	catch (const fs::filesystem_error& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
 	}
 
-	auto& textureList = assets->getAllAssetsOfType(AssetType::TEXTURE);
+	//auto& meshList = assets->getAllAssetsOfType(AssetType::MESH);
 
-	if (ImGui::TreeNode("Textures")) {
-		for (int i = 0; i < textureList.size(); i++) {
-			if (ImGui::Selectable(textureList[i].name.c_str())) {
-				// Do something when a mesh is selected
-			}
-		}
-		ImGui::TreePop();
-	}
+	//if (ImGui::TreeNode("Meshes")) {
+	//	for (int i = 0; i < meshList.size(); i++) {
+	//		if (ImGui::Selectable(meshList[i].name.c_str())) {
+	//			// Do something when a mesh is selected
+	//		}
+	//	}
+	//	ImGui::TreePop();
+	//}
 
-	auto& animations = assets->getAllAssetsOfType(AssetType::ANIMATION);
+	//auto& textureList = assets->getAllAssetsOfType(AssetType::TEXTURE);
 
-	if (ImGui::TreeNode("Animations")) {
-		for (int i = 0; i < animations.size(); i++) {
-			if (ImGui::Selectable(animations[i].name.c_str())) {
-				// Do something when a mesh is selected
-			}
-		}
-		ImGui::TreePop();
-	}
+	//if (ImGui::TreeNode("Textures")) {
+	//	for (int i = 0; i < textureList.size(); i++) {
+	//		if (ImGui::Selectable(textureList[i].name.c_str())) {
+	//			// Do something when a mesh is selected
+	//		}
+	//	}
+	//	ImGui::TreePop();
+	//}
 
-	auto& shaders = assets->getAllAssetsOfType(AssetType::SHADER);
+	//auto& animations = assets->getAllAssetsOfType(AssetType::ANIMATION);
 
-	if (ImGui::TreeNode("Shaders")) {
-		for (int i = 0; i < shaders.size(); i++) {
-			if (ImGui::Selectable(shaders[i].name.c_str())) {
-				// Do something when a mesh is selected
-			}
-		}
-		ImGui::TreePop();
-	}
+	//if (ImGui::TreeNode("Animations")) {
+	//	for (int i = 0; i < animations.size(); i++) {
+	//		if (ImGui::Selectable(animations[i].name.c_str())) {
+	//			// Do something when a mesh is selected
+	//		}
+	//	}
+	//	ImGui::TreePop();
+	//}
+
+	//auto& shaders = assets->getAllAssetsOfType(AssetType::SHADER);
+
+	//if (ImGui::TreeNode("Shaders")) {
+	//	for (int i = 0; i < shaders.size(); i++) {
+	//		if (ImGui::Selectable(shaders[i].name.c_str())) {
+	//			// Do something when a mesh is selected
+	//		}
+	//	}
+	//	ImGui::TreePop();
+	//}
 
 
 	// Render asset view content here

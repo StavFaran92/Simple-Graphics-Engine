@@ -214,6 +214,16 @@ void Assets::load()
 	}
 }
 
+AssetInfo Assets::getAsset(UUID uuid) const
+{
+	auto iter = m_assets.find(uuid);
+	if (iter != m_assets.end())
+	{
+		return iter->second;
+	}
+	return {};
+}
+
 std::string Assets::getAlias(UUID uid) const
 {
 	auto iter = m_assets.find(uid);

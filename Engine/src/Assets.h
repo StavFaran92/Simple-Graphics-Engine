@@ -40,6 +40,8 @@ public:
 
 	void load();
 
+	AssetInfo getAsset(UUID uuid) const;
+
 private:
 	//std::map<AssetType, std::unordered_set<AssetInfo>> m_assets;
 
