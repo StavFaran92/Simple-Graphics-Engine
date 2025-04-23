@@ -15,7 +15,7 @@
 
 #include "NativeScriptsLoader.h"
 
-static Resource<Texture> test;
+static std::unordered_map<std::string, Resource<Texture>> icons;
 
 static std::string getAssetTypeAsStr(AssetType aType)
 {
@@ -2138,12 +2138,7 @@ void RenderAssetViewWindow(float width, float height) {
 	{
 		const std::string filenameFull = entry.path().filename().string();
 
-		if (filenameFull == "entities.json" || filenameFull == "ProjectAssetRegistry.json")
-			continue; // Skip unwanted files
-
 		std::string filename = entry.path().stem().string();
-
-		
 
 		if (entry.is_directory())
 		{
@@ -2151,15 +2146,42 @@ void RenderAssetViewWindow(float width, float height) {
 
 			std::string dirName = "[Dir] " + filename;
 			// Create a small icon
-			ImGui::Image((ImTextureID)1, ImVec2(32, 32));
+
+			unsigned int iconID = icons.at("folder")->getID();
+			ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
 			ImGui::SameLine();
 
 			// Draw filename and small info
 			ImGui::Text("%s", dirName.c_str());
 
 			ImGui::EndGroup();
+
+			ImGui::Separator(); // nice line between items
 		}
-		else if (entry.is_regular_file())
+
+		
+
+		// Double click to open
+		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+		{
+			cwd /= entry.path().filename();
+			break;
+		}
+
+		
+
+	}
+
+	for (const auto& entry : std::filesystem::directory_iterator(cwd))
+	{
+		const std::string filenameFull = entry.path().filename().string();
+
+		if (filenameFull == "entities.json" || filenameFull == "ProjectAssetRegistry.json")
+			continue; // Skip unwanted files
+
+		std::string filename = entry.path().stem().string();
+		
+		if (entry.is_regular_file())
 		{
 			if (!assets->hasAsset(filename)) continue;
 
@@ -2167,8 +2189,26 @@ void RenderAssetViewWindow(float width, float height) {
 
 			const AssetInfo& aInfo = assets->getAsset(filename);
 
+			int iconID = 0;
+			if (aInfo.aType == AssetType::MESH)
+			{
+				iconID = icons.at("mesh")->getID();
+			}
+			else if (aInfo.aType == AssetType::TEXTURE)
+			{
+				iconID = icons.at("texture")->getID();
+			}
+			else if (aInfo.aType == AssetType::ANIMATION)
+			{
+				iconID = icons.at("animation")->getID();
+			}
+			else if (aInfo.aType == AssetType::SHADER)
+			{
+				iconID = icons.at("shader")->getID();
+			}
+
 			// Create a small icon
-			ImGui::Image((ImTextureID)test->getID(), ImVec2(32, 32));
+			ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
 			ImGui::SameLine();
 
 			std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
@@ -2181,26 +2221,21 @@ void RenderAssetViewWindow(float width, float height) {
 			ImGui::TextDisabled("(%.1f KB)", fileSize / 1024.0f);
 
 			ImGui::EndGroup();
+
+			ImGui::Separator(); // nice line between items
 		}
 
-		
+
 
 		// Double click to open
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 		{
-			if (entry.is_directory())
-			{
-				cwd /= entry.path().filename();
-				break;
-			}
-			else
-			{
-				// handle file open
-			}
+
 		}
 
-		ImGui::Separator(); // nice line between items
+		
 	}
+
 
 	ImGui::EndChild(); // end scrollable region
 }
@@ -2379,7 +2414,11 @@ public:
 		auto gui = new GUI_Helper();
 		Engine::get()->getImguiHandler()->addGUI(gui);
 
-		test = Texture::importTexture2D("C:/Users/adidk/Downloads/icons8-image-100.png");
+		icons["mesh"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-cube-100.png");
+		icons["texture"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-image-100.png");
+		icons["animation"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-skeleton-100.png");
+		icons["shader"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-code-100.png");
+		icons["folder"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-folder-100.png");
 	}
 
 	void update(float deltaTime) override
