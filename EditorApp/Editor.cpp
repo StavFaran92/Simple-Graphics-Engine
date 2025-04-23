@@ -23,7 +23,7 @@ static std::string getAssetTypeAsStr(AssetType aType)
 {
 	if (aType == AssetType::MESH) return "Mesh";
 	if (aType == AssetType::TEXTURE) return "Texture";
-	if (aType == AssetType::SHADER) return "Ahader";
+	if (aType == AssetType::SHADER) return "Shader";
 	if (aType == AssetType::ANIMATION) return "Animation";
 	return "N/A";
 }
@@ -2139,8 +2139,7 @@ void RenderAssetViewWindow(float width, float height) {
 	// Start grid layout
 	const float thumbnailSize = 64.0f;
 	const float padding = 16.0f;
-	const int columns = 4; // number of thumbnails per row
-	int columnCounter = 0;
+	const int columns = 6; // number of thumbnails per row
 
 	ImGui::Columns(columns, nullptr, false); // begin columns
 
@@ -2166,6 +2165,8 @@ void RenderAssetViewWindow(float width, float height) {
 
 			ImGui::EndGroup();
 
+			ImGui::NextColumn(); // move to next grid slot
+
 			//ImGui::Separator(); // nice line between items
 		}
 
@@ -2178,7 +2179,7 @@ void RenderAssetViewWindow(float width, float height) {
 			break;
 		}
 
-		ImGui::NextColumn(); // move to next grid slot
+		
 
 	}
 
@@ -2233,6 +2234,8 @@ void RenderAssetViewWindow(float width, float height) {
 			ImGui::EndGroup();
 
 			//ImGui::Separator(); // nice line between items
+
+			ImGui::NextColumn(); // move to next grid slot
 		}
 
 
@@ -2242,7 +2245,7 @@ void RenderAssetViewWindow(float width, float height) {
 		{
 
 		}
-		ImGui::NextColumn(); // move to next grid slot
+		
 		
 	}
 	ImGui::Columns(1); // end columns
