@@ -278,13 +278,16 @@ Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, cons
 	extractTextureDataFromFile(fileLocation, textureData);
 	Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
 
-	AssetInfo aInfo;
-	aInfo.origFilePath = fileLocation;
-	aInfo.uuid = texture.getUID();
-	aInfo.aType = AssetType::TEXTURE;
-	aInfo.name = settings.name;
-	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
+	if (settings.saveOnDisk)
+	{
+		AssetInfo aInfo;
+		aInfo.origFilePath = fileLocation;
+		aInfo.uuid = texture.getUID();
+		aInfo.aType = AssetType::TEXTURE;
+		aInfo.name = settings.name;
+		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
+		Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
+	}
 
 	return texture;
 }

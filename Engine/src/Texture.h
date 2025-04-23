@@ -111,6 +111,7 @@ public:
 		std::string name;
 		bool genMipMap = false;
 		bool flip = false;
+		bool saveOnDisk = true;
 	};
 
 	struct TextureAssetAttributes

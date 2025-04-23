@@ -15,6 +15,8 @@
 
 #include "NativeScriptsLoader.h"
 
+static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
+
 static std::unordered_map<std::string, Resource<Texture>> icons;
 
 static std::string getAssetTypeAsStr(AssetType aType)
@@ -2414,11 +2416,13 @@ public:
 		auto gui = new GUI_Helper();
 		Engine::get()->getImguiHandler()->addGUI(gui);
 
-		icons["mesh"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-cube-100.png");
-		icons["texture"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-image-100.png");
-		icons["animation"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-skeleton-100.png");
-		icons["shader"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-code-100.png");
-		icons["folder"] = Texture::importTexture2D("../../EditorApp/Resources/Content/Textures/icons8-folder-100.png");
+		Texture::TextureImportSettings settings;
+		settings.saveOnDisk = false;
+		icons["mesh"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
+		icons["texture"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
+		icons["animation"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);
+		icons["shader"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-100.png", settings);
+		icons["folder"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
 	}
 
 	void update(float deltaTime) override
