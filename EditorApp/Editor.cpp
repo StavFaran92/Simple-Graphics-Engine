@@ -2093,110 +2093,112 @@ void RenderAssetViewWindow(float width, float height) {
 
 	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
 
+	bool canGoBack = cwd != Engine::get()->getProjectDirectory();
+
+	if (!canGoBack)
+	{
+		// Make button look disabled
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f); // 50% transparency
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Gray color
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+	}
+
+	// Back button
+	bool clicked = ImGui::Button("<-", ImVec2(30, 30));
+
+	// Restore style if it was pushed
+	if (!canGoBack)
+	{
+		ImGui::PopStyleColor(3);
+		ImGui::PopStyleVar();
+	}
+
+	// Only handle click if it's allowed
+	if (clicked && canGoBack)
+	{
+		cwd = cwd.parent_path();
+	}
+
+
+	ImGui::SameLine();
+
+	// Header (fixed at top)
 	ImGui::SetWindowFontScale(1.3f);
 	ImGui::Text("%s", cwd.string().c_str());
 	ImGui::SetWindowFontScale(1.0f);
 	ImGui::Separator();
 
+	// Scrollable region
 	ImGui::BeginChild("FileBrowserScrollingRegion", ImVec2(0, 0), false);
 
-
-	if (cwd != Engine::get()->getProjectDirectory())
+	for (const auto& entry : std::filesystem::directory_iterator(cwd))
 	{
-		if (ImGui::Selectable(".."))
+		const std::string filenameFull = entry.path().filename().string();
+
+		if (filenameFull == "entities.json" || filenameFull == "ProjectAssetRegistry.json")
+			continue; // Skip unwanted files
+
+		std::string filename = entry.path().stem().string();
+
+		
+
+		if (entry.is_directory())
 		{
-			cwd = cwd.parent_path();
+			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
+
+			std::string dirName = "[Dir] " + filename;
+			// Create a small icon
+			ImGui::Image((ImTextureID)1, ImVec2(32, 32));
+			ImGui::SameLine();
+
+			// Draw filename and small info
+			ImGui::Text("%s", dirName.c_str());
+
+			ImGui::EndGroup();
 		}
-	}
-
-	try {
-		for (const auto& entry : fs::directory_iterator(cwd)) 
+		else if (entry.is_regular_file())
 		{
+			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
 
-			const std::string filenameFull = entry.path().filename().string();
+			// Create a small icon
+			ImGui::Image((ImTextureID)1, ImVec2(32, 32));
+			ImGui::SameLine();
 
-			if (filenameFull == "entities.json" || filenameFull == "ProjectAssetRegistry.json")
-				continue; // Skip unwanted files
+			const AssetInfo& aInfo = assets->getAsset(filename);
 
-			std::string filename = entry.path().stem().string();
+			std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
 
+			// Draw filename and small info
+			ImGui::Text("%s", assetName.c_str());
+
+			auto fileSize = std::filesystem::file_size(entry);
+			ImGui::SameLine();
+			ImGui::TextDisabled("(%.1f KB)", fileSize / 1024.0f);
+
+			ImGui::EndGroup();
+		}
+
+		
+
+		// Double click to open
+		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+		{
 			if (entry.is_directory())
 			{
-				std::string dirName = "[Dir] " + filename;
-				if (ImGui::Selectable(dirName.c_str()))
-				{
-					cwd /= filename; // move into the selected directory
-					break; // important! break to avoid iterating wrong cwd
-				}
+				cwd /= entry.path().filename();
+				break;
 			}
 			else
 			{
-				if(!assets->hasAsset(filename)) continue;
-
-				const AssetInfo& aInfo = assets->getAsset(filename);
-
-				std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
-				if (ImGui::Selectable(assetName.c_str()))
-				{
-				}
-
+				// handle file open
 			}
 		}
+
+		ImGui::Separator(); // nice line between items
 	}
-	catch (const fs::filesystem_error& e) {
-		std::cerr << "Error: " << e.what() << std::endl;
-	}
 
-	ImGui::EndChild(); // end scrolling area
-
-
-	//auto& meshList = assets->getAllAssetsOfType(AssetType::MESH);
-
-	//if (ImGui::TreeNode("Meshes")) {
-	//	for (int i = 0; i < meshList.size(); i++) {
-	//		if (ImGui::Selectable(meshList[i].name.c_str())) {
-	//			// Do something when a mesh is selected
-	//		}
-	//	}
-	//	ImGui::TreePop();
-	//}
-
-	//auto& textureList = assets->getAllAssetsOfType(AssetType::TEXTURE);
-
-	//if (ImGui::TreeNode("Textures")) {
-	//	for (int i = 0; i < textureList.size(); i++) {
-	//		if (ImGui::Selectable(textureList[i].name.c_str())) {
-	//			// Do something when a mesh is selected
-	//		}
-	//	}
-	//	ImGui::TreePop();
-	//}
-
-	//auto& animations = assets->getAllAssetsOfType(AssetType::ANIMATION);
-
-	//if (ImGui::TreeNode("Animations")) {
-	//	for (int i = 0; i < animations.size(); i++) {
-	//		if (ImGui::Selectable(animations[i].name.c_str())) {
-	//			// Do something when a mesh is selected
-	//		}
-	//	}
-	//	ImGui::TreePop();
-	//}
-
-	//auto& shaders = assets->getAllAssetsOfType(AssetType::SHADER);
-
-	//if (ImGui::TreeNode("Shaders")) {
-	//	for (int i = 0; i < shaders.size(); i++) {
-	//		if (ImGui::Selectable(shaders[i].name.c_str())) {
-	//			// Do something when a mesh is selected
-	//		}
-	//	}
-	//	ImGui::TreePop();
-	//}
-
-
-	// Render asset view content here
-	ImGui::End();
+	ImGui::EndChild(); // end scrollable region
 }
 
 void DisplayDebugInfoWindow()
