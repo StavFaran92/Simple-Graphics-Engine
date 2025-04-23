@@ -2136,6 +2136,14 @@ void RenderAssetViewWindow(float width, float height) {
 	// Scrollable region
 	ImGui::BeginChild("FileBrowserScrollingRegion", ImVec2(0, 0), false);
 
+	// Start grid layout
+	const float thumbnailSize = 64.0f;
+	const float padding = 16.0f;
+	const int columns = 4; // number of thumbnails per row
+	int columnCounter = 0;
+
+	ImGui::Columns(columns, nullptr, false); // begin columns
+
 	for (const auto& entry : std::filesystem::directory_iterator(cwd))
 	{
 		const std::string filenameFull = entry.path().filename().string();
@@ -2158,7 +2166,7 @@ void RenderAssetViewWindow(float width, float height) {
 
 			ImGui::EndGroup();
 
-			ImGui::Separator(); // nice line between items
+			//ImGui::Separator(); // nice line between items
 		}
 
 		
@@ -2170,7 +2178,7 @@ void RenderAssetViewWindow(float width, float height) {
 			break;
 		}
 
-		
+		ImGui::NextColumn(); // move to next grid slot
 
 	}
 
@@ -2224,7 +2232,7 @@ void RenderAssetViewWindow(float width, float height) {
 
 			ImGui::EndGroup();
 
-			ImGui::Separator(); // nice line between items
+			//ImGui::Separator(); // nice line between items
 		}
 
 
@@ -2234,10 +2242,10 @@ void RenderAssetViewWindow(float width, float height) {
 		{
 
 		}
-
+		ImGui::NextColumn(); // move to next grid slot
 		
 	}
-
+	ImGui::Columns(1); // end columns
 
 	ImGui::EndChild(); // end scrollable region
 }
