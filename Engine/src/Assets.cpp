@@ -224,6 +224,16 @@ AssetInfo Assets::getAsset(UUID uuid) const
 	return {};
 }
 
+bool Assets::hasAsset(UUID uuid) const
+{
+	auto iter = m_assets.find(uuid);
+	if (iter != m_assets.end())
+	{
+		return true;
+	}
+	return false;
+}
+
 std::string Assets::getAlias(UUID uid) const
 {
 	auto iter = m_assets.find(uid);

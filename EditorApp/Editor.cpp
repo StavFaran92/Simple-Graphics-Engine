@@ -15,7 +15,14 @@
 
 #include "NativeScriptsLoader.h"
 
-
+static std::string getAssetTypeAsStr(AssetType aType)
+{
+	if (aType == AssetType::MESH) return "Mesh";
+	if (aType == AssetType::TEXTURE) return "Texture";
+	if (aType == AssetType::SHADER) return "Ahader";
+	if (aType == AssetType::ANIMATION) return "Animation";
+	return "N/A";
+}
 
 static std::shared_ptr<filewatch::FileWatch<std::string>> watch;
 
@@ -2084,8 +2091,27 @@ void RenderAssetViewWindow(float width, float height) {
 	ImGui::Begin("Asset View", nullptr, style);
 	ImVec2 listBoxSize(windowWidth, height * 0.3f - 35);
 
+	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
+
+	ImGui::SetWindowFontScale(1.3f);
+	ImGui::Text("%s", cwd.string().c_str());
+	ImGui::SetWindowFontScale(1.0f);
+	ImGui::Separator();
+
+	ImGui::BeginChild("FileBrowserScrollingRegion", ImVec2(0, 0), false);
+
+
+	if (cwd != Engine::get()->getProjectDirectory())
+	{
+		if (ImGui::Selectable(".."))
+		{
+			cwd = cwd.parent_path();
+		}
+	}
+
 	try {
-		for (const auto& entry : fs::directory_iterator(Engine::get()->getProjectDirectory())) {
+		for (const auto& entry : fs::directory_iterator(cwd)) 
+		{
 
 			const std::string filenameFull = entry.path().filename().string();
 
@@ -2093,17 +2119,36 @@ void RenderAssetViewWindow(float width, float height) {
 				continue; // Skip unwanted files
 
 			std::string filename = entry.path().stem().string();
-			const AssetInfo& aInfo = assets->getAsset(filename);
 
-			// todo check if not an asset
+			if (entry.is_directory())
+			{
+				std::string dirName = "[Dir] " + filename;
+				if (ImGui::Selectable(dirName.c_str()))
+				{
+					cwd /= filename; // move into the selected directory
+					break; // important! break to avoid iterating wrong cwd
+				}
+			}
+			else
+			{
+				if(!assets->hasAsset(filename)) continue;
 
-			if (ImGui::Selectable(aInfo.name.c_str())) {
+				const AssetInfo& aInfo = assets->getAsset(filename);
+
+				std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
+				if (ImGui::Selectable(assetName.c_str()))
+				{
+				}
+
 			}
 		}
 	}
 	catch (const fs::filesystem_error& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 	}
+
+	ImGui::EndChild(); // end scrolling area
+
 
 	//auto& meshList = assets->getAllAssetsOfType(AssetType::MESH);
 
