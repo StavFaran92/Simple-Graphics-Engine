@@ -15,6 +15,8 @@
 
 #include "NativeScriptsLoader.h"
 
+static Resource<Texture> test;
+
 static std::string getAssetTypeAsStr(AssetType aType)
 {
 	if (aType == AssetType::MESH) return "Mesh";
@@ -2159,13 +2161,15 @@ void RenderAssetViewWindow(float width, float height) {
 		}
 		else if (entry.is_regular_file())
 		{
+			if (!assets->hasAsset(filename)) continue;
+
 			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
 
-			// Create a small icon
-			ImGui::Image((ImTextureID)1, ImVec2(32, 32));
-			ImGui::SameLine();
-
 			const AssetInfo& aInfo = assets->getAsset(filename);
+
+			// Create a small icon
+			ImGui::Image((ImTextureID)test->getID(), ImVec2(32, 32));
+			ImGui::SameLine();
 
 			std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
 
@@ -2375,29 +2379,7 @@ public:
 		auto gui = new GUI_Helper();
 		Engine::get()->getImguiHandler()->addGUI(gui);
 
-		watch = std::make_shared<filewatch::FileWatch<std::string>>(
-			Engine::get()->getProjectDirectory(),
-			[](const std::string& path, const filewatch::Event change_type) {
-				switch (change_type)
-				{
-				case filewatch::Event::added:
-					std::cout << "The file was added to the directory." << '\n';
-					break;
-				case filewatch::Event::removed:
-					std::cout << "The file was removed from the directory." << '\n';
-					break;
-				case filewatch::Event::modified:
-					std::cout << "The file was modified. This can be a change in the time stamp or attributes." << '\n';
-					break;
-				case filewatch::Event::renamed_old:
-					std::cout << "The file was renamed and this is the old name." << '\n';
-					break;
-				case filewatch::Event::renamed_new:
-					std::cout << "The file was renamed and this is the new name." << '\n';
-					break;
-				};
-			}
-		);
+		test = Texture::importTexture2D("C:/Users/adidk/Downloads/icons8-image-100.png");
 	}
 
 	void update(float deltaTime) override
@@ -2405,7 +2387,7 @@ public:
 		g_editorCamera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
-
+	
 	
 };
 
