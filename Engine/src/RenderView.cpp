@@ -44,6 +44,11 @@ unsigned int RenderView::getRenderTargetTextureID() const
     return m_renderTargetTexture.get()->getID();
 }
 
+Resource<Texture> RenderView::getRenderTargetTexture() const
+{
+	return m_renderTargetTexture;
+}
+
 unsigned int RenderView::getRenderTargetFrameBufferID() const
 {
 	return m_renderTargetFBO->getID();

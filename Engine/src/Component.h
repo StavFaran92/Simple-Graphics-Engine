@@ -448,3 +448,14 @@ struct TestComp : public Component
 	int test = 0;
 	int test2 = 0;
 };
+
+struct PostProcessComponent : public Component
+{
+	PostProcessComponent() = default;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+	}
+
+	Resource<Shader> shader;
+};

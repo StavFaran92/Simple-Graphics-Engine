@@ -15,7 +15,8 @@
 enum class ShaderOverride : int
 {
 	PBR,
-	Pixel
+	Pixel,
+	PostProcess
 };
 
 struct ShadersInfo;

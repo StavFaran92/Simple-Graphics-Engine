@@ -387,6 +387,31 @@ void Scene::draw(float deltaTime)
 		}
 
 		renderView->bind();
+		glDisable(GL_DEPTH_TEST);
+
+		// Render Post Process effects
+		for (auto&& [entity, postProcess, shader] : m_registry->get().view<PostProcessComponent, ShaderComponent>().each())
+		{
+			// TODO assert post process shader
+
+			// bind shader
+			shader.m_customShader->use();
+
+			// read texture from graphics FBO
+			auto renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+			shader.m_customShader->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
+
+			// bind mesh
+			auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
+
+			// in frag shader i need access to mesh extentes & main texture -> set uniforms
+
+			// draw
+			RenderCommand::draw(vao);
+		}
+
+		renderView->bind();
+		glEnable(GL_DEPTH_TEST);
 
 		// Render UI
 		glEnable(GL_BLEND);
