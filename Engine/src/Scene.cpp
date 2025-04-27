@@ -410,6 +410,9 @@ void Scene::draw(float deltaTime)
 			auto viewport = renderView->getViewport();
 			shader.m_customShader->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
 
+			shader.m_customShader->setUniformValue("cameraPos", graphics->cameraPos);
+			shader.m_customShader->setUniformValue("cameraLookAt", primaryCamera.front);
+
 			// bind mesh
 			auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();
 			//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad

@@ -172,9 +172,9 @@ void frag(inout vec3 color)
     vec2 xy = screenUV - .5;
 
     //color = texture(MainTexture, screenUV.xy).rgb;
-
-    vec3 ro = vec3(0.0, 0.0, 5.0);
-    vec3 rd = normalize(vec3(xy, -1));
+    mat3 lookAt = lookAt(cameraPos, cameraLookAt);
+    vec3 ro = cameraPos;
+    vec3 rd =  normalize(lookAt *vec3(xy, 1));
 
     float res = rayMarch(ro, rd);
     color = vec3(res);
