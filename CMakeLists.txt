@@ -21,5 +21,6 @@ add_subdirectory(InstancingSample)
 add_subdirectory(ShaderToy)
 add_subdirectory(TerrainSample)
 add_subdirectory(PostProcessSample)
+add_subdirectory(VolumetricCloudsSample)
 add_subdirectory(Game)
 
