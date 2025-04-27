@@ -389,6 +389,7 @@ void Scene::draw(float deltaTime)
 		Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 		renderView->swapToAdditionalTarget();
 		renderView->bind();
+		RenderCommand::clear();
 		glDisable(GL_DEPTH_TEST);
 
 		// Render Post Process effects
@@ -402,8 +403,13 @@ void Scene::draw(float deltaTime)
 			// read texture from graphics FBO
 			shader.m_customShader->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
 
+			shader.m_customShader->setModelMatrix(glm::mat4(1.0));
+			shader.m_customShader->setViewMatrix(*graphics->view);
+			shader.m_customShader->setProjectionMatrix(*graphics->projection);
+
 			// bind mesh
-			auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
+			auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();
+			//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
 
 			// in frag shader i need access to mesh extentes & main texture -> set uniforms
 

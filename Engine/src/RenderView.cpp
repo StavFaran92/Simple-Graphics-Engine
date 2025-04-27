@@ -86,6 +86,10 @@ void RenderView::swapBackToMainTarget()
 {
 	m_boundTargetTextureSlot = 0;
 
+	renderTargets[0].m_renderTargetFBO->bind();
+
+	RenderCommand::clear();
+
 	RenderCommand::copyFrameBufferData(renderTargets[1].m_renderTargetFBO->getID(),
 		renderTargets[0].m_renderTargetFBO->getID(),
 		RenderCommand::BufferBit::DEPTH_BUFFER_BIT | RenderCommand::BufferBit::COLOR_BUFFER_BIT);
