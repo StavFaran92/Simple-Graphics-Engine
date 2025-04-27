@@ -114,7 +114,7 @@ glm::mat4 CameraComponent::getProjection() const
 
 ShaderComponent::ShaderComponent()
 {
-	renderViewProjection = std::make_shared<RenderView>(RenderView::Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
+	renderViewProjection = std::make_shared<RenderView>(Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
 };
 
 void ShaderComponent::setProjectionTexture(Resource<Texture> texture)

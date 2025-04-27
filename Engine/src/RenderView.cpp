@@ -2,16 +2,17 @@
 
 #include <GL/glew.h>
 
-RenderView::RenderView(Viewport viewport, const Entity& camera)
-	: m_viewport(viewport), m_camera(camera)
+#include "RenderCommand.h"
+
+RenderTarget::RenderTarget(Viewport viewport)
 {
 	m_renderTargetFBO = std::make_shared<FrameBufferObject>();
-	m_renderTargetRBO = std::make_shared<RenderBufferObject>(m_viewport.w, m_viewport.h);
+	m_renderTargetRBO = std::make_shared<RenderBufferObject>(viewport.w, viewport.h);
 
 	m_renderTargetFBO->bind();
 
 	// Generate Texture for Position data
-	m_renderTargetTexture = Texture::createEmptyTexture(m_viewport.w, m_viewport.h);
+	m_renderTargetTexture = Texture::createEmptyTexture(viewport.w, viewport.h);
 	m_renderTargetFBO->attachTexture(m_renderTargetTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };
@@ -29,7 +30,14 @@ RenderView::RenderView(Viewport viewport, const Entity& camera)
 	m_renderTargetFBO->unbind();
 }
 
-RenderView::Viewport RenderView::getViewport() const
+RenderView::RenderView(Viewport viewport, const Entity& camera)
+	: m_viewport(viewport), m_camera(camera)
+{
+	renderTargets[0] = RenderTarget(viewport);
+	renderTargets[1] = RenderTarget(viewport);
+}
+
+Viewport RenderView::getViewport() const
 {
     return m_viewport;
 }
@@ -41,32 +49,46 @@ void RenderView::setCamera(const Entity& camera)
 
 unsigned int RenderView::getRenderTargetTextureID() const
 {
-    return m_renderTargetTexture.get()->getID();
+	return renderTargets[0].m_renderTargetTexture.get()->getID();
 }
 
 Resource<Texture> RenderView::getRenderTargetTexture() const
 {
-	return m_renderTargetTexture;
+	return renderTargets[0].m_renderTargetTexture;
 }
 
 unsigned int RenderView::getRenderTargetFrameBufferID() const
 {
-	return m_renderTargetFBO->getID();
+	return renderTargets[0].m_renderTargetFBO->getID();
 }
 
 void RenderView::setTexture(Resource<Texture> texture)
 {
-	m_renderTargetFBO->attachTexture(texture.get()->getID(), GL_COLOR_ATTACHMENT0);
+	renderTargets[0].m_renderTargetFBO->attachTexture(texture.get()->getID(), GL_COLOR_ATTACHMENT0);
 }
 
 void RenderView::bind()
 {
-	m_renderTargetFBO->bind();
+	renderTargets[m_boundTargetTextureSlot].m_renderTargetFBO->bind();
 }
 
 void RenderView::unbind()
 {
-	m_renderTargetFBO->unbind();
+	renderTargets[m_boundTargetTextureSlot].m_renderTargetFBO->unbind();
+}
+
+void RenderView::swapToAdditionalTarget()
+{
+	m_boundTargetTextureSlot = 1;
+}
+
+void RenderView::swapBackToMainTarget()
+{
+	m_boundTargetTextureSlot = 0;
+
+	RenderCommand::copyFrameBufferData(renderTargets[1].m_renderTargetFBO->getID(),
+		renderTargets[0].m_renderTargetFBO->getID(),
+		RenderCommand::BufferBit::DEPTH_BUFFER_BIT | RenderCommand::BufferBit::COLOR_BUFFER_BIT);
 }
 
 const Entity& RenderView::getCamera() const

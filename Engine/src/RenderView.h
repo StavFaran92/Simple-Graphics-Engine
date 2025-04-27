@@ -6,13 +6,26 @@
 #include "Texture.h"
 #include "Resource.h"
 
+struct Viewport
+{
+	int x, y, w, h;
+};
+
+class RenderTarget
+{
+public:
+	RenderTarget() = default;
+	RenderTarget(Viewport viewport);
+
+	std::shared_ptr<FrameBufferObject> m_renderTargetFBO;
+	std::shared_ptr<RenderBufferObject> m_renderTargetRBO;
+	Resource<Texture> m_renderTargetTexture = Resource<Texture>::empty;
+};
+
 class RenderView
 {
 public:
-	struct Viewport
-	{
-		int x, y, w, h;
-	};
+	
 
 	RenderView(Viewport viewport, const Entity& camera);
 
@@ -32,13 +45,16 @@ public:
 	void bind();
 	void unbind();
 
+	void swapToAdditionalTarget();
+	void swapBackToMainTarget();
+
 	//void setRenderTargetID(unsigned int targetID);
 
 private:
 	Viewport m_viewport;
 	Entity  m_camera = Entity::EmptyEntity;
 
-	std::shared_ptr<FrameBufferObject> m_renderTargetFBO;
-	std::shared_ptr<RenderBufferObject> m_renderTargetRBO;
-	Resource<Texture> m_renderTargetTexture = Resource<Texture>::empty;
+	RenderTarget renderTargets[2];
+
+	unsigned int m_boundTargetTextureSlot = 0;
 };

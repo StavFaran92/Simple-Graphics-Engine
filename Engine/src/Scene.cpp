@@ -386,6 +386,8 @@ void Scene::draw(float deltaTime)
 			RenderCommand::drawPatches(vao);
 		}
 
+		Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+		renderView->swapToAdditionalTarget();
 		renderView->bind();
 		glDisable(GL_DEPTH_TEST);
 
@@ -398,7 +400,6 @@ void Scene::draw(float deltaTime)
 			shader.m_customShader->use();
 
 			// read texture from graphics FBO
-			auto renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 			shader.m_customShader->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
 
 			// bind mesh
@@ -410,6 +411,7 @@ void Scene::draw(float deltaTime)
 			RenderCommand::draw(vao);
 		}
 
+		renderView->swapBackToMainTarget();
 		renderView->bind();
 		glEnable(GL_DEPTH_TEST);
 
@@ -671,7 +673,7 @@ unsigned int Scene::addRenderView(int x, int y, int w, int h, const Entity& e)
 {
 	// todo maybe use map here?
 	unsigned int id = m_renderViews.size();
-	m_renderViews.push_back(std::make_shared<RenderView>(RenderView::Viewport{x, y, w, h}, e));
+	m_renderViews.push_back(std::make_shared<RenderView>(Viewport{x, y, w, h}, e));
 	return id;
 }
 
