@@ -47,6 +47,8 @@ out vec4 FragColor;
 uniform vec3 cameraPos;
 uniform vec3 cameraLookAt;
 
+uniform vec2 screenSize;
+
 uniform sampler2D MainTexture;
 
 // ----- Methods ----- //

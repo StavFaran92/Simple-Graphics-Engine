@@ -407,6 +407,9 @@ void Scene::draw(float deltaTime)
 			shader.m_customShader->setViewMatrix(*graphics->view);
 			shader.m_customShader->setProjectionMatrix(*graphics->projection);
 
+			auto viewport = renderView->getViewport();
+			shader.m_customShader->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
+
 			// bind mesh
 			auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();
 			//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
