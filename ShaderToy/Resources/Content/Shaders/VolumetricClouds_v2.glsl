@@ -134,7 +134,13 @@ float rayMarch(vec3 ro, vec3 rd)
             float lightTransmission = lightMarch(p);
             float shadow = darknessThreshold + lightTransmission * (1.0 -darknessThreshold);
             density += sampledDensity;
-            finalLight += density * transmittance * shadow;
+
+            // for this point p 
+            // shadow is how much has reached this point from the sun
+            // density is how much light will pass on from this point onward 
+            // (this is odd since I thought sampled density makes more sense here, density is already embodied in transmittance)
+            // transmittance is how much light will reach the camera
+            finalLight += density * transmittance * shadow; 
             transmittance *= exp(-density*lightAbsorb);
 
             // float transmittance = .6f;//lightMarch(p);
