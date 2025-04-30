@@ -84,7 +84,7 @@ float sceneSDF(vec3 pos)
 {
     float distance = sdSphere(pos, 1);
 
-    vec3 q = pos - vec3(1.0,0.2,1.0)*iTime;
+    vec3 q = pos - vec3(1.0,0.2,1.0)*iTime * .4;
     float f = fbm(q);
 
     return -distance + f;
@@ -131,23 +131,22 @@ float rayMarch(vec3 ro, vec3 rd)
         float sampledDensity = sceneSDF(p);
         if(sampledDensity > 0.0)
         {
-            density += sampledDensity;
-
             float lightTransmission = lightMarch(p);
             float shadow = darknessThreshold + lightTransmission * (1.0 -darknessThreshold);
-            finalLight += shadow * density * transmittance;
-
+            density += sampledDensity;
+            finalLight += density * transmittance * shadow;
             transmittance *= exp(-density*lightAbsorb);
+
             // float transmittance = .6f;//lightMarch(p);
             // lightAccumulation *= transmittance;
             // finalLight += lightAccumulation * density * .2;
 
             // Directional derivative for fast diffuse lighting
-            //float diffuse = clamp((density - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
-            //vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
-            //vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
-            //color.rgb *= lin * color.a;
-            //res += color * (1.0 - res.a);
+            // float diffuse = clamp((sampledDensity - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
+            // vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
+            // vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), sampledDensity), sampledDensity );
+            // color.rgb *= lin * color.a;
+            // res += color * (1.0 - res.a);
         }
         d += MARCH_SIZE;
     } 
