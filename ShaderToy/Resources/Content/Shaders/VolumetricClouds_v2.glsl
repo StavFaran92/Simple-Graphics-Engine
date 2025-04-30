@@ -1,8 +1,9 @@
 #frag
 
-#define MAX_STEPS 100
+#define MAX_STEPS 200
 #define MAX_LIGHT_STEPS 6
-const float MARCH_SIZE = 0.08;
+const float MARCH_SIZE = 0.02;
+const float LIGHT_MARCH_SIZE = 0.06;
 
 vec3 sunDirection = vec3(0, 1, 0);
 
@@ -94,20 +95,19 @@ float beerLambert(float absorptionCoefficient, float distanceTraveled)
     return exp(-absorptionCoefficient * distanceTraveled);
 }
 
-const float ABSORPTION_COEFFICIENT = 0.9;
+const float ABSORPTION_COEFFICIENT = .9;
 
 float lightMarch(vec3 p0)
 {
     vec3 rd = normalize(sunDirection);
-    float marchSize = 0.03;
     float totalDensity = 0.0;
-    float d = marchSize;
+    float d = LIGHT_MARCH_SIZE;
     for(int i=0; i<MAX_LIGHT_STEPS; i++)
     {
         vec3 p = p0 + rd * d;
         float density = sceneSDF(p);
         totalDensity += density;// * marchSize;
-        d += marchSize;
+        d += LIGHT_MARCH_SIZE;
     } 
 
     float transmittance = beerLambert(ABSORPTION_COEFFICIENT, totalDensity);
@@ -118,20 +118,29 @@ float rayMarch(vec3 ro, vec3 rd)
 {
     float d = 0.;
     vec4 res = vec4(0.0);
+    float transmittance = 1.;
+    float lightAbsorb = 1.68;
+    float density = 0.;
+    float darknessThreshold = 0.1;
 
-    float totalTransmittance = 1.0;
-    float lightEnergy = 0.0;
+    float finalLight = 0.0;
 
     for(int i=0; i<MAX_STEPS; i++)
     {
         vec3 p = ro + rd * d;
-        float density = sceneSDF(p);
-        if(density > 0.0)
+        float sampledDensity = sceneSDF(p);
+        if(sampledDensity > 0.0)
         {
-            float transmittance = lightMarch(p);
-            totalTransmittance *= transmittance;
-            float luminance = density;
-            lightEnergy += totalTransmittance * luminance;
+            density += sampledDensity;
+
+            float lightTransmission = lightMarch(p);
+            float shadow = darknessThreshold + lightTransmission * (1.0 -darknessThreshold);
+            finalLight += shadow * density * transmittance;
+
+            transmittance *= exp(-density*lightAbsorb);
+            // float transmittance = .6f;//lightMarch(p);
+            // lightAccumulation *= transmittance;
+            // finalLight += lightAccumulation * density * .2;
 
             // Directional derivative for fast diffuse lighting
             //float diffuse = clamp((density - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
@@ -142,7 +151,7 @@ float rayMarch(vec3 ro, vec3 rd)
         }
         d += MARCH_SIZE;
     } 
-    return lightEnergy;
+    return finalLight;
 }
 
 mat3 lookAt(vec3 ro, vec3 target) {
