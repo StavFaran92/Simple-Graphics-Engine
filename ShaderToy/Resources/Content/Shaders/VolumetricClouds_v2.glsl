@@ -90,11 +90,9 @@ float sdBox( vec3 p, vec3 b )
 
 float sceneSDF(vec3 pos)
 {
-    float tex = texture(test, pos).r;
+    float tex = texture(test, pos + vec3(1.0,0.2,1.0)*iTime * .4).r;
     
-    float distance = 1.0 - sdBox(pos, vec3(1,1,1));
-
-    return distance * tex;
+    return tex;
 
     // vec3 q = pos - vec3(1.0,0.2,1.0)*iTime * .4;
     // float f = fbm(q);
