@@ -4,6 +4,8 @@
 #define MAX_LIGHT_STEPS 6
 const float MARCH_SIZE = 0.02;
 const float LIGHT_MARCH_SIZE = 0.06;
+const float ABSORPTION_COEFFICIENT = .9;
+const float densityScale = .11;
 
 vec3 sunDirection = vec3(0, 1, 0);
 
@@ -95,8 +97,6 @@ float beerLambert(float absorptionCoefficient, float distanceTraveled)
     return exp(-absorptionCoefficient * distanceTraveled);
 }
 
-const float ABSORPTION_COEFFICIENT = .9;
-
 float lightMarch(vec3 p0)
 {
     vec3 rd = normalize(sunDirection);
@@ -119,7 +119,7 @@ float rayMarch(vec3 ro, vec3 rd)
     float d = 0.;
     vec4 res = vec4(0.0);
     float transmittance = 1.;
-    float lightAbsorb = 1.68;
+    float lightAbsorb = 2.02;
     float density = 0.;
     float darknessThreshold = 0.1;
 
@@ -133,7 +133,7 @@ float rayMarch(vec3 ro, vec3 rd)
         {
             float lightTransmission = lightMarch(p);
             float shadow = darknessThreshold + lightTransmission * (1.0 -darknessThreshold);
-            density += sampledDensity;
+            density += sampledDensity * densityScale;
 
             // for this point p 
             // shadow is how much has reached this point from the sun
@@ -142,17 +142,6 @@ float rayMarch(vec3 ro, vec3 rd)
             // transmittance is how much light will reach the camera
             finalLight += density * transmittance * shadow; 
             transmittance *= exp(-density*lightAbsorb);
-
-            // float transmittance = .6f;//lightMarch(p);
-            // lightAccumulation *= transmittance;
-            // finalLight += lightAccumulation * density * .2;
-
-            // Directional derivative for fast diffuse lighting
-            // float diffuse = clamp((sampledDensity - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
-            // vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
-            // vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), sampledDensity), sampledDensity );
-            // color.rgb *= lin * color.a;
-            // res += color * (1.0 - res.a);
         }
         d += MARCH_SIZE;
     } 
