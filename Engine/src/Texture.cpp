@@ -433,8 +433,30 @@ Resource<Texture> Texture::importTexture3D(const std::string& fileLocation)
 		glTexParameteri(textureData.target, paramKey, paramValue);
 	}
 
-	int depth = 0;
-	glTexImage3D(textureData.target, 0, textureData.internalFormat, texture.get()->m_data.width, texture.get()->m_data.height, depth, 0, textureData.format, (int)textureData.type, textureData.data);
+	int sliceSize = 64;
+	int slicesPerRow = 512 / sliceSize;
+
+	std::vector<unsigned char> volumeData(sliceSize * sliceSize * 64 * 4); // RGBA
+	for (int z = 0; z < 64; ++z) {
+		int tileX = z % slicesPerRow;
+		int tileY = z / slicesPerRow;
+
+		for (int y = 0; y < sliceSize; ++y) {
+			for (int x = 0; x < sliceSize; ++x) {
+				int srcX = tileX * sliceSize + x;
+				int srcY = tileY * sliceSize + y;
+				int srcIndex = (srcY * 512 + srcX) * 4;
+				int dstIndex = ((z * sliceSize + y) * sliceSize + x) * 4;
+
+				volumeData[dstIndex + 0] = ((uint8_t*)(textureData.data))[srcIndex + 0];
+				volumeData[dstIndex + 1] = ((uint8_t*)(textureData.data))[srcIndex + 1];
+				volumeData[dstIndex + 2] = ((uint8_t*)(textureData.data))[srcIndex + 2];
+				volumeData[dstIndex + 3] = ((uint8_t*)(textureData.data))[srcIndex + 3];
+			}
+		}
+	}
+
+	glTexImage3D(textureData.target, 0, GL_RGBA8, 64, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, volumeData.data());
 
 	if (textureData.genMipMap)
 	{

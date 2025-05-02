@@ -82,14 +82,24 @@ float sdSphere(vec3 p, float radius)
     return length(p) - radius;
 }
 
+float sdBox( vec3 p, vec3 b )
+{
+  vec3 q = abs(p) - b;
+  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+}
+
 float sceneSDF(vec3 pos)
 {
-    float distance = sdSphere(pos, 1);
+    float tex = texture(test, pos).r;
+    
+    float distance = 1.0 - sdBox(pos, vec3(1,1,1));
 
-    vec3 q = pos - vec3(1.0,0.2,1.0)*iTime * .4;
-    float f = fbm(q);
+    return distance * tex;
 
-    return -distance + f;
+    // vec3 q = pos - vec3(1.0,0.2,1.0)*iTime * .4;
+    // float f = fbm(q);
+
+    // return -distance + f;
 }
 
 float beerLambert(float absorptionCoefficient, float distanceTraveled)
@@ -160,12 +170,8 @@ void frag(inout vec3 color)
     vec2 xy = uv - .5;
     xy *= vec2(1, -1); // hack
     vec3 ro = vec3(0.0, 0.0, 5.0);
-    vec3 rd = normalize(vec3(xy, -1 + iTime * .1));
+    vec3 rd = normalize(vec3(xy, -1));
 
-    // float res = rayMarch(ro, rd);
-    // color = vec3(res);
-    
-    color = texture(test, rd).rgb;
-
-
+    float res = rayMarch(ro, rd);
+    color = vec3(res);
 }

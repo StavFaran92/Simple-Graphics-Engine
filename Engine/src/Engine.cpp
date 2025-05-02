@@ -93,6 +93,7 @@ bool Engine::init(const InitParams& initParams)
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_3D);
 
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
