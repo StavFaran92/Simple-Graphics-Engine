@@ -1,26 +1,6 @@
 #include "EntryPoint.h"
 #include "sge.h"
 
-#include "FlyCamera.h"
-#include "PlayerController.h"
-#include "EnemyController.h"
-
-class CameraScript : public ScriptableEntity
-{
-	virtual void onCreate() override
-	{
-		Engine::get()->getWindow()->lockMouse();
-
-		m_flyCamera = std::make_shared<FlyCamera>(entity, 0, 0, 3, 1);
-	}
-
-	virtual void onUpdate(float deltaTime) {
-		m_flyCamera->onUpdate(deltaTime);
-	};
-
-	std::shared_ptr<FlyCamera> m_flyCamera;
-};
-
 class Sandbox : public Application
 {
 public:
