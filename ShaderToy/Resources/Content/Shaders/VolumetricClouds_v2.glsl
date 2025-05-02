@@ -9,7 +9,7 @@ const float densityScale = .11;
 
 vec3 sunDirection = vec3(0, 1, 0);
 
-uniform sampler2D uNoise;
+uniform sampler3D test;
 
 // float noise(vec3 x ) {
 //   vec3 p = floor(x);
@@ -160,10 +160,12 @@ void frag(inout vec3 color)
     vec2 xy = uv - .5;
     xy *= vec2(1, -1); // hack
     vec3 ro = vec3(0.0, 0.0, 5.0);
-    vec3 rd = normalize(vec3(xy, -1));
+    vec3 rd = normalize(vec3(xy, -1 + iTime * .1));
 
-    float res = rayMarch(ro, rd);
-    color = vec3(res);
+    // float res = rayMarch(ro, rd);
+    // color = vec3(res);
+    
+    color = texture(test, rd).rgb;
 
 
 }

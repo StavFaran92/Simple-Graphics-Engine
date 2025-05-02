@@ -39,6 +39,19 @@ public:
 
 	void start() override
 	{
+		Resource<Texture> densityTexture = Texture::importTexture3D("C:/Users/Stav/Downloads/VolumeCloud.png");
+
+		//if (settings.saveOnDisk)
+		//{
+		//	AssetInfo aInfo;
+		//	aInfo.origFilePath = "C:/Users/Stav/Downloads/VolumeCloud.png";
+		//	aInfo.uuid = texture.getUID();
+		//	aInfo.aType = AssetType::TEXTURE;
+		//	aInfo.name = settings.name;
+		//	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
+		//	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
+		//}
+
 		auto projectionEnt = Engine::get()->getContext()->getActiveScene()->createEntity();
 		auto displayEnt = Engine::get()->getContext()->getActiveScene()->createEntity();
 
@@ -51,6 +64,8 @@ public:
 		shaderComponent.setProjectionTexture(projectionTexture);
 		shaderComponent.projection = ShaderComponent::ProjectionType::Texture2D;
 		shaderComponent.setShader(shader);
+
+		shaderComponent.addTexture("test", densityTexture);
 
 		//Texture::TextureImportSettings settings;
 		//settings.genMipMap = true;

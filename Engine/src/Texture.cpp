@@ -364,6 +364,7 @@ void Texture::extractTextureDataFromSettings(const TextureImportSettings& settin
 		textureData.params = {
 			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
 			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+			{ GL_TEXTURE_WRAP_R, GL_REPEAT},
 			{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
 			{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
 		};
@@ -401,4 +402,48 @@ void Texture::extractTextureDataFromAttributes(const TextureAssetAttributes& att
 
 	textureData.flip = attributes.flip;
 }
+
+Resource<Texture> Texture::importTexture3D(const std::string& fileLocation)
+{
+	Texture::TextureData textureData;
+
+	textureData.target = GL_TEXTURE_3D;
+
+	Texture::TextureImportSettings settings;
+	settings.name = "VolumeCloud";
+
+	// extract texture build data
+	extractTextureDataFromSettings(settings, textureData);
+	extractTextureDataFromFile(fileLocation, textureData);
+	
+	Resource<Texture> texture = Factory<Texture>::create();
+
+	texture.get()->m_data = textureData;
+
+	texture.get()->m_attributes.flip = textureData.flip;
+	texture.get()->m_attributes.genMipMap = textureData.genMipMap;
+	texture.get()->m_attributes.isHDR = textureData.isHDR;
+
+	// generate texture
+	glGenTextures(1, &texture.get()->m_id);
+	texture.get()->bind();
+
+	for (auto& [paramKey, paramValue] : textureData.params)
+	{
+		glTexParameteri(textureData.target, paramKey, paramValue);
+	}
+
+	int depth = 0;
+	glTexImage3D(textureData.target, 0, textureData.internalFormat, texture.get()->m_data.width, texture.get()->m_data.height, depth, 0, textureData.format, (int)textureData.type, textureData.data);
+
+	if (textureData.genMipMap)
+	{
+		glGenerateMipmap(textureData.target);
+	}
+
+	texture.get()->unbind();
+
+	return texture;
+}
+
 //adi is your love of your life

@@ -234,6 +234,9 @@ public:
 	static void addTexture2D(Resource<Texture> texture);
 	static void addTexture2D(const std::string& name, Resource<Texture> texture);
 
+	static Resource<Texture> importTexture3D(const std::string& fileLocation);
+
+
 	/**  Destructor */
 	~Texture();
 private:
