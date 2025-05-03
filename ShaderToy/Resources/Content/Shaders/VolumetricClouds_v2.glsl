@@ -5,9 +5,9 @@
 const float MARCH_SIZE = 0.02;
 const float LIGHT_MARCH_SIZE = 0.06;
 const float ABSORPTION_COEFFICIENT = .9;
-const float densityScale = .11;
+const float densityScale = .0011;
 
-vec3 sunDirection = vec3(0, 1, 0);
+vec3 SUN_POSITION = vec3(0, 10, 0);
 
 uniform sampler3D test;
 
@@ -111,14 +111,14 @@ float beerLambert(float absorptionCoefficient, float distanceTraveled)
 
 float lightMarch(vec3 p0)
 {
-    vec3 rd = normalize(sunDirection);
+    vec3 rd = normalize(SUN_POSITION);
     float totalDensity = 0.0;
     float d = LIGHT_MARCH_SIZE;
     for(int i=0; i<MAX_LIGHT_STEPS; i++)
     {
         vec3 p = p0 + rd * d;
         float density = sceneSDF(p);
-        totalDensity += density;// * marchSize;
+        totalDensity += density* densityScale;
         d += LIGHT_MARCH_SIZE;
     } 
 
@@ -126,12 +126,12 @@ float lightMarch(vec3 p0)
     return transmittance;
 }
 
-float rayMarch(vec3 ro, vec3 rd)
+float rayMarch(vec3 ro, vec3 rd, inout float transmittance)
 {
     float d = 0.;
     vec4 res = vec4(0.0);
-    float transmittance = 1.;
-    float lightAbsorb = 2.02;
+    //float transmittance = 1.;
+    float lightAbsorb = 4.02;
     float density = 0.;
     float darknessThreshold = 0.1;
 
@@ -170,10 +170,22 @@ mat3 lookAt(vec3 ro, vec3 target) {
 void frag(inout vec3 color)
 {
     vec2 xy = uv - .5;
-    xy *= vec2(1, -1); // hack
+    //xy *= vec2(1, -1); // hack
     vec3 ro = vec3(0.0, .5, 4.0);
     vec3 rd = normalize(vec3(xy, -1));
 
-    float res = rayMarch(ro, rd);
-    color = vec3(res);
+    // Sun and Sky
+    vec3 sunColor = vec3(1.0,0.5,0.3);
+    vec3 sunDirection = normalize(SUN_POSITION);
+    float sun = clamp(dot(sunDirection, rd), 0.0, 1.0);
+    // Base sky color
+    color = vec3(0.7,0.7,0.90);
+    // Add vertical gradient
+    color -= 0.8 * vec3(0.90,0.75,0.90) * rd.y;
+    // Add sun color to sky
+    color += 0.5 * sunColor * pow(sun, 10.0);
+
+    float transmittance = 1.;
+    float res = rayMarch(ro, rd, transmittance);
+    color += sunColor * res;
 }
