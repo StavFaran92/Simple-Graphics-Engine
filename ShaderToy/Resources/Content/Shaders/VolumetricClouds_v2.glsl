@@ -9,8 +9,9 @@ const float densityScale = .11;
 const float lightAbsorb = 4.02;
 const float darknessThreshold = 0.1;
 float transmittance = 1.;
+float transmission = 0.;
 
-vec3 SUN_POSITION = vec3(0, 0, 10);
+vec3 SUN_POSITION = vec3(0, 10, 0);
 
 uniform sampler3D test;
 
@@ -93,20 +94,20 @@ float sdBox( vec3 p, vec3 b )
 
 float sceneSDF(vec3 pos)
 {
-    // if(sdBox(pos, vec3(3,.5,3)) > 0)
-    // {
-    //     return 0;
-    // }
-    // float tex = texture(test, pos + vec3(0, .5, 0) + vec3(1.0,0.0,0.0)*iTime * .4).r;
+    if(sdBox(pos, vec3(3,.5,3)) > 0)
+    {
+        return 0;
+    }
+    float tex = texture(test, pos + vec3(0, .5, 0) + vec3(1.0,0.0,0.0)*iTime * .4).r;
     
-    // return tex;
+    return tex;
 
-    float distance = sdSphere(pos, 1);
+    // float distance = sdSphere(pos, 1);
 
-    vec3 q = pos - vec3(1.0,0.2,1.0)*iTime * .4;
-    float f = fbm(q);
+    // vec3 q = pos - vec3(1.0,0.2,1.0)*iTime * .4;
+    // float f = fbm(q);
 
-    return -distance + f;
+    // return -distance + f;
 }
 
 float beerLambert(float absorptionCoefficient, float distanceTraveled)
@@ -123,7 +124,7 @@ float lightMarch(vec3 p0)
     {
         vec3 p = p0 + rd * d;
         float density = sceneSDF(p);
-        totalDensity += density* densityScale;
+        totalDensity += density;
         d += LIGHT_MARCH_SIZE;
     } 
 
@@ -131,7 +132,7 @@ float lightMarch(vec3 p0)
     return transmittance;
 }
 
-float rayMarch(vec3 ro, vec3 rd, inout float transmission)
+float rayMarch(vec3 ro, vec3 rd)
 {
     float d = 0.;
     vec4 res = vec4(0.0);
@@ -174,22 +175,22 @@ mat3 lookAt(vec3 ro, vec3 target) {
 void frag(inout vec3 color)
 {
     vec2 xy = uv - .5;
-    vec3 ro = vec3(0.0, 0.0, 4.0);
+    xy *= vec2(1, -1);
+    vec3 ro = vec3(0.0, 0.5, 4.0);
     vec3 rd = normalize(vec3(xy, -1));
 
     // Sun and Sky
-    vec3 sunColor = vec3(1.0,1.0,1.0);
-    // vec3 sunColor = vec3(1.0,0.5,0.3);
-    // vec3 sunDirection = normalize(SUN_POSITION);
-    // float sun = clamp(dot(sunDirection, rd), 0.0, 1.0);
-    // // Base sky color
-    // color = vec3(0.7,0.7,0.90);
-    // // Add vertical gradient
-    // color -= 0.8 * vec3(0.90,0.75,0.90) * rd.y;
-    // // Add sun color to sky
-    // color += 0.5 * sunColor * pow(sun, 10.0);
+    //vec3 sunColor = vec3(1.0,1.0,1.0);
+    vec3 sunColor = vec3(1.0,0.5,0.3);
+    vec3 sunDirection = normalize(SUN_POSITION);
+    float sun = clamp(dot(sunDirection, rd), 0.0, 1.0);
+    // Base sky color
+    color = vec3(0.7,0.7,0.90);
+    // Add vertical gradient
+    color -= 0.8 * vec3(0.90,0.75,0.90) * rd.y;
+    // Add sun color to sky
+    color += 0.5 * sunColor * pow(sun, 10.0);
 
-    float transmission = 0;
-    float res = rayMarch(ro, rd, transmission);
+    float res = rayMarch(ro, rd);
     color += sunColor * res * (1.-transmission);
 }
