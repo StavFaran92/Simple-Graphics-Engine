@@ -184,13 +184,14 @@ void frag(inout vec3 color)
     vec3 sunColor = vec3(1.0,0.5,0.3);
     vec3 sunDirection = normalize(SUN_POSITION);
     float sun = clamp(dot(sunDirection, rd), 0.0, 1.0);
-    // Base sky color
-    color = vec3(0.7,0.7,0.90);
-    // Add vertical gradient
-    color -= 0.8 * vec3(0.90,0.75,0.90) * rd.y;
-    // Add sun color to sky
-    color += 0.5 * sunColor * pow(sun, 10.0);
+    // // Base sky color
+    vec3 baseSkyColor = vec3(0.7,0.7,0.90);
+    // // Add vertical gradient
+    baseSkyColor -= 0.8 * vec3(0.90,0.75,0.90) * rd.y;
+    // // Add sun color to sky
+    baseSkyColor += 0.5 * sunColor * pow(sun, 10.0);
 
     float res = rayMarch(ro, rd);
-    color += sunColor * res * (1.-transmission);
+    vec3 cloudColor = mix(vec3(1.), vec3(0.529, 0.612, 0.690), res);
+    color = baseSkyColor * transmission + cloudColor * (1.-transmission);
 }
