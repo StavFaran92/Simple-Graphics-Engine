@@ -8,6 +8,8 @@ const float ABSORPTION_COEFFICIENT = .9;
 const float densityScale = .11;
 const float lightAbsorb = 4.02;
 const float darknessThreshold = 0.1;
+const float finalLightMultiplier = 1.;
+const float finalLightOffset = .5;
 float transmittance = 1.;
 float transmission = 0.;
 
@@ -162,7 +164,7 @@ float rayMarch(vec3 ro, vec3 rd)
     } 
 
     transmission = exp(-density);
-    return finalLight;
+    return finalLight * finalLightMultiplier + finalLightOffset;
 }
 
 mat3 lookAt(vec3 ro, vec3 target) {
@@ -191,7 +193,9 @@ void frag(inout vec3 color)
     // // Add sun color to sky
     baseSkyColor += 0.5 * sunColor * pow(sun, 10.0);
 
-    float res = rayMarch(ro, rd);
-    vec3 cloudColor = mix(vec3(1.), vec3(0.529, 0.612, 0.690), res);
+    float res = clamp(rayMarch(ro, rd), 0, 1);
+    vec3 cloudColor = mix(vec3(0.529, 0.612, 0.690), vec3(1.), res);
     color = baseSkyColor * transmission + cloudColor * (1.-transmission);
+
+    //color = vec3(res * 10, 0,0);
 }
