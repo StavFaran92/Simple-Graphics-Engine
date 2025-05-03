@@ -90,7 +90,11 @@ float sdBox( vec3 p, vec3 b )
 
 float sceneSDF(vec3 pos)
 {
-    float tex = texture(test, pos + vec3(1.0,0.2,1.0)*iTime * .4).r;
+    if(sdBox(pos, vec3(3,.5,3)) > 0)
+    {
+        return 0;
+    }
+    float tex = texture(test, pos + vec3(0, .5, 0) + vec3(1.0,0.0,0.0)*iTime * .4).r;
     
     return tex;
 
@@ -167,7 +171,7 @@ void frag(inout vec3 color)
 {
     vec2 xy = uv - .5;
     xy *= vec2(1, -1); // hack
-    vec3 ro = vec3(0.0, 0.0, 5.0);
+    vec3 ro = vec3(0.0, .5, 4.0);
     vec3 rd = normalize(vec3(xy, -1));
 
     float res = rayMarch(ro, rd);
