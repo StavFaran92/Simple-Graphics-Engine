@@ -11,11 +11,36 @@ const float darknessThreshold = 0.1;
 const float finalLightMultiplier = 1.;
 const float finalLightOffset = .5;
 float transmittance = 1.;
-float transmission = 0.;
-
+float transmission = 1.;
 vec3 SUN_POSITION = vec3(0, 10, 0);
+vec3 aabbMin = vec3(-1);
+vec3 aabbMax = vec3(1);
 
-uniform sampler3D test;
+bool intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 boxMin, vec3 boxMax, 
+out float tmin, out float tmax) 
+{
+    float tx1 = (boxMin.x - rayOrigin.x) * rayDirInv.x;
+    float tx2 = (boxMax.x - rayOrigin.x) * rayDirInv.x;
+
+    tmin = min(tx1, tx2);
+    tmax = max(tx1, tx2);
+
+    float ty1 = (boxMin.y - rayOrigin.y) * rayDirInv.y;
+    float ty2 = (boxMax.y - rayOrigin.y) * rayDirInv.y;
+
+    tmin = max(tmin, min(ty1, ty2));
+    tmax = min(tmax, max(ty1, ty2));
+
+    float tz1 = (boxMin.z - rayOrigin.z) * rayDirInv.z;
+    float tz2 = (boxMax.z - rayOrigin.z) * rayDirInv.z;
+
+    tmin = max(tmin, min(tz1, tz2));
+    tmax = min(tmax, max(tz1, tz2));
+
+    return tmax >= max(tmin, 0.0);
+}
+
+// uniform sampler3D test;
 
 // float noise(vec3 x ) {
 //   vec3 p = floor(x);
@@ -96,20 +121,20 @@ float sdBox( vec3 p, vec3 b )
 
 float sceneSDF(vec3 pos)
 {
-    if(sdBox(pos, vec3(3,.5,3)) > 0)
-    {
-        return 0;
-    }
-    float tex = texture(test, pos + vec3(0, .5, 0) + vec3(1.0,0.0,0.0)*iTime * .4).r;
+    // if(sdBox(pos, vec3(3,.5,3)) > 0)
+    // {
+    //     return 0;
+    // }
+    // float tex = texture(test, pos + vec3(0, .5, 0) + vec3(1.0,0.0,0.0)*iTime * .4).r;
     
-    return tex;
+    // return tex;
 
-    // float distance = sdSphere(pos, 1);
+    float distance = sdSphere(pos, 1);
 
-    // vec3 q = pos - vec3(1.0,0.2,1.0)*iTime * .4;
-    // float f = fbm(q);
+    vec3 q = pos - vec3(1.0,0.2,1.0)*iTime * .4;
+    float f = fbm(q);
 
-    // return -distance + f;
+    return -distance + f;
 }
 
 float beerLambert(float absorptionCoefficient, float distanceTraveled)
@@ -136,15 +161,32 @@ float lightMarch(vec3 p0)
 
 float rayMarch(vec3 ro, vec3 rd)
 {
+    vec3 rd_inv = 1. / rd; // todo optimize using LUT?
+
+    float tmin, tmax;
+    bool isIntersect = intersectAABB(ro, rd_inv, aabbMin, aabbMax, tmin, tmax);
+
+    if(!isIntersect)
+    {
+        return 0;
+    }
+
+
+
     float d = 0.;
     vec4 res = vec4(0.0);
     float density = 0.;
 
     float finalLight = 0.0;
 
+    vec3 p0 = ro + rd * tmin;
+
     for(int i=0; i<MAX_STEPS; i++)
     {
-        vec3 p = ro + rd * d;
+        if(d > tmax - tmin)
+            break;
+
+        vec3 p = p0 + d * rd;
         float sampledDensity = sceneSDF(p);
         if(sampledDensity > 0.0)
         {
@@ -161,6 +203,7 @@ float rayMarch(vec3 ro, vec3 rd)
             transmittance *= exp(-density*lightAbsorb);
         }
         d += MARCH_SIZE;
+        
     } 
 
     transmission = exp(-density);
@@ -178,7 +221,7 @@ void frag(inout vec3 color)
 {
     vec2 xy = uv - .5;
     xy *= vec2(1, -1);
-    vec3 ro = vec3(0.0, 0.5, 4.0);
+    vec3 ro = vec3(0.0, 0.5, 8.0);
     vec3 rd = normalize(vec3(xy, -1));
 
     // Sun and Sky
