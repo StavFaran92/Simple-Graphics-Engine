@@ -186,6 +186,9 @@ float rayMarch(vec3 ro, vec3 rd)
         if(d > tmax - tmin)
             break;
 
+        if(finalLight >= 1.)
+            break;
+
         vec3 p = p0 + d * rd;
         float sampledDensity = sceneSDF(p);
         if(sampledDensity > 0.0)
