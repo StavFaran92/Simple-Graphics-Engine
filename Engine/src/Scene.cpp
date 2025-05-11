@@ -52,6 +52,8 @@
 #include "DebugHelper.h"
 #include "Cubemap.h"
 #include "RenderView.h"
+#include "GameLayer.h"
+#include "EventLayerStack.h"
 
 void cameraCalculateOrientation(Transformation& transform, CameraComponent& cameraComponent)
 {
@@ -119,6 +121,9 @@ void Scene::init(Context* context)
 
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
+
+	gameEventLayer = std::make_shared<GameLayer>();
+	Engine::get()->getEventLayerStack()->addLayer(gameEventLayer);
 
 	m_deferredRenderer = std::make_shared<DeferredRenderer>(this);
 	m_deferredRenderer->init();
@@ -534,7 +539,8 @@ const SGE_Regsitry& Scene::getRegistry() const
 Entity Scene::createEntity()
 {
 	std::string name = "temp";
-	return createEntity(name);
+	Entity e = createEntity(name);
+	return e;
 }
 
 Entity Scene::createEntity(const std::string& name)
@@ -649,6 +655,8 @@ void Scene::startSimulation()
 
 		nsc.script->entity = Entity(entity, &getRegistry());
 		nsc.script->onCreate();
+
+		gameEventLayer->subscribe(nsc.script);
 	}
 
 	m_isSimulationActive = true;
@@ -666,6 +674,7 @@ void Scene::stopSimulation()
 	for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())
 	{
 		nsc.script->onDestroy();
+		gameEventLayer->unsubscribe(nsc.script);
 	}
 
 	getRegistry().getRegistry().clear();

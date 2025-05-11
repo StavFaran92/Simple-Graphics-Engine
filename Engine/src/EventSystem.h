@@ -36,9 +36,10 @@ public:
 	void addEventListener(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback, std::shared_ptr<Handler>& handler);
 	void removeEventListener(uint64_t listenerID);
 	void pushEvent(SDL_Event e);
+	void dispatch(SDL_Event e);
 private:
 	friend class Engine;
-	void dispatch(SDL_Event e);
+	
 private:
 	std::unordered_map<SDL_EventType, std::unordered_set<uint64_t>> m_listeners;
 

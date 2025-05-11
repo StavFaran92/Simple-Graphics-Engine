@@ -44,6 +44,7 @@ class Assets;
 class Animation;
 class AnimationLoader;
 class Shader;
+class EventLayerStack;
 template<typename T>class Resource;
 template<typename T>class Factory;
 template<typename T>class MemoryPool;
@@ -84,6 +85,7 @@ public:
     CommonShaders* getCommonShaders() const;
     CommonTextures* getCommonTextures() const;
     const InitParams& getInitParams() const;
+    EventLayerStack* getEventLayerStack() const;
     template<typename T>MemoryPool<T>* getMemoryPool() const { return 0; };
     template<>MemoryPool<Texture>* getMemoryPool() const { return m_memoryPoolTexture.get(); }
     template<>MemoryPool<MeshCollection>* getMemoryPool() const { return m_memoryPoolMeshCollection.get(); }
@@ -186,6 +188,8 @@ protected:
     std::atomic<bool> m_isStopped = false;
 
     std::string m_projectDirectory;
+
+    std::shared_ptr<EventLayerStack> m_eventLayerStack;
 };
 
 #define SGE_ROOT_DIR Engine::get()->getRootDir()

@@ -75,6 +75,10 @@ void Mouse::onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> c
 	});
 }
 
+void Mouse::onEvent(SDL_Event e)
+{
+}
+
 int Mouse::mouseButtonToSDLCode(MouseButton button) const
 {
 	int result = -1;

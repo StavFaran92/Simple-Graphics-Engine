@@ -29,6 +29,7 @@ public:
 	void onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback) const;
 	void onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback) const;
 
+	void onEvent(SDL_Event e);
 
 
 private:

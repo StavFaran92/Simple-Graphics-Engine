@@ -35,6 +35,7 @@
 #include "Graphics.h"
 #include "System.h"
 #include "RenderCommand.h"
+#include "EventLayerStack.h"
 
 #include "Application.h"
 #include "SDL2/SDL.h"
@@ -101,6 +102,7 @@ bool Engine::init(const InitParams& initParams)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_eventSystem = std::make_shared<EventSystem>();
+    m_eventLayerStack = std::make_shared<EventLayerStack>();
 
     m_memoryPoolTexture = std::make_shared<MemoryPool<Texture>>();
     m_memoryPoolMeshCollection = std::make_shared<MemoryPool<MeshCollection>>();
@@ -431,6 +433,11 @@ const InitParams& Engine::getInitParams() const
     return m_initParams;
 }
 
+EventLayerStack* Engine::getEventLayerStack() const
+{
+    return m_eventLayerStack.get();
+}
+
 void Engine::loadProject(const std::string& dirPath)
 {
     m_projectDirectory = dirPath;
@@ -470,7 +477,16 @@ void Engine::handleEvents(SDL_Event& e, bool& quit)
 {
     while (SDL_PollEvent(&e) != 0)
     {
-        m_imguiHandler->proccessEvents(e);
+        for (auto& eventLayer : *m_eventLayerStack) 
+        {
+            if (eventLayer->handleEvent(e)) 
+            {
+                break; // Event was consumed
+            }
+        }
+
+
+        //m_imguiHandler->proccessEvents(e);
 
         //User requests quit
         if (e.type == SDL_QUIT)
@@ -479,7 +495,7 @@ void Engine::handleEvents(SDL_Event& e, bool& quit)
         }
 
 
-        m_eventSystem->dispatch(e);
+        //m_eventSystem->dispatch(e);
     }
 }
 

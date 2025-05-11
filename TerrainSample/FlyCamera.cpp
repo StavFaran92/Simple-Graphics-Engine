@@ -19,11 +19,11 @@ FlyCamera::FlyCamera(Entity camera, float yaw, float pitch, float moveSpeed, flo
 {
 	
 
-	auto eventSystem = Engine::get()->getEventSystem();
+	//auto eventSystem = Engine::get()->getEventSystem();
 
-	eventSystem->addEventListener(SDL_MOUSEMOTION, [this](SDL_Event e) {
-		OnMouseMotion(e.motion.xrel, e.motion.yrel);
-	});
+	//eventSystem->addEventListener(SDL_MOUSEMOTION, [this](SDL_Event e) {
+	//	OnMouseMotion(e.motion.xrel, e.motion.yrel);
+	//});
 }
 
 void FlyCamera::OnMouseMotion(float xChange, float yChange)
@@ -88,6 +88,14 @@ void FlyCamera::calculateOrientation()
 
 void FlyCamera::onUpdate(float deltaTime)
 {
+}
+
+void FlyCamera::onEvent(SDL_Event e)
+{
+	if (e.type == SDL_MOUSEMOTION)
+	{
+		OnMouseMotion(e.motion.xrel, e.motion.yrel);
+	}
 }
 
 FlyCamera::~FlyCamera()

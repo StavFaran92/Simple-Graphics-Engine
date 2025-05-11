@@ -21,6 +21,8 @@ public:
 
 	void onUpdate(float deltaTime) override;
 
+	void onEvent(SDL_Event e) override;
+
 	~FlyCamera();
 private:
 	void calculateOrientation();

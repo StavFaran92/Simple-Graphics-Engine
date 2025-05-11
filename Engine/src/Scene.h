@@ -50,6 +50,7 @@ class SGE_Regsitry;
 class Entity;
 class RenderView;
 struct RigidBodyComponent;
+class GameLayer;
 namespace physx {
 	class PxScene;
 }
@@ -189,4 +190,6 @@ private:
 	SerializedScene m_serializedScene;
 
 	std::vector<std::shared_ptr<RenderView>> m_renderViews;
+
+	std::shared_ptr<GameLayer> gameEventLayer;
 };

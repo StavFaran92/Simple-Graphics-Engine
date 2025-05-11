@@ -4,6 +4,8 @@
 
 #include "Entity.h"
 
+#include "SDL.h"
+
 struct NativeScriptComponent;
 class Scene;
 class SceneSerializer;
@@ -34,6 +36,8 @@ public:
 
 	Entity entity;
 
+	virtual void onEvent(SDL_Event e) {};
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		archive(entity);
@@ -43,6 +47,7 @@ protected:
 	virtual void onCreate() {};
 	virtual void onUpdate(float deltaTime) {};
 	virtual void onDestroy() {};
+	
 
 	friend NativeScriptComponent;
 	friend Scene;
