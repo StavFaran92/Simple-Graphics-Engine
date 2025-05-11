@@ -293,9 +293,6 @@ void Engine::run(Application* app)
 
     auto system = getSubSystem<System>();
 
-    //Event handler
-    SDL_Event e;
-
     Uint64 NOW = SDL_GetPerformanceCounter();
     Uint64 LAST = 0;
     double deltaTime = 0;
@@ -312,7 +309,7 @@ void Engine::run(Application* app)
         system->setDeltaTime(deltaTime);
 
         //Handle events on queue
-        handleEvents(e, quit);
+        handleEvents(quit);
 
         m_window->update();
 
@@ -473,8 +470,10 @@ void Engine::pause()
 {
 }
 
-void Engine::handleEvents(SDL_Event& e, bool& quit)
+void Engine::handleEvents(bool& quit)
 {
+    SDL_Event e;
+
     while (SDL_PollEvent(&e) != 0)
     {
         for (auto& eventLayer : *m_eventLayerStack) 
