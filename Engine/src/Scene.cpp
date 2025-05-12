@@ -391,15 +391,16 @@ void Scene::draw(float deltaTime)
 			RenderCommand::drawPatches(vao);
 		}
 
-		Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
-		renderView->swapToAdditionalTarget();
-		renderView->bind();
-		RenderCommand::clear();
-		glDisable(GL_DEPTH_TEST);
+		
 
 		// Render Post Process effects
 		for (auto&& [entity, postProcess, shader] : m_registry->get().view<PostProcessComponent, ShaderComponent>().each())
 		{
+			Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+			renderView->swapToAdditionalTarget();
+			renderView->bind();
+			RenderCommand::clear();
+			glDisable(GL_DEPTH_TEST);
 			// TODO assert post process shader
 
 			// bind shader
@@ -426,11 +427,13 @@ void Scene::draw(float deltaTime)
 
 			// draw
 			RenderCommand::draw(vao);
+
+			renderView->swapBackToMainTarget();
+			renderView->bind();
+			glEnable(GL_DEPTH_TEST);
 		}
 
-		renderView->swapBackToMainTarget();
-		renderView->bind();
-		glEnable(GL_DEPTH_TEST);
+		
 
 		// Render UI
 		glEnable(GL_BLEND);
