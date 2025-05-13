@@ -20,7 +20,7 @@ EditorCamera::EditorCamera()
 
 void EditorCamera::onCreate()
 {
-	m_cameraController->onCreate(entity);
+	m_cameraController->onCreate(entity, m_eventSystem);
 }
 
 void EditorCamera::onUpdate(float deltaTime)

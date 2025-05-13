@@ -4,17 +4,17 @@
 #include <memory>
 
 #include "EventLayer.h"
+#include "EventSystem.h"
 
 class ScriptableEntity;
 
 class GameLayer : public EventLayer
 {
 public:
+	GameLayer();
 	bool handleEvent(SDL_Event event) override;
-
-	void subscribe(std::shared_ptr<ScriptableEntity> e);
-	void unsubscribe(std::shared_ptr<ScriptableEntity> e);
+	std::shared_ptr<EventSystem> getEventSystem() const;
 
 private:
-	std::unordered_set<std::shared_ptr<ScriptableEntity>> m_listeners;
+	std::shared_ptr<EventSystem> m_eventSystem;
 };

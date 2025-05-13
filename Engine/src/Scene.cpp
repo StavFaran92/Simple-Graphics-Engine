@@ -657,9 +657,8 @@ void Scene::startSimulation()
 		}
 
 		nsc.script->entity = Entity(entity, &getRegistry());
+		nsc.script->m_eventSystem = gameEventLayer->getEventSystem();
 		nsc.script->onCreate();
-
-		gameEventLayer->subscribe(nsc.script);
 	}
 
 	m_isSimulationActive = true;
@@ -677,7 +676,6 @@ void Scene::stopSimulation()
 	for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())
 	{
 		nsc.script->onDestroy();
-		gameEventLayer->unsubscribe(nsc.script);
 	}
 
 	getRegistry().getRegistry().clear();

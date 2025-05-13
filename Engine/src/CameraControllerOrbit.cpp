@@ -21,12 +21,10 @@
 //	m_cameraComponent->up = glm::normalize(glm::cross(m_right, front));
 //}
 
-void CameraControllerOrbit::onCreate(Entity& e)
+void CameraControllerOrbit::onCreate(Entity& e, std::shared_ptr<EventSystem> eventSystem)
 {
 	m_cameraComponent = &e.getComponent<CameraComponent>();
 	m_cameraTransform = &e.getComponent<Transformation>();
-
-	auto eventSystem = Engine::get()->getEventSystem();
 
 	eventSystem->addEventListener(SDL_MOUSEMOTION, [this](SDL_Event e)
 		{

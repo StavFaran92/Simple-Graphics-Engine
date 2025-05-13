@@ -8,7 +8,7 @@
 class CameraControllerFreeLook : public ICameraController
 {
 public:
-	void onCreate(Entity& e) override;
+	void onCreate(Entity& e, std::shared_ptr<EventSystem> eventsystem) override;
 	void onUpdate(float deltaTime) override;
 
 private:

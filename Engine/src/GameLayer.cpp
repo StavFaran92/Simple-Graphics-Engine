@@ -2,28 +2,21 @@
 
 #include "ScriptableEntity.h"
 #include "Engine.h"
-#include "EventSystem.h"
+
+GameLayer::GameLayer()
+{
+    m_eventSystem = std::make_shared<EventSystem>();
+}
 
 bool GameLayer::handleEvent(SDL_Event e)
 {
-    //Engine::get()->getInput()->getMouse()->onEvent(e);
-    //Engine::get()->getInput()->getKeyboard()->onEvent(e);
+    m_eventSystem->dispatch(e);
 
-    Engine::get()->getEventSystem()->dispatch(e);
-
-    //for (auto& listener: m_listeners) 
-    //{
-    //    listener->onEvent(e);
-    //}
     return false;
 }
 
-void GameLayer::subscribe(std::shared_ptr<ScriptableEntity> e)
+std::shared_ptr<EventSystem> GameLayer::getEventSystem() const
 {
-    m_listeners.insert(e);
+    return m_eventSystem;
 }
 
-void GameLayer::unsubscribe(std::shared_ptr<ScriptableEntity> e)
-{
-    m_listeners.erase(e); // todo check
-}

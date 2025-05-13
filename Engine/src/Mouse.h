@@ -4,6 +4,8 @@
 
 #include <functional>
 
+#include "EventSystem.h"
+
 
 class EngineAPI Mouse
 {
@@ -26,8 +28,8 @@ public:
 	const MouseState& getMouseState();
 	void getMousePosition(int& x, int& y);
 	bool getButtonPressed(MouseButton button);
-	void onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback) const;
-	void onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback) const;
+	void onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback, std::shared_ptr<EventSystem> eventSystem) const;
+	void onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback, std::shared_ptr<EventSystem> eventSystem) const;
 
 	void onEvent(SDL_Event e);
 
