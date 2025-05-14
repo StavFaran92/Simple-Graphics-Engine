@@ -6,7 +6,6 @@
 #include "Engine.h"
 #include "Context.h"
 #include "Scene.h"
-#include "EventSystem.h"
 #include "Transformation.h"
 #include "CameraControllerOrbit.h"
 #include "CameraControllerFreeLook.h"
@@ -20,7 +19,7 @@ EditorCamera::EditorCamera()
 
 void EditorCamera::onCreate()
 {
-	m_cameraController->onCreate(entity, m_eventSystem);
+	m_cameraController->onCreate(entity);
 }
 
 void EditorCamera::onUpdate(float deltaTime)

@@ -21,12 +21,16 @@
 //	m_cameraComponent->up = glm::normalize(glm::cross(m_right, front));
 //}
 
-void CameraControllerOrbit::onCreate(Entity& e, std::shared_ptr<EventSystem> eventSystem)
+void CameraControllerOrbit::onCreate(Entity& e)
 {
 	m_cameraComponent = &e.getComponent<CameraComponent>();
 	m_cameraTransform = &e.getComponent<Transformation>();
 
-	eventSystem->subscribe(SDL_MOUSEMOTION, [this](SDL_Event e)
+	auto eventSystem = Engine::get()->getEventSystem();
+
+	m_eventHandler = eventSystem->bindToLayer("GameLayer"); // TODO fix
+
+	eventSystem->subscribe(m_eventHandler, SDL_MOUSEMOTION, [this](SDL_Event e)
 		{
 			int xChange = e.motion.xrel;
 			int yChange = e.motion.yrel;
@@ -53,7 +57,7 @@ void CameraControllerOrbit::onCreate(Entity& e, std::shared_ptr<EventSystem> eve
 				m_cameraComponent->center -= m_cameraComponent->up * yVelocity;
 			}
 		});
-	eventSystem->subscribe(SDL_MOUSEBUTTONDOWN, [this](SDL_Event e) {
+	eventSystem->subscribe(m_eventHandler, SDL_MOUSEBUTTONDOWN, [this](SDL_Event e) {
 		if (e.button.button == SDL_BUTTON_RIGHT)
 		{
 			if (m_state == ControllerState::IDLE)
@@ -70,13 +74,13 @@ void CameraControllerOrbit::onCreate(Entity& e, std::shared_ptr<EventSystem> eve
 			}
 		}
 		});
-	eventSystem->subscribe(SDL_MOUSEBUTTONUP, [this](SDL_Event e) {
+	eventSystem->subscribe(m_eventHandler, SDL_MOUSEBUTTONUP, [this](SDL_Event e) {
 		if (e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_MIDDLE)
 		{
 			m_state = ControllerState::IDLE;
 		}
 		});
-	eventSystem->subscribe(SDL_MOUSEWHEEL, [this](SDL_Event e)
+	eventSystem->subscribe(m_eventHandler, SDL_MOUSEWHEEL, [this](SDL_Event e)
 		{
 			m_distance = std::clamp(m_distance - e.wheel.y, 1.f, 50.f);
 		});

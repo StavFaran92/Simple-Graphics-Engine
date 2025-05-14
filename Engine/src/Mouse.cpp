@@ -3,6 +3,11 @@
 #include "Engine.h"
 #include "EventSystem.h"
 
+Mouse::Mouse()
+{
+	m_eventHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer"); // TODO fix
+}
+
 const Mouse::MouseState& Mouse::getMouseState()
 {
 	int x, y;
@@ -53,9 +58,11 @@ bool Mouse::getButtonPressed(MouseButton button)
 	return result;
 }
 
-void Mouse::onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback, std::shared_ptr<EventSystem> eventSystem) const
+void Mouse::onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback) const
 {
-	eventSystem->subscribe(SDL_EventType::SDL_MOUSEBUTTONDOWN, [=](SDL_Event e)
+	auto eventSystem = Engine::get()->getEventSystem();
+
+	eventSystem->subscribe(m_eventHandler, SDL_EventType::SDL_MOUSEBUTTONDOWN, [=](SDL_Event e)
 	{
 		if (e.button.button == mouseButtonToSDLCode(code))
 		{
@@ -64,9 +71,11 @@ void Mouse::onMousePressed(MouseButton code, std::function<void(SDL_Event e)> ca
 	});
 }
 
-void Mouse::onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback, std::shared_ptr<EventSystem> eventSystem) const
+void Mouse::onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback) const
 {
-	eventSystem->subscribe(SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
+	auto eventSystem = Engine::get()->getEventSystem();
+
+	eventSystem->subscribe(m_eventHandler, SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
 	{
 		if (e.button.button == mouseButtonToSDLCode(code))
 		{

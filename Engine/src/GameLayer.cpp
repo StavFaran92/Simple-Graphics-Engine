@@ -3,16 +3,15 @@
 #include "ScriptableEntity.h"
 #include "Engine.h"
 
-GameLayer::GameLayer()
-{
-}
-
 bool GameLayer::handleEvent(SDL_Event e)
 {
     auto iter = m_listeners.find((SDL_EventType)e.type);
-    for (auto& c : iter->second)
+    if (iter != m_listeners.end())
     {
-        c(e);
+        for (auto& c : iter->second)
+        {
+            c(e);
+        }
     }
 
     return false;

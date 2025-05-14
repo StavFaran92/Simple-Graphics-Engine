@@ -8,7 +8,10 @@
 class GameLayer : public EventLayer
 {
 public:
-	GameLayer();
+	GameLayer() : EventLayer("GameLayer")
+	{
+	}
+
 	bool handleEvent(SDL_Event event) override;
 
 private:

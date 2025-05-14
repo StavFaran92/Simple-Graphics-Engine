@@ -15,7 +15,7 @@ class CameraScript : public ScriptableEntity
 
 		m_camera = entity;
 
-		m_handler = eventSystem->subscribe(SDL_MOUSEMOTION, [this](SDL_Event e) {
+		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, [this](SDL_Event e) {
 			OnMouseMotion(e.motion.xrel, e.motion.yrel);
 			});
 	}
@@ -26,7 +26,7 @@ class CameraScript : public ScriptableEntity
 
 		auto eventSystem = Engine::get()->getEventSystem();
 
-		eventSystem->removeEventListener(m_handler);
+		//eventSystem->removeEventListener(m_handler); // TODO fix
 	}
 
 	virtual void onUpdate(float deltaTime) {

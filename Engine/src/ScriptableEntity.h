@@ -5,7 +5,6 @@
 #include "Entity.h"
 
 #include "SDL.h"
-#include "EventSystem.h"
 
 struct NativeScriptComponent;
 class Scene;
@@ -36,7 +35,7 @@ public:
 	}
 
 	Entity entity;
-	std::shared_ptr<EventSystem> m_eventSystem;
+	uint64_t eventHandler;
 
 	template <class Archive>
 	void serialize(Archive& archive) {

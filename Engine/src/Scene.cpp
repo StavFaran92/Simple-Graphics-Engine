@@ -53,7 +53,7 @@
 #include "Cubemap.h"
 #include "RenderView.h"
 #include "GameLayer.h"
-#include "EventLayerStack.h"
+#include "EventSystem.h"
 
 void cameraCalculateOrientation(Transformation& transform, CameraComponent& cameraComponent)
 {
@@ -123,7 +123,7 @@ void Scene::init(Context* context)
 	auto height = Engine::get()->getWindow()->getHeight();
 
 	gameEventLayer = std::make_shared<GameLayer>();
-	Engine::get()->getEventLayerStack()->addLayer(gameEventLayer);
+	Engine::get()->getEventSystem()->pushLayer(gameEventLayer);
 
 	m_deferredRenderer = std::make_shared<DeferredRenderer>(this);
 	m_deferredRenderer->init();
@@ -391,15 +391,16 @@ void Scene::draw(float deltaTime)
 			RenderCommand::drawPatches(vao);
 		}
 
-		Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
-		renderView->swapToAdditionalTarget();
-		renderView->bind();
-		RenderCommand::clear();
-		glDisable(GL_DEPTH_TEST);
+		
 
 		// Render Post Process effects
 		for (auto&& [entity, postProcess, shader] : m_registry->get().view<PostProcessComponent, ShaderComponent>().each())
 		{
+			Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+			renderView->swapToAdditionalTarget();
+			renderView->bind();
+			RenderCommand::clear();
+			glDisable(GL_DEPTH_TEST);
 			// TODO assert post process shader
 
 			// bind shader
@@ -426,11 +427,13 @@ void Scene::draw(float deltaTime)
 
 			// draw
 			RenderCommand::draw(vao);
+
+			renderView->swapBackToMainTarget();
+			renderView->bind();
+			glEnable(GL_DEPTH_TEST);
 		}
 
-		renderView->swapBackToMainTarget();
-		renderView->bind();
-		glEnable(GL_DEPTH_TEST);
+		
 
 		// Render UI
 		glEnable(GL_BLEND);
@@ -656,7 +659,7 @@ void Scene::startSimulation()
 		nsc.script->entity = Entity(entity, &getRegistry());
 		nsc.script->onCreate();
 
-		Engine::get()->getEventSystem()->registerToLayer(nsc.script->entity.handlerID(), gameEventLayer);
+		nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
 	}
 
 	m_isSimulationActive = true;
@@ -674,7 +677,7 @@ void Scene::stopSimulation()
 	for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())
 	{
 		nsc.script->onDestroy();
-		gameEventLayer->unsubscribe(nsc.script);
+		//gameEventLayer->unsubscribe(nsc.script); // TODO fix
 	}
 
 	getRegistry().getRegistry().clear();

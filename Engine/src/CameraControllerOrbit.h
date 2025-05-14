@@ -8,7 +8,7 @@
 class CameraControllerOrbit : public ICameraController
 {
 public:
-	void onCreate(Entity& e, std::shared_ptr<EventSystem> eventsystem) override;
+	void onCreate(Entity& e) override;
 
 private:
 	enum class ControllerState
@@ -31,4 +31,6 @@ private:
 
 	CameraComponent* m_cameraComponent = nullptr;
 	Transformation* m_cameraTransform = nullptr;
+
+	uint64_t m_eventHandler;
 };

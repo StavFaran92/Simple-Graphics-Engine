@@ -17,4 +17,6 @@ public:
 private:
 	const Uint8* m_keyboardState;
 	int m_length;
+
+	uint64_t m_eventHandler;
 };

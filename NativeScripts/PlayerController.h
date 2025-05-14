@@ -101,7 +101,7 @@ public:
 		applyGravity(deltaTime);
 		applyMovement(deltaTime);
 
-		Engine::get()->getInput()->getMouse()->onMousePressed(Mouse::MouseButton::LeftMousebutton, [&](SDL_Event e) { shoot(); }, m_eventSystem);
+		Engine::get()->getInput()->getMouse()->onMousePressed(Mouse::MouseButton::LeftMousebutton, [&](SDL_Event e) { shoot(); });
 
 		// Handle jumping
 		Engine::get()->getInput()->getKeyboard()->onKeyPressed(SDL_SCANCODE_SPACE, [&](SDL_Event e) { if(m_isGrounded)m_velocity.y = m_jumpForce; });

@@ -2,29 +2,33 @@
 
 #include "Logger.h"
 
-void EventSystem::subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback, entity_id id)
+void EventSystem::subscribe(EventSystem::handlerID handler, SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback)
 {
-	// for iteration u beed:
+	auto& layer = getLayer(handler);
 
-	// for each layer 
-		// get entities that listen on event
-			// dispatch to entities
-
-	auto iter = m_entityLayerMap.find(id);
-	if (iter == m_entityLayerMap.end())
+	if (!layer)
 	{
-		logWarning("Could not locate layer for the specified entity, did you forget to register entity to layer?");
+		logError("Could not locate layer for the specified handler: " + std::to_string(handler));
 		return;
 	}
 
-	iter->second->subscribe(eventType, callback);
+	layer->subscribe(eventType, callback);
 }
 
-void EventSystem::registerToLayer(entity_id id, std::shared_ptr<EventLayer> layer)
+EventSystem::handlerID EventSystem::bindToLayer(const std::string& layerName)
 {
-	assert(layer);
+	std::shared_ptr<EventLayer> layer = getLayer(layerName);
 
-	m_entityLayerMap[id] = layer;
+	if (layer)
+	{
+		++s_currentSubscriber;
+		m_handlerLayerMap[s_currentSubscriber] = layerName;
+		return s_currentSubscriber;
+	}
+
+	logWarning("Invalid layer: " + layerName);
+
+	return 0;
 }
 
 //uint64_t EventSystem::subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback)
@@ -71,6 +75,7 @@ void EventSystem::dispatch(SDL_Event e)
 		{
 			break; // Event was consumed
 		}
+		iter++;
 	}
 
 	//auto& listeners = m_listeners[static_cast<SDL_EventType>(e.type)];
@@ -96,4 +101,28 @@ void EventSystem::pushLayer(std::shared_ptr<EventLayer> layer)
 
 void EventSystem::popLayer()
 {
+}
+
+std::shared_ptr<EventLayer> EventSystem::getLayer(const std::string& layerName)
+{
+	for (auto& layer : m_layers)
+	{
+		if (layer->name == layerName)
+		{
+			return layer;
+		}
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<EventLayer> EventSystem::getLayer(handlerID handler)
+{
+	auto iter = m_handlerLayerMap.find(handler);
+	if (iter != m_handlerLayerMap.end())
+	{
+		return getLayer(iter->second);
+	}
+
+	return nullptr;
 }
