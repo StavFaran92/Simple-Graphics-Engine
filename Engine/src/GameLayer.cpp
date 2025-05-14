@@ -5,18 +5,21 @@
 
 GameLayer::GameLayer()
 {
-    m_eventSystem = std::make_shared<EventSystem>();
 }
 
 bool GameLayer::handleEvent(SDL_Event e)
 {
-    m_eventSystem->dispatch(e);
+    auto iter = m_listeners.find((SDL_EventType)e.type);
+    for (auto& c : iter->second)
+    {
+        c(e);
+    }
 
     return false;
 }
 
-std::shared_ptr<EventSystem> GameLayer::getEventSystem() const
+void GameLayer::subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback)
 {
-    return m_eventSystem;
+    m_listeners[eventType].push_back(callback);
 }
 

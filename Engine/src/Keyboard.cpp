@@ -27,7 +27,7 @@ void Keyboard::onKeyPressed(SDL_Scancode code, std::function<void(SDL_Event e)> 
 		return;
 	}
 
-	Engine::get()->getEventSystem()->addEventListener(SDL_EventType::SDL_KEYDOWN, [=](SDL_Event e)
+	Engine::get()->getEventSystem()->subscribe(SDL_EventType::SDL_KEYDOWN, [=](SDL_Event e)
 	{
 		if (e.key.keysym.scancode == code)
 		{
@@ -44,7 +44,7 @@ void Keyboard::onKeyReleased(SDL_Scancode code, std::function<void(SDL_Event e)>
 		return;
 	}
 
-	Engine::get()->getEventSystem()->addEventListener(SDL_EventType::SDL_KEYUP, [=](SDL_Event e)
+	Engine::get()->getEventSystem()->subscribe(SDL_EventType::SDL_KEYUP, [=](SDL_Event e)
 	{
 		if (e.key.keysym.scancode == code)
 		{

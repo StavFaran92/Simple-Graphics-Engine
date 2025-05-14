@@ -14,7 +14,7 @@ void CameraControllerFreeLook::onCreate(Entity& e, std::shared_ptr<EventSystem> 
 	m_cameraComponent = &e.getComponent<CameraComponent>();
 	m_cameraTransform = &e.getComponent<Transformation>();
 
-	eventsystem->addEventListener(SDL_MOUSEMOTION, [this](SDL_Event e)
+	eventsystem->subscribe (SDL_MOUSEMOTION, [this](SDL_Event e)
 		{
 			auto system = Engine::get()->getSubSystem<System>();
 
@@ -65,8 +65,8 @@ void CameraControllerFreeLook::onCreate(Entity& e, std::shared_ptr<EventSystem> 
 				m_cameraTransform->translate(m_cameraComponent->right * xVelocity);
 				m_cameraTransform->translate(-m_cameraComponent->up * yVelocity);
 			}
-		});
-	eventsystem->addEventListener(SDL_MOUSEBUTTONDOWN, [this](SDL_Event e){
+		}, );
+	eventsystem->subscribe(SDL_MOUSEBUTTONDOWN, [this](SDL_Event e){
 		if (e.button.button == SDL_BUTTON_RIGHT)
 		{
 			if (m_state == ControllerState::IDLE)
@@ -83,13 +83,13 @@ void CameraControllerFreeLook::onCreate(Entity& e, std::shared_ptr<EventSystem> 
 			}
 		}
 	});
-	eventsystem->addEventListener(SDL_MOUSEBUTTONUP, [this](SDL_Event e){
+	eventsystem->subscribe(SDL_MOUSEBUTTONUP, [this](SDL_Event e){
 		if (e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_MIDDLE)
 		{
 			m_state = ControllerState::IDLE;
 		}
 	});
-	eventsystem->addEventListener(SDL_MOUSEWHEEL, [this](SDL_Event e){
+	eventsystem->subscribe(SDL_MOUSEWHEEL, [this](SDL_Event e){
 		m_cameraTransform->translate(m_cameraComponent->front * (float)e.wheel.y);
 	});
 

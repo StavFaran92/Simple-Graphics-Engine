@@ -1,34 +1,61 @@
 #include "EventSystem.h"
 
-uint64_t EventSystem::addEventListener(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback)
+#include "Logger.h"
+
+void EventSystem::subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback, entity_id id)
 {
-	if (m_listeners.find(eventType) == m_listeners.end())
+	// for iteration u beed:
+
+	// for each layer 
+		// get entities that listen on event
+			// dispatch to entities
+
+	auto iter = m_entityLayerMap.find(id);
+	if (iter == m_entityLayerMap.end())
 	{
-		m_listeners[eventType] = {};
+		logWarning("Could not locate layer for the specified entity, did you forget to register entity to layer?");
+		return;
 	}
 
-	uint64_t listenterID = ++s_listeners;
-
-	m_listeners[eventType].insert(listenterID);
-
-	m_callbacks[listenterID] = { true, callback };
-
-	return listenterID;
+	iter->second->subscribe(eventType, callback);
 }
 
-void EventSystem::addEventListener(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback, std::shared_ptr<Handler>& handler)
+void EventSystem::registerToLayer(entity_id id, std::shared_ptr<EventLayer> layer)
 {
-	addEventListener(eventType, callback);
+	assert(layer);
+
+	m_entityLayerMap[id] = layer;
 }
 
-void EventSystem::removeEventListener(uint64_t listenerID)
-{
-	auto iter = m_callbacks.find(listenerID);
-	if (iter == m_callbacks.end()) 
-		return;
+//uint64_t EventSystem::subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback)
+//{
+//	if (m_listeners.find(eventType) == m_listeners.end())
+//	{
+//		m_listeners[eventType] = {};
+//	}
+//
+//	uint64_t listenterID = ++s_listeners;
+//
+//	m_listeners[eventType].insert(listenterID);
+//
+//	m_callbacks[listenterID] = { true, callback };
+//
+//	return listenterID;
+//}
 
-	iter->second.isValid = false;
-}
+//void EventSystem::subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback, std::shared_ptr<Handler>& handler)
+//{
+//	subscribe(eventType, callback);
+//}
+//
+//void EventSystem::removeEventListener(uint64_t listenerID)
+//{
+//	auto iter = m_callbacks.find(listenerID);
+//	if (iter == m_callbacks.end()) 
+//		return;
+//
+//	iter->second.isValid = false;
+//}
 
 void EventSystem::pushEvent(SDL_Event e)
 {
@@ -37,18 +64,36 @@ void EventSystem::pushEvent(SDL_Event e)
 
 void EventSystem::dispatch(SDL_Event e)
 {
-	auto& listeners = m_listeners[static_cast<SDL_EventType>(e.type)];
-	auto iter = listeners.begin();
-	while (iter != listeners.end())
+	auto iter = m_layers.rbegin();
+	while(iter != m_layers.rend())
 	{
-		auto& cb = m_callbacks[*iter];
-		if (!cb.isValid)
+		if ((*iter)->handleEvent(e))
 		{
-			iter = listeners.erase(iter);
-			continue;
+			break; // Event was consumed
 		}
-
-		cb.func(e);
-		iter++;
 	}
+
+	//auto& listeners = m_listeners[static_cast<SDL_EventType>(e.type)];
+	//auto iter = listeners.begin();
+	//while (iter != listeners.end())
+	//{
+	//	auto& cb = m_callbacks[*iter];
+	//	if (!cb.isValid)
+	//	{
+	//		iter = listeners.erase(iter);
+	//		continue;
+	//	}
+
+	//	cb.func(e);
+	//	iter++;
+	//}
+}
+
+void EventSystem::pushLayer(std::shared_ptr<EventLayer> layer)
+{
+	m_layers.push_back(layer);
+}
+
+void EventSystem::popLayer()
+{
 }

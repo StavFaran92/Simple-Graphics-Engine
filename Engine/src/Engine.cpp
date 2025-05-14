@@ -476,13 +476,7 @@ void Engine::handleEvents(bool& quit)
 
     while (SDL_PollEvent(&e) != 0)
     {
-        for (auto& eventLayer : *m_eventLayerStack) 
-        {
-            if (eventLayer->handleEvent(e)) 
-            {
-                break; // Event was consumed
-            }
-        }
+
 
 
         //m_imguiHandler->proccessEvents(e);
@@ -494,7 +488,7 @@ void Engine::handleEvents(bool& quit)
         }
 
 
-        //m_eventSystem->dispatch(e);
+        m_eventSystem->dispatch(e);
     }
 }
 

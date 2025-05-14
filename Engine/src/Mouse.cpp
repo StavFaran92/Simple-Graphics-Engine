@@ -55,7 +55,7 @@ bool Mouse::getButtonPressed(MouseButton button)
 
 void Mouse::onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback, std::shared_ptr<EventSystem> eventSystem) const
 {
-	eventSystem->addEventListener(SDL_EventType::SDL_MOUSEBUTTONDOWN, [=](SDL_Event e)
+	eventSystem->subscribe(SDL_EventType::SDL_MOUSEBUTTONDOWN, [=](SDL_Event e)
 	{
 		if (e.button.button == mouseButtonToSDLCode(code))
 		{
@@ -66,7 +66,7 @@ void Mouse::onMousePressed(MouseButton code, std::function<void(SDL_Event e)> ca
 
 void Mouse::onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback, std::shared_ptr<EventSystem> eventSystem) const
 {
-	eventSystem->addEventListener(SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
+	eventSystem->subscribe(SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
 	{
 		if (e.button.button == mouseButtonToSDLCode(code))
 		{

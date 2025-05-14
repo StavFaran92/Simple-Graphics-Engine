@@ -21,7 +21,7 @@ FlyCamera::FlyCamera(Entity camera, float yaw, float pitch, float moveSpeed, flo
 
 	//auto eventSystem = Engine::get()->getEventSystem();
 
-	//eventSystem->addEventListener(SDL_MOUSEMOTION, [this](SDL_Event e) {
+	//eventSystem->subscribe(SDL_MOUSEMOTION, [this](SDL_Event e) {
 	//	OnMouseMotion(e.motion.xrel, e.motion.yrel);
 	//});
 }

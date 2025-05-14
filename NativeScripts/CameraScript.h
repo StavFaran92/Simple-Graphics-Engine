@@ -15,7 +15,7 @@ class CameraScript : public ScriptableEntity
 
 		m_camera = entity;
 
-		m_handler = eventSystem->addEventListener(SDL_MOUSEMOTION, [this](SDL_Event e) {
+		m_handler = eventSystem->subscribe(SDL_MOUSEMOTION, [this](SDL_Event e) {
 			OnMouseMotion(e.motion.xrel, e.motion.yrel);
 			});
 	}

@@ -1,20 +1,19 @@
 #pragma once
 
-#include <unordered_set>
+#include <vector>
 #include <memory>
 
 #include "EventLayer.h"
-#include "EventSystem.h"
-
-class ScriptableEntity;
 
 class GameLayer : public EventLayer
 {
 public:
 	GameLayer();
 	bool handleEvent(SDL_Event event) override;
-	std::shared_ptr<EventSystem> getEventSystem() const;
 
 private:
-	std::shared_ptr<EventSystem> m_eventSystem;
+	std::unordered_map<SDL_EventType, std::vector<std::function<void(SDL_Event e)>>> m_listeners;
+
+	// Inherited via EventLayer
+	void subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback) override;
 };

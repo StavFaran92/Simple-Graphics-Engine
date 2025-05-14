@@ -9,41 +9,42 @@
 
 #include "Core.h"
 
+#include "EventLayer.h"
+
+#include "Entity.h"
+
 class EngineAPI EventSystem
 {
 public:
-	class Handler
-	{
-		Handler(EventSystem* eSystem, uint64_t listenerID) : m_eventSystem(eSystem), m_listenerID(listenerID) {}
-
-		~Handler()
-		{
-			m_eventSystem->removeEventListener(m_listenerID);
-		}
-
-	private:
-		EventSystem* m_eventSystem;
-		const uint64_t m_listenerID;
-	};
-
 	struct Callback
 	{
 		bool isValid = true;
 		std::function<void(SDL_Event e)> func;
 	};
 
-	uint64_t addEventListener(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback);
-	void addEventListener(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback, std::shared_ptr<Handler>& handler);
-	void removeEventListener(uint64_t listenerID);
+	void subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback, entity_id id);
+	void registerToLayer(entity_id id, std::shared_ptr<EventLayer> layer);
+	//uint64_t subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback);
+	//void subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback, std::shared_ptr<Handler>& handler);
+	//void removeEventListener(uint64_t listenerID);
 	void pushEvent(SDL_Event e);
 	void dispatch(SDL_Event e);
+	void pushLayer(std::shared_ptr<EventLayer> layer);
+	void popLayer();
+
 private:
 	friend class Engine;
 	
 private:
-	std::unordered_map<SDL_EventType, std::unordered_set<uint64_t>> m_listeners;
+	//std::unordered_map<SDL_EventType, std::unordered_set<uint64_t>> m_listeners;
 
-	std::unordered_map < uint64_t, Callback > m_callbacks;
+	//std::unordered_map < uint64_t, Callback > m_callbacks;
 
-	inline static uint64_t s_listeners = 0;
+	//inline static uint64_t s_listeners = 0;
+
+	std::unordered_map<entity_id, bool> m_isHandled;
+
+	std::vector<std::shared_ptr<EventLayer>> m_layers;
+
+	std::unordered_map<entity_id, std::shared_ptr<EventLayer>> m_entityLayerMap;
 };
