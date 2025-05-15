@@ -677,7 +677,7 @@ void Scene::stopSimulation()
 	for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())
 	{
 		nsc.script->onDestroy();
-		//gameEventLayer->unsubscribe(nsc.script); // TODO fix
+		//gameEventLayer->unsubscribe(nsc.script); // TODO fix, ican simply remove the layer instead of all the scripts from the layer
 	}
 
 	getRegistry().getRegistry().clear();

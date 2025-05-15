@@ -15,10 +15,9 @@
 class EngineAPI EventSystem
 {
 public:
-	using handlerID = uint64_t;
-
-	void subscribe(handlerID handler, SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback);
-	handlerID bindToLayer(const std::string& layerName);
+	void subscribe(EventHandler handler, SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback);
+	void unsubscribe(EventHandler handler, SDL_EventType eventType);
+	EventHandler bindToLayer(const std::string& layerName);
 	void pushEvent(SDL_Event e);
 	void dispatch(SDL_Event e);
 	void pushLayer(std::shared_ptr<EventLayer> layer);
@@ -28,12 +27,12 @@ private:
 	friend class Engine;
 
 	std::shared_ptr<EventLayer> getLayer(const std::string& layerName);
-	std::shared_ptr<EventLayer> getLayer(handlerID handler);
+	std::shared_ptr<EventLayer> getLayer(EventHandler handler);
 	
 private:
 	inline static uint64_t s_currentSubscriber = 0;
 
 	std::vector<std::shared_ptr<EventLayer>> m_layers;
 
-	std::unordered_map<handlerID, std::string> m_handlerLayerMap;
+	std::unordered_map<EventHandler, std::string> m_handlerLayerMap;
 };

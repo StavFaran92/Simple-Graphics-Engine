@@ -3,6 +3,17 @@
 #include "SDL.h"
 #include <functional>
 #include <string>
+#include <cstdint>
+
+using EventHandler = uint64_t;
+
+struct EventCallback
+{
+	EventCallback(EventHandler handler, std::function<void(SDL_Event e)> func) : handler(handler), func(func) {};
+
+	std::function<void(SDL_Event e)> func;
+	EventHandler handler;
+};
 
 class EventLayer
 {
@@ -14,7 +25,9 @@ public:
 
 	virtual bool handleEvent(SDL_Event e) = 0;
 
-	virtual void subscribe(SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback) = 0;
+	virtual void subscribe(SDL_EventType eventType, const EventCallback& callback) = 0;
+
+	virtual void unsubscribe(EventHandler handler, SDL_EventType eventType) = 0;
 
 	std::string name;
 };

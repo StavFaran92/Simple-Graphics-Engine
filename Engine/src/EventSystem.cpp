@@ -2,7 +2,7 @@
 
 #include "Logger.h"
 
-void EventSystem::subscribe(EventSystem::handlerID handler, SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback)
+void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback)
 {
 	auto& layer = getLayer(handler);
 
@@ -12,10 +12,23 @@ void EventSystem::subscribe(EventSystem::handlerID handler, SDL_EventType eventT
 		return;
 	}
 
-	layer->subscribe(eventType, callback);
+	layer->subscribe(eventType, EventCallback(handler, callback));
 }
 
-EventSystem::handlerID EventSystem::bindToLayer(const std::string& layerName)
+void EventSystem::unsubscribe(EventHandler handler, SDL_EventType eventType)
+{
+	auto& layer = getLayer(handler);
+
+	if (!layer)
+	{
+		logError("Could not locate layer for the specified handler: " + std::to_string(handler));
+		return;
+	}
+
+	layer->unsubscribe(handler, eventType);
+}
+
+EventHandler EventSystem::bindToLayer(const std::string& layerName)
 {
 	std::shared_ptr<EventLayer> layer = getLayer(layerName);
 
@@ -116,7 +129,7 @@ std::shared_ptr<EventLayer> EventSystem::getLayer(const std::string& layerName)
 	return nullptr;
 }
 
-std::shared_ptr<EventLayer> EventSystem::getLayer(handlerID handler)
+std::shared_ptr<EventLayer> EventSystem::getLayer(EventHandler handler)
 {
 	auto iter = m_handlerLayerMap.find(handler);
 	if (iter != m_handlerLayerMap.end())
