@@ -113,6 +113,12 @@ void Scene::setPrimaryCamera(Entity e)
 	m_renderViews[0]->setCamera(e);
 }
 
+void Scene::bindScriptToLayer(entt::registry& reg, entt::entity entity) 
+{
+	auto& script = reg.get<ScriptableEntity>(entity);
+	script.eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
+};
+
 void Scene::init(Context* context)
 {
 	m_context = context;
@@ -123,6 +129,7 @@ void Scene::init(Context* context)
 	auto height = Engine::get()->getWindow()->getHeight();
 
 	gameEventLayer = std::make_shared<GameLayer>();
+	gameEventLayer->setEnabled(false);
 	Engine::get()->getEventSystem()->pushLayer(gameEventLayer);
 
 	m_deferredRenderer = std::make_shared<DeferredRenderer>(this);
@@ -193,6 +200,8 @@ void Scene::init(Context* context)
 	m_basicBox = ShapeFactory::createBox();
 
 	addRenderView(0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
+
+	m_registry->getRegistry().on_construct<ScriptableEntity>().connect<&Scene::bindScriptToLayer>(this);
 }
 
 void Scene::update(float deltaTime)
@@ -659,8 +668,10 @@ void Scene::startSimulation()
 		nsc.script->entity = Entity(entity, &getRegistry());
 		nsc.script->onCreate();
 
-		nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
+		//nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
 	}
+
+	gameEventLayer->setEnabled(true);
 
 	m_isSimulationActive = true;
 }
@@ -684,6 +695,7 @@ void Scene::stopSimulation()
 
 	Archiver::deserializeScene(m_serializedScene, *this);
 
+	gameEventLayer->setEnabled(false);
 
 	m_isSimulationActive = false;
 }

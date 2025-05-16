@@ -16,7 +16,7 @@ void CameraControllerFreeLook::onCreate(Entity& e)
 
 	auto eventSystem = Engine::get()->getEventSystem();
 
-	m_handlerID = eventSystem->bindToLayer("GameLayer"); // TODO fix
+	m_handlerID = e.getComponent<NativeScriptComponent>().script->eventHandler; // TODO fix
 
 	eventSystem->subscribe(m_handlerID, SDL_MOUSEMOTION, [this](SDL_Event e)
 		{

@@ -1,11 +1,10 @@
-#include "GameLayer.h"
+#include "UIEventLayer.h"
 
-#include "ScriptableEntity.h"
-#include "Engine.h"
+#include "imgui.h"
 
-bool GameLayer::handleEvent(SDL_Event e)
+bool UIEventLayer::handleEvent(SDL_Event e)
 {
-    if (!m_isEnabled) 
+    if (!m_isEnabled)
         return false;
 
     auto iter = m_listeners.find((SDL_EventType)e.type);
@@ -17,21 +16,22 @@ bool GameLayer::handleEvent(SDL_Event e)
         }
     }
 
-    return false;
+    auto& io = ImGui::GetIO();
+    return (io.WantCaptureMouse || io.WantCaptureKeyboard);
 }
 
-void GameLayer::subscribe(SDL_EventType eventType, const EventCallback& callback)
+void UIEventLayer::subscribe(SDL_EventType eventType, const EventCallback& callback)
 {
     m_listeners[eventType].push_back(callback);
 }
 
-void GameLayer::unsubscribe(EventHandler handler, SDL_EventType eventType)
+void UIEventLayer::unsubscribe(EventHandler handler, SDL_EventType eventType)
 {
     auto iter = m_listeners.find(eventType);
     if (iter != m_listeners.end())
     {
         std::vector<EventCallback>& eventSubscribers = iter->second;
-        for (int i=0; i<eventSubscribers.size(); i++)
+        for (int i = 0; i < eventSubscribers.size(); i++)
         {
             if (eventSubscribers[i].handler == handler)
             {
@@ -41,4 +41,3 @@ void GameLayer::unsubscribe(EventHandler handler, SDL_EventType eventType)
         }
     }
 }
-

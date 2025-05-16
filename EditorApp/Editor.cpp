@@ -14,6 +14,7 @@
 #include "tinyfiledialogs.h"
 
 #include "NativeScriptsLoader.h"
+#include "UIEventLayer.h"
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 
@@ -2401,6 +2402,9 @@ public:
 
 		NativeScriptsLoader::instance->init();
 
+		std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
+		Engine::get()->getEventSystem()->pushLayer(uiLayer);
+
 		auto scene = Engine::get()->getContext()->getActiveScene();
 
 		// store Default scene camera
@@ -2410,7 +2414,11 @@ public:
 		auto editorCamera = m_editorRegistry->createEntity("Editor Camera");
 		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
 		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
+		auto& nsc = editorCamera.getComponent<NativeScriptComponent>();
+		nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
+
+		nsc.script->onCreate();
 
 		g_editorCamera = editorCamera;
 
@@ -2426,6 +2434,10 @@ public:
 
 		auto gui = new GUI_Helper();
 		Engine::get()->getImguiHandler()->addGUI(gui);
+
+		
+
+		
 
 		Texture::TextureImportSettings settings;
 		settings.saveOnDisk = false;

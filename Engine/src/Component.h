@@ -93,7 +93,7 @@ struct EngineAPI NativeScriptComponent : public Component
 
 		script = std::make_shared< T>(std::forward<Args>(args)...);
 		script->entity = entity;
-		script->onCreate();
+		//script->onCreate();
 
 		return static_cast<T*>(script.get());
 	}

@@ -4,6 +4,7 @@
 
 class UIEventLayer : public EventLayer
 {
+public:
 	UIEventLayer() : EventLayer("UILayer")
 	{
 	}
@@ -15,4 +16,7 @@ class UIEventLayer : public EventLayer
 
 	// Inherited via EventLayer
 	void unsubscribe(EventHandler handler, SDL_EventType eventType) override;
+
+private:
+	std::unordered_map<SDL_EventType, std::vector<EventCallback>> m_listeners;
 };

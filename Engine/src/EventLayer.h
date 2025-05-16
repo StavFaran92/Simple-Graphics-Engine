@@ -29,5 +29,18 @@ public:
 
 	virtual void unsubscribe(EventHandler handler, SDL_EventType eventType) = 0;
 
+	void setEnabled(bool enabled)
+	{
+		m_isEnabled = enabled;
+	}
+
+	bool isEnabled() const
+	{
+		return m_isEnabled;
+	}
+
 	std::string name;
+
+protected:
+	bool m_isEnabled = true;
 };

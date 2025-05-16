@@ -135,6 +135,8 @@ private:
 	void clear();
 	void close();
 
+	void bindScriptToLayer(entt::registry& reg, entt::entity entity);
+
 private:
 	// -------------------- Attributes -------------------- //
 	uint32_t m_id = 0;
