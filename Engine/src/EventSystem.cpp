@@ -2,7 +2,7 @@
 
 #include "Logger.h"
 
-void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback)
+void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Subscriber* s)
 {
 	auto& layer = getLayer(handler);
 
@@ -12,10 +12,10 @@ void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, const
 		return;
 	}
 
-	layer->subscribe(eventType, EventCallback(handler, callback));
+	layer->subscribe(eventType, s);
 }
 
-void EventSystem::unsubscribe(EventHandler handler, SDL_EventType eventType)
+void EventSystem::unsubscribe(EventHandler handler, SDL_EventType eventType, Subscriber* s)
 {
 	auto& layer = getLayer(handler);
 
@@ -25,7 +25,7 @@ void EventSystem::unsubscribe(EventHandler handler, SDL_EventType eventType)
 		return;
 	}
 
-	layer->unsubscribe(handler, eventType);
+	layer->unsubscribe(eventType, s);
 }
 
 EventHandler EventSystem::bindToLayer(const std::string& layerName)

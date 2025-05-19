@@ -5,6 +5,8 @@
 #include <string>
 #include <cstdint>
 
+#include "Subscriber.h"
+
 using EventHandler = uint64_t;
 
 struct EventCallback
@@ -25,9 +27,9 @@ public:
 
 	virtual bool handleEvent(SDL_Event e) = 0;
 
-	virtual void subscribe(SDL_EventType eventType, const EventCallback& callback) = 0;
+	virtual void subscribe(SDL_EventType eventType, Subscriber* s) = 0;
 
-	virtual void unsubscribe(EventHandler handler, SDL_EventType eventType) = 0;
+	virtual void unsubscribe(SDL_EventType eventType, Subscriber* s) = 0;
 
 	void setEnabled(bool enabled)
 	{

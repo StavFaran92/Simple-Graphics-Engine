@@ -29,13 +29,13 @@ void Keyboard::onKeyPressed(SDL_Scancode code, std::function<void(SDL_Event e)> 
 		return;
 	}
 
-	Engine::get()->getEventSystem()->subscribe(m_eventHandler, SDL_EventType::SDL_KEYDOWN, [=](SDL_Event e)
-	{
-		if (e.key.keysym.scancode == code)
-		{
-			callback(e);
-		}
-	});
+	//Engine::get()->getEventSystem()->subscribe(m_eventHandler, SDL_EventType::SDL_KEYDOWN, [=](SDL_Event e)
+	//{
+	//	if (e.key.keysym.scancode == code)
+	//	{
+	//		callback(e);
+	//	}
+	//});
 }
 
 void Keyboard::onKeyReleased(SDL_Scancode code, std::function<void(SDL_Event e)> callback) const
@@ -46,11 +46,11 @@ void Keyboard::onKeyReleased(SDL_Scancode code, std::function<void(SDL_Event e)>
 		return;
 	}
 
-	Engine::get()->getEventSystem()->subscribe(m_eventHandler, SDL_EventType::SDL_KEYUP, [=](SDL_Event e)
-	{
-		if (e.key.keysym.scancode == code)
-		{
-			callback(e);
-		}
-	});
+	//Engine::get()->getEventSystem()->subscribe(m_eventHandler, SDL_EventType::SDL_KEYUP, [=](SDL_Event e)
+	//{
+	//	if (e.key.keysym.scancode == code)
+	//	{
+	//		callback(e);
+	//	}
+	//});
 }

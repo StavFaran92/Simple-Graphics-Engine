@@ -24,6 +24,7 @@ public:
 
 	void onCreate() override;
 	void onUpdate(float deltaTime) override;
+	void onEvent(SDL_Event e) override;
 private:
 	bool m_isLocked = true;
 
@@ -32,6 +33,8 @@ private:
 	std::shared_ptr<ICameraController> m_cameraController;
 
 	CameraComponent* m_cameraComponent = nullptr;
+
+	uint64_t m_eventHandler;
 
 };
 

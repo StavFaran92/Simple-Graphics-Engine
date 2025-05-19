@@ -10,9 +10,9 @@ bool UIEventLayer::handleEvent(SDL_Event e)
     auto iter = m_listeners.find((SDL_EventType)e.type);
     if (iter != m_listeners.end())
     {
-        for (auto& ec : iter->second)
+        for (auto& s : iter->second)
         {
-            ec.func(e);
+            s->onEvent(e);
         }
     }
 
@@ -20,20 +20,20 @@ bool UIEventLayer::handleEvent(SDL_Event e)
     return (io.WantCaptureMouse || io.WantCaptureKeyboard);
 }
 
-void UIEventLayer::subscribe(SDL_EventType eventType, const EventCallback& callback)
+void UIEventLayer::subscribe(SDL_EventType eventType, Subscriber* s)
 {
-    m_listeners[eventType].push_back(callback);
+    m_listeners[eventType].push_back(s);
 }
 
-void UIEventLayer::unsubscribe(EventHandler handler, SDL_EventType eventType)
+void UIEventLayer::unsubscribe(SDL_EventType eventType, Subscriber* s)
 {
     auto iter = m_listeners.find(eventType);
     if (iter != m_listeners.end())
     {
-        std::vector<EventCallback>& eventSubscribers = iter->second;
+        std::vector<Subscriber*>& eventSubscribers = iter->second;
         for (int i = 0; i < eventSubscribers.size(); i++)
         {
-            if (eventSubscribers[i].handler == handler)
+            if (eventSubscribers[i] == s)
             {
                 eventSubscribers.erase(eventSubscribers.begin() + i);
                 return;

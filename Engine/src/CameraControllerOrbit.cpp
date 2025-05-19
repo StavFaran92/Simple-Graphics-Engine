@@ -25,39 +25,40 @@ void CameraControllerOrbit::onCreate(Entity& e)
 {
 	m_cameraComponent = &e.getComponent<CameraComponent>();
 	m_cameraTransform = &e.getComponent<Transformation>();
+}
 
-	auto eventSystem = Engine::get()->getEventSystem();
+void CameraControllerOrbit::onEvent(SDL_Event e)
+{
+	if (e.type == SDL_MOUSEMOTION)
+	{
+		int xChange = e.motion.xrel;
+		int yChange = e.motion.yrel;
+		if (m_state == ControllerState::ROTATE)
+		{
+			m_angleX += xChange * m_turnSpeed;
+			m_angleY += yChange * m_turnSpeed;
 
-	m_eventHandler = eventSystem->bindToLayer("GameLayer"); // TODO fix
-
-	eventSystem->subscribe(m_eventHandler, SDL_MOUSEMOTION, [this](SDL_Event e)
+			m_angleY = std::clamp(m_angleY, -89.f, 89.f);
+		}
+		else if (m_state == ControllerState::TRANSFORM)
 		{
 			int xChange = e.motion.xrel;
 			int yChange = e.motion.yrel;
-			if (m_state == ControllerState::ROTATE)
-			{
-				m_angleX += xChange * m_turnSpeed;
-				m_angleY += yChange * m_turnSpeed;
 
-				m_angleY = std::clamp(m_angleY, -89.f, 89.f);
-			}
-			else if (m_state == ControllerState::TRANSFORM)
-			{
-				int xChange = e.motion.xrel;
-				int yChange = e.motion.yrel;
+			xChange *= m_movementSpeed;
+			yChange *= m_movementSpeed;
 
-				xChange *= m_movementSpeed;
-				yChange *= m_movementSpeed;
-
-				float xVelocity = .1f * xChange;// *deltaTime // todo fix
-				float yVelocity = .1f * yChange;// *deltaTime
+			float xVelocity = .1f * xChange;// *deltaTime // todo fix
+			float yVelocity = .1f * yChange;// *deltaTime
 
 
-				m_cameraComponent->center += m_right * xVelocity;
-				m_cameraComponent->center -= m_cameraComponent->up * yVelocity;
-			}
-		});
-	eventSystem->subscribe(m_eventHandler, SDL_MOUSEBUTTONDOWN, [this](SDL_Event e) {
+			m_cameraComponent->center += m_right * xVelocity;
+			m_cameraComponent->center -= m_cameraComponent->up * yVelocity;
+		}
+	}
+	else if (e.type == SDL_MOUSEBUTTONDOWN)
+	{
+
 		if (e.button.button == SDL_BUTTON_RIGHT)
 		{
 			if (m_state == ControllerState::IDLE)
@@ -73,15 +74,17 @@ void CameraControllerOrbit::onCreate(Entity& e)
 				m_state = ControllerState::TRANSFORM;
 			}
 		}
-		});
-	eventSystem->subscribe(m_eventHandler, SDL_MOUSEBUTTONUP, [this](SDL_Event e) {
+	}
+	else if (e.type == SDL_MOUSEBUTTONUP)
+	{
 		if (e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_MIDDLE)
 		{
 			m_state = ControllerState::IDLE;
 		}
-		});
-	eventSystem->subscribe(m_eventHandler, SDL_MOUSEWHEEL, [this](SDL_Event e)
-		{
-			m_distance = std::clamp(m_distance - e.wheel.y, 1.f, 50.f);
-		});
+	}
+	else if (e.type == SDL_MOUSEWHEEL)
+	{
+		m_distance = std::clamp(m_distance - e.wheel.y, 1.f, 50.f);
+	}
+
 }

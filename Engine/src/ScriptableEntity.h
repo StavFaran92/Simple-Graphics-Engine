@@ -5,6 +5,7 @@
 #include "Entity.h"
 
 #include "SDL.h"
+#include "Subscriber.h"
 
 struct NativeScriptComponent;
 class Scene;
@@ -12,7 +13,7 @@ class SceneSerializer;
 class EditorApp;
 class Sandbox; // TODO fix this hack!
 
-class EngineAPI ScriptableEntity
+class EngineAPI ScriptableEntity : public Subscriber
 {
 public:
 	ScriptableEntity() = default;

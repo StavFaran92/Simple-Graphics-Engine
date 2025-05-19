@@ -4,11 +4,13 @@
 
 #include "ICameraController.h"
 #include "Component.h"
+#include "Subscriber.h"
 
 class CameraControllerOrbit : public ICameraController
 {
 public:
 	void onCreate(Entity& e) override;
+	void onEvent(SDL_Event e) override;
 
 private:
 	enum class ControllerState
@@ -31,6 +33,4 @@ private:
 
 	CameraComponent* m_cameraComponent = nullptr;
 	Transformation* m_cameraTransform = nullptr;
-
-	uint64_t m_eventHandler;
 };

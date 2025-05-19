@@ -15,9 +15,9 @@ class CameraScript : public ScriptableEntity
 
 		m_camera = entity;
 
-		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, [this](SDL_Event e) {
-			OnMouseMotion(e.motion.xrel, e.motion.yrel);
-			});
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, [this](SDL_Event e) {
+		//	OnMouseMotion(e.motion.xrel, e.motion.yrel);
+		//	});
 	}
 
 	virtual void onDestroy() override

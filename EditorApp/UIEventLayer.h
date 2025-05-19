@@ -12,11 +12,11 @@ public:
 	bool handleEvent(SDL_Event e) override;
 
 	// Inherited via EventLayer
-	void subscribe(SDL_EventType eventType, const EventCallback& callback) override;
+	void subscribe(SDL_EventType eventType, Subscriber* s) override;
 
 	// Inherited via EventLayer
-	void unsubscribe(EventHandler handler, SDL_EventType eventType) override;
+	void unsubscribe(SDL_EventType eventType, Subscriber* s) override;
 
 private:
-	std::unordered_map<SDL_EventType, std::vector<EventCallback>> m_listeners;
+	std::unordered_map<SDL_EventType, std::vector<Subscriber*>> m_listeners;
 };

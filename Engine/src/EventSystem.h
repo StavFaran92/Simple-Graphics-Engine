@@ -15,8 +15,8 @@
 class EngineAPI EventSystem
 {
 public:
-	void subscribe(EventHandler handler, SDL_EventType eventType, const std::function<void(SDL_Event e)>& callback);
-	void unsubscribe(EventHandler handler, SDL_EventType eventType);
+	void subscribe(EventHandler handler, SDL_EventType eventType, Subscriber* s);
+	void unsubscribe(EventHandler handler, SDL_EventType eventType, Subscriber* s);
 	EventHandler bindToLayer(const std::string& layerName);
 	void pushEvent(SDL_Event e);
 	void dispatch(SDL_Event e);

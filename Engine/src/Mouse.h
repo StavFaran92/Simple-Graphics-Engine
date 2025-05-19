@@ -1,11 +1,12 @@
 #pragma once
 #include "Core.h"
 #include "SDL2/SDL.h"
+#include "Subscriber.h"
 
 #include <functional>
 
 
-class EngineAPI Mouse
+class EngineAPI Mouse : public Subscriber
 {
 public:
 	Mouse();
@@ -30,7 +31,7 @@ public:
 	void onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback) const;
 	void onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback) const;
 
-	void onEvent(SDL_Event e);
+	void onEvent(SDL_Event e) override;
 
 
 private:
