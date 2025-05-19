@@ -15,7 +15,6 @@
 
 #include "Component.h"
 #include "Transformation.h"
-#include "EditorCamera.h"
 #include "ScriptableEntity.h"
 #include "Material.h"
 #include "DirectionalLight.h"

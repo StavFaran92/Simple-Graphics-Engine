@@ -26,7 +26,6 @@
 #include "ShapeFactory.h"
 #include "Material.h"
 #include "DirectionalLight.h"
-#include "EditorCamera.h"
 #include "CommonShaders.h"
 #include "CommonTextures.h"
 #include "ObjectPicker.h"

@@ -18,7 +18,6 @@
 #include "Cubemap.h"
 #include "CacheSystem.h"
 
-#include "EditorCamera.h"
 #include "cube.h"
 #include "EquirectangularToCubemapConverter.h"
 #include "TextureTransformer.h"

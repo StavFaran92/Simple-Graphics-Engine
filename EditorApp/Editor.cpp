@@ -16,6 +16,9 @@
 #include "NativeScriptsLoader.h"
 #include "UIEventLayer.h"
 
+#include "EditorCamera.h"
+#include "EditorState.h"
+
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 
 static std::unordered_map<std::string, Resource<Texture>> icons;
@@ -1151,6 +1154,21 @@ void RenderViewWindow(float width, float height)
 	// Display the texture
 	ImVec2 imageSize(renderViewWindowSize.x, renderViewWindowSize.y);
 	ImGui::Image(reinterpret_cast<ImTextureID>(Engine::get()->getContext()->getActiveScene()->getRenderTargetTextureID(0)), imageSize, ImVec2(0, 1), ImVec2(1, 0));
+
+	ImVec2 mousePos = ImGui::GetMousePos();
+	ImVec2 windowPos = ImGui::GetWindowPos();
+	ImVec2 windowSize = ImGui::GetWindowSize();
+
+	// Check if the mouse is within the window bounds
+	if (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
+		mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y)
+	{
+		EditorState::Instance().isMouseInSceneView = true;
+	}
+	else
+	{
+		EditorState::Instance().isMouseInSceneView = false;
+	}
 
 	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive() && 
 		!ImGui::IsPopupOpen(1, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))

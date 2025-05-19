@@ -6,7 +6,6 @@
 #include "VertexArrayObject.h"
 #include "Shader.h"
 #include "ICamera.h"
-#include "EditorCamera.h"
 #include "SkyboxRenderer.h"
 #include "Logger.h"
 #include "Mesh.h"

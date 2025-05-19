@@ -8,6 +8,7 @@
 #include "Input.h"
 #include <algorithm>
 #include "glm/glm.hpp"
+#include "imgui.h"
 
 void CameraControllerFreeLook::onCreate(Entity& e)
 {
@@ -20,6 +21,7 @@ void CameraControllerFreeLook::onCreate(Entity& e)
 
 	eventSystem->subscribe(m_handlerID, SDL_MOUSEMOTION, [this](SDL_Event e)
 		{
+			//if(ImGui::IsMouseHoveringRect())
 			auto system = Engine::get()->getSubSystem<System>();
 
 			if (m_state == ControllerState::ROTATE)

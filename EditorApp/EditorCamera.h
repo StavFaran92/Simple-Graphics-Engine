@@ -10,7 +10,7 @@
 #include <cereal/cereal.hpp>
 
 
-class EngineAPI EditorCamera : public ScriptableEntity
+class EditorCamera : public ScriptableEntity
 {
 public:
 	enum class CameraState
@@ -20,6 +20,7 @@ public:
 	};
 public:
 	EditorCamera();
+	~EditorCamera() = default;
 
 	void onCreate() override;
 	void onUpdate(float deltaTime) override;

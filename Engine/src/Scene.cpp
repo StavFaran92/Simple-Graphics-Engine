@@ -26,7 +26,6 @@
 #include "ScriptableEntity.h"
 #include "PhysicsSystem.h"
 #include "Box.h"
-#include "EditorCamera.h"
 #include "ShadowSystem.h"
 #include "LightSystem.h"
 #include "Engine.h"

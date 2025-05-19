@@ -10,6 +10,8 @@
 #include "CameraControllerOrbit.h"
 #include "CameraControllerFreeLook.h"
 
+#include "EditorState.h"
+
 #include "Logger.h"
 
 EditorCamera::EditorCamera()

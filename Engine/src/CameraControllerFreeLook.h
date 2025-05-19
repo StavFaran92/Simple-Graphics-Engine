@@ -5,7 +5,7 @@
 #include "ICameraController.h"
 #include "Component.h"
 
-class CameraControllerFreeLook : public ICameraController
+class EngineAPI CameraControllerFreeLook : public ICameraController
 {
 public:
 	void onCreate(Entity& e) override;

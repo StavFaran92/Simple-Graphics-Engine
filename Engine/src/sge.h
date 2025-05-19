@@ -25,7 +25,6 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "ICamera.h"
-#include "EditorCamera.h"
 #include "Scene.h"
 #include "Skybox.h"
 #include "PostProcess.h"
