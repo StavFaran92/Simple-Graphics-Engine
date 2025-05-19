@@ -34,8 +34,6 @@ private:
 
 	CameraComponent* m_cameraComponent = nullptr;
 
-	uint64_t m_eventHandler;
-
 };
 
 CEREAL_REGISTER_TYPE(EditorCamera);
