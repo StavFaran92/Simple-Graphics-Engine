@@ -99,13 +99,26 @@ public:
 		handleMoveInput(deltaTime);
 		handleGroundCheck();
 		applyGravity(deltaTime);
-		applyMovement(deltaTime);
+		applyMovement(deltaTime);		
+	}
 
-		Engine::get()->getInput()->getMouse()->onMousePressed(Mouse::MouseButton::LeftMousebutton, [&](SDL_Event e) { shoot(); });
-
-		// Handle jumping
-		Engine::get()->getInput()->getKeyboard()->onKeyPressed(SDL_SCANCODE_SPACE, [&](SDL_Event e) { if(m_isGrounded)m_velocity.y = m_jumpForce; });
-		
+	void onEvent(SDL_Event e)
+	{
+		if (e.type == SDL_EventType::SDL_MOUSEBUTTONDOWN)
+		{
+			if (e.button.button == SDL_BUTTON_LEFT)
+			{
+				shoot();
+			}
+		}
+		else if (e.type == SDL_EventType::SDL_KEYDOWN)
+		{
+			if (e.key.keysym.scancode == SDL_SCANCODE_SPACE)
+			{
+				if (m_isGrounded)
+					m_velocity.y = m_jumpForce;
+			}
+		}
 	}
 
 private:

@@ -12,10 +12,10 @@ void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Subsc
 		return;
 	}
 
-	layer->subscribe(eventType, s);
+	layer->subscribe(handler, eventType, [=](SDL_Event e) { s->onEvent(e); });
 }
 
-void EventSystem::unsubscribe(EventHandler handler, SDL_EventType eventType, Subscriber* s)
+void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Callback c)
 {
 	auto& layer = getLayer(handler);
 
@@ -25,7 +25,20 @@ void EventSystem::unsubscribe(EventHandler handler, SDL_EventType eventType, Sub
 		return;
 	}
 
-	layer->unsubscribe(eventType, s);
+	layer->subscribe(handler, eventType, c);
+}
+
+void EventSystem::unsubscribe(EventHandler handler, SDL_EventType eventType)
+{
+	auto& layer = getLayer(handler);
+
+	if (!layer)
+	{
+		logError("Could not locate layer for the specified handler: " + std::to_string(handler));
+		return;
+	}
+
+	layer->unsubscribe(handler, eventType);
 }
 
 EventHandler EventSystem::bindToLayer(const std::string& layerName)

@@ -6,7 +6,7 @@
 #include <functional>
 
 
-class EngineAPI Mouse : public Subscriber
+class EngineAPI Mouse
 {
 public:
 	Mouse();
@@ -28,15 +28,13 @@ public:
 	const MouseState& getMouseState();
 	void getMousePosition(int& x, int& y);
 	bool getButtonPressed(MouseButton button);
-	void onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback) const;
-	void onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback) const;
-
-	void onEvent(SDL_Event e) override;
+	//void onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback, EventHandler handler, Subscriber* s) const;
+	//void onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback, EventHandler handler, Subscriber* s) const;
 
 
 private:
 	int mouseButtonToSDLCode(MouseButton button) const;
 	MouseState m_state;
 
-	uint64_t m_eventHandler;
+	//uint64_t m_eventHandler;
 };
