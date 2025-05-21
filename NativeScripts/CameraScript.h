@@ -1,81 +1,57 @@
 #pragma once
 
 #include "sge.h"
+#include "ICameraController.h"
 
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/cereal.hpp>
+#include "CameraControllerFreeLook.h"
 
 class CameraScript : public ScriptableEntity
 {
-	virtual void onCreate() override
+public:
+	enum class CameraState
 	{
-		Engine::get()->getWindow()->lockMouse();
-
-		auto eventSystem = Engine::get()->getEventSystem();
-
-		m_camera = entity;
-
-		//eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, [this](SDL_Event e) {
-		//	OnMouseMotion(e.motion.xrel, e.motion.yrel);
-		//	});
-	}
-
-	virtual void onDestroy() override
-	{
-		Engine::get()->getWindow()->unlockMouse();
-
-		auto eventSystem = Engine::get()->getEventSystem();
-
-		//eventSystem->removeEventListener(m_handler); // TODO fix
-	}
-
-	virtual void onUpdate(float deltaTime) {
+		FreeLook,
+		Orbit
 	};
-
-	void OnMouseMotion(float xChange, float yChange)
+public:
+	CameraScript()
 	{
-		xChange *= m_turnSpeed;
-		yChange *= m_turnSpeed;
-
-		m_yaw += xChange;
-		m_pitch -= yChange;
-
-		if (m_pitch > 89.0f)
-		{
-			m_pitch = 89.0f;
-		}
-
-		if (m_pitch < -89.0f)
-		{
-			m_pitch = -89.0f;
-		}
-
-		calculateOrientation();
+		m_cameraController = std::make_shared<CameraControllerFreeLook>();
 	}
+	~CameraScript() = default;
 
-	void calculateOrientation()
+	void onCreate() override
 	{
-		auto& camTransform = m_camera.getComponent<Transformation>();
+		auto eventSystem = Engine::get()->getEventSystem();
 
-		// Create quaternions for pitch and yaw
-		glm::quat pitchQuat = glm::angleAxis(Constants::PI + m_pitch * Constants::toRadians + Constants::PI / 2, glm::vec3(1, 0, 0));
-		glm::quat yawQuat = glm::angleAxis(Constants::PI - m_yaw * Constants::toRadians + Constants::PI / 2, glm::vec3(0, 1, 0));
+		eventHandler = eventSystem->bindToLayer("GameLayer");
 
-		// Combine the quaternions
-		glm::quat combinedQuat = yawQuat * pitchQuat;
+		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
+		eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
+		eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONUP, this);
+		eventSystem->subscribe(eventHandler, SDL_MOUSEWHEEL, this);
 
-		camTransform.setLocalRotation(combinedQuat);
+		m_cameraController->onCreate(entity);
 	}
+	void onUpdate(float deltaTime) override
+	{
+		m_cameraController->onUpdate(deltaTime);
+	}
+	void onEvent(SDL_Event e)
+	{
+		m_cameraController->onEvent(e);
+	}
+private:
+	bool m_isLocked = true;
 
-	uint64_t m_handler;
+	CameraState m_camState = CameraState::FreeLook;
 
-	float m_yaw = 0;
-	float m_pitch = 0;
+	std::shared_ptr<ICameraController> m_cameraController;
 
-	float m_movementSpeed = 3;
-	float m_turnSpeed = 1;
+	CameraComponent* m_cameraComponent = nullptr;
 
-	Entity m_camera;
 };
 
 CEREAL_REGISTER_TYPE(CameraScript);

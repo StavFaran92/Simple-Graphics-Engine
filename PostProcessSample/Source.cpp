@@ -1,6 +1,8 @@
 #include "EntryPoint.h"
 #include "sge.h"
 
+#include "CameraScript.h"
+
 class PostProcessSample : public Application
 {
 public:
@@ -18,8 +20,10 @@ public:
 
 		auto editorCamera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
 		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
-		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
+		editorCamera.addComponent<NativeScriptComponent>().bind<CameraScript>();
 		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
+
+		Engine::get()->getContext()->getActiveScene()->startSimulation();
 	}
 
 };
