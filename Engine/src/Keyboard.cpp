@@ -6,8 +6,6 @@
 Keyboard::Keyboard() 
 {
 	m_keyboardState = SDL_GetKeyboardState(&m_length);
-
-	m_eventHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer"); // TODO fix
 }
 
 int Keyboard::getKeyState(SDL_Scancode code) const
@@ -21,7 +19,7 @@ int Keyboard::getKeyState(SDL_Scancode code) const
 	return m_keyboardState[code];
 }
 
-void Keyboard::onKeyPressed(SDL_Scancode code, std::function<void(SDL_Event e)> callback) const
+void Keyboard::onKeyPressed(EventHandler handler, SDL_Scancode code, std::function<void(SDL_Event e)> callback) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -29,28 +27,28 @@ void Keyboard::onKeyPressed(SDL_Scancode code, std::function<void(SDL_Event e)> 
 		return;
 	}
 
-	//Engine::get()->getEventSystem()->subscribe(m_eventHandler, SDL_EventType::SDL_KEYDOWN, [=](SDL_Event e)
-	//{
-	//	if (e.key.keysym.scancode == code)
-	//	{
-	//		callback(e);
-	//	}
-	//});
+	Engine::get()->getEventSystem()->subscribe(handler, SDL_EventType::SDL_KEYDOWN, [=](SDL_Event e)
+	{
+		if (e.key.keysym.scancode == code)
+		{
+			callback(e);
+		}
+	});
 }
 
-void Keyboard::onKeyReleased(SDL_Scancode code, std::function<void(SDL_Event e)> callback) const
+void Keyboard::onKeyReleased(EventHandler handler, SDL_Scancode code, std::function<void(SDL_Event e)> callback) const
 {
 	if (code < 0 || code > m_length)
 	{
 		logError("Invalid key specified : " + code);
 		return;
 	}
+	Engine::get()->getEventSystem()->subscribe(handler, SDL_EventType::SDL_KEYUP, [=](SDL_Event e)
+	{
+		if (e.key.keysym.scancode == code)
+		{
+			callback(e);
+		}
+	});
 
-	//Engine::get()->getEventSystem()->subscribe(m_eventHandler, SDL_EventType::SDL_KEYUP, [=](SDL_Event e)
-	//{
-	//	if (e.key.keysym.scancode == code)
-	//	{
-	//		callback(e);
-	//	}
-	//});
 }

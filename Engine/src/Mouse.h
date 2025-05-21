@@ -5,6 +5,8 @@
 
 #include <functional>
 
+#include "EventLayer.h"
+
 
 class EngineAPI Mouse
 {
@@ -28,8 +30,8 @@ public:
 	const MouseState& getMouseState();
 	void getMousePosition(int& x, int& y);
 	bool getButtonPressed(MouseButton button);
-	//void onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback, EventHandler handler, Subscriber* s) const;
-	//void onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback, EventHandler handler, Subscriber* s) const;
+	void onMousePressed(EventHandler handler, MouseButton code, std::function<void(SDL_Event e)> callback) const;
+	void onMouseReleased(EventHandler handler, MouseButton code, std::function<void(SDL_Event e)> callback) const;
 
 
 private:

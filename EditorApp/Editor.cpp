@@ -2416,12 +2416,14 @@ public:
 		
 		ImGui::SetCurrentContext((ImGuiContext * )Engine::get()->getImguiHandler()->getCurrentContext());
 
-		Engine::get()->getInput()->getKeyboard()->onKeyPressed(SDL_SCANCODE_ESCAPE, [](SDL_Event e) { stopSimulation(); });
+		
 
 		NativeScriptsLoader::instance->init();
 
 		std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 		Engine::get()->getEventSystem()->pushLayer(uiLayer);
+
+		handler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 
 		auto scene = Engine::get()->getContext()->getActiveScene();
 
@@ -2440,8 +2442,9 @@ public:
 
 		g_editorCamera = editorCamera;
 
+		Engine::get()->getInput()->getKeyboard()->onKeyPressed(handler, SDL_SCANCODE_ESCAPE, [](SDL_Event e) { stopSimulation(); });
 		
-		Engine::get()->getInput()->getKeyboard()->onKeyReleased(SDL_SCANCODE_X, [](SDL_Event e) {
+		Engine::get()->getInput()->getKeyboard()->onKeyReleased(handler, SDL_SCANCODE_X, [](SDL_Event e) {
 			debugTerrainFlag = true;
 			});
 
@@ -2472,7 +2475,7 @@ public:
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
 	
-	
+	EventHandler handler;
 };
 
 Application* CreateApplication()

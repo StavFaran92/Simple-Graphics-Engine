@@ -57,31 +57,31 @@ bool Mouse::getButtonPressed(MouseButton button)
 	
 	return result;
 }
-//void Mouse::onMousePressed(MouseButton code, std::function<void(SDL_Event e)> callback, EventHandler handler, Subscriber* s) const
-//{
-//	auto eventSystem = Engine::get()->getEventSystem();
-//
-//	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONDOWN, s); [=](SDL_Event e)
-//	{
-//		if (e.button.button == mouseButtonToSDLCode(code))
-//		{
-//			callback(e);
-//		}
-//	});
-//}
-//
-//void Mouse::onMouseReleased(MouseButton code, std::function<void(SDL_Event e)> callback) const
-//{
-//	auto eventSystem = Engine::get()->getEventSystem();
-//
-//	//eventSystem->subscribe(m_eventHandler, SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
-//	//{
-//	//	if (e.button.button == mouseButtonToSDLCode(code))
-//	//	{
-//	//		callback(e);
-//	//	}
-//	//});
-//}
+void Mouse::onMousePressed(EventHandler handler, MouseButton code, std::function<void(SDL_Event e)> callback) const
+{
+	auto eventSystem = Engine::get()->getEventSystem();
+
+	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONDOWN, [=](SDL_Event e)
+	{
+		if (e.button.button == mouseButtonToSDLCode(code))
+		{
+			callback(e);
+		}
+	});
+}
+
+void Mouse::onMouseReleased(EventHandler handler, MouseButton code, std::function<void(SDL_Event e)> callback) const
+{
+	auto eventSystem = Engine::get()->getEventSystem();
+
+	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
+	{
+		if (e.button.button == mouseButtonToSDLCode(code))
+		{
+			callback(e);
+		}
+	});
+}
 //
 //void Mouse::onEvent(SDL_Event e)
 //{
