@@ -1,4 +1,3 @@
-#include "filewatch/FileWatch.hpp"
 #include "Menu.h"
 #include "EntryPoint.h"
 #include "sge.h"
@@ -31,8 +30,6 @@ static std::string getAssetTypeAsStr(AssetType aType)
 	if (aType == AssetType::ANIMATION) return "Animation";
 	return "N/A";
 }
-
-static std::shared_ptr<filewatch::FileWatch<std::string>> watch;
 
 namespace fs = std::filesystem;
 
