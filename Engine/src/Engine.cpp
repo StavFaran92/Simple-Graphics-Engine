@@ -478,7 +478,7 @@ void Engine::handleEvents(bool& quit)
 
 
 
-        //m_imguiHandler->proccessEvents(e);
+        m_imguiHandler->proccessEvents(e);
 
         //User requests quit
         if (e.type == SDL_QUIT)

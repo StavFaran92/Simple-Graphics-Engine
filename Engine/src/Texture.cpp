@@ -284,7 +284,17 @@ Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, cons
 		aInfo.origFilePath = fileLocation;
 		aInfo.uuid = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
-		aInfo.name = settings.name;
+
+		if (!settings.name.empty())
+		{
+			aInfo.name = settings.name;
+		}
+		else
+		{
+			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+
+		}
+
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
 	}
