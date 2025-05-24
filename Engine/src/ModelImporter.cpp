@@ -199,7 +199,7 @@ ModelImporter::ModelInfo ModelImporter::load(const std::string & path, ModelImpo
 			auto& aMaterial = scene->mMaterials[i];
 
 			// get uuid using tex name from association map
-
+			material->setName(aMaterial->GetName().C_Str());
 
 			// load texture
 

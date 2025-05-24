@@ -96,6 +96,16 @@ void Material::setTexture(Texture::TextureType textureType, Resource<Texture> te
 	m_samplers[textureType]->texture = textureHandler;
 }
 
+void Material::setName(const std::string& name)
+{
+	m_name = name;
+}
+
+std::string Material::getName() const
+{
+	return m_name;
+}
+
 std::vector<Resource<Texture>> Material::getAllTextures() const
 {
 	auto& res = std::vector<Resource<Texture>>();

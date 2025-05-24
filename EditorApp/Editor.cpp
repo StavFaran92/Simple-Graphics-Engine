@@ -1761,9 +1761,17 @@ void RenderInspectorWindow(float width, float height)
 			for (auto& [id, mat] : materials)
 			{
 				ImGui::PushID(&mat);
-				// Start a new collapsible header for each material
-				if (ImGui::CollapsingHeader(("Material " + std::to_string(index)).c_str()))
+				
+				auto& matName = mat->getName();
+				if (matName.empty())
 				{
+					matName = "Material " + std::to_string(index);
+				}
+
+				// Start a new collapsible header for each material
+				if (ImGui::CollapsingHeader(matName.c_str()))
+				{
+					
 					addSamplerEditWidget(mat, { 20,20 }, "Albedo", Texture::TextureType::Albedo);
 					addSamplerEditWidget(mat, { 20,20 }, "Normal", Texture::TextureType::Normal);
 					addSamplerEditWidget(mat, { 20,20 }, "Metallic", Texture::TextureType::Metallic);

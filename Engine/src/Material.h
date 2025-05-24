@@ -31,6 +31,9 @@ public:
 
 	void setTexture(Texture::TextureType textureType, Resource<Texture> textureHandler);
 
+	void setName(const std::string& name);
+	std::string getName() const;
+
 	std::vector<Resource<Texture>> getAllTextures() const;
 
 	std::shared_ptr<Material> clone() const;
@@ -46,4 +49,6 @@ protected:
 
 protected:
 	std::map<Texture::TextureType, std::shared_ptr<TextureSampler>> m_samplers;
+
+	std::string m_name;
 };
