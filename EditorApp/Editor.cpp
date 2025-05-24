@@ -151,7 +151,7 @@ static void displayComponent(const std::string& componentName, std::function<voi
 		ImGui::Dummy(ImVec2(0, 4));
 
 		// Adjust the rectangle to the correct end position
-		ImGui::GetWindowDrawList()->AddRect(startPos, endPos, ImGui::GetColorU32(ImGuiCol_Header), 0.f, 0, 2.f);
+		//ImGui::GetWindowDrawList()->AddRect(startPos, endPos, ImGui::GetColorU32(ImGuiCol_Header), 0.f, 0, 2.f);
 	}
 }
 
