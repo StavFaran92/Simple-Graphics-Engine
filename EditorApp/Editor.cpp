@@ -86,6 +86,30 @@ static void startsimulation()
 	Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
 }
 
+static void displayWindowHeader(const std::string& name)
+{
+	ImVec2 region = ImGui::GetContentRegionAvail();
+	float headerHeight = 24.0f;
+
+	// Header style
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(50, 50, 50, 255));
+	ImGui::BeginChild(name.c_str(), ImVec2(region.x, headerHeight), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+	// Vertical center calculation
+	float textHeight = ImGui::GetFontSize();
+	float textY = (headerHeight - textHeight) * 0.5f;
+
+	// Horizontal padding
+	float paddingLeft = 8.0f;
+
+	// Set cursor position inside child window
+	ImGui::SetCursorPos(ImVec2(paddingLeft, textY));
+	ImGui::TextUnformatted(name.c_str());
+
+	ImGui::EndChild();
+	ImGui::PopStyleColor();
+}
+
 template<typename T> 
 static void displayComponent(const std::string& componentName, std::function<void(T&)> func)
 {
@@ -519,7 +543,7 @@ void updateScene()
 
 Entity  selectedEntity = Entity::EmptyEntity;
 
-auto style = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse;
+auto style = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar;
 
 void AddColoredLabel(const char* label) 
 {
@@ -1061,6 +1085,8 @@ void RenderSceneHierarchyWindow(float width, float height)
 	ImGui::SetNextWindowSize(windowSize);
 	ImGui::Begin("Scene Hierarchy", nullptr, style);
 
+	displayWindowHeader("Scene Hierarchy");
+
 	if (ImGui::Button("+", ImVec2(windowWidth, 0)))
 	{
 		ImGui::OpenPopup("AddObjectToScenePopup");
@@ -1591,6 +1617,8 @@ void RenderInspectorWindow(float width, float height)
 	ImGui::SetNextWindowSize(ImVec2(windowWidth - 5, height * 0.7f));
 	ImGui::Begin("Inspector", nullptr, style | ImGuiWindowFlags_NoScrollbar);
 
+	displayWindowHeader("Inspector");
+
 	if (selectedEntity != Entity::EmptyEntity)
 	{
 		displayComponent<Transformation>("Transformation", [](Transformation& transform) {
@@ -2102,6 +2130,8 @@ void RenderInspectorWindow(float width, float height)
 }
 
 void RenderAssetViewWindow(float width, float height) {
+	
+
 	auto assets = Engine::get()->getSubSystem<Assets>();
 	float windowWidth = width - 10;
 	float startX = 5; // Add a gap of 5 pixels
@@ -2110,6 +2140,11 @@ void RenderAssetViewWindow(float width, float height) {
 	ImGui::SetNextWindowSize(ImVec2(windowWidth, height * 0.3f - 35)); // Adjust height as needed
 	ImGui::Begin("Asset View", nullptr, style);
 	ImVec2 listBoxSize(windowWidth, height * 0.3f - 35);
+
+
+
+	displayWindowHeader("Assets");
+
 
 	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
 
