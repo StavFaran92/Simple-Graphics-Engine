@@ -103,7 +103,7 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 	std::filesystem::copy_file(path, savedFilePath);
 
 	
-	Engine::get()->getMemoryManagementSystem()->addAssociation(path, uid);
+	Engine::get()->getMemoryManagementSystem()->addAssociation(fullName, uid);
 
 	aInfo.filePath = savedFilePath;
 	aInfo.isValid = true;

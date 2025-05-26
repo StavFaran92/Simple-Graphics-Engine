@@ -270,47 +270,7 @@ static void addTableRowExt(const std::string& rowName,
 	ImGui::SetNextItemWidth(itemWidth);
 	std::string id = "##" + rowName;
 	funcValue(id);
-}
-
-bool dragFloatTable(const std::string& id, float v[3], float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
-	{
-		ImGui::TableNextRow();
-
-		// Key: stick to left (default)
-		ImGui::TableSetColumnIndex(0);
-		ImGui::TextUnformatted(id.c_str());
-
-		// Value: right-align the DragFloat3
-		ImGui::TableSetColumnIndex(1);
-
-		const float fullWidth = ImGui::GetColumnWidth();
-		const float itemWidth = ImGui::CalcItemWidth(); // or CalcItemWidth(), or a fixed value
-		float cursorX = ImGui::GetCursorPosX() + fullWidth - itemWidth;
-
-		ImGui::SetCursorPosX(cursorX);
-		ImGui::SetNextItemWidth(itemWidth);
-		std::string id = "##" + id;
-
-		(ImGui::DragFloat3(id.c_str(), v));
-	}
-};
-
-/*#define CONCAT_INNER(a, b) a##b
-#define CONCAT(a, b) CONCAT_INNER(a, b)
-#define UNIQUE_NAME(base) CONCAT(base, __LINE__)
-
-#define TABLE_ROW(label, widget_func, ...)                                        \
-    ImGui::TableNextRow();                                                       \
-    ImGui::TableSetColumnIndex(0);                                               \
-    ImGui::TextUnformatted(label);                                               \
-    ImGui::TableSetColumnIndex(1);                                               \
-    float UNIQUE_NAME(fullWidth) = ImGui::GetColumnWidth();                      \
-    float UNIQUE_NAME(itemWidth) = ImGui::CalcItemWidth();                       \
-    float UNIQUE_NAME(cursorX) = ImGui::GetCursorPosX() +                        \
-        UNIQUE_NAME(fullWidth) - UNIQUE_NAME(itemWidth);                         \
-    ImGui::SetCursorPosX(UNIQUE_NAME(cursorX));                                  \
-    ImGui::SetNextItemWidth(UNIQUE_NAME(itemWidth));                             \
-    if (bool UNIQUE_NAME(_changed) = widget_func(label, __VA_ARGS__))        */                                               
+}                                            
 
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
