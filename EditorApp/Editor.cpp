@@ -18,6 +18,13 @@
 #include "EditorCamera.h"
 #include "EditorState.h"
 
+#define BEGIN_IMGUI_TABLE(name) \
+    if (ImGui::BeginTable(name, 2, ImGuiTableFlags_None)) { \
+        ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch, 0.4f); \
+        ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.6f);
+
+#define END_IMGUI_TABLE() ImGui::EndTable(); };
+
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 
 static std::unordered_map<std::string, Resource<Texture>> icons;
@@ -174,15 +181,15 @@ void focusOnEntity(Entity e)
 		// set destination to location + forward
 		targetLocation = targetTransform.getWorldPosition() - front * 5.f + targetAABB.extents * .5f;
 
-		// create fake frustum
-		Frustum fakeFrustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
+// create fake frustum
+Frustum fakeFrustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
 
-		// we start at the target object location and step back until the object AABB is inside the frustum.
-		while (!targetAABB.isOnFrustum(fakeFrustum))
-		{
-			targetLocation -= front;
-			fakeFrustum = Frustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
-		}
+// we start at the target object location and step back until the object AABB is inside the frustum.
+while (!targetAABB.isOnFrustum(fakeFrustum))
+{
+	targetLocation -= front;
+	fakeFrustum = Frustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
+}
 	}
 
 	auto& transform = g_editorCamera.getComponent<Transformation>();
@@ -202,7 +209,7 @@ void RenderSimulationControlView(float width, float height)
 	// Center align the buttons
 	ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
 
-	
+
 
 	// Draw the button based on the current state
 	if (startButtonPressed) {
@@ -221,35 +228,129 @@ void RenderSimulationControlView(float width, float height)
 	ImGui::End(); // End the window
 }
 
+static void addTableRow(const std::string& rowName, std::function<void(std::string id)> func)
+{
+	ImGui::TableNextRow();
+
+	// Key: stick to left (default)
+	ImGui::TableSetColumnIndex(0);
+	ImGui::TextUnformatted(rowName.c_str());
+
+	// Value: right-align the DragFloat3
+	ImGui::TableSetColumnIndex(1);
+
+	const float fullWidth = ImGui::GetColumnWidth();
+	const float itemWidth = ImGui::CalcItemWidth(); // or CalcItemWidth(), or a fixed value
+	float cursorX = ImGui::GetCursorPosX() + fullWidth - itemWidth;
+
+	ImGui::SetCursorPosX(cursorX);
+	ImGui::SetNextItemWidth(itemWidth);
+	std::string id = "##" + rowName;
+	func(id);
+}
+
+static void addTableRowExt(const std::string& rowName, 
+	std::function<void(std::string id)> funcKey, 
+	std::function<void(std::string id)> funcValue)
+{
+	ImGui::TableNextRow();
+
+	// Key: stick to left (default)
+	ImGui::TableSetColumnIndex(0);
+	funcKey(rowName.c_str());
+
+	// Value: right-align the DragFloat3
+	ImGui::TableSetColumnIndex(1);
+
+	const float fullWidth = ImGui::GetColumnWidth();
+	const float itemWidth = ImGui::CalcItemWidth(); // or CalcItemWidth(), or a fixed value
+	float cursorX = ImGui::GetCursorPosX() + fullWidth - itemWidth;
+
+	ImGui::SetCursorPosX(cursorX);
+	ImGui::SetNextItemWidth(itemWidth);
+	std::string id = "##" + rowName;
+	funcValue(id);
+}
+
+bool dragFloatTable(const std::string& id, float v[3], float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
+	{
+		ImGui::TableNextRow();
+
+		// Key: stick to left (default)
+		ImGui::TableSetColumnIndex(0);
+		ImGui::TextUnformatted(id.c_str());
+
+		// Value: right-align the DragFloat3
+		ImGui::TableSetColumnIndex(1);
+
+		const float fullWidth = ImGui::GetColumnWidth();
+		const float itemWidth = ImGui::CalcItemWidth(); // or CalcItemWidth(), or a fixed value
+		float cursorX = ImGui::GetCursorPosX() + fullWidth - itemWidth;
+
+		ImGui::SetCursorPosX(cursorX);
+		ImGui::SetNextItemWidth(itemWidth);
+		std::string id = "##" + id;
+
+		(ImGui::DragFloat3(id.c_str(), v));
+	}
+};
+
+/*#define CONCAT_INNER(a, b) a##b
+#define CONCAT(a, b) CONCAT_INNER(a, b)
+#define UNIQUE_NAME(base) CONCAT(base, __LINE__)
+
+#define TABLE_ROW(label, widget_func, ...)                                        \
+    ImGui::TableNextRow();                                                       \
+    ImGui::TableSetColumnIndex(0);                                               \
+    ImGui::TextUnformatted(label);                                               \
+    ImGui::TableSetColumnIndex(1);                                               \
+    float UNIQUE_NAME(fullWidth) = ImGui::GetColumnWidth();                      \
+    float UNIQUE_NAME(itemWidth) = ImGui::CalcItemWidth();                       \
+    float UNIQUE_NAME(cursorX) = ImGui::GetCursorPosX() +                        \
+        UNIQUE_NAME(fullWidth) - UNIQUE_NAME(itemWidth);                         \
+    ImGui::SetCursorPosX(UNIQUE_NAME(cursorX));                                  \
+    ImGui::SetNextItemWidth(UNIQUE_NAME(itemWidth));                             \
+    if (bool UNIQUE_NAME(_changed) = widget_func(label, __VA_ARGS__))        */                                               
+
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
 	glm::vec3& pos = transform.getLocalPosition();
 	glm::vec3& currentRotation = transform.getLocalRotationVec3() * Constants::toDegrees;
 	glm::vec3& scale = transform.getLocalScale();
 
-	// Position slider
-	if (ImGui::DragFloat3("Position", glm::value_ptr(pos))) 
-	{
-		transform.setLocalPosition(pos);
-		isChanged = true;
-	}
+	BEGIN_IMGUI_TABLE("Transform");
 
-	// Rotation slider (Euler angles)
-	glm::vec3 originalRotation = currentRotation;
-	if (ImGui::DragFloat3("Rotation", glm::value_ptr(currentRotation)))
-	{
-		// We use delta rotation to perform all calculations in quaternion space
-		glm::vec3 deltaRotation = currentRotation - originalRotation;
-		transform.rotate(deltaRotation * Constants::toRadians);
-		isChanged = true;
-	}
+	//TABLE_ROW("Position", ImGui::DragFloat3, glm::value_ptr(pos)) {
+	//	transform.setLocalPosition(pos);
+	//	isChanged = true;
+	//}
 
-	// Scale slider
-	if (ImGui::DragFloat3("Scale", glm::value_ptr(scale))) 
-	{
-		transform.setLocalScale(scale);
-		isChanged = true;
-	}
+	addTableRow("Position", [&](std::string id) {
+		if (ImGui::DragFloat3(id.c_str(), glm::value_ptr(pos))) {
+			transform.setLocalPosition(pos);
+			isChanged = true;
+		}
+	});
+
+	addTableRow("Rotation", [&](std::string id) {
+		glm::vec3 originalRotation = currentRotation;
+		if (ImGui::DragFloat3(id.c_str(), glm::value_ptr(currentRotation))) {
+			// We use delta rotation to perform all calculations in quaternion space
+			glm::vec3 deltaRotation = currentRotation - originalRotation;
+			transform.rotate(deltaRotation * Constants::toRadians);
+			isChanged = true;
+		}
+	});
+
+	addTableRow("Scale", [&](std::string id) {
+		if (ImGui::DragFloat3(id.c_str(), glm::value_ptr(scale))) {
+			transform.setLocalScale(scale);
+			isChanged = true;
+		}
+	});
+
+	END_IMGUI_TABLE();
+
 }
 
 static void displayAssetTextureSelectPopup()
@@ -1607,6 +1708,15 @@ static void addSkyboxTextureEditWidget(SkyboxComponent& skybox)
 	//}
 }
 
+void rightAlignedText(const std::string& text) {
+	float textWidth = ImGui::CalcTextSize(text.c_str()).x;
+	float fullWidth = ImGui::GetColumnWidth();
+	float padding = ImGui::GetStyle().ItemSpacing.x;
+
+	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + fullWidth - textWidth - padding);
+	ImGui::TextUnformatted(text.c_str());
+}
+
 void RenderInspectorWindow(float width, float height) 
 {
 	auto assets = Engine::get()->getSubSystem<Assets>();
@@ -1678,13 +1788,35 @@ void RenderInspectorWindow(float width, float height)
 		displayComponent<MeshComponent>("Mesh", [](MeshComponent& meshComponent) {
 			if (meshComponent.mesh.isEmpty()) return;
 
-			ImGui::Text("Number of vertices: %d", (int)meshComponent.mesh.get()->getNumOfVertices());
+			BEGIN_IMGUI_TABLE("Mesh");
+
+			addTableRow("Vertices count:", [&](std::string id) {
+				rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()).c_str());
+			});
+
+			addTableRowExt("Select Mesh", 
+				[&](std::string id) 
+				{
+					if (ImGui::Button("Select Mesh"))
+					{
+						showMeshSelector = true;
+					}
+				},
+				[&](std::string id) 
+				{
+					rightAlignedText(Engine::get()->getSubSystem<Assets>()->getAlias(meshComponent.mesh.getUID()).c_str());
+				});
+
+			END_IMGUI_TABLE();
+			
+
+			//ImGui::Text("Number of vertices: %d", (int)meshComponent.mesh.get()->getNumOfVertices());
 
 			 //Button to trigger some action
-			if (ImGui::Button("Select Mesh")) 
-			{
-				showMeshSelector = true;
-			}
+			//if (ImGui::Button("Select Mesh")) 
+			//{
+			//	showMeshSelector = true;
+			//}
 
 			std::string selectedMeshUID;
 			displaySelectMeshWindow(selectedMeshUID);
@@ -1694,10 +1826,12 @@ void RenderInspectorWindow(float width, float height)
 				meshComponent.mesh = Resource<MeshCollection>(selectedMeshUID);
 			}
 
-			ImGui::SameLine();
+			//ImGui::SameLine();
 
 			// Text display field
-			ImGui::Text(Engine::get()->getSubSystem<Assets>()->getAlias(meshComponent.mesh.getUID()).c_str());
+			//ImGui::Text(Engine::get()->getSubSystem<Assets>()->getAlias(meshComponent.mesh.getUID()).c_str());
+
+			
 			});
 
 		displayComponent<CameraComponent>("Camera", [](CameraComponent& cameraComponent) {
