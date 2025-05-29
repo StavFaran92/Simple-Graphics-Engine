@@ -28,9 +28,13 @@ public:
 
 	int pickObject(int x, int y);
 
+	int getSelectedObject() const;
+
 private:
 	FrameBufferObject m_frameBuffer;
 	Resource<Texture> m_targetTexture;
 	Resource<Shader> m_pickingShader;
+
+	int m_selectedObject = -1;
 };
 

@@ -441,7 +441,38 @@ void Scene::draw(float deltaTime)
 			glEnable(GL_DEPTH_TEST);
 		}
 
-		
+		// Highlight selected object
+		auto objectPicker = Engine::get()->getSubSystem<ObjectPicker>();
+		int selectedObject = objectPicker->getSelectedObject();
+		if (selectedObject > -1)
+		{
+			// get entity from ID
+
+			for (auto&& [entity, obj] : getRegistry().get().view<ObjectComponent>().each())
+			{
+				if ((entity_id)entity == selectedObject)
+				{
+					Entity e(entity, &getRegistry());
+
+					auto& mesh = e.getComponent<MeshComponent>();
+					logDebug(std::to_string(mesh.mesh->getNumOfVertices()))
+				}
+			}
+
+			// get mesh
+
+			// bind highlight FBO
+
+			// bind highlight shader
+
+			// can I do it in a single pass?
+
+			// apply V&H kernel
+
+			// if value is above threshold color it
+
+			// same flow as above with the render view
+		}
 
 		// Render UI
 		glEnable(GL_BLEND);
@@ -502,15 +533,15 @@ void Scene::draw(float deltaTime)
 
 
 
-	for (const auto& cb : m_renderCallbacks[RenderPhase::POST_RENDER_BEGIN])
-	{
-		cb();
-	}
+	//for (const auto& cb : m_renderCallbacks[RenderPhase::POST_RENDER_BEGIN])
+	//{
+	//	cb();
+	//}
 
-	for (const auto& cb : m_renderCallbacks[RenderPhase::POST_RENDER_END])
-	{
-		cb();
-	}
+	//for (const auto& cb : m_renderCallbacks[RenderPhase::POST_RENDER_END])
+	//{
+	//	cb();
+	//}
 }
 
 Scene::RenderCallback* Scene::addRenderCallback(RenderPhase renderPhase, RenderCallback renderCallback)
