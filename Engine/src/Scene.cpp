@@ -201,6 +201,8 @@ void Scene::init(Context* context)
 	addRenderView(0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 
 	m_registry->getRegistry().on_construct<ScriptableEntity>().connect<&Scene::bindScriptToLayer>(this);
+
+	m_highlightRenderView = std::make_shared<RenderView>(Viewport{0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight() }, Entity::EmptyEntity);
 }
 
 void Scene::update(float deltaTime)
@@ -455,7 +457,9 @@ void Scene::draw(float deltaTime)
 					Entity e(entity, &getRegistry());
 
 					auto& mesh = e.getComponent<MeshComponent>();
-					logDebug(std::to_string(mesh.mesh->getNumOfVertices()))
+
+					m_highlightRenderView->bind();
+
 				}
 			}
 
@@ -472,6 +476,13 @@ void Scene::draw(float deltaTime)
 			// if value is above threshold color it
 
 			// same flow as above with the render view
+
+			//i should write to empty canvas, then dilate it in a second pass, then write it into the main image
+			//issue is i cant dilate it in-place, so i either find a way to do it,
+			// or pass it to main image, 
+			// write to main iamge,
+			// then dilate on spare buffer using edges from main image,
+			// then swap to first buffer and draw using dilated in spare image and main image combined
 		}
 
 		// Render UI
