@@ -483,6 +483,10 @@ void Scene::draw(float deltaTime)
 			// write to main iamge,
 			// then dilate on spare buffer using edges from main image,
 			// then swap to first buffer and draw using dilated in spare image and main image combined
+
+			// 1st pass - draw mesh to depth buffer
+			// 2nd pass - use depth buffer values to apply gradient V&H
+			// 3rd pass - dilate and merge with original image
 		}
 
 		// Render UI
