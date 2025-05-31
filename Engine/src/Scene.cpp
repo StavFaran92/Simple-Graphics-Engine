@@ -485,8 +485,22 @@ void Scene::draw(float deltaTime)
 			// then swap to first buffer and draw using dilated in spare image and main image combined
 
 			// 1st pass - draw mesh to depth buffer
+			// -- get mesh
+			// -- bind very simple shader
+			// -- bind highlight FBO
+			// -- draw
 			// 2nd pass - use depth buffer values to apply gradient V&H
+			// -- swap highlight FBO buffers
+			// -- bind edge detection shader
+			// -- set texture as uniform
+			// -- bind highlight FBO
+			// -- draw
 			// 3rd pass - dilate and merge with original image
+			// -- bind dilate and merge shader
+			// --set texture as uniform
+			// --set main texture as uniform
+			// -- bind scene FBO
+			// -- draw
 		}
 
 		// Render UI
