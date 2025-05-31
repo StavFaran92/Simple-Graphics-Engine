@@ -477,43 +477,66 @@ void Scene::draw(float deltaTime)
 					Entity e(entity, &getRegistry());
 					auto& mesh = e.getComponent<MeshComponent>();
 
-					// 1st pass
-					m_highlightRenderView->bind();
-					m_highlightMaskShader->use();
-					m_highlightMaskShader->setModelMatrix(glm::mat4(1.0));
-					m_highlightMaskShader->setViewMatrix(*graphics->view);
-					m_highlightMaskShader->setProjectionMatrix(*graphics->projection);
+					{
+						glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Highlight Pass 1 - Mask");
 
-					auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
-					RenderCommand::draw(vao);
+						// 1st pass
+						m_highlightRenderView->bind();
+						m_highlightMaskShader->use();
+						m_highlightMaskShader->setModelMatrix(glm::mat4(1.0));
+						m_highlightMaskShader->setViewMatrix(*graphics->view);
+						m_highlightMaskShader->setProjectionMatrix(*graphics->projection);
 
-					// 2nd pass
-					auto& binaryMaskTexture = m_highlightRenderView->getRenderTargetTexture();
-					m_highlightRenderView->swapToAdditionalTarget();
-					m_highlightRenderView->bind();
-					m_highlightEdgeDetectionShader->use();
-					auto width = Engine::get()->getWindow()->getWidth();
-					auto height = Engine::get()->getWindow()->getHeight();
-					glm::vec2 texelSize = glm::vec2(1.0 / width, 1.0 / height);
-					m_highlightEdgeDetectionShader->setUniformValue("uTexelSize", texelSize);
-					m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
-					
-					RenderCommand::draw(vao);
+						auto vao = mesh.mesh.get()->getPrimaryMesh()->getVAO();
+						RenderCommand::draw(vao);
 
-					// 3rd pass
-					Resource<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
-					m_highlightRenderView->swapBackToMainTarget(); // todo optimize (i should fetch the secondary texture instead)
-					auto& edgeDetectedTexture = m_highlightRenderView->getRenderTargetTexture(); // todo fix
-					m_highlightMergeShader->use();
-					m_highlightMergeShader->setUniformValue("uTexelSize", texelSize);
-					m_highlightMergeShader->setUniformValue("uHighlightColor", glm::vec3(0.04, 0.28, 0.26));
-					m_highlightMergeShader->setUniformValue("uDilationRadius", 5);
-					m_highlightMergeShader->setTextureInShader(mainSceneRenderTargetTexture, "MainTexture", 0);
-					m_highlightMergeShader->setTextureInShader(edgeDetectedTexture, "uEdgeTex", 1);
+						glPopDebugGroup();
+					}
 
-					graphics->renderView->bind();
+					{
+						glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Highlight Pass 2 - Edge Detection");
 
-					RenderCommand::draw(vao);
+						// 2nd pass
+						auto& binaryMaskTexture = m_highlightRenderView->getRenderTargetTexture();
+						m_highlightRenderView->swapToAdditionalTarget();
+						m_highlightRenderView->bind();
+						m_highlightEdgeDetectionShader->use();
+						auto width = Engine::get()->getWindow()->getWidth();
+						auto height = Engine::get()->getWindow()->getHeight();
+						glm::vec2 texelSize = glm::vec2(1.0 / width, 1.0 / height);
+						m_highlightEdgeDetectionShader->setUniformValue("uTexelSize", texelSize);
+						m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
+
+						auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+						RenderCommand::draw(vao);
+
+						glPopDebugGroup();
+					}
+
+					{
+						glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Highlight Pass 3 - Merge");
+
+						// 3rd pass
+						Resource<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
+						m_highlightRenderView->swapBackToMainTarget(); // todo optimize (i should fetch the secondary texture instead)
+						auto& edgeDetectedTexture = m_highlightRenderView->getRenderTargetTexture(); // todo fix
+						auto width = Engine::get()->getWindow()->getWidth();
+						auto height = Engine::get()->getWindow()->getHeight();
+						glm::vec2 texelSize = glm::vec2(1.0 / width, 1.0 / height);
+						m_highlightMergeShader->use();
+						m_highlightMergeShader->setUniformValue("uTexelSize", texelSize);
+						m_highlightMergeShader->setUniformValue("uHighlightColor", glm::vec3(0.04, 0.28, 0.26));
+						m_highlightMergeShader->setUniformValue("uDilationRadius", 5);
+						m_highlightMergeShader->setTextureInShader(mainSceneRenderTargetTexture, "MainTexture", 0);
+						m_highlightMergeShader->setTextureInShader(edgeDetectedTexture, "uEdgeTex", 1);
+
+						graphics->renderView->bind();
+
+						auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+						RenderCommand::draw(vao);
+
+						glPopDebugGroup();
+					}
 				}
 			}
 		}
