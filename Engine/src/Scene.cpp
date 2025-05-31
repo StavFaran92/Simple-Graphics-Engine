@@ -203,6 +203,10 @@ void Scene::init(Context* context)
 	m_registry->getRegistry().on_construct<ScriptableEntity>().connect<&Scene::bindScriptToLayer>(this);
 
 	m_highlightRenderView = std::make_shared<RenderView>(Viewport{0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight() }, Entity::EmptyEntity);
+
+	m_highlightMaskShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl");
+	m_highlightEdgeDetectionShader = Shader::createOverrideShader("HighlightEdgeDetectionShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess);
+	m_highlightMergeShader = Shader::createOverrideShader("HighlightMergeShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess);
 }
 
 void Scene::update(float deltaTime)
@@ -449,41 +453,6 @@ void Scene::draw(float deltaTime)
 		if (selectedObject > -1)
 		{
 			// get entity from ID
-
-			for (auto&& [entity, obj] : getRegistry().get().view<ObjectComponent>().each())
-			{
-				if ((entity_id)entity == selectedObject)
-				{
-					Entity e(entity, &getRegistry());
-
-					auto& mesh = e.getComponent<MeshComponent>();
-
-					m_highlightRenderView->bind();
-
-				}
-			}
-
-			// get mesh
-
-			// bind highlight FBO
-
-			// bind highlight shader
-
-			// can I do it in a single pass?
-
-			// apply V&H kernel
-
-			// if value is above threshold color it
-
-			// same flow as above with the render view
-
-			//i should write to empty canvas, then dilate it in a second pass, then write it into the main image
-			//issue is i cant dilate it in-place, so i either find a way to do it,
-			// or pass it to main image, 
-			// write to main iamge,
-			// then dilate on spare buffer using edges from main image,
-			// then swap to first buffer and draw using dilated in spare image and main image combined
-
 			// 1st pass - draw mesh to depth buffer
 			// -- get mesh
 			// -- bind very simple shader
@@ -497,10 +466,45 @@ void Scene::draw(float deltaTime)
 			// -- draw
 			// 3rd pass - dilate and merge with original image
 			// -- bind dilate and merge shader
-			// --set texture as uniform
-			// --set main texture as uniform
+			// -- set texture as uniform
+			// -- set main texture as uniform
 			// -- bind scene FBO
 			// -- draw
+			for (auto&& [entity, obj] : getRegistry().get().view<ObjectComponent>().each())
+			{
+				if ((entity_id)entity == selectedObject)
+				{
+					Entity e(entity, &getRegistry());
+					auto& mesh = e.getComponent<MeshComponent>();
+
+					// 1st pass
+					m_highlightRenderView->bind();
+					m_highlightMaskShader->use();
+
+					auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+					RenderCommand::draw(vao);
+
+					// 2nd pass
+					auto& binaryMaskTexture = m_highlightRenderView->getRenderTargetTexture();
+					m_highlightRenderView->swapToAdditionalTarget();
+					m_highlightRenderView->bind();
+					m_highlightEdgeDetectionShader->use();
+					m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
+					
+					RenderCommand::draw(vao);
+
+					// 3rd pass
+					Resource<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
+					auto& edgeDetectedTexture = m_highlightRenderView->getRenderTargetTexture(); // todo fix
+					m_highlightMergeShader->use();
+					m_highlightMergeShader->setTextureInShader(mainSceneRenderTargetTexture, "MainTexture", 0);
+					m_highlightMergeShader->setTextureInShader(edgeDetectedTexture, "uEdgeTex", 1);
+
+					graphics->renderView->bind();
+
+					RenderCommand::draw(vao);
+				}
+			}
 		}
 
 		// Render UI

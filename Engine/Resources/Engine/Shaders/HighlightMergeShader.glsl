@@ -8,7 +8,7 @@ uniform vec2 uTexelSize;
 uniform vec3 uHighlightColor;
 uniform int uDilationRadius;
 
-void main() 
+void frag(inout vec3 color)
 {
     vec2 uv = gl_FragCoord.xy * uTexelSize;
 
@@ -24,5 +24,5 @@ void main()
     vec3 sceneColor = texture(MainTexture, uv).rgb;
     vec3 finalColor = mix(sceneColor, uHighlightColor, edge);
 
-    FragColor = vec4(finalColor, 1.0);
+    color = finalColor;
 }

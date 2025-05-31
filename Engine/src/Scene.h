@@ -194,4 +194,10 @@ private:
 	std::vector<std::shared_ptr<RenderView>> m_renderViews;
 
 	std::shared_ptr<GameLayer> gameEventLayer;
+
+	std::shared_ptr<RenderView> m_highlightRenderView;
+
+	Resource<Shader> m_highlightMaskShader;
+	Resource<Shader> m_highlightEdgeDetectionShader;
+	Resource<Shader> m_highlightMergeShader;
 };
