@@ -489,14 +489,22 @@ void Scene::draw(float deltaTime)
 					m_highlightRenderView->swapToAdditionalTarget();
 					m_highlightRenderView->bind();
 					m_highlightEdgeDetectionShader->use();
+					auto width = Engine::get()->getWindow()->getWidth();
+					auto height = Engine::get()->getWindow()->getHeight();
+					glm::vec2 texelSize = glm::vec2(1.0 / width, 1.0 / height);
+					m_highlightEdgeDetectionShader->setUniformValue("uTexelSize", texelSize);
 					m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
 					
 					RenderCommand::draw(vao);
 
 					// 3rd pass
 					Resource<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
+					m_highlightRenderView->swapBackToMainTarget(); // todo optimize (i should fetch the secondary texture instead)
 					auto& edgeDetectedTexture = m_highlightRenderView->getRenderTargetTexture(); // todo fix
 					m_highlightMergeShader->use();
+					m_highlightMergeShader->setUniformValue("uTexelSize", texelSize);
+					m_highlightMergeShader->setUniformValue("uHighlightColor", glm::vec3(0.04, 0.28, 0.26));
+					m_highlightMergeShader->setUniformValue("uDilationRadius", 5);
 					m_highlightMergeShader->setTextureInShader(mainSceneRenderTargetTexture, "MainTexture", 0);
 					m_highlightMergeShader->setTextureInShader(edgeDetectedTexture, "uEdgeTex", 1);
 
