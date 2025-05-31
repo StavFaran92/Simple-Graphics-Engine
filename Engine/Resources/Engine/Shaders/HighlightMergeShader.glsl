@@ -1,8 +1,5 @@
 #frag
 
-#version 330 core
-out vec4 FragColor;
-
 uniform sampler2D uEdgeTex;
 uniform vec2 uTexelSize;
 uniform vec3 uHighlightColor;

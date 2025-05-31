@@ -480,6 +480,9 @@ void Scene::draw(float deltaTime)
 					// 1st pass
 					m_highlightRenderView->bind();
 					m_highlightMaskShader->use();
+					m_highlightMaskShader->setModelMatrix(glm::mat4(1.0));
+					m_highlightMaskShader->setViewMatrix(*graphics->view);
+					m_highlightMaskShader->setProjectionMatrix(*graphics->projection);
 
 					auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
 					RenderCommand::draw(vao);

@@ -1,8 +1,5 @@
 #frag
 
-#version 330 core
-out vec4 FragColor;
-
 uniform sampler2D uMaskTex;
 uniform vec2 uTexelSize; // = 1.0 / screen resolution
 
