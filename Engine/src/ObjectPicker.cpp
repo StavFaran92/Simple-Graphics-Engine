@@ -107,6 +107,10 @@ int ObjectPicker::pickObject(int x, int y)
 		logInfo("Selected Object: " + std::to_string(pixel.ObjectID));
 		m_selectedObject = pixel.ObjectID;
 	}
+	else
+	{
+		m_selectedObject = -1;
+	}
 
 	return m_selectedObject;
 

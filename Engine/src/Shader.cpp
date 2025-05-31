@@ -500,6 +500,10 @@ void embeddOverrideShaderInUberShader(ShadersInfo& shaderOverrideInfo, ShaderOve
 		{
 			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcessShader.glsl";
 		}
+		else if (shaderOverride == ShaderOverride::Volume)
+		{
+			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/VolumeShader.glsl";
+		}
 
 		std::string& pixelShaderSources = Engine::get()->getShaderLoader()->readShader(shaderPath);
 

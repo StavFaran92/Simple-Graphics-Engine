@@ -172,7 +172,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 	{
 		Entity entityHandler{ entity, &scene->getRegistry() };
 
-        if (entityHandler.HasComponent<PostProcessComponent>()) continue; // todo fix
+        if (entityHandler.HasComponent<VolumeComponent>()) continue; // todo fix
 
         graphics->entity = &entityHandler;
 

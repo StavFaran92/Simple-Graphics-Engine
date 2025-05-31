@@ -407,8 +407,8 @@ void Scene::draw(float deltaTime)
 
 		
 
-		// Render Post Process effects
-		for (auto&& [entity, postProcess, shader] : m_registry->get().view<PostProcessComponent, ShaderComponent>().each())
+		// Render Volumetrics
+		for (auto&& [entity, volume, shader] : m_registry->get().view<VolumeComponent, ShaderComponent>().each())
 		{
 			Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 			renderView->swapToAdditionalTarget();
@@ -477,18 +477,21 @@ void Scene::draw(float deltaTime)
 					Entity e(entity, &getRegistry());
 					auto& mesh = e.getComponent<MeshComponent>();
 
+					glDisable(GL_DEPTH_TEST);
+
 					{
 						glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Highlight Pass 1 - Mask");
 
 						// 1st pass
 						m_highlightRenderView->bind();
+						RenderCommand::clear();
 						m_highlightMaskShader->use();
-						m_highlightMaskShader->setModelMatrix(glm::mat4(1.0));
+						m_highlightMaskShader->setModelMatrix(e.getComponent<Transformation>().getWorldTransformation());
 						m_highlightMaskShader->setViewMatrix(*graphics->view);
 						m_highlightMaskShader->setProjectionMatrix(*graphics->projection);
 
-						auto vao = mesh.mesh.get()->getPrimaryMesh()->getVAO();
-						RenderCommand::draw(vao);
+						for (auto& m : mesh.mesh->getMeshes())
+							RenderCommand::draw(m->getVAO());
 
 						glPopDebugGroup();
 					}
@@ -500,6 +503,7 @@ void Scene::draw(float deltaTime)
 						auto& binaryMaskTexture = m_highlightRenderView->getRenderTargetTexture();
 						m_highlightRenderView->swapToAdditionalTarget();
 						m_highlightRenderView->bind();
+						//RenderCommand::clear();
 						m_highlightEdgeDetectionShader->use();
 						auto width = Engine::get()->getWindow()->getWidth();
 						auto height = Engine::get()->getWindow()->getHeight();
@@ -525,7 +529,7 @@ void Scene::draw(float deltaTime)
 						glm::vec2 texelSize = glm::vec2(1.0 / width, 1.0 / height);
 						m_highlightMergeShader->use();
 						m_highlightMergeShader->setUniformValue("uTexelSize", texelSize);
-						m_highlightMergeShader->setUniformValue("uHighlightColor", glm::vec3(0.04, 0.28, 0.26));
+						m_highlightMergeShader->setUniformValue("uHighlightColor", glm::vec3(1.0, 0.55, 0.0));
 						m_highlightMergeShader->setUniformValue("uDilationRadius", 5);
 						m_highlightMergeShader->setTextureInShader(mainSceneRenderTargetTexture, "MainTexture", 0);
 						m_highlightMergeShader->setTextureInShader(edgeDetectedTexture, "uEdgeTex", 1);
@@ -537,6 +541,8 @@ void Scene::draw(float deltaTime)
 
 						glPopDebugGroup();
 					}
+
+					glEnable(GL_DEPTH_TEST);
 				}
 			}
 		}

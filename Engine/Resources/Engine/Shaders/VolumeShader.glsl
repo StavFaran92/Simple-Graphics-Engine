@@ -14,8 +14,12 @@ layout (location = 0) in vec3 aPos;
 out vec2 uv;
                                                                                     
 void main()                                                                         
-{  
-    gl_Position = vec4(aPos.xy, 1.0, 1.0); 
+{
+    vec3 pos = aPos;
+    uv = (pos.xy + 1.0) / 2.0; // Transform from [-1, 1] to [0, 1] range
+    // gl_Position = vec4(pos.xy, 1.0, 1.0);  
+    
+    gl_Position = projection * view * model * vec4(aPos, 1.0); 
                                   
 }
 

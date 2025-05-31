@@ -449,9 +449,9 @@ struct TestComp : public Component
 	int test2 = 0;
 };
 
-struct PostProcessComponent : public Component
+struct VolumeComponent : public Component
 {
-	PostProcessComponent() = default;
+	VolumeComponent() = default;
 
 	template <class Archive>
 	void serialize(Archive& archive) {

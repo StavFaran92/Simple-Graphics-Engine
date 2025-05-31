@@ -16,6 +16,7 @@ enum class ShaderOverride : int
 {
 	PBR,
 	Pixel,
+	Volume,
 	PostProcess
 };
 
