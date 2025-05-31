@@ -48,6 +48,8 @@ Resource<Texture> Texture::createEmptyTexture(int width, int height, int interna
 	textureData.params = {
 		{GL_TEXTURE_MIN_FILTER, GL_NEAREST },
 		{GL_TEXTURE_MAG_FILTER, GL_NEAREST },
+		{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+		{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
 	};
 
 	return create2DTextureFromBuffer(textureData);

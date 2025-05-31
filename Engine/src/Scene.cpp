@@ -530,7 +530,7 @@ void Scene::draw(float deltaTime)
 						m_highlightMergeShader->use();
 						m_highlightMergeShader->setUniformValue("uTexelSize", texelSize);
 						m_highlightMergeShader->setUniformValue("uHighlightColor", glm::vec3(1.0, 0.55, 0.0));
-						m_highlightMergeShader->setUniformValue("uDilationRadius", 5);
+						m_highlightMergeShader->setUniformValue("uDilationRadius", 3);
 						m_highlightMergeShader->setTextureInShader(mainSceneRenderTargetTexture, "MainTexture", 0);
 						m_highlightMergeShader->setTextureInShader(edgeDetectedTexture, "uEdgeTex", 1);
 
