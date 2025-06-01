@@ -1,77 +1,127 @@
-//#include "Grid.h"
-//
-//#include "Vertex.h"
-//#include "Renderer.h"
-//#include "Mesh.h"
-//
-//std::shared_ptr<Grid> Grid::GenerateGrid(int slices)
-//{
-//    auto grid = std::make_shared<Grid>();
-//
-//    auto vertices = std::make_shared<std::vector<Vertex>>();;
-//    auto indices = std::make_shared<std::vector<unsigned int>>();
-//
-//    for (int j = -slices; j <= slices; ++j) {
-//        for (int i = -slices; i <= slices; ++i) {
-//            float x = i;
-//            float y = 0;
-//            float z = j;
-//
-//            Vertex vertex;
-//            vertex.Position = glm::vec3(x, y, z);
-//            vertex.Normal = Constants::VEC3_ZERO;
-//            vertex.TexCoords = { 0,0 };
-//
-//            vertices->push_back(vertex);
-//        }
-//    }
-//
-//    for (unsigned int j = 0; j < slices; ++j) {
-//        for (unsigned int i = 0; i < slices; ++i) {
-//
-//            unsigned int row1 = j * (slices + 1);
-//            unsigned int row2 = (j + 1) * (slices + 1);
-//
-//            indices->insert(indices->end(), { row1 + i, row1 + i + 1, row1 + i + 1, row2 + i + 1 });
-//            indices->insert(indices->end(), { row2 + i + 1, row2 + i, row2 + i, row1 + i });
-//
-//        }
-//    }
-//
-//    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(vertices, indices);
-//
-//    //auto shader = std::make_shared < Shader >("Resources\\Shaders\\shader.vert", "Resources\\Shaders\\shader.frag");
-//    //shader->SetEnableMaterials(true);
-//    //shader->SetEnableLights(true);
-//    //shader->SetEnableTextures(true);
-//    //grid->AttachShader(shader);
-//
-//    std::shared_ptr<Material> material = std::make_shared<Material>(32.0f);
-//    grid->UseMaterial(material);
-//
-//    grid->m_meshes.push_back(mesh);
-//
-//    return grid;
-//}
-//
-//void Grid::Draw(std::shared_ptr<IRenderer> renderer, Resource<Shader> shader)
-//{
-//    auto currShader = m_shader;
-//
-//    if (shader)
-//        currShader = shader;
-//
-//    currShader->SetMat4("model", m_transformation->GetTransformation());
-//
-//    if (m_material)
-//    {
-//        m_material->UseMaterial(currShader);
-//    }
-//
-//    renderer->SetDrawType(Renderer::DrawType::Lines);
-//
-//    for (auto i = 0; i < m_meshes.size(); i++)
-//    {
-//        m_meshes[i]->renderMesh(currShader, renderer);
-//    }
-//}
+#include "Grid.h"
+
+#include "Factory.h"
+#include "MeshBuilder.h"
+#include "MeshExporter.h"
+
+aiScene* generateScene(const std::vector<float>& vertices, const std::vector<unsigned int>& indices)
+{
+	// Create a new mesh
+	aiMesh* mesh = new aiMesh();
+	mesh->mNumVertices = vertices.size();
+	mesh->mVertices = new aiVector3D[mesh->mNumVertices];
+	mesh->mNormals = new aiVector3D[mesh->mNumVertices];
+	mesh->mTextureCoords[0] = new aiVector3D[mesh->mNumVertices];
+	mesh->mNumUVComponents[0] = 2;
+
+	// Set vertices
+	for (unsigned int i = 0; i < mesh->mNumVertices / 5; ++i)
+	{
+		mesh->mVertices[i] = aiVector3D(vertices[i * 5 + 0], vertices[i * 5 + 1], vertices[i * 5 + 2]);
+		mesh->mTextureCoords[0][i] = aiVector3D(vertices[i * 5 + 3], vertices[i * 5 + 4], 0.0f);
+	}
+
+	mesh->mNumFaces = indices.size() / 4;
+	mesh->mFaces = new aiFace[mesh->mNumFaces];
+
+	// Set faces
+	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
+		mesh->mFaces[i].mNumIndices = 4;
+		mesh->mFaces[i].mIndices = new unsigned int[4] { indices[i * 4 + 0], indices[i * 4 + 1], indices[i * 4 + 2], indices[i * 4 + 3] };
+	}
+
+	mesh->mPrimitiveTypes = aiPrimitiveType_POLYGON;
+
+	// Create a new scene
+	aiScene* scene = new aiScene();
+	scene->mNumMeshes = 1;
+	scene->mMeshes = new aiMesh * [1] { mesh };
+	scene->mNumMaterials = 1;
+	scene->mMaterials = new aiMaterial * [1] { new aiMaterial() };
+	scene->mRootNode = new aiNode();
+	scene->mRootNode->mNumMeshes = 1;
+	scene->mRootNode->mMeshes = new unsigned int[1] { 0 };
+
+	return scene;
+}
+
+Resource<MeshCollection> Grid::generateGrid(int x, int y, bool isTransient)
+{
+	int xRez = x;
+	int yRez = y;
+
+	// vertex generation
+	std::vector<float> vertices;
+	std::vector<unsigned int> indices;
+	int vertexCount = (xRez + 1) * (yRez + 1);
+
+	vertices.reserve(vertexCount * 5);
+	indices.reserve(xRez * yRez * 4);
+
+	// Vertex generation
+	for (int i = 0; i <= yRez; i++)
+	{
+		for (int j = 0; j <= xRez; j++)
+		{
+			// Vertex positions
+			float xPos = (j / (float)xRez) - 0.5f;  // Normalize to [-0.5, 0.5]
+			float zPos = (i / (float)yRez) - 0.5f;  // Normalize to [-0.5, 0.5]
+			float yPos = 0.0f;  // Flat terrain
+
+			// Texture coordinates
+			float u = j / (float)xRez;
+			float v = i / (float)yRez;
+
+			// Add position and texture coordinate to vertex list
+			vertices.push_back(xPos);  // x
+			vertices.push_back(yPos);  // y
+			vertices.push_back(zPos);  // z
+			vertices.push_back(u);     // u
+			vertices.push_back(v);     // v
+		}
+	}
+
+	// Index generation for the grid
+	for (int i = 0; i < yRez; i++)
+	{
+		for (int j = 0; j < xRez; j++)
+		{
+			int topLeft = i * (xRez + 1) + j;
+			int topRight = topLeft + 1;
+			int bottomLeft = (i + 1) * (xRez + 1) + j;
+			int bottomRight = bottomLeft + 1;
+
+			// Quad indices
+			indices.push_back(topLeft);
+			indices.push_back(topRight);
+			indices.push_back(bottomLeft);
+			indices.push_back(bottomRight);
+		}
+	}
+
+
+	Resource<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+
+	auto mesh = std::make_shared<Mesh>();
+
+	VertexLayout layout;
+	layout.attribs.push_back(LayoutAttribute::Positions);
+	layout.attribs.push_back(LayoutAttribute::Texcoords);
+	layout.numOfVertices = vertexCount;
+	layout.build();
+
+	MeshBuilder::builder()
+		.addRawVertices(vertices.data(), layout)
+		.addIndices(indices)
+		.build(*mesh.get());
+
+	meshCollection.get()->addMesh(mesh);
+
+	if (!isTransient)
+	{
+		aiScene* scene = generateScene(vertices, indices);
+		MeshExporter::exportMesh(meshCollection, scene);
+	}
+
+	return meshCollection;
+}

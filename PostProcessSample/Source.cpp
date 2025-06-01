@@ -10,9 +10,9 @@ public:
 	void start() override
 	{
 		auto ent = Engine::get()->getContext()->getActiveScene()->createEntity();
-		ent.addComponent<PostProcessComponent>();
+		ent.addComponent<VolumeComponent>();
 
-		auto& shader = Shader::createOverrideShader("RayMarchSample", "../../PostProcessSample/Resources/Content/Shaders/BasicShader.glsl", ShaderOverride::PostProcess);
+		auto& shader = Shader::createOverrideShader("RayMarchSample", "../../PostProcessSample/Resources/Content/Shaders/BasicShader.glsl", ShaderOverride::Volume);
 		auto& shaderComponent = ent.addComponent<ShaderComponent>();
 		shaderComponent.setShader(shader);
 

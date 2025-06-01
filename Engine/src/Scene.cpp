@@ -359,10 +359,7 @@ void Scene::draw(float deltaTime)
 		glDepthMask(GL_TRUE);
 		glDepthFunc(GL_LESS);
 
-		m_terrainShader->use();
-
-		m_terrainShader->setUniformValue("view", *graphics->view);
-		m_terrainShader->setUniformValue("projection", *graphics->projection);
+		
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//glEnable(GL_POLYGON_OFFSET_LINE);
@@ -371,6 +368,9 @@ void Scene::draw(float deltaTime)
 		// Render terrain
 		for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
 		{
+			m_terrainShader->use();
+			m_terrainShader->setUniformValue("view", *graphics->view);
+			m_terrainShader->setUniformValue("projection", *graphics->projection);
 			m_terrainShader->setUniformValue("scale", terrain.getScale());
 			m_terrainShader->setUniformValue("model", transform.getWorldTransformation());
 			m_terrainShader->setUniformValue("width", terrain.getWidth());
