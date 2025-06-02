@@ -200,4 +200,6 @@ private:
 	Resource<Shader> m_highlightMaskShader;
 	Resource<Shader> m_highlightEdgeDetectionShader;
 	Resource<Shader> m_highlightMergeShader;
+
+	std::shared_ptr<VertexArrayObject> m_wireframeGrid;
 };

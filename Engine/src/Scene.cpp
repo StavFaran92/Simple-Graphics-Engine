@@ -207,6 +207,40 @@ void Scene::init(Context* context)
 	m_highlightMaskShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl");
 	m_highlightEdgeDetectionShader = Shader::createOverrideShader("HighlightEdgeDetectionShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess);
 	m_highlightMergeShader = Shader::createOverrideShader("HighlightMergeShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess);
+
+	VertexLayout layout;
+	layout.attribs.push_back(LayoutAttribute::Positions);
+	m_wireframeGrid = std::make_shared<VertexArrayObject>(layout);
+	
+	const float step = 0.1f;
+	const int gridSize = 10;
+	const float maxCoord = (gridSize - 1) * step;
+
+	// Horizontal lines (along X, Z stays fixed)
+	for (int z = 0; z < gridSize; ++z)
+	{
+		float zCoord = z * step;
+
+		Vertex v0, v1;
+		v0.position = glm::vec3(0.0f, 0.0f, zCoord);
+		v1.position = glm::vec3(maxCoord, 0.0f, zCoord);
+		m_wireframeGrid->addVertex(v0);
+		m_wireframeGrid->addVertex(v1);
+	}
+
+	// Vertical lines (along Z, X stays fixed)
+	for (int x = 0; x < gridSize; ++x)
+	{
+		float xCoord = x * step;
+
+		Vertex v0, v1;
+		v0.position = glm::vec3(xCoord, 0.0f, 0.0f);
+		v1.position = glm::vec3(xCoord, 0.0f, maxCoord);
+		m_wireframeGrid->addVertex(v0);
+		m_wireframeGrid->addVertex(v1);
+	}
+
+	m_wireframeGrid->build();
 }
 
 void Scene::update(float deltaTime)
@@ -545,6 +579,22 @@ void Scene::draw(float deltaTime)
 					glEnable(GL_DEPTH_TEST);
 				}
 			}
+		}
+
+		// Render WireframeGrid
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Wireframe Grid");
+
+			m_highlightMaskShader->use();
+			m_highlightMaskShader->setModelMatrix(glm::mat4(1.0));
+			m_highlightMaskShader->setViewMatrix(*graphics->view);
+			m_highlightMaskShader->setProjectionMatrix(*graphics->projection);
+
+			m_wireframeGrid->Bind();
+
+			glDrawArrays(GL_LINES, 0, 40);
+
+			glPopDebugGroup();
 		}
 
 		// Render UI
