@@ -8,16 +8,18 @@
 //#include "VertexBufferLayout.h"
 #include "VertexBufferElement.h"
 #include "ElementBufferObject.h"
+#include "VertexLayout.h"
 
 struct VertexLayout;
 
 class VertexArrayObject
 {
 public:
+	VertexArrayObject();
 	VertexArrayObject(const VertexLayout& layout);
 	~VertexArrayObject();
 
-	void AttachBuffer(const ElementBufferObject* ebo);
+	void AttachBuffer(const VertexBufferObject& vbo, const ElementBufferObject* ebo);
 	
 
 	void setLayout(const VertexLayout& layout);

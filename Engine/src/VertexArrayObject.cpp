@@ -5,6 +5,13 @@
 #include "Logger.h"
 #include "VertexLayout.h"
 
+VertexArrayObject::VertexArrayObject()
+	: m_layout()
+{
+	glGenVertexArrays(1, &m_id);
+	glBindVertexArray(m_id);
+}
+
 VertexArrayObject::VertexArrayObject(const VertexLayout& layout)
 	: m_layout(layout)
 {
@@ -18,14 +25,14 @@ VertexArrayObject::~VertexArrayObject()
 	glDeleteVertexArrays(1, &m_id);
 }
 
-void VertexArrayObject::AttachBuffer(const ElementBufferObject* ebo)
+void VertexArrayObject::AttachBuffer(const VertexBufferObject& vbo, const ElementBufferObject* ebo)
 {
 	// bind this VAO
 	Bind();
 
 	// bind VBO to associate with this VAO
-	m_vbo->Bind();
-	m_verticesCount = m_vbo->getLength();
+	vbo.Bind();
+	m_verticesCount = vbo.getLength();
 
 	// bind IBO to associate with this VAO
 	if (ebo)
@@ -158,7 +165,7 @@ bool VertexArrayObject::build()
 	m_vbo = std::make_shared<VertexBufferObject>(&(raw[0]), m_vertices.size(), bufferSize);
 
 	// fill vertex attributes
-	AttachBuffer(0);
+	AttachBuffer(*m_vbo.get(), 0);
 
 
 	return true;
