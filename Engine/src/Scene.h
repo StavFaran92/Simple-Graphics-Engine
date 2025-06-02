@@ -14,6 +14,7 @@
 #include "IRenderer.h"
 #include "Entity.h"
 #include "Archiver.h"
+#include "WireframeGrid.h"
 
 
 class Model;
@@ -201,5 +202,5 @@ private:
 	Resource<Shader> m_highlightEdgeDetectionShader;
 	Resource<Shader> m_highlightMergeShader;
 
-	std::shared_ptr<VertexArrayObject> m_wireframeGrid;
+	WireframeGrid m_wireframeGrid;
 };

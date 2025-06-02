@@ -10,7 +10,7 @@ public:
 	{
 		VertexLayout layout;
 		layout.attribs.push_back(LayoutAttribute::Positions);
-		vao = VertexArrayObject(layout);
+		vao = std::make_shared<VertexArrayObject>(layout);
 
 		const float step = 0.1f;
 		const int gridSize = 10;
@@ -24,8 +24,8 @@ public:
 			Vertex v0, v1;
 			v0.position = glm::vec3(0.0f, 0.0f, zCoord);
 			v1.position = glm::vec3(maxCoord, 0.0f, zCoord);
-			vao.addVertex(v0);
-			vao.addVertex(v1);
+			vao->addVertex(v0);
+			vao->addVertex(v1);
 		}
 
 		// Vertical lines (along Z, X stays fixed)
@@ -36,12 +36,12 @@ public:
 			Vertex v0, v1;
 			v0.position = glm::vec3(xCoord, 0.0f, 0.0f);
 			v1.position = glm::vec3(xCoord, 0.0f, maxCoord);
-			vao.addVertex(v0);
-			vao.addVertex(v1);
+			vao->addVertex(v0);
+			vao->addVertex(v1);
 		}
 
-		vao.build();
+		vao->build();
 	}
 
-	VertexArrayObject vao;
+	std::shared_ptr<VertexArrayObject> vao;
 };
