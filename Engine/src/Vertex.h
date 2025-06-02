@@ -3,8 +3,11 @@
 #include "glm/glm.hpp"
 
 struct Vertex {
-	glm::vec3 Position;
-	glm::vec3 Normal;
-	glm::vec2 TexCoords;
-	//glm::vec3 Colors;
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 texCoord;
+	glm::vec3 color;
+	glm::vec2 tangent;
+	glm::vec3 boneIDs;
+	glm::vec3 boneWeights;
 };
