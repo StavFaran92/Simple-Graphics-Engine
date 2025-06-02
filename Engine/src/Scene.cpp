@@ -551,13 +551,15 @@ void Scene::draw(float deltaTime)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Wireframe Grid");
 
-			m_highlightMaskShader->use();
-			m_highlightMaskShader->setModelMatrix(glm::mat4(1.0));
-			m_highlightMaskShader->setViewMatrix(*graphics->view);
-			m_highlightMaskShader->setProjectionMatrix(*graphics->projection);
+			m_wireframeGrid.shader->use();
+			m_wireframeGrid.shader->setModelMatrix(glm::mat4(1.0));
+			m_wireframeGrid.shader->setViewMatrix(*graphics->view);
+			m_wireframeGrid.shader->setProjectionMatrix(*graphics->projection);
+			m_wireframeGrid.shader->setUniformValue("color", glm::vec3(0.6, 0.6, 0.6));
 
 			m_wireframeGrid.vao->Bind();
 
+			glLineWidth(2); // Size in pixels
 			glDrawArrays(GL_LINES, 0, m_wireframeGrid.vao->GetVerticesCount());
 
 			glPopDebugGroup();

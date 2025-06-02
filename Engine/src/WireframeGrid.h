@@ -2,6 +2,8 @@
 
 #include "VertexLayout.h"
 #include "VertexArrayObject.h"
+#include "Shader.h"
+#include "Resource.h"
 
 class WireframeGrid
 {
@@ -12,36 +14,39 @@ public:
 		layout.attribs.push_back(LayoutAttribute::Positions);
 		vao = std::make_shared<VertexArrayObject>(layout);
 
-		const float step = 0.1f;
-		const int gridSize = 10;
-		const float maxCoord = (gridSize - 1) * step;
+		const float step = 1.0f;
+		const int gridSize = 50;
+		const float halfSize = (gridSize - 1) * step * 0.5f;
 
 		// Horizontal lines (along X, Z stays fixed)
-		for (int z = 0; z < gridSize; ++z)
+		for (int i = 0; i < gridSize; ++i)
 		{
-			float zCoord = z * step;
+			float z = -halfSize + i * step;
 
 			Vertex v0, v1;
-			v0.position = glm::vec3(0.0f, 0.0f, zCoord);
-			v1.position = glm::vec3(maxCoord, 0.0f, zCoord);
+			v0.position = glm::vec3(-halfSize, 0.0f, z);
+			v1.position = glm::vec3(halfSize, 0.0f, z);
 			vao->addVertex(v0);
 			vao->addVertex(v1);
 		}
 
 		// Vertical lines (along Z, X stays fixed)
-		for (int x = 0; x < gridSize; ++x)
+		for (int i = 0; i < gridSize; ++i)
 		{
-			float xCoord = x * step;
+			float x = -halfSize + i * step;
 
 			Vertex v0, v1;
-			v0.position = glm::vec3(xCoord, 0.0f, 0.0f);
-			v1.position = glm::vec3(xCoord, 0.0f, maxCoord);
+			v0.position = glm::vec3(x, 0.0f, -halfSize);
+			v1.position = glm::vec3(x, 0.0f, halfSize);
 			vao->addVertex(v0);
 			vao->addVertex(v1);
 		}
 
 		vao->build();
+
+		shader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl");
 	}
 
 	std::shared_ptr<VertexArrayObject> vao;
+	Resource<Shader> shader;
 };
