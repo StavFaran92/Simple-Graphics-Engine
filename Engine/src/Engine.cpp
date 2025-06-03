@@ -331,7 +331,9 @@ void Engine::run(Application* app)
         //glBlitFramebuffer(0, 0, m_window->getWidth(), m_window->getHeight(), 0, 0, m_window->getWidth(), m_window->getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "GUI render pass");
         m_imguiHandler->render();
+        glPopDebugGroup();
 
         m_window->SwapBuffer();
 

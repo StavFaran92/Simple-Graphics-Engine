@@ -198,7 +198,7 @@ void Scene::init(Context* context)
 
 	m_basicBox = ShapeFactory::createBox();
 
-	addRenderView(0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
+	addRenderView("Scene View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 
 	m_registry->getRegistry().on_construct<ScriptableEntity>().connect<&Scene::bindScriptToLayer>(this);
 
@@ -262,6 +262,9 @@ void Scene::draw(float deltaTime)
 		auto viewport = renderView->getViewport();
 
 		renderView->bind();
+
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, renderView->getName().c_str());
+
 		RenderCommand::clear();
 
 		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
@@ -284,7 +287,11 @@ void Scene::draw(float deltaTime)
 		graphics->brdfLUT = m_BRDFIntegrationLUT;
 		graphics->renderView = renderView;
 
-		m_shadowSystem->renderToDepthMap();
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Shadow Map");
+			m_shadowSystem->renderToDepthMap();
+			glPopDebugGroup();
+		}
 
 		graphics->lightSpaceMatrix = m_shadowSystem->getLightSpaceMat();
 		graphics->shadowMap = m_shadowSystem->getShadowMap();
@@ -320,17 +327,25 @@ void Scene::draw(float deltaTime)
 
 		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Deferred Renderer pass");
 		m_deferredRenderer->renderScene(this);
+		glPopDebugGroup();
 
 		unsigned int srcID = m_deferredRenderer->getGBuffer().getID();
 		unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
 
 		RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
 
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Forward Renderer pass");
 		m_forwardRenderer->renderScene(this);
+		glPopDebugGroup();
 
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Custom shader render pass");
 		m_forwardRenderer->renderSceneUsingCustomShader(this);
+		glPopDebugGroup();
 
+
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Skybox render pass");
 		// Render skybox
 		glDepthMask(GL_FALSE);
 		glDepthFunc(GL_LEQUAL);
@@ -359,11 +374,15 @@ void Scene::draw(float deltaTime)
 		glDepthMask(GL_TRUE);
 		glDepthFunc(GL_LESS);
 
+		glPopDebugGroup();
+
 		
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//glEnable(GL_POLYGON_OFFSET_LINE);
 		//glPolygonOffset(-1.0, -1.0);
+
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Terrain render pass");
 
 		// Render terrain
 		for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
@@ -405,7 +424,10 @@ void Scene::draw(float deltaTime)
 			RenderCommand::drawPatches(vao);
 		}
 
+		glPopDebugGroup();
+
 		
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Volumetrics render pass");
 
 		// Render Volumetrics
 		for (auto&& [entity, volume, shader] : m_registry->get().view<VolumeComponent, ShaderComponent>().each())
@@ -446,6 +468,8 @@ void Scene::draw(float deltaTime)
 			renderView->bind();
 			glEnable(GL_DEPTH_TEST);
 		}
+
+		glPopDebugGroup();
 
 		// Highlight selected object
 		auto objectPicker = Engine::get()->getSubSystem<ObjectPicker>();
@@ -595,7 +619,9 @@ void Scene::draw(float deltaTime)
 
 		glDisable(GL_BLEND);
 
+		glPopDebugGroup();
 	}
+
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//glDisable(GL_POLYGON_OFFSET_LINE);
@@ -826,11 +852,11 @@ physx::PxScene* Scene::getPhysicsScene() const
 	return m_PhysicsScene;
 }
 
-unsigned int Scene::addRenderView(int x, int y, int w, int h, const Entity& e)
+unsigned int Scene::addRenderView(const std::string& name, int x, int y, int w, int h, const Entity& e)
 {
 	// todo maybe use map here?
 	unsigned int id = m_renderViews.size();
-	m_renderViews.push_back(std::make_shared<RenderView>(Viewport{x, y, w, h}, e));
+	m_renderViews.push_back(std::make_shared<RenderView>(Viewport{x, y, w, h}, e, name));
 	return id;
 }
 

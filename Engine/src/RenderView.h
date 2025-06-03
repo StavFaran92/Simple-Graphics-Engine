@@ -27,7 +27,7 @@ class RenderView
 public:
 	
 
-	RenderView(Viewport viewport, const Entity& camera);
+	RenderView(Viewport viewport, const Entity& camera, const std::string& name = "temp");
 
 	Viewport getViewport() const;
 
@@ -48,6 +48,8 @@ public:
 	void swapToAdditionalTarget();
 	void swapBackToMainTarget();
 
+	std::string getName() const;
+
 	//void setRenderTargetID(unsigned int targetID);
 
 private:
@@ -57,4 +59,6 @@ private:
 	RenderTarget renderTargets[2];
 
 	unsigned int m_boundTargetTextureSlot = 0;
+
+	const std::string m_name;
 };

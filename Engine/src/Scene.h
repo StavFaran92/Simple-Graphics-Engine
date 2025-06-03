@@ -116,7 +116,7 @@ public:
 
 	physx::PxScene* getPhysicsScene() const;
 
-	unsigned int addRenderView(int x, int y, int w, int h, const Entity& e);
+	unsigned int addRenderView(const std::string& name, int x, int y, int w, int h, const Entity& e);
 
 	unsigned int getRenderTargetFrameBufferID(unsigned int) const;
 	unsigned int getRenderTargetTextureID(unsigned int) const;

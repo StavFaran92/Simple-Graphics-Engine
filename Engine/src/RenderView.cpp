@@ -30,8 +30,8 @@ RenderTarget::RenderTarget(Viewport viewport)
 	m_renderTargetFBO->unbind();
 }
 
-RenderView::RenderView(Viewport viewport, const Entity& camera)
-	: m_viewport(viewport), m_camera(camera)
+RenderView::RenderView(Viewport viewport, const Entity& camera, const std::string& name)
+	: m_viewport(viewport), m_camera(camera), m_name(name)
 {
 	renderTargets[0] = RenderTarget(viewport);
 	renderTargets[1] = RenderTarget(viewport);
@@ -93,6 +93,11 @@ void RenderView::swapBackToMainTarget()
 	RenderCommand::copyFrameBufferData(renderTargets[1].m_renderTargetFBO->getID(),
 		renderTargets[0].m_renderTargetFBO->getID(),
 		RenderCommand::BufferBit::DEPTH_BUFFER_BIT | RenderCommand::BufferBit::COLOR_BUFFER_BIT);
+}
+
+std::string RenderView::getName() const
+{
+	return m_name;
 }
 
 const Entity& RenderView::getCamera() const
