@@ -22,6 +22,8 @@ public:
 	Resource(UUID uid) : m_uid(uid) 
 	{
 		Engine::get()->getResourceManager()->incRef(uid);
+
+		if(!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
 	};
 
 	Resource(const Resource<T>& other) 
@@ -31,6 +33,8 @@ public:
 		{
 			Engine::get()->getResourceManager()->incRef(other.m_uid);
 		}
+
+		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
 	};
 
 	Resource<T>& operator=(const Resource<T>& other)
@@ -45,6 +49,7 @@ public:
 		{
 			Engine::get()->getResourceManager()->incRef(other.m_uid);
 		}
+		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
 
 		return *this;
 	};
@@ -53,12 +58,14 @@ public:
 	{
 		m_uid = other.m_uid;
 		other.m_uid = EMPTY_UUID;
+		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
 	};
 
 	Resource<T>& operator=(Resource<T>&& other)
 	{
 		m_uid = other.m_uid;
 		other.m_uid = EMPTY_UUID;
+		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
 
 		return *this;
 	};

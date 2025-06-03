@@ -236,6 +236,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 	graphics->shader = m_gBufferShader;
 	graphics->shader->use();
 
+	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
+
 	// Render all objects
 	for (auto& entityHandler : graphics->entityGroup)
 	{
@@ -288,6 +290,10 @@ void DeferredRenderer::renderScene(Scene* scene)
 		}
 		
 	};
+
+	glPopDebugGroup();
+
+	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Light pass");
 
 	if (graphics->renderMode == RenderMode::WIREFRAME)
 	{
@@ -401,6 +407,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 		auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
 		RenderCommand::draw(mesh->getVAO());
 	}
+
+	glPopDebugGroup();
 
 	//graphics->renderView->unbind();
 }

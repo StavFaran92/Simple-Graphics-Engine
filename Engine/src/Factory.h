@@ -14,9 +14,9 @@ public:
     {
         T* texture = new T(args...);
         auto uid = uuid::generate_uuid_v4();
-        Resource<T> res(uid);
         Engine::get()->getMemoryPool<T>()->add(uid, texture);
         Engine::get()->getResourceManager()->incRef(uid);
+        Resource<T> res(uid);
         return res;
     }
 };
