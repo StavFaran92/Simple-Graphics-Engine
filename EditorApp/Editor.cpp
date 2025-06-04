@@ -967,6 +967,7 @@ void displayentityName(const Entity& e)
 	if (ImGui::IsItemClicked())
 	{
 		selectedEntity = e;
+		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(selectedEntity.handlerID());
 	}
 }
 

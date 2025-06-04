@@ -499,7 +499,9 @@ void Scene::draw(float deltaTime)
 				if ((entity_id)entity == selectedObject)
 				{
 					Entity e(entity, &getRegistry());
-					auto& mesh = e.getComponent<MeshComponent>();
+					auto mesh = e.tryGetComponent<MeshComponent>();
+
+					if (!mesh) break;
 
 					glDisable(GL_DEPTH_TEST);
 
@@ -514,7 +516,7 @@ void Scene::draw(float deltaTime)
 						m_highlightMaskShader->setViewMatrix(*graphics->view);
 						m_highlightMaskShader->setProjectionMatrix(*graphics->projection);
 
-						for (auto& m : mesh.mesh->getMeshes())
+						for (auto& m : mesh->mesh->getMeshes())
 							RenderCommand::draw(m->getVAO());
 
 						glPopDebugGroup();

@@ -121,3 +121,8 @@ int ObjectPicker::getSelectedObject() const
 {
 	return m_selectedObject;
 }
+
+void ObjectPicker::setSelectedObject(int selectedID)
+{
+	m_selectedObject = selectedID;
+}

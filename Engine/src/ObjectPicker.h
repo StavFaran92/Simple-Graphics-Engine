@@ -30,6 +30,8 @@ public:
 
 	int getSelectedObject() const;
 
+	void setSelectedObject(int selectedID);
+
 private:
 	FrameBufferObject m_frameBuffer;
 	Resource<Texture> m_targetTexture;
