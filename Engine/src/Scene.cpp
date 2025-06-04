@@ -363,10 +363,10 @@ void Scene::draw(float deltaTime)
 			graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
 			graphics->model = &transform.getWorldTransformation();
 
-			if (skybox.skyboxImage.isEmpty()) continue;
+			if (skybox.cubemap.isEmpty()) continue;
 
-			skybox.skyboxImage.get()->bind();
-			skybox.skyboxImage.get()->setSlot(0);
+			skybox.cubemap.get()->bind();
+			skybox.cubemap.get()->setSlot(0);
 
 			auto vao = graphics->mesh->getVAO();
 			RenderCommand::draw(vao);

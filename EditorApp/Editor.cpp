@@ -1208,6 +1208,19 @@ void RenderSceneHierarchyWindow(float width, float height)
 			ImGui::EndMenu(); // End the submenu
 		}
 
+		if (ImGui::BeginMenu("Environment"))
+		{ // Begin the submenu
+			if (ImGui::MenuItem("Skybox"))
+			{
+				Entity e = Engine::get()->getContext()->getActiveScene()->createEntity();
+				e.addComponent<SkyboxComponent>();
+				updateScene();
+				selectedEntity = sceneObjects[0].e;
+			}
+
+			ImGui::EndMenu(); // End the submenu
+		}
+
 		// Add more submenus or menu items as needed
 		ImGui::EndPopup();
 	}
@@ -1642,33 +1655,6 @@ static void addSamplerEditWidget(std::shared_ptr<Material> mat, ImVec2 size, con
 	
 }
 
-static void addSkyboxTextureEditWidget(SkyboxComponent& skybox)
-{
-	
-
-	ImVec2 imageSize(50, 50);
-	ImGui::Image(reinterpret_cast<ImTextureID>(skybox.originalImage.get()->getID()), imageSize, ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
-
-	//if (ImGui::IsItemClicked()) {
-
-	//	const char* supportedImageFormats[4] = { "*.png", "*.jpg", "*.bmp", "*.tga" };
-	//	const char* texturetoUsePath = tinyfd_openFileDialog(
-	//		"Select A texture to load",
-	//		"",
-	//		4,
-	//		supportedImageFormats,
-	//		"image files",
-	//		0);
-
-	//	if (texturetoUsePath) {
-	//		// Load the new texture and set it to the material
-	//		auto& tex = Engine::get()->getSubSystem<Assets>()->importTexture2D(texturetoUsePath, false);
-
-	//		mat->setTexture(ttype, tex);
-	//	}
-	//}
-}
-
 void rightAlignedText(const std::string& text) {
 	float textWidth = ImGui::CalcTextSize(text.c_str()).x;
 	float fullWidth = ImGui::GetColumnWidth();
@@ -1924,11 +1910,15 @@ void RenderInspectorWindow(float width, float height)
 			});
 
 		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
-			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [](std::string uuid) {
-				Resource<Texture> tex(uuid);
-				Skybox::loadSkybox(tex, selectedEntity, Engine::get()->getContext()->getActiveScene().get());
-					
+			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](std::string uuid) {
+				skybox.setSkybox(Resource<Texture>(uuid));
 			});
+
+			// Compile Button
+			if (ImGui::Button("Build"))
+			{
+				skybox.build();
+			}
 		});
 
 		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {

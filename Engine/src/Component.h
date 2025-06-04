@@ -50,7 +50,7 @@ struct EngineAPI SkyboxComponent : public Component
 {
 	SkyboxComponent() = default;
 
-	SkyboxComponent(Resource<Texture> skyboxImage) : skyboxImage(skyboxImage) {}
+	SkyboxComponent(Resource<Texture> skyboxImage);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -58,8 +58,13 @@ struct EngineAPI SkyboxComponent : public Component
 
 	}
 
-	Resource<Texture> skyboxImage;
+	void setSkybox(Resource<Texture> image);
+
+	void build();
+	
+
 	Resource<Texture> originalImage;
+	Resource<Texture> cubemap;
 };
 
 struct EngineAPI RenderableComponent : public Component

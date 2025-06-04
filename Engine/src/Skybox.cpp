@@ -89,7 +89,7 @@ Entity Skybox::createSkyboxHelper(Resource<Texture> cubemap, Resource<Texture> e
     scene->setIBLData(irradianceMap, prefilterEnvMap);
 
     entity.RemoveComponent<RenderableComponent>();
-    entity.RemoveComponent<MaterialComponent>();
+    //entity.RemoveComponent<MaterialComponent>();
     auto& skyboxComponent = entity.addComponent<SkyboxComponent>(cubemap);
     skyboxComponent.originalImage = equirectangularMap;
 
