@@ -604,7 +604,7 @@ void updateScene()
 
 Entity  selectedEntity = Entity::EmptyEntity;
 
-auto style = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar;
+auto style = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
 
 void AddColoredLabel(const char* label) 
 {
@@ -2429,7 +2429,7 @@ class GUI_Helper : public GuiMenu {
 		int screenWidth = Engine::get()->getWindow()->getWidth();
 		int screenHeight = Engine::get()->getWindow()->getHeight();
 
-		ImGui::StyleColorsDark(); // Change the style to a dark theme
+		
 
 
 		// Render menu bar
@@ -2541,7 +2541,58 @@ public:
 		
 		ImGui::SetCurrentContext((ImGuiContext * )Engine::get()->getImguiHandler()->getCurrentContext());
 
-		
+		ImGuiStyle& style = ImGui::GetStyle();
+		ImVec4* colors = style.Colors;
+
+		// Base: deeper dark, subtle warmth
+		colors[ImGuiCol_Text] = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);
+		colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.55f, 0.60f, 1.00f);
+		colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.11f, 0.13f, 1.00f);
+		colors[ImGuiCol_ChildBg] = ImVec4(0.12f, 0.13f, 0.15f, 1.00f);
+		colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.09f, 0.10f, 0.98f);
+		colors[ImGuiCol_Border] = ImVec4(0.28f, 0.30f, 0.33f, 0.35f);
+		colors[ImGuiCol_FrameBg] = ImVec4(0.17f, 0.18f, 0.20f, 1.00f);
+		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.22f, 0.23f, 0.26f, 1.00f);
+		colors[ImGuiCol_FrameBgActive] = ImVec4(0.30f, 0.32f, 0.36f, 1.00f);
+
+		// Accent: vibrant cyan + blue
+		ImVec4 vibrant = ImVec4(0.26f, 0.80f, 0.85f, 1.00f);  // cyan/teal
+		ImVec4 active = ImVec4(0.25f, 0.55f, 0.95f, 1.00f);   // bright blue
+
+		colors[ImGuiCol_TitleBg] = ImVec4(0.12f, 0.13f, 0.15f, 1.00f);
+		colors[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.17f, 0.19f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.25f, 0.30f, 0.33f, 0.90f);
+		colors[ImGuiCol_CheckMark] = vibrant;
+		colors[ImGuiCol_SliderGrab] = vibrant;
+		colors[ImGuiCol_SliderGrabActive] = active;
+		colors[ImGuiCol_Button] = ImVec4(0.18f, 0.20f, 0.23f, 1.00f);
+		colors[ImGuiCol_ButtonHovered] = vibrant;
+		colors[ImGuiCol_ButtonActive] = active;
+		colors[ImGuiCol_Header] = ImVec4(0.18f, 0.20f, 0.23f, 1.00f);
+		colors[ImGuiCol_HeaderHovered] = vibrant;
+		colors[ImGuiCol_HeaderActive] = active;
+		colors[ImGuiCol_Separator] = ImVec4(0.30f, 0.30f, 0.35f, 1.00f);
+		colors[ImGuiCol_ResizeGrip] = vibrant;
+		colors[ImGuiCol_ResizeGripHovered] = active;
+		colors[ImGuiCol_ResizeGripActive] = ImVec4(0.28f, 0.68f, 1.00f, 1.00f);
+		colors[ImGuiCol_Tab] = ImVec4(0.14f, 0.16f, 0.20f, 1.00f);
+		colors[ImGuiCol_TabHovered] = vibrant;
+		colors[ImGuiCol_TabActive] = active;
+		colors[ImGuiCol_MenuBarBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f); // same as window bg for cohesion
+		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.80f, 0.85f, 0.35f); // for highlighted menu items
+		colors[ImGuiCol_PopupBg] = ImVec4(0.10f, 0.10f, 0.12f, 0.98f); // dropdowns and popups
+
+		// Optional: small touch of glow or "punch"
+		colors[ImGuiCol_BorderShadow] = ImVec4(0.0f, 0.0f, 0.0f, 0.25f);
+
+		style.WindowPadding = ImVec2(10, 10);
+		style.FrameRounding = 4.0f;
+		style.GrabRounding = 4.0f;
+		style.ScrollbarRounding = 4.0f;
+		style.FramePadding = ImVec2(6, 4);
+		style.ItemSpacing = ImVec2(10, 6);
+		style.IndentSpacing = 16.0f;
+		style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
 
 		NativeScriptsLoader::instance->init();
 
