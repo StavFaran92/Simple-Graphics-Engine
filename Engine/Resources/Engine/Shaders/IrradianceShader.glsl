@@ -60,6 +60,13 @@ void main()
             // convert from tangent space to world space using above TBN
             vec3 sampleVec = v.x * right + v.y * up + v.z * N;
 
+            vec3 sample = texture(environmentMap, sampleVec).rgb;
+
+            if(length(sample) > 10000)
+            {
+                continue;
+            }
+
             // sample the evironemnt map 
             irradiance += texture(environmentMap, sampleVec).rgb * cos(theta) * sin(theta);
             numOfSamples++;

@@ -101,7 +101,15 @@ void main()
 
         float NdotL = max(0.0, dot(N, L)); 
 
-        prefilteredColor += texture(environmentMap, L).rgb * NdotL;
+        vec3 sample = texture(environmentMap, L).rgb;
+
+        if(length(sample) > 10000)
+        {
+            continue;
+        }
+
+        prefilteredColor += sample * NdotL;
+
         totalWeight += NdotL;
     }
 
