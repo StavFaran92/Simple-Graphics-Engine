@@ -166,7 +166,7 @@ bool DeferredRenderer::init()
 {
 	setupGBuffer();
 
-	//setupSSAO();
+	setupSSAO();
 
 	// Generate screen quad
 	m_quad = ScreenQuad::GenerateScreenQuad(&Engine::get()->getContext()->getRegistry());
@@ -305,73 +305,57 @@ void DeferredRenderer::renderScene(Scene* scene)
 	m_gBuffer.unbind();
 
 
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 	
-#if 0
+#if 1
+	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "SSAO pass");
+
+
 	m_ssaoFBO.bind();
+	m_ssaoPassShader->use();
+	RenderCommand::clear();
 
 	// SSAO
-	m_positionTexture->setSlot(0);
-	m_positionTexture->bind();
-	m_ssaoPassShader->setValue("gPosition", 0);
-
-	m_normalTexture->setSlot(1);
-	m_normalTexture->bind();
-	m_ssaoPassShader->setValue("gNormal", 1);
-
-	m_ssaoNoiseTexture->setSlot(2);
-	m_ssaoNoiseTexture->bind();
-	m_ssaoPassShader->setValue("gSSAONoise", 2);
+	m_ssaoPassShader->setTextureInShader(m_positionTexture, "gPosition", 0);
+	m_ssaoPassShader->setTextureInShader(m_normalTexture, "gNormal", 1);
+	m_ssaoPassShader->setTextureInShader(m_ssaoNoiseTexture, "gSSAONoise", 2);
 
 	// TODO remove
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
 
-	m_ssaoPassShader->setValue("screenWidth", width);
-	m_ssaoPassShader->setValue("screenHeight", height);
+	m_ssaoPassShader->setUniformValue("screenWidth", width);
+	m_ssaoPassShader->setUniformValue("screenHeight", height);
 
 	for (unsigned int i = 0; i < 64; ++i)
 	{
-		m_ssaoPassShader->setValue("ssaoKernel[" + std::to_string(i) + "]", m_ssaoKernel[i]);
+		m_ssaoPassShader->setUniformValue("ssaoKernel[" + std::to_string(i) + "]", m_ssaoKernel[i]);
 	}
 
-	m_ssaoPassShader->setValue("projection", *graphics->projection);
-
-	m_ssaoPassShader->use();
+	m_ssaoPassShader->setUniformValue("projection", *graphics->projection);
 
 	{
 		// render to quad
-		auto& mesh = m_quad.getComponent<MeshComponent>();
-
-		DrawQueueRenderParams renderParams2D;
-		renderParams2D.mesh = mesh.mesh.get();
-
-		m_2DRenderer->render(renderParams2D);
+		auto vao = m_quad.getComponent<MeshComponent>().mesh->getPrimaryMesh()->getVAO();
+		RenderCommand::draw(vao);
 	}
-
-	m_ssaoFBO.unbind();
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_ssaoBlurFBO.bind();
-	
-	m_ssaoColorBuffer->setSlot(0);
-	m_ssaoColorBuffer->bind();
-	m_ssaoBlurPassShader->setValue("gSSAOColorBuffer", 0);
-
 	m_ssaoBlurPassShader->use();
+
+	m_ssaoBlurPassShader->setTextureInShader(m_ssaoColorBuffer, "gSSAOColorBuffer", 0);
+
 
 	{
 		// render to quad
-		auto& mesh = m_quad.getComponent<MeshComponent>();
-
-		DrawQueueRenderParams renderParams2D;
-		renderParams2D.mesh = mesh.mesh.get();
-
-		m_2DRenderer->render(renderParams2D);
+		auto vao = m_quad.getComponent<MeshComponent>().mesh->getPrimaryMesh()->getVAO();
+		RenderCommand::draw(vao);
 	}
 
-	m_ssaoBlurFBO.unbind();
+	glPopDebugGroup();
+
 #endif
 
 	// bind textures
