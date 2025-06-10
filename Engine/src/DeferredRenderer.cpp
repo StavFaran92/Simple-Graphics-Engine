@@ -310,6 +310,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 #if 1
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "SSAO pass");
 
+	glDisable(GL_DEPTH_TEST);
 
 	m_ssaoFBO.bind();
 	m_ssaoPassShader->use();
@@ -340,8 +341,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 		RenderCommand::draw(vao);
 	}
 
-	glClear(GL_COLOR_BUFFER_BIT);
-
+	//glClear(GL_COLOR_BUFFER_BIT);
+	
 	m_ssaoBlurFBO.bind();
 	m_ssaoBlurPassShader->use();
 
@@ -353,6 +354,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 		auto vao = m_quad.getComponent<MeshComponent>().mesh->getPrimaryMesh()->getVAO();
 		RenderCommand::draw(vao);
 	}
+
+	glEnable(GL_DEPTH_TEST);
 
 	glPopDebugGroup();
 
@@ -368,12 +371,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 	m_lightPassShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 5);
 	m_lightPassShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
 	m_lightPassShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
-
-#if 0
-	m_ssaoBlurColorBuffer->setSlot(3);
-	m_ssaoBlurColorBuffer->bind();
-	m_lightPassShader->setValue("gSSAOColorBuffer", 3);
-#endif
+	m_lightPassShader->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
 
 	graphics->renderView->bind();
 

@@ -148,12 +148,35 @@ void Shader::BuildShaders(const ShadersInfo& shaderCode)
 	for (GLint i = 0; i < activeUniforms; ++i)
 	{
 		char name[256];
-		GLsizei length;
-		GLint size;
-		GLenum type;
+		GLsizei length = 0;
+		GLint size = 0;
+		GLenum type = 0;
+
 		glGetActiveUniform(m_id, i, sizeof(name), &length, &size, &type, name);
-		GLint location = glGetUniformLocation(m_id, name);
-		m_uniformLocationCache[name] = location;
+
+		std::string baseName(name);
+
+		// Check if it's an array element: ends with [0]
+		bool isArray = false;
+		if (baseName.size() >= 3 && baseName.substr(baseName.size() - 3) == "[0]") {
+			isArray = true;
+			baseName = baseName.substr(0, baseName.size() - 3); // strip "[0]"
+		}
+
+		// Handle arrays
+		if (isArray) {
+			for (int j = 0; j < size; ++j) {
+				std::string elem = baseName + "[" + std::to_string(j) + "]";
+				GLint loc = glGetUniformLocation(m_id, elem.c_str());
+				if (loc != -1)
+					m_uniformLocationCache[elem] = loc;
+			}
+		}
+		else {
+			GLint loc = glGetUniformLocation(m_id, baseName.c_str());
+			if (loc != -1)
+				m_uniformLocationCache[baseName] = loc;
+		}
 	}
 
 	// Delete shaders
