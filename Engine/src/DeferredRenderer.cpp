@@ -307,7 +307,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	//glDisable(GL_DEPTH_TEST);
 	
-#if 1
+#if 0
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "SSAO pass");
 
 	glDisable(GL_DEPTH_TEST);
@@ -371,7 +371,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 	m_lightPassShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 5);
 	m_lightPassShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
 	m_lightPassShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
-	m_lightPassShader->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
+	//m_lightPassShader->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
 
 	graphics->renderView->bind();
 
