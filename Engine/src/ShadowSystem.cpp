@@ -20,6 +20,7 @@
 #include "Graphics.h"
 #include "RenderCommand.h"
 #include "ShapeFactory.h"
+#include "DebugHelper.h"
 
 
 const unsigned int SHADOW_WIDTH = 1024;
@@ -61,6 +62,8 @@ bool ShadowSystem::init()
 	m_fbo.unbind();
 
 	m_simpleDepthShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/SimpleDepthShader.glsl");
+
+	DebugHelper::getInstance().registerTextureForDebug("Depth map", m_depthMapTexture);
 
 	//m_bufferDisplay = std::make_shared<ScreenBufferDisplay>(m_scene);
 	//m_bufferDisplay->init(Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight());

@@ -61,3 +61,13 @@ void DebugHelper::drawLine(const glm::vec3& p1, const glm::vec3& p2, const glm::
 void DebugHelper::drawTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3)
 {
 }
+
+void DebugHelper::registerTextureForDebug(const std::string& name, Resource<Texture> texture)
+{
+	m_debugTextures[name] = texture;
+}
+
+const std::map<std::string, Resource<Texture>>& DebugHelper::getDebugTextures() const
+{
+	return m_debugTextures;
+}

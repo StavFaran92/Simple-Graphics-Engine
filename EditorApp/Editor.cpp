@@ -54,6 +54,9 @@ static bool showShaderCreateWindow = false;
 
 static bool startButtonPressed = false;
 
+static std::string selectedTextureName;
+static bool showTextureDisplayWindow = false;
+
 Entity g_primaryCamera;
 Entity g_editorCamera;
 
@@ -767,6 +770,37 @@ static void addAssetLoadWidget(const std::string& name, ImGuiTextBuffer& textBuf
 	}
 	ImGui::SameLine();
 	ImGui::TextUnformatted(textBuffer.begin(), textBuffer.end());
+}
+
+void ShowTextureDisplayWindow()
+{
+	if (showTextureDisplayWindow)
+	{
+		ImGui::OpenPopup("Texture Preview");
+		showTextureDisplayWindow = false;
+	}
+	if (ImGui::BeginPopupModal("Texture Preview", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		const auto& selectedRes = DebugHelper::getInstance().getDebugTextures().at(selectedTextureName);
+		Texture* tex = selectedRes.get();
+
+		if (tex)
+		{
+			ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->getID()));
+			ImVec2 texSize(512, 512); // Preview size (can be dynamic)
+
+			ImGui::Text("%s", selectedTextureName.c_str());
+			ImGui::Image(texID, texSize);
+		}
+
+		if (ImGui::Button("Close"))
+		{
+			ImGui::CloseCurrentPopup();
+			showTextureDisplayWindow = false;
+		}
+
+		ImGui::EndPopup();
+	}
 }
 
 void ShowTextureCreatorWindow()
@@ -2400,22 +2434,49 @@ void RenderAssetViewWindow(float width, float height) {
 void DisplayDebugInfoWindow()
 {
 	//if (displayDebugInfoWindow)
+	ImVec2 windowSize(400.f, 400.f);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
+	ImGui::Begin("Debug Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+	// --- Basic Debug Info ---
+	auto fps = Engine::get()->getSubSystem<System>()->getFPS();
+	ImGui::Text("FPS: %.1f", fps);
+
+	auto deltaTime = Engine::get()->getSubSystem<System>()->getDeltaTime() * 1000;
+	ImGui::Text("Delta time: %.1f ms", deltaTime);
+
+	auto triangleCount = Engine::get()->getSubSystem<System>()->getTriangleCount();
+	ImGui::Text("Triangle count: %u", triangleCount);
+
+	ImGui::Separator();
+
+	// --- Texture List ---
+	const auto& debugTextures = DebugHelper::getInstance().getDebugTextures();
+
+	ImGui::Text("Debug Textures:");
+	for (const auto& [name, textureResource] : debugTextures)
 	{
-		ImVec2 windowSize(200.f, 150.f);
-		ImGui::SetNextWindowSize(windowSize);
-		ImGui::Begin("Debug Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+		// Show image button
+		ImGui::BeginGroup();
+		ImGui::PushID(name.c_str());
 
-		auto fps = Engine::get()->getSubSystem<System>()->getFPS();
-		ImGui::Text("FPS: %.1f", fps);
+		if (ImGui::CollapsingHeader(name.c_str()))
+		{
+			ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(textureResource.get()->getID()));
+			if (ImGui::ImageButton(texID, ImVec2(100, 100)))
+			{
+				selectedTextureName = name;
+				showTextureDisplayWindow = true;
+				ImGui::OpenPopup("Texture Preview");
+			}
+		}
 
-		auto deltaTime = Engine::get()->getSubSystem<System>()->getDeltaTime() * 1000;
-		ImGui::Text("Delta time: %.1f ms", deltaTime);
 
-		auto triangleCount = Engine::get()->getSubSystem<System>()->getTriangleCount();
-		ImGui::Text("Triangle count: %u", triangleCount);
-
-		ImGui::End();
+		ImGui::PopID();
+		ImGui::EndGroup();
 	}
+
+	ImGui::End();
 }
 
 
@@ -2520,6 +2581,7 @@ class GUI_Helper : public GuiMenu {
 		RenderAssetViewWindow(screenWidth, screenHeight); // Add the Asset View window
 		ShowTextureCreatorWindow();
 		ShowShaderCreatorWindow();
+		ShowTextureDisplayWindow();
 
 		DisplayDebugInfoWindow();
 		

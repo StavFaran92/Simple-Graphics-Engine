@@ -20,6 +20,7 @@
 #include "System.h"
 #include "ShapeFactory.h"
 #include "RenderView.h"
+#include "DebugHelper.h"
 
 static float lerp(float a, float b, float t)
 {
@@ -158,6 +159,8 @@ bool DeferredRenderer::setupSSAO()
 	m_ssaoBlurFBO.unbind();
 
 	m_ssaoBlurPassShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOBlurPassShader.glsl");
+
+	DebugHelper::getInstance().registerTextureForDebug("SSAO Color", m_ssaoBlurColorBuffer);
 
 	return true;
 }
