@@ -45,6 +45,7 @@ class Animation;
 class AnimationLoader;
 class Shader;
 class EventLayerStack;
+struct EngineConfig;
 template<typename T>class Resource;
 template<typename T>class Factory;
 template<typename T>class MemoryPool;
@@ -86,6 +87,7 @@ public:
     CommonTextures* getCommonTextures() const;
     const InitParams& getInitParams() const;
     EventLayerStack* getEventLayerStack() const;
+    const EngineConfig& getConfig() const;
     template<typename T>MemoryPool<T>* getMemoryPool() const { return 0; };
     template<>MemoryPool<Texture>* getMemoryPool() const { return m_memoryPoolTexture.get(); }
     template<>MemoryPool<MeshCollection>* getMemoryPool() const { return m_memoryPoolMeshCollection.get(); }
@@ -99,6 +101,8 @@ public:
     std::string getProjectDirectory() const;
 
     std::shared_ptr<Material> getDefaultMaterial() const;
+
+    void reloadEngineConfig();
 
     void pause();
     void resume();
@@ -177,6 +181,7 @@ protected:
     std::shared_ptr<CommonShaders> m_commonShaders;
     std::shared_ptr<CommonTextures> m_commonTextures;
     std::shared_ptr<Assets> m_assets;
+    std::shared_ptr<EngineConfig> m_engineConfig;
 
     InitParams m_initParams;
 

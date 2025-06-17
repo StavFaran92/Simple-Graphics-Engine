@@ -35,6 +35,7 @@
 #include "System.h"
 #include "RenderCommand.h"
 #include "EventLayerStack.h"
+#include "EngineConfig.h"
 
 #include "Application.h"
 #include "SDL2/SDL.h"
@@ -55,6 +56,40 @@ bool Engine::init(const InitParams& initParams)
     }
 
     m_initParams = initParams;
+
+    m_resourceManager = std::make_shared<ResourceManager>();
+    if (!SGE_EXPORT_PACKAGE)
+    {
+        auto found = false;
+        try
+        {
+            size_t len = 0;
+            char* sgeRoot = nullptr;
+            errno_t err = _dupenv_s(&sgeRoot, &len, "SGE");
+            if (err == 0 && sgeRoot)
+            {
+                found = true;
+                m_resourceManager->setRootDir(std::string(sgeRoot) + "/Engine/");
+            }
+            free(sgeRoot);
+        }
+        catch (std::exception e)
+        {
+            logError(e.what());
+        }
+
+        if (!found)
+        {
+            m_resourceManager->setRootDir("./");
+        }
+
+    }
+    else
+    {
+        m_resourceManager->setRootDir("./");
+    }
+
+    m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR + "/EngineConfig.json");
 
     m_projectDirectory = initParams.projectDir;
 
@@ -111,40 +146,10 @@ bool Engine::init(const InitParams& initParams)
     m_memoryPoolAnimation = std::make_shared<MemoryPool<Animation>>();
     m_memoryPoolShader = std::make_shared<MemoryPool<Shader>>();
 
-    m_resourceManager = std::make_shared<ResourceManager>();
 
     m_projectManager = std::make_shared<ProjectManager>();
 
-    if (!SGE_EXPORT_PACKAGE)
-    {
-        auto found = false;
-        try
-        {
-            size_t len = 0;
-            char* sgeRoot = nullptr;
-            errno_t err = _dupenv_s(&sgeRoot, &len, "SGE");
-            if (err == 0 && sgeRoot)
-            {
-                found = true;
-                m_resourceManager->setRootDir(std::string(sgeRoot) + "/Engine/");
-            }
-            free(sgeRoot);
-        }
-        catch (std::exception e)
-        {
-            logError(e.what());
-        }
-
-        if (!found)
-        {
-            m_resourceManager->setRootDir("./");
-        }
-        
-    }
-    else
-    {
-        m_resourceManager->setRootDir("./");
-    }
+    
 
     m_window = std::make_shared<Window>();
     if (!m_window->init())
@@ -439,6 +444,11 @@ EventLayerStack* Engine::getEventLayerStack() const
     return m_eventLayerStack.get();
 }
 
+const EngineConfig& Engine::getConfig() const
+{
+    return *m_engineConfig.get();
+}
+
 void Engine::loadProject(const std::string& dirPath)
 {
     m_projectDirectory = dirPath;
@@ -468,6 +478,11 @@ std::string Engine::getProjectDirectory() const
 std::shared_ptr<Material> Engine::getDefaultMaterial() const
 {
     return m_defaultMaterial;
+}
+
+void Engine::reloadEngineConfig()
+{
+    m_engineConfig->loadConfig();
 }
 
 void Engine::pause()

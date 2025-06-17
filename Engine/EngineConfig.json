@@ -1,0 +1,12 @@
+{
+  "Rendering": {
+    "RenderShadowMap": true,
+    "RenderForwardPass": true,
+    "RenderDeferredPass": true,
+    "RenderCustomShadersPass": true,
+    "RenderSkyboxPass": true,
+    "RenderTerrainPass": true,
+    "RenderVolumetricsPass": true,
+    "RenderWireframeGrid": true
+  }
+}

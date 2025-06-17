@@ -2543,6 +2543,9 @@ class GUI_Helper : public GuiMenu {
 
 						//std::filesystem::create_directories("../Game/data");
 					}
+					if (ImGui::MenuItem("Reload config", "")) {
+						Engine::get()->reloadEngineConfig();
+					}
 					ImGui::Separator(); // Optional: Add a separator
 					if (ImGui::MenuItem("Quit", "Alt+F4")) {
 						Engine::get()->stop();
