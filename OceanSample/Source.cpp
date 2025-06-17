@@ -2,6 +2,7 @@
 #include "sge.h"
 
 #include "GUIHandler.h"
+#include "NativeScripts.h"
 
 Entity camera;
 
@@ -14,7 +15,9 @@ public:
 
 		camera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
 		camera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
-		camera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
+		camera.addComponent<NativeScriptComponent>().bind<CameraScript>();
+		camera.getComponent<Transformation>().setLocalPosition(glm::vec3(3, 3, 3));
+		//camera.getComponent<Transformation>().setLocalRotation().set(glm::vec3(3, 3, 3));
 		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(camera);
 
 		auto quad = Engine::get()->getContext()->getActiveScene()->createEntity();
@@ -30,11 +33,13 @@ public:
 		planeTransform.scale({ 100, 100, 1 });
 
 		createOcean(quad);
+
+		//camera.getComponent<NativeScriptComponent>().script->onCreate();
 	}
 
 	void update(float deltaTime) override
 	{
-		camera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
+		//camera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
 	}
 
 private:
@@ -42,28 +47,30 @@ private:
 	{
 		auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/WaterShader.glsl", ShaderOverride::PBR).build();
 
-		auto brickTexture = Engine::get()->getSubSystem<Assets>()->importTexture2D("Resources/Content/Textures/water_new_height.png");
+		auto brickTexture = Texture::importTexture2D("Resources/Content/Textures/water_new_height.png");
 		shader.addTexture("waterNormalSampler", brickTexture);
 
 		quad.addComponent<ShaderComponent>(shader);
 
 		//quad.getComponent<MaterialComponent>().materials[0]->setTexture(Texture::Type::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
 
-		auto gui = new GUIHandler(shader.m_customShader);
+		auto gui = new GUIHandler(shader.m_customShader.get());
 		Engine::get()->getImguiHandler()->addGUI(gui);
 	}
 
 	void createOcean(Entity quad)
 	{
-		auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/OceanShader.glsl", ShaderOverride::PBR).build();
+		auto& shader = Shader::createOverrideShader("OceanShader", "Resources/Content/Shaders/OceanShader.glsl", ShaderOverride::PBR);
+		//auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/OceanShader.glsl", ShaderOverride::PBR).build();
 
-		quad.addComponent<ShaderComponent>(shader);
+		auto& shaderComponent = quad.addComponent<ShaderComponent>();
+		shaderComponent.setShader(shader);
 
-		shader.m_customShader->setUniformValue("amplitude", 0.5f);
-		shader.m_customShader->setUniformValue("waveDirection", glm::vec2(1, 0));
-		shader.m_customShader->setUniformValue("waveLength", 2.0f);
-		shader.m_customShader->setUniformValue("waveSpeed", 1.0f);
-		shader.m_customShader->setUniformValue("steepness", .5f);
+		shader->setUniformValue("amplitude", 0.5f);
+		shader->setUniformValue("waveDirection", glm::vec2(1, 0));
+		shader->setUniformValue("waveLength", 2.0f);
+		shader->setUniformValue("waveSpeed", 1.0f);
+		shader->setUniformValue("steepness", .5f);
 
 		//std::shared_ptr<Material> mat = std::make_shared<Material>();
 		//quad.addComponent<MaterialComponent>().addMaterial().materials[0]->setTexture(Texture::Type::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));

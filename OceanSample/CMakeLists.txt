@@ -10,6 +10,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE GUI)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 	${CMAKE_SOURCE_DIR}/Engine/src
+	${CMAKE_SOURCE_DIR}/NativeScripts
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE
