@@ -53,6 +53,7 @@
 #include "RenderView.h"
 #include "GameLayer.h"
 #include "EventSystem.h"
+#include "EngineConfig.h"
 
 void cameraCalculateOrientation(Transformation& transform, CameraComponent& cameraComponent)
 {
@@ -287,6 +288,7 @@ void Scene::draw(float deltaTime)
 		graphics->brdfLUT = m_BRDFIntegrationLUT;
 		graphics->renderView = renderView;
 
+		if(Engine::get()->getConfig().renderConfig.renderShadowMap)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Shadow Map");
 			m_shadowSystem->renderToDepthMap();
@@ -327,54 +329,63 @@ void Scene::draw(float deltaTime)
 
 		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Deferred Renderer pass");
-		m_deferredRenderer->renderScene(this);
-		glPopDebugGroup();
-
-		unsigned int srcID = m_deferredRenderer->getGBuffer().getID();
-		unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
-
-		RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
-
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Forward Renderer pass");
-		m_forwardRenderer->renderScene(this);
-		glPopDebugGroup();
-
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Custom shader render pass");
-		m_forwardRenderer->renderSceneUsingCustomShader(this);
-		glPopDebugGroup();
-
-
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Skybox render pass");
-		// Render skybox
-		glDepthMask(GL_FALSE);
-		glDepthFunc(GL_LEQUAL);
-		m_skyboxShader->use();
-		renderView->bind();
-
-		m_skyboxShader->setViewMatrix(*graphics->view);
-		m_skyboxShader->setProjectionMatrix(*graphics->projection);
-
-		for (auto&& [entity, skybox, transform] :
-			m_registry->get().view<SkyboxComponent, Transformation>().each())
+		if (Engine::get()->getConfig().renderConfig.renderDeferredPass)
 		{
-			Entity entityhandler{ entity, m_registry.get() };
-			graphics->entity = &entityhandler;
-			graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
-			graphics->model = &transform.getWorldTransformation();
-
-			if (skybox.cubemap.isEmpty()) continue;
-
-			skybox.cubemap.get()->bind();
-			skybox.cubemap.get()->setSlot(0);
-
-			auto vao = graphics->mesh->getVAO();
-			RenderCommand::draw(vao);
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Deferred Renderer pass");
+			m_deferredRenderer->renderScene(this);
+			unsigned int srcID = m_deferredRenderer->getGBuffer().getID();
+			unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
+			RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
+			glPopDebugGroup();
 		}
-		glDepthMask(GL_TRUE);
-		glDepthFunc(GL_LESS);
 
-		glPopDebugGroup();
+		if (Engine::get()->getConfig().renderConfig.renderForwardPass)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Forward Renderer pass");
+			m_forwardRenderer->renderScene(this);
+			glPopDebugGroup();
+		}
+
+		if (Engine::get()->getConfig().renderConfig.renderCustomShadersPass)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Custom shader render pass");
+			m_forwardRenderer->renderSceneUsingCustomShader(this);
+			glPopDebugGroup();
+		}
+
+		if (Engine::get()->getConfig().renderConfig.renderSkyboxPass)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Skybox render pass");
+			// Render skybox
+			glDepthMask(GL_FALSE);
+			glDepthFunc(GL_LEQUAL);
+			m_skyboxShader->use();
+			renderView->bind();
+
+			m_skyboxShader->setViewMatrix(*graphics->view);
+			m_skyboxShader->setProjectionMatrix(*graphics->projection);
+
+			for (auto&& [entity, skybox, transform] :
+				m_registry->get().view<SkyboxComponent, Transformation>().each())
+			{
+				Entity entityhandler{ entity, m_registry.get() };
+				graphics->entity = &entityhandler;
+				graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
+				graphics->model = &transform.getWorldTransformation();
+
+				if (skybox.cubemap.isEmpty()) continue;
+
+				skybox.cubemap.get()->bind();
+				skybox.cubemap.get()->setSlot(0);
+
+				auto vao = graphics->mesh->getVAO();
+				RenderCommand::draw(vao);
+			}
+			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LESS);
+
+			glPopDebugGroup();
+		}
 
 		
 
@@ -382,94 +393,99 @@ void Scene::draw(float deltaTime)
 		//glEnable(GL_POLYGON_OFFSET_LINE);
 		//glPolygonOffset(-1.0, -1.0);
 
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Terrain render pass");
-
-		// Render terrain
-		for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
+		if (Engine::get()->getConfig().renderConfig.renderTerrainPass)
 		{
-			m_terrainShader->use();
-			m_terrainShader->setUniformValue("view", *graphics->view);
-			m_terrainShader->setUniformValue("projection", *graphics->projection);
-			m_terrainShader->setUniformValue("scale", terrain.getScale());
-			m_terrainShader->setUniformValue("model", transform.getWorldTransformation());
-			m_terrainShader->setUniformValue("width", terrain.getWidth());
-			m_terrainShader->setUniformValue("height", terrain.getHeight());
-			Resource<Texture> heightmap = terrain.getHeightmap();
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Terrain render pass");
 
-			if (heightmap.isEmpty())
-				continue;
-
-			heightmap.get()->bind();
-			heightmap.get()->setSlot(0);
-			m_terrainShader->setUniformValue("heightMap", 0);
-
-			int textureCount = terrain.getTextureCount();
-			m_terrainShader->setUniformValue("textureCount", textureCount);
-
-			for (int i = 0; i < textureCount; i++)
+			// Render terrain
+			for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
 			{
-				auto texture = terrain.getTexture(i);
-				texture.get()->setSlot(i + 1);
-				texture.get()->bind();
-				m_terrainShader->setUniformValue("texture_" + std::to_string(i), i + 1);
+				m_terrainShader->use();
+				m_terrainShader->setUniformValue("view", *graphics->view);
+				m_terrainShader->setUniformValue("projection", *graphics->projection);
+				m_terrainShader->setUniformValue("scale", terrain.getScale());
+				m_terrainShader->setUniformValue("model", transform.getWorldTransformation());
+				m_terrainShader->setUniformValue("width", terrain.getWidth());
+				m_terrainShader->setUniformValue("height", terrain.getHeight());
+				Resource<Texture> heightmap = terrain.getHeightmap();
 
-				auto textureBlend = terrain.getTextureBlend(i);
-				m_terrainShader->setUniformValue("textureBlend[" + std::to_string(i) + "]", textureBlend);
+				if (heightmap.isEmpty())
+					continue;
 
-				glm::vec2 textureScale = terrain.getTextureScale(i);
-				m_terrainShader->setUniformValue("textureScale[" + std::to_string(i) + "]", textureScale);
+				heightmap.get()->bind();
+				heightmap.get()->setSlot(0);
+				m_terrainShader->setUniformValue("heightMap", 0);
+
+				int textureCount = terrain.getTextureCount();
+				m_terrainShader->setUniformValue("textureCount", textureCount);
+
+				for (int i = 0; i < textureCount; i++)
+				{
+					auto texture = terrain.getTexture(i);
+					texture.get()->setSlot(i + 1);
+					texture.get()->bind();
+					m_terrainShader->setUniformValue("texture_" + std::to_string(i), i + 1);
+
+					auto textureBlend = terrain.getTextureBlend(i);
+					m_terrainShader->setUniformValue("textureBlend[" + std::to_string(i) + "]", textureBlend);
+
+					glm::vec2 textureScale = terrain.getTextureScale(i);
+					m_terrainShader->setUniformValue("textureScale[" + std::to_string(i) + "]", textureScale);
+				}
+
+				auto vao = terrain.getMesh().get()->getPrimaryMesh()->getVAO();
+				RenderCommand::drawPatches(vao);
 			}
 
-			auto vao = terrain.getMesh().get()->getPrimaryMesh()->getVAO();
-			RenderCommand::drawPatches(vao);
+			glPopDebugGroup();
 		}
 
-		glPopDebugGroup();
-
-		
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Volumetrics render pass");
-
-		// Render Volumetrics
-		for (auto&& [entity, volume, shader] : m_registry->get().view<VolumeComponent, ShaderComponent>().each())
+		if (Engine::get()->getConfig().renderConfig.renderVolumetricsPass)
 		{
-			Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
-			renderView->swapToAdditionalTarget();
-			renderView->bind();
-			RenderCommand::clear();
-			glDisable(GL_DEPTH_TEST);
-			// TODO assert post process shader
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Volumetrics render pass");
 
-			// bind shader
-			shader.m_customShader->use();
+			// Render Volumetrics
+			for (auto&& [entity, volume, shader] : m_registry->get().view<VolumeComponent, ShaderComponent>().each())
+			{
+				Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+				renderView->swapToAdditionalTarget();
+				renderView->bind();
+				RenderCommand::clear();
+				glDisable(GL_DEPTH_TEST);
+				// TODO assert post process shader
 
-			// read texture from graphics FBO
-			shader.m_customShader->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
+				// bind shader
+				shader.m_customShader->use();
 
-			shader.m_customShader->setModelMatrix(glm::mat4(1.0));
-			shader.m_customShader->setViewMatrix(*graphics->view);
-			shader.m_customShader->setProjectionMatrix(*graphics->projection);
+				// read texture from graphics FBO
+				shader.m_customShader->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
 
-			auto viewport = renderView->getViewport();
-			shader.m_customShader->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
+				shader.m_customShader->setModelMatrix(glm::mat4(1.0));
+				shader.m_customShader->setViewMatrix(*graphics->view);
+				shader.m_customShader->setProjectionMatrix(*graphics->projection);
 
-			shader.m_customShader->setUniformValue("cameraPos", graphics->cameraPos);
-			shader.m_customShader->setUniformValue("cameraLookAt", primaryCamera.front);
+				auto viewport = renderView->getViewport();
+				shader.m_customShader->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
 
-			// bind mesh
-			auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();
-			//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
+				shader.m_customShader->setUniformValue("cameraPos", graphics->cameraPos);
+				shader.m_customShader->setUniformValue("cameraLookAt", primaryCamera.front);
 
-			// in frag shader i need access to mesh extentes & main texture -> set uniforms
+				// bind mesh
+				auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();
+				//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
 
-			// draw
-			RenderCommand::draw(vao);
+				// in frag shader i need access to mesh extentes & main texture -> set uniforms
 
-			renderView->swapBackToMainTarget();
-			renderView->bind();
-			glEnable(GL_DEPTH_TEST);
+				// draw
+				RenderCommand::draw(vao);
+
+				renderView->swapBackToMainTarget();
+				renderView->bind();
+				glEnable(GL_DEPTH_TEST);
+			}
+
+			glPopDebugGroup();
 		}
-
-		glPopDebugGroup();
 
 		// Highlight selected object
 		auto objectPicker = Engine::get()->getSubSystem<ObjectPicker>();
@@ -574,6 +590,7 @@ void Scene::draw(float deltaTime)
 		}
 
 		// Render WireframeGrid
+		if (Engine::get()->getConfig().renderConfig.renderWireframeGrid)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Wireframe Grid");
 
