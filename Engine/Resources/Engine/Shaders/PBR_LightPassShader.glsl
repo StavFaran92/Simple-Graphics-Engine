@@ -246,7 +246,7 @@ void main()
 	float metallic = texture(gMRA, TexCoords).r;
 	float roughness = texture(gMRA, TexCoords).g;
 	float ao = texture(gMRA, TexCoords).b;
-	// float ssao = texture(gSSAOColorBuffer, TexCoords).r;
+	float ssao = texture(gSSAOColorBuffer, TexCoords).r;
 
 	vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
 	float shadow = shadowCalculations(fragPosInLightSpace);
@@ -294,7 +294,7 @@ void main()
 	// ambient diffuse irradiance
 	vec3 irradiance = texture(gIrradianceMap, N).rgb;
 	vec3 diffuse = irradiance * albedo;
-	vec3 ambient = (kd * diffuse + specular) * ao /** ssao*/ * vec3(1.f);
+	vec3 ambient = (kd * diffuse + specular) * ao * ssao * vec3(1.f);
 
 	// combine results
 	vec3 color = L0 + ambient;
