@@ -47,7 +47,7 @@ private:
 	{
 		auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/WaterShader.glsl", ShaderOverride::PBR).build();
 
-		auto brickTexture = Texture::importTexture2D("Resources/Content/Textures/water_new_height.png");
+		auto brickTexture = Texture::importTexture2D("../../OceanSample/Resources/Content/Textures/water_new_height.png");
 		shader.addTexture("waterNormalSampler", brickTexture);
 
 		quad.addComponent<ShaderComponent>(shader);
@@ -60,7 +60,7 @@ private:
 
 	void createOcean(Entity quad)
 	{
-		auto& shader = Shader::createOverrideShader("OceanShader", "Resources/Content/Shaders/OceanShader.glsl", ShaderOverride::PBR);
+		auto& shader = Shader::createOverrideShader("OceanShader", "../../OceanSample/Resources/Content/Shaders/OceanShader.glsl", ShaderOverride::PBR);
 		//auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/OceanShader.glsl", ShaderOverride::PBR).build();
 
 		auto& shaderComponent = quad.addComponent<ShaderComponent>();
