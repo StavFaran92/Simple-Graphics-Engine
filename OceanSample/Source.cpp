@@ -11,14 +11,27 @@ class Sandbox : public Application
 public:
 	void start() override
 	{
+		Engine::get()->getContext()->getActiveScene()->startSimulation();
+
 		ImGui::SetCurrentContext((ImGuiContext*)Engine::get()->getImguiHandler()->getCurrentContext());
 
-		camera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
-		camera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
-		camera.addComponent<NativeScriptComponent>().bind<CameraScript>();
-		camera.getComponent<Transformation>().setLocalPosition(glm::vec3(3, 3, 3));
-		//camera.getComponent<Transformation>().setLocalRotation().set(glm::vec3(3, 3, 3));
-		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(camera);
+		//camera = Engine::get()->getContext()->getActiveScene()->createEntity("Editor Camera");
+		//camera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
+		//camera.addComponent<NativeScriptComponent>().bind<CameraScript>();
+		//camera.getComponent<Transformation>().setLocalPosition(glm::vec3(3, 3, 3));
+		////camera.getComponent<Transformation>().setLocalRotation().set(glm::vec3(3, 3, 3));
+		//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(camera);
+
+
+
+		auto editorCamera = Engine::get()->getContext()->getActiveScene()->createEntity("Camera");
+		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
+		editorCamera.addComponent<NativeScriptComponent>().bind<CameraScript>();
+		auto& nsc = editorCamera.getComponent<NativeScriptComponent>();
+		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
+		nsc.script->onCreate();
+
+
 
 		auto quad = Engine::get()->getContext()->getActiveScene()->createEntity();
 		auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import("Resources/Content/Meshes/sd_plane.fbx");
@@ -66,7 +79,7 @@ private:
 		auto& shaderComponent = quad.addComponent<ShaderComponent>();
 		shaderComponent.setShader(shader);
 
-		shader->setUniformValue("amplitude", 0.5f);
+		shader->setUniformValue("amplitude", 3.5f);
 		shader->setUniformValue("waveDirection", glm::vec2(1, 0));
 		shader->setUniformValue("waveLength", 2.0f);
 		shader->setUniformValue("waveSpeed", 1.0f);
