@@ -5,12 +5,12 @@
 class GUIHandler : public GuiMenu
 {
 public:
-    GUIHandler(Shader* shader);
+    GUIHandler(Resource<Shader> shader);
     void display() override;
 
 
 private:
-    Shader* m_shader = nullptr;
+    Resource<Shader> m_shader = nullptr;
 };
 
 

@@ -257,6 +257,8 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                     }
                 }
 
+                graphics->material->use(graphics->shader);
+
                 {
                     int currentSlot = 8;
                     for (const auto& [texName, texture] : shaderComponent.customTextures)

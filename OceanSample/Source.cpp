@@ -4,6 +4,96 @@
 #include "GUIHandler.h"
 #include "NativeScripts.h"
 
+class OceanGUI : public GuiMenu
+{
+public:
+	OceanGUI(Resource<Shader> shader)
+	{
+		auto ctx = ImGui::GetCurrentContext();
+
+		ImGui::SetCurrentContext(ctx);
+
+		m_shader = shader;
+	}
+	void display() override
+	{
+		ImGui::SetNextWindowPos({ 10, 10 }, ImGuiCond_Once);
+		ImGui::SetNextWindowSize({ 300, 250 }, ImGuiCond_Once);
+		ImGui::Begin("Gretsner wave Controller", 0, ImGuiWindowFlags_NoResize);
+
+		ImGui::PushItemWidth(100);
+
+		static float amplitude = 0.5f;
+
+		if (ImGui::InputFloat("amplitude", &amplitude))
+			m_shader->setUniformValue("amplitude", amplitude);
+
+		static auto waveDir = glm::vec2(1, 0);
+
+		if (ImGui::InputFloat2("wave Direction (x,y)", glm::value_ptr(waveDir)))
+			m_shader->setUniformValue("waveDirection", waveDir);
+
+		static float waveLength = 2.0f;
+
+		if (ImGui::InputFloat("wave Length", &waveLength))
+			m_shader->setUniformValue("waveLength", waveLength);
+
+		static float waveSpeed = 5.0f;
+
+		if (ImGui::InputFloat("wave Speed", &waveSpeed))
+			m_shader->setUniformValue("waveSpeed", waveSpeed);
+
+		static float steepness = .5f;
+
+		if (ImGui::SliderFloat("Steepness", &steepness, 0, 1))
+			m_shader->setUniformValue("steepness", steepness);
+
+		ImGui::PopItemWidth();
+
+
+		ImGui::End();
+	}
+
+private:
+	Resource<Shader> m_shader = nullptr;
+};
+
+class PoolGUI : public GuiMenu
+{
+public:
+	PoolGUI(Resource<Shader> shader)
+	{
+		auto ctx = ImGui::GetCurrentContext();
+
+		ImGui::SetCurrentContext(ctx);
+
+		m_shader = shader;
+	}
+	void display() override
+	{
+		ImGui::SetNextWindowPos({ 10, 10 }, ImGuiCond_Once);
+		ImGui::SetNextWindowSize({ 300, 250 }, ImGuiCond_Once);
+		ImGui::Begin("Pool Controller", 0, ImGuiWindowFlags_NoResize);
+
+		ImGui::PushItemWidth(100);
+
+		if (ImGui::Button("Recompile shader"))
+		{
+			m_shader->recompile();
+		}
+
+		ImGui::PopItemWidth();
+
+		
+
+		ImGui::End();
+	}
+
+private:
+	Resource<Shader> m_shader = nullptr;
+};
+
+
 Entity camera;
 
 class Sandbox : public Application
@@ -45,7 +135,7 @@ public:
 		//planeTransform.rotate({ 1,0,0 }, 180);
 		planeTransform.scale({ 100, 100, 1 });
 
-		createOcean(quad);
+		createPool(quad);
 
 		//camera.getComponent<NativeScriptComponent>().script->onCreate();
 	}
@@ -58,16 +148,20 @@ public:
 private:
 	void createPool(Entity quad)
 	{
-		auto& shader = CustomShaderBuilder::create("Resources/Content/Shaders/WaterShader.glsl", ShaderOverride::PBR).build();
+		auto& shader = Shader::createOverrideShader("WaterShader", "../../OceanSample/Resources/Content/Shaders/WaterShader.glsl", ShaderOverride::PBR);
 
-		auto brickTexture = Texture::importTexture2D("../../OceanSample/Resources/Content/Textures/water_new_height.png");
-		shader.addTexture("waterNormalSampler", brickTexture);
+		
 
-		quad.addComponent<ShaderComponent>(shader);
+		auto& shaderComponent = quad.addComponent<ShaderComponent>();
+		shaderComponent.setShader(shader);
+
+		auto waterNormal = Texture::importTexture2D("../../OceanSample/Resources/Content/Textures/water_new_height.png");
+		//shader->setTextureInShader(waterNormal, "waterNormalSampler", 0);
+		shaderComponent.addTexture("waterNormalSampler", waterNormal);
 
 		//quad.getComponent<MaterialComponent>().materials[0]->setTexture(Texture::Type::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
 
-		auto gui = new GUIHandler(shader.m_customShader.get());
+		auto gui = new PoolGUI(shader);
 		Engine::get()->getImguiHandler()->addGUI(gui);
 	}
 
