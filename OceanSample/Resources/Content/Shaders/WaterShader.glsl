@@ -41,8 +41,8 @@ vec2 createNormalWave(vec3 aPos, float xSpeed, float ySpeed, float amp)
 void frag(inout vec3 albedo, inout vec3 normal, inout float metallic, inout float roughness, inout float ao)
 {
 	float pixelDistance = getCameraPosition().y - getPixelPosition().y;
-	pixelDistance /= 10000.0;
-	pixelDistance = pow(pixelDistance, 0.7); 
+	pixelDistance /= 100.0;
+	pixelDistance = pow(pixelDistance, 0.2); 
 
 	// do feresnel maybe
 
@@ -53,8 +53,10 @@ void frag(inout vec3 albedo, inout vec3 normal, inout float metallic, inout floa
 	//color = vec3(1.0,0.0,0.0);
 	//color = mix(colorA, colorB, pixelDistance) * color;
 	albedo = mix(colorA, colorB, pixelDistance);
+	// albedo = colorB;
+	// albedo = vec3(clamp(pixelDistance,0,1),0,0);
 	roughness = .8;
-	metallic = 0.1;
+	metallic = 0.0;
 	// albedo = vec3(1,0,0);
 
 	vec3 worldPos = getPixelPosition() / 100;

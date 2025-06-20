@@ -329,6 +329,8 @@ void Scene::draw(float deltaTime)
 
 		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 
+		glEnable(GL_DEPTH_TEST);
+
 		if (Engine::get()->getConfig().renderConfig.renderDeferredPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Deferred Renderer pass");

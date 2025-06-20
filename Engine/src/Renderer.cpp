@@ -185,6 +185,16 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 graphics->shader->setUniformValue("isAnimated", true);
             }
 
+            graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+            graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+
+            graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+            graphics->shader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
+
+            graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 5);
+            graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 6);
+            graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 7);
+
 
 
             for (auto mesh : meshCollecton.get()->getMeshes())
@@ -201,12 +211,6 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 {
                     //continue; todo fix
                 }
-
-                graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-                graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
-
-                graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
-                graphics->shader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
 
                 auto matIndex = mesh->getMaterialIndex();
                 auto materialComponent = graphics->entity->tryGetComponent<MaterialComponent>();

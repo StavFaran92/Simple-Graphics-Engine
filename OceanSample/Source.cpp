@@ -82,6 +82,11 @@ public:
 			m_shader->recompile();
 		}
 
+		if (ImGui::Button("reload config"))
+		{
+			Engine::get()->reloadEngineConfig();
+		}
+
 		ImGui::PopItemWidth();
 
 		
@@ -111,6 +116,15 @@ public:
 		//camera.getComponent<Transformation>().setLocalPosition(glm::vec3(3, 3, 3));
 		////camera.getComponent<Transformation>().setLocalRotation().set(glm::vec3(3, 3, 3));
 		//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(camera);
+
+		auto skybox = Engine::get()->getContext()->getActiveScene()->createEntity("Skybox");
+		
+		Texture::TextureImportSettings importSettings;
+		importSettings.flip = true;
+		auto skyboxTexture = Texture::importTexture2D("C:/Users/Stav/Downloads/sunflowers_puresky_4k.hdr", importSettings);
+		auto& skyboxComponent = skybox.addComponent<SkyboxComponent>();
+		skyboxComponent.setSkybox(skyboxTexture);
+		skyboxComponent.build();
 
 
 

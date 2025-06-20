@@ -136,7 +136,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 
 float geometrySchlickGGX(float NdotV, float roughness)
 {
-    float r = (roughness + 1.0);
+    float r = (roughness);
     float k = (r * r) / 8.0;
 
     float num = NdotV;
@@ -323,7 +323,27 @@ void main()
 		L0 += DirLightRadiance(dirLight[i], s);
 	}
 
-    vec3 color = L0;
+    // generate Kd to accomodate only for diffuse (exclude specular)
+	vec3 F = fresnelSchlickRoughness(max(0.0, dot(normal, V)), F0, roughness);
+	
+	vec3 prefilterColor = textureLod(gPrefilterEnvMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+	vec2 envBRDF = texture(gBRDFIntegrationLUT, vec2(max(dot(normal, V), 0.0), roughness)).rg;
+	vec3 specular = prefilterColor * (envBRDF.x * F + envBRDF.y); 
+
+	vec3 ks = F;
+	vec3 kd = 1.0 - ks;
+
+	// ambient diffuse irradiance
+	vec3 irradiance = texture(gIrradianceMap, normal).rgb;
+	vec3 diffuse = irradiance * albedo;
+	vec3 ambient = (kd * diffuse + specular) * ao /** ssao*/ * vec3(1.f);
+
+    vec3 color = L0 + ambient;
+
+    // HDR tonemapping
+    color = color / (color + vec3(1.0));
+    // gamma correct
+    color = pow(color, vec3(1.0/2.2));
 
     FragColor = vec4(color, 1.0);
 }

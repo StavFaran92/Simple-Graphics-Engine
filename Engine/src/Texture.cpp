@@ -219,6 +219,8 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 		textureData.isHDR = true;
 	}
 
+	stbi_set_flip_vertically_on_load(textureData.flip);
+
 	if (textureData.isHDR)
 	{
 		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
@@ -227,8 +229,6 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	{
 		textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
 	}
-
-
 
 	// load validation
 	if (!textureData.data)
