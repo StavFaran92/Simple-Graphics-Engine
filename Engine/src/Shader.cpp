@@ -338,6 +338,7 @@ void Shader::setUniformValue(const std::string& name, const Value& v)
 
 	if (m_uniformLocationCache.find(name) == m_uniformLocationCache.end())
 	{
+		//logWarning("Could not find " + name + " in shader.");
 		return;
 	}
 

@@ -97,40 +97,6 @@ void Renderer::setUniforms()
 
     auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-    //auto context = Engine::get()->getContext();
-    //if (context->getActiveScene()->getSkybox() && entity->HasComponent<Material>())
-    //{
-    //    auto mat = entity->getComponent<Material>();
-    //    if (mat.isReflective())
-    //    {
-    //        shaderToUse = context->GetReflectionShader();
-    //        shaderToUse->use();
-    //        shaderToUse->setValue("skybox", 0);
-    //        auto textures = context->getActiveScene()->getSkybox()->getTextureHandlers();
-    //        if (textures.size() <= 0)
-    //        {
-    //            logError("Skybox does not contain cubemap texture.");
-    //            return;
-    //        }
-    //        textures[0]->bind();
-    //    }
-
-    //    if (mat.isRefractive())
-    //    {
-    //        shaderToUse = context->GetRefractiveShader();
-    //        shaderToUse->use();
-    //        shaderToUse->setValue("skybox", 0);
-    //        shaderToUse->setValue("refractiveRatio", 1 / 1.52f);
-    //        auto textures = context->getActiveScene()->getSkybox()->getTextureHandlers();
-    //        if (textures.size() <= 0)
-    //        {
-    //            logError("Skybox does not contain cubemap texture.");
-    //            return;
-    //        }
-    //        textures[0]->bind();
-    //    }
-    //}
-
     // Model
     if (graphics->model)
     {
@@ -257,8 +223,6 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                     }
                 }
 
-                graphics->material->use(graphics->shader);
-
                 {
                     int currentSlot = 8;
                     for (const auto& [texName, texture] : shaderComponent.customTextures)
@@ -283,6 +247,8 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 if (shaderComponent.projection == ShaderComponent::ProjectionType::DefaultProjection)
                 {
                     graphics->renderView->bind();
+                    glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(*graphics->model)));
+                    graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
                     setUniforms();
                     RenderCommand::draw(mesh->getVAO());
                 }

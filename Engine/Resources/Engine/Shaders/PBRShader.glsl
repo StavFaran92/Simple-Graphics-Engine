@@ -30,7 +30,7 @@ out VS_OUT {
 // ----- Uniforms ----- //
 
 uniform mat4 finalBonesMatrices[MAX_BONES];
-
+uniform mat3 transposeInverseModelMatrix;
 
 float getTime()
 {
@@ -75,7 +75,7 @@ void main()
         }
     }
 
-    vec3 aNorm = mat3(transpose(inverse(aModel))) * totalNormal;
+    vec3 aNorm = transposeInverseModelMatrix * totalNormal;
 
 #ifdef CUSTOM_SHADER
     vert(totalPosition.xyz, aNorm);
@@ -288,21 +288,25 @@ float getTime()
 
 void main()
 {
-    vec3 N = normalize(fs_in.normal);
-    vec3 V = normalize(cameraPos - fs_in.fragPos);
-    vec3 R = reflect(-V, N);
-
+    vec3 normal = normalize(fs_in.normal);
     vec3 albedo = pow(getPBRTexture(material.samplerAlbedo).rgb, vec3(2.2));
     float metallic = getPBRTexture(material.samplerMetallic).r;
     float roughness = getPBRTexture(material.samplerRoughness).r;
     float ao = getPBRTexture(material.samplerAO).r;
+
+#ifdef CUSTOM_SHADER
+    frag(albedo, normal, metallic, roughness, ao);
+#endif
+
+    vec3 V = normalize(cameraPos - fs_in.fragPos);
+    vec3 R = reflect(-V, normal);
 
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     Surface s;
     s.fragPos = fs_in.fragPos;
     s.V = V;
-    s.N = N;
+    s.N = normal;
     s.F0 = F0;
     s.metallic = metallic;
     s.roughness = roughness;
@@ -320,10 +324,6 @@ void main()
 	}
 
     vec3 color = L0;
-
-#ifdef CUSTOM_SHADER
-    frag(color);
-#endif
 
     FragColor = vec4(color, 1.0);
 }
