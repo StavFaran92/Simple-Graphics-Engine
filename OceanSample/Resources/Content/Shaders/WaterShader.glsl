@@ -35,14 +35,14 @@ vec2 createNormalWave(vec3 aPos, float xSpeed, float ySpeed, float amp)
 	float t = getTime();
 	worldPos.x += t * xSpeed;
 	worldPos.y += t * ySpeed;
-	return texture(waterNormalSampler, worldPos).xy;
+	return texture(waterNormalSampler, worldPos).rg;
 }
 
 void frag(inout vec3 albedo, inout vec3 normal, inout float metallic, inout float roughness, inout float ao)
 {
 	float pixelDistance = getCameraPosition().y - getPixelPosition().y;
-	pixelDistance /= 1000.0;
-	pixelDistance = pow(pixelDistance, 0.5); 
+	pixelDistance /= 10000.0;
+	pixelDistance = pow(pixelDistance, 0.7); 
 
 	// do feresnel maybe
 
@@ -53,19 +53,19 @@ void frag(inout vec3 albedo, inout vec3 normal, inout float metallic, inout floa
 	//color = vec3(1.0,0.0,0.0);
 	//color = mix(colorA, colorB, pixelDistance) * color;
 	albedo = mix(colorA, colorB, pixelDistance);
-	roughness = .1;
-	metallic = 0;
+	roughness = .8;
+	metallic = 0.1;
 	// albedo = vec3(1,0,0);
 
 	vec3 worldPos = getPixelPosition() / 100;
 
 	// Set normal
 	vec2 normalWave = vec2(0.0);
-	normalWave += createNormalWave(worldPos, 0.01, 0.001, 3.0);
-	normalWave += createNormalWave(worldPos, 0.001, -0.01, 3.5);
-	normalWave += createNormalWave(worldPos, 0.001, -0.001, 1.0);
+	normalWave += createNormalWave(worldPos, 0.1, 0.01, 3.0);
+	normalWave += createNormalWave(worldPos, 0.01, -0.1, 3.5);
+	normalWave += createNormalWave(worldPos, 0.01, -0.01, 1.0);
 
-	//float z = sqrt(1 - normalWave.x * normalWave.x - normalWave.y * normalWave.y);
+	float z = sqrt(1 - normalWave.x * normalWave.x - normalWave.y * normalWave.y);
 
 	normal = vec3(normalWave.x, 1, normalWave.y);
 }
