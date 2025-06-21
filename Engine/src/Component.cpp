@@ -223,7 +223,10 @@ void ShaderComponent::update()
 		m_customShader.get()->setUniformValue(name, value);
 	}
 
-	setProjectionTexture(projectionTexture);
+	if (!projectionTexture.isEmpty())
+	{
+		setProjectionTexture(projectionTexture);
+	}
 }
 
 SkyboxComponent::SkyboxComponent(Resource<Texture> skyboxImage)
