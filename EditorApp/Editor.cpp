@@ -1252,6 +1252,13 @@ void RenderSceneHierarchyWindow(float width, float height)
 				selectedEntity = sceneObjects[0].e;
 			}
 
+			if (ImGui::MenuItem("Pool"))
+			{
+				Entity e = WaterSystem::createPool();
+				updateScene();
+				selectedEntity = sceneObjects[0].e;
+			}
+
 			ImGui::EndMenu(); // End the submenu
 		}
 
