@@ -8,6 +8,7 @@
 #include "Component.h"
 #include "TerrainMaterial.h"
 #include "TextureArray.h"
+#include "Entity.h"
 
 static const int MAX_TEXTURE_COUNT = 4;
 
@@ -29,6 +30,8 @@ class EngineAPI Terrain : public Component
 public:
 	static Terrain generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath);
 	static Terrain generateTerrain(int width, int height, float scale, Resource<Texture> heightMap);
+
+	static Entity createTerrain(int width, int height, float scale, Resource<Texture> heightMap);
 
 
 	Terrain() = default;

@@ -23,6 +23,28 @@
 #include "TextureTransformer.h"
 #include "IBL.h"
 
+Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
+{
+    auto scene = Engine::get()->getContext()->getActiveScene();
+    auto skyboxEntity = scene->createEntity("Skybox");
+
+    // Todo support cubemap
+    if (texType == TexType::CUBEMAP)
+    {
+        logError("Cubemap currently not supported.");
+        return Entity::EmptyEntity;
+    }
+    else if (texType == TexType::EQUIRECTANGULAR)
+    {
+        auto skyboxTexture = Texture::importTexture2D(textureFilepath);
+        auto& skyboxComponent = skyboxEntity.addComponent<SkyboxComponent>(skyboxTexture);
+        skyboxComponent.build();
+    }
+
+    return skyboxEntity;
+    
+}
+
 Entity Skybox::CreateSkyboxFromEquirectangularMap(const std::string& equirectnagularMapPath, Scene* scene)
 {
     if (!scene)

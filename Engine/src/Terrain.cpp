@@ -7,8 +7,25 @@
 #include "Logger.h"
 #include "CommonTextures.h"
 #include "Grid.h"
+#include "Context.h"
+#include "Scene.h"
 
 #include "GL/glew.h"
+
+Entity Terrain::createTerrain(int width, int height, float scale, Resource<Texture> heightMap)
+{
+	auto terrainEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
+
+	auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
+	terrainComponent.m_textureCount = 1;
+
+	auto& grassTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
+	terrainComponent.setTexture(0, grassTexture);
+
+	terrainEntity.addComponent<Terrain>(terrainComponent);
+
+	return terrainEntity;
+}
 
 Terrain Terrain::generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath)
 {

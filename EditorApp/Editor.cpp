@@ -1246,8 +1246,14 @@ void RenderSceneHierarchyWindow(float width, float height)
 		{ // Begin the submenu
 			if (ImGui::MenuItem("Skybox"))
 			{
-				Entity e = Engine::get()->getContext()->getActiveScene()->createEntity();
-				e.addComponent<SkyboxComponent>();
+				Entity e = Skybox::createSkybox(SGE_ROOT_DIR + "Resources/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR);
+				updateScene();
+				selectedEntity = sceneObjects[0].e;
+			}
+
+			if (ImGui::MenuItem("Terrain"))
+			{
+				Entity e = Terrain::createTerrain(100, 100, 1, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
 				updateScene();
 				selectedEntity = sceneObjects[0].e;
 			}

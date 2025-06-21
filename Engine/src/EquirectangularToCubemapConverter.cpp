@@ -17,12 +17,15 @@
 #include "MeshCollection.h"
 #include "Context.h"
 #include "Cubemap.h"
+#include "TextureTransformer.h"
 
 #include "Engine.h"
 
 
 Resource<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(Resource<Texture> equirectangularTexture)
 {
+	equirectangularTexture = TextureTransformer::flipVertical(equirectangularTexture);
+
 	auto equirectangularShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/EquirectangularToCubemap.glsl");
 
 	// Generate FBO 
@@ -61,6 +64,8 @@ Resource<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubema
 	equirectangularShader->setProjectionMatrix(captureProjection);
 	equirectangularShader->setUniformValue("equirectangularMap", 0);
 
+
+	
 	equirectangularTexture.get()->setSlot(0);
 	equirectangularTexture.get()->bind();
 	

@@ -7,7 +7,7 @@
 
 Entity WaterSystem::createPool()
 {
-	auto poolQuad = Engine::get()->getContext()->getActiveScene()->createEntity();
+	auto poolQuad = Engine::get()->getContext()->getActiveScene()->createEntity("Pool");
 
 	// TODO use grid instead
 	auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx"); 
@@ -17,8 +17,6 @@ Entity WaterSystem::createPool()
 
 	auto& planeTransform = poolQuad.getComponent<Transformation>();
 	planeTransform.rotate({ 1,0,0 }, 90);
-	//planeTransform.rotate({ 0,1,0 }, 90);
-	//planeTransform.rotate({ 1,0,0 }, 180);
 	planeTransform.scale({ 100, 100, 1 });
 
 	auto& shader = Shader::createOverrideShader("WaterShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
