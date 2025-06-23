@@ -57,7 +57,20 @@ Resource<Texture> Texture::createEmptyTexture(int width, int height, int interna
 
 Resource<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
 {
-	Resource<Texture> texture = Factory<Texture>::create();
+	Resource<Texture> texture;
+	if (textureData.isTransient)
+	{
+		if (textureData.textureName.empty())
+		{
+			logError("Transient texture must have a name!");
+			return Resource<Texture>::empty;
+		}
+		texture = Factory<Texture>::createUsingCustomUUID(textureData.textureName);
+	}
+	else
+	{
+		texture = Factory<Texture>::create();
+	}
 
 	texture.get()->build(textureData);
 

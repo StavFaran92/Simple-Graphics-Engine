@@ -459,9 +459,23 @@ void replaceDirective(std::string& source, const std::string& directive, std::st
 	}
 }
 
-Resource<Shader> Shader::createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride)
+Resource<Shader> Shader::createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient)
 {
-	Resource<Shader> shader = Factory<Shader>::create();
+	Resource<Shader> shader;
+	if (isTransient)
+	{
+		if (name.empty())
+		{
+			logError("Transient shader must have a name!");
+			return Resource<Shader>::empty;
+		}
+		shader = Factory<Shader>::createUsingCustomUUID(name);
+	}
+	else
+	{
+		shader = Factory<Shader>::create();
+	}
+
 	shader->m_isShaderOverride = true;
 	shader->shaderOverride = shaderOverride;
 	shader->m_glslFilePath = filepath;
@@ -473,6 +487,7 @@ Resource<Shader> Shader::createOverrideShader(const std::string& name, const std
 	aInfo.aType = AssetType::SHADER;
 	aInfo.name = name;
 	aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
+	aInfo.isTransient = isTransient;
 	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
 
 	return shader;

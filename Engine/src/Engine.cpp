@@ -459,7 +459,8 @@ void Engine::loadProject(const std::string& dirPath)
     m_context = std::make_shared<Context>(par);
 
     m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
-    m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::load());
+    m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
+    m_commonShaders = std::make_shared<CommonShaders>();
     m_defaultMaterial = std::make_shared<Material>();
 
     m_projectManager->loadProject(filePath, m_context);

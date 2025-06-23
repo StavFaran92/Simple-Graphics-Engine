@@ -104,6 +104,9 @@ public:
 		bool flip = false;
 
 		void* facesData[6]{ nullptr }; //only apply to Cubemap
+
+		bool isTransient = false;
+		std::string textureName;
 	};
 
 	struct TextureImportSettings

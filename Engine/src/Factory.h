@@ -12,9 +12,19 @@ public:
     template<typename... Args>
     static Resource<T> create(Args&&... args)
     {
-        T* texture = new T(args...);
+        T* asset = new T(args...);
         auto uid = uuid::generate_uuid_v4();
-        Engine::get()->getMemoryPool<T>()->add(uid, texture);
+        Engine::get()->getMemoryPool<T>()->add(uid, asset);
+        Engine::get()->getResourceManager()->incRef(uid);
+        Resource<T> res(uid);
+        return res;
+    }
+
+    template<typename... Args>
+    static Resource<T> createUsingCustomUUID(UUID uid, Args&&... args)
+    {
+        T* asset = new T(args...);
+        Engine::get()->getMemoryPool<T>()->add(uid, asset);
         Engine::get()->getResourceManager()->incRef(uid);
         Resource<T> res(uid);
         return res;

@@ -5,6 +5,7 @@
 #include "Context.h"
 #include "ProjectAssetRegistry.h"
 #include "CacheSystem.h"
+#include <gl/glew.h>
 
 CommonTextures::CommonTextures()
 {
@@ -26,36 +27,70 @@ CommonTextures* CommonTextures::create()
 
 	{
 		static unsigned char* whiteColor = new unsigned char[3] { 255, 255, 255 }; // todo rethink this
-		auto texture = Texture::createDummyTexture(whiteColor);
+
+		Texture::TextureData tData;
+		tData.target = GL_TEXTURE_2D;
+		tData.width = 1;
+		tData.height = 1;
+		tData.bpp = 3;
+		tData.data = whiteColor;
+		tData.internalFormat = Texture::InternalFormat::RGB2;
+		tData.format = Texture::Format::RGB;
+		tData.type = Texture::Type::UNSIGNED_BYTE;
+		tData.isTransient = true;
+		tData.textureName = "SGE_TEXTURE_WHITE";
+		tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+						{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+						{GL_TEXTURE_WRAP_S, GL_REPEAT},
+						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
+
+		auto texture = Texture::create2DTextureFromBuffer(tData);
 		instance->m_textures[TextureType::WHITE_1X1] = texture;
 
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
-		Texture::writeTexture2D(savedFileLocation, texture);
+		//auto& projectDir = Engine::get()->getProjectDirectory();
+		//std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
+		//Texture::writeTexture2D(savedFileLocation, texture);
 
 		AssetInfo aInfo;
 		aInfo.uuid = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_WHITE";
-		aInfo.filePath = savedFileLocation;
+		aInfo.isTransient = true;
+		//aInfo.filePath = savedFileLocation;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 	}
 
 	{
 		static unsigned char* blackColor = new unsigned char[3] { 0, 0, 0};
-		auto texture = Texture::createDummyTexture(blackColor);
+		Texture::TextureData tData;
+		tData.target = GL_TEXTURE_2D;
+		tData.width = 1;
+		tData.height = 1;
+		tData.bpp = 3;
+		tData.data = blackColor;
+		tData.internalFormat = Texture::InternalFormat::RGB2;
+		tData.format = Texture::Format::RGB;
+		tData.type = Texture::Type::UNSIGNED_BYTE;
+		tData.isTransient = true;
+		tData.textureName = "SGE_TEXTURE_BLACK";
+		tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+						{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+						{GL_TEXTURE_WRAP_S, GL_REPEAT},
+						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
+		auto texture = Texture::create2DTextureFromBuffer(tData);
 		instance->m_textures[TextureType::BLACK_1X1] = texture;
 
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
-		Texture::writeTexture2D(savedFileLocation, texture);
+		//auto& projectDir = Engine::get()->getProjectDirectory();
+		//std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
+		//Texture::writeTexture2D(savedFileLocation, texture);
 
 		AssetInfo aInfo;
 		aInfo.uuid = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_BLACK";
-		aInfo.filePath = savedFileLocation;
+		aInfo.isTransient = true;
+		//aInfo.filePath = savedFileLocation;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 	}

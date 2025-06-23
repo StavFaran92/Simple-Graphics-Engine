@@ -97,22 +97,27 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 	std::string name = fullName.substr(0, fullName.find_first_of('.'));
 	std::string ext = std::filesystem::path(path).extension().string();
 
-	// Save asset in resource folder
-	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string savedFilePath = projectDir + "/" + uid + ext;
-	std::filesystem::copy_file(path, savedFilePath);
-
 	
-	Engine::get()->getMemoryManagementSystem()->addAssociation(fullName, uid);
+	
 
-	aInfo.filePath = savedFilePath;
+	if (!aInfo.isTransient)
+	{
+		// Save asset in resource folder
+		auto& projectDir = Engine::get()->getProjectDirectory();
+		const std::string savedFilePath = projectDir + "/" + uid + ext;
+		std::filesystem::copy_file(path, savedFilePath);
+
+		aInfo.filePath = savedFilePath;
+
+		Engine::get()->getMemoryManagementSystem()->addAssociation(fullName, uid);
+		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
+	}
+
 	aInfo.isValid = true;
-
-	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 
 	m_assets[uid] = aInfo;
 
-	logInfo("Successfully imported asset: '" + path + "' into: '" + savedFilePath + "'.");
+	logInfo("Successfully imported asset: '" + path + "' into: '" + aInfo.name + "'.");
 
 	return aInfo;
 }
@@ -127,17 +132,20 @@ AssetInfo Assets::addAsset(AssetInfo aInfo)
 	assert(!savedFilepath.empty());
 	assert(!uid.empty());
 	
-	Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.name, uid); //TODO maybe use some naming convention here?
 
 	aInfo.filePath = savedFilepath;
 	aInfo.isValid = true;
 	aInfo.aType = aType;
 
-	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
+	if (!aInfo.isTransient)
+	{
+		Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.name, uid); //TODO maybe use some naming convention here?
+		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
+	}
 
 	m_assets[uid] = aInfo;
 
-	logInfo("Successfully Added asset: '" + savedFilepath + "'.");
+	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
 
 	return aInfo;
 }
@@ -164,11 +172,11 @@ void Assets::load()
 	for (const auto& asset : meshAssets)
 	{
 		UUID uuid = asset.uuid;
-		ModelImporter::ModelInfo mInfo;
 		MeshCollection* meshPtr = new MeshCollection();
-		Resource<MeshCollection> generatedMesh(uuid);
-		mInfo.mesh = generatedMesh;
 		Engine::get()->getMemoryPool<MeshCollection>()->add(uuid, meshPtr);
+		Resource<MeshCollection> generatedMesh(uuid);
+		ModelImporter::ModelInfo mInfo;
+		mInfo.mesh = generatedMesh;
 		Engine::get()->getResourceManager()->incRef(uuid);
 		Engine::get()->getSubSystem<ModelImporter>()->load(asset.filePath, mInfo);
 		m_assets[uuid] = asset;
@@ -190,8 +198,8 @@ void Assets::load()
 	{
 		UUID uuid = asset.uuid;
 		Animation* animPtr = new Animation();
-		Resource<Animation> anim(uuid);
 		Engine::get()->getMemoryPool<Animation>()->add(uuid, animPtr);
+		Resource<Animation> anim(uuid);
 		Engine::get()->getResourceManager()->incRef(uuid);
 		Engine::get()->getSubSystem<AnimationLoader>()->load(asset.filePath, anim);
 		m_assets[uuid] = asset;
@@ -205,8 +213,8 @@ void Assets::load()
 		std::string shaderOverrideStr = asset.attributes.at("shader_override");
 		ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
 		Shader* shaderPtr = new Shader();
-		Resource<Shader> shader(uuid);
 		Engine::get()->getMemoryPool<Shader>()->add(uuid, shaderPtr);
+		Resource<Shader> shader(uuid);
 		Engine::get()->getResourceManager()->incRef(uuid);
 		Shader::load(shader, asset.filePath, shaderOverride);
 

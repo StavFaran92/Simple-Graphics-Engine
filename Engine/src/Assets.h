@@ -16,6 +16,7 @@ struct AssetInfo
 	bool isValid = false;
 	std::map<std::string, std::string> attributes;
 	std::string name;
+	bool isTransient = false;
 	//bool isClient = false
 	//timestamp
 	//size
