@@ -167,6 +167,18 @@ void Assets::load()
 {
 	auto par = Engine::get()->getContext()->getProjectAssetRegistry();
 
+	
+
+	// Load textures
+	std::vector<AssetInfo> textureAssets = par->getAllAssetsOfType(AssetType::TEXTURE);
+	for (const auto& asset : textureAssets)
+	{
+		UUID uuid = asset.uuid;
+		Engine::get()->getResourceManager()->incRef(uuid);
+		Texture::loadTexture2D(asset);
+		m_assets[uuid] = asset;
+	}
+
 	// Load meshes
 	std::vector<AssetInfo> meshAssets = par->getAllAssetsOfType(AssetType::MESH);
 	for (const auto& asset : meshAssets)
@@ -179,16 +191,6 @@ void Assets::load()
 		mInfo.mesh = generatedMesh;
 		Engine::get()->getResourceManager()->incRef(uuid);
 		Engine::get()->getSubSystem<ModelImporter>()->load(asset.filePath, mInfo);
-		m_assets[uuid] = asset;
-	}
-
-	// Load textures
-	std::vector<AssetInfo> textureAssets = par->getAllAssetsOfType(AssetType::TEXTURE);
-	for (const auto& asset : textureAssets)
-	{
-		UUID uuid = asset.uuid;
-		Engine::get()->getResourceManager()->incRef(uuid);
-		Texture::loadTexture2D(asset);
 		m_assets[uuid] = asset;
 	}
 

@@ -172,7 +172,7 @@ bool DeferredRenderer::init()
 	setupSSAO();
 
 	// Generate screen quad
-	m_quad = ScreenQuad::GenerateScreenQuad(&Engine::get()->getContext()->getRegistry());
+	m_quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
 	m_quad.RemoveComponent<RenderableComponent>();
 	m_quad.RemoveComponent<ObjectComponent>();
 

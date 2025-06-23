@@ -9,6 +9,7 @@ Resource<MeshCollection> Sphere::createMesh(float radius, int sectors, int stack
 {
     ModelImporter::ModelImportSettings settings;
     settings.name = "SGE_SPHERE_MESH";
+    settings.isTransient = true;
     return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sphere.gltf", settings).mesh;
     //// clear memory of prev arrays
     //auto positions = new std::vector<glm::vec3>();

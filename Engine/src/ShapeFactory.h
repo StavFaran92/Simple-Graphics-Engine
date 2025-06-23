@@ -14,8 +14,6 @@ class EngineAPI ShapeFactory
 {
 public:
 	static Entity createBoxEntity(SGE_Regsitry* registry);
-	static void createBoxEntity(Entity& e, SGE_Regsitry* registry);
-	static Resource<MeshCollection> createBox();
 	static Entity createQuad(SGE_Regsitry* registry);
 	static Entity createSphere(SGE_Regsitry* registry);
 

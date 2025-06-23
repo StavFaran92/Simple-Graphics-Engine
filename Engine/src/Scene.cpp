@@ -197,7 +197,7 @@ void Scene::init(Context* context)
 
 	m_skyboxShader = Shader::create(SGE_ROOT_DIR +"Resources/Engine/Shaders/SkyboxShader.glsl");
 
-	m_basicBox = ShapeFactory::createBox();
+	m_basicBox = Box::createMesh();
 
 	addRenderView("Scene View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 

@@ -36,6 +36,7 @@
 #include "RenderCommand.h"
 #include "EventLayerStack.h"
 #include "EngineConfig.h"
+#include "BuiltInMeshes.h"
 
 #include "Application.h"
 #include "SDL2/SDL.h"
@@ -210,6 +211,7 @@ bool Engine::init(const InitParams& initParams)
 
         m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
         m_commonShaders = std::make_shared<CommonShaders>();
+        m_builtInMeshes = std::make_shared<BuiltInMeshes>();
         m_defaultMaterial = std::make_shared<Material>();
         
         createStartupScene(m_context, initParams);
@@ -434,6 +436,11 @@ CommonTextures* Engine::getCommonTextures() const
     return m_commonTextures.get();
 }
 
+BuiltInMeshes* Engine::getBuiltInMeshes() const
+{
+    return m_builtInMeshes.get();
+}
+
 const InitParams& Engine::getInitParams() const
 {
     return m_initParams;
@@ -461,7 +468,15 @@ void Engine::loadProject(const std::string& dirPath)
     m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
     m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
     m_commonShaders = std::make_shared<CommonShaders>();
+    m_builtInMeshes = std::make_shared<BuiltInMeshes>();
     m_defaultMaterial = std::make_shared<Material>();
+
+    // This is a shit hack I must fix,
+    // I cannot put camera in built in meshes since it also containts material and texture data I need.
+    ModelImporter::ModelImportSettings settings;
+    settings.isTransient = true;
+    settings.name = "SGE_MAIN_CAMERA";
+    auto modelInfo = getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj", settings);
 
     m_projectManager->loadProject(filePath, m_context);
 }
@@ -531,7 +546,11 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
 
-    auto modelInfo = getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj");
+    ModelImporter::ModelImportSettings settings;
+    settings.isTransient = true;
+    settings.name = "SGE_MAIN_CAMERA";
+    auto modelInfo = getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj", settings);
+
     mainCamera.addComponent<MeshComponent>().mesh = modelInfo.mesh;
     mainCamera.addComponent<RenderableComponent>();
 

@@ -23,6 +23,7 @@ Resource<MeshCollection> Quad::createMesh()
 {
 	ModelImporter::ModelImportSettings settings;
 	settings.name = "SGE_QUAD_MESH";
+	settings.isTransient = true;
 	return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/plane.gltf", settings).mesh;
 	//VertexLayout layout;
 	//layout.numOfVertices = 4;

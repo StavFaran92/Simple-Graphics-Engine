@@ -94,19 +94,37 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 	}
 
 	ModelImporter::ModelInfo mInfo;
-	mInfo.mesh = Factory<MeshCollection>::create();
 
-	// TODO I should probably copy the file instead of export (issue with GLTF and bin)
-	auto savedFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
+	if (!settings.isTransient)
+	{
+		mInfo.mesh = Factory<MeshCollection>::create();
+	}
+	else
+	{
+		mInfo.mesh = Factory<MeshCollection>::createUsingCustomUUID(settings.name);
+	}
+
 	AssetInfo aInfo;
 	aInfo.uuid = mInfo.mesh.getUID();
 	aInfo.aType = AssetType::MESH;
-	aInfo.filePath = savedFilePath;
 	aInfo.name = settings.name;
 	if (aInfo.name.empty())
 	{
 		aInfo.name = std::filesystem::path(path).filename().string();
 	}
+
+	std::string savedFilePath;
+	if (!settings.isTransient)
+	{
+		// TODO I should probably copy the file instead of export (issue with GLTF and bin)
+		savedFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
+		aInfo.filePath = savedFilePath;
+	}
+	else
+	{
+		aInfo.isTransient = true;
+	}
+
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 	if (scene->HasMaterials())
@@ -129,7 +147,14 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 		}
 	}
 
-	load(savedFilePath, mInfo);
+	if (!settings.isTransient)
+	{
+		load(savedFilePath, mInfo);
+	}
+	else
+	{
+		load(path, mInfo);
+	}
 
 #if 0 // display AABB for models
 	for (auto& mesh : mInfo.mesh.get()->getMeshes())

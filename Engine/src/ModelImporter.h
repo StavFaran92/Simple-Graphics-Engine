@@ -48,6 +48,7 @@ public:
 	struct ModelImportSettings
 	{
 		std::string name;
+		bool isTransient = false;
 	};
 
 	struct ModelInfo

@@ -75,6 +75,7 @@ Resource<MeshCollection> Box::createMesh()
 {
     ModelImporter::ModelImportSettings settings;
     settings.name = "SGE_BOX_MESH";
+    settings.isTransient = true;
     return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/cube.gltf", settings).mesh;
     //VertexLayout layout;
     //layout.numOfVertices = 36;

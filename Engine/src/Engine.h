@@ -45,6 +45,7 @@ class Animation;
 class AnimationLoader;
 class Shader;
 class EventLayerStack;
+class BuiltInMeshes;
 struct EngineConfig;
 template<typename T>class Resource;
 template<typename T>class Factory;
@@ -85,6 +86,7 @@ public:
     ResourceManager* getResourceManager() const;
     CommonShaders* getCommonShaders() const;
     CommonTextures* getCommonTextures() const;
+    BuiltInMeshes* getBuiltInMeshes() const;
     const InitParams& getInitParams() const;
     EventLayerStack* getEventLayerStack() const;
     const EngineConfig& getConfig() const;
@@ -179,6 +181,7 @@ protected:
     std::shared_ptr<MemoryPool<Shader>> m_memoryPoolShader;
     std::shared_ptr<ProjectManager> m_projectManager;
     std::shared_ptr<CommonShaders> m_commonShaders;
+    std::shared_ptr<BuiltInMeshes> m_builtInMeshes;
     std::shared_ptr<CommonTextures> m_commonTextures;
     std::shared_ptr<Assets> m_assets;
     std::shared_ptr<EngineConfig> m_engineConfig;
