@@ -113,6 +113,7 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 		aInfo.name = std::filesystem::path(path).filename().string();
 	}
 
+	const aiScene* sceneDAE = 0;
 	std::string savedFilePath;
 	if (!settings.isTransient)
 	{
@@ -122,6 +123,9 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 	}
 	else
 	{
+		Assimp::Exporter exporter;
+		const aiExportDataBlob* blob = exporter.ExportToBlob(scene, "collada");
+		scene = m_importer->ReadFileFromMemory(blob->data, blob->size, 0);
 		aInfo.isTransient = true;
 	}
 
@@ -153,7 +157,7 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 	}
 	else
 	{
-		load(path, mInfo);
+		loadScene(scene, path, mInfo);
 	}
 
 #if 0 // display AABB for models
@@ -171,6 +175,60 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 #endif 
 
 	return mInfo;
+}
+
+ModelImporter::ModelInfo ModelImporter::loadScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo)
+{
+	// create new model session
+	ModelImporter::ModelImportSession session;
+	session.filepath = path;
+	session.fileDir = std::filesystem::path(path).parent_path().string();
+	session.name = "modelName";
+	session.mesh = modelInfo.mesh;
+
+	// extract mesh from root node
+	processNode(scene->mRootNode, scene, session);
+
+	if (scene->HasMaterials())
+	{
+		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+		{
+			auto& material = std::make_shared<Material>();
+			auto& aMaterial = scene->mMaterials[i];
+
+			// get uuid using tex name from association map
+			material->setName(aMaterial->GetName().C_Str());
+
+			// load texture
+
+			aiString diffuseStr;
+			if (aMaterial->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &diffuseStr) == aiReturn_SUCCESS)
+			{
+				std::string name = std::filesystem::path(diffuseStr.C_Str()).filename().string();
+				UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(name);
+				Resource<Texture> texture = Resource<Texture>(uuid);
+				material->setTexture(Texture::TextureType::Albedo, texture);
+			}
+
+			aiString normalStr;
+			if (aMaterial->GetTexture(aiTextureType::aiTextureType_NORMALS, 0, &normalStr) == aiReturn_SUCCESS)
+			{
+				std::string name = std::filesystem::path(normalStr.C_Str()).filename().string();
+				UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(name);
+				Resource<Texture> texture = Resource<Texture>(uuid);
+				material->setTexture(Texture::TextureType::Normal, texture);
+
+
+			}
+
+			if (material->getAllTextures().size() > 0)
+			{
+				modelInfo.materials[i] = material;
+			}
+		}
+	}
+
+	return modelInfo;
 }
 
 ModelImporter::ModelInfo ModelImporter::load(const std::string & path, ModelImporter::ModelInfo& modelInfo)
