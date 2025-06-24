@@ -77,9 +77,9 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	ModelInfo load(const std::string& path, ModelInfo& modelInfo);
+	ModelInfo loadModelFromFile(const std::string& path, ModelInfo& modelInfo);
 
-	ModelInfo loadScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo);
+	void loadModelFromAssimpScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo);
 private:
 	friend class Engine;
 

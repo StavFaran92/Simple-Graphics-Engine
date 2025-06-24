@@ -77,10 +77,8 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 
 	auto fileDir = std::filesystem::path(path).parent_path().string();
 
-	const aiScene* scene = nullptr;
-
 	// read scene from file
-	scene = m_importer->ReadFile(path, 
+	 const aiScene* scene = m_importer->ReadFile(path,
 		aiProcess_Triangulate | 
 		aiProcess_GenSmoothNormals | 
 		aiProcess_FlipUVs | 
@@ -95,42 +93,7 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 
 	ModelImporter::ModelInfo mInfo;
 
-	if (!settings.isTransient)
-	{
-		mInfo.mesh = Factory<MeshCollection>::create();
-	}
-	else
-	{
-		mInfo.mesh = Factory<MeshCollection>::createUsingCustomUUID(settings.name);
-	}
-
-	AssetInfo aInfo;
-	aInfo.uuid = mInfo.mesh.getUID();
-	aInfo.aType = AssetType::MESH;
-	aInfo.name = settings.name;
-	if (aInfo.name.empty())
-	{
-		aInfo.name = std::filesystem::path(path).filename().string();
-	}
-
-	const aiScene* sceneDAE = 0;
-	std::string savedFilePath;
-	if (!settings.isTransient)
-	{
-		// TODO I should probably copy the file instead of export (issue with GLTF and bin)
-		savedFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
-		aInfo.filePath = savedFilePath;
-	}
-	else
-	{
-		Assimp::Exporter exporter;
-		const aiExportDataBlob* blob = exporter.ExportToBlob(scene, "collada");
-		scene = m_importer->ReadFileFromMemory(blob->data, blob->size, 0);
-		aInfo.isTransient = true;
-	}
-
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-
+	// Import textures
 	if (scene->HasMaterials())
 	{
 		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
@@ -151,14 +114,45 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 		}
 	}
 
+	AssetInfo aInfo;
+
 	if (!settings.isTransient)
 	{
-		load(savedFilePath, mInfo);
+		mInfo.mesh = Factory<MeshCollection>::create();
+
+		// TODO I should probably copy the file instead of export (issue with GLTF and bin)
+		std::string savedFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
+		aInfo.filePath = savedFilePath;
+		aInfo.origFilePath = path;
+
+		loadModelFromFile(savedFilePath, mInfo);
 	}
 	else
 	{
-		loadScene(scene, path, mInfo);
+		mInfo.mesh = Factory<MeshCollection>::createUsingCustomUUID(settings.name);
+
+		// Formats such as obj and GLTF cause issues with the engine meshes,
+		// a hack I use is to convert the mesh on import into a DAE file (collada format)
+		// or in the case of transient mesh convert into DAE blob and load the scene from it to avoid I/O.
+		Assimp::Exporter exporter;
+		const aiExportDataBlob* blob = exporter.ExportToBlob(scene, "collada");
+		scene = m_importer->ReadFileFromMemory(blob->data, blob->size, 0);
+		aInfo.isTransient = true;
+
+		loadModelFromAssimpScene(scene, path, mInfo);
+		exporter.FreeBlob();
 	}
+	
+	// Add asset
+	aInfo.uuid = mInfo.mesh.getUID();
+	aInfo.aType = AssetType::MESH;
+	aInfo.name = settings.name;
+	if (aInfo.name.empty())
+	{
+		aInfo.name = std::filesystem::path(path).filename().string();
+	}
+
+	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 #if 0 // display AABB for models
 	for (auto& mesh : mInfo.mesh.get()->getMeshes())
@@ -177,95 +171,13 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 	return mInfo;
 }
 
-ModelImporter::ModelInfo ModelImporter::loadScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo)
 {
-	// create new model session
-	ModelImporter::ModelImportSession session;
-	session.filepath = path;
-	session.fileDir = std::filesystem::path(path).parent_path().string();
-	session.name = "modelName";
-	session.mesh = modelInfo.mesh;
-
-	// extract mesh from root node
-	processNode(scene->mRootNode, scene, session);
-
-	if (scene->HasMaterials())
-	{
-		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		{
-			auto& material = std::make_shared<Material>();
-			auto& aMaterial = scene->mMaterials[i];
-
-			// get uuid using tex name from association map
-			material->setName(aMaterial->GetName().C_Str());
-
-			// load texture
-
-			aiString diffuseStr;
-			if (aMaterial->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &diffuseStr) == aiReturn_SUCCESS)
-			{
-				std::string name = std::filesystem::path(diffuseStr.C_Str()).filename().string();
-				UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(name);
-				Resource<Texture> texture = Resource<Texture>(uuid);
-				material->setTexture(Texture::TextureType::Albedo, texture);
-			}
-
-			aiString normalStr;
-			if (aMaterial->GetTexture(aiTextureType::aiTextureType_NORMALS, 0, &normalStr) == aiReturn_SUCCESS)
-			{
-				std::string name = std::filesystem::path(normalStr.C_Str()).filename().string();
-				UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(name);
-				Resource<Texture> texture = Resource<Texture>(uuid);
-				material->setTexture(Texture::TextureType::Normal, texture);
-
-
-			}
-
-			if (material->getAllTextures().size() > 0)
-			{
-				modelInfo.materials[i] = material;
-			}
-		}
-	}
-
-	return modelInfo;
-}
-
-ModelImporter::ModelInfo ModelImporter::load(const std::string & path, ModelImporter::ModelInfo& modelInfo)
-{
-	if (!std::filesystem::exists(path))
-	{
-		logError("File doesn't exists: " + path);
-		return {};
-	}
-
-	const aiScene* scene = nullptr;
-
-	// If the scene was previously loaded last, we can optimize the load since it is already in memory.
-	if (path == m_lastLoadedSceneName)
-	{
-		scene = m_importer->GetScene();
-	}
-	else
-	{
-
-		// read scene from file
-		scene = m_importer->ReadFile(path, aiProcess_ValidateDataStructure);
-
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-		{
-			logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
-			return {};
-		}
-	}
-
-	m_lastLoadedSceneName = path;
-
 	std::string modelName = std::filesystem::path(path).filename().string();
 	modelName = modelName.substr(0, modelName.find_first_of('.'));
 
 	// create new model session
-	ModelImportSession session;
+	ModelImporter::ModelImportSession session;
 	session.filepath = path;
 	session.fileDir = std::filesystem::path(path).parent_path().string();
 	session.name = modelName;
@@ -303,7 +215,7 @@ ModelImporter::ModelInfo ModelImporter::load(const std::string & path, ModelImpo
 				Resource<Texture> texture = Resource<Texture>(uuid);
 				material->setTexture(Texture::TextureType::Normal, texture);
 
-				
+
 			}
 
 			if (material->getAllTextures().size() > 0)
@@ -312,8 +224,39 @@ ModelImporter::ModelInfo ModelImporter::load(const std::string & path, ModelImpo
 			}
 		}
 	}
+}
 
-	
+ModelImporter::ModelInfo ModelImporter::loadModelFromFile(const std::string & path, ModelImporter::ModelInfo& modelInfo)
+{
+	if (!std::filesystem::exists(path))
+	{
+		logError("File doesn't exists: " + path);
+		return {};
+	}
+
+	const aiScene* scene = nullptr;
+
+	// If the scene was previously loaded last, we can optimize the load since it is already in memory.
+	if (path == m_lastLoadedSceneName)
+	{
+		scene = m_importer->GetScene();
+	}
+	else
+	{
+
+		// read scene from file
+		scene = m_importer->ReadFile(path, aiProcess_ValidateDataStructure);
+
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+		{
+			logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
+			return {};
+		}
+	}
+
+	m_lastLoadedSceneName = path;
+
+	loadModelFromAssimpScene(scene, path, modelInfo);
 
 	return modelInfo;
 }

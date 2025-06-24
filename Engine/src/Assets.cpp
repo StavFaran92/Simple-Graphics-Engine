@@ -190,7 +190,7 @@ void Assets::load()
 		ModelImporter::ModelInfo mInfo;
 		mInfo.mesh = generatedMesh;
 		Engine::get()->getResourceManager()->incRef(uuid);
-		Engine::get()->getSubSystem<ModelImporter>()->load(asset.filePath, mInfo);
+		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(asset.filePath, mInfo);
 		m_assets[uuid] = asset;
 	}
 
