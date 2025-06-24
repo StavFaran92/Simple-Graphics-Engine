@@ -269,6 +269,9 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 		throw std::runtime_error("Unsupported texture format!");
 	}
 
+	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
+	textureData.textureName = textureName;
+
 	textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
 }
 
@@ -287,18 +290,20 @@ Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, cons
 	Texture::TextureData textureData;
 
 	textureData.target = GL_TEXTURE_2D;
+	textureData.isTransient = settings.isTransient;
 
 	// extract texture build data
 	extractTextureDataFromSettings(settings, textureData);
 	extractTextureDataFromFile(fileLocation, textureData);
 	Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
 
-	if (settings.saveOnDisk)
+	if (!settings.isTransient)
 	{
 		AssetInfo aInfo;
 		aInfo.origFilePath = fileLocation;
 		aInfo.uuid = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
+		aInfo.isTransient = textureData.isTransient;
 
 		if (!settings.name.empty())
 		{

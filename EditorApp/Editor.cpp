@@ -2729,7 +2729,7 @@ public:
 		
 
 		Texture::TextureImportSettings settings;
-		settings.saveOnDisk = false;
+		settings.isTransient = true;
 		icons["mesh"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
 		icons["texture"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
 		icons["animation"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);

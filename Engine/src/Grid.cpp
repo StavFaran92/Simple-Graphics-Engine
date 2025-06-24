@@ -3,6 +3,7 @@
 #include "Factory.h"
 #include "MeshBuilder.h"
 #include "MeshExporter.h"
+#include "Assets.h"
 
 aiScene* generateScene(const std::vector<float>& vertices, const std::vector<unsigned int>& indices)
 {
@@ -120,7 +121,15 @@ Resource<MeshCollection> Grid::generateGrid(int x, int y, bool isTransient)
 	if (!isTransient)
 	{
 		aiScene* scene = generateScene(vertices, indices);
-		MeshExporter::exportMesh(meshCollection, scene);
+		auto savedFilepath = MeshExporter::exportMesh(meshCollection, scene);
+
+		AssetInfo aInfo;
+		aInfo.uuid = meshCollection.getUID();
+		aInfo.aType = AssetType::MESH;
+		aInfo.filePath = savedFilepath;
+		aInfo.name = "Grid_" + std::to_string(x) + "_" + std::to_string(y);
+
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 	}
 
 	return meshCollection;

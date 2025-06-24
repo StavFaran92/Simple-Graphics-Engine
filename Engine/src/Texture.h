@@ -115,6 +115,7 @@ public:
 		bool genMipMap = false;
 		bool flip = false;
 		bool saveOnDisk = true;
+		bool isTransient = false;
 	};
 
 	struct TextureAssetAttributes
