@@ -88,6 +88,14 @@ public:
 
 	};
 
+	enum TextureKeyParams : int {
+		TEXTURE_WRAP_S = 0x2802,
+		TEXTURE_WRAP_T = 0x2803,
+		TEXTURE_WRAP_R = 0x8072,
+		TEXTURE_MAG_FILTER = 0x2800,
+		TEXTURE_MIN_FILTER = 0x2801,
+	};
+
 	struct TextureData
 	{
 		int width = 0;
@@ -116,37 +124,54 @@ public:
 		bool flip = false;
 		bool saveOnDisk = true;
 		bool isTransient = false;
+		std::map<int, int> params;
 	};
 
 	struct TextureAssetAttributes
 	{
+		bool genMipMap = false;
+		bool flip = false;
+		bool isHDR = false;
+		std::map<int, int> params;
+
+		// Serialize all members into map<string, string>
+		std::map<std::string, std::string> toMap() const
+		{
+			std::map<std::string, std::string> out;
+			out["gen_mip_map"] = genMipMap ? "true" : "false";
+			out["flip"] = flip ? "true" : "false";
+			out["is_hdr"] = isHDR ? "true" : "false";
+
+			for (const auto& [key, value] : params)
+			{
+				out["param_" + std::to_string(key)] = std::to_string(value);
+			}
+
+			return out;
+		}
+
 		TextureAssetAttributes()
 		{
 		}
 
+		// Deserialize from map<string, string>
 		TextureAssetAttributes(const std::map<std::string, std::string>& in)
 		{
 			genMipMap = in.at("gen_mip_map") == "true";
 			flip = in.at("flip") == "true";
 			isHDR = in.at("is_hdr") == "true";
+
+			params.clear();
+			for (const auto& [key, value] : in)
+			{
+				if (key.rfind("param_", 0) == 0)  // key starts with "param_"
+				{
+					int paramKey = std::stoi(key.substr(6));
+					int paramValue = std::stoi(value);
+					params[paramKey] = paramValue;
+				}
+			}
 		}
-
-		std::map<std::string, std::string> toMap() const
-		{
-			return {
-				{ "gen_mip_map", genMipMap ? "true" : "false" },
-				{ "flip", flip ? "true" : "false" },
-				{ "is_hdr", isHDR ? "true" : "false" },
-			};
-		}
-
-		bool genMipMap = false;
-		bool flip = false;
-		bool isHDR = false;
-
-		
-
-		
 	};
 
 	/** Constructor */

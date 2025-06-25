@@ -3,6 +3,7 @@
 #include "Quad.h"
 #include "Box.h"
 #include "Sphere.h"
+#include "Grid.h"
 
 #include "Assets.h"
 #include "ModelImporter.h"
@@ -46,6 +47,11 @@ BuiltInMeshes::BuiltInMeshes()
 		//aInfo.name = "SGE_SPHERE_MESH";
 		//aInfo.isTransient = true;
 		//Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+	}
+
+	{
+		auto& mesh = Grid::generateGrid(10, 10, true);
+		m_meshes[MeshType::GRID] = mesh;
 	}
 }
 

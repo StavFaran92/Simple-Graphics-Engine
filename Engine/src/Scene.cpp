@@ -435,8 +435,13 @@ void Scene::draw(float deltaTime)
 					m_terrainShader->setUniformValue("textureScale[" + std::to_string(i) + "]", textureScale);
 				}
 
-				auto vao = terrain.getMesh().get()->getPrimaryMesh()->getVAO();
-				RenderCommand::drawPatches(vao);
+				auto& terrainMesh = terrain.getMesh();
+				if (!terrainMesh.isEmpty())
+				{
+					auto vao = terrainMesh->getPrimaryMesh()->getVAO();
+					RenderCommand::drawPatches(vao);
+				}
+				
 			}
 
 			glPopDebugGroup();

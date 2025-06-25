@@ -12,7 +12,8 @@ public:
 		BOX,
 		SPHERE,
 		QUAD,
-		CAMERA
+		CAMERA,
+		GRID
 	};
 
 	BuiltInMeshes();

@@ -9,6 +9,7 @@
 #include "Grid.h"
 #include "Context.h"
 #include "Scene.h"
+#include "BuiltInMeshes.h"
 
 #include "GL/glew.h"
 
@@ -36,7 +37,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, const std::
 
 Terrain Terrain::generateTerrain(int width, int height, float scale, Resource<Texture> heightMap)
 {
-	auto& meshCollection = Grid::generateGrid(10, 10, false);
+	auto& meshCollection = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRID);//Grid::generateGrid(10, 10, false);
 
 	Terrain terrain;
 	terrain.m_heightmap = heightMap;

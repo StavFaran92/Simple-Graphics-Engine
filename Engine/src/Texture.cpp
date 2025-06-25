@@ -290,8 +290,7 @@ Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, cons
 	Texture::TextureData textureData;
 
 	textureData.target = GL_TEXTURE_2D;
-	textureData.isTransient = settings.isTransient;
-
+	
 	// extract texture build data
 	extractTextureDataFromSettings(settings, textureData);
 	extractTextureDataFromFile(fileLocation, textureData);
@@ -378,31 +377,36 @@ void Texture::addTexture2D(const std::string& name, Resource<Texture> texture)
 
 void Texture::extractTextureDataFromSettings(const TextureImportSettings& settings, Texture::TextureData& textureData)
 {
-	if (settings.genMipMap)
+	textureData.params = settings.params;
+
+	// if params not specified use default params values
+	if (textureData.params.empty())
 	{
-		textureData.params = {
-			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-		};
-
-		textureData.genMipMap = true;
+		if (settings.genMipMap)
+		{
+			textureData.params = {
+				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+			};
+		}
+		else
+		{
+			textureData.params = {
+				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+				{ GL_TEXTURE_WRAP_R, GL_REPEAT},
+				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+			};
+		}
 	}
-	else
-	{
-		textureData.params = {
-			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_R, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-		};
 
-		textureData.genMipMap = false;
-	}
-
+	textureData.genMipMap = settings.genMipMap;
 	textureData.flip = settings.flip;
+	textureData.isTransient = settings.isTransient;
+	
 }
 
 void Texture::extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData)
@@ -423,8 +427,9 @@ void Texture::extractTextureDataFromAttributes(const TextureAssetAttributes& att
 		textureData.params = {
 			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
 			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_NEAREST},
-			{ GL_TEXTURE_MAG_FILTER, GL_NEAREST},
+			{ GL_TEXTURE_WRAP_R, GL_REPEAT},
+			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
 		};
 
 		textureData.genMipMap = false;
