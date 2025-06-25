@@ -90,8 +90,8 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 
 	if (serializedEnt.skybox)
 	{
-		auto skybox = Skybox::loadSkybox(serializedEnt.skybox->originalImage, entityHandler, &scene);
-		skybox.getComponent<SkyboxComponent>().originalImage = serializedEnt.skybox->originalImage;
+		auto& skyboxComponent = entityHandler.addComponent<SkyboxComponent>(serializedEnt.skybox.value());
+		skyboxComponent.build();
 	}
 
 	if (serializedEnt.collisionSphere)
@@ -195,12 +195,14 @@ void Archiver::deserializeContext(SerializedContext serializedContext, Context* 
 {
 	ctx->m_scenes.clear();
 
+	ctx->m_activeScene = serializedContext.activeScene;
+
 	for (auto& [sceneID, serializedScene] : serializedContext.serializedScenes)
 	{
 		std::shared_ptr<Scene> scene = std::make_shared<Scene>(ctx);
-		deserializeScene(serializedScene, *scene.get());
 		ctx->m_scenes[sceneID] = scene;
+		deserializeScene(serializedScene, *scene.get());
 	}
 
-	ctx->m_activeScene = serializedContext.activeScene;
+	
 }
