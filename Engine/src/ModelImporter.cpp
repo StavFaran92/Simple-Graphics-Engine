@@ -93,6 +93,8 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 
 	ModelImporter::ModelInfo mInfo;
 
+	std::unordered_set<std::string> cachedTextures;
+
 	// Import textures
 	if (scene->HasMaterials())
 	{
@@ -100,13 +102,13 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
-			auto& diffuse = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir);
+			auto& diffuse = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures);
 			if (!diffuse.isEmpty())
 			{
 				mInfo.textures.push_back(diffuse);
 			}
 
-			auto& normal = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir);
+			auto& normal = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures);
 			if (!normal.isEmpty())
 			{
 				mInfo.textures.push_back(normal);
@@ -425,7 +427,7 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 
 
 
-Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiTextureType type, const std::string& dir)
+Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_set<std::string>& cachedTextures)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
@@ -439,7 +441,16 @@ Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiText
 		return Resource<Texture>::empty;
 	}
 
+	if (cachedTextures.find(path) != cachedTextures.end())
+	{
+		// Already loaded
+		return Resource<Texture>::empty;
+	}
+
 	auto texture = Texture::importTexture2D(path);
+
+	cachedTextures.insert(path);
+
 	return texture;
 }
 
