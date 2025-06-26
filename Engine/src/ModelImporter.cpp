@@ -116,11 +116,38 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 		}
 	}
 
+
 	AssetInfo aInfo;
 
 	if (!settings.isTransient)
 	{
 		mInfo.mesh = Factory<MeshCollection>::create();
+
+		if (scene->HasTextures())
+		{
+			aiScene* strippedScene = new aiScene(*scene);
+
+			for (unsigned int i = 0; i < strippedScene->mNumMaterials; ++i)
+			{
+				aiMaterial* mat = strippedScene->mMaterials[i];
+
+				for (int t = aiTextureType_NONE + 1; t <= aiTextureType_UNKNOWN; ++t)
+				{
+					aiTextureType texType = static_cast<aiTextureType>(t);
+
+					unsigned int texCount = mat->GetTextureCount(texType);
+					for (unsigned int index = 0; index < texCount; ++index)
+					{
+						strippedScene->mTextures[index] = nullptr;
+						strippedScene->mNumTextures = 0;
+						// Remove only the texture reference (path binding)
+						//mat->RemoveProperty(AI_MATKEY_TEXTURE(texType, index));
+					}
+				}
+			}
+
+			scene = strippedScene;
+		}
 
 		// TODO I should probably copy the file instead of export (issue with GLTF and bin)
 		std::string savedFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);

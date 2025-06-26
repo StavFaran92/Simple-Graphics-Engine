@@ -1044,9 +1044,12 @@ void displayEntity(Entity& e)
 
 	if (selectedEntity == e)
 	{
-		if (ImGui::IsMouseDoubleClicked(0))
+		if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 		{
-			focusOnEntity(e);
+			if (ImGui::IsMouseDoubleClicked(0))
+			{
+				focusOnEntity(e);
+			}
 		}
 
 		if (selectedEntityRename)
