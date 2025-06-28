@@ -11,6 +11,7 @@ class Bone;
 
 struct MeshNodeData
 {
+	// convert from parent node space to this node space
 	glm::mat4 transformation;
 	std::string name;
 	int childrenCount;

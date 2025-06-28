@@ -8,19 +8,16 @@ Animation::Animation()
 
 void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices)
 {
-	std::string nodeName = nodeData.name;
-	glm::mat4 nodeTransform = nodeData.transformation;
-
-	//auto iter = m_bones.find(nodeName);
-	//if (iter != m_bones.end())
-	//{
-	//	auto& bone = (*iter).second;
-	//	if (bone)
-	//	{
-	//		bone->update(currentTime);
-	//		nodeTransform = bone->getLocalTransform(); // todo verify this behaviour
-	//	}
-	//}
+	/*
+		We look at the vertex in mesh space at the beginning, 
+		now we want to look at it relative to the bone it relates to
+		so we create the invert-bind matrix that takes a vertex in mesh space and converts it to bone space (different for each bone)
+		for example if a bone is rotated to do side for example 45 degrees, then we need to rotate our view by 45
+		degrees to view the vertex as if it relative to the bone (so the bone center is at (0,0))
+		so we take the the transofrmation of the bone (e.g. rotated 45 deg)
+		and we multiply be parent
+		so each matrix holds the data of "how to get a vertex from mesh space into tthis bone's space"
+	*/
 
 	/* 
 	We essentialy wish to go from Bone "Bind" space to Pose space,
@@ -35,16 +32,17 @@ void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, g
 	at 11:57
 	*/
 
-	glm::mat4 globalTransformation = parentTransform * nodeTransform; // transform from local space to model space
+	std::string nodeName = nodeData.name;
+	glm::mat4 nodeTransform = nodeData.transformation;
+	glm::mat4 globalTransformation = parentTransform * nodeTransform; //convert bone transform from bone space into parent space (eventually into animated mesh space)
 
 	if (m_bones.find(nodeName) != m_bones.end())
 	{
 		auto bone = m_bones[nodeName];
 		bone->update(currentTime);
-		nodeTransform = bone->getLocalTransform(); // todo verify this behaviour
-		globalTransformation = parentTransform * nodeTransform;
-		finalBoneMatrices[nodeName] = globalTransformation;
 	}
+
+	finalBoneMatrices[nodeName] = globalTransformation;
 
 	for (int i = 0; i < nodeData.childrenCount; i++)
 	{
@@ -56,7 +54,7 @@ void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, g
 
 void Animation::calculateFinalBoneMatrices(float currentTime, std::unordered_map<std::string, glm::mat4>& outFinalBoneMatrices)
 {
-	return calculateFinalBoneMatricesHelper(m_rootNode, glm::mat4(1.0f), currentTime, outFinalBoneMatrices);
+	return calculateFinalBoneMatricesHelper(m_rootNode, glm::mat4(1.0), currentTime, outFinalBoneMatrices);
 }
 
 float Animation::getDuration() const

@@ -20,7 +20,7 @@ void Animator::update(float dt)
 	}
 }
 
-void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::vector<glm::mat4>& outFinalBoneMatrices) const
+void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
 {
 	if (m_currentAnimation.isEmpty()) 
 		return;
@@ -28,9 +28,9 @@ void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::v
 	std::unordered_map<std::string, glm::mat4> m_intermediateBoneMatrices;
 	m_currentAnimation.get()->calculateFinalBoneMatrices(m_currentTime, m_intermediateBoneMatrices);
 	
-	outFinalBoneMatrices = meshCollection->getBoneOffsets();
+	meshSpaceToBoneSpaceBindPoseMat = meshCollection->getBoneOffsets();
 
-	for (auto& [boneName, boneTransform] : m_intermediateBoneMatrices)
+	for (auto& [boneName, boneSpaceToMeshSpaceAnimationPoseMat] : m_intermediateBoneMatrices)
 	{
 		// Get static bone offset
 		auto boneID = meshCollection->getBoneID(boneName);
@@ -38,7 +38,7 @@ void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::v
 		{
 			continue;
 		}
-		outFinalBoneMatrices[boneID] = boneTransform * outFinalBoneMatrices[boneID]; //todo check 
+		meshSpaceToBoneSpaceBindPoseMat[boneID] = boneSpaceToMeshSpaceAnimationPoseMat * meshSpaceToBoneSpaceBindPoseMat[boneID];
 	}
 }
 
