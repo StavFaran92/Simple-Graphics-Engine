@@ -40,6 +40,8 @@ void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, g
 	{
 		auto bone = m_bones[nodeName];
 		bone->update(currentTime);
+		nodeTransform = bone->getLocalTransform();
+		globalTransformation = parentTransform * nodeTransform;
 	}
 
 	finalBoneMatrices[nodeName] = globalTransformation;
