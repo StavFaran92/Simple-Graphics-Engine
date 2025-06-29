@@ -409,6 +409,8 @@ void Scene::draw(float deltaTime)
 				m_terrainShader->setUniformValue("model", transform.getWorldTransformation());
 				m_terrainShader->setUniformValue("width", terrain.getWidth());
 				m_terrainShader->setUniformValue("height", terrain.getHeight());
+				m_terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
+				m_terrainShader->setTextureInShader(graphics->shadowMap, "shadowMap", 5);
 				Resource<Texture> heightmap = terrain.getHeightmap();
 
 				if (heightmap.isEmpty())

@@ -93,6 +93,7 @@ out vec2 texCoord;
 
 // Send to fragment shader for coloring
 out float height;
+out vec3 fragPos;
 
 void main()
 {
@@ -132,6 +133,8 @@ void main()
     // displace point along normal
     p += normal * height * scale;
 
+    fragPos = (model * p).xyz;
+
     gl_Position = projection * view * model * p;
 }
 
@@ -151,8 +154,12 @@ uniform vec2 textureScale[4];
 
 uniform float scale;
 
+uniform sampler2D shadowMap;
+uniform mat4 lightSpaceMatrix;
+
 in float height;
 in vec2 texCoord;
+in vec3 fragPos;
 
 out vec4 color;
 
@@ -166,6 +173,41 @@ vec4 sampleFromTexture(int textureIndex, vec2 uv)
     else if (textureIndex == 3) return texture(texture_3, uv);
 
     return vec4(0.0); // Return black if index is out of bounds
+}
+
+float shadowCalculations(vec4 fragPosInLightSpace)
+{
+	// perform perspective divide
+    vec3 projCoords = fragPosInLightSpace.xyz / fragPosInLightSpace.w;
+	
+	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+	
+	projCoords = projCoords * 0.5 + 0.5; 
+	
+	float borderBias =  max(texelSize.x, texelSize.y) * 2;
+	
+	if(projCoords.x >= 1.0 - borderBias || projCoords.x <= borderBias ||
+		projCoords.y >= 1.0 - borderBias || projCoords.y <= borderBias ||
+		projCoords.z >= 1.0 - borderBias || projCoords.z <= borderBias)
+        return 0.0;
+	
+	float shadow = 0;
+	float bias = 0.005;
+	float currentDepth = projCoords.z;
+	
+	
+	for(int x = -1; x <= 1; ++x)
+	{
+		for(int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+			shadow += (currentDepth - bias > pcfDepth) ? 1.0 : 0.0;
+		}
+	}
+	
+	shadow /= 9.0;
+	
+	return shadow;
 }
 
 void main()
@@ -192,4 +234,9 @@ void main()
             }
         }
     }
+
+    vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
+	float shadow = shadowCalculations(fragPosInLightSpace) * 0.8; // 0.8 to generate some ambient light
+
+    color = color * (1.0 - shadow);
 }
