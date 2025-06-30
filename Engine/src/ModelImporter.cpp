@@ -64,6 +64,8 @@ ModelImporter::ModelImporter()
 
 	m_importer = std::make_shared<Assimp::Importer>();
 
+	m_importer->SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
 	logInfo("Model importer init successfully.");
 }
 
@@ -90,6 +92,52 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 		logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
 		return {};
 	}
+
+	
+
+	auto metadata = scene->mMetaData;
+	if (metadata) {
+		for (unsigned int i = 0; i < metadata->mNumProperties; ++i) {
+			aiString key = metadata->mKeys[i];
+			aiMetadataEntry& entry = metadata->mValues[i];
+
+			std::string valueStr;
+
+			// Handle types manually
+			switch (entry.mType) {
+			case AI_BOOL:
+				valueStr = (*(bool*)entry.mData) ? "true" : "false";
+				break;
+			case AI_INT32:
+				valueStr = std::to_string(*(int32_t*)entry.mData);
+				break;
+			case AI_UINT64:
+				valueStr = std::to_string(*(uint64_t*)entry.mData);
+				break;
+			case AI_FLOAT:
+				valueStr = std::to_string(*(float*)entry.mData);
+				break;
+			case AI_DOUBLE:
+				valueStr = std::to_string(*(double*)entry.mData);
+				break;
+			case AI_AISTRING:
+				valueStr = ((aiString*)entry.mData)->C_Str();
+				break;
+			case AI_AIVECTOR3D:
+			{
+				aiVector3D vec = *(aiVector3D*)entry.mData;
+				valueStr = "(" + std::to_string(vec.x) + ", " + std::to_string(vec.y) + ", " + std::to_string(vec.z) + ")";
+			}
+			break;
+			default:
+				valueStr = "<Unsupported Type>";
+				break;
+			}
+
+			logInfo("metadata - Key: " + std::string(key.C_Str()) + ", Value: " + valueStr);
+		}
+	}
+
 
 	ModelImporter::ModelInfo mInfo;
 

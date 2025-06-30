@@ -11,6 +11,8 @@
 AnimationLoader::AnimationLoader()
 {
     Engine::get()->registerSubSystem<AnimationLoader>(this);
+
+    m_importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
 }
 
 void readSceneNodeData(MeshNodeData& nodeData, const aiNode* scene)
