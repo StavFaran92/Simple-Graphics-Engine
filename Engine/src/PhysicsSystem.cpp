@@ -309,6 +309,12 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
         auto& collider = e.getComponent<CollisionBoxComponent>();
         shape = createBoxShape(collider.halfExtent * scale.x, collider.halfExtent * scale.y, collider.halfExtent * scale.z);
 
+        if (!shape)
+        {
+            logError("Failed to create physics shape");
+            return;
+        }
+
         Physics::LayerMask mask = collider.layerMask;
 
         physx::PxFilterData filterData;

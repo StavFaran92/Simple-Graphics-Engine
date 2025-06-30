@@ -29,6 +29,8 @@ static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 
 static std::unordered_map<std::string, Resource<Texture>> icons;
 
+std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
+
 static std::string getAssetTypeAsStr(AssetType aType)
 {
 	if (aType == AssetType::MESH) return "Mesh";
@@ -86,6 +88,9 @@ static void stopSimulation()
 	Engine::get()->getContext()->getActiveScene()->stopSimulation();
 
 	Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_editorCamera);
+
+	uiLayer->setEnabled(true);
+	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->unlock();
 }
 
 static void startsimulation()
@@ -94,6 +99,10 @@ static void startsimulation()
 	Engine::get()->getContext()->getActiveScene()->startSimulation();
 
 	Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
+
+	uiLayer->setEnabled(false);
+	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock();
+
 }
 
 static void displayWindowHeader(const std::string& name)
@@ -2691,7 +2700,6 @@ public:
 
 		NativeScriptsLoader::instance->init();
 
-		std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 		Engine::get()->getEventSystem()->pushLayer(uiLayer);
 
 		handler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
