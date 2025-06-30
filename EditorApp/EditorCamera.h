@@ -29,7 +29,7 @@ public:
 	void lock();
 	void unlock();
 private:
-	bool m_isLocked = true;
+	bool m_isLocked = false;
 
 	CameraState m_camState = CameraState::FreeLook;
 
