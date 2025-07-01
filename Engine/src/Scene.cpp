@@ -617,6 +617,11 @@ void Scene::draw(float deltaTime)
 			glPopDebugGroup();
 		}
 
+		if (m_isSimulationActive)
+		{
+			Engine::get()->getPhysicsSystem()->visualizePhysicsShapeDebug(this);
+		}
+
 		// Render UI
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

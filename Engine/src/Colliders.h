@@ -2,6 +2,20 @@
 
 #include "Physics.h"
 
+#include "cereal/types/optional.hpp"
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/cereal.hpp>
+
+#define SERIALIZED_MEMBER(name, member)	archive(cereal::make_nvp(name, member));
+
+#define SERIALIZED_MEMBER_OPTIONAL(name, member, value)	\
+	try {												\
+		archive(cereal::make_nvp(name, member));		\
+	}													\
+	catch (const cereal::Exception&) {					\
+		member = value;									\
+	}
+
 enum class ColliderType : int
 {
 	NONE,
@@ -34,7 +48,7 @@ struct CollisionBox : public Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("halfExtent", halfExtent);
+		SERIALIZED_MEMBER("halfExtent", extents);
 	}
 
 	virtual ColliderType getType() const override
@@ -42,7 +56,7 @@ struct CollisionBox : public Collider
 		return ColliderType::BOX;
 	}
 
-	glm::vec3 extents{};
+	glm::vec3 extents{.5f};
 };
 
 struct CollisionSphere : public Collider
@@ -59,7 +73,7 @@ struct CollisionSphere : public Collider
 		return ColliderType::SPHERE;
 	}
 
-	float radius = 0;
+	float radius = .5f;
 };
 
 struct CollisionMesh : public Collider
@@ -94,3 +108,12 @@ struct CollisionTerrain : Collider
 		return ColliderType::TERRAIN;
 	}
 };
+
+CEREAL_REGISTER_TYPE(CollisionTerrain);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CollisionTerrain)
+CEREAL_REGISTER_TYPE(CollisionMesh);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CollisionMesh)
+CEREAL_REGISTER_TYPE(CollisionSphere);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CollisionSphere)
+CEREAL_REGISTER_TYPE(CollisionBox);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CollisionBox)

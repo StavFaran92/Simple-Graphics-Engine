@@ -7,10 +7,24 @@
 #include "Physics.h"
 #include "Scene.h"
 #include "Registry.h"
+#include "GL//glew.h"
+#include "Graphics.h"
+#include "RenderCommand.h"
+#include "BuiltInMeshes.h"
+#include <glm/gtx/quaternion.hpp>
 
 using namespace physx;
 
 #define PX_RELEASE(x)	if(x)	{ x->release(); x = nullptr; }
+
+glm::mat4 PxTransformToMat4(const physx::PxTransform & transform)
+{
+    glm::quat rotationQuat(transform.q.w, transform.q.x, transform.q.y, transform.q.z);
+    glm::vec3 translationVec(transform.p.x, transform.p.y, transform.p.z);
+    glm::mat4 mat = glm::translate(glm::mat4(1.0f), translationVec) * glm::toMat4(rotationQuat);
+
+    return mat;
+}
 
 bool PhysicsSystem::init()
 {
@@ -49,6 +63,8 @@ bool PhysicsSystem::init()
     }
 
     m_defaultMaterial = m_physics->createMaterial(0.5f, 0.5f, 0.1f);
+
+    m_debugVisualizeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl");
 
     m_isInit = true;
 
@@ -281,9 +297,71 @@ void PhysicsSystem::stopScenePhysics(Scene* scene)
     }
 }
 
-void PhysicsSystem::renderWireframeDebug()
+void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
 {
+    auto graphics = Engine::get()->getSubSystem<Graphics>();
 
+    auto physicsScene = scene->getPhysicsScene();
+
+    physx::PxU32 nbActors = physicsScene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC);
+    if (nbActors)
+    {
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Physics Debug");
+
+        m_debugVisualizeShader->use();
+
+        m_debugVisualizeShader->setViewMatrix(*graphics->view);
+        m_debugVisualizeShader->setProjectionMatrix(*graphics->projection);
+        m_debugVisualizeShader->setUniformValue("color", glm::vec3(0, 1, 0));
+
+        glDisable(GL_DEPTH_TEST);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glEnable(GL_POLYGON_OFFSET_LINE);
+        glPolygonOffset(-1.0, -1.0);
+        glLineWidth(1); // Size in pixels
+
+        std::vector<physx::PxRigidActor*> actors(nbActors);
+        physicsScene->getActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<physx::PxActor**>(&actors[0]), nbActors);
+
+        for (physx::PxRigidActor* actor : actors)
+        {
+            physx::PxU32 nbShapes = actor->getNbShapes();
+            std::vector<physx::PxShape*> shapes(nbShapes);
+            actor->getShapes(shapes.data(), nbShapes);
+
+            for (physx::PxShape* shape : shapes)
+            {
+                physx::PxGeometryHolder geometry = shape->getGeometry();
+                physx::PxTransform localPose = shape->getLocalPose();
+                physx::PxTransform actorPose = actor->getGlobalPose();
+                physx::PxTransform worldPose = actorPose * localPose;
+                const auto& model = PxTransformToMat4(worldPose);
+                m_debugVisualizeShader->setModelMatrix(model);
+
+                if (geometry.any().getType() == PxGeometryType::eBOX)
+                {
+                    auto& mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
+                    auto vao = mesh->getPrimaryMesh()->getVAO();
+                    RenderCommand::draw(vao);
+                }
+
+                if (geometry.any().getType() == PxGeometryType::eSPHERE)
+                {
+                    auto& mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
+                    auto vao = mesh->getPrimaryMesh()->getVAO();
+                    RenderCommand::draw(vao);
+                }
+            }
+        }
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDisable(GL_POLYGON_OFFSET_LINE);
+
+        glEnable(GL_DEPTH_TEST);
+
+        glPopDebugGroup();
+    }
 }
 
 
@@ -310,7 +388,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     auto& pc = e.getComponent<PhysicsComponent>();
     auto scale = transform.getWorldScale();
 
-    if (pc.collider->getType() == ColliderType::NONE)
+    if (pc.colliderType == ColliderType::NONE)
     {
         return;
     }

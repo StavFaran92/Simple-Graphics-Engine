@@ -23,7 +23,7 @@ public:
 	void stopScenePhysics(Scene* scene);
 	void update(Scene* scene, float deltaTime);
 
-	void renderWireframeDebug();
+	void visualizePhysicsShapeDebug(Scene* scene);
 
 	void close();
 
@@ -57,4 +57,6 @@ private:
 	bool m_isSimulationActive = false;
 
 	bool m_isInit = false;
+
+	Resource<Shader> m_debugVisualizeShader;
 };

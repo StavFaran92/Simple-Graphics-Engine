@@ -134,6 +134,8 @@ struct EngineAPI PhysicsComponent : public Component
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER("type", type);
 		SERIALIZED_MEMBER("mass", mass);
+		SERIALIZED_MEMBER("collider", collider);
+		SERIALIZED_MEMBER("colliderType", colliderType);
 	}
 
 	bool isLockedLinearX = false;
