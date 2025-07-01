@@ -41,7 +41,7 @@ public:
 	{
 		// Apply the computed velocity to move the character
 		auto& transform = entity.getComponent<Transformation>();
-		auto& rb = entity.getComponent<RigidBodyComponent>();
+		auto& rb = entity.getComponent<PhysicsComponent>();
 		glm::vec3 newPosition = m_movementH + m_movementV + glm::vec3(0, m_velocity.y / 1000.f, 0);
 		rb.move(newPosition);
 	}
@@ -89,7 +89,7 @@ public:
 		Physics::HitResult hitResult;
 		if (Physics::raycast(transform.getWorldPosition(), camComponent.front, 100.f, hitResult, Physics::LayerMask::LAYER_1))
 		{
-			hitResult.e.getComponent<RigidBodyComponent>().setForce(-hitResult.normal * m_bulletForce);
+			hitResult.e.getComponent<PhysicsComponent>().setForce(-hitResult.normal * m_bulletForce);
 		}
 	}
 

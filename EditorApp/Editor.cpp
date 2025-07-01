@@ -1742,7 +1742,7 @@ void RenderInspectorWindow(float width, float height)
 			displayTransformation(transform, isChanged);
 		});
 
-		displayComponent<RigidBodyComponent>("RigidBody", [](RigidBodyComponent& rBody) {
+		displayComponent<PhysicsComponent>("Physics", [](PhysicsComponent& rBody) {
 			ImGui::Combo("##Type", (int*)&rBody.type, rigidyBodyTypesStrList, IM_ARRAYSIZE(rigidyBodyTypesStrList));
 			ImGui::InputFloat("Mass", &rBody.mass);
 
@@ -1771,25 +1771,77 @@ void RenderInspectorWindow(float width, float height)
 			ImGui::PushID("AngularZ");
 			ImGui::Checkbox("Z", &rBody.isLockedAngularZ);
 			ImGui::PopID();
+
+			
+
+			static const char* colliderTypeNames[] = {
+				"None", "Box", "Sphere", "Terrain", "Mesh", "Capsule"
+			};
+
+			if (ImGui::Combo("Collider Type", (int*)&rBody.colliderType, colliderTypeNames, IM_ARRAYSIZE(colliderTypeNames))) {
+				switch (rBody.colliderType) {
+				case ColliderType::NONE: rBody.collider = 0; break;
+				case ColliderType::BOX: rBody.collider = std::make_shared<CollisionBox>(); break;
+				case ColliderType::SPHERE: rBody.collider = std::make_shared<CollisionSphere>(); break;
+				case ColliderType::TERRAIN: rBody.collider = std::make_shared<CollisionTerrain>(); break;
+				case ColliderType::MESH: rBody.collider = std::make_shared<CollisionMesh>(); break;
+				case ColliderType::CAPSULE: /* when implemented */ break;
+				}
+			}
+
+			ColliderType type = rBody.colliderType;
+
+			if (type == ColliderType::NONE)
+			{
+				return;
+			}
+
+			ImGui::Combo("##LayerMask", (int*)&rBody.collider->layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+
+			switch (type) {
+			case ColliderType::BOX:
+				if (auto* box = dynamic_cast<CollisionBox*>(rBody.collider.get())) {
+					ImGui::InputFloat3("Extents", &box->extents.x);
+				}
+				break;
+			case ColliderType::SPHERE:
+				if (auto* sphere = dynamic_cast<CollisionSphere*>(rBody.collider.get())) {
+					ImGui::InputFloat("Radius", &sphere->radius);
+				}
+				break;
+			case ColliderType::TERRAIN:
+				ImGui::TextDisabled("Terrain collider has no editable parameters.");
+				break;
+			case ColliderType::MESH:
+				if (auto* mesh = dynamic_cast<CollisionMesh*>(rBody.collider.get())) {
+					ImGui::Checkbox("Convex", &mesh->isConvex);
+					// Optional: display mesh resource name, etc.
+				}
+				break;
+			case ColliderType::CAPSULE:
+				// Handle capsule here if you define its struct
+				ImGui::Text("Capsule collider UI not implemented yet.");
+				break;
+			}
 		});
 
-		displayComponent<CollisionBoxComponent>("Collision Box", [](CollisionBoxComponent& collisionBox) {
-			ImGui::InputFloat("Half Extent", &collisionBox.halfExtent);
-			ImGui::Combo("##LayerMask", (int*)&collisionBox.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-		});
+		//displayComponent<CollisionBoxComponent>("Collision Box", [](CollisionBoxComponent& collisionBox) {
+		//	ImGui::InputFloat("Half Extent", &collisionBox.halfExtent);
+		//	ImGui::Combo("##LayerMask", (int*)&collisionBox.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+		//});
 
-		displayComponent<CollisionSphereComponent>("Collision Sphere", [](CollisionSphereComponent& collisionSphere) {
-			ImGui::InputFloat("Radius", &collisionSphere.radius);
-			ImGui::Combo("##LayerMask", (int*)&collisionSphere.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-			});
+		//displayComponent<CollisionSphereComponent>("Collision Sphere", [](CollisionSphereComponent& collisionSphere) {
+		//	ImGui::InputFloat("Radius", &collisionSphere.radius);
+		//	ImGui::Combo("##LayerMask", (int*)&collisionSphere.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+		//	});
 
-		displayComponent<CollisionMeshComponent>("Collision Mesh", [](CollisionMeshComponent& collisionMesh) {
-			ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-			});
+		//displayComponent<CollisionMeshComponent>("Collision Mesh", [](CollisionMeshComponent& collisionMesh) {
+		//	ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+		//	});
 
-		displayComponent<CollisionTerrainComponent>("Collision Terrain", [](CollisionTerrainComponent& collision) {
-			//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-			});
+		//displayComponent<CollisionTerrainComponent>("Collision Terrain", [](CollisionTerrainComponent& collision) {
+		//	//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+		//	});
 
 		displayComponent<MeshComponent>("Mesh", [](MeshComponent& meshComponent) {
 			if (meshComponent.mesh.isEmpty()) return;
@@ -2182,20 +2234,20 @@ void RenderInspectorWindow(float width, float height)
 				selectedEntity.addComponent<Transformation>(selectedEntity);
 			}
 
-			if (ImGui::MenuItem("RigidBody"))
+			if (ImGui::MenuItem("Physics"))
 			{
-				selectedEntity.addComponent<RigidBodyComponent>();
+				selectedEntity.addComponent<PhysicsComponent>();
 			}
 
-			if (ImGui::MenuItem("Collision Box"))
-			{
-				selectedEntity.addComponent<CollisionBoxComponent>();
-			}
+			//if (ImGui::MenuItem("Collision Box"))
+			//{
+			//	selectedEntity.addComponent<CollisionBoxComponent>();
+			//}
 
-			if (ImGui::MenuItem("Collision Sphere"))
-			{
-				selectedEntity.addComponent<CollisionSphereComponent>();
-			}
+			//if (ImGui::MenuItem("Collision Sphere"))
+			//{
+			//	selectedEntity.addComponent<CollisionSphereComponent>();
+			//}
 
 			if (ImGui::MenuItem("Collision Mesh"))
 			{
@@ -2209,10 +2261,10 @@ void RenderInspectorWindow(float width, float height)
 				//}
 			}
 
-			if (ImGui::MenuItem("Collision Terrain"))
-			{
-				selectedEntity.addComponent<CollisionTerrainComponent>();
-			}
+			//if (ImGui::MenuItem("Collision Terrain"))
+			//{
+			//	selectedEntity.addComponent<CollisionTerrainComponent>();
+			//}
 
 			if (ImGui::MenuItem("Mesh"))
 			{

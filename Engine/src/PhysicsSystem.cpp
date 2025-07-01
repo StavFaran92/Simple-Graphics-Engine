@@ -85,7 +85,7 @@ physx::PxMaterial* PhysicsSystem::getDefaultMaterial() const
     return m_defaultMaterial;
 }
 
-physx::PxRigidActor* PhysicsSystem::createRigidBody(Transformation& transform, RigidBodyComponent& rb)
+physx::PxRigidActor* PhysicsSystem::createRigidBody(Transformation& transform, PhysicsComponent& rb)
 {
     transform.forceUpdate();
     auto scale = transform.getLocalScale();
@@ -155,7 +155,7 @@ void PhysicsSystem::removeActor(Scene* scene, entt::entity entity)
 {
     Entity e{ entity, &scene->getRegistry()};
 
-    auto& rBody = e.getComponent<RigidBodyComponent>();
+    auto& rBody = e.getComponent<PhysicsComponent>();
     scene->getPhysicsScene()->removeActor(*(physx::PxRigidActor*)rBody.simulatedBody);
 }
 
@@ -163,7 +163,7 @@ void PhysicsSystem::createActor(Scene* scene, entt::entity entity)
 {
     Entity e{ entity, &scene->getRegistry()};
     auto& transform = e.getComponent<Transformation>();
-    auto& rb = e.getComponent<RigidBodyComponent>();
+    auto& rb = e.getComponent<PhysicsComponent>();
 
     auto body = createRigidBody(transform, rb);
     createShape(body, e, true);
@@ -178,7 +178,12 @@ void PhysicsSystem::createTerrainActor(Scene* scene, entt::entity entity)
 {
     Entity e{ entity, &scene->getRegistry() };
     auto& transform = e.getComponent<Transformation>();
-    auto& collider = e.getComponent<CollisionTerrainComponent>();
+    auto& rb = e.getComponent<PhysicsComponent>();
+    if (rb.collider->getType() != ColliderType::TERRAIN)
+    {
+        return;
+    }
+    auto& collider = std::static_pointer_cast<CollisionTerrain>(rb.collider);
     auto& terrain = e.getComponent<Terrain>();
 
     // todo verify all components exists
@@ -257,20 +262,20 @@ void PhysicsSystem::createTerrainActor(Scene* scene, entt::entity entity)
 
 void PhysicsSystem::startScenePhysics(Scene* scene)
 {
-    for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<RigidBodyComponent>().each())
+    for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<PhysicsComponent>().each())
     {
         createActor(scene, entity);
     }
 
-    for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<CollisionTerrainComponent>().each())
-    {
-        createTerrainActor(scene, entity);
-    }
+    //for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<CollisionTerrainComponent>().each())
+    //{
+    //    createTerrainActor(scene, entity);
+    //}
 }
 
 void PhysicsSystem::stopScenePhysics(Scene* scene)
 {
-    for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<RigidBodyComponent>().each())
+    for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<PhysicsComponent>().each())
     {
         removeActor(scene, entity);
     }
@@ -302,12 +307,18 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 {
     physx::PxShape* shape = nullptr;
     auto& transform = e.getComponent<Transformation>();
+    auto& pc = e.getComponent<PhysicsComponent>();
     auto scale = transform.getWorldScale();
 
-    if (e.HasComponent<CollisionBoxComponent>())
+    if (pc.collider->getType() == ColliderType::NONE)
     {
-        auto& collider = e.getComponent<CollisionBoxComponent>();
-        shape = createBoxShape(collider.halfExtent * scale.x, collider.halfExtent * scale.y, collider.halfExtent * scale.z);
+        return;
+    }
+
+    if (pc.collider->getType() == ColliderType::BOX)
+    {
+        auto& collider = std::dynamic_pointer_cast<CollisionBox>(pc.collider);
+        shape = createBoxShape(collider->extents.x * scale.x, collider->extents.y * scale.y, collider->extents.z * scale.z);
 
         if (!shape)
         {
@@ -315,44 +326,118 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
             return;
         }
 
-        Physics::LayerMask mask = collider.layerMask;
+        Physics::LayerMask mask = collider->layerMask;
 
         physx::PxFilterData filterData;
         filterData.word0 = mask;
 
         shape->setQueryFilterData(filterData);
     }
-    else if (e.HasComponent<CollisionSphereComponent>())
+    else if (pc.collider->getType() == ColliderType::SPHERE)
     {
-        auto& collider = e.getComponent<CollisionSphereComponent>();
-        if (collider.radius <= 0)
+        auto& collider = std::dynamic_pointer_cast<CollisionSphere>(pc.collider);
+        if (collider->radius <= 0)
         {
-            logWarning("Invalid collider radius: " + std::to_string(collider.radius));
+            logWarning("Invalid collider radius: " + std::to_string(collider->radius));
             return;
         }
-        shape = createSphereShape(collider.radius * std::max(std::max(scale.x, scale.y), scale.z));
+        shape = createSphereShape(collider->radius * std::max(std::max(scale.x, scale.y), scale.z));
 
         assert(shape);
 
-        Physics::LayerMask mask = collider.layerMask;
+        Physics::LayerMask mask = collider->layerMask;
 
         physx::PxFilterData filterData;
         filterData.word0 = mask;
 
         shape->setQueryFilterData(filterData);
     }
-    else if (e.HasComponent<CollisionMeshComponent>())
+    else if (pc.collider->getType() == ColliderType::MESH)
     {
-        auto collisionMeshComponent = e.getComponent<CollisionMeshComponent>();
-        const std::vector<glm::vec3>& apos = collisionMeshComponent.mesh.get()->getPositions();
+        auto& collider = std::dynamic_pointer_cast<CollisionMesh>(pc.collider);
+        const std::vector<glm::vec3>& apos = collider->mesh.get()->getPositions();
         shape = createConvexMeshShape(apos);
 
-        Physics::LayerMask mask = collisionMeshComponent.layerMask;
+        Physics::LayerMask mask = collider->layerMask;
 
         physx::PxFilterData filterData;
         filterData.word0 = mask;
 
         shape->setQueryFilterData(filterData);
+    }
+    else if (pc.collider->getType() == ColliderType::TERRAIN)
+    {
+        auto& collider = std::static_pointer_cast<CollisionTerrain>(pc.collider);
+        auto& terrain = e.getComponent<Terrain>();
+
+        // todo verify all components exists
+
+        transform.forceUpdate();
+        auto scale = transform.getLocalScale();
+        physx::PxTransform pxTransform = PhysXUtils::toPhysXTransform(transform);
+
+        physx::PxHeightFieldDesc heightFieldDesc;
+
+        const auto& heightmapData = terrain.getHeightmap().get()->getData();
+
+        heightFieldDesc.nbColumns = heightmapData.width;
+        heightFieldDesc.nbRows = heightmapData.height;
+        heightFieldDesc.samples.data = new unsigned int[sizeof(unsigned int) * heightFieldDesc.nbColumns * heightFieldDesc.nbRows];
+        heightFieldDesc.samples.stride = sizeof(unsigned int);
+        unsigned char* currentByte = (unsigned char*)heightFieldDesc.samples.data;
+        for (int row = 0; row < heightFieldDesc.nbRows; row++)
+        {
+            for (int column = 0; column < heightFieldDesc.nbColumns; column++)
+            {
+                physx::PxHeightFieldSample* currentSample = (physx::PxHeightFieldSample*)currentByte;
+
+                // we flip the row and col order, I have no idea why physx accept the data like that
+                auto a = static_cast<uint8_t*>(heightmapData.data)[(column * heightmapData.width + row) * heightmapData.bpp];
+                currentSample->height = static_cast<int16_t>(a/* * 2^8*/); // we use the full range of the height map field
+
+                currentSample->clearTessFlag();
+                currentByte += heightFieldDesc.samples.stride;
+            }
+        }
+        PxHeightField* heightField = m_cooking->createHeightField(heightFieldDesc, m_physics->getPhysicsInsertionCallback());
+        if (!heightField)
+        {
+            logError("createHeightField failed!");
+            return;
+        }
+        // create shape for heightfield		
+        //PxTransform pose(PxVec3(-(heightFieldDesc.nbRows * terrain.getHeight()) / 2.0f,
+        //    0.0f,
+        //    -((PxReal)heightFieldDesc.nbColumns * terrain.getWidth()) / 2.0f),
+        //    PxQuat(PxIdentity));
+
+        float terrainColScale = (float)terrain.getWidth() / (PxReal)heightFieldDesc.nbColumns;
+        float terrainRowScale = (float)terrain.getHeight() / (PxReal)heightFieldDesc.nbRows;
+        float terrainHeightScale = terrain.getScale() / 255.f;
+
+        PxTransform pose(PxVec3(-terrain.getHeight() / 2.f,
+            0.0f,
+            -terrain.getWidth() / 2.0f), PxQuat(PxIdentity));
+
+        PxRigidActor* heightFieldActor = m_physics->createRigidStatic(pose); // todo fix
+        if (!heightFieldActor)
+        {
+            logError("createRigidStatic failed!");
+            return;
+        }
+
+
+
+        PxShape* shape = PxRigidActorExt::createExclusiveShape(*heightFieldActor,
+            PxHeightFieldGeometry(heightField, PxMeshGeometryFlags(),
+                terrainHeightScale, terrainRowScale, terrainColScale),
+            *getDefaultMaterial());
+
+        if (!shape)
+        {
+            logError("createShape failed!");
+            return;
+        }
     }
 
     if (shape)
@@ -405,7 +490,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             {
                 entity_id id = *(entity_id*)actor->userData;
                 Entity e{ entt::entity(id), &scene->getRegistry()};
-                auto& rb = e.getComponent<RigidBodyComponent>();
+                auto& rb = e.getComponent<PhysicsComponent>();
 
                 physx::PxTransform targetPose = actor->getGlobalPose();
                 targetPose.p += physx::PxVec3(rb.m_targetPisition.x, rb.m_targetPisition.y, rb.m_targetPisition.z);
@@ -421,7 +506,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             {
                 entity_id id = *(entity_id*)actor->userData;
                 Entity e{ entt::entity(id),  &scene->getRegistry() };
-                auto& rb = e.getComponent<RigidBodyComponent>();
+                auto& rb = e.getComponent<PhysicsComponent>();
 
                 if (rb.isChanged)
                 {
@@ -447,7 +532,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             entity_id id = *(entity_id*)actor->userData;
             Entity e{ entt::entity(id),  &scene->getRegistry() };
 
-            if (e.HasComponent<CollisionTerrainComponent>())
+            if (e.getComponent<PhysicsComponent>().colliderType == ColliderType::TERRAIN)
                 continue;
 
             auto& transform = e.getComponent<Transformation>();

@@ -61,10 +61,10 @@ struct SerializedEntity
 {
 	entt::entity entity;
 	std::optional<Transformation> transform;
-	std::optional<RigidBodyComponent> rigidBody;
-	std::optional<CollisionBoxComponent> collisionBox;
-	std::optional<CollisionSphereComponent> collisionSphere;
-	std::optional<CollisionTerrainComponent> collisionTerrain;
+	std::optional<PhysicsComponent> physics;
+	//std::optional<CollisionBoxComponent> collisionBox;
+	//std::optional<CollisionSphereComponent> collisionSphere;
+	//std::optional<CollisionTerrainComponent> collisionTerrain;
 	std::optional<MeshComponent> mesh;
 	std::optional<RenderableComponent> renderableComponent;
 	std::optional<CameraComponent> camera;
@@ -84,10 +84,7 @@ struct SerializedEntity
 	void serialize(Archive& archive) {
 		archive(entity,
 			transform,
-			rigidBody,
-			collisionBox,
-			collisionSphere,
-			collisionTerrain,
+			physics,
 			mesh,
 			renderableComponent,
 			camera,

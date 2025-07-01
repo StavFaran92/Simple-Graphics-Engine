@@ -9,9 +9,9 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	SerializedEntity serializedEntity;
 	serializedEntity.entity = e.handler();
 	serializedEntity.camera = getComponentIfExists<CameraComponent>(e);
-	serializedEntity.collisionBox = getComponentIfExists<CollisionBoxComponent>(e);
-	serializedEntity.collisionSphere = getComponentIfExists<CollisionSphereComponent>(e);
-	serializedEntity.collisionTerrain = getComponentIfExists<CollisionTerrainComponent>(e);
+	//serializedEntity.collisionBox = getComponentIfExists<CollisionBoxComponent>(e);
+	//serializedEntity.collisionSphere = getComponentIfExists<CollisionSphereComponent>(e);
+	//serializedEntity.collisionTerrain = getComponentIfExists<CollisionTerrainComponent>(e);
 	serializedEntity.dLight = getComponentIfExists<DirectionalLight>(e);
 	serializedEntity.image = getComponentIfExists<ImageComponent>(e);
 	serializedEntity.mat = getComponentIfExists<MaterialComponent>(e);
@@ -20,7 +20,7 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	serializedEntity.obj = getComponentIfExists<ObjectComponent>(e);
 	serializedEntity.pLight = getComponentIfExists<PointLight>(e);
 	serializedEntity.renderableComponent = getComponentIfExists<RenderableComponent>(e);
-	serializedEntity.rigidBody = getComponentIfExists<RigidBodyComponent>(e);
+	serializedEntity.physics = getComponentIfExists<PhysicsComponent>(e);
 	serializedEntity.skybox = getComponentIfExists<SkyboxComponent>(e);
 	serializedEntity.transform = getComponentIfExists<Transformation>(e);
 	serializedEntity.animator = getComponentIfExists<Animator>(e);
@@ -94,24 +94,24 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 		skyboxComponent.build();
 	}
 
-	if (serializedEnt.collisionSphere)
-	{
-		entityHandler.addComponent<CollisionSphereComponent>(serializedEnt.collisionSphere.value());
-	}
+	//if (serializedEnt.collisionSphere)
+	//{
+	//	entityHandler.addComponent<CollisionSphereComponent>(serializedEnt.collisionSphere.value());
+	//}
 
-	if (serializedEnt.collisionBox)
-	{
-		entityHandler.addComponent<CollisionBoxComponent>(serializedEnt.collisionBox.value());
-	}
+	//if (serializedEnt.collisionBox)
+	//{
+	//	entityHandler.addComponent<CollisionBoxComponent>(serializedEnt.collisionBox.value());
+	//}
 
-	if (serializedEnt.collisionTerrain)
-	{
-		entityHandler.addComponent<CollisionTerrainComponent>(serializedEnt.collisionTerrain.value());
-	}
+	//if (serializedEnt.collisionTerrain)
+	//{
+	//	entityHandler.addComponent<CollisionTerrainComponent>(serializedEnt.collisionTerrain.value());
+	//}
 
-	if (serializedEnt.rigidBody)
+	if (serializedEnt.physics)
 	{
-		entityHandler.addComponent<RigidBodyComponent>(serializedEnt.rigidBody.value());
+		entityHandler.addComponent<PhysicsComponent>(serializedEnt.physics.value());
 	}
 
 	if (serializedEnt.image)

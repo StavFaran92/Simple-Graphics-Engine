@@ -26,7 +26,7 @@ public:
 
 		m_movement = glm::vec3(dir.x, 0.f, dir.z) * m_speed;
 
-		auto& rb = entity.getComponent<RigidBodyComponent>();
+		auto& rb = entity.getComponent<PhysicsComponent>();
 		rb.addForce(m_movement);
 		
 	}

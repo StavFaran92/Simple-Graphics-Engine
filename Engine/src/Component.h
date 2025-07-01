@@ -11,6 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Physics.h"
 #include "cereal/types/optional.hpp"
+#include "Colliders.h"
 
 #define SERIALIZED_MEMBER(name, member)	archive(cereal::make_nvp(name, member));
 
@@ -119,11 +120,10 @@ struct EngineAPI NativeScriptComponent : public Component
 	}
 };
 
-struct EngineAPI RigidBodyComponent : public Component
+struct EngineAPI PhysicsComponent : public Component
 {
 
-	RigidBodyComponent() = default;
-	RigidBodyComponent(RigidbodyType type, float mass) : type(type), mass(mass) {};
+	PhysicsComponent() = default;
 
 	void addForce(glm::vec3 force);
 	void setForce(glm::vec3 force);
@@ -145,67 +145,101 @@ struct EngineAPI RigidBodyComponent : public Component
 	RigidbodyType type = RigidbodyType::Static;
 	float mass = 0;
 	bool isChanged = false;
-	glm::vec3 m_targetPisition{0};
+	glm::vec3 m_targetPisition{ 0 };
 	glm::vec3 m_force{ 0 };
 	void* simulatedBody = nullptr;
+
+	std::shared_ptr<Collider> collider;
+	ColliderType colliderType = ColliderType::NONE;
 };
 
-struct EngineAPI CollisionBoxComponent : public Component
-{
-	CollisionBoxComponent() = default;
-	CollisionBoxComponent(float halfExtent) : halfExtent(halfExtent) {};
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("halfExtent", halfExtent);
-		SERIALIZED_MEMBER("layerMask", layerMask);
-	}
-
-	float halfExtent = 0;
-	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
-};
-
-struct EngineAPI CollisionSphereComponent : public Component
-{
-	CollisionSphereComponent() = default;
-	CollisionSphereComponent(float radius) : radius(radius) {};
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("radius", radius);
-		SERIALIZED_MEMBER("layerMask", layerMask);
-	}
-
-	float radius = 0;
-	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
-};
-
-struct EngineAPI CollisionMeshComponent : public Component
-{
-	CollisionMeshComponent() = default;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("isConvex", isConvex);
-		SERIALIZED_MEMBER("layerMask", layerMask);
-	}
-
-	bool isConvex = false;
-	Resource<Mesh> mesh = Resource<Mesh>::empty;
-	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
-};
-
-struct EngineAPI CollisionTerrainComponent : Component
-{
-	CollisionTerrainComponent() = default;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("layerMask", layerMask);
-	}
-
-	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
-};
+//struct EngineAPI RigidBodyComponent : public Component
+//{
+//
+//	RigidBodyComponent() = default;
+//	RigidBodyComponent(RigidbodyType type, float mass) : type(type), mass(mass) {};
+//
+//	void addForce(glm::vec3 force);
+//	void setForce(glm::vec3 force);
+//
+//	void move(glm::vec3 position);
+//
+//	template <class Archive>
+//	void serialize(Archive& archive) {
+//		SERIALIZED_MEMBER("type", type);
+//		SERIALIZED_MEMBER("mass", mass);
+//	}
+//
+//	bool isLockedLinearX = false;
+//	bool isLockedLinearY = false;
+//	bool isLockedLinearZ = false;
+//	bool isLockedAngularX = false;
+//	bool isLockedAngularY = false;
+//	bool isLockedAngularZ = false;
+//	RigidbodyType type = RigidbodyType::Static;
+//	float mass = 0;
+//	bool isChanged = false;
+//	glm::vec3 m_targetPisition{0};
+//	glm::vec3 m_force{ 0 };
+//	void* simulatedBody = nullptr;
+//};
+//
+//struct EngineAPI CollisionBoxComponent : public Component
+//{
+//	CollisionBoxComponent() = default;
+//	CollisionBoxComponent(float halfExtent) : halfExtent(halfExtent) {};
+//
+//	template <class Archive>
+//	void serialize(Archive& archive) {
+//		SERIALIZED_MEMBER("halfExtent", halfExtent);
+//		SERIALIZED_MEMBER("layerMask", layerMask);
+//	}
+//
+//	float halfExtent = 0;
+//	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
+//};
+//
+//struct EngineAPI CollisionSphereComponent : public Component
+//{
+//	CollisionSphereComponent() = default;
+//	CollisionSphereComponent(float radius) : radius(radius) {};
+//
+//	template <class Archive>
+//	void serialize(Archive& archive) {
+//		SERIALIZED_MEMBER("radius", radius);
+//		SERIALIZED_MEMBER("layerMask", layerMask);
+//	}
+//
+//	float radius = 0;
+//	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
+//};
+//
+//struct EngineAPI CollisionMeshComponent : public Component
+//{
+//	CollisionMeshComponent() = default;
+//
+//	template <class Archive>
+//	void serialize(Archive& archive) {
+//		SERIALIZED_MEMBER("isConvex", isConvex);
+//		SERIALIZED_MEMBER("layerMask", layerMask);
+//	}
+//
+//	bool isConvex = false;
+//	Resource<Mesh> mesh = Resource<Mesh>::empty;
+//	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
+//};
+//
+//struct EngineAPI CollisionTerrainComponent : Component
+//{
+//	CollisionTerrainComponent() = default;
+//
+//	template <class Archive>
+//	void serialize(Archive& archive) {
+//		SERIALIZED_MEMBER("layerMask", layerMask);
+//	}
+//
+//	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
+//};
 
 struct EngineAPI CameraComponent : public Component
 {

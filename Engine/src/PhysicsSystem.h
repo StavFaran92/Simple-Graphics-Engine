@@ -28,7 +28,7 @@ public:
 	void close();
 
 private:
-	physx::PxRigidActor* createRigidBody(Transformation& trasform, RigidBodyComponent& rb);
+	physx::PxRigidActor* createRigidBody(Transformation& trasform, PhysicsComponent& rb);
 	void createActor(Scene* scene, entt::entity entity);
 	void removeActor(Scene* scene, entt::entity entity);
 	void createShape(physx::PxRigidActor* body, Entity e, bool recursive);

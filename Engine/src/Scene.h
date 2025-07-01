@@ -50,7 +50,6 @@ class TextureHandler;
 class SGE_Regsitry;
 class Entity;
 class RenderView;
-struct RigidBodyComponent;
 class GameLayer;
 namespace physx {
 	class PxScene;
