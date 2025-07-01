@@ -336,11 +336,14 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                 physx::PxTransform localPose = shape->getLocalPose();
                 physx::PxTransform actorPose = actor->getGlobalPose();
                 physx::PxTransform worldPose = actorPose * localPose;
-                const auto& model = PxTransformToMat4(worldPose);
-                m_debugVisualizeShader->setModelMatrix(model);
+                auto& model = PxTransformToMat4(worldPose);
+                
 
                 if (geometry.any().getType() == PxGeometryType::eBOX)
                 {
+                    PxVec3 extents = geometry.box().halfExtents * 2.;
+                    model = glm::scale(model, glm::vec3(extents.x, extents.y, extents.z));
+                    m_debugVisualizeShader->setModelMatrix(model);
                     auto& mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
                     auto vao = mesh->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
@@ -348,6 +351,9 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
 
                 if (geometry.any().getType() == PxGeometryType::eSPHERE)
                 {
+                    float radius2 = geometry.sphere().radius * 2.;
+                    model = glm::scale(model, glm::vec3(radius2));
+                    m_debugVisualizeShader->setModelMatrix(model);
                     auto& mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
                     auto vao = mesh->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
