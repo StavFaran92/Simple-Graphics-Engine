@@ -503,16 +503,9 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
             0.0f,
             -terrain.getWidth() / 2.0f), PxQuat(PxIdentity));
 
-        PxRigidActor* heightFieldActor = m_physics->createRigidStatic(pose); // todo fix
-        if (!heightFieldActor)
-        {
-            logError("createRigidStatic failed!");
-            return;
-        }
+        body->setGlobalPose(pose);
 
-
-
-        PxShape* shape = PxRigidActorExt::createExclusiveShape(*heightFieldActor,
+        PxShape* shape = PxRigidActorExt::createExclusiveShape(*body,
             PxHeightFieldGeometry(heightField, PxMeshGeometryFlags(),
                 terrainHeightScale, terrainRowScale, terrainColScale),
             *getDefaultMaterial());
