@@ -80,6 +80,9 @@ physx::PxScene* PhysicsSystem::createScene()
     sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
     physx::PxScene* scene = m_physics->createScene(sceneDesc);
 
+    auto controllerManager = PxCreateControllerManager(*scene);
+    m_CCTControllers[scene] = controllerManager;
+
 #ifdef SGE_DEBUG
     physx::PxPvdSceneClient* pvdClient = scene->getScenePvdClient();
     if (pvdClient)
@@ -276,6 +279,43 @@ void PhysicsSystem::createTerrainActor(Scene* scene, entt::entity entity)
     heightFieldActor->userData = (void*)id;
 }
 
+void PhysicsSystem::createCCTController(Scene* scene, entt::entity entity)
+{
+    auto iter = m_CCTControllers.find(scene->getPhysicsScene());
+
+    if (iter == m_CCTControllers.end())
+    {
+        logError("Could not locate scene's CCT Controller manager");
+        return;
+    }
+
+    auto controllerManager = iter->second;
+
+    float crouchHeight = .25f;
+
+    Entity e(entity, &scene->getRegistry());
+    auto pos = e.getComponent<Transformation>().getWorldPosition();
+
+    PxCapsuleControllerDesc desc;
+
+    desc.height = 1.f;
+    desc.radius = .3f;
+    desc.position = physx::PxExtendedVec3(pos.x, pos.y, pos.z);
+    desc.material = m_defaultMaterial;
+
+    //mType = desc.mType;
+    //mInitialPosition = desc.mPosition;
+    //mStandingSize = height;
+    //mCrouchingSize = crouchHeight;
+    //mControllerRadius = radius;
+
+    PxController* ctrl = static_cast<PxCapsuleController*>(controllerManager->createController(desc));
+    PX_ASSERT(ctrl);
+
+    entity_id * id = new entity_id(e.handlerID());
+    ctrl->getActor()->userData = (void*)id;
+}
+
 void PhysicsSystem::startScenePhysics(Scene* scene)
 {
     for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<PhysicsComponent>().each())
@@ -283,10 +323,10 @@ void PhysicsSystem::startScenePhysics(Scene* scene)
         createActor(scene, entity);
     }
 
-    //for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<CollisionTerrainComponent>().each())
-    //{
-    //    createTerrainActor(scene, entity);
-    //}
+    for (auto&& [entity, pc] : scene->getRegistry().getRegistry().view<PlayerController>().each())
+    {
+        createCCTController(scene, entity);
+    }
 }
 
 void PhysicsSystem::stopScenePhysics(Scene* scene)
@@ -567,16 +607,20 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             {
                 entity_id id = *(entity_id*)actor->userData;
                 Entity e{ entt::entity(id), &scene->getRegistry()};
-                auto& rb = e.getComponent<PhysicsComponent>();
 
-                physx::PxTransform targetPose = actor->getGlobalPose();
-                targetPose.p += physx::PxVec3(rb.m_targetPisition.x, rb.m_targetPisition.y, rb.m_targetPisition.z);
-                targetPose.q = physx::PxQuat(physx::PxIdentity);
-
-                if (rb.isChanged)
+                if (e.HasComponent<PhysicsComponent>())
                 {
-                    dynamicBody->setKinematicTarget(targetPose);
-                    rb.isChanged = false;
+                    auto& rb = e.getComponent<PhysicsComponent>();
+
+                    physx::PxTransform targetPose = actor->getGlobalPose();
+                    targetPose.p += physx::PxVec3(rb.m_targetPisition.x, rb.m_targetPisition.y, rb.m_targetPisition.z);
+                    targetPose.q = physx::PxQuat(physx::PxIdentity);
+
+                    if (rb.isChanged)
+                    {
+                        dynamicBody->setKinematicTarget(targetPose);
+                        rb.isChanged = false;
+                    }
                 }
             }
             else // Dynamic
@@ -609,7 +653,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             entity_id id = *(entity_id*)actor->userData;
             Entity e{ entt::entity(id),  &scene->getRegistry() };
 
-            if (e.getComponent<PhysicsComponent>().colliderType == ColliderType::TERRAIN)
+            if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().colliderType == ColliderType::TERRAIN)
                 continue;
 
             auto& transform = e.getComponent<Transformation>();

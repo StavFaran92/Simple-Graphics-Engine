@@ -1839,9 +1839,10 @@ void RenderInspectorWindow(float width, float height)
 		//	ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
 		//	});
 
-		//displayComponent<CollisionTerrainComponent>("Collision Terrain", [](CollisionTerrainComponent& collision) {
-		//	//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-		//	});
+		displayComponent<PlayerController>("Player Controller", [](PlayerController& controller) {
+			ImGui::TextDisabled("Controller has no editable parameters.");
+			//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+			});
 
 		displayComponent<MeshComponent>("Mesh", [](MeshComponent& meshComponent) {
 			if (meshComponent.mesh.isEmpty()) return;
@@ -2237,6 +2238,11 @@ void RenderInspectorWindow(float width, float height)
 			if (ImGui::MenuItem("Physics"))
 			{
 				selectedEntity.addComponent<PhysicsComponent>();
+			}
+
+			if (ImGui::MenuItem("Player Controller"))
+			{
+				selectedEntity.addComponent<PlayerController>();
 			}
 
 			//if (ImGui::MenuItem("Collision Box"))

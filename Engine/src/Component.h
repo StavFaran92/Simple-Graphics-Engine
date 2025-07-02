@@ -500,3 +500,14 @@ struct VolumeComponent : public Component
 
 	Resource<Shader> shader;
 };
+
+struct EngineAPI PlayerController : public Component
+{
+	PlayerController() = default;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+	}
+
+	int temp = 0;
+};

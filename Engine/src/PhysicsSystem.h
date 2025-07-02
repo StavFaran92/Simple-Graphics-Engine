@@ -38,6 +38,8 @@ private:
 	physx::PxMaterial* getDefaultMaterial() const;
 	void createTerrainActor(Scene* scene, entt::entity entity);
 
+	void createCCTController(Scene* scene, entt::entity entity);
+
 private:
 	physx::PxDefaultAllocator       m_defaultAllocatorCallback;
 	physx::PxDefaultErrorCallback   m_defaultErrorCallback;
@@ -48,6 +50,7 @@ private:
 	physx::PxPhysics* m_physics = nullptr;
 
 	std::vector<physx::PxScene*>    m_scenes;
+	std::map<physx::PxScene*, physx::PxControllerManager*> m_CCTControllers;
 
 	physx::PxMaterial* m_defaultMaterial = nullptr;
 	physx::PxCooking* m_cooking = nullptr;

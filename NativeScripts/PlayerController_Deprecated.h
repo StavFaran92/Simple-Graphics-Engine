@@ -5,10 +5,10 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/cereal.hpp>
 
-class PlayerController : public ScriptableEntity
+class PlayerController_Deprecated : public ScriptableEntity
 {
 public:
-	PlayerController() = default;
+	PlayerController_Deprecated() = default;
 
 	void onCreate() override
 	{
@@ -135,5 +135,5 @@ private:
 	glm::vec3 m_movementV{};
 };
 
-CEREAL_REGISTER_TYPE(PlayerController);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableEntity, PlayerController)
+CEREAL_REGISTER_TYPE(PlayerController_Deprecated);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableEntity, PlayerController_Deprecated)
