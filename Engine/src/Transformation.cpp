@@ -92,7 +92,7 @@ void Transformation::forceUpdate()
 	if (m_parent.valid())
 	{
 		auto& pTransform = m_parent.getComponent<Transformation>();
-		m_modelMatrix *= pTransform.getWorldTransformation();
+		m_modelMatrix = pTransform.getWorldTransformation() * m_modelMatrix;
 		m_globalTranslation *= pTransform.getWorldPosition();
 		m_globalRotation *= pTransform.getWorldRotation();
 		m_globalScale *= pTransform.getWorldScale();

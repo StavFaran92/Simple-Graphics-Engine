@@ -16,6 +16,11 @@ public:
 	{
 		m_camera = Engine::get()->getContext()->getActiveScene()->getEntityByName("Main Camera");
 		m_movementSpeed = 3.f;
+		m_cameraTransform = &m_camera.getComponent<Transformation>();
+
+		auto eventSystem = Engine::get()->getEventSystem();
+		eventHandler = eventSystem->bindToLayer("GameLayer");
+		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
 	}
 
 	void handleGroundCheck()
@@ -98,7 +103,6 @@ public:
 
 	void onUpdate(float deltaTime) override
 	{
-		
 		handleMoveInput(deltaTime);
 		handleGroundCheck();
 		applyGravity(deltaTime);
@@ -107,6 +111,38 @@ public:
 
 	void onEvent(SDL_Event e)
 	{
+		if (e.type == SDL_MOUSEMOTION)
+		{
+			auto system = Engine::get()->getSubSystem<System>();
+
+			float xChange = e.motion.xrel;
+			float yChange = e.motion.yrel;
+
+			xChange *= m_turnSpeed * system->getDeltaTime();
+			yChange *= m_turnSpeed * system->getDeltaTime();
+
+			m_yaw -= xChange;
+			m_pitch -= yChange;
+
+			if (m_pitch > 89.0f)
+			{
+				m_pitch = 89.0f;
+			}
+
+			if (m_pitch < -89.0f)
+			{
+				m_pitch = -89.0f;
+			}
+
+			glm::quat pitchQuat = glm::angleAxis(glm::radians(m_pitch), glm::vec3(1, 0, 0));
+			glm::quat yawQuat = glm::angleAxis(glm::radians(m_yaw), glm::vec3(0, 1, 0));
+
+			// Combine the quaternions
+			glm::quat combinedQuat = yawQuat * pitchQuat;
+
+			m_cameraTransform->setWorldRotation(combinedQuat);
+		}
+
 		if (e.type == SDL_EventType::SDL_MOUSEBUTTONDOWN)
 		{
 			if (e.button.button == SDL_BUTTON_LEFT)
@@ -137,7 +173,12 @@ private:
 	glm::vec3 m_movementH{};
 	glm::vec3 m_movementV{};
 
+	float m_yaw = 0;
+	float m_pitch = 0;
+	float m_turnSpeed = 10.f;
+
 	physx::PxController* m_controller;
+	Transformation* m_cameraTransform = nullptr;
 };
 
 CEREAL_REGISTER_TYPE(PlayerControllerScript);
