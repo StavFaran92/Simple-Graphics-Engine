@@ -509,5 +509,16 @@ struct EngineAPI PlayerController : public Component
 	void serialize(Archive& archive) {
 	}
 
-	int temp = 0;
+	void move(glm::vec3 disp)
+	{
+		m_disp = disp;
+	}
+
+	void reset()
+	{
+		m_disp = glm::vec3(0.f);
+	}
+
+	glm::vec3 m_disp{};
+	int controllerIndex = 0;
 };

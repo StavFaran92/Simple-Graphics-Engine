@@ -5,10 +5,12 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/cereal.hpp>
 
-class PlayerController_Deprecated : public ScriptableEntity
+#include <PxPhysicsAPI.h> // TODO consider remove
+
+class PlayerControllerScript : public ScriptableEntity
 {
 public:
-	PlayerController_Deprecated() = default;
+	PlayerControllerScript() = default;
 
 	void onCreate() override
 	{
@@ -41,9 +43,10 @@ public:
 	{
 		// Apply the computed velocity to move the character
 		auto& transform = entity.getComponent<Transformation>();
-		auto& rb = entity.getComponent<PhysicsComponent>();
-		glm::vec3 newPosition = m_movementH + m_movementV + glm::vec3(0, m_velocity.y / 1000.f, 0);
-		rb.move(newPosition);
+		auto& pc = entity.getComponent<PlayerController>();
+		glm::vec3 disp = m_movementH + m_movementV + glm::vec3(0, m_velocity.y / 1000.f, 0);
+		pc.move(disp);
+		//rb.move(newPosition);
 	}
 
 	void handleMoveInput(float deltaTime)
@@ -133,7 +136,9 @@ private:
 	glm::vec3 m_velocity{};
 	glm::vec3 m_movementH{};
 	glm::vec3 m_movementV{};
+
+	physx::PxController* m_controller;
 };
 
-CEREAL_REGISTER_TYPE(PlayerController_Deprecated);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableEntity, PlayerController_Deprecated)
+CEREAL_REGISTER_TYPE(PlayerControllerScript);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableEntity, PlayerControllerScript)

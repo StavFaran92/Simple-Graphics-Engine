@@ -335,6 +335,16 @@ void PhysicsSystem::stopScenePhysics(Scene* scene)
     {
         removeActor(scene, entity);
     }
+
+    auto iter = m_CCTControllers.find(scene->getPhysicsScene());
+
+    if (iter == m_CCTControllers.end())
+    {
+        logError("Could not locate scene's CCT Controller manager");
+        return;
+    }
+
+    iter->second->purgeControllers();
 }
 
 void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
@@ -622,6 +632,31 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                         rb.isChanged = false;
                     }
                 }
+
+                //if (e.HasComponent<PlayerController>())
+                //{
+                //    static const PxControllerFilters filters(NULL, NULL, NULL);
+
+                //    auto& pc = e.getComponent<PlayerController>();
+
+                //    auto iter = m_CCTControllers.find(physicsScene);
+                //    if (iter != m_CCTControllers.end())
+                //    {
+                //        auto controllerManager = iter->second;
+                //        auto CCTController = controllerManager->getController(pc.controllerIndex);
+                //        CCTController->move(physx::PxVec3(pc.disp.x, pc.disp.y, pc.disp.z), 0.0f, deltaTime, filters);
+                //    }
+
+                //    //physx::PxTransform targetPose = actor->getGlobalPose();
+                //    //targetPose.p += physx::PxVec3(rb.m_targetPisition.x, rb.m_targetPisition.y, rb.m_targetPisition.z);
+                //    //targetPose.q = physx::PxQuat(physx::PxIdentity);
+
+                //    //if (rb.isChanged)
+                //    //{
+                //    //    dynamicBody->setKinematicTarget(targetPose);
+                //    //    rb.isChanged = false;
+                //    //}
+                //}
             }
             else // Dynamic
             {
@@ -640,6 +675,44 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             }
         }
     }
+
+    auto iter = m_CCTControllers.find(physicsScene);
+    if (iter != m_CCTControllers.end())
+    {
+        auto controllerManager = iter->second;
+        physx::PxU32 nbControllers = controllerManager->getNbControllers();
+
+        for (physx::PxU32 i = 0; i < nbControllers; ++i)
+        {
+            physx::PxController* cct = controllerManager->getController(i);
+            if (!cct) continue;
+
+            // Get associated actor
+            physx::PxRigidActor* actor = cct->getActor();
+            if (!actor || !actor->userData) continue;
+
+            // Convert userData to entity
+            entity_id id = *(entity_id*)actor->userData;
+            Entity e{ entt::entity(id), &scene->getRegistry() };
+
+            // Check for PlayerController component
+            if (!e.HasComponent<PlayerController>()) continue;
+
+            auto& pc = e.getComponent<PlayerController>();
+
+            // Move using displacement in component
+            static const physx::PxControllerFilters filters(nullptr, nullptr, nullptr);
+            cct->move(
+                physx::PxVec3(pc.m_disp.x, pc.m_disp.y, pc.m_disp.z),
+                0.0f, // min distance
+                deltaTime,
+                filters
+            );
+            pc.reset();
+        }
+    }
+
+
 
     // Retrieve Graphics transform from Physics transform
     physx::PxU32 nbActors = physicsScene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC);
