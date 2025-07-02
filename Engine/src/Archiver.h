@@ -64,7 +64,7 @@ struct SerializedEntity
 	std::optional<PhysicsComponent> physics;
 	//std::optional<CollisionBoxComponent> collisionBox;
 	//std::optional<CollisionSphereComponent> collisionSphere;
-	//std::optional<CollisionTerrainComponent> collisionTerrain;
+	std::optional<PlayerController> playerController;
 	std::optional<MeshComponent> mesh;
 	std::optional<RenderableComponent> renderableComponent;
 	std::optional<CameraComponent> camera;
@@ -85,6 +85,7 @@ struct SerializedEntity
 		archive(entity,
 			transform,
 			physics,
+			playerController,
 			mesh,
 			renderableComponent,
 			camera,
