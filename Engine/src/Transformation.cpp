@@ -85,7 +85,6 @@ void Transformation::update()
 void Transformation::forceUpdate()
 {
 	m_modelMatrix = calculateModelMatrix();
-	m_globalTranslation = m_localTranslation;
 	m_globalRotation = m_localRotation;
 	m_globalScale = m_localScale;
 
@@ -93,8 +92,7 @@ void Transformation::forceUpdate()
 	{
 		auto& pTransform = m_parent.getComponent<Transformation>();
 		m_modelMatrix = pTransform.getWorldTransformation() * m_modelMatrix;
-		m_globalTranslation *= pTransform.getWorldPosition();
-		m_globalRotation *= pTransform.getWorldRotation();
+		m_globalRotation = pTransform.getWorldRotation() * m_globalRotation;
 		m_globalScale *= pTransform.getWorldScale();
 	}
 
@@ -187,7 +185,7 @@ glm::vec3 Transformation::getLocalPosition() const
 
 glm::vec3 Transformation::getWorldPosition() const
 {
-	return m_globalTranslation;
+	return glm::vec3(m_modelMatrix[3][0], m_modelMatrix[3][1], m_modelMatrix[3][2]);
 }
 
 glm::quat Transformation::getLocalRotationQuat() const

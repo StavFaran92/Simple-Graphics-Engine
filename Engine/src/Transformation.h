@@ -124,7 +124,6 @@ private:
 	glm::quat m_localRotation;
 	glm::vec3 m_localScale;
 
-	glm::vec3 m_globalTranslation;
 	glm::quat m_globalRotation;
 	glm::vec3 m_globalScale;
 
