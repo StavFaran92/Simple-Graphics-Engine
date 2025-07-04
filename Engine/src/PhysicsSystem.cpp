@@ -709,6 +709,14 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                 filters
             );
             pc.reset();
+
+            auto& transform = e.getComponent<Transformation>();
+
+            physx::PxTransform pxTransform = actor->getGlobalPose();
+
+            glm::vec3 translation(pxTransform.p.x, pxTransform.p.y, pxTransform.p.z);
+
+            transform.setWorldPosition(translation);
         }
     }
 
@@ -727,6 +735,9 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             Entity e{ entt::entity(id),  &scene->getRegistry() };
 
             if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().colliderType == ColliderType::TERRAIN)
+                continue;
+
+            if (e.HasComponent<PlayerController>())
                 continue;
 
             auto& transform = e.getComponent<Transformation>();
