@@ -140,7 +140,8 @@ public:
 			// Combine the quaternions
 			glm::quat combinedQuat = yawQuat * pitchQuat;
 
-			m_cameraTransform->setWorldRotation(combinedQuat);
+			auto& transform = entity.getComponent<Transformation>();
+			transform.setWorldRotation(combinedQuat);
 		}
 
 		if (e.type == SDL_EventType::SDL_MOUSEBUTTONDOWN)

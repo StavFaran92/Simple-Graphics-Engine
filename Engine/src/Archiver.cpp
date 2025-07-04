@@ -47,8 +47,6 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 			Entity eChild(entity.handler(), &scene.getRegistry());
 			transform.addChild(eChild);
 		}
-
-		transform.forceUpdate();
 	}
 	if (serializedEnt.dLight)
 	{
@@ -175,6 +173,15 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 	{
 		deserializeEntity(serializedEnt, scene);
 	}
+
+	// We postpone the transform update because at the moment of transform creation not all transforms 
+	// have been created yet.
+	for (auto& [e, trans] : scene.getRegistry().getRegistry().view<Transformation>().each())
+	{
+		trans.forceUpdate();
+	}
+
+	
 }
 
 SerializedContext Archiver::serializeContext(const Context* ctx)
