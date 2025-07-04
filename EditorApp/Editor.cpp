@@ -2760,7 +2760,8 @@ public:
 
 		Engine::get()->getEventSystem()->pushLayer(uiLayer);
 
-		handler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
+		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
+		gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
 
 		auto scene = Engine::get()->getContext()->getActiveScene();
 
@@ -2779,9 +2780,9 @@ public:
 
 		g_editorCamera = editorCamera;
 
-		Engine::get()->getInput()->getKeyboard()->onKeyPressed(handler, SDL_SCANCODE_ESCAPE, [](SDL_Event e) { stopSimulation(); });
+		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, SDL_SCANCODE_ESCAPE, [](SDL_Event e) { stopSimulation(); });
 		
-		Engine::get()->getInput()->getKeyboard()->onKeyReleased(handler, SDL_SCANCODE_X, [](SDL_Event e) {
+		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiHandler, SDL_SCANCODE_X, [](SDL_Event e) {
 			debugTerrainFlag = true;
 			});
 
@@ -2812,7 +2813,8 @@ public:
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
 	
-	EventHandler handler;
+	EventHandler uiHandler;
+	EventHandler gameHandler;
 };
 
 Application* CreateApplication()

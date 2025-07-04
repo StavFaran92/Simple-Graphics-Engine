@@ -21,6 +21,13 @@ public:
 		auto eventSystem = Engine::get()->getEventSystem();
 		eventHandler = eventSystem->bindToLayer("GameLayer");
 		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
+
+		Engine::get()->getWindow()->lockMouse();
+	}
+
+	void onDestroy()
+	{
+		Engine::get()->getWindow()->unlockMouse();
 	}
 
 	void handleGroundCheck()
