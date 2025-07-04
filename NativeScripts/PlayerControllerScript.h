@@ -15,7 +15,7 @@ public:
 	void onCreate() override
 	{
 		m_camera = Engine::get()->getContext()->getActiveScene()->getEntityByName("Main Camera");
-		m_movementSpeed = 3.f;
+		m_movementSpeed = 30.f;
 		m_cameraTransform = &m_camera.getComponent<Transformation>();
 
 		auto eventSystem = Engine::get()->getEventSystem();
@@ -141,7 +141,7 @@ public:
 				m_pitch = -89.0f;
 			}
 
-			glm::quat pitchQuat = glm::angleAxis(glm::radians(m_pitch), glm::vec3(1, 0, 0));
+			glm::quat pitchQuat = glm::angleAxis(glm::radians(m_pitch), glm::vec3(-1, 0, 0));
 			glm::quat yawQuat = glm::angleAxis(glm::radians(m_yaw), glm::vec3(0, 1, 0));
 
 			// Combine the quaternions
