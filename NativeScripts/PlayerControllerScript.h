@@ -17,10 +17,13 @@ public:
 		m_camera = Engine::get()->getContext()->getActiveScene()->getEntityByName("Main Camera");
 		m_movementSpeed = 30.f;
 		m_cameraTransform = &m_camera.getComponent<Transformation>();
+		m_animator = &entity.getComponent<Animator>();
 
 		auto eventSystem = Engine::get()->getEventSystem();
 		eventHandler = eventSystem->bindToLayer("GameLayer");
 		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
+		eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
+		eventSystem->subscribe(eventHandler, SDL_KEYDOWN, this);
 
 		Engine::get()->getWindow()->lockMouse();
 	}
@@ -93,6 +96,12 @@ public:
 			m_movementV = glm::vec3(0);
 		}
 
+		if (glm::length(m_movementH + m_movementV) > 0.1f)
+		{
+			m_animationState = "Run";
+			//m_animator->playAnimation();
+		}
+
 
 	}
 
@@ -131,15 +140,16 @@ public:
 			m_yaw -= xChange;
 			m_pitch -= yChange;
 
-			if (m_pitch > 89.0f)
+			if (m_pitch > 70.0f)
 			{
-				m_pitch = 89.0f;
+				m_pitch = 70.0f;
 			}
 
-			if (m_pitch < -89.0f)
+			if (m_pitch < 0.0f)
 			{
-				m_pitch = -89.0f;
+				m_pitch = 0.0f;
 			}
+
 
 			glm::quat pitchQuat = glm::angleAxis(glm::radians(m_pitch), glm::vec3(-1, 0, 0));
 			glm::quat yawQuat = glm::angleAxis(glm::radians(m_yaw), glm::vec3(0, 1, 0));
@@ -158,7 +168,8 @@ public:
 				shoot();
 			}
 		}
-		else if (e.type == SDL_EventType::SDL_KEYDOWN)
+
+		if (e.type == SDL_EventType::SDL_KEYDOWN)
 		{
 			if (e.key.keysym.scancode == SDL_SCANCODE_SPACE)
 			{
@@ -174,7 +185,7 @@ private:
 
 	bool m_isGrounded = false;
 	bool m_isJumping = false;
-	float m_jumpForce = 200.f;
+	float m_jumpForce = 400;
 	float m_bulletForce = 800.f;
 
 	glm::vec3 m_velocity{};
@@ -185,8 +196,10 @@ private:
 	float m_pitch = 0;
 	float m_turnSpeed = 10.f;
 
-	physx::PxController* m_controller;
+	physx::PxController* m_controller = nullptr;
 	Transformation* m_cameraTransform = nullptr;
+	Animator* m_animator = nullptr;
+	std::string m_animationState = "Idle";
 };
 
 CEREAL_REGISTER_TYPE(PlayerControllerScript);
