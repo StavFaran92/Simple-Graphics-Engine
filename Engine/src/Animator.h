@@ -18,13 +18,22 @@ public:
 	void playAnimation(Resource<Animation> animation);
 	void setPlaybackSpeed(float playbackSpeed);
 
+	void addAnimation(const std::string& name, Resource<Animation> animation);
+	void removeAnimation(const std::string& name);
+	void playAnimation(const std::string& name);
+	Resource<Animation> getAnimation(const std::string& name);
+	const std::map<std::string, Resource<Animation>>& getAllAnimations() const;
+
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(m_currentAnimation, m_playbackSpeed);
+		archive(m_currentAnimation, m_playbackSpeed, m_animations);
 	}
 
 	Resource<Animation> m_currentAnimation;
 	float m_currentTime = 0.f;
 	std::unordered_map<std::string, glm::mat4> m_finalBoneMatrices;
 	float m_playbackSpeed = 1.f;
+
+private:
+	std::map<std::string, Resource<Animation>> m_animations;
 };

@@ -17,7 +17,7 @@ public:
 		m_camera = Engine::get()->getContext()->getActiveScene()->getEntityByName("Main Camera");
 		m_movementSpeed = 30.f;
 		m_cameraTransform = &m_camera.getComponent<Transformation>();
-		m_animator = &entity.getComponent<Animator>();
+		//m_animator = &entity.getComponent<Animator>();
 
 		auto eventSystem = Engine::get()->getEventSystem();
 		eventHandler = eventSystem->bindToLayer("GameLayer");

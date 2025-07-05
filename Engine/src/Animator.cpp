@@ -52,3 +52,43 @@ void Animator::setPlaybackSpeed(float playbackSpeed)
 {
 	m_playbackSpeed = playbackSpeed;
 }
+
+void Animator::addAnimation(const std::string& name, Resource<Animation> animation)
+{
+	m_animations[name] = animation;
+}
+
+void Animator::removeAnimation(const std::string& name)
+{
+	auto iter = m_animations.find(name);
+	if (iter != m_animations.end())
+	{
+		m_animations.erase(iter);
+	}
+}
+
+void Animator::playAnimation(const std::string& name)
+{
+	Resource<Animation>& anim = getAnimation(name);
+	if (!anim.isEmpty())
+	{
+		playAnimation(anim);
+	}
+}
+
+Resource<Animation> Animator::getAnimation(const std::string& name)
+{
+	auto iter = m_animations.find(name);
+	if (iter == m_animations.end())
+	{
+		logWarning("Could not find animation: {}", name);
+		return Resource<Animation>::empty;
+	}
+
+	return iter->second;
+}
+
+const std::map<std::string, Resource<Animation>>& Animator::getAllAnimations() const
+{
+	return m_animations;
+}

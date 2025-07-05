@@ -18,6 +18,8 @@
 #include "EditorCamera.h"
 #include "EditorState.h"
 
+#include <imgui_stdlib.h>
+
 #define BEGIN_IMGUI_TABLE(name) \
     if (ImGui::BeginTable(name, 2, ImGuiTableFlags_None)) { \
         ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch, 0.4f); \
@@ -77,10 +79,82 @@ static void displaySelectMeshWindow();
 
 struct EntityState
 {
+	Entity e;
+
 	Resource<Shader> shader;
+
+	std::vector<std::string> animationRenameBuffers{};
+
+	EntityState(Entity e)
+		: e(e)
+	{
+	}
+
+	void update()
+	{
+		if (e.HasComponent<Animator>())
+		{
+			auto& animator = e.getComponent<Animator>();
+			auto animations = animator.getAllAnimations();
+			animationRenameBuffers.clear();
+			for (const auto& [name, anim] : animations) {
+				animationRenameBuffers.push_back(name);
+			}
+		}
+		
+
+	}
 };
 
-std::unordered_map<entity_id, EntityState> g_states;
+
+
+class EntityStates
+{
+public:
+	void selectEntity(Entity e)
+	{
+		if (e == Entity::EmptyEntity)
+		{
+			return;
+		}
+
+		m_selectedEntity = e;
+
+		std::shared_ptr<EntityState> eState = std::make_shared<EntityState>(e);
+		eState->update();
+
+		m_states[e.handlerID()] = eState;
+	}
+
+	EntityState& getCurrentEntityState()
+	{
+		auto iter = m_states.find(m_selectedEntity.handlerID());
+		if (iter == m_states.end())
+		{
+			auto eState = std::make_shared<EntityState>(m_selectedEntity);
+			eState->update();
+			m_states[m_selectedEntity.handlerID()] = eState;
+			return *eState.get();
+		}
+
+		return *iter->second.get();
+	}
+
+	Entity getSelectedEntity() const
+	{
+		return m_selectedEntity;
+	}
+
+private:
+	std::unordered_map<entity_id, std::shared_ptr<EntityState>> m_states;
+	Entity m_selectedEntity = Entity::EmptyEntity;
+};
+
+static EntityStates state;
+
+
+
+
 
 static void stopSimulation()
 {
@@ -132,13 +206,13 @@ static void displayWindowHeader(const std::string& name)
 template<typename T> 
 static void displayComponent(const std::string& componentName, std::function<void(T&)> func)
 {
-	if (selectedEntity.HasComponent<T>())
+	if (state.getSelectedEntity().HasComponent<T>())
 	{
 		ImVec2 startPos = ImGui::GetCursorScreenPos();
 		ImVec2 startPosCursor = ImGui::GetCursorPos(); // Capture the initial cursor position
 
 		AddColoredLabel(componentName.c_str());
-		auto& component = selectedEntity.getComponent<T>();
+		auto& component = state.getSelectedEntity().getComponent<T>();
 
 		ImVec2 cursorPos = ImGui::GetCursorPos();
 		ImVec2 windowSize = ImGui::GetWindowSize();
@@ -148,7 +222,7 @@ static void displayComponent(const std::string& componentName, std::function<voi
 			ImGui::SetCursorPos(ImVec2(windowSize.x - 24.0f, cursorPos.y - ImGui::GetTextLineHeightWithSpacing() - 7.0f));
 			ImGui::PushID(componentName.c_str());
 			if (ImGui::Button("X")) {
-				selectedEntity.RemoveComponent<T>();
+				state.getSelectedEntity().RemoveComponent<T>();
 				ImGui::EndGroup();
 				updateScene();
 				return;
@@ -612,10 +686,6 @@ void updateScene()
 	}
 }
 
-
-
-Entity  selectedEntity = Entity::EmptyEntity;
-
 auto style = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
 
 void AddColoredLabel(const char* label) 
@@ -1005,12 +1075,12 @@ void displayentityName(const Entity& e)
 {
 	auto& obj = e.getComponent<ObjectComponent>();
 
-	ImGui::Selectable(obj.name.c_str(), (selectedEntity == e));
+	ImGui::Selectable(obj.name.c_str(), (state.getSelectedEntity() == e));
 
 	if (ImGui::IsItemClicked())
 	{
-		selectedEntity = e;
-		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(selectedEntity.handlerID());
+		state.selectEntity(e);
+		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
 	}
 }
 
@@ -1051,7 +1121,7 @@ void displayEntity(Entity& e)
 		displayentityName(e);
 	}
 
-	if (selectedEntity == e)
+	if (state.getSelectedEntity() == e)
 	{
 		if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 		{
@@ -1117,7 +1187,7 @@ void displayEntity(Entity& e)
 			{
 				e.remove();
 				updateScene();
-				selectedEntity = Entity::EmptyEntity;
+				state.selectEntity(Entity::EmptyEntity);
 			}
 
 			ImGui::EndPopup();
@@ -1206,7 +1276,7 @@ void RenderSceneHierarchyWindow(float width, float height)
 		{
 			Engine::get()->getContext()->getActiveScene()->createEntity();
 			updateScene();
-			selectedEntity = sceneObjects[0].e;
+			state.selectEntity(sceneObjects[0].e);
 		}
 		if (ImGui::BeginMenu("Primitive")) 
 		{ // Begin the submenu
@@ -1214,19 +1284,19 @@ void RenderSceneHierarchyWindow(float width, float height)
 			{
 				ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getActiveScene()->getRegistry());
 				updateScene();
-				selectedEntity = sceneObjects[0].e;
+				state.selectEntity(sceneObjects[0].e);
 			}
 			if (ImGui::MenuItem("Sphere")) 
 			{
 				ShapeFactory::createSphere(&Engine::get()->getContext()->getActiveScene()->getRegistry());
 				updateScene();
-				selectedEntity = sceneObjects[0].e;
+				state.selectEntity(sceneObjects[0].e);
 			}
 			if (ImGui::MenuItem("Quad")) 
 			{
 				ShapeFactory::createQuad(&Engine::get()->getContext()->getActiveScene()->getRegistry());
 				updateScene();
-				selectedEntity = sceneObjects[0].e;
+				state.selectEntity(sceneObjects[0].e);
 			}
 
 			ImGui::EndMenu(); // End the submenu
@@ -1240,7 +1310,7 @@ void RenderSceneHierarchyWindow(float width, float height)
 				auto e = Engine::get()->getContext()->getActiveScene()->createEntity("Directional_Light_" + std::to_string(createdDLightCount++));
 				e.addComponent<DirectionalLight>(glm::vec3{ 0,0,0 }, glm::vec3{0,-1,0}, 1.f, 1.f);
 				updateScene();
-				selectedEntity = sceneObjects[0].e;
+				state.selectEntity(sceneObjects[0].e);
 			}
 			if (ImGui::MenuItem("Point Light"))
 			{
@@ -1248,7 +1318,7 @@ void RenderSceneHierarchyWindow(float width, float height)
 				auto e = Engine::get()->getContext()->getActiveScene()->createEntity("Point_Light_" + std::to_string(createdPLightCount++));
 				e.addComponent<PointLight>(glm::vec3{ 0,0,0 }, 1.f, 1.f, Attenuation());
 				updateScene();
-				selectedEntity = sceneObjects[0].e;
+				state.selectEntity(sceneObjects[0].e);
 			}
 
 			ImGui::EndMenu(); // End the submenu
@@ -1260,21 +1330,21 @@ void RenderSceneHierarchyWindow(float width, float height)
 			{
 				Entity e = Skybox::createSkybox(SGE_ROOT_DIR + "Resources/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR);
 				updateScene();
-				selectedEntity = sceneObjects[0].e;
+				state.selectEntity(sceneObjects[0].e);
 			}
 
 			if (ImGui::MenuItem("Terrain"))
 			{
 				Entity e = Terrain::createTerrain(100, 100, 1, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
 				updateScene();
-				selectedEntity = sceneObjects[0].e;
+				state.selectEntity(sceneObjects[0].e);
 			}
 
 			if (ImGui::MenuItem("Pool"))
 			{
 				Entity e = WaterSystem::createPool();
 				updateScene();
-				selectedEntity = sceneObjects[0].e;
+				state.selectEntity(sceneObjects[0].e);
 			}
 
 			ImGui::EndMenu(); // End the submenu
@@ -1348,7 +1418,7 @@ void RenderViewWindow(float width, float height)
 
 				if (selectedID == -1)
 				{
-					selectedEntity = Entity::EmptyEntity;
+					state.selectEntity(Entity::EmptyEntity);
 
 				}
 				else
@@ -1358,7 +1428,7 @@ void RenderViewWindow(float width, float height)
 					{
 						if (sceneObj.e.handlerID() == selectedID)
 						{
-							selectedEntity = sceneObj.e;
+							state.selectEntity(sceneObj.e);
 							break;
 						}
 					}
@@ -1454,9 +1524,9 @@ void RenderViewWindow(float width, float height)
 			ImGui::EndChild(); // End the inner window
 		}
 
-		if (selectedEntity != Entity::EmptyEntity)
+		if (state.getSelectedEntity() != Entity::EmptyEntity)
 		{
-			auto& transform = selectedEntity.getComponent<Transformation>();
+			auto& transform = state.getSelectedEntity().getComponent<Transformation>();
 
 			glm::mat4 glmMat = transform.getLocalTransformation();
 			float* matrixPtr = glm::value_ptr(glmMat);
@@ -1723,6 +1793,8 @@ void rightAlignedText(const std::string& text) {
 	ImGui::TextUnformatted(text.c_str());
 }
 
+static bool showWindow = true;
+
 void RenderInspectorWindow(float width, float height) 
 {
 	auto assets = Engine::get()->getSubSystem<Assets>();
@@ -1731,11 +1803,11 @@ void RenderInspectorWindow(float width, float height)
 	float startX = width * 0.85f + 5; // Add a gap of 5 pixels
 	ImGui::SetNextWindowPos(ImVec2(startX, 25)); // Adjust vertical position to make space for the menu bar
 	ImGui::SetNextWindowSize(ImVec2(windowWidth - 5, height * 0.7f));
-	ImGui::Begin("Inspector", nullptr, style | ImGuiWindowFlags_NoScrollbar);
+	ImGui::Begin("Inspector", &showWindow, style | ImGuiWindowFlags_NoScrollbar);
 
 	displayWindowHeader("Inspector");
 
-	if (selectedEntity != Entity::EmptyEntity)
+	if (state.getSelectedEntity() != Entity::EmptyEntity)
 	{
 		displayComponent<Transformation>("Transformation", [](Transformation& transform) {
 			bool isChanged = false;
@@ -2001,7 +2073,7 @@ void RenderInspectorWindow(float width, float height)
 			auto& transformations = instanceBatch.getTransformations();
 
 			if (ImGui::Button("Add Transformation")) {
-				instanceBatch.addTransformation(std::make_shared<Transformation>(selectedEntity));
+				instanceBatch.addTransformation(std::make_shared<Transformation>(state.getSelectedEntity()));
 			}
 
 			if (ImGui::BeginChild("Transformations List", ImVec2(0, 200), true)) {
@@ -2046,24 +2118,77 @@ void RenderInspectorWindow(float width, float height)
 		displayComponent<Animator>("Animator", [](Animator& animator) {
 
 
-			// Button to trigger some action
-			if (ImGui::Button("Select Animation"))
+			static int animIndex = 0;
+			static std::string animName;
+			static std::string selectedAnimUID;
+			//static bool showAnimationSelector = false;
+			//static std::vector<std::string> renameBuffer{};
+
+			EntityState& eState = state.getCurrentEntityState();
+			
+
+			auto animations = animator.getAllAnimations();
+
+			auto iter = animations.cbegin();
+
+			// Display animation list
+			int index = 0;
+			while (iter != animations.cend())
 			{
-				showAnimationSelector = true;
+				auto& name = iter->first;
+				auto& animation = iter->second;
+
+				ImGui::PushID(index);
+
+				std::string oldName = name;
+
+				ImGui::InputText("##Name", &eState.animationRenameBuffers[index]);
+
+				if (ImGui::IsItemDeactivatedAfterEdit()) {
+					auto newAnimationName = std::string(eState.animationRenameBuffers[index]);
+					// This runs when the user is done editing,
+					// either by pressing Enter or unfocusing the input field
+					if (newAnimationName != oldName) {
+						auto anim = animator.getAnimation(oldName);
+						animator.removeAnimation(oldName);
+						animator.addAnimation(newAnimationName, anim);
+						break;
+					}
+				}
+
+				ImGui::SameLine();
+
+				// Select animation button
+				if (ImGui::Button("Select")) {
+					animIndex = index;
+					animName = name;
+					showAnimationSelector = true;
+				}
+
+				ImGui::SameLine();
+				ImGui::TextUnformatted(animation.getUID().c_str());
+
+				ImGui::PopID();
+
+				iter++;
+				index++;
 			}
 
-			std::string selectedAnimationUID;
-			displaySelectAnimationWindow(selectedAnimationUID);
-
-			if (!selectedAnimationUID.empty())
-			{
-				animator.m_currentAnimation = Resource<Animation>(selectedAnimationUID);
+			// Show animation selector popup (externally defined)
+			if (showAnimationSelector) {
+				displaySelectAnimationWindow(selectedAnimUID);
+				if (!selectedAnimUID.empty()) {
+					animator.addAnimation(animName, Resource<Animation>(selectedAnimUID));
+					selectedAnimUID.clear();
+					showAnimationSelector = false;
+				}
 			}
 
-			ImGui::SameLine();
-
-			// Text display field
-			ImGui::Text(animator.m_currentAnimation.getUID().c_str());
+			if (ImGui::Button("Add Animation")) {
+				animator.addAnimation("New Animation", Resource<Animation>::empty);
+				eState.animationRenameBuffers.push_back("New Animation");
+			}
+			
 
 			ImGui::DragFloat("playback speed", &animator.m_playbackSpeed);
 			});
@@ -2232,17 +2357,17 @@ void RenderInspectorWindow(float width, float height)
 		{
 			if (ImGui::MenuItem("Transformation"))
 			{
-				selectedEntity.addComponent<Transformation>(selectedEntity);
+				state.getSelectedEntity().addComponent<Transformation>(state.getSelectedEntity());
 			}
 
 			if (ImGui::MenuItem("Physics"))
 			{
-				selectedEntity.addComponent<PhysicsComponent>();
+				state.getSelectedEntity().addComponent<PhysicsComponent>();
 			}
 
 			if (ImGui::MenuItem("Player Controller"))
 			{
-				selectedEntity.addComponent<PlayerController>();
+				state.getSelectedEntity().addComponent<PlayerController>();
 			}
 
 			//if (ImGui::MenuItem("Collision Box"))
@@ -2274,22 +2399,22 @@ void RenderInspectorWindow(float width, float height)
 
 			if (ImGui::MenuItem("Mesh"))
 			{
-				selectedEntity.addComponent<MeshComponent>();
+				state.getSelectedEntity().addComponent<MeshComponent>();
 			}
 
 			if (ImGui::MenuItem("Camera"))
 			{
-				selectedEntity.addComponent<CameraComponent>();
+				state.getSelectedEntity().addComponent<CameraComponent>();
 			}
 
 			if (ImGui::MenuItem("Script"))
 			{
-				selectedEntity.addComponent<NativeScriptComponent>();
+				state.getSelectedEntity().addComponent<NativeScriptComponent>();
 			}
 
 			if (ImGui::MenuItem("InstanceBatch"))
 			{
-				auto meshComponent = selectedEntity.tryGetComponent<MeshComponent>();
+				auto meshComponent = state.getSelectedEntity().tryGetComponent<MeshComponent>();
 				if (meshComponent)
 				{
 					throw std::runtime_error("Not implemented");
@@ -2300,34 +2425,34 @@ void RenderInspectorWindow(float width, float height)
 
 			if (ImGui::MenuItem("Image"))
 			{
-				auto& img = selectedEntity.addComponent<ImageComponent>(Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1));
+				auto& img = state.getSelectedEntity().addComponent<ImageComponent>(Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1));
 				img.size = { 50, 50 };
 			}
 
 			if (ImGui::MenuItem("Animator"))
 			{
-				auto& animator = selectedEntity.addComponent<Animator>();
+				auto& animator = state.getSelectedEntity().addComponent<Animator>();
 			}
 
 			if (ImGui::MenuItem("Terrain"))
 			{
-				auto& terrain = selectedEntity.addComponent<Terrain>();
+				auto& terrain = state.getSelectedEntity().addComponent<Terrain>();
 			}
 
 			if (ImGui::MenuItem("Skybox"))
 			{
-				auto& skybox = selectedEntity.addComponent<SkyboxComponent>();
+				auto& skybox = state.getSelectedEntity().addComponent<SkyboxComponent>();
 			}
 
 			if (ImGui::MenuItem("Shader"))
 			{
-				auto& shader = selectedEntity.addComponent<ShaderComponent>();
+				auto& shader = state.getSelectedEntity().addComponent<ShaderComponent>();
 			}
 
 			//Todo REMOVE
 			if (ImGui::MenuItem("TestComponent"))
 			{
-				auto& testComp = selectedEntity.addComponent<TestComp>();
+				auto& testComp = state.getSelectedEntity().addComponent<TestComp>();
 			}
 
 			ImGui::EndPopup();
@@ -2594,7 +2719,7 @@ class GUI_Helper : public GuiMenu {
 						if (lTheSelectFolderName)
 						{
 							Engine::get()->loadProject(lTheSelectFolderName);
-							selectedEntity = Entity::EmptyEntity;
+							state.selectEntity(Entity::EmptyEntity);
 							updateScene();
 						}
 					}
