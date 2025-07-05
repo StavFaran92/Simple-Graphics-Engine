@@ -44,6 +44,7 @@ void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::v
 
 void Animator::playAnimation(Resource<Animation> animation)
 {
+	// TODO remove maybe, there is a bug here due to name not being set
 	m_currentAnimation = animation;
 	m_currentTime = 0.f;
 }
@@ -73,6 +74,7 @@ void Animator::playAnimation(const std::string& name)
 	if (!anim.isEmpty())
 	{
 		playAnimation(anim);
+		m_currentAnimationName = name;
 	}
 }
 

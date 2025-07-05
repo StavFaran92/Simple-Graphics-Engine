@@ -23,12 +23,14 @@ public:
 	void playAnimation(const std::string& name);
 	Resource<Animation> getAnimation(const std::string& name);
 	const std::map<std::string, Resource<Animation>>& getAllAnimations() const;
+	std::string getCurrentAnimationName() const;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
 		archive(m_currentAnimation, m_playbackSpeed, m_animations);
 	}
 
+	std::string m_currentAnimationName;
 	Resource<Animation> m_currentAnimation;
 	float m_currentTime = 0.f;
 	std::unordered_map<std::string, glm::mat4> m_finalBoneMatrices;

@@ -17,7 +17,7 @@ public:
 		m_camera = Engine::get()->getContext()->getActiveScene()->getEntityByName("Main Camera");
 		m_movementSpeed = 30.f;
 		m_cameraTransform = &m_camera.getComponent<Transformation>();
-		//m_animator = &entity.getComponent<Animator>();
+		m_animator = &entity.getComponent<Animator>();
 
 		auto eventSystem = Engine::get()->getEventSystem();
 		eventHandler = eventSystem->bindToLayer("GameLayer");
@@ -99,7 +99,18 @@ public:
 		if (glm::length(m_movementH + m_movementV) > 0.1f)
 		{
 			m_animationState = "Run";
-			//m_animator->playAnimation();
+			if (m_animator->m_currentAnimationName != m_animationState)
+			{
+				m_animator->playAnimation(m_animationState);
+			}
+		}
+		else
+		{
+			m_animationState = "Idle";
+			if (m_animator->m_currentAnimationName != m_animationState)
+			{
+				m_animator->playAnimation(m_animationState);
+			}
 		}
 
 
