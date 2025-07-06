@@ -1089,11 +1089,19 @@ void displayEntityHelper(Entity& e)
 	auto& transform = e.getComponent<Transformation>();
 	auto& obj = e.getComponent<ObjectComponent>();
 
-	if (ImGui::IsItemClicked())
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 	{
 		state.selectEntity(e);
 		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
 	}
+
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+	{
+		state.selectEntity(e);
+		ImGui::OpenPopup("SceneObjectContextPopup");
+	}
+
+	
 
 	if (state.getSelectedEntity() == e)
 	{
@@ -1135,7 +1143,7 @@ void displayEntityHelper(Entity& e)
 			}
 		}
 
-		if (ImGui::BeginPopupContextItem("SceneObjectContextPopup"))
+		if (ImGui::BeginPopup("SceneObjectContextPopup"))
 		{
 			if (ImGui::MenuItem("Rename"))
 			{
