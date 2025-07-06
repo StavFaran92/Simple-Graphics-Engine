@@ -1089,6 +1089,12 @@ void displayEntityHelper(Entity& e)
 	auto& transform = e.getComponent<Transformation>();
 	auto& obj = e.getComponent<ObjectComponent>();
 
+	if (ImGui::IsItemClicked())
+	{
+		state.selectEntity(e);
+		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
+	}
+
 	if (state.getSelectedEntity() == e)
 	{
 		if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
@@ -1192,17 +1198,12 @@ void displayEntity(Entity& e)
 
 	if (hasChildren)
 	{
-		if (ImGui::TreeNodeEx((obj.name).c_str()))
+		bool isOpen = ImGui::TreeNodeEx((obj.name).c_str());
+
+		displayEntityHelper(e);
+
+		if (isOpen)
 		{
-
-			if (ImGui::IsItemClicked())
-			{
-				state.selectEntity(e);
-				Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
-			}
-
-			displayEntityHelper(e);
-
 			//ImGui::TreePush(obj.name.c_str());
 			auto childrens = transform.getChildren();
 			auto childIter = childrens.begin();
@@ -1214,21 +1215,10 @@ void displayEntity(Entity& e)
 			//ImGui::TreePop();
 			ImGui::TreePop();
 		}
-		//else
-		//{
-		//	displayentityName(e);
-		//}
 	}
 	else
 	{
 		ImGui::TreeNodeEx((obj.name).c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen);
-
-		if (ImGui::IsItemClicked())
-		{
-			state.selectEntity(e);
-			Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
-		}
-
 		displayEntityHelper(e);
 	}
 
