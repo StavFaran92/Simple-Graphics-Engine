@@ -104,10 +104,11 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 	{
 		// Save asset in resource folder
 		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string savedFilePath = projectDir + "/" + uid + ext;
+		const std::string relativeFilepath = "/" + uid + ext;
+		const std::string savedFilePath = projectDir + relativeFilepath;
 		std::filesystem::copy_file(path, savedFilePath);
 
-		aInfo.filePath = savedFilePath;
+		aInfo.filePath = relativeFilepath;
 
 		Engine::get()->getMemoryManagementSystem()->addAssociation(fullName, uid);
 		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
@@ -190,7 +191,8 @@ void Assets::load()
 		ModelImporter::ModelInfo mInfo;
 		mInfo.mesh = generatedMesh;
 		Engine::get()->getResourceManager()->incRef(uuid);
-		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(asset.filePath, mInfo);
+		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
+		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
 		m_assets[uuid] = asset;
 	}
 
@@ -203,7 +205,8 @@ void Assets::load()
 		Engine::get()->getMemoryPool<Animation>()->add(uuid, animPtr);
 		Resource<Animation> anim(uuid);
 		Engine::get()->getResourceManager()->incRef(uuid);
-		Engine::get()->getSubSystem<AnimationLoader>()->load(asset.filePath, anim);
+		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
+		Engine::get()->getSubSystem<AnimationLoader>()->load(filepath, anim);
 		m_assets[uuid] = asset;
 	}
 
@@ -218,7 +221,8 @@ void Assets::load()
 		Engine::get()->getMemoryPool<Shader>()->add(uuid, shaderPtr);
 		Resource<Shader> shader(uuid);
 		Engine::get()->getResourceManager()->incRef(uuid);
-		Shader::load(shader, asset.filePath, shaderOverride);
+		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
+		Shader::load(shader, filepath, shaderOverride);
 
 		m_assets[uuid] = asset;
 	}

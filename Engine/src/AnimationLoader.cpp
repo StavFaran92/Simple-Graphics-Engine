@@ -127,13 +127,14 @@ Resource<Animation> AnimationLoader::import(const std::string& path, const Anima
 
     auto& projectDir = Engine::get()->getProjectDirectory();
     Assimp::Exporter exporter;
-    const std::string savedFilePath = projectDir + "/" + animation.getUID() + ".dae";
+    const std::string relativeFilepath = "/" + animation.getUID() + ".dae";
+    const std::string savedFilePath = projectDir + "/" + relativeFilepath;
     exporter.Export(scene, "collada", savedFilePath);
 
     AssetInfo aInfo;
     aInfo.uuid = animation.getUID();
     aInfo.aType = AssetType::ANIMATION;
-    aInfo.filePath = savedFilePath;
+    aInfo.filePath = relativeFilepath;
     aInfo.name = settings.name;
     if (aInfo.name.empty())
     {

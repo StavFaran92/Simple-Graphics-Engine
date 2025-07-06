@@ -330,7 +330,8 @@ Resource<Texture> Texture::loadTexture2D(AssetInfo aInfo)
 	// extract texture build data
 	TextureAssetAttributes attributes(aInfo.attributes);
 	extractTextureDataFromAttributes(attributes, textureData);
-	extractTextureDataFromFile(aInfo.filePath, textureData);
+	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	extractTextureDataFromFile(filepath, textureData);
 
 	// Create texture
 	Texture* texture = new Texture();
@@ -363,14 +364,15 @@ void Texture::addTexture2D(const std::string& name, Resource<Texture> texture)
 	texture->m_data.bpp = 3;
 
 	auto& projectDir = Engine::get()->getProjectDirectory();
-	std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
+	const std::string relativeFilepath = "/" + texture.getUID() + ".png";
+	std::string savedFileLocation = projectDir + relativeFilepath;
 	writeTexture2D(savedFileLocation, texture);
 
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::TEXTURE;
 	aInfo.uuid = texture.getUID();
 	aInfo.name = name;
-	aInfo.filePath = savedFileLocation;
+	aInfo.filePath = relativeFilepath;
 	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }
