@@ -1084,42 +1084,10 @@ void displayentityName(const Entity& e)
 	}
 }
 
-void displayEntity(Entity& e)
+void displayEntityHelper(Entity& e)
 {
 	auto& transform = e.getComponent<Transformation>();
 	auto& obj = e.getComponent<ObjectComponent>();
-	bool hasChildren = transform.getChildren().size() > 0;
-
-	if (hasChildren)
-	{
-		if (ImGui::TreeNode("##arrow"))
-		{
-			ImGui::SameLine();
-
-			displayentityName(e);
-
-			ImGui::TreePush("##tree");
-			auto childrens = transform.getChildren();
-			auto childIter = childrens.begin();
-			while (childIter != childrens.end())
-			{
-				displayEntity(childIter->second);
-				childIter++;
-			}
-			ImGui::TreePop();
-			ImGui::TreePop();
-		}
-		else
-		{
-			ImGui::SameLine();
-
-			displayentityName(e);
-		}
-	}
-	else
-	{
-		displayentityName(e);
-	}
 
 	if (state.getSelectedEntity() == e)
 	{
@@ -1178,9 +1146,9 @@ void displayEntity(Entity& e)
 				}
 			}
 
-			if (ImGui::MenuItem("Set above as parent")) // todo fix this nonsense
+			if (ImGui::MenuItem("Remove from parent")) // todo fix this nonsense
 			{
-				e.getComponent<Transformation>().setParent(sceneObjects[0].e);
+				e.getComponent<Transformation>().removeParent();
 			}
 
 			if (ImGui::MenuItem("Delete"))
@@ -1214,6 +1182,57 @@ void displayEntity(Entity& e)
 		}
 		ImGui::EndDragDropTarget();
 	}
+}
+
+void displayEntity(Entity& e)
+{
+	auto& transform = e.getComponent<Transformation>();
+	auto& obj = e.getComponent<ObjectComponent>();
+	bool hasChildren = transform.getChildren().size() > 0;
+
+	if (hasChildren)
+	{
+		if (ImGui::TreeNodeEx((obj.name).c_str()))
+		{
+
+			if (ImGui::IsItemClicked())
+			{
+				state.selectEntity(e);
+				Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
+			}
+
+			displayEntityHelper(e);
+
+			//ImGui::TreePush(obj.name.c_str());
+			auto childrens = transform.getChildren();
+			auto childIter = childrens.begin();
+			while (childIter != childrens.end())
+			{
+				displayEntity(childIter->second);
+				childIter++;
+			}
+			//ImGui::TreePop();
+			ImGui::TreePop();
+		}
+		//else
+		//{
+		//	displayentityName(e);
+		//}
+	}
+	else
+	{
+		ImGui::TreeNodeEx((obj.name).c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen);
+
+		if (ImGui::IsItemClicked())
+		{
+			state.selectEntity(e);
+			Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
+		}
+
+		displayEntityHelper(e);
+	}
+
+	
 }
 
 void displaySceneObjects()
