@@ -368,37 +368,29 @@ static void addTableRowExt(const std::string& rowName,
 
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
-	glm::vec3& pos = transform.getLocalPosition();
-	glm::vec3& currentRotation = transform.getLocalRotationVec3() * Constants::toDegrees;
-	glm::vec3& scale = transform.getLocalScale();
+	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+	auto& localTransform = transform.getLocalTransformation();
+	ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localTransform), matrixTranslation, matrixRotation, matrixScale);
 
 	BEGIN_IMGUI_TABLE("Transform");
 
-	//TABLE_ROW("Position", ImGui::DragFloat3, glm::value_ptr(pos)) {
-	//	transform.setLocalPosition(pos);
-	//	isChanged = true;
-	//}
-
 	addTableRow("Position", [&](std::string id) {
-		if (ImGui::DragFloat3(id.c_str(), glm::value_ptr(pos))) {
-			transform.setLocalPosition(pos);
+		if (ImGui::DragFloat3(id.c_str(), matrixTranslation, .1f)) {
+			transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
 			isChanged = true;
 		}
 	});
 
 	addTableRow("Rotation", [&](std::string id) {
-		glm::vec3 originalRotation = currentRotation;
-		if (ImGui::DragFloat3(id.c_str(), glm::value_ptr(currentRotation))) {
-			// We use delta rotation to perform all calculations in quaternion space
-			glm::vec3 deltaRotation = currentRotation - originalRotation;
-			transform.rotate(deltaRotation * Constants::toRadians);
+		if (ImGui::DragFloat3(id.c_str(), matrixRotation), .001f, 0.f, 180.f) {
+			transform.setLocalRotation(glm::radians(glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2])));
 			isChanged = true;
 		}
 	});
 
 	addTableRow("Scale", [&](std::string id) {
-		if (ImGui::DragFloat3(id.c_str(), glm::value_ptr(scale))) {
-			transform.setLocalScale(scale);
+		if (ImGui::DragFloat3(id.c_str(), matrixScale, .1f)) {
+			transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
 			isChanged = true;
 		}
 	});
