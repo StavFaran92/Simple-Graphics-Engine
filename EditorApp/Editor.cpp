@@ -1578,7 +1578,7 @@ void RenderViewWindow(float width, float height)
 		{
 			auto& transform = state.getSelectedEntity().getComponent<Transformation>();
 
-			glm::mat4 glmMat = transform.getLocalTransformation();
+			glm::mat4 glmMat = transform.getWorldTransformation();
 			float* matrixPtr = glm::value_ptr(glmMat);
 
 			auto camView = Engine::get()->getContext()->getActiveScene()->getActiveCameraView();
@@ -1611,11 +1611,27 @@ void RenderViewWindow(float width, float height)
 			ImGuizmo::Manipulate(camViewPtr, projectionPtr, operationMode, currentGizmoMode, matrixPtr, NULL, useSnap ? &snapValues[0] : NULL, NULL, NULL);
 
 			float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-			ImGuizmo::DecomposeMatrixToComponents(matrixPtr, matrixTranslation, matrixRotation, matrixScale);
+			
 
-			transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
-			transform.setLocalRotation(glm::vec3(Constants::toRadians * matrixRotation[0], Constants::toRadians * matrixRotation[1], Constants::toRadians * matrixRotation[2]));
-			transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
+			if (transform.getParent().valid())
+			{
+				auto parentWorld = transform.getParent().getComponent<Transformation>().getWorldTransformation();
+				glm::mat4 newLocal = glm::inverse(parentWorld) * glmMat;
+
+				ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(newLocal), matrixTranslation, matrixRotation, matrixScale);
+
+				transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
+				transform.setLocalRotation(glm::vec3(Constants::toRadians* matrixRotation[0], Constants::toRadians* matrixRotation[1], Constants::toRadians* matrixRotation[2]));
+				transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
+			}
+			else
+			{
+				ImGuizmo::DecomposeMatrixToComponents(matrixPtr, matrixTranslation, matrixRotation, matrixScale);
+
+				transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
+				transform.setLocalRotation(glm::vec3(Constants::toRadians * matrixRotation[0], Constants::toRadians * matrixRotation[1], Constants::toRadians * matrixRotation[2]));
+				transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
+			}
 		}
 
 	}

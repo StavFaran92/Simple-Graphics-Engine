@@ -69,6 +69,7 @@ public:
 	void setLocalRotation(glm::quat quat);
 	void setWorldRotation(glm::quat quat);
 	void setLocalScale(glm::vec3 scale);
+	void setWorldScale(glm::vec3 scale);
 
 	glm::mat4 getWorldTransformation() const;
 	glm::vec3 getLocalPosition() const;

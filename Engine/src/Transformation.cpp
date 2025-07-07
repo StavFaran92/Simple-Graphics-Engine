@@ -178,6 +178,21 @@ void Transformation::setLocalScale(glm::vec3 scale)
 	m_isDirty = true;
 }
 
+void Transformation::setWorldScale(glm::vec3 scale)
+{
+	auto parent = m_entity.getParent();
+	if (parent.valid())
+	{
+		auto& parentTransform = parent.getComponent<Transformation>();
+		setLocalScale(scale / parentTransform.getWorldScale());
+	}
+	else
+	{
+		setLocalScale(scale);
+	}
+	m_isDirty = true;
+}
+
 glm::vec3 Transformation::getLocalPosition() const
 {
 	return m_localTranslation;
