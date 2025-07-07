@@ -85,6 +85,8 @@ struct EntityState
 
 	std::vector<std::string> animationRenameBuffers{};
 
+	std::string renameBuffer;
+
 	EntityState(Entity e)
 		: e(e)
 	{
@@ -100,6 +102,12 @@ struct EntityState
 			for (const auto& [name, anim] : animations) {
 				animationRenameBuffers.push_back(name);
 			}
+		}
+
+		if (e.HasComponent<ObjectComponent>())
+		{
+			auto& obj = e.getComponent<ObjectComponent>();
+			renameBuffer = obj.name;
 		}
 		
 
@@ -1089,6 +1097,8 @@ void displayEntityHelper(Entity& e)
 	auto& transform = e.getComponent<Transformation>();
 	auto& obj = e.getComponent<ObjectComponent>();
 
+	
+
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 	{
 		state.selectEntity(e);
@@ -1113,35 +1123,35 @@ void displayEntityHelper(Entity& e)
 			}
 		}
 
-		if (selectedEntityRename)
-		{
-			// Editable text field
-			char buffer[256];
-			strncpy(buffer, obj.name.c_str(), sizeof(buffer));
-			buffer[sizeof(buffer) - 1] = '\0'; // Ensure null termination
+		//if (selectedEntityRename)
+		//{
+		//	// Editable text field
+		//	char buffer[256];
+		//	strncpy(buffer, obj.name.c_str(), sizeof(buffer));
+		//	buffer[sizeof(buffer) - 1] = '\0'; // Ensure null termination
 
-			if (ImGui::InputText("##edit", buffer, IM_ARRAYSIZE(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
-			{
-				bool isValid = true;
-				for (int j = 0; j < sceneObjects.size(); j++)
-				{
-					if (sceneObjects[j].e == e) continue;
+		//	if (ImGui::InputText("##edit", buffer, IM_ARRAYSIZE(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+		//	{
+		//		bool isValid = true;
+		//		for (int j = 0; j < sceneObjects.size(); j++)
+		//		{
+		//			if (sceneObjects[j].e == e) continue;
 
-					if (sceneObjects[j].name == buffer)
-					{
-						logError("Cannot rename to already existing name.");
-						isValid = false;
-					}
-				}
+		//			if (sceneObjects[j].name == buffer)
+		//			{
+		//				logError("Cannot rename to already existing name.");
+		//				isValid = false;
+		//			}
+		//		}
 
-				if (isValid)
-				{
-					obj.name = buffer;
-					updateScene(); // Assuming this updates any necessary scene state
-					selectedEntityRename = false;
-				}
-			}
-		}
+		//		if (isValid)
+		//		{
+		//			obj.name = buffer;
+		//			updateScene(); // Assuming this updates any necessary scene state
+		//			selectedEntityRename = false;
+		//		}
+		//	}
+		//}
 
 		if (ImGui::BeginPopup("SceneObjectContextPopup"))
 		{
@@ -1196,6 +1206,27 @@ void displayEntityHelper(Entity& e)
 		}
 		ImGui::EndDragDropTarget();
 	}
+
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(150.0f);
+	if (selectedEntityRename && state.getSelectedEntity() == e)
+	{
+		ImGui::SetKeyboardFocusHere();
+		std::string& renameText = state.getCurrentEntityState().renameBuffer;
+		ImGui::InputText(("##edit_" + obj.name).c_str(), &renameText);
+
+		if (ImGui::IsItemDeactivated())
+		{
+			obj.name = renameText;
+			updateScene(); // Assuming this updates any necessary scene state
+			selectedEntityRename = false;
+		}
+		//ImGui::InputText("##edit", &yourNameString);
+	}
+	else
+	{
+		ImGui::Text(obj.name.c_str());
+	}
 }
 
 void displayEntity(Entity& e)
@@ -1204,9 +1235,11 @@ void displayEntity(Entity& e)
 	auto& obj = e.getComponent<ObjectComponent>();
 	bool hasChildren = transform.getChildren().size() > 0;
 
+	ImGui::SetNextItemWidth(300.0f);
+
 	if (hasChildren)
 	{
-		bool isOpen = ImGui::TreeNodeEx((obj.name).c_str());
+		bool isOpen = ImGui::TreeNodeEx(("##" + obj.name).c_str(), ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth);
 
 		displayEntityHelper(e);
 
@@ -1226,7 +1259,7 @@ void displayEntity(Entity& e)
 	}
 	else
 	{
-		ImGui::TreeNodeEx((obj.name).c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen);
+		ImGui::TreeNodeEx(("##" + obj.name).c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth);
 		displayEntityHelper(e);
 	}
 
