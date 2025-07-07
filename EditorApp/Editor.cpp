@@ -1213,7 +1213,17 @@ void displayEntityHelper(Entity& e)
 	{
 		ImGui::SetKeyboardFocusHere();
 		std::string& renameText = state.getCurrentEntityState().renameBuffer;
+
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0)); // Fully transparent background
+		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0, 0, 0, 0));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0, 0, 0, 0));
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+
 		ImGui::InputText(("##edit_" + obj.name).c_str(), &renameText);
+
+		ImGui::PopStyleVar();
+		ImGui::PopStyleColor(3); // Pop all three
 
 		if (ImGui::IsItemDeactivated())
 		{
