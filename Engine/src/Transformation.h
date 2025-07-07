@@ -107,6 +107,8 @@ public:
 	void update();
 	void forceUpdate();
 
+	glm::mat4 worldToLocal(const glm::mat4& mat) const;
+
 	std::unordered_map<entity_id, Entity> getChildren();
 
 	template <class Archive>

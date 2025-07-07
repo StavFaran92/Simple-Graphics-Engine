@@ -313,3 +313,16 @@ void Transformation::rotateAroundLerp(glm::vec3 pivot, glm::vec3 axis, float ang
 
 	m_isDirty = true;
 }
+
+glm::mat4 Transformation::worldToLocal(const glm::mat4& mat) const
+{
+	if (getParent().valid())
+	{
+		auto parentWorld = getParent().getComponent<Transformation>().getWorldTransformation();
+		return glm::inverse(parentWorld) * mat;
+	}
+	else
+	{
+		return mat;
+	}
+}

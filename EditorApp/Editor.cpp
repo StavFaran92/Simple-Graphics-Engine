@@ -1235,11 +1235,17 @@ void displayEntity(Entity& e)
 	auto& obj = e.getComponent<ObjectComponent>();
 	bool hasChildren = transform.getChildren().size() > 0;
 
+	static int nonLeafTreeFlags = ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
+	static int leafTreeFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
+
 	ImGui::SetNextItemWidth(300.0f);
 
+	
 	if (hasChildren)
 	{
-		bool isOpen = ImGui::TreeNodeEx(("##" + obj.name).c_str(), ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth);
+		int flags = nonLeafTreeFlags;
+		flags = (state.getSelectedEntity() == e) ? flags | ImGuiTreeNodeFlags_Selected : flags;
+		bool isOpen = ImGui::TreeNodeEx(("##" + obj.name).c_str(), flags);
 
 		displayEntityHelper(e);
 
@@ -1259,7 +1265,9 @@ void displayEntity(Entity& e)
 	}
 	else
 	{
-		ImGui::TreeNodeEx(("##" + obj.name).c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth);
+		int flags = leafTreeFlags;
+		flags = (state.getSelectedEntity() == e) ? flags | ImGuiTreeNodeFlags_Selected : flags;
+		ImGui::TreeNodeEx(("##" + obj.name).c_str(), flags);
 		displayEntityHelper(e);
 	}
 
@@ -1611,27 +1619,13 @@ void RenderViewWindow(float width, float height)
 			ImGuizmo::Manipulate(camViewPtr, projectionPtr, operationMode, currentGizmoMode, matrixPtr, NULL, useSnap ? &snapValues[0] : NULL, NULL, NULL);
 
 			float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-			
+			auto& localTransform = transform.worldToLocal(glmMat);
 
-			if (transform.getParent().valid())
-			{
-				auto parentWorld = transform.getParent().getComponent<Transformation>().getWorldTransformation();
-				glm::mat4 newLocal = glm::inverse(parentWorld) * glmMat;
+			ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localTransform), matrixTranslation, matrixRotation, matrixScale);
 
-				ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(newLocal), matrixTranslation, matrixRotation, matrixScale);
-
-				transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
-				transform.setLocalRotation(glm::vec3(Constants::toRadians* matrixRotation[0], Constants::toRadians* matrixRotation[1], Constants::toRadians* matrixRotation[2]));
-				transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
-			}
-			else
-			{
-				ImGuizmo::DecomposeMatrixToComponents(matrixPtr, matrixTranslation, matrixRotation, matrixScale);
-
-				transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
-				transform.setLocalRotation(glm::vec3(Constants::toRadians * matrixRotation[0], Constants::toRadians * matrixRotation[1], Constants::toRadians * matrixRotation[2]));
-				transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
-			}
+			transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
+			transform.setLocalRotation(glm::vec3(Constants::toRadians* matrixRotation[0], Constants::toRadians* matrixRotation[1], Constants::toRadians* matrixRotation[2]));
+			transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
 		}
 
 	}
