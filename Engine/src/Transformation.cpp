@@ -3,6 +3,9 @@
 #include "LinearAlgebraUtil.h"
 #include "Logger.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/matrix_decompose.hpp"
+
 glm::mat4 Transformation::getWorldTransformation() const
 {
 	return m_modelMatrix;
@@ -29,16 +32,32 @@ void Transformation::setParent(Entity parent)
 		removeParent();
 	}
 
-	auto& pTransform = parent.getComponent<Transformation>();
-	//m_rootTransformation = glm::inverse(pTransform.getWorldTransformation());
 
-	setLocalPosition(getLocalPosition() - pTransform.getWorldPosition());
-	setLocalRotation(glm::inverse(pTransform.getLocalRotationQuat()) * m_localRotation);
-	setLocalScale(getLocalScale() / pTransform.getWorldScale());
+	// PG(x) = Parent global transform
+	// L(x) = local transform
+	// I take my local mat, transform by parent inverse global mat -> PG(x)-1*L(x)
+	// so after all OPs the render will have PG(x)-1*PG(x)*L(x) = L(x)
+	// i decompose PG(x)-1*L(x) into parts and set each one
+	// for opposite I take L(x) = PG(x)*L(x) to undo my changes.
+
+	auto& pTransform = parent.getComponent<Transformation>();
+	glm::mat4& L = getLocalTransformation();
+	glm::mat4& PG = pTransform.getWorldTransformation();
+
+	glm::mat4& finalMat = glm::inverse(PG) * L;
+
+	glm::vec3 scale, translation, skew;
+	glm::quat rotation;
+	glm::vec4 perspective;
+
+	bool success = glm::decompose(finalMat, scale, rotation, translation, skew, perspective);
+
+	setLocalScale(scale);
+	setLocalRotation(rotation);
+	setLocalPosition(translation);
 
 	m_parent = parent;
 	pTransform.addChild(m_entity);
-	//parent.addChildren(m_entity);
 }
 
 void Transformation::removeParent()
@@ -46,10 +65,24 @@ void Transformation::removeParent()
 	if (m_parent.handlerID() == Entity::EmptyEntity.handlerID())
 		return;
 
-	//m_parent.removeChildren(m_entity);
 	auto& pTransform = m_parent.getComponent<Transformation>();
-	pTransform.removeChild(m_entity);
+	glm::mat4& L = getLocalTransformation();
+	glm::mat4& PG = pTransform.getWorldTransformation();
 
+	glm::mat4& finalMat = PG * L;
+
+	glm::vec3 scale, translation, skew;
+	glm::quat rotation;
+	glm::vec4 perspective;
+
+	bool success = glm::decompose(finalMat, scale, rotation, translation, skew, perspective);
+
+	setLocalScale(scale);
+	setLocalRotation(rotation);
+	setLocalPosition(translation);
+
+	
+	pTransform.removeChild(m_entity);
 	m_parent = Entity::EmptyEntity;
 }
 
