@@ -285,10 +285,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 			auto materialComponent = graphics->entity->tryGetComponent<MaterialComponent>();
 			if (materialComponent)
 			{
-				if (matIndex < materialComponent->count)
-				{
-					graphics->material = materialComponent->at(matIndex).get();
-				}
+
+				graphics->material = materialComponent->at(matIndex).get();
 			}
 
 			// draw model

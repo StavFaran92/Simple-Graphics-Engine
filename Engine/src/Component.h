@@ -345,12 +345,18 @@ struct EngineAPI MaterialComponent : public Component
 
 	std::shared_ptr<Material> at(int index)
 	{
-		return materials.at(index);
+		auto iter = materials.find(index);
+		if (iter == materials.end())
+		{
+			return Engine::get()->getDefaultMaterial();
+		}
+		return iter->second;
 	}
 
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER("materials", materials);
+		SERIALIZED_MEMBER("materialCount", count);
 	}
 
 	std::map<int, std::shared_ptr<Material>> materials;

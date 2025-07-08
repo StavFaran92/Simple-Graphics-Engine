@@ -81,7 +81,7 @@ int Window::init()
 	}
 
 	//Use Vsync
-	if (SDL_GL_SetSwapInterval(1) < 0)
+	if (SDL_GL_SetSwapInterval(1) != 0)
 	{
 		logError("Warning: Unable to set VSync! SDL Error: {}", SDL_GetError());
 		return false;

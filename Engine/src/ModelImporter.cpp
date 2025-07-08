@@ -198,11 +198,11 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 		}
 
 		// TODO I should probably copy the file instead of export (issue with GLTF and bin)
-		std::string savedFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
-		aInfo.filePath = savedFilePath;
+		std::string relativeFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
+		aInfo.filePath = relativeFilePath;
 		aInfo.origFilePath = path;
 
-		loadModelFromFile(savedFilePath, mInfo);
+		loadModelFromFile(Engine::get()->getProjectDirectory() + relativeFilePath, mInfo);
 	}
 	else
 	{
