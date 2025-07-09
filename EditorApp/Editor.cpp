@@ -121,12 +121,12 @@ class EntityStates
 public:
 	void selectEntity(Entity e)
 	{
+		m_selectedEntity = e;
+
 		if (e == Entity::EmptyEntity)
 		{
 			return;
 		}
-
-		m_selectedEntity = e;
 
 		std::shared_ptr<EntityState> eState = std::make_shared<EntityState>(e);
 		eState->update();
