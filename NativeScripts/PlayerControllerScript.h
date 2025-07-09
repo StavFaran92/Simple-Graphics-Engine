@@ -17,7 +17,9 @@ public:
 		m_camera = Engine::get()->getContext()->getActiveScene()->getEntityByName("Main Camera");
 		m_movementSpeed = 30.f;
 		m_cameraTransform = &m_camera.getComponent<Transformation>();
-		m_animator = &entity.getComponent<Animator>();
+		m_animator = &entity.getComponentInChildren<Animator>();
+		cameraPivot = entity.getChildByName("CameraPivot");
+		meshRoot = entity.getChildByName("MeshRoot");
 
 		auto eventSystem = Engine::get()->getEventSystem();
 		eventHandler = eventSystem->bindToLayer("GameLayer");
@@ -62,6 +64,15 @@ public:
 		glm::vec3 disp = m_movementH + m_movementV + glm::vec3(0, m_velocity.y / 1000.f, 0);
 		pc.move(disp);
 		//rb.move(newPosition);
+
+		glm::vec3 hDir = m_movementH + m_movementV;
+		if (glm::length(hDir) > 0.1)
+		{
+			auto& camComponent = m_camera.getComponent<CameraComponent>();
+			auto angle = -atan2(hDir.z, hDir.x);
+			meshRoot.getComponent<Transformation>().setLocalRotation(glm::vec3(0, angle + Constants::PI/2., 0));
+		}
+
 	}
 
 	void handleMoveInput(float deltaTime)
@@ -168,7 +179,7 @@ public:
 			// Combine the quaternions
 			glm::quat combinedQuat = yawQuat * pitchQuat;
 
-			auto& transform = entity.getComponent<Transformation>();
+			auto& transform = cameraPivot.getComponent<Transformation>();
 			transform.setWorldRotation(combinedQuat);
 		}
 
@@ -211,6 +222,8 @@ private:
 	Transformation* m_cameraTransform = nullptr;
 	Animator* m_animator = nullptr;
 	std::string m_animationState = "Idle";
+	Entity cameraPivot;
+	Entity meshRoot;
 };
 
 CEREAL_REGISTER_TYPE(PlayerControllerScript);

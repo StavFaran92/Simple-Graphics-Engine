@@ -73,3 +73,19 @@ void Entity::setRoot(Entity e)
     auto& transform = getComponent<Transformation>();
     transform.setRoot(e);
 }
+
+Entity Entity::getChildByName(const std::string& name)
+{
+    auto& childrens = getChildren();
+    for(auto& [eid, child] : childrens)
+    {
+        auto& obj = child.getComponent<ObjectComponent>();
+        if (obj.name == name)
+        {
+            return child;
+        }
+    }
+
+    logWarning("Could not find child with name {}", name);
+    return Entity::EmptyEntity;
+}

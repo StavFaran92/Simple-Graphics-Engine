@@ -151,6 +151,33 @@ public:
         throw std::runtime_error("Component not found in tree hierarchy.");
     }
 
+    template<typename T>
+    T& getComponentInChildren(bool includeSelf = true)
+    {
+        assert(valid() && "Invalid entity.");
+        if (includeSelf)
+        {
+            if (HasComponent<T>())
+            {
+                return getComponent<T>();
+            }
+        }
+
+        auto childrens = getChildren();
+        for (auto [id, child] : childrens)
+        {
+            T* comp = child.tryGetComponent<T>();
+            if (comp)
+            {
+                return *comp;
+            }
+        }
+
+        assert(false && "Component not found in tree hierarchy.");
+
+        throw std::runtime_error("Component not found in tree hierarchy.");
+    }
+
     /**
      * @brief Checks if the entity has a specific component
      * @tparam T Type of the component
@@ -192,6 +219,7 @@ public:
     void addChildren(Entity entity);
     void removeChildren(Entity entity);
     std::unordered_map<entity_id, Entity> getChildren();
+    Entity getChildByName(const std::string& name);
 
     Entity getRoot() const;
 
