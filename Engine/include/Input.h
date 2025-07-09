@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/Core.h"
-#include "ui/Keyboard.h"
-#include "ui/Mouse.h"
+#include "Core.h"
+#include "Keyboard.h"
+#include "Mouse.h"
 
 class EngineAPI Input 
 {

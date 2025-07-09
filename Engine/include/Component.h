@@ -4,14 +4,14 @@
 
 #include "core/Core.h"
 
-#include "component/ScriptableEntity.h"
-#include "core/Configurations.h"
-#include "render/RenderView.h"
-#include "geometry/Mesh.h"
+#include "ScriptableEntity.h"
+#include "Configurations.h"
+#include "RenderView.h"
+#include "Mesh.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include "physics/Physics.h"
+#include "Physics.h"
 #include "cereal/types/optional.hpp"
-#include "physics/Colliders.h"
+#include "Colliders.h"
 
 #define SERIALIZED_MEMBER(name, member)	archive(cereal::make_nvp(name, member));
 

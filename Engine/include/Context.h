@@ -2,8 +2,8 @@
 
 #include <map>
 #include <memory>
-#include "core/Core.h"
-#include "memory/Resource.h"
+#include "Core.h"
+#include "Resource.h"
 
 class Model;
 class Shader;

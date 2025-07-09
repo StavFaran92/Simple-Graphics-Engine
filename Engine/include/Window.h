@@ -6,7 +6,7 @@
 #include "SDL2/SDL.h"
 #include "core/Core.h"
 
-#include "core/Configurations.h"
+#include "Configurations.h"
 
 class EngineAPI Window
 {

@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include "glm/glm.hpp"
-#include "component/Component.h"
+#include "Component.h"
 
 class Animation;
 

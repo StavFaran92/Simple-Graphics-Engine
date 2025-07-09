@@ -8,21 +8,21 @@
 #include <iostream>
 #include <fstream>
 
-#include "core/Core.h"
-#include "systems/Logger.h"
+#include "Core.h"
+#include "Logger.h"
 #include <glm/glm.hpp>
 #include "entt/entt.hpp"
 
-#include "component/Component.h"
-#include "component/Transformation.h"
-#include "component/ScriptableEntity.h"
-#include "render/Material.h"
-#include "lights/DirectionalLight.h"
-#include "lights/PointLight.h"
+#include "Component.h"
+#include "Transformation.h"
+#include "ScriptableEntity.h"
+#include "Material.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
 #include "Skybox.h"
-#include "runtime/Context.h"
-#include "animation/Animator.h"
-#include "component/Terrain.h"
+#include "Context.h"
+#include "Animator.h"
+#include "Terrain.h"
 
 class Scene;
 class Entity;

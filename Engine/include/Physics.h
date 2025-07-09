@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-#include "runtime/Entity.h"
+#include "Entity.h"
 
 class EngineAPI Physics
 {

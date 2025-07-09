@@ -3,7 +3,7 @@
 
 #include <string>
 #include "core/Core.h"
-#include "component/Component.h"
+#include "Component.h"
 
 class Shader;
 

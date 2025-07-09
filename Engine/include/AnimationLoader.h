@@ -2,14 +2,14 @@
 
 #include <memory>
 #include "animation/Animation.h"
-#include "memory/Resource.h"
+#include "Resource.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/Exporter.hpp>
 
-#include "core/Core.h"
+#include "Core.h"
 
 class EngineAPI AnimationLoader
 {

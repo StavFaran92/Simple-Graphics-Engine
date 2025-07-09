@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/Core.h"
-#include "core/Registry.h"
+#include "Core.h"
+#include "Registry.h"
 
 using entity_id = entt::id_type;
 struct NativeScriptComponent;
