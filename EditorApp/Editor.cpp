@@ -122,6 +122,7 @@ public:
 	void selectEntity(Entity e)
 	{
 		m_selectedEntity = e;
+		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(m_selectedEntity.handlerID());
 
 		if (e == Entity::EmptyEntity)
 		{
@@ -183,6 +184,7 @@ static void startsimulation()
 	Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
 
 	uiLayer->setEnabled(false);
+	state.selectEntity(Entity::EmptyEntity);
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock();
 
 }
@@ -1080,7 +1082,6 @@ void displayentityName(const Entity& e)
 	if (ImGui::IsItemClicked())
 	{
 		state.selectEntity(e);
-		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
 	}
 }
 
@@ -1094,7 +1095,6 @@ void displayEntityHelper(Entity& e)
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 	{
 		state.selectEntity(e);
-		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(state.getSelectedEntity().handlerID());
 	}
 
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
