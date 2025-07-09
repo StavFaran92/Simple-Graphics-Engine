@@ -1,8 +1,8 @@
-#include "ImguiHandler.h"
+#include "ui/ImguiHandler.h"
 
-#include "Menu.h"
+#include "ui/Menu.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"

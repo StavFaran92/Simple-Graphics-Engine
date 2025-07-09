@@ -1,6 +1,6 @@
-#include "ProjectAssetRegistry.h"
+#include "serialize/ProjectAssetRegistry.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 
 
 

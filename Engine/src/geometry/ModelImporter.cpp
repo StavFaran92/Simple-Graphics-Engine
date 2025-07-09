@@ -6,7 +6,7 @@
 #include <assimp/postprocess.h>
 #include <algorithm>
 
-#include "Logger.h"
+#include "systems/Logger.h"
 #include <filesystem>
 #include "MeshBuilder.h"
 #include "Resource.h"
@@ -14,13 +14,13 @@
 #include "Entity.h"
 #include "Component.h"
 #include "Shader.h"
-#include "Engine.h"
-#include "CacheSystem.h"
+#include "core/Engine.h"
+#include "core/CacheSystem.h"
 #include "Scene.h"
 #include "Assets.h"
-#include "AssimpGLMHelpers.h"
-#include "Factory.h"
-#include "MeshExporter.h"
+#include "utils/AssimpGLMHelpers.h"
+#include "core/Factory.h"
+#include "geometry/MeshExporter.h"
 #include "ShapeFactory.h"
 
 bool findFile(const std::filesystem::path& directory, const std::string& fileName, std::filesystem::path& outputPath)

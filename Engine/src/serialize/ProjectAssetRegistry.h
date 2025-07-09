@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <nlohmann/json.hpp>
-#include "UUID.h"
+#include "memory/UUID.h"
 
 #include "Resource.h"
 #include "Texture.h"

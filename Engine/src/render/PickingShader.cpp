@@ -1,6 +1,6 @@
-#include "PickingShader.h"
+#include "render/PickingShader.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 
 PickingShader::PickingShader() : Shader(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl")
 {

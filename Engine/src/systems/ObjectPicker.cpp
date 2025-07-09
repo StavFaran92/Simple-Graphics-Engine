@@ -2,27 +2,27 @@
 
 #include "GL/glew.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 #include "Context.h"
 #include "Scene.h"
 #include "Window.h"
-#include "FrameBufferObject.h"
-#include "RenderBufferObject.h"
+#include "render/FrameBufferObject.h"
+#include "render/RenderBufferObject.h"
 #include "Resource.h"
 #include "Input.h"
-#include "IRenderer.h"
+#include "render/IRenderer.h"
 #include "ICamera.h"
-#include "PickingShader.h"
+#include "render/PickingShader.h"
 #include "Entity.h"
 #include "Texture.h"
 #include "Shader.h"
 #include "Component.h"
-#include "RenderCommand.h"
+#include "render/RenderCommand.h"
 #include "ShapeFactory.h"
 #include "Transformation.h"
-#include "MeshCollection.h"
+#include "geometry/MeshCollection.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 
 ObjectPicker::ObjectPicker()
 {

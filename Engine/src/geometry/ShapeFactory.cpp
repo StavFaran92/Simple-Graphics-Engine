@@ -1,6 +1,6 @@
 #include "ShapeFactory.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 #include "Context.h"
 #include "Mesh.h"
 #include "Entity.h"
@@ -11,11 +11,11 @@
 #include "Scene.h"
 #include "Transformation.h"
 #include "Shader.h"
-#include "Registry.h"
+#include "core/Registry.h"
 //#include "RenderableComponent.h"
 #include "Component.h"
-#include "CacheSystem.h"
-#include "BuiltInMeshes.h"
+#include "core/CacheSystem.h"
+#include "systems/BuiltInMeshes.h"
 
 Entity ShapeFactory::createEntity(SGE_Regsitry* registry, const std::string& name)
 {

@@ -1,7 +1,7 @@
-#include "MeshSerializer.h"
+#include "geometry/MeshSerializer.h"
 
 #include <fstream>
-#include "Logger.h"
+#include "systems/Logger.h"
 
 #include "Mesh.h"
 

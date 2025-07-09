@@ -1,10 +1,10 @@
 #pragma once
 
-#include "IRenderer.h"
+#include "render/IRenderer.h"
 
-#include "VertexArrayObject.h"
-#include "FrameBufferObject.h"
-#include "RenderBufferObject.h"
+#include "render/VertexArrayObject.h"
+#include "render/FrameBufferObject.h"
+#include "render/RenderBufferObject.h"
 #include "Resource.h"
 #include "Entity.h"
 

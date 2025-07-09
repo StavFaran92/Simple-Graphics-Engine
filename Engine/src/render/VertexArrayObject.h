@@ -1,14 +1,14 @@
 #pragma once
 
 #include <vector>
-#include "Vertex.h"
+#include "render/Vertex.h"
 
-#include "VertexBufferObject.h"
+#include "render/VertexBufferObject.h"
 
-//#include "VertexBufferLayout.h"
-#include "VertexBufferElement.h"
-#include "ElementBufferObject.h"
-#include "VertexLayout.h"
+//#include "render/VertexBufferLayout.h"
+#include "render/VertexBufferElement.h"
+#include "render/ElementBufferObject.h"
+#include "render/VertexLayout.h"
 
 struct VertexLayout;
 

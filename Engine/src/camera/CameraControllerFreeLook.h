@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "ICameraController.h"
+#include "camera/ICameraController.h"
 #include "Component.h"
 #include "Subscriber.h"
 

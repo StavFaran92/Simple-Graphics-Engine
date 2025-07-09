@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RendererIntermediate.h"
+#include "render/RendererIntermediate.h"
 
 class Model;
 class ICamera;

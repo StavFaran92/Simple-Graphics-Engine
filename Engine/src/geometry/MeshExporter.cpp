@@ -1,8 +1,8 @@
-#include "MeshExporter.h"
+#include "geometry/MeshExporter.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 #include "Context.h"
-#include "ProjectAssetRegistry.h"
+#include "serialize/ProjectAssetRegistry.h"
 
 std::string MeshExporter::exportMesh(Resource<MeshCollection> mesh, const aiScene* scene)
 {

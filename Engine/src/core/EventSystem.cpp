@@ -1,6 +1,6 @@
 #include "EventSystem.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 
 void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Subscriber* s)
 {

@@ -1,4 +1,4 @@
-#include "EngineConfig.h"
+#include "core/EngineConfig.h"
 
 #include <fstream>
 #include <nlohmann/json.hpp>

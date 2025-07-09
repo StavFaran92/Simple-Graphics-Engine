@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SDL2/SDL.h"
-#include "Core.h"
+#include "core/Core.h"
 
 #include <vector>
 

@@ -1,9 +1,9 @@
 #include "DebugHelper.h"
 
-#include "VertexArrayObject.h"
-#include "VertexLayout.h"
+#include "render/VertexArrayObject.h"
+#include "render/VertexLayout.h"
 #include "Shader.h"
-#include "Graphics.h"
+#include "render/Graphics.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <GL/glew.h>

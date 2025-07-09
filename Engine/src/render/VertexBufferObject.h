@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "Vertex.h"
+#include "render/Vertex.h"
 
 class VertexBufferObject
 {

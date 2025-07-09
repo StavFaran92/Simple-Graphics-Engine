@@ -6,7 +6,7 @@
 #include <assimp/postprocess.h>
 
 #include "Resource.h"
-#include "MeshCollection.h"
+#include "geometry/MeshCollection.h"
 
 class MeshExporter
 {

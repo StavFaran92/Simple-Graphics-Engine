@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core.h"
+#include "core/Core.h"
 #include "Entity.h"
 #include "Resource.h"
 

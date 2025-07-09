@@ -1,10 +1,10 @@
 #include "Sphere.h"
-#include "ApplicationConstants.h"
+#include "core/ApplicationConstants.h"
 #include "Mesh.h"
 #include "MeshBuilder.h"
-#include "Engine.h"
+#include "core/Engine.h"
 #include "ModelImporter.h"
-#include "Factory.h"
+#include "core/Factory.h"
 #include "Assets.h"
 
 Resource<MeshCollection> Sphere::createMesh(float radius, int sectors, int stacks)

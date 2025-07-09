@@ -1,4 +1,4 @@
-#include "LinearAlgebraUtil.h"
+#include "utils/LinearAlgebraUtil.h"
 
 void calcAverageNormal(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices,
 	unsigned int verticeCount, unsigned int vLength, unsigned int normalOffset)

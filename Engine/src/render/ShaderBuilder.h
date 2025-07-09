@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 
-#include "Core.h"
+#include "core/Core.h"
 #include "Shader.h"
 #include "Component.h"
 

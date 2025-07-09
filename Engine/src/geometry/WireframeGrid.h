@@ -1,7 +1,7 @@
 #pragma once
 
-#include "VertexLayout.h"
-#include "VertexArrayObject.h"
+#include "render/VertexLayout.h"
+#include "render/VertexArrayObject.h"
 #include "Shader.h"
 #include "Resource.h"
 

@@ -1,6 +1,6 @@
-#include "Graphics.h"
+#include "render/Graphics.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 
 Graphics::Graphics()
 {

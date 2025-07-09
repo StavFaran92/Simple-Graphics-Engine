@@ -1,4 +1,4 @@
-#include "TextureArray.h"
+#include "texture/TextureArray.h"
 
 #include <GL/glew.h>
 #include "stb_image.h"

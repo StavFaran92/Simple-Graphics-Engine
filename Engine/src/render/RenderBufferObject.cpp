@@ -1,4 +1,4 @@
-#include "RenderBufferObject.h"
+#include "render/RenderBufferObject.h"
 
 #include "GL/glew.h"
 

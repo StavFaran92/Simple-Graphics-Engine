@@ -3,21 +3,21 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "Skybox.h"
-#include "SkyboxRenderer.h"
+#include "render/SkyboxRenderer.h"
 #include "ICamera.h"
-#include "PhongShader.h"
-#include "PickingShader.h"
+#include "render/PhongShader.h"
+#include "render/PickingShader.h"
 #include "Shader.h"
 
 #include "Scene.h"
-#include "Engine.h"
+#include "core/Engine.h"
 
-#include "Logger.h"
-#include "Engine.h"
+#include "systems/Logger.h"
+#include "core/Engine.h"
 #include "Texture.h"
 #include "Material.h"
-#include "ProjectAssetRegistry.h"
-#include "Graphics.h"
+#include "serialize/ProjectAssetRegistry.h"
+#include "render/Graphics.h"
 
 Context::Context(const std::shared_ptr<ProjectAssetRegistry>& par)
 {

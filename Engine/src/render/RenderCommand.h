@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "VertexArrayObject.h"
-#include "Core.h"
+#include "render/VertexArrayObject.h"
+#include "core/Core.h"
 
 #include "gl/glew.h"
 

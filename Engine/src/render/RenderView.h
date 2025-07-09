@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Entity.h"
-#include "FrameBufferObject.h"
-#include "RenderBufferObject.h"
+#include "render/FrameBufferObject.h"
+#include "render/RenderBufferObject.h"
 #include "Texture.h"
 #include "Resource.h"
 

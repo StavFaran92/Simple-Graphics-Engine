@@ -5,10 +5,10 @@
 #include <functional>
 template<class T>  class Resource;
 
-#include "MemoryPool.h"
-#include "ProjectAssetRegistry.h"
+#include "memory/MemoryPool.h"
+#include "serialize/ProjectAssetRegistry.h"
 #include "Context.h"
-#include "Engine.h"
+#include "core/Engine.h"
 #include "ResourceManager.h"
 
 class Texture;

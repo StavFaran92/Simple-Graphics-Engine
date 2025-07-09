@@ -1,12 +1,12 @@
-#include "RendererIntermediate.h"
+#include "render/RendererIntermediate.h"
 
 #include <GL/glew.h>
 
-#include "Engine.h"
+#include "core/Engine.h"
 #include "Window.h"
-#include "Logger.h"
-#include "ScreenQuad.h"
-#include "Renderer2D.h"
+#include "systems/Logger.h"
+#include "render/ScreenQuad.h"
+#include "render/Renderer2D.h"
 
 void RendererIntermediate::draw(const VertexArrayObject& vao) const
 {

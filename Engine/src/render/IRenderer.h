@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "glm/glm.hpp"
-#include "Core.h"
+#include "core/Core.h"
 #include <entt/entt.hpp>
 #include "Resource.h"
 

@@ -1,4 +1,4 @@
-#include "Bone.h"
+#include "animation/Bone.h"
 
 template<typename T>
 int getDescreteIndex(const std::vector<T>& list, float animationTime)

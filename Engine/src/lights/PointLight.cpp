@@ -1,7 +1,7 @@
 #include "PointLight.h"
 
 #include "Shader.h"
-#include "Logger.h"
+#include "systems/Logger.h"
 #include "Transformation.h"
 
 PointLight::PointLight(glm::vec3 color, float aIntensity, float dIntensity, Attenuation attenuation)

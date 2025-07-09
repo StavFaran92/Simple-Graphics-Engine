@@ -1,8 +1,8 @@
-#include "RenderCommand.h"
-#include "Engine.h"
+#include "render/RenderCommand.h"
+#include "core/Engine.h"
 #include "System.h"
-#include "Graphics.h"
-#include "RenderView.h"
+#include "render/Graphics.h"
+#include "render/RenderView.h"
 
 #include <GL/glew.h>
 

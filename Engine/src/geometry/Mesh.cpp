@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
 #include "MeshBuilder.h"
-#include "Logger.h"
+#include "systems/Logger.h"
 
 #include <GL\glew.h>
 

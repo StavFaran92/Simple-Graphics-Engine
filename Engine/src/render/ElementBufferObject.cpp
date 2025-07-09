@@ -1,8 +1,8 @@
-#include "ElementBufferObject.h"
+#include "render/ElementBufferObject.h"
 
 #include <GL/glew.h>
 
-#include "Logger.h"
+#include "systems/Logger.h"
 
 ElementBufferObject::ElementBufferObject(unsigned int* data, unsigned int length)
 	:m_length(length)

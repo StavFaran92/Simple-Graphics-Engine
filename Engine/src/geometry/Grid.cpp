@@ -1,8 +1,8 @@
-#include "Grid.h"
+#include "geometry/Grid.h"
 
-#include "Factory.h"
+#include "core/Factory.h"
 #include "MeshBuilder.h"
-#include "MeshExporter.h"
+#include "geometry/MeshExporter.h"
 #include "Assets.h"
 
 aiScene* generateScene(const std::vector<float>& vertices, const std::vector<unsigned int>& indices)

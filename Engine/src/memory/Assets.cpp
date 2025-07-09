@@ -4,12 +4,12 @@
 
 
 #include "Texture.h"
-#include "Animation.h"
+#include "animation/Animation.h"
 #include "AnimationLoader.h"
-#include "CacheSystem.h"
+#include "core/CacheSystem.h"
 #include "ModelImporter.h"
-#include "Factory.h"
-#include "ShaderBuilder.h"
+#include "core/Factory.h"
+#include "render/ShaderBuilder.h"
 
 #include <filesystem>
 

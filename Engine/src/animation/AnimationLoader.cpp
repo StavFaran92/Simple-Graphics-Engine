@@ -1,10 +1,10 @@
 #include "AnimationLoader.h"
 
-#include "AssimpGLMHelpers.h"
-#include "Factory.h"
+#include "utils/AssimpGLMHelpers.h"
+#include "core/Factory.h"
 #include "Context.h"
-#include "ProjectAssetRegistry.h"
-#include "Bone.h"
+#include "serialize/ProjectAssetRegistry.h"
+#include "animation/Bone.h"
 #include "Assets.h"
 #include <filesystem>
 

@@ -1,4 +1,4 @@
-#include "MeshCollection.h"
+#include "geometry/MeshCollection.h"
 
 void MeshCollection::addMesh(const std::shared_ptr<Mesh>& mesh)
 {

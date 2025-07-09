@@ -1,9 +1,9 @@
 #include "Material.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 #include <GL\glew.h>
 
-#include "Engine.h"
+#include "core/Engine.h"
 #include "Context.h"
 #include "CommonTextures.h"
 

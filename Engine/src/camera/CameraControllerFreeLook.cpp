@@ -1,8 +1,8 @@
-#include "CameraControllerFreeLook.h"
+#include "camera/CameraControllerFreeLook.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 #include "EventSystem.h"
-#include "ApplicationConstants.h"
+#include "core/ApplicationConstants.h"
 #include "Transformation.h"
 #include "System.h"
 #include "Input.h"

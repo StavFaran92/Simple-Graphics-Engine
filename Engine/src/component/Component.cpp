@@ -1,13 +1,13 @@
 #include "Component.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 #include "Context.h"
 #include "Material.h"
 #include "Transformation.h"
 #include "CommonTextures.h"
-#include "EquirectangularToCubemapConverter.h"
+#include "utils/EquirectangularToCubemapConverter.h"
 #include "Scene.h"
-#include "IBL.h"
+#include "render/IBL.h"
 #include <GL/glew.h>
 
 MaterialComponent::MaterialComponent()

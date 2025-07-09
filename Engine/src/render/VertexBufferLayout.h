@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "VertexBufferElement.h"
+#include "render/VertexBufferElement.h"
 #include <GL/glew.h>
 
 class VertexBufferLayout

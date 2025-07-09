@@ -1,6 +1,6 @@
-#include "Animation.h"
+#include "animation/Animation.h"
 
-#include "Bone.h"
+#include "animation/Bone.h"
 
 Animation::Animation()
 {

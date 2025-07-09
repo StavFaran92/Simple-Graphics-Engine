@@ -1,12 +1,12 @@
-#include "Renderer2D.h"
+#include "render/Renderer2D.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 #include <GL/glew.h>
 
-#include "VertexArrayObject.h"
+#include "render/VertexArrayObject.h"
 #include "ICamera.h"
 #include "Mesh.h"
-#include "Graphics.h"
+#include "render/Graphics.h"
 
 void Renderer2D::render()
 {

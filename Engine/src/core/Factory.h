@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UUID.h"
+#include "memory/UUID.h"
 #include "ResourceManager.h"
 
 template<typename T> class Resource;

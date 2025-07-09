@@ -1,10 +1,10 @@
 #include "CommonTextures.h"
 
 #include "Assets.h"
-#include "Cubemap.h"
+#include "texture/Cubemap.h"
 #include "Context.h"
-#include "ProjectAssetRegistry.h"
-#include "CacheSystem.h"
+#include "serialize/ProjectAssetRegistry.h"
+#include "core/CacheSystem.h"
 #include <gl/glew.h>
 
 CommonTextures::CommonTextures()

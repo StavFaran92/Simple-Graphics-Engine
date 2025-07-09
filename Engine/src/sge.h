@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Core.h"
-#include "Application.h"
+#include "core/Core.h"
+#include "core/Application.h"
 
 #ifndef TESTBED
-//#include "EntryPoint.h"
+//#include "core/EntryPoint.h"
 #endif
 
 //external
 #ifdef GUI
-#include "ImguiHandler.h"
+#include "ui/ImguiHandler.h"
 #include "imgui.h"
 #endif
 
@@ -33,7 +33,6 @@
 #include "Mouse.h"
 #include "EventSystem.h"
 #include "Quad.h"
-#include "Renderer.h"
 #include "Box.h"
 #include "Sphere.h"
 #include "Configurations.h"
@@ -41,15 +40,12 @@
 #include "ModelImporter.h"
 #include "Resource.h"
 #include "GuiMenu.h"
-#include "Shader.h"
 #include "Entity.h"
 #include "ShapeFactory.h"
 #include "Component.h"
 #include "Random.h"
 #include "TimeManager.h"
-#include "ShaderBuilder.h"
 #include "CommonTextures.h"
-#include "RenderCommand.h"
 #include "ResourceManager.h"
 #include "ObjectPicker.h"
 #include "Physics.h"

@@ -1,4 +1,4 @@
-#include "SkyboxRenderer.h"
+#include "render/SkyboxRenderer.h"
 #include "Shader.h"
 #include "ICamera.h"
 #include "Entity.h"
@@ -9,7 +9,7 @@
 #include "Material.h"
 #include <GL/glew.h>
 #include "Component.h"
-#include "Engine.h"
+#include "core/Engine.h"
 
 void SkyboxRenderer::render()
 {

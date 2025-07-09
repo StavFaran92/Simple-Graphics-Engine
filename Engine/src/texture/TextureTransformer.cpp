@@ -1,18 +1,18 @@
-#include "TextureTransformer.h"
+#include "texture/TextureTransformer.h"
 
 #include "Resource.h"
 #include "Texture.h"
 #include "Shader.h"
-#include "FrameBufferObject.h"
-#include "RenderBufferObject.h"
+#include "render/FrameBufferObject.h"
+#include "render/RenderBufferObject.h"
 #include "ShapeFactory.h"
-#include "Engine.h"
+#include "core/Engine.h"
 #include "Context.h"
 #include "Entity.h"
 #include "Component.h"
-#include "RenderCommand.h"
+#include "render/RenderCommand.h"
 #include <GL/glew.h>
-#include "MeshCollection.h"
+#include "geometry/MeshCollection.h"
 
 Resource<Texture> TextureTransformer::flipVertical(Resource<Texture> srcTexture)
 {

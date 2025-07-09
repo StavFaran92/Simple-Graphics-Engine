@@ -2,8 +2,8 @@
 
 #include <GL/glew.h>
 
-#include "Vertex.h"
-#include "Renderer.h"
+#include "render/Vertex.h"
+#include "render/Renderer.h"
 #include "Mesh.h"
 #include "Box.h"
 #include "Resource.h"
@@ -13,15 +13,15 @@
 #include "Component.h"
 #include "Context.h"
 #include "Assets.h"
-#include "Engine.h"
+#include "core/Engine.h"
 #include "Scene.h"
-#include "Cubemap.h"
-#include "CacheSystem.h"
+#include "texture/Cubemap.h"
+#include "core/CacheSystem.h"
 
-#include "cube.h"
-#include "EquirectangularToCubemapConverter.h"
-#include "TextureTransformer.h"
-#include "IBL.h"
+#include "geometry/cube.h"
+#include "utils/EquirectangularToCubemapConverter.h"
+#include "texture/TextureTransformer.h"
+#include "render/IBL.h"
 
 Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
 {

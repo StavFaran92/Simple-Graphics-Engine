@@ -2,8 +2,8 @@
 
 #include "Mesh.h"
 #include "MeshBuilder.h"
-#include "VertexLayout.h"
-#include "Engine.h"
+#include "render/VertexLayout.h"
+#include "core/Engine.h"
 #include "ModelImporter.h"
 
 static const float vertices[] = {

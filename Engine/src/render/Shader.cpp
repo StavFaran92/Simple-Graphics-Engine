@@ -6,13 +6,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
 
-#include "Utils.h"
-#include "Logger.h"
-#include "ShaderLoader.h"
-#include "Engine.h"
+#include "utils/Utils.h"
+#include "systems/Logger.h"
+#include "render/ShaderLoader.h"
+#include "core/Engine.h"
 #include "Texture.h"
 #include "Resource.h"
-#include "Factory.h"
+#include "core/Factory.h"
 #include "Assets.h"
 #include "CommonTextures.h"
 

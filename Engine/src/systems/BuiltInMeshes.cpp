@@ -1,9 +1,9 @@
-#include "BuiltInMeshes.h"
+#include "systems/BuiltInMeshes.h"
 
 #include "Quad.h"
 #include "Box.h"
 #include "Sphere.h"
-#include "Grid.h"
+#include "geometry/Grid.h"
 
 #include "Assets.h"
 #include "ModelImporter.h"

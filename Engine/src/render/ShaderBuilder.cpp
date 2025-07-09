@@ -1,13 +1,13 @@
-#include "ShaderBuilder.h"
+#include "render/ShaderBuilder.h"
 
 #include <sstream>
 
-#include "Engine.h"
-#include "ShaderLoader.h"
+#include "core/Engine.h"
+#include "render/ShaderLoader.h"
 
-#include "Utils.h"
+#include "utils/Utils.h"
 #include "CommonTextures.h"
-#include "Factory.h"
+#include "core/Factory.h"
 
 #include "Assets.h"
 

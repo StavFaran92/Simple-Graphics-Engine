@@ -1,6 +1,6 @@
-#include "IRenderer.h"
+#include "render/IRenderer.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 #include <GL/glew.h>
 
 void IRenderer::SetDrawType(DrawType drawType)

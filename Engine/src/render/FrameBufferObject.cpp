@@ -1,7 +1,7 @@
-#include "FrameBufferObject.h"
+#include "render/FrameBufferObject.h"
 
 #include "GL/glew.h"
-#include "Logger.h"
+#include "systems/Logger.h"
 
 #define VALIDATE_BIND if (s_boundFBO != m_id) { logWarning("Frame buffer object is currently not bound"); }
 

@@ -1,7 +1,7 @@
-#include "ScreenQuad.h"
+#include "render/ScreenQuad.h"
 
-#include "Vertex.h"
-#include "Renderer.h"
+#include "render/Vertex.h"
+#include "render/Renderer.h"
 #include "Mesh.h"
 #include "Quad.h"
 #include "ShapeFactory.h"

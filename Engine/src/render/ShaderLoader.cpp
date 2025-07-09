@@ -1,6 +1,6 @@
-#include "ShaderLoader.h"
-#include "Utils.h"
-#include "Logger.h"
+#include "render/ShaderLoader.h"
+#include "utils/Utils.h"
+#include "systems/Logger.h"
 #include <map>
 
 enum class ShaderType

@@ -4,8 +4,8 @@
 #include "SDL2/SDL.h"
 
 
-#include "Logger.h"
-#include "Engine.h"
+#include "systems/Logger.h"
+#include "core/Engine.h"
 
 Window::Window()
 {

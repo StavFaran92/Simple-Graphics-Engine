@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "Core.h"
+#include "core/Core.h"
 #include "SDL2/SDL_scancode.h"
 
 class Model;

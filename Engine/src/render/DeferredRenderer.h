@@ -1,9 +1,9 @@
 #pragma once
 
-#include "RendererIntermediate.h"
+#include "render/RendererIntermediate.h"
 
-#include "FrameBufferObject.h"
-#include "RenderBufferObject.h"
+#include "render/FrameBufferObject.h"
+#include "render/RenderBufferObject.h"
 #include "Resource.h"
 #include "Entity.h"
 #include "Window.h"

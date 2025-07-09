@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IShaderParser.h"
+#include "render/IShaderParser.h"
 
 class ShaderParser_tntmeijs : public IShaderParser
 {

@@ -1,5 +1,5 @@
-#include "Cubemap.h"
-#include "ApplicationConstants.h"
+#include "texture/Cubemap.h"
+#include "core/ApplicationConstants.h"
 
 #include <GL/glew.h>
 
@@ -9,19 +9,19 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 #include "Configurations.h"
-#include "CacheSystem.h"
-#include "Engine.h"
+#include "core/CacheSystem.h"
+#include "core/Engine.h"
 #include "Resource.h"
 #include "Assets.h"
-#include "Factory.h"
+#include "core/Factory.h"
 #include "Context.h"
-#include "ProjectAssetRegistry.h"
+#include "serialize/ProjectAssetRegistry.h"
 
 #include "Texture.h" 
 
-#include "EquirectangularToCubemapConverter.h"
+#include "utils/EquirectangularToCubemapConverter.h"
 
 Resource<Texture> Cubemap::createCubemapFromCubemapFiles(const std::vector<std::string>& faces)
 {

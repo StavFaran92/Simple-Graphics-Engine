@@ -1,6 +1,6 @@
-#include "CommonShaders.h"
+#include "render/CommonShaders.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 
 CommonShaders::CommonShaders()
 {

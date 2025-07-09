@@ -1,17 +1,17 @@
 #include "Texture.h"
-#include "ApplicationConstants.h"
+#include "core/ApplicationConstants.h"
 
 #include <GL/glew.h>
 
-#include "Logger.h"
+#include "systems/Logger.h"
 #include "Configurations.h"
-#include "CacheSystem.h"
-#include "Engine.h"
+#include "core/CacheSystem.h"
+#include "core/Engine.h"
 #include "Resource.h"
-#include "Factory.h"
+#include "core/Factory.h"
 #include "Context.h"
 
-#include "EquirectangularToCubemapConverter.h" // todo remove
+#include "utils/EquirectangularToCubemapConverter.h" // todo remove
 
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"

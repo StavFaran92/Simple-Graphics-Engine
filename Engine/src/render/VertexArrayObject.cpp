@@ -1,9 +1,9 @@
-#include "VertexArrayObject.h"
+#include "render/VertexArrayObject.h"
 
 #include <gl/glew.h>
 
-#include "Logger.h"
-#include "VertexLayout.h"
+#include "systems/Logger.h"
+#include "render/VertexLayout.h"
 
 VertexArrayObject::VertexArrayObject()
 	: m_layout()

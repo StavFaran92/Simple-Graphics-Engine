@@ -1,16 +1,16 @@
-#include "PhysicsSystem.h"
+#include "physics/PhysicsSystem.h"
 
-#include "Logger.h"
+#include "systems/Logger.h"
 
-#include "PhysXUtils.h"
+#include "physics/PhysXUtils.h"
 #include "Component.h"
 #include "Physics.h"
 #include "Scene.h"
-#include "Registry.h"
+#include "core/Registry.h"
 #include "GL//glew.h"
-#include "Graphics.h"
-#include "RenderCommand.h"
-#include "BuiltInMeshes.h"
+#include "render/Graphics.h"
+#include "render/RenderCommand.h"
+#include "systems/BuiltInMeshes.h"
 #include <glm/gtx/quaternion.hpp>
 
 using namespace physx;
