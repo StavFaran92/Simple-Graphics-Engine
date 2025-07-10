@@ -8,7 +8,7 @@
 
 #include "Logger.h"
 #include <filesystem>
-#include "MeshBuilder.h"
+#include "geometry/MeshBuilder.h"
 #include "Resource.h"
 #include "Material.h"
 #include "Entity.h"

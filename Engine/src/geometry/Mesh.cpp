@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-#include "MeshBuilder.h"
+#include "geometry/MeshBuilder.h"
 #include "Logger.h"
 #include "render/VertexArrayObject.h"
 

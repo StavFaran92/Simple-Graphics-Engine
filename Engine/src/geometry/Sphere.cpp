@@ -1,7 +1,7 @@
 #include "Sphere.h"
 #include "ApplicationConstants.h"
 #include "Mesh.h"
-#include "MeshBuilder.h"
+#include "geometry/MeshBuilder.h"
 #include "Engine.h"
 #include "ModelImporter.h"
 #include "core/Factory.h"

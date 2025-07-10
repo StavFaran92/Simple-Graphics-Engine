@@ -9,7 +9,6 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "Entity.h"
-#include "MeshBuilder.h"
 #include "Material.h"
 #include "MeshCollection.h"
 

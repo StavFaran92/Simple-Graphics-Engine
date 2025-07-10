@@ -10,7 +10,7 @@
 #include "Mesh.h"
 #include "VertexLayout.h"
 
-class EngineAPI MeshBuilder
+class MeshBuilder
 {
 public:
 	MeshBuilder();

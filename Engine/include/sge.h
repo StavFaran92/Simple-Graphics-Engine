@@ -36,7 +36,6 @@
 #include "Box.h"
 #include "Sphere.h"
 #include "Configurations.h"
-#include "MeshBuilder.h"
 #include "ModelImporter.h"
 #include "Resource.h"
 #include "GuiMenu.h"

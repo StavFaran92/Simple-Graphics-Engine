@@ -1,7 +1,7 @@
 #include "Quad.h"
 
 #include "Mesh.h"
-#include "MeshBuilder.h"
+#include "geometry/MeshBuilder.h"
 #include "VertexLayout.h"
 #include "ModelImporter.h"
 #include "Context.h"

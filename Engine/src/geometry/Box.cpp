@@ -1,7 +1,7 @@
 #include "Box.h"
 
 #include "Mesh.h"
-#include "MeshBuilder.h"
+#include "geometry/MeshBuilder.h"
 #include "VertexLayout.h"
 #include "Engine.h"
 #include "ModelImporter.h"

@@ -3,7 +3,7 @@
 #include "Core.h"
 #include "Resource.h"
 
-class Mesh;
+#include "MeshCollection.h"
 
 class EngineAPI Box
 {

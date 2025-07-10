@@ -1,8 +1,8 @@
 #pragma once
-#include "Core.h"
-#include "Mesh.h"
 
-class MeshBuilder;
+#include "Core.h"
+
+#include "MeshCollection.h"
 
 class EngineAPI Quad 
 {

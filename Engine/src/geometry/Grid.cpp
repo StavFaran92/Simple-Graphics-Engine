@@ -1,7 +1,7 @@
 #include "geometry/Grid.h"
 
 #include "core/Factory.h"
-#include "MeshBuilder.h"
+#include "geometry/MeshBuilder.h"
 #include "geometry/MeshExporter.h"
 #include "Assets.h"
 

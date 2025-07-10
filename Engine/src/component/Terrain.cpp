@@ -2,7 +2,7 @@
 #include "Texture.h"
 #include "VertexLayout.h"
 #include "Assets.h"
-#include "MeshBuilder.h"
+#include "geometry/MeshBuilder.h"
 #include "core/Factory.h"
 #include "Logger.h"
 #include "CommonTextures.h"
