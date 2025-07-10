@@ -3,12 +3,12 @@
 #include "imgui.h"
 
 #include "core/FileUtil.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 
-#include "core/Engine.h"
+#include "Engine.h"
 #include "Context.h"
 
-#include "core/ApplicationConstants.h"
+#include "ApplicationConstants.h"
 
 using namespace Constants;
 

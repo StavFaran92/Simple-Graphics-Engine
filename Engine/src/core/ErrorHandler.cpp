@@ -1,6 +1,6 @@
 #include "core/ErrorHandler.h"
 
-#include "systems/Logger.h"
+#include "Logger.h"
 
 int ErrorHandler::handle(const std::exception& e)
 {

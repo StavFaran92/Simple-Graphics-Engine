@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "core/Engine.h"
+#include "Engine.h"
 #include "render/ShaderLoader.h"
 
 #include "utils/Utils.h"

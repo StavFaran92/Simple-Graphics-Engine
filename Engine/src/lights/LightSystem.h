@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "render/IRenderer.h"
+#include "IRenderer.h"
 
 class UniformBufferObject;
 class Context;

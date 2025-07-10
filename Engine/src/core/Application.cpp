@@ -1,7 +1,7 @@
-#include "core/Application.h"
+#include "Application.h"
 
-#include "systems/Logger.h"
-#include "core/Engine.h"
+#include "Logger.h"
+#include "Engine.h"
 #include "Context.h"
 #include "Scene.h"
 #include "Skybox.h"

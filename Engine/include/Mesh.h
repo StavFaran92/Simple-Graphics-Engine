@@ -2,20 +2,19 @@
 #include <memory>
 #include <vector>
 
-#include "core/Core.h"
-#include "render/Renderer.h"
-#include "render/Shader.h"
-#include "memory/Resource.h"
+#include "Core.h"
+#include "Shader.h"
+#include "Resource.h"
 
-#include "render/VertexBufferObject.h"
-#include "render/ElementBufferObject.h"
-#include "render/VertexArrayObject.h"
+class VertexBufferObject;
+class ElementBufferObject;
+class VertexArrayObject;
 
-#include "core/ApplicationConstants.h"
+#include "ApplicationConstants.h"
 
-#include "core/Configurations.h"
-#include "render/VertexLayout.h"
-#include "geometry/AABB.h"
+#include "Configurations.h"
+#include "VertexLayout.h"
+#include "AABB.h"
 
 struct MeshData
 {

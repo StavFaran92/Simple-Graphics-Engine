@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Resource.h"
-#include "geometry/MeshCollection.h"
+#include "MeshCollection.h"
 
 
 class Grid

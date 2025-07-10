@@ -6,10 +6,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "core/Core.h"
+#include "Core.h"
 
-#include "runtime/Entity.h"
-#include "component/Component.h"
+#include "Entity.h"
+#include "Component.h"
 
 class EngineAPI Transformation : public Component
 {

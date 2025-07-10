@@ -9,17 +9,17 @@
 
 #include "GL/glew.h"
 #include "glm/ext.hpp"
-#include "systems/Logger.h"
+#include "Logger.h"
 
 #include "render/RenderCommand.h"
 #include "Entity.h"
 #include "Component.h"
-#include "geometry/MeshCollection.h"
+#include "MeshCollection.h"
 #include "Context.h"
 #include "texture/Cubemap.h"
 #include "texture/TextureTransformer.h"
 
-#include "core/Engine.h"
+#include "Engine.h"
 
 
 Resource<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(Resource<Texture> equirectangularTexture)

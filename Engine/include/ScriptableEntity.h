@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/Core.h"
+#include "Core.h"
 
-#include "runtime/Entity.h"
+#include "Entity.h"
 
 #include "SDL.h"
 #include "Subscriber.h"

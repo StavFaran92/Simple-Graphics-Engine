@@ -2,7 +2,7 @@
 
 #include "Texture.h"
 #include "Resource.h"
-#include "core/Core.h"
+#include "Core.h"
 
 class EngineAPI TextureSampler
 {

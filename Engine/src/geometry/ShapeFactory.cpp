@@ -1,6 +1,6 @@
 #include "ShapeFactory.h"
 
-#include "core/Engine.h"
+#include "Engine.h"
 #include "Context.h"
 #include "Mesh.h"
 #include "Entity.h"
@@ -11,7 +11,7 @@
 #include "Scene.h"
 #include "Transformation.h"
 #include "Shader.h"
-#include "core/Registry.h"
+#include "Registry.h"
 //#include "RenderableComponent.h"
 #include "Component.h"
 #include "core/CacheSystem.h"

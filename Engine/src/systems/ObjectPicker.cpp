@@ -2,7 +2,7 @@
 
 #include "GL/glew.h"
 
-#include "core/Engine.h"
+#include "Engine.h"
 #include "Context.h"
 #include "Scene.h"
 #include "Window.h"
@@ -10,7 +10,7 @@
 #include "render/RenderBufferObject.h"
 #include "Resource.h"
 #include "Input.h"
-#include "render/IRenderer.h"
+#include "IRenderer.h"
 #include "ICamera.h"
 #include "render/PickingShader.h"
 #include "Entity.h"
@@ -20,9 +20,10 @@
 #include "render/RenderCommand.h"
 #include "ShapeFactory.h"
 #include "Transformation.h"
-#include "geometry/MeshCollection.h"
+#include "MeshCollection.h"
+#include "render/FrameBufferObject.h"
 
-#include "systems/Logger.h"
+#include "Logger.h"
 
 ObjectPicker::ObjectPicker()
 {
@@ -33,8 +34,10 @@ bool ObjectPicker::init()
 {
 	m_pickingShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl");
 
+	m_frameBuffer = std::make_shared<FrameBufferObject>();
+
 	// Bind FBO
-	m_frameBuffer.bind();
+	m_frameBuffer->bind();
 
 	auto activeScene = Engine::get()->getContext()->getActiveScene();;
 
@@ -44,28 +47,28 @@ bool ObjectPicker::init()
 
 	// Create a empty texture and attach to FBO
 	m_targetTexture = Texture::createEmptyTexture(width, height, GL_RGB32UI, GL_RGB_INTEGER, GL_UNSIGNED_INT);
-	m_frameBuffer.attachTexture(m_targetTexture.get()->getID());
+	m_frameBuffer->attachTexture(m_targetTexture.get()->getID());
 
 	// Create RBO and attach to FBO
 	RenderBufferObject rbo{ width, height };
-	m_frameBuffer.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
+	m_frameBuffer->attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
 
 	// validate FBO
-	if (!m_frameBuffer.isComplete())
+	if (!m_frameBuffer->isComplete())
 	{
 		logError("Framebuffer is not complete!");
 		return false;
 	}
 
 	// Cleanup
-	m_frameBuffer.unbind();
+	m_frameBuffer->unbind();
 
 	return true;
 }
 
 int ObjectPicker::pickObject(int x, int y)
 {
-	m_frameBuffer.bind();
+	m_frameBuffer->bind();
 
 	m_pickingShader->use();
 
@@ -100,7 +103,7 @@ int ObjectPicker::pickObject(int x, int y)
 	PixelInfo pixel;
 	glReadPixels(x, Engine::get()->getWindow()->getHeight() - y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &pixel);
 
-	m_frameBuffer.unbind();
+	m_frameBuffer->unbind();
 
 	if (pixel.ObjectID != 0)
 	{

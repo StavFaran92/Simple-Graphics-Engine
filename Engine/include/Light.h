@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 
 #include <string>
-#include "core/Core.h"
+#include "Core.h"
 #include "Component.h"
 
 class Shader;

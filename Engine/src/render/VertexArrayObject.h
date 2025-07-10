@@ -8,7 +8,7 @@
 //#include "render/VertexBufferLayout.h"
 #include "render/VertexBufferElement.h"
 #include "render/ElementBufferObject.h"
-#include "render/VertexLayout.h"
+#include "VertexLayout.h"
 
 struct VertexLayout;
 

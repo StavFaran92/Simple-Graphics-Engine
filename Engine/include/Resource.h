@@ -5,9 +5,9 @@
 
 class Texture;
 class Mesh;
-#include "core/Engine.h"
-#include "memory/MemoryPool.h"
-#include "memory/ResourceManager.h"
+#include "Engine.h"
+#include "MemoryPool.h"
+#include "ResourceManager.h"
 
 template<typename T>
 class Resource

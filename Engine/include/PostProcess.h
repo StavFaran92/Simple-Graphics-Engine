@@ -1,6 +1,6 @@
 #pragma once
-#include "core/Core.h"
-#include "memory/Resource.h"
+#include "Core.h"
+#include "Resource.h"
 
 class Shader;
 

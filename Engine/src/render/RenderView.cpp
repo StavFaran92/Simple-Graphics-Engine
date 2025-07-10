@@ -1,8 +1,10 @@
-#include "render/RenderView.h"
+#include "RenderView.h"
 
 #include <GL/glew.h>
 
 #include "render/RenderCommand.h"
+#include "render/FrameBufferObject.h"
+#include "render/RenderBufferObject.h"
 
 RenderTarget::RenderTarget(Viewport viewport)
 {

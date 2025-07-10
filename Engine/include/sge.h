@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core/Core.h"
-#include "core/Application.h"
+#include "Core.h"
+#include "Application.h"
 
 #ifndef TESTBED
-//#include "core/EntryPoint.h"
+//#include "EntryPoint.h"
 #endif
 
 //external

@@ -9,7 +9,7 @@
 #include "Material.h"
 #include <GL/glew.h>
 #include "Component.h"
-#include "core/Engine.h"
+#include "Engine.h"
 
 void SkyboxRenderer::render()
 {

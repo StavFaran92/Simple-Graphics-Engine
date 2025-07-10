@@ -1,4 +1,4 @@
-#include "core/Registry.h"
+#include "Registry.h"
 
 #include "Entity.h"
 #include "Component.h"

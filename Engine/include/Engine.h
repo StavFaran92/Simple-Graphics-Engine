@@ -7,8 +7,8 @@
 #include <typeinfo>
 #include <typeindex>
 #include <unordered_map>
-#include "core/Core.h"
-#include "memory/UUID.h"
+#include "Core.h"
+#include "UUID.h"
 
 
 class Context;

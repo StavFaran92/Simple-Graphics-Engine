@@ -1,9 +1,9 @@
 #include "Light.h"
 #include <GL/glew.h>
-#include "core/ApplicationConstants.h"
+#include "ApplicationConstants.h"
 #include "Transformation.h"
 #include "Shader.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 
 Light::Light()
 	:m_color(glm::vec3(1.0f, 1.0f, 1.0f)), m_ambientIntensity(0.2f), m_diffuseIntensity(.5f)

@@ -2,9 +2,9 @@
 
 #include "Resource.h"
 #include "gl/glew.h"
-#include "core/Engine.h"
+#include "Engine.h"
 #include "Window.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 #include "Component.h"
 #include "Transformation.h"
 #include "render/ScreenQuad.h"
@@ -15,11 +15,11 @@
 #include "render/RenderCommand.h"
 #include "Context.h"
 #include "Animator.h"
-#include "geometry/MeshCollection.h"
+#include "MeshCollection.h"
 #include "render/Graphics.h"
 #include "System.h"
 #include "ShapeFactory.h"
-#include "render/RenderView.h"
+#include "RenderView.h"
 #include "DebugHelper.h"
 
 static float lerp(float a, float b, float t)

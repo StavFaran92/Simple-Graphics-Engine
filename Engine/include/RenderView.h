@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Entity.h"
-#include "render/FrameBufferObject.h"
-#include "render/RenderBufferObject.h"
 #include "Texture.h"
 #include "Resource.h"
+
+class FrameBufferObject;
+class RenderBufferObject;
 
 struct Viewport
 {

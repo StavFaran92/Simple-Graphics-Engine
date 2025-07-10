@@ -2,7 +2,7 @@
 
 #include "ui/Menu.h"
 
-#include "systems/Logger.h"
+#include "Logger.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"

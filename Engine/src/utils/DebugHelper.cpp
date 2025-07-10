@@ -1,7 +1,7 @@
 #include "DebugHelper.h"
 
 #include "render/VertexArrayObject.h"
-#include "render/VertexLayout.h"
+#include "VertexLayout.h"
 #include "Shader.h"
 #include "render/Graphics.h"
 

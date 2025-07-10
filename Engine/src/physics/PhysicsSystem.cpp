@@ -1,12 +1,12 @@
 #include "physics/PhysicsSystem.h"
 
-#include "systems/Logger.h"
+#include "Logger.h"
 
 #include "physics/PhysXUtils.h"
 #include "Component.h"
 #include "Physics.h"
 #include "Scene.h"
-#include "core/Registry.h"
+#include "Registry.h"
 #include "GL//glew.h"
 #include "render/Graphics.h"
 #include "render/RenderCommand.h"

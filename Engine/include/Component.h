@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "core/Core.h"
+#include "Core.h"
 
 #include "ScriptableEntity.h"
 #include "Configurations.h"

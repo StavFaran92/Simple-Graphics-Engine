@@ -1,6 +1,6 @@
 #pragma once
-#include "lights/Light.h"
-#include "core/Core.h"
+#include "Light.h"
+#include "Core.h"
 
 
 struct EngineAPI Attenuation {

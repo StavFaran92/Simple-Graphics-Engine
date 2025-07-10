@@ -3,12 +3,12 @@
 #include "Skybox.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
-#include "core/Engine.h"
+#include "Engine.h"
 #include "ICamera.h"
 #include "render/SkyboxRenderer.h"
 #include "render/PostProcessProjector.h"
 #include "core/CoroutineSystem.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 #include "render/PhongShader.h"
 #include "render/PickingShader.h"
 #include "Context.h"
@@ -28,7 +28,7 @@
 #include "Box.h"
 #include "systems/ShadowSystem.h"
 #include "lights/LightSystem.h"
-#include "core/Engine.h"
+#include "Engine.h"
 #include "TimeManager.h"
 #include "render/UniformBufferObject.h"
 #include "render/DeferredRenderer.h"
@@ -39,21 +39,22 @@
 #include "CommonTextures.h"
 #include "render/RenderCommand.h"
 #include "render/IBL.h"
-#include "core/Registry.h"
+#include "Registry.h"
 #include "Physics.h"
 #include "Archiver.h"
 #include "Animator.h"
 #include "Terrain.h"
-#include "geometry/AABB.h"
-#include "geometry/Frustum.h"
-#include "geometry/MeshCollection.h"
+#include "AABB.h"
+#include "Frustum.h"
+#include "MeshCollection.h"
 #include "render/Graphics.h"
 #include "DebugHelper.h"
 #include "texture/Cubemap.h"
-#include "render/RenderView.h"
+#include "RenderView.h"
 #include "core/GameLayer.h"
 #include "EventSystem.h"
 #include "core/EngineConfig.h"
+#include "geometry/WireframeGrid.h"
 
 void cameraCalculateOrientation(Transformation& transform, CameraComponent& cameraComponent)
 {
@@ -208,6 +209,8 @@ void Scene::init(Context* context)
 	m_highlightMaskShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl");
 	m_highlightEdgeDetectionShader = Shader::createOverrideShader("HighlightEdgeDetectionShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
 	m_highlightMergeShader = Shader::createOverrideShader("HighlightMergeShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
+
+	m_wireframeGrid = std::make_shared<WireframeGrid>();
 }
 
 void Scene::update(float deltaTime)
@@ -603,16 +606,16 @@ void Scene::draw(float deltaTime)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Wireframe Grid");
 
-			m_wireframeGrid.shader->use();
-			m_wireframeGrid.shader->setModelMatrix(glm::mat4(1.0));
-			m_wireframeGrid.shader->setViewMatrix(*graphics->view);
-			m_wireframeGrid.shader->setProjectionMatrix(*graphics->projection);
-			m_wireframeGrid.shader->setUniformValue("color", glm::vec3(0.6, 0.6, 0.6));
+			m_wireframeGrid->shader->use();
+			m_wireframeGrid->shader->setModelMatrix(glm::mat4(1.0));
+			m_wireframeGrid->shader->setViewMatrix(*graphics->view);
+			m_wireframeGrid->shader->setProjectionMatrix(*graphics->projection);
+			m_wireframeGrid->shader->setUniformValue("color", glm::vec3(0.6, 0.6, 0.6));
 
-			m_wireframeGrid.vao->Bind();
+			m_wireframeGrid->vao->Bind();
 
 			glLineWidth(2); // Size in pixels
-			glDrawArrays(GL_LINES, 0, m_wireframeGrid.vao->GetVerticesCount());
+			glDrawArrays(GL_LINES, 0, m_wireframeGrid->vao->GetVerticesCount());
 
 			glPopDebugGroup();
 		}

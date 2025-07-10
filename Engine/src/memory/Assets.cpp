@@ -4,7 +4,7 @@
 
 
 #include "Texture.h"
-#include "animation/Animation.h"
+#include "Animation.h"
 #include "AnimationLoader.h"
 #include "core/CacheSystem.h"
 #include "ModelImporter.h"

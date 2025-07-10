@@ -1,4 +1,4 @@
-#include "core/Engine.h"
+#include "Engine.h"
 
 #include "Context.h"
 #include "render/Renderer.h"
@@ -12,7 +12,7 @@
 #include "Input.h"
 #include "EventSystem.h"
 #include "ModelImporter.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 #include "core/CacheSystem.h"
 #include "TimeManager.h"
 #include "physics/PhysicsSystem.h"
@@ -38,7 +38,7 @@
 #include "core/EngineConfig.h"
 #include "systems/BuiltInMeshes.h"
 
-#include "core/Application.h"
+#include "Application.h"
 #include "SDL2/SDL.h"
 
 #include "GL/glew.h"

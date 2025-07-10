@@ -1,6 +1,6 @@
 #pragma once
 
-#include "geometry/Frustum.h"
+#include "Frustum.h"
 
 class Volume
 {

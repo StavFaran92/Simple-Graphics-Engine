@@ -5,8 +5,8 @@
 #include <vector>
 #include <map>
 
-#include "core/Core.h"
-#include "core/ApplicationConstants.h"
+#include "Core.h"
+#include "ApplicationConstants.h"
 #include "Configurations.h"
 #include "Resource.h"
 #include "Texture.h"

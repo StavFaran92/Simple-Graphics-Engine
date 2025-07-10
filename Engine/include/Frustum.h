@@ -1,6 +1,6 @@
 #pragma once
 
-#include "geometry/Plane.h"
+#include "Plane.h"
 
 struct Frustum
 {

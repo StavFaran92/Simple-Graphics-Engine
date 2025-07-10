@@ -1,6 +1,6 @@
 #pragma once
-#include "core/Core.h"
-#include "geometry/Mesh.h"
+#include "Core.h"
+#include "Mesh.h"
 
 class MeshBuilder;
 

@@ -4,7 +4,7 @@
 #include <fstream>
 #include <unordered_map>
 
-#include "systems/Logger.h"
+#include "Logger.h"
 #include "Mesh.h"
 #include "serialize/ProjectAssetRegistry.h"
 #include "geometry/MeshSerializer.h"
@@ -13,7 +13,7 @@
 #include "Archiver.h"
 #include "ModelImporter.h"
 #include "AnimationLoader.h"
-#include "geometry/MeshCollection.h"
+#include "MeshCollection.h"
 //#include "TextureSerializer.h"
 #include <nlohmann/json.hpp>
 

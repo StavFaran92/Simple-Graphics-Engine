@@ -2,7 +2,7 @@
 
 #include "Mesh.h"
 #include "MeshBuilder.h"
-#include "render/VertexLayout.h"
+#include "VertexLayout.h"
 #include "ModelImporter.h"
 #include "Context.h"
 

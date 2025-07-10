@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "core/EventLayer.h"
+#include "EventLayer.h"
 
 class EventLayerStack
 {

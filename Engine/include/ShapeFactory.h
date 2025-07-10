@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include "core/Core.h"
+#include "Core.h"
 
 class Entity;
 class SGE_Regsitry;

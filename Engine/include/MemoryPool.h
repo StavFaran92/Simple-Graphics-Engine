@@ -3,8 +3,8 @@
 #include <unordered_map>
 #include <memory>
 #include <functional>
-#include "memory/UUID.h"
-#include "systems/Logger.h"
+#include "UUID.h"
+#include "Logger.h"
 
 template<typename T>
 class MemoryPool

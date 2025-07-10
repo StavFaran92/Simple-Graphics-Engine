@@ -10,10 +10,10 @@
 #include "Shader.h"
 
 #include "Scene.h"
-#include "core/Engine.h"
+#include "Engine.h"
 
-#include "systems/Logger.h"
-#include "core/Engine.h"
+#include "Logger.h"
+#include "Engine.h"
 #include "Texture.h"
 #include "Material.h"
 #include "serialize/ProjectAssetRegistry.h"

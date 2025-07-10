@@ -7,9 +7,9 @@
 #include <GL/glew.h>
 
 #include "utils/Utils.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 #include "render/ShaderLoader.h"
-#include "core/Engine.h"
+#include "Engine.h"
 #include "Texture.h"
 #include "Resource.h"
 #include "core/Factory.h"

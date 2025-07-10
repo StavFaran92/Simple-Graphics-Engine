@@ -1,12 +1,12 @@
 #include "Texture.h"
-#include "core/ApplicationConstants.h"
+#include "ApplicationConstants.h"
 
 #include <GL/glew.h>
 
-#include "systems/Logger.h"
+#include "Logger.h"
 #include "Configurations.h"
 #include "core/CacheSystem.h"
-#include "core/Engine.h"
+#include "Engine.h"
 #include "Resource.h"
 #include "core/Factory.h"
 #include "Context.h"

@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "render/VertexArrayObject.h"
-#include "core/Core.h"
+#include "Core.h"
 
 #include "gl/glew.h"
 

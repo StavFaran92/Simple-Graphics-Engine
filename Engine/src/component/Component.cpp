@@ -1,6 +1,6 @@
 #include "Component.h"
 
-#include "core/Engine.h"
+#include "Engine.h"
 #include "Context.h"
 #include "Material.h"
 #include "Transformation.h"
@@ -9,6 +9,7 @@
 #include "Scene.h"
 #include "render/IBL.h"
 #include <GL/glew.h>
+#include "render/VertexArrayObject.h"
 
 MaterialComponent::MaterialComponent()
 {

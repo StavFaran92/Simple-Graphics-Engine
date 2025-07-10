@@ -5,13 +5,13 @@
 #include <memory>
 #include <string>
 
-#include "core/Core.h"
-#include "geometry/Mesh.h"
-#include "texture/Texture.h"
-#include "runtime/Entity.h"
-#include "geometry/MeshBuilder.h"
-#include "render/Material.h"
-#include "geometry/MeshCollection.h"
+#include "Core.h"
+#include "Mesh.h"
+#include "Texture.h"
+#include "Entity.h"
+#include "MeshBuilder.h"
+#include "Material.h"
+#include "MeshCollection.h"
 
 // Forward declerations
 struct aiNode;

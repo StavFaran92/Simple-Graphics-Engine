@@ -6,7 +6,7 @@
 #include <assimp/postprocess.h>
 #include <algorithm>
 
-#include "systems/Logger.h"
+#include "Logger.h"
 #include <filesystem>
 #include "MeshBuilder.h"
 #include "Resource.h"
@@ -14,7 +14,7 @@
 #include "Entity.h"
 #include "Component.h"
 #include "Shader.h"
-#include "core/Engine.h"
+#include "Engine.h"
 #include "core/CacheSystem.h"
 #include "Scene.h"
 #include "Assets.h"

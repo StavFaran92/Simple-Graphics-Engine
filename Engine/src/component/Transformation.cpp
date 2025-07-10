@@ -1,7 +1,7 @@
 #include "Transformation.h"
 #include<glm/gtx/quaternion.hpp>
 #include "utils/LinearAlgebraUtil.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/matrix_decompose.hpp"

@@ -1,23 +1,34 @@
 import os
 import re
 
-# Folder where your headers and sources live
-ROOT_DIR = "../Engine/src"
+# Adjusted for script location
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ENGINE_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "Engine"))
 
-# Extensions to process
+SOURCE_ROOTS = [
+    os.path.join(ENGINE_ROOT, "src"),
+    os.path.join(ENGINE_ROOT, "include")
+]
+
 FILE_EXTENSIONS = (".cpp", ".h", ".hpp", ".cxx")
 
-# Regex to find flat includes
-INCLUDE_PATTERN = re.compile(r'#include\s+"([\w\d_]+\.h)"')
+INCLUDE_PATTERN = re.compile(r'#include\s+"([^"]+)"')
 
 def build_header_map():
     header_map = {}
-    for dirpath, _, filenames in os.walk(ROOT_DIR):
-        for filename in filenames:
-            if filename.endswith(".h"):
-                rel_path = os.path.relpath(os.path.join(dirpath, filename), ROOT_DIR)
-                header_map[filename] = rel_path.replace(os.sep, "/")
+
+    for root in SOURCE_ROOTS:
+        for dirpath, _, filenames in os.walk(root):
+            for filename in filenames:
+                if filename.endswith(".h"):
+                    abs_path = os.path.join(dirpath, filename)
+
+                    # Always strip the include *root* (either src/ or include/)
+                    rel_path = os.path.relpath(abs_path, root).replace(os.sep, "/")
+
+                    header_map[filename] = rel_path
     return header_map
+
 
 def process_file(filepath, header_map):
     changed = False
@@ -28,25 +39,30 @@ def process_file(filepath, header_map):
         for line in lines:
             match = INCLUDE_PATTERN.search(line)
             if match:
-                header = match.group(1)
-                if header in header_map:
-                    new_path = header_map[header]
-                    if f'"{new_path}"' not in line:
-                        print(f"Updating include in {filepath}: {line.strip()} → {new_path}")
-                        line = line.replace(f'"{header}"', f'"{new_path}"')
-                        changed = True
-            f.write(line)
+                include_path = match.group(1)
+                filename = os.path.basename(include_path)
 
+                if filename in header_map:
+                    correct_path = header_map[filename]
+
+                    if include_path != correct_path:
+                        print(f"{filepath}: {include_path} → {correct_path}")
+                        line = line.replace(f'"{include_path}"', f'"{correct_path}"')
+                        changed = True
+
+            f.write(line)
     return changed
 
 def main():
     header_map = build_header_map()
-    print(f"Found {len(header_map)} headers.")
+    print(f"Tracking {len(header_map)} headers...")
 
-    for dirpath, _, filenames in os.walk(ROOT_DIR):
-        for filename in filenames:
-            if filename.endswith(FILE_EXTENSIONS):
-                process_file(os.path.join(dirpath, filename), header_map)
+    for root in SOURCE_ROOTS:
+        for dirpath, _, filenames in os.walk(root):
+            for filename in filenames:
+                if filename.endswith(FILE_EXTENSIONS):
+                    filepath = os.path.join(dirpath, filename)
+                    process_file(filepath, header_map)
 
 if __name__ == "__main__":
     main()

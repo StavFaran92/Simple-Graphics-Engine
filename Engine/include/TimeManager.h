@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-#include "core/Core.h"
+#include "Core.h"
 
 class EngineAPI TimeManager
 {

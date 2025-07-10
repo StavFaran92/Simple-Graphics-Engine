@@ -2,7 +2,7 @@
 
 #include <exception>
 
-#include "core/Core.h"
+#include "Core.h"
 
 class EngineAPI ErrorHandler
 {

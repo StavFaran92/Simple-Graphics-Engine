@@ -1,7 +1,7 @@
 #include "Keyboard.h"
-#include "core/Engine.h"
+#include "Engine.h"
 #include "EventSystem.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 
 Keyboard::Keyboard() 
 {

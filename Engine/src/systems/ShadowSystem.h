@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core/Core.h"
+#include "Core.h"
 
 #include "render/FrameBufferObject.h"
-#include "render/IRenderer.h"
+#include "IRenderer.h"
 #include "Entity.h"
 
 class Shader;

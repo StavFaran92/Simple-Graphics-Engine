@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "core/Core.h"
+#include "Core.h"
 #include "Mesh.h"
 #include "Resource.h"
 

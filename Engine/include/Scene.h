@@ -8,13 +8,12 @@
 #include <map>
 #include <functional>
 
-#include "core/Core.h"
+#include "Core.h"
 
 #include "glm/glm.hpp"
-#include "render/IRenderer.h"
-#include "runtime/Entity.h"
-#include "serialize/Archiver.h"
-#include "geometry/WireframeGrid.h"
+#include "IRenderer.h"
+#include "Entity.h"
+#include "Archiver.h"
 
 
 class Model;
@@ -51,6 +50,7 @@ class SGE_Regsitry;
 class Entity;
 class RenderView;
 class GameLayer;
+class WireframeGrid;
 namespace physx {
 	class PxScene;
 }
@@ -201,5 +201,5 @@ private:
 	Resource<Shader> m_highlightEdgeDetectionShader;
 	Resource<Shader> m_highlightMergeShader;
 
-	WireframeGrid m_wireframeGrid;
+	std::shared_ptr<WireframeGrid> m_wireframeGrid;
 };

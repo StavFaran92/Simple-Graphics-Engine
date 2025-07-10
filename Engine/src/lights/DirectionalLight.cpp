@@ -1,7 +1,7 @@
 #include "DirectionalLight.h"
 
 #include "Shader.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 
 DirectionalLight::DirectionalLight()
 

@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-#include "core/EventLayer.h"
+#include "EventLayer.h"
 
 class GameLayer : public EventLayer
 {

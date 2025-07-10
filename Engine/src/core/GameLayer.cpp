@@ -1,7 +1,7 @@
 #include "core/GameLayer.h"
 
 #include "ScriptableEntity.h"
-#include "core/Engine.h"
+#include "Engine.h"
 
 bool GameLayer::handleEvent(SDL_Event e)
 {

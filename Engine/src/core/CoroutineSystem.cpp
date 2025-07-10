@@ -1,5 +1,5 @@
 #include "core/CoroutineSystem.h"
-#include "systems/Logger.h"
+#include "Logger.h"
 
 void CoroutineSystem::addCoroutine(const Coroutine& coroutine)
 {

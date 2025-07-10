@@ -6,13 +6,13 @@
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
 #include "ShapeFactory.h"
-#include "core/Engine.h"
+#include "Engine.h"
 #include "Context.h"
 #include "Entity.h"
 #include "Component.h"
 #include "render/RenderCommand.h"
 #include <GL/glew.h>
-#include "geometry/MeshCollection.h"
+#include "MeshCollection.h"
 
 Resource<Texture> TextureTransformer::flipVertical(Resource<Texture> srcTexture)
 {

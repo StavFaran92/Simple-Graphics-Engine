@@ -1,6 +1,6 @@
 #include "render/Renderer2D.h"
 
-#include "systems/Logger.h"
+#include "Logger.h"
 #include <GL/glew.h>
 
 #include "render/VertexArrayObject.h"

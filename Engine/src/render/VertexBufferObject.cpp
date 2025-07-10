@@ -1,7 +1,7 @@
 #include "render/VertexBufferObject.h"
 
 #include <GL/glew.h>
-#include "systems/Logger.h"
+#include "Logger.h"
 
 VertexBufferObject::VertexBufferObject(const void* data, unsigned int length, unsigned int size)
 	: m_length(length)

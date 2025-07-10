@@ -4,7 +4,7 @@
 
 #include "SDL2/SDL_syswm.h"
 #include "SDL2/SDL.h"
-#include "core/Core.h"
+#include "Core.h"
 
 #include "Configurations.h"
 

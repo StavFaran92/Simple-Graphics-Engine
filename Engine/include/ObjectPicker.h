@@ -1,11 +1,9 @@
 #pragma once
 #include <memory>
 
-#include "core/Core.h"
+#include "Core.h"
 
-#include "memory/Resource.h"
-#include "render/FrameBufferObject.h"
-#include "render/RenderBufferObject.h"
+#include "Resource.h"
 
 class FrameBufferObject;
 class RenderBufferObject;
@@ -33,7 +31,7 @@ public:
 	void setSelectedObject(int selectedID);
 
 private:
-	FrameBufferObject m_frameBuffer;
+	std::shared_ptr<FrameBufferObject> m_frameBuffer;
 	Resource<Texture> m_targetTexture;
 	Resource<Shader> m_pickingShader;
 

@@ -1,4 +1,4 @@
-#include "texture/TextureSampler.h"
+#include "TextureSampler.h"
 #include "CommonTextures.h"
 
 TextureSampler::TextureSampler(int channelCount)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "animation/Animation.h"
+#include "Animation.h"
 #include "Resource.h"
 
 #include <assimp/Importer.hpp>

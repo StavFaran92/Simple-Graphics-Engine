@@ -1,7 +1,7 @@
 #pragma once
 #include "render/RendererIntermediate.h"
 
-#include "core/Core.h"
+#include "Core.h"
 
 // forward declerations
 class ICamera;

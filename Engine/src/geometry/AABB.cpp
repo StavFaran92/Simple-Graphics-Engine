@@ -1,6 +1,6 @@
 #pragma once
 
-#include "geometry/AABB.h"
+#include "AABB.h"
 #include "Transformation.h"
 
 

@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <cstdint>
-#include "core/Core.h"
+#include "Core.h"
 #include <PxPhysicsAPI.h>
 
 #include "Transformation.h"

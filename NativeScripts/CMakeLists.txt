@@ -7,7 +7,7 @@ file(GLOB_RECURSE SOURCES *.cpp *.h)
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
-	${CMAKE_SOURCE_DIR}/Engine/src
+	${CMAKE_SOURCE_DIR}/Engine/include
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE

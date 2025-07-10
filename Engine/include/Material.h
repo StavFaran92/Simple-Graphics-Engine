@@ -2,12 +2,12 @@
 
 #include <memory>
 #include <map>
-#include "core/Core.h"
+#include "Core.h"
 
-#include "memory/Resource.h"
-#include "render/Shader.h"
-#include "texture/Texture.h"
-#include "texture/TextureSampler.h"
+#include "Resource.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "TextureSampler.h"
 
 class EngineAPI Material
 {
