@@ -1,4 +1,4 @@
-#include "camera/CameraControllerOrbit.h"
+#include "CameraControllerOrbit.h"
 
 #include "Engine.h"
 #include "EventSystem.h"

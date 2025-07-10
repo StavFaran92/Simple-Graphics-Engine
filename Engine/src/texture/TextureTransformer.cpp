@@ -10,7 +10,7 @@
 #include "Context.h"
 #include "Entity.h"
 #include "Component.h"
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include <GL/glew.h>
 #include "MeshCollection.h"
 

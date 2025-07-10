@@ -17,7 +17,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Component.h"
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include "ShapeFactory.h"
 #include "Transformation.h"
 #include "MeshCollection.h"

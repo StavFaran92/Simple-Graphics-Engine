@@ -1,10 +1,12 @@
 #pragma once
 
 #include <memory>
-#include "render/VertexArrayObject.h"
+
 #include "Core.h"
 
 #include "gl/glew.h"
+
+class VertexArrayObject;
 
 class EngineAPI RenderCommand
 {

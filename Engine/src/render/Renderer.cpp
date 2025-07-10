@@ -26,7 +26,7 @@
 #include "render/Graphics.h"
 #include "RenderView.h"
 #include "render/ScreenQuad.h"
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include "ShapeFactory.h"
 
 

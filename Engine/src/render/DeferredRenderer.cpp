@@ -12,7 +12,7 @@
 #include "render/Renderer2D.h"
 #include "Material.h"
 #include "Random.h"
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include "Context.h"
 #include "Animator.h"
 #include "MeshCollection.h"

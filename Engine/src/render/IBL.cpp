@@ -11,7 +11,7 @@
 #include "glm/ext.hpp"
 #include "Logger.h"
 
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include "Entity.h"
 #include "Component.h"
 #include "Mesh.h"

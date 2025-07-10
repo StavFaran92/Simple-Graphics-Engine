@@ -37,7 +37,7 @@
 #include <GL/glew.h>
 #include "utils/EquirectangularToCubemapConverter.h"
 #include "CommonTextures.h"
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include "render/IBL.h"
 #include "Registry.h"
 #include "Physics.h"

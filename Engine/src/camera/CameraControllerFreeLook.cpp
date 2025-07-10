@@ -1,4 +1,4 @@
-#include "camera/CameraControllerFreeLook.h"
+#include "CameraControllerFreeLook.h"
 
 #include "Engine.h"
 #include "EventSystem.h"

@@ -18,7 +18,7 @@
 #include "Animator.h"
 #include "MeshCollection.h"
 #include "render/Graphics.h"
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include "ShapeFactory.h"
 #include "DebugHelper.h"
 

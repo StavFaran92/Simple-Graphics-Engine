@@ -1,8 +1,9 @@
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include "Engine.h"
 #include "System.h"
 #include "render/Graphics.h"
 #include "RenderView.h"
+#include "render/VertexArrayObject.h"
 
 #include <GL/glew.h>
 

@@ -1,8 +1,8 @@
 #pragma once
 #include "Engine.h"
 #include "Application.h"
-#include "serialize/ArchiveInitializer.h"
-#include "core/ErrorHandler.h"
+#include "ArchiveInitializer.h"
+#include "ErrorHandler.h"
 
 Application* CreateApplication();
 

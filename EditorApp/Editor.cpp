@@ -1035,7 +1035,7 @@ void ShowModelCreatorWindow()
 		"Select an asset to load",
 		"",
 		5,
-		g_supportedFormats,
+		Constants::g_supportedFormats,
 		"",
 		0);
 

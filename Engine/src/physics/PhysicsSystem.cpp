@@ -9,7 +9,7 @@
 #include "Registry.h"
 #include "GL//glew.h"
 #include "render/Graphics.h"
-#include "render/RenderCommand.h"
+#include "RenderCommand.h"
 #include "systems/BuiltInMeshes.h"
 #include <glm/gtx/quaternion.hpp>
 

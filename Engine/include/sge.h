@@ -9,7 +9,7 @@
 
 //external
 #ifdef GUI
-#include "ui/ImguiHandler.h"
+#include "ImguiHandler.h"
 #include "imgui.h"
 #endif
 
@@ -57,3 +57,4 @@
 #include "System.h"
 #include "DebugHelper.h"
 #include "WaterSystem.h"
+#include "RenderCommand.h"

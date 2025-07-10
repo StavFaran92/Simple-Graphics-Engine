@@ -1,4 +1,4 @@
-#include "core/ErrorHandler.h"
+#include "ErrorHandler.h"
 
 #include "Logger.h"
 
