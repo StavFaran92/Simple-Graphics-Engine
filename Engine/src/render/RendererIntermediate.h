@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IRenderer.h"
+#include "render/IRenderer.h"
 
 #include "render/VertexArrayObject.h"
 #include "render/FrameBufferObject.h"

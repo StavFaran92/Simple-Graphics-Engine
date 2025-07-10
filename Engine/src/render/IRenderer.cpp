@@ -1,4 +1,4 @@
-#include "IRenderer.h"
+#include "render/IRenderer.h"
 
 #include "Logger.h"
 #include <GL/glew.h>

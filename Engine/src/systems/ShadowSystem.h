@@ -3,7 +3,7 @@
 #include "Core.h"
 
 #include "render/FrameBufferObject.h"
-#include "IRenderer.h"
+#include "render/IRenderer.h"
 #include "Entity.h"
 
 class Shader;

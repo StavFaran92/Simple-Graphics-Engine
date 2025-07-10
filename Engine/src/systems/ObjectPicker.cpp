@@ -10,7 +10,7 @@
 #include "render/RenderBufferObject.h"
 #include "Resource.h"
 #include "Input.h"
-#include "IRenderer.h"
+#include "render/IRenderer.h"
 #include "ICamera.h"
 #include "render/PickingShader.h"
 #include "Entity.h"
