@@ -40,5 +40,7 @@ void EngineConfig::loadConfig()
             renderConfig.renderVolumetricsPass = render["RenderVolumetricsPass"].get<bool>();
         if (render.contains("RenderWireframeGrid"))
             renderConfig.renderWireframeGrid = render["RenderWireframeGrid"].get<bool>();
+        if (render.contains("RenderFoliagePass"))
+            renderConfig.renderFoliagePass = render["RenderFoliagePass"].get<bool>();
     }
 }

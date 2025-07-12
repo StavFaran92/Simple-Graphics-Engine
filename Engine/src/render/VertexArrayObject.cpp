@@ -25,14 +25,16 @@ VertexArrayObject::~VertexArrayObject()
 	glDeleteVertexArrays(1, &m_id);
 }
 
-void VertexArrayObject::AttachBuffer(const VertexBufferObject& vbo, const ElementBufferObject* ebo)
+void VertexArrayObject::AttachBuffer(std::shared_ptr<VertexBufferObject> vbo, const ElementBufferObject* ebo)
 {
 	// bind this VAO
 	Bind();
 
+	m_vbo = vbo;
+
 	// bind VBO to associate with this VAO
-	vbo.Bind();
-	m_verticesCount = vbo.getLength();
+	vbo->Bind();
+	m_verticesCount = vbo->getLength();
 
 	// bind IBO to associate with this VAO
 	if (ebo)
@@ -165,7 +167,7 @@ bool VertexArrayObject::build()
 	m_vbo = std::make_shared<VertexBufferObject>(&(raw[0]), m_vertices.size(), bufferSize);
 
 	// fill vertex attributes
-	AttachBuffer(*m_vbo.get(), 0);
+	AttachBuffer(m_vbo, 0);
 
 
 	return true;
@@ -189,4 +191,9 @@ unsigned int VertexArrayObject::GetIndexCount() const
 unsigned int VertexArrayObject::GetVerticesCount() const
 {
 	return m_verticesCount;
+}
+
+unsigned int VertexArrayObject::getBufferID() const
+{
+	return m_vbo->getID();
 }

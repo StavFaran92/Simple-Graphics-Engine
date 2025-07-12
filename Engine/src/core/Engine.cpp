@@ -37,6 +37,7 @@
 #include "core/EventLayerStack.h"
 #include "core/EngineConfig.h"
 #include "systems/BuiltInMeshes.h"
+#include "systems/FoliageSystem.h"
 
 #include "Application.h"
 #include "SDL2/SDL.h"
@@ -185,6 +186,7 @@ bool Engine::init(const InitParams& initParams)
     auto animationLoader = new AnimationLoader();
     auto graphics = new Graphics();
     auto system = new System();
+    
     m_assets = std::make_shared<Assets>();
 
     m_timeManager = std::make_shared<TimeManager>();
@@ -219,7 +221,8 @@ bool Engine::init(const InitParams& initParams)
         saveProject();
     }
 
-   
+    auto foliageSystem = new FoliageSystem();
+    foliageSystem->init();
 
     auto objectPicker = new ObjectPicker();
     if (!objectPicker->init())

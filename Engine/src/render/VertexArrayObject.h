@@ -19,7 +19,7 @@ public:
 	VertexArrayObject(const VertexLayout& layout);
 	~VertexArrayObject();
 
-	void AttachBuffer(const VertexBufferObject& vbo, const ElementBufferObject* ebo);
+	void AttachBuffer(std::shared_ptr<VertexBufferObject> vbo, const ElementBufferObject* ebo);
 	
 
 	void setLayout(const VertexLayout& layout);
@@ -31,6 +31,7 @@ public:
 	void Unbind() const;
 	unsigned int GetIndexCount() const;
 	unsigned int GetVerticesCount() const;
+	unsigned int getBufferID() const;
 
 private:
 	void fillVertexAttributes();

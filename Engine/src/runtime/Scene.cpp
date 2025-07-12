@@ -56,6 +56,8 @@
 #include "core/EngineConfig.h"
 #include "geometry/WireframeGrid.h"
 #include "systems/BuiltInMeshes.h"
+#include "FoliageComponent.h"
+#include "systems/FoliageSystem.h"
 
 void cameraCalculateOrientation(Transformation& transform, CameraComponent& cameraComponent)
 {
@@ -359,45 +361,27 @@ void Scene::draw(float deltaTime)
 			glPopDebugGroup();
 		}
 
-		if (Engine::get()->getConfig().renderConfig.renderSkyboxPass)
+		if (Engine::get()->getConfig().renderConfig.renderFoliagePass)
 		{
-			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Skybox render pass");
-			// Render skybox
-			glDepthMask(GL_FALSE);
-			glDepthFunc(GL_LEQUAL);
-			m_skyboxShader->use();
-			renderView->bind();
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Foliage render pass");
 
-			m_skyboxShader->setViewMatrix(*graphics->view);
-			m_skyboxShader->setProjectionMatrix(*graphics->projection);
-
-			for (auto&& [entity, skybox, transform] :
-				m_registry->get().view<SkyboxComponent, Transformation>().each())
+			for (auto&& [entity, foliage, transform] : m_registry->get().view<FoliageComponent, Transformation>().each())
 			{
-				Entity entityhandler{ entity, m_registry.get() };
-				graphics->entity = &entityhandler;
-				graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
-				graphics->model = &transform.getWorldTransformation();
+				auto& foliageShader = Engine::get()->getSubSystem<FoliageSystem>()->getFoliageShader();
+				foliageShader->use();
+				foliageShader->setUniformValue("view", *graphics->view);
+				foliageShader->setUniformValue("projection", *graphics->projection);
 
-				if (skybox.cubemap.isEmpty()) continue;
+				// create instance batch from foliage map
 
-				skybox.cubemap.get()->bind();
-				skybox.cubemap.get()->setSlot(0);
-
-				auto vao = graphics->mesh->getVAO();
-				RenderCommand::draw(vao);
+				//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRASS_BLADE); 
+				auto& grassBlade = Engine::get()->getSubSystem<FoliageSystem>()->getGrassBladeMesh();
+				auto vao = grassBlade->getPrimaryMesh()->getVAO();
+				RenderCommand::drawInstanced(vao, Engine::get()->getSubSystem<FoliageSystem>()->getCount());
 			}
-			glDepthMask(GL_TRUE);
-			glDepthFunc(GL_LESS);
 
 			glPopDebugGroup();
 		}
-
-		
-
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		//glEnable(GL_POLYGON_OFFSET_LINE);
-		//glPolygonOffset(-1.0, -1.0);
 
 		if (Engine::get()->getConfig().renderConfig.renderTerrainPass)
 		{
@@ -447,11 +431,53 @@ void Scene::draw(float deltaTime)
 					auto vao = terrainMesh->getPrimaryMesh()->getVAO();
 					RenderCommand::drawPatches(vao);
 				}
-				
+
 			}
 
 			glPopDebugGroup();
 		}
+
+		if (Engine::get()->getConfig().renderConfig.renderSkyboxPass)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Skybox render pass");
+			// Render skybox
+			glDepthMask(GL_FALSE);
+			glDepthFunc(GL_LEQUAL);
+			m_skyboxShader->use();
+			renderView->bind();
+
+			m_skyboxShader->setViewMatrix(*graphics->view);
+			m_skyboxShader->setProjectionMatrix(*graphics->projection);
+
+			for (auto&& [entity, skybox, transform] :
+				m_registry->get().view<SkyboxComponent, Transformation>().each())
+			{
+				Entity entityhandler{ entity, m_registry.get() };
+				graphics->entity = &entityhandler;
+				graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
+				graphics->model = &transform.getWorldTransformation();
+
+				if (skybox.cubemap.isEmpty()) continue;
+
+				skybox.cubemap.get()->bind();
+				skybox.cubemap.get()->setSlot(0);
+
+				auto vao = graphics->mesh->getVAO();
+				RenderCommand::draw(vao);
+			}
+			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LESS);
+
+			glPopDebugGroup();
+		}
+
+		
+
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glEnable(GL_POLYGON_OFFSET_LINE);
+		//glPolygonOffset(-1.0, -1.0);
+
+		
 
 		if (Engine::get()->getConfig().renderConfig.renderVolumetricsPass)
 		{

@@ -2406,6 +2406,18 @@ void RenderInspectorWindow(float width, float height)
 			}
 		});
 
+		displayComponent<FoliageComponent>("Foliage Component", [](FoliageComponent& foliage) {
+			// Compile Button
+			addTextureEditWidget(foliage.m_foliageSpreadMap, { 100,100 }, [&](std::string uuid) {
+				foliage.m_foliageSpreadMap = Resource<Texture>(uuid);
+				});
+
+			if (ImGui::Button("build"))
+			{
+				foliage.build();
+			}
+			});
+
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
 			});
 
@@ -2508,6 +2520,11 @@ void RenderInspectorWindow(float width, float height)
 			if (ImGui::MenuItem("Shader"))
 			{
 				auto& shader = state.getSelectedEntity().addComponent<ShaderComponent>();
+			}
+
+			if (ImGui::MenuItem("Foliage"))
+			{
+				auto& foliage = state.getSelectedEntity().addComponent<FoliageComponent>();
 			}
 
 			//Todo REMOVE

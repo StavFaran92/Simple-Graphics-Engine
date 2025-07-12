@@ -13,6 +13,8 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
+	unsigned int getID() const;
+
 	unsigned int getLength() const;
 private:
 	unsigned int m_id = 0;

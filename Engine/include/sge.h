@@ -57,3 +57,4 @@
 #include "DebugHelper.h"
 #include "WaterSystem.h"
 #include "RenderCommand.h"
+#include "FoliageComponent.h"

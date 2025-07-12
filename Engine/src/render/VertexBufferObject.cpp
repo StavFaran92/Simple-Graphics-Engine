@@ -27,6 +27,11 @@ void VertexBufferObject::Unbind() const
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+unsigned int VertexBufferObject::getID() const
+{
+	return m_id;
+}
+
 unsigned int VertexBufferObject::getLength() const
 {
 	return m_length;

@@ -177,7 +177,7 @@ bool Mesh::build(MeshData& mData)
 	delete[] vertices;
 
 	m_vao->setLayout(m_layout);
-	m_vao->AttachBuffer(*m_vbo, m_ibo.get());
+	m_vao->AttachBuffer(m_vbo, m_ibo.get());
 
 	m_positions = mData.m_positions;
 

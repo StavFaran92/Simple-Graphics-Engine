@@ -14,6 +14,7 @@ struct EngineConfig
 		bool renderTerrainPass = true;
 		bool renderVolumetricsPass = true;
 		bool renderWireframeGrid = true;
+		bool renderFoliagePass = true;
 	};
 
 	EngineConfig(const std::string& path);
