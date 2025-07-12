@@ -55,6 +55,7 @@
 #include "EventSystem.h"
 #include "core/EngineConfig.h"
 #include "geometry/WireframeGrid.h"
+#include "systems/BuiltInMeshes.h"
 
 void cameraCalculateOrientation(Transformation& transform, CameraComponent& cameraComponent)
 {
@@ -198,7 +199,7 @@ void Scene::init(Context* context)
 
 	m_skyboxShader = Shader::create(SGE_ROOT_DIR +"Resources/Engine/Shaders/SkyboxShader.glsl");
 
-	m_basicBox = Box::createMesh();
+	m_basicBox = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
 
 	addRenderView("Scene View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 

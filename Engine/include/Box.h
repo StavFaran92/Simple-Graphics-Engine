@@ -8,6 +8,6 @@
 class EngineAPI Box
 {
 public:
-	static Resource<MeshCollection> createMesh();
+	static void createMesh(Resource<MeshCollection>& meshCollection);
 };
 

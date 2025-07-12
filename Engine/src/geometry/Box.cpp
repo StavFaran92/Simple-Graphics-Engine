@@ -71,19 +71,24 @@ static const unsigned int indices[] = {
     6, 7, 3
 };
 
-Resource<MeshCollection> Box::createMesh()
+void Box::createMesh(Resource<MeshCollection>& meshCollection)
 {
-    ModelImporter::ModelImportSettings settings;
-    settings.name = "SGE_BOX_MESH";
-    settings.isTransient = true;
-    return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/cube.gltf", settings).mesh;
-    //VertexLayout layout;
-    //layout.numOfVertices = 36;
-    //layout.attribs.emplace_back(LayoutAttribute::Positions);
-    //layout.attribs.emplace_back(LayoutAttribute::Normals);
-    //layout.attribs.emplace_back(LayoutAttribute::Texcoords);
+    //ModelImporter::ModelImportSettings settings;
+    //settings.name = "SGE_BOX_MESH";
+    //settings.isTransient = true;
+    //return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/cube.gltf", settings).mesh;
 
-    //return MeshBuilder::builder()
-    //    .addRawVertices((float*)vertices, layout)
-    //    .build();
+    auto mesh = std::make_shared<Mesh>();
+
+    VertexLayout layout;
+    layout.numOfVertices = 36;
+    layout.attribs.emplace_back(LayoutAttribute::Positions);
+    layout.attribs.emplace_back(LayoutAttribute::Normals);
+    layout.attribs.emplace_back(LayoutAttribute::Texcoords);
+
+    MeshBuilder::builder()
+        .addRawVertices((float*)vertices, layout)
+        .build(*mesh.get());
+
+    meshCollection.get()->addMesh(mesh);
 }

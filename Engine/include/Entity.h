@@ -94,8 +94,15 @@ public:
     {
         static_assert(std::is_base_of<Component, T>::value, "T must inherit from Component.");
 
-        assert(valid() && "Invalid entity.");
-        assert(m_registry->getRegistry().has<T>(m_entity) && "Component does not exist.");
+        if (!valid())
+        {
+            throw std::runtime_error("Invalid Entity specified.");
+        }
+        if (!m_registry->getRegistry().any_of<T>(m_entity))
+        {
+            throw std::runtime_error("Entity does not have component: TBD");
+
+        }
         return m_registry->getRegistry().get<T>(m_entity);
     }
 

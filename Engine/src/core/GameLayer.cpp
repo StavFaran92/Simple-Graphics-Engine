@@ -2,6 +2,7 @@
 
 #include "ScriptableEntity.h"
 #include "Engine.h"
+#include "Logger.h"
 
 bool GameLayer::handleEvent(SDL_Event e)
 {
@@ -13,7 +14,14 @@ bool GameLayer::handleEvent(SDL_Event e)
     {
         for (auto& ec : iter->second)
         {
-            ec.func(e);
+            try
+            {
+                ec.func(e);
+            }
+            catch (const std::exception& e)
+            {
+                logError("Exception occured: {}", e.what());
+            }
         }
     }
 

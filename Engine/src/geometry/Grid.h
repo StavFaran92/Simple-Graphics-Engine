@@ -7,5 +7,5 @@
 class Grid
 {
 public:
-	static Resource<MeshCollection> generateGrid(int x, int y, bool isTransient = true);
+	static void generateGrid(Resource<MeshCollection>& meshCollection,int x, int y);
 };

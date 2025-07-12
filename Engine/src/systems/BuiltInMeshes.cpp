@@ -7,51 +7,49 @@
 
 #include "Assets.h"
 #include "ModelImporter.h"
+#include "core/Factory.h"
+
+void addAsAsset(const Resource<MeshCollection>& meshCollection)
+{
+	AssetInfo aInfo;
+	aInfo.uuid = meshCollection.getUID();
+	aInfo.aType = AssetType::MESH;
+	aInfo.name = meshCollection.getUID();
+	aInfo.isTransient = true;
+	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+}
 
 BuiltInMeshes::BuiltInMeshes()
 {
 	{
 		// Create box
-		auto& mesh = Box::createMesh();
-		m_meshes[MeshType::BOX] = mesh;
-
-		//AssetInfo aInfo;
-		//aInfo.uuid = mesh.getUID();
-		//aInfo.aType = AssetType::MESH;
-		//aInfo.name = "SGE_BOX_MESH";
-		//aInfo.isTransient = true;
-		//Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+		Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_BOX");
+		Box::createMesh(meshCollection);
+		addAsAsset(meshCollection);
+		m_meshes[MeshType::BOX] = meshCollection;
 	}
 
 	{
 		// Create Quad
-		auto& mesh = Quad::createMesh();
-		m_meshes[MeshType::QUAD] = mesh;
-
-		//AssetInfo aInfo;
-		//aInfo.uuid = mesh.getUID();
-		//aInfo.aType = AssetType::MESH;
-		//aInfo.name = "SGE_QUAD_MESH";
-		//aInfo.isTransient = true;
-		//Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+		Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_QUAD");
+		Quad::createMesh(meshCollection);
+		addAsAsset(meshCollection);
+		m_meshes[MeshType::QUAD] = meshCollection;
 	}
 
 	{
 		// Create sphere
-		auto& mesh = Sphere::createMesh(1, 36, 36);
-		m_meshes[MeshType::SPHERE] = mesh;
-
-		//AssetInfo aInfo;
-		//aInfo.uuid = mesh.getUID();
-		//aInfo.aType = AssetType::MESH;
-		//aInfo.name = "SGE_SPHERE_MESH";
-		//aInfo.isTransient = true;
-		//Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+		Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_SPHERE");
+		Sphere::createMesh(meshCollection, 1, 36, 36);
+		addAsAsset(meshCollection);
+		m_meshes[MeshType::SPHERE] = meshCollection;
 	}
 
 	{
-		auto& mesh = Grid::generateGrid(10, 10, true);
-		m_meshes[MeshType::GRID] = mesh;
+		Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_GRID");
+		Grid::generateGrid(meshCollection, 10, 10);
+		addAsAsset(meshCollection);
+		m_meshes[MeshType::GRID] = meshCollection;
 	}
 }
 

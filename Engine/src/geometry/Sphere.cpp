@@ -7,7 +7,7 @@
 #include "core/Factory.h"
 #include "Assets.h"
 
-Resource<MeshCollection> Sphere::createMesh(float radius, int sectors, int stacks)
+void Sphere::createMesh(Resource<MeshCollection>& meshCollection, float radius, int sectors, int stacks)
 {
     //ModelImporter::ModelImportSettings settings;
     //settings.name = "SGE_SPHERE_MESH";
@@ -100,7 +100,7 @@ Resource<MeshCollection> Sphere::createMesh(float radius, int sectors, int stack
         }
     }
 
-    Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_SPHERE");
+    
 
     auto mesh = std::make_shared<Mesh>();
 
@@ -119,21 +119,4 @@ Resource<MeshCollection> Sphere::createMesh(float radius, int sectors, int stack
         .build(*mesh.get());
 
     meshCollection.get()->addMesh(mesh);
-
-    AssetInfo aInfo;
-    aInfo.uuid = meshCollection.getUID();
-    aInfo.aType = AssetType::MESH;
-    aInfo.name = "SGE_MESH_SPHERE";
-    aInfo.isTransient = true;
-
-    Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-
-    return meshCollection;
-
-    //return MeshBuilder::builder()
-    //    .addPositions(*positions)
-    //    .addNormals(*normals)
-    //    .addTexcoords(*texcoords)
-    //    .addIndices(*indices)
-    //    .build();
 }

@@ -46,7 +46,7 @@ aiScene* generateScene(const std::vector<float>& vertices, const std::vector<uns
 	return scene;
 }
 
-Resource<MeshCollection> Grid::generateGrid(int x, int y, bool isTransient)
+void Grid::generateGrid(Resource<MeshCollection>& meshCollection, int x, int y)
 {
 	int xRez = x;
 	int yRez = y;
@@ -101,7 +101,7 @@ Resource<MeshCollection> Grid::generateGrid(int x, int y, bool isTransient)
 	}
 
 
-	Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_GRID");
+	
 
 	auto mesh = std::make_shared<Mesh>();
 
@@ -117,23 +117,4 @@ Resource<MeshCollection> Grid::generateGrid(int x, int y, bool isTransient)
 		.build(*mesh.get());
 
 	meshCollection.get()->addMesh(mesh);
-
-	AssetInfo aInfo;
-	aInfo.uuid = meshCollection.getUID();
-	aInfo.aType = AssetType::MESH;
-	aInfo.name = "Grid_" + std::to_string(x) + "_" + std::to_string(y);
-
-	if (!isTransient)
-	{
-		aiScene* scene = generateScene(vertices, indices);
-		auto savedFilepath = MeshExporter::exportMesh(meshCollection, scene);
-	}
-	else
-	{
-		aInfo.isTransient = true;
-	}
-
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-
-	return meshCollection;
 }
