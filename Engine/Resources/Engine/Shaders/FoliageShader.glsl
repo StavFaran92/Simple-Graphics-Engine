@@ -15,7 +15,7 @@ layout (location = 4) in vec3 instancePos;
 void main()                                                                         
 { 
     mat4 model = mat4(1.0);
-    model[3] = vec4(instancePos, 1.0);
+    //model[3] = vec4(instancePos, 1.0);
     gl_Position = projection * view * model * vec4(aPos, 1.0); 
                                   
 }

@@ -4,7 +4,7 @@
 #include "Logger.h"
 
 VertexBufferObject::VertexBufferObject(const void* data, unsigned int length, unsigned int size)
-	: m_length(length)
+	: m_length(length), m_size(size)
 {
 	glGenBuffers(1, &m_id);
 	glBindBuffer(GL_ARRAY_BUFFER, m_id);
@@ -35,4 +35,9 @@ unsigned int VertexBufferObject::getID() const
 unsigned int VertexBufferObject::getLength() const
 {
 	return m_length;
+}
+
+unsigned int VertexBufferObject::getSize() const
+{
+	return m_size;
 }
