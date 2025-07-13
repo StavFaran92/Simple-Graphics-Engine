@@ -380,8 +380,8 @@ void Scene::draw(float deltaTime)
 				//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRASS_BLADE); 
 				auto& grassBlade = Engine::get()->getSubSystem<FoliageSystem>()->getGrassBladeMesh();
 				auto vao = grassBlade->getPrimaryMesh()->getVAO();
-				//RenderCommand::drawInstanced(vao, Engine::get()->getSubSystem<FoliageSystem>()->getCount());
-				RenderCommand::draw(vao);
+				RenderCommand::drawInstanced(vao, Engine::get()->getSubSystem<FoliageSystem>()->getCount());
+				//RenderCommand::draw(vao);
 			}
 
 			glPopDebugGroup();

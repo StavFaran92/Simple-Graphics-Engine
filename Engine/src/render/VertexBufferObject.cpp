@@ -3,12 +3,94 @@
 #include <GL/glew.h>
 #include "Logger.h"
 
-VertexBufferObject::VertexBufferObject(const void* data, unsigned int length, unsigned int size)
-	: m_length(length), m_size(size)
+std::shared_ptr<VertexBufferObject> VertexBufferObject::createRaw(const void* data, unsigned int length, unsigned int size, const VertexLayout& layout)
 {
-	glGenBuffers(1, &m_id);
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	std::shared_ptr<VertexBufferObject> instance = std::make_shared<VertexBufferObject>();
+	glGenBuffers(1, &instance->m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, instance->m_id);
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	instance->setLayout(layout);
+	instance->m_length = length;
+	instance->m_size = size;
+	return instance;
+}
+
+std::shared_ptr<VertexBufferObject> VertexBufferObject::create(const std::vector<Vertex>& vertices, const VertexLayout& layout)
+{
+	VertexLayout instLayout = layout;
+	// create raw vertices vector
+	// calculate stride
+	int stride = 0;
+	for (auto entry : layout.attribs)
+	{
+		auto& attribData = getAttributeData(entry);
+		stride += attribData.length * attribData.size;
+	}
+
+	// Update layout info
+	instLayout.stride = stride;
+
+	std::vector<uint8_t> raw;
+	unsigned int bufferSize = stride * vertices.size();
+	raw.resize(bufferSize);
+
+	for (size_t i = 0; i < vertices.size(); ++i)
+	{
+		size_t offset = 0;
+		uint8_t* dest = raw.data() + i * stride;
+
+		for (auto entry : layout.attribs)
+		{
+			auto& attribData = getAttributeData(entry);
+			const Vertex& v = vertices[i];
+
+			if (entry == LayoutAttribute::Positions)
+			{
+				memcpy(dest + offset + attribData.size * 0, &v.position.x, attribData.size);
+				memcpy(dest + offset + attribData.size * 1, &v.position.y, attribData.size);
+				memcpy(dest + offset + attribData.size * 2, &v.position.z, attribData.size);
+			}
+			else if (entry == LayoutAttribute::Normals)
+			{
+				memcpy(dest + offset + attribData.size * 0, &v.normal.x, attribData.size);
+				memcpy(dest + offset + attribData.size * 1, &v.normal.y, attribData.size);
+				memcpy(dest + offset + attribData.size * 2, &v.normal.z, attribData.size);
+			}
+			else if (entry == LayoutAttribute::Texcoords)
+			{
+				memcpy(dest + offset + attribData.size * 0, &v.texCoord.x, attribData.size);
+				memcpy(dest + offset + attribData.size * 1, &v.texCoord.y, attribData.size);
+			}
+			else if (entry == LayoutAttribute::Colors)
+			{
+				memcpy(dest + offset + attribData.size * 0, &v.color.x, attribData.size);
+				memcpy(dest + offset + attribData.size * 1, &v.color.y, attribData.size);
+				memcpy(dest + offset + attribData.size * 2, &v.color.z, attribData.size);
+			}
+			else if (entry == LayoutAttribute::Tangents)
+			{
+				memcpy(dest + offset + attribData.size * 0, &v.tangent.x, attribData.size);
+				memcpy(dest + offset + attribData.size * 1, &v.tangent.y, attribData.size);
+			}
+			else if (entry == LayoutAttribute::BoneIDs)
+			{
+				memcpy(dest + offset + attribData.size * 0, &v.boneIDs.x, attribData.size);
+				memcpy(dest + offset + attribData.size * 1, &v.boneIDs.y, attribData.size);
+				memcpy(dest + offset + attribData.size * 2, &v.boneIDs.z, attribData.size);
+			}
+			else if (entry == LayoutAttribute::BoneWeights)
+			{
+				memcpy(dest + offset + attribData.size * 0, &v.boneWeights.x, attribData.size);
+				memcpy(dest + offset + attribData.size * 1, &v.boneWeights.y, attribData.size);
+				memcpy(dest + offset + attribData.size * 2, &v.boneWeights.z, attribData.size);
+			}
+
+			offset += attribData.length * attribData.size;
+		}
+	}
+
+	// create VBO & Fill content
+	return VertexBufferObject::createRaw(&(raw[0]), vertices.size(), bufferSize, instLayout);
 }
 
 VertexBufferObject::~VertexBufferObject()
@@ -40,4 +122,28 @@ unsigned int VertexBufferObject::getLength() const
 unsigned int VertexBufferObject::getSize() const
 {
 	return m_size;
+}
+
+const VertexLayout& VertexBufferObject::getLayout() const
+{
+	return m_layout;
+}
+
+void VertexBufferObject::setLayout(const VertexLayout& layout)
+{
+	m_layout = layout;
+}
+
+void VertexBufferObject::addVertex(const Vertex& v)
+{
+	m_vertices.push_back(v);
+}
+
+void VertexBufferObject::addVertices(const std::vector<Vertex>& vs)
+{
+	m_vertices.reserve(vs.size());
+	for (const auto& v : vs)
+	{
+		addVertex(v);
+	}
 }

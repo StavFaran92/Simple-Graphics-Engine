@@ -27,6 +27,8 @@ enum class LayoutAttribute// : int
 	InstanceModel_1,
 	InstanceModel_2,
 	InstanceModel_3,
+
+	InstancePos,
 };
 
 struct AttributeData
@@ -51,6 +53,8 @@ const std::map<LayoutAttribute, AttributeData> g_attributeMetadata =
 	{ LayoutAttribute::InstanceModel_1, AttributeData{4, sizeof(float), 8, typeid(float).name()}},
 	{ LayoutAttribute::InstanceModel_2, AttributeData{4, sizeof(float), 9, typeid(float).name()}},
 	{ LayoutAttribute::InstanceModel_3, AttributeData{4, sizeof(float), 10, typeid(float).name()}},
+
+	{ LayoutAttribute::InstancePos, AttributeData{3, sizeof(float), 4, typeid(float).name()}},
 };
 
 AttributeData getAttributeData(LayoutAttribute attribute);

@@ -26,15 +26,6 @@ bool FoliageSystem::init()
 	//Quad::createMesh(meshCollection);
 	m_grassBlade = modelInfo.mesh;
 
-	m_grassBlade->getPrimaryMesh()->getVAO()->Bind();
-
-	std::shared_ptr<VertexBufferObject> vbo = std::make_shared<VertexBufferObject>(0, )
-	m_grassBlade->getPrimaryMesh()->getVAO()->AttachBuffer()
-
-	
-
-	m_grassBlade->getPrimaryMesh()->getVAO()->Unbind();
-
 	return true;
 }
 
@@ -54,14 +45,19 @@ void FoliageSystem::setMeshLocations(const std::vector<glm::vec3>& locations)
 	//	glBufferSubData(GL_ARRAY_BUFFER, i*, sizeof(glm::vec3), locations.data());
 	//}
 
-	std::shared_ptr<VertexBufferObject> vbo = std::make_shared<VertexBufferObject>(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3)); //when clean will cause issues
-	vbo->Bind();
+	VertexLayout layout;
+	layout.attribs.push_back(LayoutAttribute::InstancePos);
 
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)(sizeof(glm::vec3)));
+	auto vbo = VertexBufferObject::createRaw(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3), layout);
+	m_grassBlade->getPrimaryMesh()->getVAO()->attachBuffer(vbo, 0);
+	m_grassBlade->getPrimaryMesh()->getVAO()->build(); 
 	glVertexAttribDivisor(4, 1);
 
-	m_grassBlade->getPrimaryMesh()->getVAO()->AttachBuffer(vbo, 0); // this will cause issues
+	//std::shared_ptr<VertexBufferObject> vbo = std::make_shared<VertexBufferObject>(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3)); //when clean will cause issues
+	//vbo->Bind();
+
+	//glEnableVertexAttribArray(4);
+	//glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)(sizeof(glm::vec3)));
 
 	count = locations.size();
 }

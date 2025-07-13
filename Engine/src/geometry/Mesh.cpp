@@ -172,12 +172,14 @@ bool Mesh::build(MeshData& mData)
 		m_ibo = std::make_shared<ElementBufferObject>((unsigned int*)&(mData.m_indices[0]), mData.m_indices.size());
 	}
 
-	m_vbo = std::make_shared<VertexBufferObject>(&(vertices[0]), m_layout.numOfVertices, bufferSize);
+
+	auto vbo = VertexBufferObject::createRaw(&(vertices[0]), m_layout.numOfVertices, bufferSize, m_layout);
 
 	delete[] vertices;
 
-	m_vao->setLayout(m_layout);
-	m_vao->AttachBuffer(m_vbo, m_ibo.get());
+	m_vao->attachBuffer(vbo, m_ibo.get());
+	m_vao->setVertexCount(m_positions.size());
+	m_vao->build();
 
 	m_positions = mData.m_positions;
 

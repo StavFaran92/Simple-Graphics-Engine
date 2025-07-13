@@ -12,11 +12,17 @@ public:
 	{
 		VertexLayout layout;
 		layout.attribs.push_back(LayoutAttribute::Positions);
-		vao = std::make_shared<VertexArrayObject>(layout);
+		vao = std::make_shared<VertexArrayObject>();
+		
+		
+
 
 		const float step = 1.0f;
 		const int gridSize = 50;
 		const float halfSize = (gridSize - 1) * step * 0.5f;
+
+		std::vector<Vertex> vertices;
+		vertices.reserve(gridSize * 2);
 
 		// Horizontal lines (along X, Z stays fixed)
 		for (int i = 0; i < gridSize; ++i)
@@ -26,8 +32,8 @@ public:
 			Vertex v0, v1;
 			v0.position = glm::vec3(-halfSize, 0.0f, z);
 			v1.position = glm::vec3(halfSize, 0.0f, z);
-			vao->addVertex(v0);
-			vao->addVertex(v1);
+			vertices.push_back(v0);
+			vertices.push_back(v1);
 		}
 
 		// Vertical lines (along Z, X stays fixed)
@@ -38,10 +44,13 @@ public:
 			Vertex v0, v1;
 			v0.position = glm::vec3(x, 0.0f, -halfSize);
 			v1.position = glm::vec3(x, 0.0f, halfSize);
-			vao->addVertex(v0);
-			vao->addVertex(v1);
+			vertices.push_back(v0);
+			vertices.push_back(v1);
 		}
 
+		std::shared_ptr<VertexBufferObject> vbo = VertexBufferObject::create(vertices, layout);
+		vao->attachBuffer(vbo, 0);
+		vao->setVertexCount(vertices.size());
 		vao->build();
 
 		shader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl");
