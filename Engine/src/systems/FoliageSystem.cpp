@@ -20,7 +20,7 @@ bool FoliageSystem::init()
 
 	// At the moment i dont have infrastructure to import a mesh and alter its VAO in the same call.
 	//auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass.obj"); // TODO use single blade model
-	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import("C:/Users/Stav/Downloads/single_grass_blade/scene.gltf");
+	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/scene.gltf");
 
 	//Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_GRASS");
 	//Quad::createMesh(meshCollection);
