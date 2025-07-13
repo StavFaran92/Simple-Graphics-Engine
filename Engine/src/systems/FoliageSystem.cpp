@@ -4,6 +4,8 @@
 #include "Context.h"
 #include "ModelImporter.h"
 #include "render/VertexArrayObject.h"
+#include "Quad.h"
+#include "core/Factory.h"
 #include <GL/glew.h>
 
 FoliageSystem::FoliageSystem()
@@ -13,28 +15,23 @@ FoliageSystem::FoliageSystem()
 
 bool FoliageSystem::init()
 {
+	//m_foliageShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
 	m_foliageShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
 
 	// At the moment i dont have infrastructure to import a mesh and alter its VAO in the same call.
 	//auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass.obj"); // TODO use single blade model
-	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import("C:/Users/Stav/Downloads/grass/source/GrassPatch.fbx");
-	m_grassBlade = modelInfo.mesh;
+	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import("C:/Users/Stav/Downloads/single_grass_blade/scene.gltf");
+
+	Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_GRASS");
+	Quad::createMesh(meshCollection);
+	m_grassBlade = meshCollection;
 
 	m_grassBlade->getPrimaryMesh()->getVAO()->Bind();
 
-	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-	glEnableVertexAttribArray(7);
-	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
-	glEnableVertexAttribArray(8);
-	glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
-	glEnableVertexAttribArray(9);
-	glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)(sizeof(glm::vec3)));
 
-	glVertexAttribDivisor(6, 1);
-	glVertexAttribDivisor(7, 1);
-	glVertexAttribDivisor(8, 1);
-	glVertexAttribDivisor(9, 1);
+	glVertexAttribDivisor(4, 1);
 
 	m_grassBlade->getPrimaryMesh()->getVAO()->Unbind();
 
@@ -47,13 +44,13 @@ Resource<MeshCollection> FoliageSystem::getGrassBladeMesh()
 	return m_grassBlade;
 }
 
-void FoliageSystem::setMeshLocations(const std::vector<glm::mat4>& matrices)
+void FoliageSystem::setMeshLocations(const std::vector<glm::vec3>& locations)
 {
 	// TODO change, this is very specific to impl
 	glBindBuffer(GL_ARRAY_BUFFER, m_grassBlade->getPrimaryMesh()->getVAO()->getBufferID());
-	glBufferData(GL_ARRAY_BUFFER, matrices.size() * sizeof(glm::mat4), matrices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, locations.size() * sizeof(glm::vec3), locations.data(), GL_STATIC_DRAW);
 
-	count = matrices.size();
+	count = locations.size();
 }
 
 int FoliageSystem::getCount() const

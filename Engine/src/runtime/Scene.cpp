@@ -336,6 +336,7 @@ void Scene::draw(float deltaTime)
 		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 
 		glEnable(GL_DEPTH_TEST);
+		graphics->renderView->bind();
 
 		if (Engine::get()->getConfig().renderConfig.renderDeferredPass)
 		{
@@ -364,6 +365,8 @@ void Scene::draw(float deltaTime)
 		if (Engine::get()->getConfig().renderConfig.renderFoliagePass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Foliage render pass");
+
+			graphics->renderView->bind();
 
 			for (auto&& [entity, foliage, transform] : m_registry->get().view<FoliageComponent, Transformation>().each())
 			{

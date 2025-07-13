@@ -10,11 +10,13 @@
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
                                                                                     
 layout (location = 0) in vec3 aPos;
-layout (location = 6) in mat4 instanceModel;                                    
+layout (location = 4) in vec3 instancePos;                                    
                                                                                     
 void main()                                                                         
-{  
-    gl_Position = projection * view * instanceModel * vec4(aPos, 1.0); 
+{ 
+    mat4 model = mat4(1.0);
+    model[3] = vec4(instancePos, 1.0);
+    gl_Position = projection * view * model * vec4(aPos, 1.0); 
                                   
 }
 

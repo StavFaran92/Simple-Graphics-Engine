@@ -27,7 +27,7 @@ void FoliageComponent::build()
     std::vector<GLubyte> pixels(width * height * 3);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
 
-    std::vector<glm::mat4> foliageMatrices;
+    std::vector<glm::vec3> foliageLocations;
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
@@ -41,11 +41,10 @@ void FoliageComponent::build()
                     static_cast<float>(y)
                 );
 
-                glm::mat4 mat = glm::translate(glm::mat4(1.0f), position);
-                foliageMatrices.push_back(mat);
+                foliageLocations.push_back(position);
             }
         }
     }
 
-	Engine::get()->getSubSystem<FoliageSystem>()->setMeshLocations(foliageMatrices);
+	Engine::get()->getSubSystem<FoliageSystem>()->setMeshLocations(foliageLocations);
 }
