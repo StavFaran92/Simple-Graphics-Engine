@@ -15,5 +15,7 @@ struct EngineAPI FoliageComponent : public Component
 	std::vector<glm::mat4> matrices;
 
 	void build();
+
+	float density = 0;
 	
 };

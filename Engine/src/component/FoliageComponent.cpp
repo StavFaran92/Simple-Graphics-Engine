@@ -2,6 +2,7 @@
 
 #include "Transformation.h"
 #include "systems/FoliageSystem.h"
+#include "Random.h"
 
 #include <GL/glew.h> // TODO Remove
 
@@ -29,19 +30,30 @@ void FoliageComponent::build()
 
     std::vector<glm::vec3> foliageLocations;
 
+    const int densityMultiplier = 255;
+    RandomNumberGenerator rng;
+
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             int i = (y * width + x) * 3;
             GLubyte r = pixels[i];
 
-            if (r > 0) {
-                glm::vec3 position = glm::vec3(
-                    static_cast<float>(x),
-                    0.0f, // flat on ground (you can add noise/height here)
-                    static_cast<float>(y)
-                );
+            if (r > 0.f) {
+                float scale = r / 255.f;
+                int bladeCount = density * scale * densityMultiplier;
+                float xoffset = rng.rand();
+                float yoffset = rng.rand();
 
-                foliageLocations.push_back(position);
+                for (int j = 0; j < bladeCount; j++)
+                {
+                    glm::vec3 position = glm::vec3(
+                        static_cast<float>(x) + xoffset,
+                        0.0f, // flat on ground (you can add noise/height here)
+                        static_cast<float>(y) + yoffset
+                    );
+
+                    foliageLocations.push_back(position);
+                }
             }
         }
     }

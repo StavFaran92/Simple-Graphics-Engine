@@ -2412,6 +2412,8 @@ void RenderInspectorWindow(float width, float height)
 				foliage.m_foliageSpreadMap = Resource<Texture>(uuid);
 				});
 
+			ImGui::DragFloat("Density", &foliage.density, 0.0f, 1.0f);
+
 			if (ImGui::Button("build"))
 			{
 				foliage.build();
