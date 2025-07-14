@@ -41,11 +41,12 @@ void FoliageComponent::build()
             if (r > 0.f) {
                 float scale = r / 255.f;
                 int bladeCount = density * scale * densityMultiplier;
-                float xoffset = rng.rand();
-                float yoffset = rng.rand();
 
                 for (int j = 0; j < bladeCount; j++)
                 {
+                    float xoffset = rng.rand();
+                    float yoffset = rng.rand();
+
                     glm::vec3 position = glm::vec3(
                         static_cast<float>(x) + xoffset,
                         0.0f, // flat on ground (you can add noise/height here)
