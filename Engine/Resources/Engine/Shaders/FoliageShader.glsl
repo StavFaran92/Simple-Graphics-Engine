@@ -26,9 +26,21 @@ void main()
 
 out vec4 FragColor;
 
+uniform vec3 colorA;
+uniform vec3 colorB;
+
 // uniform vec3 color;
 
 void main() 
 {
-    FragColor = vec4(0.0, 1.0, 0.0, 1.0); 
+
+    // for(int i = 0; i < dirLightCount; ++i)
+	// {
+    //     vec3 ambient = 0.0f;
+	// 	vec3 diffuse = dirLight[i].direction
+	// }
+
+    vec3 color = mix(colorA, colorB, gl_FragCoord.y);
+
+    FragColor = vec4(color, 1.0); 
 }

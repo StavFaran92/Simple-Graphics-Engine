@@ -374,6 +374,8 @@ void Scene::draw(float deltaTime)
 				foliageShader->use();
 				foliageShader->setUniformValue("view", *graphics->view);
 				foliageShader->setUniformValue("projection", *graphics->projection);
+				foliageShader->setUniformValue("colorA", foliage.colorA);
+				foliageShader->setUniformValue("colorB", foliage.colorB);
 
 				// create instance batch from foliage map
 
