@@ -172,7 +172,7 @@ static void stopSimulation()
 	Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_editorCamera);
 
 	uiLayer->setEnabled(true);
-	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->unlock();
+	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->unlock(); //TODO this should be in camera event
 }
 
 static void startsimulation()
@@ -184,7 +184,7 @@ static void startsimulation()
 
 	uiLayer->setEnabled(false);
 	state.selectEntity(Entity::EmptyEntity);
-	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock();
+	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock(); //TODO this should be in camera event
 
 }
 
@@ -1236,7 +1236,7 @@ void displayEntity(Entity& e)
 	auto& obj = e.getComponent<ObjectComponent>();
 	bool hasChildren = transform.getChildren().size() > 0;
 
-	static int nonLeafTreeFlags = ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
+	static int nonLeafTreeFlags = ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
 	static int leafTreeFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 	ImGui::SetNextItemWidth(300.0f);
@@ -2412,7 +2412,7 @@ void RenderInspectorWindow(float width, float height)
 				foliage.m_foliageSpreadMap = Resource<Texture>(uuid);
 				});
 
-			ImGui::DragFloat("Density", &foliage.density, 0.0f, 1.0f);
+			ImGui::DragFloat("Density", &foliage.density, 0.01f, 0.0f, 1.0f);
 
 			if (ImGui::Button("build"))
 			{
