@@ -201,4 +201,6 @@ private:
 	Resource<Shader> m_highlightMergeShader;
 
 	std::shared_ptr<WireframeGrid> m_wireframeGrid;
+
+	Resource<Shader> m_sampleComputeShader;
 };

@@ -105,12 +105,20 @@ void Shader::BuildShaders(const ShadersInfo& shaderCode)
 	}
 
 	// Create and attach vertex shader to program
-	GLuint vertexShader = AddShader(shaderCode.vertexCode, GL_VERTEX_SHADER);
-	glAttachShader(m_id, vertexShader);
+	GLuint vertexShader = 0;
+	if (!shaderCode.vertexCode.empty())
+	{
+		vertexShader = AddShader(shaderCode.vertexCode, GL_VERTEX_SHADER);
+		glAttachShader(m_id, vertexShader);
+	}
 
 	// Create and attach fragment shader to program
-	GLuint fragShader = AddShader(shaderCode.fragmentCode, GL_FRAGMENT_SHADER);
-	glAttachShader(m_id, fragShader);
+	GLuint fragShader = 0;
+	if (!shaderCode.fragmentCode.empty())
+	{
+		fragShader = AddShader(shaderCode.fragmentCode, GL_FRAGMENT_SHADER);
+		glAttachShader(m_id, fragShader);
+	}
 
 	// Create and attach geometry shader to program if needed
 	GLuint geometryShader = 0;
@@ -134,6 +142,14 @@ void Shader::BuildShaders(const ShadersInfo& shaderCode)
 	{
 		tessEvalShader = AddShader(shaderCode.tessEvaluationCode, GL_TESS_EVALUATION_SHADER);
 		glAttachShader(m_id, tessEvalShader);
+	}
+
+	// Create and attach compute shader
+	GLuint computeShader = 0;
+	if (!shaderCode.computeCode.empty())
+	{
+		computeShader = AddShader(shaderCode.computeCode, GL_COMPUTE_SHADER);
+		glAttachShader(m_id, computeShader);
 	}
 
 	// Link shader program
@@ -179,9 +195,12 @@ void Shader::BuildShaders(const ShadersInfo& shaderCode)
 		}
 	}
 
-	// Delete shaders
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragShader);
+	// Delete 
+	if(vertexShader)
+		glDeleteShader(vertexShader);
+
+	if(fragShader)
+		glDeleteShader(fragShader);
 
 	if (geometryShader)
 		glDeleteShader(geometryShader);
@@ -191,6 +210,9 @@ void Shader::BuildShaders(const ShadersInfo& shaderCode)
 
 	if (tessEvalShader)
 		glDeleteShader(tessEvalShader);
+
+	if (computeShader)
+		glDeleteShader(computeShader);
 
 	//parseUniforms();
 }

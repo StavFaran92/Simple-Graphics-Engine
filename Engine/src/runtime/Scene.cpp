@@ -166,7 +166,7 @@ void Scene::init(Context* context)
 	if (!m_shadowSystem->init())
 	{
 		logError("Shadow System init failed!");
-	} 
+	}
 
 
 	m_lightSystem = std::make_shared<LightSystem>(m_context, this);
@@ -178,7 +178,7 @@ void Scene::init(Context* context)
 	m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)4 / 3, 0.1f, 1000.0f);
 
 	m_defaultUIProjection = glm::ortho(0.0f, (float)Engine::get()->getWindow()->getWidth(), (float)Engine::get()->getWindow()->getHeight(), 0.0f, -1.0f, 1.0f);
-	
+
 	m_quadUI = ShapeFactory::createQuad(&getRegistry());
 	m_quadUI.RemoveComponent<RenderableComponent>();
 	m_quadUI.RemoveComponent<ObjectComponent>();
@@ -199,7 +199,7 @@ void Scene::init(Context* context)
 	// Create BRDF look up texture
 	m_BRDFIntegrationLUT = IBL::generateBRDFIntegrationLUT(this);
 
-	m_skyboxShader = Shader::create(SGE_ROOT_DIR +"Resources/Engine/Shaders/SkyboxShader.glsl");
+	m_skyboxShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/SkyboxShader.glsl");
 
 	m_basicBox = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
 
@@ -207,13 +207,38 @@ void Scene::init(Context* context)
 
 	m_registry->getRegistry().on_construct<ScriptableEntity>().connect<&Scene::bindScriptToLayer>(this);
 
-	m_highlightRenderView = std::make_shared<RenderView>(Viewport{0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight() }, Entity::EmptyEntity);
+	m_highlightRenderView = std::make_shared<RenderView>(Viewport{ 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight() }, Entity::EmptyEntity);
 
 	m_highlightMaskShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl");
 	m_highlightEdgeDetectionShader = Shader::createOverrideShader("HighlightEdgeDetectionShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
 	m_highlightMergeShader = Shader::createOverrideShader("HighlightMergeShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
 
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
+
+
+	std::vector<GLuint> data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // sum = 45
+
+	GLuint ssbo;
+	glGenBuffers(1, &ssbo);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, data.size() * sizeof(GLuint), data.data(), GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo); // Binding = 0
+
+
+	m_sampleComputeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/SampleComputeShader.glsl");
+
+	m_sampleComputeShader->use();
+	glDispatchCompute((GLuint)data.size(), 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+
+	// Read result
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	GLuint* ptr = (GLuint*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
+	GLuint result = ptr[0];
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+	logInfo("Sum is: {}", result);
 }
 
 void Scene::update(float deltaTime)
