@@ -28,7 +28,7 @@ void FoliageComponent::build()
     std::vector<GLubyte> pixels(width * height * 3);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
 
-    std::vector<glm::vec3> foliageLocations;
+    std::vector<glm::vec4> foliageLocations;
 
     const int densityMultiplier = 255;
     RandomNumberGenerator rng;
@@ -47,10 +47,11 @@ void FoliageComponent::build()
                     float xoffset = rng.rand();
                     float yoffset = rng.rand();
 
-                    glm::vec3 position = glm::vec3(
+                    glm::vec4 position = glm::vec4(
                         static_cast<float>(x) + xoffset,
                         0.0f, // flat on ground (you can add noise/height here)
-                        static_cast<float>(y) + yoffset
+                        static_cast<float>(y) + yoffset,
+                        1.0f
                     );
 
                     foliageLocations.push_back(position);

@@ -39,7 +39,7 @@ Resource<MeshCollection> FoliageSystem::getGrassBladeMesh()
 	return m_grassBlade;
 }
 
-void FoliageSystem::setMeshLocations(const std::vector<glm::vec3>& locations)
+void FoliageSystem::setMeshLocations(const std::vector<glm::vec4>& locations)
 {
 	// TODO change, this is very specific to impl
 	//glBindBuffer(GL_ARRAY_BUFFER, m_grassBlade->getPrimaryMesh()->getVAO()->getBufferID());
@@ -59,7 +59,7 @@ void FoliageSystem::setMeshLocations(const std::vector<glm::vec3>& locations)
 
 	
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, locations.size() * sizeof(glm::vec3), locations.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, locations.size() * sizeof(glm::vec4), locations.data(), GL_DYNAMIC_DRAW);
 
 	//std::shared_ptr<VertexBufferObject> vbo = std::make_shared<VertexBufferObject>(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3)); //when clean will cause issues
 	//vbo->Bind();

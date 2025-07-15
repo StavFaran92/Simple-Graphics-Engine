@@ -10,7 +10,7 @@ public:
 	bool init();
 
 	Resource<MeshCollection> getGrassBladeMesh();
-	void setMeshLocations(const std::vector<glm::vec3>& locations);
+	void setMeshLocations(const std::vector<glm::vec4>& locations);
 	int getCount() const;
 	Resource<Shader>& getFoliageShader();
 	unsigned int getSSBO() const;

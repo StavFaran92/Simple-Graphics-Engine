@@ -12,7 +12,7 @@ ScriptableEntity* NativeScriptsLoader::getScript(const std::string& name) const
     auto iter = m_scriptsCallbacks.find(name);
     if (iter == m_scriptsCallbacks.end())
     {
-        logError("Could not find script: " + name)
+        logError("Could not find script: " + name);
         return nullptr;
     }
 

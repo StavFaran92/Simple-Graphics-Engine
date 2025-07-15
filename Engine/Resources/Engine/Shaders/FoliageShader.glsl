@@ -14,7 +14,7 @@ layout (location = 1) in vec3 norm;
 // layout (location = 4) in vec3 instancePos; 
 
 layout(std430, binding = 0) buffer InstanceData {
-    vec3 instancePos[];
+    vec4 instancePos[];
 };
 
 out vec3 Normal;
@@ -23,7 +23,7 @@ out vec3 fragPos;
 void main()                                                                         
 { 
     mat4 model = mat4(1.0);
-    model[3] = vec4(instancePos[gl_InstanceID], 1.0);
+    model[3] = instancePos[gl_InstanceID];
     Normal = norm;
     fragPos = aPos;
     gl_Position = projection * view * model * vec4(aPos, 1.0); 
