@@ -216,29 +216,28 @@ void Scene::init(Context* context)
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
 
 
-	std::vector<GLuint> data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // sum = 45
+	//std::vector<GLuint> data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // sum = 45
 
-	GLuint ssbo;
-	glGenBuffers(1, &ssbo);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, data.size() * sizeof(GLuint), data.data(), GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo); // Binding = 0
-
-
-	m_sampleComputeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/SampleComputeShader.glsl");
-
-	m_sampleComputeShader->use();
-	glDispatchCompute((GLuint)data.size(), 1, 1);
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	//glGenBuffers(1, &ssbo);
+	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	//glBufferData(GL_SHADER_STORAGE_BUFFER, data.size() * sizeof(GLuint), data.data(), GL_DYNAMIC_DRAW);
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo); // Binding = 0
 
 
-	// Read result
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-	GLuint* ptr = (GLuint*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
-	GLuint result = ptr[0];
-	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	//m_sampleComputeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/SampleComputeShader.glsl");
 
-	logInfo("Sum is: {}", result);
+	//m_sampleComputeShader->use();
+	//glDispatchCompute((GLuint)data.size(), 1, 1);
+	//glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+
+	//// Read result
+	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	//GLuint* ptr = (GLuint*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
+	//GLuint result = ptr[0];
+	//glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+	//logInfo("Sum is: {}", result);
 }
 
 void Scene::update(float deltaTime)
@@ -402,6 +401,9 @@ void Scene::draw(float deltaTime)
 				foliageShader->setUniformValue("colorA", foliage.colorA);
 				foliageShader->setUniformValue("colorB", foliage.colorB);
 				foliageShader->setUniformValue("viewDir", primaryCamera.front);
+
+				unsigned int ssbo = Engine::get()->getSubSystem<FoliageSystem>()->getSSBO();
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
 
 				// create instance batch from foliage map
 

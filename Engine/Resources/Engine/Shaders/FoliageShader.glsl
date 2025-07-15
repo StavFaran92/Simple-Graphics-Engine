@@ -1,6 +1,6 @@
 #vert
 
-#version 330 
+#version 430 
 
 // ----- Definitions ----- //
 
@@ -11,7 +11,11 @@
                                                                                     
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 norm;
-layout (location = 4) in vec3 instancePos; 
+// layout (location = 4) in vec3 instancePos; 
+
+layout(std430, binding = 0) buffer InstanceData {
+    vec3 instancePos[];
+};
 
 out vec3 Normal;
 out vec3 fragPos;
@@ -19,7 +23,7 @@ out vec3 fragPos;
 void main()                                                                         
 { 
     mat4 model = mat4(1.0);
-    model[3] = vec4(instancePos, 1.0);
+    model[3] = vec4(instancePos[gl_InstanceID], 1.0);
     Normal = norm;
     fragPos = aPos;
     gl_Position = projection * view * model * vec4(aPos, 1.0); 

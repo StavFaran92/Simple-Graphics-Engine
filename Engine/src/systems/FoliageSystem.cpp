@@ -28,6 +28,8 @@ bool FoliageSystem::init()
 	//Quad::createMesh(meshCollection);
 	m_grassBlade = modelInfo.mesh;
 
+	glGenBuffers(1, &ssbo);
+
 	return true;
 }
 
@@ -47,13 +49,17 @@ void FoliageSystem::setMeshLocations(const std::vector<glm::vec3>& locations)
 	//	glBufferSubData(GL_ARRAY_BUFFER, i*, sizeof(glm::vec3), locations.data());
 	//}
 
-	VertexLayout layout;
-	layout.attribs.push_back(LayoutAttribute::InstancePos);
+	//VertexLayout layout;
+	//layout.attribs.push_back(LayoutAttribute::InstancePos);
 
-	auto vbo = VertexBufferObject::createRaw(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3), layout);
-	m_grassBlade->getPrimaryMesh()->getVAO()->attachBuffer(vbo, 0);
-	m_grassBlade->getPrimaryMesh()->getVAO()->build(); 
-	glVertexAttribDivisor(4, 1);
+	//auto vbo = VertexBufferObject::createRaw(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3), layout);
+	//m_grassBlade->getPrimaryMesh()->getVAO()->attachBuffer(vbo, 0);
+	//m_grassBlade->getPrimaryMesh()->getVAO()->build(); 
+	//glVertexAttribDivisor(4, 1);
+
+	
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, locations.size() * sizeof(glm::vec3), locations.data(), GL_DYNAMIC_DRAW);
 
 	//std::shared_ptr<VertexBufferObject> vbo = std::make_shared<VertexBufferObject>(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3)); //when clean will cause issues
 	//vbo->Bind();
@@ -73,4 +79,9 @@ int FoliageSystem::getCount() const
 Resource<Shader>& FoliageSystem::getFoliageShader()
 {
 	return m_foliageShader;
+}
+
+unsigned int FoliageSystem::getSSBO() const
+{
+	return ssbo;
 }
