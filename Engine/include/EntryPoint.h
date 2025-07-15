@@ -85,6 +85,8 @@ int sgeEntry(int argc, char* argv[])
     catch (const std::runtime_error& e)
     {
         return ErrorHandler::handle(e);
+
+        Logger::get()->flush();
     }
 #endif //SGE_DEBUG
     return 0;

@@ -51,6 +51,8 @@ Engine* Engine::instance = nullptr;
 
 bool Engine::init(const InitParams& initParams)
 {
+    Logger::init("test.log");
+
     if (m_isInit)
     {
         logError("Engine already started!");

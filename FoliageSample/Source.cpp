@@ -137,6 +137,8 @@ public:
 		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/sample_grass_spread.png");
 		foliage.build();
 
+		
+
 		//camera.getComponent<NativeScriptComponent>().script->onCreate();
 	}
 
