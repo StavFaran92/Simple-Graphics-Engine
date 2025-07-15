@@ -59,6 +59,11 @@
 #include "FoliageComponent.h"
 #include "systems/FoliageSystem.h"
 
+struct PlaneGPU {
+	glm::vec3 normal;
+	float d;
+};
+
 void cameraCalculateOrientation(Transformation& transform, CameraComponent& cameraComponent)
 {
 	auto quat = transform.getWorldRotation();
@@ -222,6 +227,8 @@ void Scene::init(Context* context)
 	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, m_atomicCounterBuffer);
 
+	glGenBuffers(1, &m_frustumUBO);
+
 	//std::vector<GLuint> data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // sum = 45
 
 	//glGenBuffers(1, &ssbo);
@@ -236,7 +243,7 @@ void Scene::init(Context* context)
 	//glDispatchCompute((GLuint)data.size(), 1, 1);
 	//glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-
+	
 	//// Read result
 	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
 	//GLuint* ptr = (GLuint*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
@@ -417,8 +424,25 @@ void Scene::draw(float deltaTime)
 				glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
 				glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), &zero); // reset counter to 0
 
+				std::array<glm::vec4, 6> planes;
+				planes[0] = glm::vec4(frustum.m_znear.m_normal, frustum.m_znear.m_distance);
+				planes[1] = glm::vec4(frustum.m_zfar.m_normal, frustum.m_zfar.m_distance);
+				planes[2] = glm::vec4(frustum.m_right.m_normal, frustum.m_right.m_distance);
+				planes[3] = glm::vec4(frustum.m_left.m_normal, frustum.m_left.m_distance);
+				planes[4] = glm::vec4(frustum.m_up.m_normal, frustum.m_up.m_distance);
+				planes[5] = glm::vec4(frustum.m_down.m_normal, frustum.m_down.m_distance);
+
+				glBindBuffer(GL_UNIFORM_BUFFER, m_frustumUBO);
+				glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 6, planes.data(), GL_DYNAMIC_DRAW);
+				glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_frustumUBO);
+
 				glDispatchCompute(ceil(instanceCount / 32.f), 1, 1);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+				glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
+				GLuint* ptr = (GLuint*)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
+				GLuint result = ptr[0];
+				glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 
 				// fill blades on grass in each quad
 
@@ -437,7 +461,7 @@ void Scene::draw(float deltaTime)
 				//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRASS_BLADE); 
 				auto& grassBlade = Engine::get()->getSubSystem<FoliageSystem>()->getGrassBladeMesh();
 				auto vao = grassBlade->getPrimaryMesh()->getVAO();
-				RenderCommand::drawInstanced(vao, Engine::get()->getSubSystem<FoliageSystem>()->getCount());
+				RenderCommand::drawInstanced(vao, result);
 				//RenderCommand::draw(vao);
 			}
 
