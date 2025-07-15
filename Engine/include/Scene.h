@@ -203,5 +203,7 @@ private:
 	std::shared_ptr<WireframeGrid> m_wireframeGrid;
 
 	Resource<Shader> m_sampleComputeShader;
+	Resource<Shader> m_frustumCullGPUShader;
+	unsigned int m_atomicCounterBuffer;
 	
 };

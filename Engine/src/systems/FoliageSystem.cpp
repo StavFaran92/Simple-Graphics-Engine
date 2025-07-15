@@ -28,7 +28,8 @@ bool FoliageSystem::init()
 	//Quad::createMesh(meshCollection);
 	m_grassBlade = modelInfo.mesh;
 
-	glGenBuffers(1, &ssbo);
+	glGenBuffers(1, &inputSSBO);
+	glGenBuffers(1, &outputSSBO);
 
 	return true;
 }
@@ -58,8 +59,11 @@ void FoliageSystem::setMeshLocations(const std::vector<glm::vec4>& locations)
 	//glVertexAttribDivisor(4, 1);
 
 	
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, inputSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, locations.size() * sizeof(glm::vec4), locations.data(), GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, outputSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, locations.size() * sizeof(glm::vec4), NULL, GL_DYNAMIC_DRAW);
 
 	//std::shared_ptr<VertexBufferObject> vbo = std::make_shared<VertexBufferObject>(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3)); //when clean will cause issues
 	//vbo->Bind();
@@ -81,7 +85,12 @@ Resource<Shader>& FoliageSystem::getFoliageShader()
 	return m_foliageShader;
 }
 
-unsigned int FoliageSystem::getSSBO() const
+unsigned int FoliageSystem::getInputSSBO() const
 {
-	return ssbo;
+	return inputSSBO;
+}
+
+unsigned int FoliageSystem::getOutputSSBO() const
+{
+	return outputSSBO;
 }

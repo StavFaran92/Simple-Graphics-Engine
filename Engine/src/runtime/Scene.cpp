@@ -215,6 +215,12 @@ void Scene::init(Context* context)
 
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
 
+	m_frustumCullGPUShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FrustumCullComputeShader.glsl");
+
+	glGenBuffers(1, &m_atomicCounterBuffer);
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
+	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, m_atomicCounterBuffer);
 
 	//std::vector<GLuint> data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // sum = 45
 
@@ -394,6 +400,28 @@ void Scene::draw(float deltaTime)
 
 			for (auto&& [entity, foliage, transform] : m_registry->get().view<FoliageComponent, Transformation>().each())
 			{
+				// Perform frustum cull
+				m_frustumCullGPUShader->use();
+
+				unsigned int inputSSBO = Engine::get()->getSubSystem<FoliageSystem>()->getInputSSBO();
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, inputSSBO);
+
+				unsigned int outputSSBO = Engine::get()->getSubSystem<FoliageSystem>()->getOutputSSBO();
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, outputSSBO);
+
+				m_frustumCullGPUShader->setUniformValue("positionsSize", Engine::get()->getSubSystem<FoliageSystem>()->getCount());
+
+				int instanceCount = Engine::get()->getSubSystem<FoliageSystem>()->getCount();
+
+				GLuint zero = 0;
+				glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
+				glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), &zero); // reset counter to 0
+
+				glDispatchCompute(ceil(instanceCount / 32.f), 1, 1);
+				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+				// fill blades on grass in each quad
+
 				auto& foliageShader = Engine::get()->getSubSystem<FoliageSystem>()->getFoliageShader();
 				foliageShader->use();
 				foliageShader->setUniformValue("view", *graphics->view);
@@ -402,8 +430,7 @@ void Scene::draw(float deltaTime)
 				foliageShader->setUniformValue("colorB", foliage.colorB);
 				foliageShader->setUniformValue("viewDir", primaryCamera.front);
 
-				unsigned int ssbo = Engine::get()->getSubSystem<FoliageSystem>()->getSSBO();
-				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, outputSSBO);
 
 				// create instance batch from foliage map
 

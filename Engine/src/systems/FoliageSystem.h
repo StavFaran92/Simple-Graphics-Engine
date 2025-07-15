@@ -13,11 +13,13 @@ public:
 	void setMeshLocations(const std::vector<glm::vec4>& locations);
 	int getCount() const;
 	Resource<Shader>& getFoliageShader();
-	unsigned int getSSBO() const;
+	unsigned int getInputSSBO() const;
+	unsigned int getOutputSSBO() const;
 
 private:
 	Resource<MeshCollection> m_grassBlade;
 	int count = 0;
 	Resource<Shader> m_foliageShader;
-	unsigned int ssbo;
+	unsigned int inputSSBO;
+	unsigned int outputSSBO;
 };
