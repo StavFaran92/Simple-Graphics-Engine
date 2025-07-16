@@ -968,12 +968,12 @@ unsigned int Scene::getRenderViewTextureID(const std::string& name) const
 
 unsigned int Scene::getGameRenderViewTextureID() const
 {
-	return getRenderViewFrameBufferID("Game View"); // todo fix
+	return getRenderViewTextureID("Game View"); // todo fix
 }
 
 unsigned int Scene::getGameRenderViewFrameBufferID() const
 {
-	return getRenderViewTextureID("Game View"); // todo fix
+	return getRenderViewFrameBufferID("Game View"); // todo fix
 }
 
 std::shared_ptr<RenderView> Scene::getRenderView(const std::string& name) const
