@@ -334,7 +334,7 @@ void Engine::run(Application* app)
         draw(deltaTime);
         app->update(deltaTime);
 
-        RenderCommand::copyFrameBufferData(m_context->getActiveScene()->getRenderTargetFrameBufferID(0), 
+        RenderCommand::copyFrameBufferData(m_context->getActiveScene()->getGameRenderViewFrameBufferID(), 
             0, 
             RenderCommand::BufferBit::DEPTH_BUFFER_BIT | RenderCommand::BufferBit::COLOR_BUFFER_BIT);
 
@@ -546,7 +546,6 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
 
     auto mainCamera = startupScene->createEntity("Main Camera");
     mainCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 1000.0f));
-    startupScene->setPrimaryCamera(mainCamera);
     mainCamera.getComponent<Transformation>().setLocalPosition({10,10,10});
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
@@ -564,6 +563,8 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     {
         materialComponent.setMaterial(idx, m);
     }
+
+    m_context->getActiveScene()->setPrimaryCamera(mainCamera);
 
     if (initParams.templateScene)
     {

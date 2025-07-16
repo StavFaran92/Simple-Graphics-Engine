@@ -110,23 +110,23 @@ glm::mat4 Scene::getProjection() const
 	return m_defaultPerspectiveProjection;
 }
 
-Entity Scene::getActiveCamera() const
+Entity Scene::getGameCamera() const
 {
 	assert(m_renderViews.size() > 0);
-	return m_renderViews[0]->getCamera();
+	return getRenderView("Game View")->getCamera();
 }
 
 void Scene::setPrimaryCamera(Entity e)
 {
 	assert(m_renderViews.size() > 0);
-	m_renderViews[0]->setCamera(e);
+	getRenderView("Game View")->setCamera(e);
 }
 
 void Scene::bindScriptToLayer(entt::registry& reg, entt::entity entity) 
 {
 	auto& script = reg.get<ScriptableEntity>(entity);
 	script.eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
-};
+}
 
 void Scene::init(Context* context)
 {
@@ -208,7 +208,7 @@ void Scene::init(Context* context)
 
 	m_basicBox = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
 
-	addRenderView("Scene View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
+	addRenderView("Game View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 
 	m_registry->getRegistry().on_construct<ScriptableEntity>().connect<&Scene::bindScriptToLayer>(this);
 
@@ -251,7 +251,7 @@ void Scene::update(float deltaTime)
 		transform.update();
 	}
 
-	getActiveCamera().getComponent<Transformation>().update();
+	getGameCamera().getComponent<Transformation>().update();
 
 	if (m_isSimulationActive)
 	{
@@ -292,7 +292,7 @@ void Scene::draw(float deltaTime)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-	for (auto& renderView : m_renderViews)
+	for (auto& [rName, renderView] : m_renderViews)
 	{
 		auto viewport = renderView->getViewport();
 
@@ -799,8 +799,8 @@ void Scene::removeEntity(const Entity& e)
 
 glm::mat4 Scene::getActiveCameraView() const
 {
-	auto& primaryCamera = getActiveCamera().getComponent<CameraComponent>();
-	auto& primaryCameraTransform = getActiveCamera().getComponent<Transformation>();
+	auto& primaryCamera = getGameCamera().getComponent<CameraComponent>();
+	auto& primaryCameraTransform = getGameCamera().getComponent<Transformation>();
 
 	return glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
 }
@@ -937,26 +937,55 @@ physx::PxScene* Scene::getPhysicsScene() const
 	return m_PhysicsScene;
 }
 
-unsigned int Scene::addRenderView(const std::string& name, int x, int y, int w, int h, const Entity& e)
+void Scene::addRenderView(const std::string& name, int x, int y, int w, int h, const Entity& e)
 {
-	// todo maybe use map here?
-	unsigned int id = m_renderViews.size();
-	m_renderViews.push_back(std::make_shared<RenderView>(Viewport{x, y, w, h}, e, name));
-	return id;
+	m_renderViews[name] = std::make_shared<RenderView>(Viewport{x, y, w, h}, e, name);
 }
 
-unsigned int Scene::getRenderTargetFrameBufferID(unsigned int id) const
+unsigned int Scene::getRenderViewFrameBufferID(const std::string& name) const
 {
-	assert(id < m_renderViews.size());
+	auto renderView = getRenderView(name);
 
-	return m_renderViews[id]->getRenderTargetFrameBufferID();
+	if (!renderView)
+	{
+		return 0;
+	}
+
+	return renderView->getRenderTargetFrameBufferID();
 }
 
-unsigned int Scene::getRenderTargetTextureID(unsigned int id) const
+unsigned int Scene::getRenderViewTextureID(const std::string& name) const
 {
-	assert(id < m_renderViews.size());
+	auto renderView = getRenderView(name);
 
-	return m_renderViews[id]->getRenderTargetTextureID();
+	if (!renderView)
+	{
+		return 0;
+	}
+
+	return renderView->getRenderTargetTextureID();
+}
+
+unsigned int Scene::getGameRenderViewTextureID() const
+{
+	return getRenderViewFrameBufferID("Game View"); // todo fix
+}
+
+unsigned int Scene::getGameRenderViewFrameBufferID() const
+{
+	return getRenderViewTextureID("Game View"); // todo fix
+}
+
+std::shared_ptr<RenderView> Scene::getRenderView(const std::string& name) const
+{
+	auto iter = m_renderViews.find(name);
+	if (iter == m_renderViews.end())
+	{
+		logWarning("Could not find render view {}", name);
+		return nullptr;
+	}
+
+	return iter->second;
 }
 
 bool Scene::isSimulationActive() const

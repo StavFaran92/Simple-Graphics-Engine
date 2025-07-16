@@ -169,7 +169,7 @@ static void stopSimulation()
 	startButtonPressed = false; // Toggle the state
 	Engine::get()->getContext()->getActiveScene()->stopSimulation();
 
-	Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_editorCamera);
+	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_editorCamera);
 
 	uiLayer->setEnabled(true);
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->unlock(); //TODO this should be in camera event
@@ -180,7 +180,7 @@ static void startsimulation()
 	startButtonPressed = true; // Toggle the state
 	Engine::get()->getContext()->getActiveScene()->startSimulation();
 
-	Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
+	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
 
 	uiLayer->setEnabled(false);
 	state.selectEntity(Entity::EmptyEntity);
@@ -1439,7 +1439,19 @@ void RenderViewWindow(float width, float height)
 	
 	// Display the texture
 	ImVec2 imageSize(renderViewWindowSize.x, renderViewWindowSize.y);
-	ImGui::Image(reinterpret_cast<ImTextureID>(Engine::get()->getContext()->getActiveScene()->getRenderTargetTextureID(0)), imageSize, ImVec2(0, 1), ImVec2(1, 0));
+
+	unsigned int activeViewID = 0;
+	if (Engine::get()->getContext()->getActiveScene()->isSimulationActive())
+	{
+		activeViewID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewTextureID();
+	}
+	else
+	{
+		activeViewID = Engine::get()->getContext()->getActiveScene()->getRenderViewTextureID("Editor View");
+	}
+
+	//unsigned int activeViewID = Engine::get()->getContext()->getActiveScene()->getRenderViewTextureID("Editor View");
+	ImGui::Image(reinterpret_cast<ImTextureID>(activeViewID), imageSize, ImVec2(0, 1), ImVec2(1, 0));
 
 	ImVec2 mousePos = ImGui::GetMousePos();
 	ImVec2 windowPos = ImGui::GetWindowPos();
@@ -1656,7 +1668,7 @@ void RenderViewWindow(float width, float height)
 
 		
 
-		auto renderTargetID = Engine::get()->getContext()->getActiveScene()->getRenderTargetTextureID(g_previewWindowID);
+		auto renderTargetID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewTextureID();
 		ImGui::Image(reinterpret_cast<ImTextureID>(renderTargetID), cameraPreviewSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::EndChild();
@@ -2971,7 +2983,7 @@ public:
 		auto scene = Engine::get()->getContext()->getActiveScene();
 
 		// store Default scene camera
-		g_primaryCamera = scene->getActiveCamera();
+		g_primaryCamera = scene->getGameCamera();
 
 		// set Editor camera as active camera
 		auto editorCamera = m_editorRegistry->createEntity("Editor Camera");
@@ -2979,7 +2991,7 @@ public:
 		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
 		auto& nsc = editorCamera.getComponent<NativeScriptComponent>();
 		nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
-		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
+		//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
 
 		nsc.script->onCreate();
 
@@ -2992,7 +3004,10 @@ public:
 			});
 
 		//g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView(0, 0, 300, 200, g_primaryCamera);
-		g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView("Game Preview", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), g_primaryCamera);
+		//g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView("Game Preview", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), g_primaryCamera);
+		Engine::get()->getContext()->getActiveScene()->addRenderView("Editor View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), editorCamera);
+		g_previewWindowID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewFrameBufferID();
+		//Engine::get()->getContext()->getActiveScene()->setActiveRenderView("Editor View");
 
 		updateScene();
 
@@ -3015,6 +3030,7 @@ public:
 	void update(float deltaTime) override
 	{
 		g_editorCamera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
+		g_editorCamera.getComponent<Transformation>().update();
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
 	

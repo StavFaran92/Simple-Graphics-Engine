@@ -103,9 +103,6 @@ public:
 
 	glm::mat4 getProjection() const;
 
-	Entity getActiveCamera() const;
-	void setPrimaryCamera(Entity e);
-
 	void startSimulation();
 	void stopSimulation();
 	bool isSimulationActive() const;
@@ -114,13 +111,19 @@ public:
 
 	physx::PxScene* getPhysicsScene() const;
 
-	unsigned int addRenderView(const std::string& name, int x, int y, int w, int h, const Entity& e);
 
-	unsigned int getRenderTargetFrameBufferID(unsigned int) const;
-	unsigned int getRenderTargetTextureID(unsigned int) const;
+	void addRenderView(const std::string& name, int x, int y, int w, int h, const Entity& e);
+	//void setActiveRenderView(const std::string& name);
+	void setRenderViewEnabled(bool enabled);
 
+	unsigned int getRenderViewFrameBufferID(const std::string& name) const;
+	unsigned int getRenderViewTextureID(const std::string& name) const;
 
-	//void setPrimaryCamera(ICamera* camera);
+	unsigned int getGameRenderViewTextureID() const;
+	unsigned int getGameRenderViewFrameBufferID() const;
+
+	Entity getGameCamera() const;
+	void setPrimaryCamera(Entity e);
 
 private:
 	// -------------------- Methods -------------------- //
@@ -135,6 +138,7 @@ private:
 	void close();
 
 	void bindScriptToLayer(entt::registry& reg, entt::entity entity);
+	std::shared_ptr<RenderView> getRenderView(const std::string& name) const;
 
 private:
 	// -------------------- Attributes -------------------- //
@@ -190,7 +194,7 @@ private:
 
 	SerializedScene m_serializedScene;
 
-	std::vector<std::shared_ptr<RenderView>> m_renderViews;
+	std::map<std::string, std::shared_ptr<RenderView>> m_renderViews;
 
 	std::shared_ptr<GameLayer> gameEventLayer;
 
