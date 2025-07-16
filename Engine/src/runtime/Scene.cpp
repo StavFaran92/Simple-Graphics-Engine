@@ -220,15 +220,6 @@ void Scene::init(Context* context)
 
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
 
-	m_frustumCullGPUShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FrustumCullComputeShader.glsl");
-
-	glGenBuffers(1, &m_atomicCounterBuffer);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
-	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, m_atomicCounterBuffer);
-
-	glGenBuffers(1, &m_frustumUBO);
-
 	//std::vector<GLuint> data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // sum = 45
 
 	//glGenBuffers(1, &ssbo);
@@ -407,62 +398,8 @@ void Scene::draw(float deltaTime)
 
 			for (auto&& [entity, foliage, transform] : m_registry->get().view<FoliageComponent, Transformation>().each())
 			{
-				// Perform frustum cull
-				m_frustumCullGPUShader->use();
-
-				unsigned int inputSSBO = Engine::get()->getSubSystem<FoliageSystem>()->getInputSSBO();
-				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, inputSSBO);
-
-				unsigned int outputSSBO = Engine::get()->getSubSystem<FoliageSystem>()->getOutputSSBO();
-				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, outputSSBO);
-
-				m_frustumCullGPUShader->setUniformValue("positionsSize", Engine::get()->getSubSystem<FoliageSystem>()->getCount());
-
-				int instanceCount = Engine::get()->getSubSystem<FoliageSystem>()->getCount();
-
-				GLuint zero = 0;
-				glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
-				glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), &zero); // reset counter to 0
-
-				std::array<glm::vec4, 6> planes;
-				planes[0] = glm::vec4(frustum.m_znear.m_normal, frustum.m_znear.m_distance);
-				planes[1] = glm::vec4(frustum.m_zfar.m_normal, frustum.m_zfar.m_distance);
-				planes[2] = glm::vec4(frustum.m_right.m_normal, frustum.m_right.m_distance);
-				planes[3] = glm::vec4(frustum.m_left.m_normal, frustum.m_left.m_distance);
-				planes[4] = glm::vec4(frustum.m_up.m_normal, frustum.m_up.m_distance);
-				planes[5] = glm::vec4(frustum.m_down.m_normal, frustum.m_down.m_distance);
-
-				glBindBuffer(GL_UNIFORM_BUFFER, m_frustumUBO);
-				glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 6, planes.data(), GL_DYNAMIC_DRAW);
-				glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_frustumUBO);
-
-				glDispatchCompute(ceil(instanceCount / 32.f), 1, 1);
-				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-				glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
-				GLuint* ptr = (GLuint*)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
-				GLuint result = ptr[0];
-				glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-
-				// fill blades on grass in each quad
-
-				auto& foliageShader = Engine::get()->getSubSystem<FoliageSystem>()->getFoliageShader();
-				foliageShader->use();
-				foliageShader->setUniformValue("view", *graphics->view);
-				foliageShader->setUniformValue("projection", *graphics->projection);
-				foliageShader->setUniformValue("colorA", foliage.colorA);
-				foliageShader->setUniformValue("colorB", foliage.colorB);
-				foliageShader->setUniformValue("viewDir", primaryCamera.front);
-
-				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, outputSSBO);
-
-				// create instance batch from foliage map
-
-				//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRASS_BLADE); 
-				auto& grassBlade = Engine::get()->getSubSystem<FoliageSystem>()->getGrassBladeMesh();
-				auto vao = grassBlade->getPrimaryMesh()->getVAO();
-				RenderCommand::drawInstanced(vao, result);
-				//RenderCommand::draw(vao);
+				Engine::get()->getSubSystem<FoliageSystem>()->setFrustum(frustum);
+				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(foliage);
 			}
 
 			glPopDebugGroup();
