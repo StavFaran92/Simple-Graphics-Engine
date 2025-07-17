@@ -23,8 +23,8 @@ public:
 
 	void SwapBuffer();
 	void update();
-	void lockMouse() { m_isMouseLocked = true; }
-	void unlockMouse() { m_isMouseLocked = false; }
+	void lockMouse();
+	void unlockMouse();
 
 	SDL_Window* GetWindow() { return m_mainWindow; }
 	SDL_GLContext GetContext() { return m_glContext; }

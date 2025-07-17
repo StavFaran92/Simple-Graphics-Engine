@@ -117,8 +117,18 @@ inline void Window::SwapBuffer()
 
 void Window::update()
 { 
-	if (m_isMouseLocked)
-		SDL_WarpMouseInWindow(m_mainWindow, m_halfWidth, m_halfHeight); 
+	//if (m_isMouseLocked)
+	//	SDL_WarpMouseInWindow(m_mainWindow, m_halfWidth, m_halfHeight); 
+}
+
+void Window::lockMouse()
+{
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+}
+
+void Window::unlockMouse()
+{
+	SDL_SetRelativeMouseMode(SDL_FALSE);
 }
 
 void* Window::GetNativeWindow()

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "glm/glm.hpp"
 #include "imgui.h"
+#include "Window.h"
 
 void CameraControllerFreeLook::onCreate(Entity& e)
 {
@@ -125,6 +126,7 @@ void CameraControllerFreeLook::onEvent(SDL_Event e)
 			if (m_state == ControllerState::IDLE)
 			{
 				m_state = ControllerState::ROTATE;
+				Engine::get()->getWindow()->lockMouse();
 			}
 		}
 
@@ -133,6 +135,7 @@ void CameraControllerFreeLook::onEvent(SDL_Event e)
 			if (m_state == ControllerState::IDLE)
 			{
 				m_state = ControllerState::TRANSFORM;
+				Engine::get()->getWindow()->lockMouse();
 			}
 		}
 	}
@@ -141,6 +144,7 @@ void CameraControllerFreeLook::onEvent(SDL_Event e)
 		if (e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_MIDDLE)
 		{
 			m_state = ControllerState::IDLE;
+			Engine::get()->getWindow()->unlockMouse();
 		}
 	}
 	else if (e.type == SDL_MOUSEWHEEL)
