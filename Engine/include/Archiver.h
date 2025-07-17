@@ -106,11 +106,13 @@ struct SerializedEntity
 struct SerializedScene
 {
 	std::vector<SerializedEntity> serializedEntities;
+	entt::entity gameCamera;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(serializedEntities);
+		archive(serializedEntities, gameCamera);
 	}
+
 };
 
 struct SerializedContext

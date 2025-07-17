@@ -1,6 +1,7 @@
 #include "Archiver.h"
 
 #include "Scene.h"
+#include "systems/BuiltInMeshes.h"
 
 Archiver* Archiver::instance = new Archiver();
 
@@ -162,6 +163,8 @@ SerializedScene Archiver::serializeScene(Scene* scene)
 		}
 		});
 
+	serializedScene.gameCamera = scene->getGameCamera().handler();
+
 	return serializedScene;
 }
 
@@ -173,6 +176,21 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 	{
 		deserializeEntity(serializedEnt, scene);
 	}
+
+	Entity gameCameraEntity(serializedScene.gameCamera, &scene.getRegistry());
+	if (!gameCameraEntity.valid() || !gameCameraEntity.HasComponent<CameraComponent>())
+	{
+		logError("Invalid game camera serialized, creating a new camera.");
+
+		gameCameraEntity = scene.createEntity("Main Camera");
+		gameCameraEntity.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 1000.0f));
+		gameCameraEntity.getComponent<Transformation>().setLocalPosition({ 10,10,10 });
+		gameCameraEntity.getComponent<CameraComponent>().center = { 0,0,0 };
+		gameCameraEntity.getComponent<CameraComponent>().up = { 0,1,0 };
+		gameCameraEntity.addComponent<MeshComponent>().mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::CAMERA);
+		gameCameraEntity.addComponent<RenderableComponent>();
+	}
+	scene.setGameCamera(gameCameraEntity);
 
 	// We postpone the transform update because at the moment of transform creation not all transforms 
 	// have been created yet.
