@@ -1646,6 +1646,9 @@ void RenderViewWindow(float width, float height)
 
 	}
 
+	if(state.getSelectedEntity() != Entity::EmptyEntity && 
+		state.getSelectedEntity().HasComponent<CameraComponent>() && 
+		state.getSelectedEntity() == Engine::get()->getContext()->getActiveScene()->getGameCamera())
 	{
 		// Create a child window
 

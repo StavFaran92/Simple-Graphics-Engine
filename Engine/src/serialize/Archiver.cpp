@@ -72,7 +72,7 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 	{
 		entityHandler.addComponent<CameraComponent>(serializedEnt.camera.value());
 
-		scene.setGameCamera(entityHandler);
+		//scene.setGameCamera(entityHandler);
 	}
 
 	if (serializedEnt.mat)
