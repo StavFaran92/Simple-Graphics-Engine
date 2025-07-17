@@ -116,7 +116,7 @@ Entity Scene::getGameCamera() const
 	return getRenderView("Game View")->getCamera();
 }
 
-void Scene::setPrimaryCamera(Entity e)
+void Scene::setGameCamera(Entity e)
 {
 	assert(m_renderViews.size() > 0);
 	getRenderView("Game View")->setCamera(e);
@@ -797,7 +797,7 @@ void Scene::removeEntity(const Entity& e)
 	m_registry->removeEntity(e);
 }
 
-glm::mat4 Scene::getActiveCameraView() const
+glm::mat4 Scene::getGameCameraView() const
 {
 	auto& primaryCamera = getGameCamera().getComponent<CameraComponent>();
 	auto& primaryCameraTransform = getGameCamera().getComponent<Transformation>();

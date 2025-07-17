@@ -93,8 +93,6 @@ public:
 	Entity createEntity(const std::string& name);
 	void removeEntity(const Entity& e);
 
-	glm::mat4 getActiveCameraView() const;
-	
 	void displayWireframeMesh(Entity e);
 
 	void setIBLData(Resource<Texture> irradianceMap, Resource<Texture> prefilterEnvMap);
@@ -123,7 +121,9 @@ public:
 	unsigned int getGameRenderViewFrameBufferID() const;
 
 	Entity getGameCamera() const;
-	void setPrimaryCamera(Entity e);
+	void setGameCamera(Entity e);
+
+	glm::mat4 getGameCameraView() const;
 
 private:
 	// -------------------- Methods -------------------- //

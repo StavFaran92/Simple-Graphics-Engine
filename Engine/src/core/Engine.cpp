@@ -564,7 +564,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
         materialComponent.setMaterial(idx, m);
     }
 
-    m_context->getActiveScene()->setPrimaryCamera(mainCamera);
+    m_context->getActiveScene()->setGameCamera(mainCamera);
 
     if (initParams.templateScene)
     {

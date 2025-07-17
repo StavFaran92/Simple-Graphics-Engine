@@ -1157,7 +1157,7 @@ void displayEntityHelper(Entity& e)
 				if (ImGui::MenuItem("Set as Primary Camera"))
 				{
 					auto scene = Engine::get()->getContext()->getActiveScene();
-					scene->setPrimaryCamera(e);
+					scene->setGameCamera(e);
 				}
 			}
 
@@ -1485,7 +1485,7 @@ void RenderViewWindow(float width, float height)
 				// We alter the mouse position from small window into full screen (the renderered object pick texture)
 				int alteredX = (mousePos.x - startX) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
 				int alteredY = (mousePos.y - 65) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
-				int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY);
+				int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
 
 				if (selectedID == -1)
 				{
@@ -1602,7 +1602,10 @@ void RenderViewWindow(float width, float height)
 			glm::mat4 glmMat = transform.getWorldTransformation();
 			float* matrixPtr = glm::value_ptr(glmMat);
 
-			auto camView = Engine::get()->getContext()->getActiveScene()->getActiveCameraView();
+			auto& primaryCamera = g_editorCamera.getComponent<CameraComponent>();
+			auto& primaryCameraTransform = g_editorCamera.getComponent<Transformation>();
+
+			auto camView = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
 			const float* camViewPtr = glm::value_ptr(camView);
 
 			auto projection = Engine::get()->getContext()->getActiveScene()->getProjection();

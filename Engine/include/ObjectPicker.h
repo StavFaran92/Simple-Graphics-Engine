@@ -4,6 +4,7 @@
 #include "Core.h"
 
 #include "Resource.h"
+#include "Entity.h"
 
 class FrameBufferObject;
 class RenderBufferObject;
@@ -24,7 +25,7 @@ public:
 
 	bool init();
 
-	int pickObject(int x, int y);
+	int pickObject(int x, int y, Entity camera);
 
 	int getSelectedObject() const;
 

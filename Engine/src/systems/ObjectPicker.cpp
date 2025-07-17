@@ -66,8 +66,19 @@ bool ObjectPicker::init()
 	return true;
 }
 
-int ObjectPicker::pickObject(int x, int y)
+int ObjectPicker::pickObject(int x, int y, Entity camera)
 {
+	if (!camera.HasComponent<CameraComponent>())
+	{
+		logWarning("Entity does not have camera component!");
+		return -1;
+	}
+
+	auto& primaryCamera = camera.getComponent<CameraComponent>();
+	auto& primaryCameraTransform = camera.getComponent<Transformation>();
+
+	auto view = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
+
 	m_frameBuffer->bind();
 
 	m_pickingShader->use();
@@ -80,7 +91,7 @@ int ObjectPicker::pickObject(int x, int y)
 	auto activeScene = Engine::get()->getContext()->getActiveScene();
 
 	m_pickingShader->setUniformValue("projection", activeScene->getProjection());
-	m_pickingShader->setUniformValue("view", activeScene->getActiveCameraView());
+	m_pickingShader->setUniformValue("view", view);
 
 	for (auto& [entity, meshComponent, transform] : activeScene->getRegistry().getRegistry().view<MeshComponent, Transformation>().each())
 	{
