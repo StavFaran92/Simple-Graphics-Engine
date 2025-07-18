@@ -13,7 +13,15 @@ public:
             auto projectDir = Engine::get()->getProjectDirectory();
             std::ofstream os(projectDir + "/entities.json");
             cereal::JSONOutputArchive oarchive(os);
-            oarchive(serializedContext);
+
+            try
+            {
+                oarchive(serializedContext);
+            }
+            catch (const cereal::Exception& e)
+            {
+                logError("Serialization Error occured: {}", e.what());
+            }
 
             Engine::get()->getContext()->save();
             });
@@ -23,9 +31,20 @@ public:
             std::ifstream is(projectDir + "/entities.json");
             cereal::JSONInputArchive iarchive(is);
             SerializedContext ptrs;
-            iarchive(ptrs);
 
-            Archiver::deserializeContext(ptrs, Engine::get()->getContext());
+            try
+            {
+                iarchive(ptrs);
+                Archiver::deserializeContext(ptrs, Engine::get()->getContext());
+                
+            }
+            catch (const cereal::Exception& e)
+            {
+                logError("Deserialization Error occured: {}", e.what());
+            }
+
+
+           
             });
 	}
 };

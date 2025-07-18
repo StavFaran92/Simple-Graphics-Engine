@@ -12,16 +12,7 @@
 #include "Physics.h"
 #include "cereal/types/optional.hpp"
 #include "Colliders.h"
-
-#define SERIALIZED_MEMBER(name, member)	archive(cereal::make_nvp(name, member));
-
-#define SERIALIZED_MEMBER_OPTIONAL(name, member, value)	\
-	try {												\
-		archive(cereal::make_nvp(name, member));		\
-	}													\
-	catch (const cereal::Exception&) {					\
-		member = value;									\
-	}
+#include "serialize/CerealHelpers.h"
 
 /**
 HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
@@ -55,7 +46,7 @@ struct EngineAPI SkyboxComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("originalImage", originalImage);
+		SERIALIZED_MEMBER(originalImage);
 
 	}
 
@@ -74,7 +65,7 @@ struct EngineAPI RenderableComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("renderTechnique", renderTechnique);
+		SERIALIZED_MEMBER(renderTechnique);
 	}
 
 	enum class RenderTechnique : int
@@ -115,8 +106,8 @@ struct EngineAPI NativeScriptComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("entity", entity);
-		SERIALIZED_MEMBER("script", script);
+		SERIALIZED_MEMBER(entity);
+		SERIALIZED_MEMBER(script);
 	}
 };
 
@@ -132,10 +123,10 @@ struct EngineAPI PhysicsComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("type", type);
-		SERIALIZED_MEMBER("mass", mass);
-		SERIALIZED_MEMBER("collider", collider);
-		SERIALIZED_MEMBER("colliderType", colliderType);
+		SERIALIZED_MEMBER(type);
+		SERIALIZED_MEMBER(mass);
+		SERIALIZED_MEMBER(collider);
+		SERIALIZED_MEMBER(colliderType);
 	}
 
 	bool isLockedLinearX = false;
@@ -249,8 +240,8 @@ struct EngineAPI CameraComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("center", center);
-		SERIALIZED_MEMBER("up", up);
+		SERIALIZED_MEMBER(center);
+		SERIALIZED_MEMBER(up);
 	}
 
 	static CameraComponent createPerspectiveCamera(float fovy, float aspect, float znear, float zfar)
@@ -292,8 +283,8 @@ struct EngineAPI MeshComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("mesh", mesh);
-		SERIALIZED_MEMBER("materialSlot", materialSlot);
+		SERIALIZED_MEMBER(mesh);
+		SERIALIZED_MEMBER(materialSlot);
 
 	}
 
@@ -355,8 +346,8 @@ struct EngineAPI MaterialComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("materials", materials);
-		SERIALIZED_MEMBER("materialCount", count);
+		SERIALIZED_MEMBER(materials);
+		SERIALIZED_MEMBER(count);
 	}
 
 	std::map<int, std::shared_ptr<Material>> materials;
@@ -370,8 +361,8 @@ struct EngineAPI ObjectComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("name", name);
-		SERIALIZED_MEMBER("e", e);
+		SERIALIZED_MEMBER(name);
+		SERIALIZED_MEMBER(e);
 	}
 
 	std::string name;
@@ -462,10 +453,10 @@ struct EngineAPI ImageComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("image", image);
-		SERIALIZED_MEMBER("size", size);
-		SERIALIZED_MEMBER("position", position);
-		SERIALIZED_MEMBER("rotate", rotate);
+		SERIALIZED_MEMBER(image);
+		SERIALIZED_MEMBER(size);
+		SERIALIZED_MEMBER(position);
+		SERIALIZED_MEMBER(rotate);
 	}
 
 	glm::vec2 size;
@@ -488,8 +479,8 @@ struct TestComp : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("test", test);
-		SERIALIZED_MEMBER_OPTIONAL("test2", test2, 0);
+		SERIALIZED_MEMBER(test);
+		SERIALIZED_MEMBER_OPTIONAL(test2, 0);
 	}
 
 	int test = 0;

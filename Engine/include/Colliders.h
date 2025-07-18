@@ -5,16 +5,7 @@
 #include "cereal/types/optional.hpp"
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/cereal.hpp>
-
-#define SERIALIZED_MEMBER(name, member)	archive(cereal::make_nvp(name, member));
-
-#define SERIALIZED_MEMBER_OPTIONAL(name, member, value)	\
-	try {												\
-		archive(cereal::make_nvp(name, member));		\
-	}													\
-	catch (const cereal::Exception&) {					\
-		member = value;									\
-	}
+#include "serialize/CerealHelpers.h"
 
 enum class ColliderType : int
 {
@@ -34,7 +25,7 @@ struct Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("layerMask", layerMask);
+		SERIALIZED_MEMBER(layerMask);
 	}
 
 	virtual ColliderType getType() const = 0;
@@ -48,7 +39,7 @@ struct CollisionBox : public Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("halfExtent", extents);
+		SERIALIZED_MEMBER(extents);
 	}
 
 	virtual ColliderType getType() const override
@@ -65,7 +56,7 @@ struct CollisionSphere : public Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("radius", radius);
+		SERIALIZED_MEMBER(radius);
 	}
 
 	virtual ColliderType getType() const override
@@ -82,7 +73,7 @@ struct CollisionMesh : public Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("isConvex", isConvex);
+		SERIALIZED_MEMBER(isConvex);
 	}
 
 	virtual ColliderType getType() const override
@@ -100,7 +91,7 @@ struct CollisionTerrain : Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER("layerMask", layerMask);
+		SERIALIZED_MEMBER(layerMask);
 	}
 
 	virtual ColliderType getType() const override

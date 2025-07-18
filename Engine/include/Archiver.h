@@ -24,6 +24,8 @@
 #include "Animator.h"
 #include "Terrain.h"
 
+#include "serialize/CerealHelpers.h"
+
 class Scene;
 class Entity;
 class Context;
@@ -62,8 +64,6 @@ struct SerializedEntity
 	entt::entity entity;
 	std::optional<Transformation> transform;
 	std::optional<PhysicsComponent> physics;
-	//std::optional<CollisionBoxComponent> collisionBox;
-	//std::optional<CollisionSphereComponent> collisionSphere;
 	std::optional<PlayerController> playerController;
 	std::optional<MeshComponent> mesh;
 	std::optional<RenderableComponent> renderableComponent;
@@ -82,24 +82,24 @@ struct SerializedEntity
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(entity,
-			transform,
-			physics,
-			playerController,
-			mesh,
-			renderableComponent,
-			camera,
-			nsc,
-			mat,
-			dLight,
-			pLight,
-			obj,
-			skybox,
-			image,
-			animator,
-			terrain,
-			testComponent,
-			shader);
+		SERIALIZED_MEMBER(entity),
+		SERIALIZED_MEMBER(transform),
+		SERIALIZED_MEMBER(physics),
+		SERIALIZED_MEMBER(playerController),
+		SERIALIZED_MEMBER(mesh),
+		SERIALIZED_MEMBER(renderableComponent),
+		SERIALIZED_MEMBER(camera),
+		SERIALIZED_MEMBER(nsc),
+		SERIALIZED_MEMBER(mat),
+		SERIALIZED_MEMBER(dLight),
+		SERIALIZED_MEMBER(pLight),
+		SERIALIZED_MEMBER(obj),
+		SERIALIZED_MEMBER(skybox),
+		SERIALIZED_MEMBER(image),
+		SERIALIZED_MEMBER(animator),
+		SERIALIZED_MEMBER(terrain),
+		SERIALIZED_MEMBER(testComponent),
+		SERIALIZED_MEMBER(shader);
 	}
 };
 
@@ -110,7 +110,8 @@ struct SerializedScene
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(serializedEntities, gameCamera);
+		SERIALIZED_MEMBER(serializedEntities),
+		SERIALIZED_MEMBER_OPTIONAL(gameCamera, 0);
 	}
 
 };
@@ -122,7 +123,8 @@ struct SerializedContext
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(serializedScenes, activeScene);
+		SERIALIZED_MEMBER(serializedScenes),
+		SERIALIZED_MEMBER(activeScene);
 	}
 };
 
