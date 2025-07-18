@@ -4,10 +4,10 @@
 
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "Resource.h"
-#include "Entity.h"
-#include "Window.h"
-#include "Configurations.h"
+#include "memory/Resource.h"
+#include "runtime/Entity.h"
+#include "core/Window.h"
+#include "core/Configurations.h"
 
 class FrameBufferObject;
 class RenderBufferObject;

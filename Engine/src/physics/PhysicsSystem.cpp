@@ -1,15 +1,15 @@
 #include "physics/PhysicsSystem.h"
 
-#include "Logger.h"
+#include "core/Logger.h"
 
 #include "physics/PhysXUtils.h"
-#include "Component.h"
-#include "Physics.h"
-#include "Scene.h"
-#include "Registry.h"
+#include "component/Component.h"
+#include "physics/Physics.h"
+#include "runtime/Scene.h"
+#include "core/Registry.h"
 #include "GL//glew.h"
 #include "render/Graphics.h"
-#include "RenderCommand.h"
+#include "render/RenderCommand.h"
 #include "systems/BuiltInMeshes.h"
 #include <glm/gtx/quaternion.hpp>
 

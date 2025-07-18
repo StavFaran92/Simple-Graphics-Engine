@@ -1,15 +1,15 @@
-#include "CameraControllerFreeLook.h"
+#include "camera/CameraControllerFreeLook.h"
 
-#include "Engine.h"
-#include "EventSystem.h"
-#include "ApplicationConstants.h"
-#include "Transformation.h"
-#include "System.h"
-#include "Input.h"
+#include "core/Engine.h"
+#include "core/EventSystem.h"
+#include "core/ApplicationConstants.h"
+#include "component/Transformation.h"
+#include "core/System.h"
+#include "ui/Input.h"
 #include <algorithm>
 #include "glm/glm.hpp"
 #include "imgui.h"
-#include "Window.h"
+#include "core/Window.h"
 
 void CameraControllerFreeLook::onCreate(Entity& e)
 {

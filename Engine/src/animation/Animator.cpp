@@ -1,7 +1,7 @@
-#include "Animator.h"
+#include "animation/Animator.h"
 
-#include "Animation.h"
-#include "MeshCollection.h"
+#include "animation/Animation.h"
+#include "geometry/MeshCollection.h"
 
 Animator::Animator(Resource<Animation> animation)
 	: m_currentAnimation(animation)

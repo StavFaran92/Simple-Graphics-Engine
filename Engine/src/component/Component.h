@@ -2,16 +2,16 @@
 
 #include <memory>
 
-#include "Core.h"
+#include "core/Core.h"
 
-#include "ScriptableEntity.h"
-#include "Configurations.h"
-#include "RenderView.h"
-#include "Mesh.h"
+#include "component/ScriptableEntity.h"
+#include "core/Configurations.h"
+#include "render/RenderView.h"
+#include "geometry/Mesh.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include "Physics.h"
+#include "physics/Physics.h"
 #include "cereal/types/optional.hpp"
-#include "Colliders.h"
+#include "physics/Colliders.h"
 #include "serialize/CerealHelpers.h"
 
 /**
@@ -396,8 +396,13 @@ struct EngineAPI ShaderComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(m_customShader, shaderOverride, customTextures, projection, projectionTexture/*, renderViewProjection*/,
-			/*m_uniformProperties,*/ m_shaderFilePath, isValid);
+			SERIALIZED_MEMBER(m_customShader); 
+			SERIALIZED_MEMBER(shaderOverride); 
+			SERIALIZED_MEMBER(customTextures); 
+			SERIALIZED_MEMBER(projection); 
+			SERIALIZED_MEMBER(projectionTexture);
+			SERIALIZED_MEMBER(m_shaderFilePath); 
+			SERIALIZED_MEMBER(isValid);
 	}
 
 	// This will only be used by forward renderer, ignored by deffered

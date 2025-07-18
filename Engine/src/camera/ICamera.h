@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "Core.h"
-#include "ScriptableEntity.h"
+#include "core/Core.h"
+#include "component/ScriptableEntity.h"
 
 class EngineAPI ICamera : public ScriptableEntity
 {

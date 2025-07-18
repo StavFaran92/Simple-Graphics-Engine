@@ -1,5 +1,5 @@
 #include "texture/Cubemap.h"
-#include "ApplicationConstants.h"
+#include "core/ApplicationConstants.h"
 
 #include <GL/glew.h>
 
@@ -9,17 +9,17 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#include "Logger.h"
-#include "Configurations.h"
+#include "core/Logger.h"
+#include "core/Configurations.h"
 #include "core/CacheSystem.h"
-#include "Engine.h"
-#include "Resource.h"
-#include "Assets.h"
+#include "core/Engine.h"
+#include "memory/Resource.h"
+#include "memory/Assets.h"
 #include "core/Factory.h"
-#include "Context.h"
+#include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
 
-#include "Texture.h" 
+#include "texture/Texture.h" 
 
 #include "utils/EquirectangularToCubemapConverter.h"
 

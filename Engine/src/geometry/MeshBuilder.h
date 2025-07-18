@@ -4,11 +4,11 @@
 #include <vector>
 #include <memory>
 
-#include "Core.h"
-#include "Configurations.h"
+#include "core/Core.h"
+#include "core/Configurations.h"
 
-#include "Mesh.h"
-#include "VertexLayout.h"
+#include "geometry/Mesh.h"
+#include "render/VertexLayout.h"
 
 class MeshBuilder
 {

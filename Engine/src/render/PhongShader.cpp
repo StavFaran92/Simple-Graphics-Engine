@@ -1,8 +1,8 @@
 #include "render/PhongShader.h"
 
-#include "PointLight.h"
-#include "DirectionalLight.h"
-#include "Transformation.h"
+#include "lights/PointLight.h"
+#include "lights/DirectionalLight.h"
+#include "component/Transformation.h"
 
 void PhongShader::updateDirLights(Shader* shader, entt::registry& registry)
 {

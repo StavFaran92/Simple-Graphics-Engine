@@ -1,10 +1,10 @@
-#include "Quad.h"
+#include "geometry/Quad.h"
 
-#include "Mesh.h"
+#include "geometry/Mesh.h"
 #include "geometry/MeshBuilder.h"
-#include "VertexLayout.h"
-#include "ModelImporter.h"
-#include "Context.h"
+#include "render/VertexLayout.h"
+#include "geometry/ModelImporter.h"
+#include "runtime/Context.h"
 
 static const float vertices[] = {
 	// positions          // colors           // texture coords

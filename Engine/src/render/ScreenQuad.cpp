@@ -2,14 +2,14 @@
 
 #include "render/Vertex.h"
 #include "render/Renderer.h"
-#include "Mesh.h"
-#include "Quad.h"
-#include "ShapeFactory.h"
-#include "Entity.h"
-#include "Scene.h"
-#include "Component.h"
+#include "geometry/Mesh.h"
+#include "geometry/Quad.h"
+#include "geometry/ShapeFactory.h"
+#include "runtime/Entity.h"
+#include "runtime/Scene.h"
+#include "component/Component.h"
 
-#include "RenderableComponent.h"
+#include "component/RenderableComponent.h"
 
 Entity ScreenQuad::GenerateScreenQuad(SGE_Regsitry* registry)
 {

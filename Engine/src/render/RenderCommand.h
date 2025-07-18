@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Core.h"
+#include "core/Core.h"
 
 #include "gl/glew.h"
 

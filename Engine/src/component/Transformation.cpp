@@ -1,7 +1,7 @@
-#include "Transformation.h"
+#include "component/Transformation.h"
 #include<glm/gtx/quaternion.hpp>
 #include "utils/LinearAlgebraUtil.h"
-#include "Logger.h"
+#include "core/Logger.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/matrix_decompose.hpp"
@@ -18,16 +18,16 @@ void Transformation::getWorldTransformation(glm::mat4& mat)
 
 glm::mat4 Transformation::getLocalTransformation() const
 {
-	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), m_localTranslation);
-	glm::mat4 rotationMatrix = glm::mat4_cast(m_localRotation);
-	glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), m_localScale);
+	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), localTranslation);
+	glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
+	glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), localScale);
 
 	return translationMatrix * rotationMatrix * scaleMatrix;
 }
 
 void Transformation::setParent(Entity parent)
 {
-	if (m_parent != Entity::EmptyEntity)
+	if (parent != Entity::EmptyEntity)
 	{
 		removeParent();
 	}
@@ -56,16 +56,16 @@ void Transformation::setParent(Entity parent)
 	setLocalRotation(rotation);
 	setLocalPosition(translation);
 
-	m_parent = parent;
-	pTransform.addChild(m_entity);
+	parent = parent;
+	pTransform.addChild(entity);
 }
 
 void Transformation::removeParent()
 {
-	if (m_parent.handlerID() == Entity::EmptyEntity.handlerID())
+	if (parent.handlerID() == Entity::EmptyEntity.handlerID())
 		return;
 
-	auto& pTransform = m_parent.getComponent<Transformation>();
+	auto& pTransform = parent.getComponent<Transformation>();
 	glm::mat4& L = getLocalTransformation();
 	glm::mat4& PG = pTransform.getWorldTransformation();
 
@@ -82,23 +82,23 @@ void Transformation::removeParent()
 	setLocalPosition(translation);
 
 	
-	pTransform.removeChild(m_entity);
-	m_parent = Entity::EmptyEntity;
+	pTransform.removeChild(entity);
+	parent = Entity::EmptyEntity;
 }
 
 Entity Transformation::getParent() const
 {
-	return m_parent;
+	return parent;
 }
 
 Entity Transformation::getRoot() const
 {
-	return m_root;
+	return root;
 }
 
 Entity Transformation::setRoot(Entity root)
 {
-	return m_root = root;
+	return root = root;
 }
 
 void Transformation::update()
@@ -109,7 +109,7 @@ void Transformation::update()
 		return;
 	}
 
-	for (auto& [_,child] : m_children)
+	for (auto& [_,child] : children)
 	{
 		child.getComponent<Transformation>().update();
 	}
@@ -118,12 +118,12 @@ void Transformation::update()
 void Transformation::forceUpdate()
 {
 	m_modelMatrix = calculateModelMatrix();
-	m_globalRotation = m_localRotation;
-	m_globalScale = m_localScale;
+	m_globalRotation = localRotation;
+	m_globalScale = localScale;
 
-	if (m_parent.valid())
+	if (parent.valid())
 	{
-		auto& pTransform = m_parent.getComponent<Transformation>();
+		auto& pTransform = parent.getComponent<Transformation>();
 		m_modelMatrix = pTransform.getWorldTransformation() * m_modelMatrix;
 		m_globalRotation = pTransform.getWorldRotation() * m_globalRotation;
 		m_globalScale *= pTransform.getWorldScale();
@@ -131,7 +131,7 @@ void Transformation::forceUpdate()
 
 	m_isDirty = false;
 
-	for (auto& [_, child] : m_children)
+	for (auto& [_, child] : children)
 	{
 		child.getComponent<Transformation>().forceUpdate();
 	}
@@ -139,37 +139,37 @@ void Transformation::forceUpdate()
 
 void Transformation::addChild(Entity entity)
 {
-	m_children[entity.handlerID()] = entity;
+	children[entity.handlerID()] = entity;
 }
 
 void Transformation::removeChild(Entity entity)
 {
-	m_children.erase(entity.handlerID());
+	children.erase(entity.handlerID());
 }
 
 glm::mat4 Transformation::calculateModelMatrix()
 {
-	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), m_localTranslation);
-	glm::mat4 rotationMatrix = glm::mat4_cast(m_localRotation);
-	glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), m_localScale);
+	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), localTranslation);
+	glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
+	glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), localScale);
 
 	return translationMatrix * rotationMatrix * scaleMatrix;
 }
 
 std::unordered_map<entity_id, Entity> Transformation::getChildren()
 {
-	return m_children;
+	return children;
 }
 
 void Transformation::setLocalPosition(glm::vec3 pos)
 {
-	m_localTranslation = pos;
+	localTranslation = pos;
 
 	m_isDirty = true;
 }
 void Transformation::setWorldPosition(glm::vec3 pos)
 {
-	auto parent = m_entity.getParent();
+	auto parent = entity.getParent();
 	if (parent.valid())
 	{
 		auto& parentTransform = parent.getComponent<Transformation>();
@@ -188,12 +188,12 @@ void Transformation::setLocalRotation(float angle, glm::vec3 axis)
 }
 void Transformation::setLocalRotation(glm::quat quat)
 {
-	m_localRotation = quat;
+	localRotation = quat;
 	m_isDirty = true;
 }
 void Transformation::setWorldRotation(glm::quat quat)
 {
-	auto parent = m_entity.getParent();
+	auto parent = entity.getParent();
 	if (parent.valid())
 	{
 		auto& parentTransform = parent.getComponent<Transformation>();
@@ -207,13 +207,13 @@ void Transformation::setWorldRotation(glm::quat quat)
 }
 void Transformation::setLocalScale(glm::vec3 scale)
 {
-	m_localScale = scale;
+	localScale = scale;
 	m_isDirty = true;
 }
 
 void Transformation::setWorldScale(glm::vec3 scale)
 {
-	auto parent = m_entity.getParent();
+	auto parent = entity.getParent();
 	if (parent.valid())
 	{
 		auto& parentTransform = parent.getComponent<Transformation>();
@@ -228,7 +228,7 @@ void Transformation::setWorldScale(glm::vec3 scale)
 
 glm::vec3 Transformation::getLocalPosition() const
 {
-	return m_localTranslation;
+	return localTranslation;
 }
 
 glm::vec3 Transformation::getWorldPosition() const
@@ -238,12 +238,12 @@ glm::vec3 Transformation::getWorldPosition() const
 
 glm::quat Transformation::getLocalRotationQuat() const
 {
-	return m_localRotation;
+	return localRotation;
 }
 
 glm::vec3 Transformation::getLocalRotationVec3() const
 {
-	return glm::eulerAngles(m_localRotation);
+	return glm::eulerAngles(localRotation);
 }
 
 glm::quat Transformation::getWorldRotation() const
@@ -253,7 +253,7 @@ glm::quat Transformation::getWorldRotation() const
 
 glm::vec3 Transformation::getLocalScale() const
 {
-	return m_localScale;
+	return localScale;
 }
 
 glm::vec3 Transformation::getWorldScale() const
@@ -263,24 +263,24 @@ glm::vec3 Transformation::getWorldScale() const
 
 glm::vec3 Transformation::getForward() const
 {
-	return m_localRotation * glm::vec3(0, 0, -1);
+	return localRotation * glm::vec3(0, 0, -1);
 }
 
 glm::vec3 Transformation::getUp() const
 {
-	return m_localRotation * glm::vec3(0, 1, 0);
+	return localRotation * glm::vec3(0, 1, 0);
 }
 
 glm::vec3 Transformation::getRight() const
 {
-	return m_localRotation * glm::vec3(1,0,0);
+	return localRotation * glm::vec3(1,0,0);
 }
 
 void Transformation::translate(float x, float y, float z)
 {
-	m_localTranslation.x += x;
-	m_localTranslation.y += y;
-	m_localTranslation.z += z;
+	localTranslation.x += x;
+	localTranslation.y += y;
+	localTranslation.z += z;
 
 	m_isDirty = true;
 }
@@ -292,9 +292,9 @@ void Transformation::translate(glm::vec3 translation)
 
 void Transformation::scale(float x, float y, float z)
 {
-	m_localScale.x *= x;
-	m_localScale.y *= y;
-	m_localScale.z *= z;
+	localScale.x *= x;
+	localScale.y *= y;
+	localScale.z *= z;
 
 	m_isDirty = true;
 }
@@ -306,14 +306,14 @@ void Transformation::scale(glm::vec3 scaleFactor)
 
 void Transformation::rotate(glm::vec3 eulers)
 {
-	m_localRotation = glm::quat(eulers) * m_localRotation;
+	localRotation = glm::quat(eulers) * localRotation;
 
 	m_isDirty = true;
 }
 
 void Transformation::rotateLerp(glm::vec3 axis, float angle, float t)
 {
-	m_localRotation = glm::mix(m_localRotation, glm::angleAxis(degToRad(angle), axis) * m_localRotation, t);// *m_orientationLocal;
+	localRotation = glm::mix(localRotation, glm::angleAxis(degToRad(angle), axis) * localRotation, t);// *m_orientationLocal;
 
 	m_isDirty = true;
 }
@@ -321,7 +321,7 @@ void Transformation::rotateLerp(glm::vec3 axis, float angle, float t)
 
 void Transformation::rotate(glm::vec3 axis, float angle)
 {
-	m_localRotation = glm::angleAxis(degToRad(angle), axis) * m_localRotation;
+	localRotation = glm::angleAxis(degToRad(angle), axis) * localRotation;
 
 	m_isDirty = true;
 }

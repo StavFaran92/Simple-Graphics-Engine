@@ -1,15 +1,15 @@
 #pragma once
 
 #include <memory>
-#include "Animation.h"
-#include "Resource.h"
+#include "animation/Animation.h"
+#include "memory/Resource.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/Exporter.hpp>
 
-#include "Core.h"
+#include "core/Core.h"
 
 class EngineAPI AnimationLoader
 {

@@ -1,10 +1,10 @@
 #pragma once
 #include <memory>
 
-#include "Core.h"
+#include "core/Core.h"
 
-#include "Resource.h"
-#include "Entity.h"
+#include "memory/Resource.h"
+#include "runtime/Entity.h"
 
 class FrameBufferObject;
 class RenderBufferObject;

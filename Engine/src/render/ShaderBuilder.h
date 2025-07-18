@@ -3,9 +3,9 @@
 #include <string>
 #include <map>
 
-#include "Core.h"
-#include "Shader.h"
-#include "Component.h"
+#include "core/Core.h"
+#include "render/Shader.h"
+#include "component/Component.h"
 
 class EngineAPI CustomShaderBuilder
 {

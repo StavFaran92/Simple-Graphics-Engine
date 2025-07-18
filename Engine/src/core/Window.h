@@ -4,9 +4,9 @@
 
 #include "SDL2/SDL_syswm.h"
 #include "SDL2/SDL.h"
-#include "Core.h"
+#include "core/Core.h"
 
-#include "Configurations.h"
+#include "core/Configurations.h"
 
 class EngineAPI Window
 {

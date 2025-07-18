@@ -1,13 +1,13 @@
-#include "FoliageSystem.h"
+#include "systems/FoliageSystem.h"
 
 #include "geometry/MeshBuilder.h"
-#include "Context.h"
-#include "ModelImporter.h"
+#include "runtime/Context.h"
+#include "geometry/ModelImporter.h"
 #include "render/VertexArrayObject.h"
-#include "Quad.h"
+#include "geometry/Quad.h"
 #include "core/Factory.h"
 #include "render/Graphics.h"
-#include "RenderCommand.h"
+#include "render/RenderCommand.h"
 #include <GL/glew.h>
 
 FoliageSystem::FoliageSystem()

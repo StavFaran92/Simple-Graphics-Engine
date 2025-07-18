@@ -1,11 +1,11 @@
-#include "Sphere.h"
-#include "ApplicationConstants.h"
-#include "Mesh.h"
+#include "geometry/Sphere.h"
+#include "core/ApplicationConstants.h"
+#include "geometry/Mesh.h"
 #include "geometry/MeshBuilder.h"
-#include "Engine.h"
-#include "ModelImporter.h"
+#include "core/Engine.h"
+#include "geometry/ModelImporter.h"
 #include "core/Factory.h"
-#include "Assets.h"
+#include "memory/Assets.h"
 
 void Sphere::createMesh(Resource<MeshCollection>& meshCollection, float radius, int sectors, int stacks)
 {

@@ -1,10 +1,10 @@
-#include "Box.h"
+#include "geometry/Box.h"
 
-#include "Mesh.h"
+#include "geometry/Mesh.h"
 #include "geometry/MeshBuilder.h"
-#include "VertexLayout.h"
-#include "Engine.h"
-#include "ModelImporter.h"
+#include "render/VertexLayout.h"
+#include "core/Engine.h"
+#include "geometry/ModelImporter.h"
 
 static const float vertices[] = {
 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,

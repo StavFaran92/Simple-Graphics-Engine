@@ -1,7 +1,7 @@
-#include "Mouse.h"
+#include "ui/Mouse.h"
 
-#include "Engine.h"
-#include "EventSystem.h"
+#include "core/Engine.h"
+#include "core/EventSystem.h"
 
 Mouse::Mouse()
 {

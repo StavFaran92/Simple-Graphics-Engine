@@ -1,15 +1,15 @@
 #include "render/SkyboxRenderer.h"
-#include "Shader.h"
-#include "ICamera.h"
-#include "Entity.h"
-#include "Context.h"
-#include "Shader.h"
-#include "Mesh.h"
-#include "Transformation.h"
-#include "Material.h"
+#include "render/Shader.h"
+#include "camera/ICamera.h"
+#include "runtime/Entity.h"
+#include "runtime/Context.h"
+#include "render/Shader.h"
+#include "geometry/Mesh.h"
+#include "component/Transformation.h"
+#include "render/Material.h"
 #include <GL/glew.h>
-#include "Component.h"
-#include "Engine.h"
+#include "component/Component.h"
+#include "core/Engine.h"
 
 void SkyboxRenderer::render()
 {

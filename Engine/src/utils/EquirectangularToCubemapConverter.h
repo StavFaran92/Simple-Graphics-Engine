@@ -2,7 +2,7 @@
 
 class Scene;
 
-#include "Resource.h"
+#include "memory/Resource.h"
 
 class EquirectangularToCubemapConverter
 {

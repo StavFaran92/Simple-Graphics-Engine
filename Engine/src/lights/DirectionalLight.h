@@ -1,6 +1,7 @@
 #pragma once
-#include "Light.h"
-#include "Core.h"
+#include "lights/Light.h"
+#include "core/Core.h"
+#include "serialize/CerealHelpers.h"
 
 
 class EngineAPI DirectionalLight : public Light
@@ -18,6 +19,6 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(m_color);
+		SERIALIZED_MEMBER(color);
 	}
 };

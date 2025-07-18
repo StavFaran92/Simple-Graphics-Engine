@@ -3,8 +3,8 @@
 //STL
 #include <string>
 
-#include "Engine.h"
-#include "Window.h"
+#include "core/Engine.h"
+#include "core/Window.h"
 #include "commdlg.h"
 
 class FileUtil

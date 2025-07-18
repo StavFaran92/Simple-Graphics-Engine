@@ -1,6 +1,7 @@
 #pragma once
-#include "Light.h"
-#include "Core.h"
+#include "lights/Light.h"
+#include "core/Core.h"
+#include "serialize/CerealHelpers.h"
 
 
 struct EngineAPI Attenuation {
@@ -10,7 +11,9 @@ struct EngineAPI Attenuation {
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(constant, linear, quadratic);
+			SERIALIZED_MEMBER(constant); 
+			SERIALIZED_MEMBER(linear);
+			SERIALIZED_MEMBER(quadratic);
 	}
 };
 
@@ -18,7 +21,7 @@ class EngineAPI PointLight : public Light
 {
 public:
 	PointLight() :
-		Light(), m_attenuation()
+		Light(), attenuation()
 	{
 		m_name = "pointLights";
 	}
@@ -32,9 +35,10 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(m_attenuation, m_color);
+		SERIALIZED_MEMBER(attenuation);
+		SERIALIZED_MEMBER(color);
 	}
 
 private:
-	Attenuation m_attenuation;
+	Attenuation attenuation;
 };

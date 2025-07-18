@@ -1,15 +1,15 @@
-#include "Application.h"
+#include "core/Application.h"
 
-#include "Logger.h"
-#include "Engine.h"
-#include "Context.h"
-#include "Scene.h"
-#include "Skybox.h"
-#include "Input.h"
-#include "Mouse.h"
-#include "Keyboard.h"
-#include "Box.h"
-#include "Quad.h"
+#include "core/Logger.h"
+#include "core/Engine.h"
+#include "runtime/Context.h"
+#include "runtime/Scene.h"
+#include "systems/Skybox.h"
+#include "ui/Input.h"
+#include "ui/Mouse.h"
+#include "ui/Keyboard.h"
+#include "geometry/Box.h"
+#include "geometry/Quad.h"
 
 Context* Application::getContext() const
 {

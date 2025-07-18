@@ -1,9 +1,9 @@
 #pragma once
 
-#include "VertexLayout.h"
+#include "render/VertexLayout.h"
 #include "render/VertexArrayObject.h"
-#include "Shader.h"
-#include "Resource.h"
+#include "render/Shader.h"
+#include "memory/Resource.h"
 
 class WireframeGrid
 {

@@ -1,10 +1,10 @@
 #include "geometry/MeshBuilder.h"
 
-#include "Logger.h"
-#include "VertexLayout.h"
+#include "core/Logger.h"
+#include "render/VertexLayout.h"
 #include "core/Factory.h"
 #include "geometry/MeshSerializer.h"
-#include "Context.h"
+#include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
 
 MeshBuilder& MeshBuilder::addPosition(const glm::vec3& position)

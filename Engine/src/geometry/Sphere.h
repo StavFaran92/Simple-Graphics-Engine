@@ -1,7 +1,7 @@
 #pragma once
-#include "Core.h"
+#include "core/Core.h"
 
-#include "MeshCollection.h"
+#include "geometry/MeshCollection.h"
 
 class EngineAPI Sphere
 {

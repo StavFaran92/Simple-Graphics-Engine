@@ -1,11 +1,11 @@
 #pragma once
-#include "Core.h"
+#include "core/Core.h"
 #include "SDL2/SDL.h"
-#include "Subscriber.h"
+#include "core/Subscriber.h"
 
 #include <functional>
 
-#include "EventLayer.h"
+#include "core/EventLayer.h"
 
 
 class EngineAPI Mouse

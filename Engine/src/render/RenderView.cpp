@@ -1,8 +1,8 @@
-#include "RenderView.h"
+#include "render/RenderView.h"
 
 #include <GL/glew.h>
 
-#include "RenderCommand.h"
+#include "render/RenderCommand.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
 

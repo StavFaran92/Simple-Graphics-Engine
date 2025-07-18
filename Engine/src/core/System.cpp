@@ -1,6 +1,6 @@
-#include "System.h"
+#include "core/System.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 
 System::System()
 {

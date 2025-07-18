@@ -1,8 +1,8 @@
 #pragma once
 
 #include <map>
-#include "Resource.h"
-#include "MeshCollection.h"
+#include "memory/Resource.h"
+#include "geometry/MeshCollection.h"
 
 class EngineAPI BuiltInMeshes
 {

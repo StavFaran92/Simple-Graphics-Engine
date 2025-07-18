@@ -1,10 +1,6 @@
 #pragma once
 
-#include "ICamera.h"
-#include "Core.h"
-#include "Component.h"
-#include "ScriptableEntity.h"
-#include "ICameraController.h"
+#include "sge.h"
 
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/cereal.hpp>

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Entity.h"
-#include "Texture.h"
-#include "Resource.h"
+#include "runtime/Entity.h"
+#include "texture/Texture.h"
+#include "memory/Resource.h"
 
 class FrameBufferObject;
 class RenderBufferObject;

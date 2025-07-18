@@ -1,25 +1,25 @@
 #include "utils/EquirectangularToCubemapConverter.h"
 
-#include "Texture.h"
+#include "texture/Texture.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "Resource.h"
-#include "Shader.h"
-#include "ShapeFactory.h"
+#include "memory/Resource.h"
+#include "render/Shader.h"
+#include "geometry/ShapeFactory.h"
 
 #include "GL/glew.h"
 #include "glm/ext.hpp"
-#include "Logger.h"
+#include "core/Logger.h"
 
-#include "RenderCommand.h"
-#include "Entity.h"
-#include "Component.h"
-#include "MeshCollection.h"
-#include "Context.h"
+#include "render/RenderCommand.h"
+#include "runtime/Entity.h"
+#include "component/Component.h"
+#include "geometry/MeshCollection.h"
+#include "runtime/Context.h"
 #include "texture/Cubemap.h"
 #include "texture/TextureTransformer.h"
 
-#include "Engine.h"
+#include "core/Engine.h"
 
 
 Resource<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(Resource<Texture> equirectangularTexture)

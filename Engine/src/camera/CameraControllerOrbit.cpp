@@ -1,9 +1,9 @@
-#include "CameraControllerOrbit.h"
+#include "camera/CameraControllerOrbit.h"
 
-#include "Engine.h"
-#include "EventSystem.h"
-#include "ApplicationConstants.h"
-#include "Transformation.h"
+#include "core/Engine.h"
+#include "core/EventSystem.h"
+#include "core/ApplicationConstants.h"
+#include "component/Transformation.h"
 #include <algorithm>
 #include "glm/glm.hpp"
 

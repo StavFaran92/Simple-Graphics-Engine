@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Texture.h"
-#include "Resource.h"
-#include "Core.h"
+#include "texture/Texture.h"
+#include "memory/Resource.h"
+#include "core/Core.h"
 
 class EngineAPI TextureSampler
 {
@@ -34,6 +34,15 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(texture, channelMaskR, channelMaskG, channelMaskB, channelMaskA, channelCount, xOffset, yOffset, xScale, yScale);
+		SERIALIZED_MEMBER(texture); 
+		SERIALIZED_MEMBER(channelMaskR); 
+		SERIALIZED_MEMBER(channelMaskG); 
+		SERIALIZED_MEMBER(channelMaskB); 
+		SERIALIZED_MEMBER(channelMaskA);
+		SERIALIZED_MEMBER(channelCount); 
+		SERIALIZED_MEMBER(xOffset);
+		SERIALIZED_MEMBER(yOffset); 
+		SERIALIZED_MEMBER(xScale); 
+		SERIALIZED_MEMBER(yScale);
 	}
 };

@@ -1,7 +1,7 @@
-#include "Mesh.h"
+#include "geometry/Mesh.h"
 
 #include "geometry/MeshBuilder.h"
-#include "Logger.h"
+#include "core/Logger.h"
 #include "render/VertexArrayObject.h"
 
 #include <GL\glew.h>

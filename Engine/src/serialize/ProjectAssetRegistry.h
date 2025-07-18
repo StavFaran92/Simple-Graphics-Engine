@@ -3,10 +3,10 @@
 #include <vector>
 
 #include <nlohmann/json.hpp>
-#include "UUID.h"
+#include "memory/UUID.h"
 
-#include "Resource.h"
-#include "Texture.h"
+#include "memory/Resource.h"
+#include "texture/Texture.h"
 
 struct AssetInfo;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Physics.h"
+#include "physics/Physics.h"
 
 #include "cereal/types/optional.hpp"
 #include <cereal/types/polymorphic.hpp>

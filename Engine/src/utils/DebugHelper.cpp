@@ -1,8 +1,8 @@
-#include "DebugHelper.h"
+#include "utils/DebugHelper.h"
 
 #include "render/VertexArrayObject.h"
-#include "VertexLayout.h"
-#include "Shader.h"
+#include "render/VertexLayout.h"
+#include "render/Shader.h"
 #include "render/Graphics.h"
 
 #include <glm/gtc/matrix_transform.hpp>

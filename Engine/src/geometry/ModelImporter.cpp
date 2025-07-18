@@ -1,4 +1,4 @@
-#include "ModelImporter.h"
+#include "geometry/ModelImporter.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/Exporter.hpp>
@@ -6,22 +6,22 @@
 #include <assimp/postprocess.h>
 #include <algorithm>
 
-#include "Logger.h"
+#include "core/Logger.h"
 #include <filesystem>
 #include "geometry/MeshBuilder.h"
-#include "Resource.h"
-#include "Material.h"
-#include "Entity.h"
-#include "Component.h"
-#include "Shader.h"
-#include "Engine.h"
+#include "memory/Resource.h"
+#include "render/Material.h"
+#include "runtime/Entity.h"
+#include "component/Component.h"
+#include "render/Shader.h"
+#include "core/Engine.h"
 #include "core/CacheSystem.h"
-#include "Scene.h"
-#include "Assets.h"
+#include "runtime/Scene.h"
+#include "memory/Assets.h"
 #include "utils/AssimpGLMHelpers.h"
 #include "core/Factory.h"
 #include "geometry/MeshExporter.h"
-#include "ShapeFactory.h"
+#include "geometry/ShapeFactory.h"
 
 bool findFile(const std::filesystem::path& directory, const std::string& fileName, std::filesystem::path& outputPath)
 {

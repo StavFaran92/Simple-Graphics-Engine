@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core.h"
+#include "core/Core.h"
 
 #include <glm/glm.hpp>
 
-#include "Entity.h"
+#include "runtime/Entity.h"
 
 class EngineAPI Physics
 {

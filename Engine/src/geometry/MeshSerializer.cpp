@@ -1,9 +1,9 @@
 #include "geometry/MeshSerializer.h"
 
 #include <fstream>
-#include "Logger.h"
+#include "core/Logger.h"
 
-#include "Mesh.h"
+#include "geometry/Mesh.h"
 
 struct BinaryLayoutInfo
 {

@@ -1,14 +1,14 @@
-#include "ImguiHandler.h"
+#include "ui/ImguiHandler.h"
 
 #include "ui/Menu.h"
 
-#include "Logger.h"
+#include "core/Logger.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
-#include "GuiMenu.h"
+#include "ui/GuiMenu.h"
 #include "ImGuizmo.h"
 
 bool ImguiHandler::init(SDL_Window* window, const SDL_GLContext& context)

@@ -1,6 +1,6 @@
-#include "Archiver.h"
+#include "serialize/Archiver.h"
 
-#include "Scene.h"
+#include "runtime/Scene.h"
 #include "systems/BuiltInMeshes.h"
 
 Archiver* Archiver::instance = new Archiver();
@@ -39,9 +39,9 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 	if (serializedEnt.transform)
 	{
 		auto& transform = entityHandler.addComponent<Transformation>(serializedEnt.transform.value());
-		transform.m_entity.setRegistry(&scene.getRegistry());
-		transform.m_root.setRegistry(&scene.getRegistry());
-		transform.m_parent.setRegistry(&scene.getRegistry());
+		transform.entity.setRegistry(&scene.getRegistry());
+		transform.root.setRegistry(&scene.getRegistry());
+		transform.parent.setRegistry(&scene.getRegistry());
 
 		for (auto [_, entity] : serializedEnt.transform.value().getChildren())
 		{

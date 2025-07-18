@@ -3,7 +3,7 @@
 #include "core/Factory.h"
 #include "geometry/MeshBuilder.h"
 #include "geometry/MeshExporter.h"
-#include "Assets.h"
+#include "memory/Assets.h"
 
 aiScene* generateScene(const std::vector<float>& vertices, const std::vector<unsigned int>& indices)
 {

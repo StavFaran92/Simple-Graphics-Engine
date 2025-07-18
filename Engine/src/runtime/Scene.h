@@ -8,11 +8,11 @@
 #include <map>
 #include <functional>
 
-#include "Core.h"
+#include "core/Core.h"
 
 #include "glm/glm.hpp"
-#include "Entity.h"
-#include "Archiver.h"
+#include "runtime/Entity.h"
+#include "serialize/Archiver.h"
 
 
 class Model;

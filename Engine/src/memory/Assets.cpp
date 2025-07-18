@@ -1,13 +1,13 @@
-#include "Assets.h"
+#include "memory/Assets.h"
 
 #include <GL/glew.h>
 
 
-#include "Texture.h"
-#include "Animation.h"
-#include "AnimationLoader.h"
+#include "texture/Texture.h"
+#include "animation/Animation.h"
+#include "animation/AnimationLoader.h"
 #include "core/CacheSystem.h"
-#include "ModelImporter.h"
+#include "geometry/ModelImporter.h"
 #include "core/Factory.h"
 #include "render/ShaderBuilder.h"
 

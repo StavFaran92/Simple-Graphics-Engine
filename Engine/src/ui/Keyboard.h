@@ -2,10 +2,10 @@
 
 #include <iostream>
 #include <functional>
-#include "Core.h"
+#include "core/Core.h"
 
 #include "SDL2/SDL.h"
-#include "EventLayer.h"
+#include "core/EventLayer.h"
 
 class EngineAPI Keyboard
 {

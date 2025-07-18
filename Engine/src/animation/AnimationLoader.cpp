@@ -1,11 +1,11 @@
-#include "AnimationLoader.h"
+#include "animation/AnimationLoader.h"
 
 #include "utils/AssimpGLMHelpers.h"
 #include "core/Factory.h"
-#include "Context.h"
+#include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
 #include "animation/Bone.h"
-#include "Assets.h"
+#include "memory/Assets.h"
 #include <filesystem>
 
 AnimationLoader::AnimationLoader()

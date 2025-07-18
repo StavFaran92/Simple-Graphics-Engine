@@ -1,7 +1,7 @@
 #pragma once
 
-#include "AABB.h"
-#include "Transformation.h"
+#include "geometry/AABB.h"
+#include "component/Transformation.h"
 
 
 

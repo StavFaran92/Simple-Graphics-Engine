@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core.h"
+#include "core/Core.h"
 
-#include "Component.h"
+#include "component/Component.h"
 
 struct EngineAPI FoliageComponent : public Component
 {

@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "render/Shader.h"
 
 #include <regex>
 
@@ -7,14 +7,14 @@
 #include <GL/glew.h>
 
 #include "utils/Utils.h"
-#include "Logger.h"
+#include "core/Logger.h"
 #include "render/ShaderLoader.h"
-#include "Engine.h"
-#include "Texture.h"
-#include "Resource.h"
+#include "core/Engine.h"
+#include "texture/Texture.h"
+#include "memory/Resource.h"
 #include "core/Factory.h"
-#include "Assets.h"
-#include "CommonTextures.h"
+#include "memory/Assets.h"
+#include "systems/CommonTextures.h"
 
 uint32_t Shader::s_activeShader = 0;
 

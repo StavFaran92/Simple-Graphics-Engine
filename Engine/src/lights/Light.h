@@ -2,8 +2,8 @@
 #include <glm/glm.hpp>
 
 #include <string>
-#include "Core.h"
-#include "Component.h"
+#include "core/Core.h"
+#include "component/Component.h"
 
 class Shader;
 
@@ -23,7 +23,7 @@ public:
 	virtual ~Light();
 
 protected:
-	glm::vec3 m_color;
+	glm::vec3 color;
 	float m_ambientIntensity = 0;
 	float m_diffuseIntensity = 0;
 	std::string m_name;

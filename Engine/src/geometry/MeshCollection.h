@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "Core.h"
-#include "Mesh.h"
-#include "Resource.h"
+#include "core/Core.h"
+#include "geometry/Mesh.h"
+#include "memory/Resource.h"
 
 class EngineAPI MeshCollection
 {

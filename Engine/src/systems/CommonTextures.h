@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include "Resource.h"
+#include "memory/Resource.h"
 
 class Texture;
 

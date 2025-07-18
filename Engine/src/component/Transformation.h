@@ -6,58 +6,59 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Core.h"
+#include "core/Core.h"
 
-#include "Entity.h"
-#include "Component.h"
+#include "runtime/Entity.h"
+#include "component/Component.h"
+#include "serialize/CerealHelpers.h"
 
 class EngineAPI Transformation : public Component
 {
 public:
 	Transformation() :
-		m_entity(Entity::EmptyEntity),
-		m_localTranslation(0, 0, 0),
-		m_localRotation(1, 0, 0, 0),
-		m_localScale(1, 1, 1),
+		entity(Entity::EmptyEntity),
+		localTranslation(0, 0, 0),
+		localRotation(1, 0, 0, 0),
+		localScale(1, 1, 1),
 		m_relativeRot(1.f)
 	{
-		m_root = m_entity;
+		root = entity;
 		m_isDirty = true;
 		update();
 	}
 
 	Transformation(const Entity& entity) :
-		m_entity(entity),
-		m_localTranslation(0, 0, 0),
-		m_localRotation(1, 0, 0, 0),
-		m_localScale(1, 1, 1),
+		entity(entity),
+		localTranslation(0, 0, 0),
+		localRotation(1, 0, 0, 0),
+		localScale(1, 1, 1),
 		m_relativeRot(1.f)
 	{
-		m_root = entity;
+		root = entity;
 		m_isDirty = true;
 		update();
 	}
 
 	Transformation(const Entity& entity, glm::vec3 translation) :
-		m_entity(entity),
-		m_localTranslation(translation),
-		m_localRotation(1, 0, 0, 0),
-		m_localScale(1, 1, 1),
+		entity(entity),
+		localTranslation(translation),
+		localRotation(1, 0, 0, 0),
+		localScale(1, 1, 1),
 		m_relativeRot(1.f)
 	{
-		m_root = entity;
+		root = entity;
 		m_isDirty = true;
 		update();
 	}
 
 	Transformation(const Entity& entity, glm::vec3 translation, glm::quat rotation) :
-		m_entity(entity),
-		m_localTranslation(translation),
-		m_localRotation(rotation),
-		m_localScale(1, 1, 1),
+		entity(entity),
+		localTranslation(translation),
+		localRotation(rotation),
+		localScale(1, 1, 1),
 		m_relativeRot(1.f)
 	{
-		m_root = entity;
+		root = entity;
 		m_isDirty = true;
 		update();
 	}
@@ -113,7 +114,13 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(m_localTranslation, m_localRotation, m_localScale, m_parent, m_entity, m_root, m_children);
+		SERIALIZED_MEMBER(localTranslation); 
+		SERIALIZED_MEMBER(localRotation);
+		SERIALIZED_MEMBER(localScale); 
+		SERIALIZED_MEMBER(parent); 
+		SERIALIZED_MEMBER(entity); 
+		SERIALIZED_MEMBER(root); 
+		SERIALIZED_MEMBER(children);
 	}
 
 private:
@@ -123,24 +130,20 @@ private:
 private:
 	friend class Archiver;
 
-	glm::vec3 m_localTranslation;
-	glm::quat m_localRotation;
-	glm::vec3 m_localScale;
+	glm::vec3 localTranslation;
+	glm::quat localRotation;
+	glm::vec3 localScale;
+	Entity parent = Entity::EmptyEntity;
+	Entity entity = Entity::EmptyEntity;
+	Entity root = Entity::EmptyEntity;
+	std::unordered_map<entity_id, Entity> children{};
 
+private:
 	glm::quat m_globalRotation;
 	glm::vec3 m_globalScale;
-
 	glm::mat4 m_modelMatrix;
-
 	glm::mat4 m_relativeRot;
-
-
 	glm::mat4 m_rootTransformation{ 1.f };
-
-	Entity m_parent = Entity::EmptyEntity;
-	Entity m_entity = Entity::EmptyEntity;
-	Entity m_root = Entity::EmptyEntity;
-	std::unordered_map<entity_id, Entity> m_children{};
 
 	bool m_isDirty = true;
 };

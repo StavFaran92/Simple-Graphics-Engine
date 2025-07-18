@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "Resource.h"
-#include "Shader.h"
-#include "Texture.h"
+#include "memory/Resource.h"
+#include "render/Shader.h"
+#include "texture/Texture.h"
 
 class TerrainMaterial
 {

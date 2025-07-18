@@ -5,9 +5,9 @@
 #include <memory>
 
 #include "glm/glm.hpp"
-#include "Core.h"
+#include "core/Core.h"
 #include <entt/entt.hpp>
-#include "Resource.h"
+#include "memory/Resource.h"
 
 class Shader;
 class VertexArrayObject;

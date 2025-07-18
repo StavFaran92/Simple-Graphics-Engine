@@ -1,4 +1,4 @@
-#include "Animation.h"
+#include "animation/Animation.h"
 
 #include "animation/Bone.h"
 
@@ -83,7 +83,7 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-#include "AnimationLoader.h"
+#include "animation/AnimationLoader.h"
 void Animation::load(UUID uid, const std::string& path)
 {
 	Engine::get()->getSubSystem<AnimationLoader>()->load(path, Resource<Animation>(uid));

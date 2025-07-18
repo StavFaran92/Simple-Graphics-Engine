@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core.h"
-#include "Resource.h"
+#include "core/Core.h"
+#include "memory/Resource.h"
 
-#include "MeshCollection.h"
+#include "geometry/MeshCollection.h"
 
 class EngineAPI Box
 {

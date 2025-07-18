@@ -2,7 +2,7 @@
 
 #include <GL/glew.h>
 
-#include "Logger.h"
+#include "core/Logger.h"
 
 ElementBufferObject::ElementBufferObject(unsigned int* data, unsigned int length)
 	:m_length(length)

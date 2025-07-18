@@ -1,6 +1,6 @@
-#include "Configurations.h"
+#include "core/Configurations.h"
 
-#include "Logger.h"
+#include "core/Logger.h"
 
 AttributeData getAttributeData(LayoutAttribute attribute)
 {

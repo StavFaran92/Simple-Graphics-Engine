@@ -2,9 +2,9 @@
 
 #include <glm/glm.hpp>
 
-#include "ICameraController.h"
-#include "Component.h"
-#include "Subscriber.h"
+#include "camera/ICameraController.h"
+#include "component/Component.h"
+#include "core/Subscriber.h"
 
 class CameraControllerOrbit : public ICameraController
 {

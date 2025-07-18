@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "UUID.h"
+#include "memory/UUID.h"
 
 class ResourceManager
 {

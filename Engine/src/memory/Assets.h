@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Engine.h"
-#include "Resource.h"
-#include "Core.h"
-#include "Configurations.h"
+#include "core/Engine.h"
+#include "memory/Resource.h"
+#include "core/Core.h"
+#include "core/Configurations.h"
 
 #include <unordered_set>
 

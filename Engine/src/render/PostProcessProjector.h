@@ -3,8 +3,8 @@
 #include <memory>
 
 #include "IProjector.h"
-#include "Entity.h"
-#include "Resource.h"
+#include "runtime/Entity.h"
+#include "memory/Resource.h"
 
 class FrameBufferObject;
 class RenderBufferObject;

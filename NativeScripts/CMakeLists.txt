@@ -8,6 +8,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 	${CMAKE_SOURCE_DIR}/Engine/include
+	${CMAKE_SOURCE_DIR}/Engine/src
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE

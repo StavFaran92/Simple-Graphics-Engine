@@ -2,11 +2,11 @@
 
 #include <vector>
 #include <cstdint>
-#include "Core.h"
+#include "core/Core.h"
 #include <PxPhysicsAPI.h>
 
-#include "Transformation.h"
-#include "Configurations.h"
+#include "component/Transformation.h"
+#include "core/Configurations.h"
 #include <glm/glm.hpp>
 
 class PhysicsSystem

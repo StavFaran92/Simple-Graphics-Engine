@@ -2,9 +2,9 @@
 
 #include <GL/glew.h>
 
-#include "Engine.h"
-#include "Window.h"
-#include "Logger.h"
+#include "core/Engine.h"
+#include "core/Window.h"
+#include "core/Logger.h"
 #include "render/ScreenQuad.h"
 #include "render/Renderer2D.h"
 

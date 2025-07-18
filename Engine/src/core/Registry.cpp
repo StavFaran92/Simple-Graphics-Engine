@@ -1,8 +1,8 @@
-#include "Registry.h"
+#include "core/Registry.h"
 
-#include "Entity.h"
-#include "Component.h"
-#include "Transformation.h"
+#include "runtime/Entity.h"
+#include "component/Component.h"
+#include "component/Transformation.h"
 
 
 entt::registry& SGE_Regsitry::get()

@@ -1,13 +1,13 @@
 #include "serialize/ProjectAssetRegistry.h"
 
-#include "Logger.h"
+#include "core/Logger.h"
 
 
 
 #include <filesystem>
 #include <fstream>
 
-#include "Assets.h"
+#include "memory/Assets.h"
 
 using json = nlohmann::json;
 

@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "render/Vertex.h"
-#include "VertexLayout.h"
+#include "render/VertexLayout.h"
 
 class VertexBufferObject
 {

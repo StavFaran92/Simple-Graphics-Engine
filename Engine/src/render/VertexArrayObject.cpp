@@ -2,8 +2,8 @@
 
 #include <gl/glew.h>
 
-#include "Logger.h"
-#include "VertexLayout.h"
+#include "core/Logger.h"
+#include "render/VertexLayout.h"
 
 VertexArrayObject::VertexArrayObject()
 {

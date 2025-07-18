@@ -2,8 +2,8 @@
 
 #include <memory>
 #include <map>
-#include "Shader.h"
-#include "Resource.h"
+#include "render/Shader.h"
+#include "memory/Resource.h"
 
 class CommonShaders
 {

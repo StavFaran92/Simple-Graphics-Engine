@@ -1,8 +1,8 @@
-#include "Physics.h"
+#include "physics/Physics.h"
 
-#include "Engine.h"
-#include "Context.h"
-#include "Scene.h"
+#include "core/Engine.h"
+#include "runtime/Context.h"
+#include "runtime/Scene.h"
 
 #include <PxPhysicsAPI.h>
 

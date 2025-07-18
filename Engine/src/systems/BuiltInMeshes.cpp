@@ -1,12 +1,12 @@
 #include "systems/BuiltInMeshes.h"
 
-#include "Quad.h"
-#include "Box.h"
-#include "Sphere.h"
+#include "geometry/Quad.h"
+#include "geometry/Box.h"
+#include "geometry/Sphere.h"
 #include "geometry/Grid.h"
 
-#include "Assets.h"
-#include "ModelImporter.h"
+#include "memory/Assets.h"
+#include "geometry/ModelImporter.h"
 #include "core/Factory.h"
 
 void addAsAsset(const Resource<MeshCollection>& meshCollection)

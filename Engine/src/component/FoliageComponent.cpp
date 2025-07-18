@@ -1,8 +1,8 @@
-#include "FoliageComponent.h"
+#include "component/FoliageComponent.h"
 
-#include "Transformation.h"
+#include "component/Transformation.h"
 #include "systems/FoliageSystem.h"
-#include "Random.h"
+#include "core/Random.h"
 
 #include <GL/glew.h> // TODO Remove
 

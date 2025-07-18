@@ -3,11 +3,11 @@
 #include <string>
 #include <vector>
 
-#include "Core.h"
-#include "Component.h"
+#include "core/Core.h"
+#include "component/Component.h"
 //#include "render/TerrainMaterial.h"
 //#include "texture/TextureArray.h"
-#include "Entity.h"
+#include "runtime/Entity.h"
 
 static const int MAX_TEXTURE_COUNT = 4;
 

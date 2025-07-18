@@ -8,9 +8,9 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "Core.h"
+#include "core/Core.h"
 
-#include "EventLayer.h"
+#include "core/EventLayer.h"
 
 class EngineAPI EventSystem
 {

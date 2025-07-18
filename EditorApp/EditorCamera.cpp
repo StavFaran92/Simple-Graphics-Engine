@@ -2,18 +2,10 @@
 
 #include <gl/glew.h>
 
-#include "ApplicationConstants.h"
-#include "Engine.h"
-#include "Context.h"
-#include "Scene.h"
-#include "Transformation.h"
-#include "CameraControllerOrbit.h"
-#include "CameraControllerFreeLook.h"
-#include "EventSystem.h"
+#include "sge.h"
 
 #include "EditorState.h"
 
-#include "Logger.h"
 
 EditorCamera::EditorCamera()
 {

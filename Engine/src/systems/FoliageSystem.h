@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Resource.h"
-#include "MeshCollection.h"
-#include "FoliageComponent.h"
+#include "memory/Resource.h"
+#include "geometry/MeshCollection.h"
+#include "component/FoliageComponent.h"
 
 class FoliageSystem
 {

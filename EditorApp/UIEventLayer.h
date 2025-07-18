@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EventLayer.h"
+#include "sge.h"
 
 class UIEventLayer : public EventLayer
 {

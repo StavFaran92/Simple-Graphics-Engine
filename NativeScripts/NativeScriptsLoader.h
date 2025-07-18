@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "ScriptableEntity.h"
+#include "sge.h"
 #include "NativeScriptsRegister.h"
 
 class NativeScriptsLoader

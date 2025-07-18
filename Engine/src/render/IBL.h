@@ -1,7 +1,7 @@
 #pragma once
 
 class Scene;
-#include "Resource.h"
+#include "memory/Resource.h"
 
 class IBL
 {

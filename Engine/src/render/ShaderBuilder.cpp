@@ -2,14 +2,14 @@
 
 #include <sstream>
 
-#include "Engine.h"
+#include "core/Engine.h"
 #include "render/ShaderLoader.h"
 
 #include "utils/Utils.h"
-#include "CommonTextures.h"
+#include "systems/CommonTextures.h"
 #include "core/Factory.h"
 
-#include "Assets.h"
+#include "memory/Assets.h"
 
 //enum class DirectiveType
 //{

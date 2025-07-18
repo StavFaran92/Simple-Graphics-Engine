@@ -1,11 +1,11 @@
 #include "render/Renderer2D.h"
 
-#include "Logger.h"
+#include "core/Logger.h"
 #include <GL/glew.h>
 
 #include "render/VertexArrayObject.h"
-#include "ICamera.h"
-#include "Mesh.h"
+#include "camera/ICamera.h"
+#include "geometry/Mesh.h"
 #include "render/Graphics.h"
 
 void Renderer2D::render()

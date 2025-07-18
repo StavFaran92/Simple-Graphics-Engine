@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core.h"
-#include "Entity.h"
+#include "core/Core.h"
+#include "runtime/Entity.h"
 
 class EngineAPI WaterSystem
 {

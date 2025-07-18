@@ -2,12 +2,12 @@
 
 #include <memory>
 #include <map>
-#include "Core.h"
+#include "core/Core.h"
 
-#include "Resource.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "TextureSampler.h"
+#include "memory/Resource.h"
+#include "render/Shader.h"
+#include "texture/Texture.h"
+#include "texture/TextureSampler.h"
 
 class EngineAPI Material
 {
@@ -40,7 +40,7 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(m_samplers);
+		SERIALIZED_MEMBER(m_samplers);
 	}
 
 protected:

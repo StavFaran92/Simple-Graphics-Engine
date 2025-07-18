@@ -5,9 +5,10 @@
 
 class Texture;
 class Mesh;
-#include "Engine.h"
-#include "MemoryPool.h"
-#include "ResourceManager.h"
+#include "core/Engine.h"
+#include "memory/MemoryPool.h"
+#include "memory/ResourceManager.h"
+#include "serialize/CerealHelpers.h"
 
 template<typename T>
 class Resource
@@ -15,57 +16,57 @@ class Resource
 public:
 	static Resource<T> empty;
 
-	Resource() : m_uid(EMPTY_UUID) {};
+	Resource() : uuid(EMPTY_UUID) {};
 
-	Resource(std::nullptr_t) : m_uid(EMPTY_UUID) {};
+	Resource(std::nullptr_t) : uuid(EMPTY_UUID) {};
 
-	Resource(UUID uid) : m_uid(uid) 
+	Resource(UUID uid) : uuid(uid) 
 	{
 		Engine::get()->getResourceManager()->incRef(uid);
 
-		if(!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
+		if(!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
 	};
 
 	Resource(const Resource<T>& other) 
 	{
-		m_uid = other.m_uid;
-		if (other.m_uid != EMPTY_UUID)
+		uuid = other.uuid;
+		if (other.uuid != EMPTY_UUID)
 		{
-			Engine::get()->getResourceManager()->incRef(other.m_uid);
+			Engine::get()->getResourceManager()->incRef(other.uuid);
 		}
 
-		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
+		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
 	};
 
 	Resource<T>& operator=(const Resource<T>& other)
 	{
-		if (m_uid == other.m_uid) 
+		if (uuid == other.uuid) 
 			return *this;
 
 		clean();
 
-		m_uid = other.m_uid;
-		if (other.m_uid != EMPTY_UUID)
+		uuid = other.uuid;
+		if (other.uuid != EMPTY_UUID)
 		{
-			Engine::get()->getResourceManager()->incRef(other.m_uid);
+			Engine::get()->getResourceManager()->incRef(other.uuid);
 		}
-		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
+		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
 
 		return *this;
 	};
 
 	Resource(Resource<T>&& other)
 	{
-		m_uid = other.m_uid;
-		other.m_uid = EMPTY_UUID;
-		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
+		uuid = other.uuid;
+		other.uuid = EMPTY_UUID;
+		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
 	};
 
 	Resource<T>& operator=(Resource<T>&& other)
 	{
-		m_uid = other.m_uid;
-		other.m_uid = EMPTY_UUID;
-		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
+		uuid = other.uuid;
+		other.uuid = EMPTY_UUID;
+		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
 
 		return *this;
 	};
@@ -77,13 +78,13 @@ public:
 
 	inline T* get() const
 	{
-		m_cache = Engine::get()->getMemoryPool<T>()->get(m_uid);
+		m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
 		return m_cache;
 	}
 
 	inline UUID getUID() const 
 	{ 
-		return m_uid; 
+		return uuid; 
 	}
 
 	void release()
@@ -93,25 +94,17 @@ public:
 
 	bool isEmpty() const
 	{
-		return m_uid == EMPTY_UUID;
+		return uuid == EMPTY_UUID;
 	}
 
 	template <class Archive>
-	void save(Archive& archive) const {
-		archive(m_uid);
-	}
-
-	template <class Archive>
-	void load(Archive& archive) {
-		archive(m_uid);
-		int a = Engine::get()->getResourceManager()->incRef(m_uid);
-		logDebug("Loaded Resource: m_uid: " + m_uid + ", ref count: " + std::to_string(a));
-		
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(uuid);
 	}
 
 	~Resource<T>() // destructor
 	{
-		if(m_uid != EMPTY_UUID) clean();
+		if(uuid != EMPTY_UUID) clean();
 	}
 
 private:
@@ -120,18 +113,18 @@ private:
 
 	void clean()
 	{
-		if (Engine::get()->getResourceManager()->decRef(m_uid) == 0)
+		if (Engine::get()->getResourceManager()->decRef(uuid) == 0)
 		{
-			if (m_uid != EMPTY_UUID)
+			if (uuid != EMPTY_UUID)
 			{
-				Engine::get()->getMemoryPool<T>()->erase(m_uid);
+				Engine::get()->getMemoryPool<T>()->erase(uuid);
 			}
 
-			m_uid = EMPTY_UUID;
+			uuid = EMPTY_UUID;
 		}
 	}
 private:
-	UUID m_uid = EMPTY_UUID;
+	UUID uuid = EMPTY_UUID;
 	mutable T* m_cache = nullptr;
 };
 

@@ -1,11 +1,9 @@
 #pragma once
 
 #include "sge.h"
-#include "ICameraController.h"
 
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/cereal.hpp>
-#include "CameraControllerFreeLook.h"
 
 class CameraScript : public ScriptableEntity
 {

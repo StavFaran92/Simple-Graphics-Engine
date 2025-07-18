@@ -1,7 +1,7 @@
 #include "render/VertexBufferObject.h"
 
 #include <GL/glew.h>
-#include "Logger.h"
+#include "core/Logger.h"
 
 std::shared_ptr<VertexBufferObject> VertexBufferObject::createRaw(const void* data, unsigned int length, unsigned int size, const VertexLayout& layout)
 {

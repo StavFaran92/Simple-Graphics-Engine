@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Quad.h"
+#include "geometry/Quad.h"
 
 class Entity;
 class SGE_Regsitry;

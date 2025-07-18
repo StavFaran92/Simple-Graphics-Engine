@@ -1,11 +1,11 @@
-#include "Window.h"
+#include "core/Window.h"
 
 #include <GL/glew.h>
 #include "SDL2/SDL.h"
 
 
-#include "Logger.h"
-#include "Engine.h"
+#include "core/Logger.h"
+#include "core/Engine.h"
 
 Window::Window()
 {

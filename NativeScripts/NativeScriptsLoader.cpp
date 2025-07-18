@@ -1,7 +1,5 @@
 #include "NativeScriptsLoader.h"
 
-#include "Logger.h"
-
 void NativeScriptsLoader::init()
 {
     m_registerer = std::make_unique<NativeScriptRegisterer>();

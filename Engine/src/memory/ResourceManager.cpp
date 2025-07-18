@@ -1,4 +1,4 @@
-#include "ResourceManager.h"
+#include "memory/ResourceManager.h"
 
 std::string ResourceManager::getRootDir() const
 {

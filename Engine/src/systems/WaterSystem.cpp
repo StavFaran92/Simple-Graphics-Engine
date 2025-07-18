@@ -1,9 +1,9 @@
-#include "WaterSystem.h"
+#include "systems/WaterSystem.h"
 
-#include "Engine.h"
-#include "Context.h"
-#include "Scene.h"
-#include "ModelImporter.h"
+#include "core/Engine.h"
+#include "runtime/Context.h"
+#include "runtime/Scene.h"
+#include "geometry/ModelImporter.h"
 
 Entity WaterSystem::createPool()
 {

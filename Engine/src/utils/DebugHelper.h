@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "Engine.h"
-#include "Core.h"
-#include "Resource.h"
+#include "core/Engine.h"
+#include "core/Core.h"
+#include "memory/Resource.h"
 
 #include <glm/glm.hpp>
 

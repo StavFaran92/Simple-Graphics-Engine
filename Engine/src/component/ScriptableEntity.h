@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Core.h"
+#include "core/Core.h"
 
-#include "Entity.h"
+#include "runtime/Entity.h"
 
 #include "SDL.h"
-#include "Subscriber.h"
+#include "core/Subscriber.h"
 
 struct NativeScriptComponent;
 class Scene;

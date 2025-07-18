@@ -1,11 +1,11 @@
-#include "Material.h"
+#include "render/Material.h"
 
-#include "Logger.h"
+#include "core/Logger.h"
 #include <GL\glew.h>
 
-#include "Engine.h"
-#include "Context.h"
-#include "CommonTextures.h"
+#include "core/Engine.h"
+#include "runtime/Context.h"
+#include "systems/CommonTextures.h"
 
 Material::Material()
 {

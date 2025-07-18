@@ -8,21 +8,21 @@
 #include <iostream>
 #include <fstream>
 
-#include "Core.h"
-#include "Logger.h"
+#include "core/Core.h"
+#include "core/Logger.h"
 #include <glm/glm.hpp>
 #include "entt/entt.hpp"
 
-#include "Component.h"
-#include "Transformation.h"
-#include "ScriptableEntity.h"
-#include "Material.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
-#include "Skybox.h"
-#include "Context.h"
-#include "Animator.h"
-#include "Terrain.h"
+#include "component/Component.h"
+#include "component/Transformation.h"
+#include "component/ScriptableEntity.h"
+#include "render/Material.h"
+#include "lights/DirectionalLight.h"
+#include "lights/PointLight.h"
+#include "systems/Skybox.h"
+#include "runtime/Context.h"
+#include "animation/Animator.h"
+#include "component/Terrain.h"
 
 #include "serialize/CerealHelpers.h"
 
@@ -34,17 +34,23 @@ namespace glm
 {
 	template<class Archive>
 	void serialize(Archive& archive, glm::vec3& v) {
-		archive(v.x, v.y, v.z);
+			SERIALIZED_MEMBER(v.x); 
+			SERIALIZED_MEMBER(v.y); 
+			SERIALIZED_MEMBER(v.z);
 	}
 
 	template<class Archive>
 	void serialize(Archive& archive, glm::vec2& v) {
-		archive(v.x, v.y);
+		SERIALIZED_MEMBER(v.x); 
+		SERIALIZED_MEMBER(v.y);
 	}
 
 	template<class Archive>
 	void serialize(Archive& archive, glm::quat& q) {
-		archive(q.x, q.y, q.z, q.w);
+			SERIALIZED_MEMBER(q.x); 
+			SERIALIZED_MEMBER(q.y); 
+			SERIALIZED_MEMBER(q.z); 
+			SERIALIZED_MEMBER(q.w);
 	}
 };
 
@@ -82,23 +88,23 @@ struct SerializedEntity
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(entity),
-		SERIALIZED_MEMBER(transform),
-		SERIALIZED_MEMBER(physics),
-		SERIALIZED_MEMBER(playerController),
-		SERIALIZED_MEMBER(mesh),
-		SERIALIZED_MEMBER(renderableComponent),
-		SERIALIZED_MEMBER(camera),
-		SERIALIZED_MEMBER(nsc),
-		SERIALIZED_MEMBER(mat),
-		SERIALIZED_MEMBER(dLight),
-		SERIALIZED_MEMBER(pLight),
-		SERIALIZED_MEMBER(obj),
-		SERIALIZED_MEMBER(skybox),
-		SERIALIZED_MEMBER(image),
-		SERIALIZED_MEMBER(animator),
-		SERIALIZED_MEMBER(terrain),
-		SERIALIZED_MEMBER(testComponent),
+		SERIALIZED_MEMBER(entity);
+		SERIALIZED_MEMBER(transform);
+		SERIALIZED_MEMBER(physics);
+		SERIALIZED_MEMBER(playerController);
+		SERIALIZED_MEMBER(mesh);
+		SERIALIZED_MEMBER(renderableComponent);
+		SERIALIZED_MEMBER(camera);
+		SERIALIZED_MEMBER(nsc);
+		SERIALIZED_MEMBER(mat);
+		SERIALIZED_MEMBER(dLight);
+		SERIALIZED_MEMBER(pLight);
+		SERIALIZED_MEMBER(obj);
+		SERIALIZED_MEMBER(skybox);
+		SERIALIZED_MEMBER(image);
+		SERIALIZED_MEMBER(animator);
+		SERIALIZED_MEMBER(terrain);
+		SERIALIZED_MEMBER(testComponent);
 		SERIALIZED_MEMBER(shader);
 	}
 };
@@ -110,8 +116,8 @@ struct SerializedScene
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(serializedEntities),
-		SERIALIZED_MEMBER_OPTIONAL(gameCamera, 0);
+		SERIALIZED_MEMBER(serializedEntities);
+		SERIALIZED_MEMBER_OPTIONAL(gameCamera, entt::null);
 	}
 
 };
@@ -123,7 +129,7 @@ struct SerializedContext
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(serializedScenes),
+		SERIALIZED_MEMBER(serializedScenes);
 		SERIALIZED_MEMBER(activeScene);
 	}
 };

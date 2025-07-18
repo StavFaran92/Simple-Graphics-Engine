@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core.h"
+#include "core/Core.h"
 
 #include "render/FrameBufferObject.h"
 #include "render/IRenderer.h"
-#include "Entity.h"
+#include "runtime/Entity.h"
 
 class Shader;
 class Scene;

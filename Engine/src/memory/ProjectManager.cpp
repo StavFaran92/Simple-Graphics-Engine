@@ -4,16 +4,16 @@
 #include <fstream>
 #include <unordered_map>
 
-#include "Logger.h"
-#include "Mesh.h"
+#include "core/Logger.h"
+#include "geometry/Mesh.h"
 #include "serialize/ProjectAssetRegistry.h"
 #include "geometry/MeshSerializer.h"
-#include "Texture.h"
-#include "Assets.h"
-#include "Archiver.h"
-#include "ModelImporter.h"
-#include "AnimationLoader.h"
-#include "MeshCollection.h"
+#include "texture/Texture.h"
+#include "memory/Assets.h"
+#include "serialize/Archiver.h"
+#include "geometry/ModelImporter.h"
+#include "animation/AnimationLoader.h"
+#include "geometry/MeshCollection.h"
 //#include "TextureSerializer.h"
 #include <nlohmann/json.hpp>
 

@@ -8,7 +8,7 @@
 #include <queue>
 #include <variant>
 
-#include "Core.h"
+#include "core/Core.h"
 
 #include "glm/glm.hpp"
 

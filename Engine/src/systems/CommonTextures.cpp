@@ -1,8 +1,8 @@
-#include "CommonTextures.h"
+#include "systems/CommonTextures.h"
 
-#include "Assets.h"
+#include "memory/Assets.h"
 #include "texture/Cubemap.h"
-#include "Context.h"
+#include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
 #include "core/CacheSystem.h"
 #include <gl/glew.h>

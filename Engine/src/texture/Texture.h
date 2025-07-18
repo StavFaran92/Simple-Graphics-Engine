@@ -5,10 +5,10 @@
 #include <vector>
 #include <map>
 
-#include "Core.h"
-#include "ApplicationConstants.h"
-#include "Configurations.h"
-#include "Resource.h"
+#include "core/Core.h"
+#include "core/ApplicationConstants.h"
+#include "core/Configurations.h"
+#include "memory/Resource.h"
 
 struct AssetInfo;
 

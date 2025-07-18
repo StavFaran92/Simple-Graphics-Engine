@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "Core.h"
-#include "Configurations.h"
+#include "core/Core.h"
+#include "core/Configurations.h"
 
 
 struct EngineAPI VertexLayout

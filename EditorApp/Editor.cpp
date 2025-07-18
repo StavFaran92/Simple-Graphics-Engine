@@ -1,7 +1,6 @@
 #include "EntryPoint.h"
 #include "sge.h"
 
-#include "Window.h"
 #include "commdlg.h"
 
 #include <filesystem>

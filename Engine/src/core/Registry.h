@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entt/entt.hpp"
-#include "Core.h"
+#include "core/Core.h"
 
 class Entity;
 

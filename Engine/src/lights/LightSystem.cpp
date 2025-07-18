@@ -1,12 +1,12 @@
 #include "lights/LightSystem.h"
 
 #include "render/UniformBufferObject.h"
-#include "Scene.h"
-#include "Context.h"
+#include "runtime/Scene.h"
+#include "runtime/Context.h"
 #include "render/IRenderer.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
-#include "Transformation.h"
+#include "lights/DirectionalLight.h"
+#include "lights/PointLight.h"
+#include "component/Transformation.h"
 #include "render/Graphics.h"
 
 #define NR_POINT_LIGHTS 32

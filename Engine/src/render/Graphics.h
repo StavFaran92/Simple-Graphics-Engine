@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include "Resource.h"
-#include "Entity.h"
+#include "memory/Resource.h"
+#include "runtime/Entity.h"
 
 class Scene;
 class Context;

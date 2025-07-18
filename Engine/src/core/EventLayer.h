@@ -5,7 +5,7 @@
 #include <string>
 #include <cstdint>
 
-#include "Subscriber.h"
+#include "core/Subscriber.h"
 
 using EventHandler = uint64_t;
 
