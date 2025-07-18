@@ -30,10 +30,10 @@ bool FoliageSystem::init()
 	//Quad::createMesh(meshCollection);
 	m_grassBlade = modelInfo.mesh;
 
-	glGenBuffers(1, &inputSSBO);
-	glGenBuffers(1, &outputSSBO);
+	glGenBuffers(1, &m_foliageChunksSSBO);
+	glGenBuffers(1, &m_visibleFoliageChunksSSBO);
 
-	m_frustumCullGPUShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FrustumCullComputeShader.glsl");
+	m_frustumCullComputeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FrustumCullComputeShader.glsl");
 
 	glGenBuffers(1, &m_atomicCounterBuffer);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
@@ -70,11 +70,14 @@ void FoliageSystem::setMeshLocations(const std::vector<glm::vec4>& locations)
 	//glVertexAttribDivisor(4, 1);
 
 	
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, inputSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_foliageChunksSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, locations.size() * sizeof(glm::vec4), locations.data(), GL_DYNAMIC_DRAW);
 
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, outputSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_visibleFoliageChunksSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, locations.size() * sizeof(glm::vec4), NULL, GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_finalFoliageLocationsSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, locations.size() * sizeof(glm::vec4) * 255, NULL, GL_DYNAMIC_DRAW);
 
 	//std::shared_ptr<VertexBufferObject> vbo = std::make_shared<VertexBufferObject>(&(locations[0]), locations.size(), locations.size() * sizeof(glm::vec3)); //when clean will cause issues
 	//vbo->Bind();
@@ -98,12 +101,12 @@ Resource<Shader>& FoliageSystem::getFoliageShader()
 
 unsigned int FoliageSystem::getInputSSBO() const
 {
-	return inputSSBO;
+	return m_foliageChunksSSBO;
 }
 
 unsigned int FoliageSystem::getOutputSSBO() const
 {
-	return outputSSBO;
+	return m_visibleFoliageChunksSSBO;
 }
 
 void FoliageSystem::setFrustum(Frustum& frustum)
@@ -124,23 +127,30 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 	// Perform frustum cull
-	m_frustumCullGPUShader->use();
+	m_frustumCullComputeShader->use();
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, inputSSBO);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, outputSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_foliageChunksSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_visibleFoliageChunksSSBO);
 
-	m_frustumCullGPUShader->setUniformValue("positionsSize", count);
+	m_frustumCullComputeShader->setUniformValue("positionsSize", count);
 
-	int instanceCount = count;
+	{
+		int texWidth = foliage.m_foliageSpreadMap->getWidth();
+		int texHeight = foliage.m_foliageSpreadMap->getHeight();
 
-	GLuint zero = 0;
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
-	glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), &zero); // reset counter to 0
+		int instanceCount = texWidth * texHeight;
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_frustumUBO);
+		{
+			GLuint zero = 0;
+			glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
+			glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), &zero); // reset counter to 0
+		}
 
-	glDispatchCompute(ceil(instanceCount / 32.f), 1, 1);
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_frustumUBO);
+
+		glDispatchCompute(ceil(instanceCount / 32.f), 1, 1);
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	}
 
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
 	GLuint* ptr = (GLuint*)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
@@ -148,6 +158,28 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 
 	// fill blades on grass in each quad
+
+	// populate grass chunks
+	Resource<Shader>& populateGrassComputeShader = m_populateGrassComputeShader;
+	populateGrassComputeShader->use();
+
+	populateGrassComputeShader->setTextureInShader(foliage.m_foliageSpreadMap, "spreadMap", 0);
+	
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_finalFoliageLocationsSSBO);
+
+	{
+		GLuint zero = 0;
+		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
+		glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), &zero); // reset counter to 0
+	}
+
+	{
+		int texWidth = foliage.m_foliageSpreadMap->getWidth();
+		int texHeight = foliage.m_foliageSpreadMap->getHeight();
+
+		glDispatchCompute(ceil(texWidth / 32.f), ceil(texHeight / 32.f), 1);
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	}
 
 	auto& foliageShader = m_foliageShader;
 	foliageShader->use();
@@ -157,7 +189,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageShader->setUniformValue("colorB", foliage.colorB);
 	//foliageShader->setUniformValue("viewDir", primaryCamera.front);
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, outputSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_finalFoliageLocationsSSBO);
 
 	// create instance batch from foliage map
 

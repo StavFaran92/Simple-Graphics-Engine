@@ -25,11 +25,14 @@ private:
 	Resource<MeshCollection> m_grassBlade;
 	int count = 0;
 	Resource<Shader> m_foliageShader;
-	unsigned int inputSSBO;
-	unsigned int outputSSBO;
+
+	unsigned int m_foliageChunksSSBO;
+	unsigned int m_visibleFoliageChunksSSBO;
+	unsigned int m_finalFoliageLocationsSSBO;
 
 	Resource<Shader> m_sampleComputeShader;
-	Resource<Shader> m_frustumCullGPUShader;
+	Resource<Shader> m_frustumCullComputeShader;
+	Resource<Shader> m_populateGrassComputeShader;
 	unsigned int m_atomicCounterBuffer;
 	unsigned int m_frustumUBO;
 };

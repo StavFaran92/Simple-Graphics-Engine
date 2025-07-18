@@ -8,7 +8,7 @@
 
 Mesh::Mesh()
 {
-	logInfo(__FUNCTION__);
+	logTrace(__FUNCTION__);
 }
 
 const std::vector<glm::vec3>& Mesh::getPositions() const
@@ -277,6 +277,6 @@ int Mesh::getMaterialIndex() const
 
 Mesh::~Mesh()
 {
-	logInfo( __FUNCTION__ );
+	logTrace( __FUNCTION__ );
 	clearMesh();
 }
