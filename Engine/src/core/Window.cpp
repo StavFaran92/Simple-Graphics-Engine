@@ -7,6 +7,11 @@
 #include "core/Logger.h"
 #include "core/Engine.h"
 
+void APIENTRY MyDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
+	GLsizei length, const GLchar* message, const void* userParam) {
+	logError("OpenGL Debug: {]", std::string(message));
+}
+
 Window::Window()
 {
 }
@@ -79,6 +84,10 @@ int Window::init()
 		logError("Error initializing GLEW! {}", glewGetErrorString(glewError));
 		return false;
 	}
+
+	//glEnable(GL_DEBUG_OUTPUT);
+	//glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	//glDebugMessageCallback(MyDebugCallback, nullptr);
 
 	//Use Vsync
 	if (SDL_GL_SetSwapInterval(1) != 0)

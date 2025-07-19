@@ -30,33 +30,16 @@ void FoliageComponent::build()
 
     std::vector<glm::vec4> foliageLocations;
 
-    const int densityMultiplier = 255;
-    RandomNumberGenerator rng;
-
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            int i = (y * width + x) * 3;
-            GLubyte r = pixels[i];
+            glm::vec4 position = glm::vec4(
+                static_cast<float>(x),
+                0.0f, // flat on ground (you can add noise/height here)
+                static_cast<float>(y),
+                1.0f
+            );
 
-            if (r > 0.f) {
-                float scale = r / 255.f;
-                int bladeCount = density * scale * densityMultiplier;
-
-                for (int j = 0; j < bladeCount; j++)
-                {
-                    float xoffset = rng.rand();
-                    float yoffset = rng.rand();
-
-                    glm::vec4 position = glm::vec4(
-                        static_cast<float>(x) + xoffset,
-                        0.0f, // flat on ground (you can add noise/height here)
-                        static_cast<float>(y) + yoffset,
-                        1.0f
-                    );
-
-                    foliageLocations.push_back(position);
-                }
-            }
+            foliageLocations.push_back(position);
         }
     }
 

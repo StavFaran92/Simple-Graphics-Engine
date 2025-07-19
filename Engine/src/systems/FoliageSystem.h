@@ -35,4 +35,5 @@ private:
 	Resource<Shader> m_populateGrassComputeShader;
 	unsigned int m_atomicCounterBuffer;
 	unsigned int m_frustumUBO;
+	unsigned int m_randomPatchSampleUBO;
 };

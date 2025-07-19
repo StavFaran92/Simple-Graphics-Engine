@@ -9,6 +9,7 @@
 #include "render/Graphics.h"
 #include "render/RenderCommand.h"
 #include <GL/glew.h>
+#include "core/Random.h"
 
 FoliageSystem::FoliageSystem()
 {
@@ -32,8 +33,10 @@ bool FoliageSystem::init()
 
 	glGenBuffers(1, &m_foliageChunksSSBO);
 	glGenBuffers(1, &m_visibleFoliageChunksSSBO);
+	glGenBuffers(1, &m_finalFoliageLocationsSSBO);
 
 	m_frustumCullComputeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FrustumCullComputeShader.glsl");
+	m_populateGrassComputeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/PopulateFoliageComputeShader.glsl");
 
 	glGenBuffers(1, &m_atomicCounterBuffer);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
@@ -41,6 +44,29 @@ bool FoliageSystem::init()
 	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, m_atomicCounterBuffer);
 
 	glGenBuffers(1, &m_frustumUBO);
+
+	RandomNumberGenerator rng;
+	std::vector<glm::vec4> foliageLocations;
+	foliageLocations.reserve(255);
+
+	for (int j = 0; j < 255; j++)
+	{
+		float xoffset = rng.rand();
+		float yoffset = rng.rand();
+
+		glm::vec4 position = glm::vec4(
+			xoffset,
+			0.0f,
+			yoffset,
+			1.0f
+		);
+
+		foliageLocations.push_back(position);
+	}
+
+	glGenBuffers(1, &m_randomPatchSampleUBO);
+	glBindBuffer(GL_UNIFORM_BUFFER, m_randomPatchSampleUBO);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageLocations.size(), foliageLocations.data(), GL_DYNAMIC_DRAW);
 
 	return true;
 }
@@ -125,6 +151,11 @@ void FoliageSystem::setFrustum(Frustum& frustum)
 
 void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 {
+	if (foliage.m_foliageSpreadMap.isEmpty() || count <= 0)
+	{
+		return;
+	}
+
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 	// Perform frustum cull
 	m_frustumCullComputeShader->use();
@@ -164,8 +195,11 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	populateGrassComputeShader->use();
 
 	populateGrassComputeShader->setTextureInShader(foliage.m_foliageSpreadMap, "spreadMap", 0);
+	populateGrassComputeShader->setUniformValue("textureWidth", foliage.m_foliageSpreadMap->getWidth());
+	populateGrassComputeShader->setUniformValue("textureHeight", foliage.m_foliageSpreadMap->getHeight());
 	
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_finalFoliageLocationsSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_visibleFoliageChunksSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_finalFoliageLocationsSSBO);
 
 	{
 		GLuint zero = 0;
@@ -176,6 +210,8 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	{
 		int texWidth = foliage.m_foliageSpreadMap->getWidth();
 		int texHeight = foliage.m_foliageSpreadMap->getHeight();
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_randomPatchSampleUBO);
 
 		glDispatchCompute(ceil(texWidth / 32.f), ceil(texHeight / 32.f), 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
