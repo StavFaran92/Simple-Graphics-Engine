@@ -58,7 +58,7 @@ bool FoliageSystem::init()
 			xoffset,
 			0.0f,
 			yoffset,
-			1.0f
+			0.0f
 		);
 
 		foliageLocations.push_back(position);
@@ -183,18 +183,23 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	}
 
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
-	GLuint* ptr = (GLuint*)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
-	GLuint result = ptr[0];
-	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-
 	// fill blades on grass in each quad
 
 	// populate grass chunks
 	Resource<Shader>& populateGrassComputeShader = m_populateGrassComputeShader;
 	populateGrassComputeShader->use();
 
-	populateGrassComputeShader->setTextureInShader(foliage.m_foliageSpreadMap, "spreadMap", 0);
+	//populateGrassComputeShader->setTextureInShader(foliage.m_foliageSpreadMap, "spreadMap", 0);
+	glBindImageTexture(
+		0,                // binding = 0, must match `layout(binding = 0)`
+		foliage.m_foliageSpreadMap->getID(),    // OpenGL texture ID
+		0,                // mip level
+		GL_FALSE,         // layered
+		0,                // layer
+		GL_READ_ONLY,     // or GL_WRITE_ONLY / GL_READ_WRITE
+		GL_RGBA8           // must match internal format in texture creation
+	);
+
 	populateGrassComputeShader->setUniformValue("textureWidth", foliage.m_foliageSpreadMap->getWidth());
 	populateGrassComputeShader->setUniformValue("textureHeight", foliage.m_foliageSpreadMap->getHeight());
 	
@@ -216,6 +221,11 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		glDispatchCompute(ceil(texWidth / 32.f), ceil(texHeight / 32.f), 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	}
+
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);
+	GLuint* ptr = (GLuint*)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
+	GLuint result = ptr[0];
+	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 
 	auto& foliageShader = m_foliageShader;
 	foliageShader->use();

@@ -21,7 +21,7 @@ layout(std140, binding = 0) uniform RandomPatchSample { // todo give better name
 layout(binding = 0) uniform atomic_uint visibleCounter;
 uniform int textureWidth;
 uniform int textureHeight;
-uniform sampler2D spreadMap;
+layout(rgba8, binding = 0) uniform image2D spreadMap;
 
 void main() 
 {
@@ -29,8 +29,8 @@ void main()
     {
         return;
     }
-    
-    uint spread = floatBitsToUint(texture(spreadMap, gl_GlobalInvocationID.xy).r * 255);
+
+    uint spread = uint(imageLoad(spreadMap, ivec2(gl_GlobalInvocationID.xy)).r * 255.0);
     uint writeIndex = atomicCounterAdd(visibleCounter, spread);
     vec4 originalPosData = positions[gl_GlobalInvocationID.y * textureWidth + gl_GlobalInvocationID.x];
     for(int i=0; i<spread; i++)
