@@ -128,7 +128,7 @@ public:
 		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
 		editorCamera.addComponent<NativeScriptComponent>().bind<CameraScript>();
 		auto& nsc = editorCamera.getComponent<NativeScriptComponent>();
-		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
+		Engine::get()->getContext()->getActiveScene()->setGameCamera(editorCamera);
 		nsc.script->onCreate();
 
 		Entity grass = Engine::get()->getContext()->getActiveScene()->createEntity("Grass");
