@@ -18,15 +18,8 @@ void FoliageComponent::build()
 	//	matrices.push_back(transformations[i]->getWorldTransformation());
 	//}
 
-    unsigned int tex = m_foliageSpreadMap->getID();
-
     int width = m_foliageSpreadMap->getWidth();
     int height = m_foliageSpreadMap->getHeight();
-    m_foliageSpreadMap->bind();
-
-    // Allocate buffer for 1 channel per pixel
-    std::vector<GLubyte> pixels(width * height * 3);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
 
     std::vector<glm::vec4> foliageLocations;
 
