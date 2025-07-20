@@ -30,12 +30,19 @@ void main()
         return;
     }
 
-    uint spread = uint(imageLoad(spreadMap, ivec2(gl_GlobalInvocationID.xy)).r * 255.0);
+    vec4 pos = positions[gl_GlobalInvocationID.y * textureWidth + gl_GlobalInvocationID.x];
+    int idY = int(pos.w) / textureWidth;
+    int idX = int(pos.w) % textureWidth;
+
+    uint spread = uint(floor(imageLoad(spreadMap, ivec2(idX, idY)).r * 255.0));
+    if(spread == 0)
+        return;
     uint writeIndex = atomicCounterAdd(visibleCounter, spread);
-    vec4 originalPosData = positions[gl_GlobalInvocationID.y * textureWidth + gl_GlobalInvocationID.x];
     for(int i=0; i<spread; i++)
     {
-        outputPositions[writeIndex] = originalPosData + randomPatchSample[i];
+        outputPositions[writeIndex] = pos + randomPatchSample[i];
+        outputPositions[writeIndex].w = 1.; // todo revert, this is needed
+        // outputPositions[writeIndex].w = gl_GlobalInvocationID.y * textureWidth + gl_GlobalInvocationID.x;
         writeIndex++;
     }
 }

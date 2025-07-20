@@ -95,7 +95,7 @@ std::shared_ptr<VertexBufferObject> VertexBufferObject::create(const std::vector
 
 VertexBufferObject::~VertexBufferObject()
 {
-	logInfo( __FUNCTION__ );
+	logDebug( __FUNCTION__ );
 	glDeleteBuffers(1, &m_id);
 }
 

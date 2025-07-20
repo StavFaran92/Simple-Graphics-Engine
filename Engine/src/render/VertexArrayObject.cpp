@@ -13,7 +13,7 @@ VertexArrayObject::VertexArrayObject()
 
 VertexArrayObject::~VertexArrayObject()
 {
-	logInfo( __FUNCTION__ );
+	logDebug( __FUNCTION__ );
 	glDeleteVertexArrays(1, &m_id);
 }
 

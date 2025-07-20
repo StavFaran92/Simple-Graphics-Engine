@@ -180,7 +180,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_frustumUBO);
 
 		glDispatchCompute(ceil(instanceCount / 32.f), 1, 1);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 
 	// fill blades on grass in each quad
@@ -219,7 +219,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_randomPatchSampleUBO);
 
 		glDispatchCompute(ceil(texWidth / 32.f), ceil(texHeight / 32.f), 1);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, m_atomicCounterBuffer);

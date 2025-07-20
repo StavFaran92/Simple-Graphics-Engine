@@ -60,12 +60,13 @@ void main()
     }
 
     vec4 posData = positions[gl_GlobalInvocationID.x];
-    uint idx = floatBitsToUint(posData.w);
+    //uint idx = floatBitsToUint(posData.w);
     vec3 pos = posData.xyz;
     if(isInFrustum(pos))
     {
         uint writeIndex = atomicCounterIncrement(visibleCounter);
         // visibleIDs[writeIndex] = idx;
         outputPositions[writeIndex] = posData;
+        outputPositions[writeIndex].w = gl_GlobalInvocationID.x;
     }
 }
