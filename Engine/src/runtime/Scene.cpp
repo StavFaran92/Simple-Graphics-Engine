@@ -398,6 +398,7 @@ void Scene::draw(float deltaTime)
 
 			for (auto&& [entity, foliage, transform] : m_registry->get().view<FoliageComponent, Transformation>().each())
 			{
+				Engine::get()->getSubSystem<FoliageSystem>()->setView(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getForward());
 				Engine::get()->getSubSystem<FoliageSystem>()->setFrustum(frustum);
 				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(foliage);
 			}

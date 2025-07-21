@@ -4,6 +4,12 @@
 #include "geometry/MeshCollection.h"
 #include "component/FoliageComponent.h"
 
+struct FoliagePatch
+{
+	glm::vec3 pos{};
+	float density = 0;
+};
+
 class FoliageSystem
 {
 public:
@@ -18,6 +24,7 @@ public:
 	unsigned int getOutputSSBO() const;
 
 	void setFrustum(Frustum& frustum);
+	void setView(glm::vec3 pos, glm::vec3 front);
 
 	void drawFoliage(FoliageComponent& foliage);
 
@@ -26,8 +33,8 @@ private:
 	int count = 0;
 	Resource<Shader> m_foliageShader;
 
-	unsigned int m_foliageChunksSSBO;
-	unsigned int m_visibleFoliageChunksSSBO;
+	unsigned int m_foliagePatchesSSBO;
+	unsigned int m_visibleFoliagePatchesSSBO;
 	unsigned int m_finalFoliageLocationsSSBO;
 
 	Resource<Shader> m_sampleComputeShader;
@@ -36,4 +43,8 @@ private:
 	unsigned int m_atomicCounterBuffer;
 	unsigned int m_frustumUBO;
 	unsigned int m_randomPatchSampleUBO;
+
+	std::vector<FoliagePatch> m_patches;
+	glm::vec3 m_camPos;
+	glm::vec3 m_camFront;
 };
