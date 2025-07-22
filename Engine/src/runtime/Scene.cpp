@@ -398,9 +398,12 @@ void Scene::draw(float deltaTime)
 
 			for (auto&& [entity, foliage, transform] : m_registry->get().view<FoliageComponent, Transformation>().each())
 			{
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				Engine::get()->getSubSystem<FoliageSystem>()->setView(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getForward());
 				Engine::get()->getSubSystem<FoliageSystem>()->setFrustum(frustum);
 				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(foliage);
+				glDisable(GL_BLEND);
 			}
 
 			glPopDebugGroup();

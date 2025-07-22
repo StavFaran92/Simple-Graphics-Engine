@@ -29,7 +29,7 @@ bool FoliageSystem::init()
 	settings.isTransient = true;
 	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/scene.gltf", settings);
 
-	auto mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
+	//auto mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
 
 	//Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_GRASS");
 	//Quad::createMesh(meshCollection);
@@ -85,6 +85,10 @@ bool FoliageSystem::init()
 		}
 
 	}
+
+	Texture::TextureImportSettings tSettings;
+	tSettings.flip = false;
+	grassTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/grass.png", tSettings);
 
 	return true;
 }
@@ -340,35 +344,37 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		}
 		else
 		{
-			//auto& foliageShader = m_foliageQuadShader;
-			//foliageShader->use();
-			//foliageShader->setUniformValue("view", *graphics->view);
-			//foliageShader->setUniformValue("projection", *graphics->projection);
-			//foliageShader->setUniformValue("colorA", foliage.colorA);
-			//foliageShader->setUniformValue("colorB", foliage.colorB);
-			//foliageShader->setUniformValue("patchSize", glm::vec2(visiblePatches[i].width, visiblePatches[i].height));
-			//foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
+			auto& foliageShader = m_foliageQuadShader;
+			foliageShader->use();
+			foliageShader->setUniformValue("view", *graphics->view);
+			foliageShader->setUniformValue("projection", *graphics->projection);
+			foliageShader->setUniformValue("colorA", foliage.colorA);
+			foliageShader->setUniformValue("colorB", foliage.colorB);
+			foliageShader->setUniformValue("patchSize", glm::vec2(visiblePatches[i].width, visiblePatches[i].height));
+			foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
+			foliageShader->setTextureInShader(grassTexture, "grassTexture", 0);
+			
 
 
-			//for (int j = 0; j < 100; j++)
-			//{
-			//	glm::vec3 translation = glm::vec3(visiblePatches[i].pos) + glm::vec3(foliageRandomLocations[j].x * 10, 0, foliageRandomLocations[j].z * 10);
-			//	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
-			//	//glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
-			//	glm::mat4 rotationMatrix = glm::mat4(1.0);
-			//	//glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(visiblePatches[i].width, 1, visiblePatches[i].height));
+			for (int j = 0; j < 100; j++)
+			{
+				glm::vec3 translation = glm::vec3(visiblePatches[i].pos) + glm::vec3(foliageRandomLocations[j].x * 10, 0, foliageRandomLocations[j].z * 10);
+				glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+				//glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
+				//glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), );
+				//glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(visiblePatches[i].width, 1, visiblePatches[i].height));
 
-			//	glm::mat4 model = translationMatrix * rotationMatrix /** scaleMatrix*/;
-
-
-			//	foliageShader->setUniformValue("model", model);
+				glm::mat4 model = translationMatrix/* * rotationMatrix*/ /** scaleMatrix*/;
 
 
+				foliageShader->setUniformValue("model", model);
 
-			//	auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
-			//	auto vao = grassBlade->getPrimaryMesh()->getVAO();
-			//	RenderCommand::draw(vao);
-			//}
+
+
+				auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
+				auto vao = grassBlade->getPrimaryMesh()->getVAO();
+				RenderCommand::draw(vao);
+			}
 		}
 	}
 	//RenderCommand::draw(vao);
