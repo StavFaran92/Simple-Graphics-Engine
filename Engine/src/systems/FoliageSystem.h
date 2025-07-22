@@ -8,6 +8,10 @@ struct FoliagePatch
 {
 	glm::vec3 pos{};
 	float density = 0;
+	int idx = 0;
+	int idy = 0;
+	int width = 10;
+	int height = 10;
 };
 
 class FoliageSystem
@@ -43,8 +47,11 @@ private:
 	unsigned int m_atomicCounterBuffer;
 	unsigned int m_frustumUBO;
 	unsigned int m_randomPatchSampleUBO;
+	unsigned int m_patchOffsetUBO;
 
 	std::vector<FoliagePatch> m_patches;
 	glm::vec3 m_camPos;
 	glm::vec3 m_camFront;
+
+	Frustum m_frustum;
 };

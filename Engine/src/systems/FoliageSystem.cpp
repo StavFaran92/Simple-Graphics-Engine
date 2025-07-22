@@ -69,6 +69,20 @@ bool FoliageSystem::init()
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageLocations.size(), foliageLocations.data(), GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_randomPatchSampleUBO);
 
+	for (int i = 0; i < 20; i++)
+	{
+		for (int j = 0; j < 10; j++)
+		{
+			FoliagePatch patch;
+			patch.pos = glm::vec3(i * 10, 0, j * 10);
+			patch.width = 10;
+			patch.height = 10;
+			m_patches.push_back(patch);
+
+		}
+
+	}
+
 	return true;
 }
 
@@ -96,14 +110,19 @@ void FoliageSystem::setMeshLocations(const std::vector<glm::vec4>& locations)
 	//m_grassBlade->getPrimaryMesh()->getVAO()->build(); 
 	//glVertexAttribDivisor(4, 1);
 
-	for (int i = 0; i < locations.size(); i++)
-	{
-		FoliagePatch patch;
-		patch.pos = glm::vec3(locations[i].x, locations[i].y, locations[i].z);
-		patch.density = locations[i].w;
-		m_patches.push_back(patch);
+	//for (int i = 0; i < locations.size(); i++)
+	//{
+	//	FoliagePatch patch;
+	//	patch.pos = glm::vec3(locations[i].x, locations[i].y, locations[i].z);
+	//	patch.density = locations[i].w;
+	//	m_patches.push_back(patch);
 
-	}
+	//}
+
+	//glGenBuffers(1, &m_patchOffsetUBO);
+	//glBindBuffer(GL_UNIFORM_BUFFER, m_patchOffsetUBO);
+	//glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageLocations.size(), foliageLocations.data(), GL_DYNAMIC_DRAW);
+	//glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_randomPatchSampleUBO);
 
 	
 	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_foliagePatchesSSBO);
@@ -147,22 +166,46 @@ unsigned int FoliageSystem::getOutputSSBO() const
 
 void FoliageSystem::setFrustum(Frustum& frustum)
 {
-	std::array<glm::vec4, 6> planes;
-	planes[0] = glm::vec4(frustum.m_znear.m_normal, frustum.m_znear.m_distance);
-	planes[1] = glm::vec4(frustum.m_zfar.m_normal, frustum.m_zfar.m_distance);
-	planes[2] = glm::vec4(frustum.m_right.m_normal, frustum.m_right.m_distance);
-	planes[3] = glm::vec4(frustum.m_left.m_normal, frustum.m_left.m_distance);
-	planes[4] = glm::vec4(frustum.m_up.m_normal, frustum.m_up.m_distance);
-	planes[5] = glm::vec4(frustum.m_down.m_normal, frustum.m_down.m_distance);
+	m_frustum = frustum;
 
-	glBindBuffer(GL_UNIFORM_BUFFER, m_frustumUBO);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 6, planes.data(), GL_DYNAMIC_DRAW);
+	//m_planes[0] = glm::vec4(frustum.m_znear.m_normal, frustum.m_znear.m_distance);
+	//m_planes[1] = glm::vec4(frustum.m_zfar.m_normal, frustum.m_zfar.m_distance);
+	//m_planes[2] = glm::vec4(frustum.m_right.m_normal, frustum.m_right.m_distance);
+	//m_planes[3] = glm::vec4(frustum.m_left.m_normal, frustum.m_left.m_distance);
+	//m_planes[4] = glm::vec4(frustum.m_up.m_normal, frustum.m_up.m_distance);
+	//m_planes[5] = glm::vec4(frustum.m_down.m_normal, frustum.m_down.m_distance);
+
+	//glBindBuffer(GL_UNIFORM_BUFFER, m_frustumUBO);
+	//glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 6, planes.data(), GL_DYNAMIC_DRAW);
 }
 
 void FoliageSystem::setView(glm::vec3 pos, glm::vec3 front)
 {
 	m_camPos = pos;
 	m_camFront = front;
+}
+
+float getSignedDistanceToPlane(glm::vec3 pos, const Plane& plane)
+{
+	return glm::dot(plane.m_normal, pos) - plane.m_distance;
+}
+
+bool isForwardOfPlane(glm::vec3 pos, const Plane& plane)
+{
+	// Compute the projection interval radius of b onto L(t) = b.c + t * p.n
+	float r = 10 * abs(plane.m_normal.x) + 10 * abs(plane.m_normal.y) + 10 * abs(plane.m_normal.z);
+
+	return -r <= getSignedDistanceToPlane(pos, plane);
+}
+
+bool isInFrustum(const Frustum& frustum, glm::vec3 pos)
+{
+	return isForwardOfPlane(pos, frustum.m_znear) &&
+		isForwardOfPlane(pos, frustum.m_zfar) &&
+		isForwardOfPlane(pos, frustum.m_right) &&
+		isForwardOfPlane(pos, frustum.m_left) &&
+		isForwardOfPlane(pos, frustum.m_up) &&
+		isForwardOfPlane(pos, frustum.m_down);
 }
 
 void FoliageSystem::drawFoliage(FoliageComponent& foliage)
@@ -251,13 +294,22 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	//GLuint result = ptr[0];
 	//glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 
-	std::sort(m_patches.begin(), m_patches.end(), [this](const FoliagePatch& a, const FoliagePatch& b) {
+	std::vector<FoliagePatch> visiblePatches;
+	for (int i = 0; i < m_patches.size(); i++)
+	{
+		if (isInFrustum(m_frustum, m_patches[i].pos))
+		{
+			visiblePatches.push_back(m_patches[i]);
+		}
+	}
+
+	std::sort(visiblePatches.begin(), visiblePatches.end(), [this](const FoliagePatch& a, const FoliagePatch& b) {
 		float da = glm::dot(a.pos - m_camPos, m_camFront);
 		float db = glm::dot(b.pos - m_camPos, m_camFront);
-		return da < db; // sort farthest first (front-to-back)
+		return da < db; // (front-to-back)
 		});
 
-	for (int i = 0; i < m_patches.size(); i++)
+	for (int i = 0; i < visiblePatches.size(); i++)
 	{
 
 		auto& foliageShader = m_foliageShader;
@@ -266,15 +318,19 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		foliageShader->setUniformValue("projection", *graphics->projection);
 		foliageShader->setUniformValue("colorA", foliage.colorA);
 		foliageShader->setUniformValue("colorB", foliage.colorB);
-		foliageShader->setUniformValue("patchPosition", m_patches[i].pos);
+		foliageShader->setUniformValue("patchPosition", visiblePatches[i].pos);
+		foliageShader->setUniformValue("patchSize", glm::vec2(visiblePatches[i].width, visiblePatches[i].height));
+		foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
 		//foliageShader->setUniformValue("viewDir", primaryCamera.front);
 
 		// create instance batch from foliage map
 
+		// iterate patch size 
+
 		//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRASS_BLADE); 
 		auto& grassBlade = m_grassBlade;
 		auto vao = grassBlade->getPrimaryMesh()->getVAO();
-		RenderCommand::drawInstanced(vao, 255);
+		RenderCommand::drawInstanced(vao, 255 * visiblePatches[i].width * visiblePatches[i].height);
 	}
 	//RenderCommand::draw(vao);
 }
