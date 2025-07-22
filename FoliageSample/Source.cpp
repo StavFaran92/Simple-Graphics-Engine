@@ -111,7 +111,6 @@ public:
 
 		Engine::get()->getContext()->getActiveScene()->startSimulation();
 
-		ImGui::SetCurrentContext((ImGuiContext*)Engine::get()->getImguiHandler()->getCurrentContext());
 
 		//auto skybox = Engine::get()->getContext()->getActiveScene()->createEntity("Skybox");
 		//

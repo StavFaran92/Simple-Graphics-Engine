@@ -12,6 +12,7 @@ struct FoliagePatch
 	int idy = 0;
 	int width = 10;
 	int height = 10;
+	int LOD = 0;
 };
 
 class FoliageSystem
@@ -36,6 +37,7 @@ private:
 	Resource<MeshCollection> m_grassBlade;
 	int count = 0;
 	Resource<Shader> m_foliageShader;
+	Resource<Shader> m_foliageQuadShader;
 
 	unsigned int m_foliagePatchesSSBO;
 	unsigned int m_visibleFoliagePatchesSSBO;
@@ -54,4 +56,6 @@ private:
 	glm::vec3 m_camFront;
 
 	Frustum m_frustum;
+
+	std::vector<glm::vec3>foliageRandomLocations;
 };

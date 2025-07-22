@@ -10,6 +10,7 @@
 #include "render/RenderCommand.h"
 #include <GL/glew.h>
 #include "core/Random.h"
+#include "systems/BuiltInMeshes.h"
 
 FoliageSystem::FoliageSystem()
 {
@@ -20,12 +21,15 @@ bool FoliageSystem::init()
 {
 	//m_foliageShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
 	m_foliageShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
+	m_foliageQuadShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl");
 
 	// At the moment i dont have infrastructure to import a mesh and alter its VAO in the same call.
 	//auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass.obj"); // TODO use single blade model
 	ModelImporter::ModelImportSettings settings;
 	settings.isTransient = true;
 	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/scene.gltf", settings);
+
+	auto mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
 
 	//Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_GRASS");
 	//Quad::createMesh(meshCollection);
@@ -46,8 +50,7 @@ bool FoliageSystem::init()
 	glGenBuffers(1, &m_frustumUBO);
 
 	RandomNumberGenerator rng;
-	std::vector<glm::vec4> foliageLocations;
-	foliageLocations.reserve(255);
+	foliageRandomLocations.reserve(255);
 
 	for (int j = 0; j < 255; j++)
 	{
@@ -61,12 +64,12 @@ bool FoliageSystem::init()
 			0.0f
 		);
 
-		foliageLocations.push_back(position);
+		foliageRandomLocations.push_back(position);
 	}
 
 	glGenBuffers(1, &m_randomPatchSampleUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, m_randomPatchSampleUBO);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageLocations.size(), foliageLocations.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageRandomLocations.size(), foliageRandomLocations.data(), GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_randomPatchSampleUBO);
 
 	for (int i = 0; i < 20; i++)
@@ -309,28 +312,64 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		return da < db; // (front-to-back)
 		});
 
+	
+
 	for (int i = 0; i < visiblePatches.size(); i++)
 	{
 
-		auto& foliageShader = m_foliageShader;
-		foliageShader->use();
-		foliageShader->setUniformValue("view", *graphics->view);
-		foliageShader->setUniformValue("projection", *graphics->projection);
-		foliageShader->setUniformValue("colorA", foliage.colorA);
-		foliageShader->setUniformValue("colorB", foliage.colorB);
-		foliageShader->setUniformValue("patchPosition", visiblePatches[i].pos);
-		foliageShader->setUniformValue("patchSize", glm::vec2(visiblePatches[i].width, visiblePatches[i].height));
-		foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
-		//foliageShader->setUniformValue("viewDir", primaryCamera.front);
+		float distance = glm::dot(visiblePatches[i].pos - m_camPos, m_camFront);
 
-		// create instance batch from foliage map
+		
+		
 
-		// iterate patch size 
+		if (distance < 100)
+		{
+			auto& foliageShader = m_foliageShader;
+			foliageShader->use();
+			foliageShader->setUniformValue("view", *graphics->view);
+			foliageShader->setUniformValue("projection", *graphics->projection);
+			foliageShader->setUniformValue("colorA", foliage.colorA);
+			foliageShader->setUniformValue("colorB", foliage.colorB);
+			foliageShader->setUniformValue("patchPosition", visiblePatches[i].pos);
+			foliageShader->setUniformValue("patchSize", glm::vec2(visiblePatches[i].width, visiblePatches[i].height));
+			foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
+		
+			auto& grassBlade = m_grassBlade;
+			auto vao = grassBlade->getPrimaryMesh()->getVAO();
+			RenderCommand::drawInstanced(vao, 255 * visiblePatches[i].width * visiblePatches[i].height);
+		}
+		else
+		{
+			//auto& foliageShader = m_foliageQuadShader;
+			//foliageShader->use();
+			//foliageShader->setUniformValue("view", *graphics->view);
+			//foliageShader->setUniformValue("projection", *graphics->projection);
+			//foliageShader->setUniformValue("colorA", foliage.colorA);
+			//foliageShader->setUniformValue("colorB", foliage.colorB);
+			//foliageShader->setUniformValue("patchSize", glm::vec2(visiblePatches[i].width, visiblePatches[i].height));
+			//foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
 
-		//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRASS_BLADE); 
-		auto& grassBlade = m_grassBlade;
-		auto vao = grassBlade->getPrimaryMesh()->getVAO();
-		RenderCommand::drawInstanced(vao, 255 * visiblePatches[i].width * visiblePatches[i].height);
+
+			//for (int j = 0; j < 100; j++)
+			//{
+			//	glm::vec3 translation = glm::vec3(visiblePatches[i].pos) + glm::vec3(foliageRandomLocations[j].x * 10, 0, foliageRandomLocations[j].z * 10);
+			//	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+			//	//glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
+			//	glm::mat4 rotationMatrix = glm::mat4(1.0);
+			//	//glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(visiblePatches[i].width, 1, visiblePatches[i].height));
+
+			//	glm::mat4 model = translationMatrix * rotationMatrix /** scaleMatrix*/;
+
+
+			//	foliageShader->setUniformValue("model", model);
+
+
+
+			//	auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
+			//	auto vao = grassBlade->getPrimaryMesh()->getVAO();
+			//	RenderCommand::draw(vao);
+			//}
+		}
 	}
 	//RenderCommand::draw(vao);
 }
