@@ -355,20 +355,19 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 	//glDisable(GL_DEPTH_TEST); 
 	glDepthMask(GL_FALSE); //For max LOD grass i need to turn depth write off to get correct alpha blend
+	auto& foliageShader = m_foliageQuadShader;
+	foliageShader->use();
+	foliageShader->setUniformValue("view", *graphics->view);
+	foliageShader->setUniformValue("projection", *graphics->projection);
+	foliageShader->setUniformValue("colorA", foliage.colorA);
+	foliageShader->setUniformValue("colorB", foliage.colorB);
+	
 
 	for (int i = patchesMaxLOD.size()-1; i >= 0 ; i--)
 	{
-		auto& foliageShader = m_foliageQuadShader;
-		foliageShader->use();
-		foliageShader->setUniformValue("view", *graphics->view);
-		foliageShader->setUniformValue("projection", *graphics->projection);
-		foliageShader->setUniformValue("colorA", foliage.colorA);
-		foliageShader->setUniformValue("colorB", foliage.colorB);
 		foliageShader->setUniformValue("patchSize", glm::vec2(patchesMaxLOD[i].width, patchesMaxLOD[i].height));
 		foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
 		foliageShader->setTextureInShader(grassTexture, "grassTexture", 0);
-
-
 
 		for (int j = 0; j < 100; j++)
 		{
