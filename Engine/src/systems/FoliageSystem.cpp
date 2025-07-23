@@ -313,8 +313,8 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 	// I also need to sort back to front to achieve correct max LOD
 	std::sort(visiblePatches.begin(), visiblePatches.end(), [this](const FoliagePatch& a, const FoliagePatch& b) {
-		float da = glm::dot(a.pos - m_camPos, m_camFront);
-		float db = glm::dot(b.pos - m_camPos, m_camFront);
+		float da = glm::dot(glm::vec2(a.pos.x, a.pos.z) - glm::vec2(m_camPos.x, m_camPos.z), glm::vec2(m_camFront.x, m_camFront.z));
+		float db = glm::dot(glm::vec2(b.pos.x, b.pos.z) - glm::vec2(m_camPos.x, m_camPos.z), glm::vec2(m_camFront.x, m_camFront.z));
 		return da < db; // (front-to-back)
 		});
 
