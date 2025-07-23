@@ -57,6 +57,7 @@ private:
 
 	Frustum m_frustum;
 
-	std::vector<glm::mat4>foliageRandomLocations;
+	std::vector<glm::mat4>foliageRandomTransforms;
+	std::vector<glm::vec3>foliageRandomLocations;
 	Resource<Texture>grassTexture;
 };
