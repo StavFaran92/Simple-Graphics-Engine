@@ -107,7 +107,7 @@ void main()
 
     // Set expected height range for blending
     float minY = 0.0;
-    float maxY = 2.0; // adjust to match your scene/object scale
+    float maxY = 1.5; // adjust to match your scene/object scale
 
     // Interpolation factor
     float t = clamp((fragPos.y - minY) / (maxY - minY), 0.0, 1.0);
