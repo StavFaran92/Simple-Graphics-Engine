@@ -11,6 +11,7 @@
 #include <GL/glew.h>
 #include "core/Random.h"
 #include "systems/BuiltInMeshes.h"
+#include <glm/ext.hpp>
 
 FoliageSystem::FoliageSystem()
 {
@@ -374,10 +375,13 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 			glm::vec3 translation = glm::vec3(patchesMaxLOD[i].pos) + glm::vec3(foliageRandomLocations[j].x * 10, 0, foliageRandomLocations[j].z * 10);
 			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
 			//glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
-			//glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), );
+			
+			float phi = -atan2f(m_camFront.z, m_camFront.x);
+			glm::quat q(glm::vec3(0.f, phi + Constants::PI / 2, 0.f));
+			glm::mat4 rotationMatrix = glm::mat4_cast(q);
 			//glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(visiblePatches[i].width, 1, visiblePatches[i].height));
 
-			glm::mat4 model = translationMatrix/* * rotationMatrix*/ /** scaleMatrix*/;
+			glm::mat4 model = translationMatrix * rotationMatrix /** scaleMatrix*/;
 
 
 			foliageShader->setUniformValue("model", model);
