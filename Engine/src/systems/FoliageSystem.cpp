@@ -57,20 +57,21 @@ bool FoliageSystem::init()
 	{
 		float xoffset = rng.rand();
 		float yoffset = rng.rand();
+		float scaleFactor = rng.rand() * .4 + .8;
+		float yawRotationFactor = rng.rand() * 2 * Constants::PI;
 
-		glm::vec4 position = glm::vec4(
-			xoffset,
-			0.0f,
-			yoffset,
-			0.0f
-		);
+		glm::mat4 translate = glm::translate(glm::mat4(1.0), glm::vec3(xoffset, 0.0f, yoffset));
+		glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(1, scaleFactor, 1));
+		glm::mat4 rot = glm::rotate(glm::mat4(1.0), yawRotationFactor, glm::vec3(0,1,0));
 
-		foliageRandomLocations.push_back(position);
+		glm::mat4 trans = translate * rot * scale;
+
+		foliageRandomLocations.push_back(trans);
 	}
 
 	glGenBuffers(1, &m_randomPatchSampleUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, m_randomPatchSampleUBO);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageRandomLocations.size(), foliageRandomLocations.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * foliageRandomLocations.size(), foliageRandomLocations.data(), GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_randomPatchSampleUBO);
 
 	for (int i = 0; i < 2; i++)
@@ -372,8 +373,9 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 		for (int j = 0; j < 100; j++)
 		{
-			glm::vec3 translation = glm::vec3(patchesMaxLOD[i].pos) + glm::vec3(foliageRandomLocations[j].x * 10, 0, foliageRandomLocations[j].z * 10);
-			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+			//glm::vec3 translation = glm::vec3(patchesMaxLOD[i].pos) + glm::vec3(foliageRandomLocations[j].x * 10, 0, foliageRandomLocations[j].z * 10);
+			//glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+			glm::mat4 translationMatrix = glm::mat4(1.0);
 			//glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
 			
 			float phi = -atan2f(m_camFront.z, m_camFront.x);

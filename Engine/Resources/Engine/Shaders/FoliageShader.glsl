@@ -18,7 +18,7 @@ layout (location = 1) in vec3 norm;
 // };
 
 layout(std140, binding = 0) uniform RandomPatchSample { // todo give better name
-    vec4 randomPatchSample[255]; 
+    mat4 randomPatchSample[255]; 
 };
 
 // layout(std140, binding = 1) uniform PatchOffset { // todo give better name
@@ -40,11 +40,12 @@ void main()
     int patchX = patchID % int(patchCount.x);
     int patchY = patchID / int(patchCount.y);
     vec4 patchOffset = vec4(patchX, 0.0, patchY, 0.0);
-    mat4 model = mat4(1.0);
-    model[3] = vec4(patchPosition, 1.0) + patchOffset + randomPatchSample[invocationID];
+    mat4 localModel = mat4(1.0);
+    localModel[3] = vec4(patchPosition, 1.0) + patchOffset;
+    localModel = model * localModel;
     Normal = norm;
     fragPos = aPos;
-    gl_Position = projection * view * model * vec4(aPos, 1.0); 
+    gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
                                   
 }
 
