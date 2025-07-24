@@ -41,7 +41,7 @@ void main()
     int patchY = patchID / int(patchCount.y);
     vec4 patchOffset = vec4(patchX, 0.0, patchY, 0.0);
     mat4 localModel = randomPatchSample[invocationID];
-    localModel[3] += vec4(patchPosition, 1.0) + patchOffset;
+    localModel[3] += vec4(patchPosition, 0.0) + patchOffset;
     Normal = norm;
     fragPos = aPos;
     gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
