@@ -67,7 +67,7 @@ bool FoliageSystem::init()
 		glm::mat4 trans = translate * rot * scale;
 
 		foliageRandomTransforms.push_back(trans);
-		foliageRandomLocations.push_back(glm::vec3(xoffset, 0.0f, yoffset));
+		//foliageRandomLocations.push_back(glm::vec3(xoffset, 0.0f, yoffset));
 	}
 
 	glGenBuffers(1, &m_randomPatchSampleUBO);
@@ -374,7 +374,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 		for (int j = 0; j < 100; j++)
 		{
-			glm::vec3 translation = glm::vec3(patchesMaxLOD[i].pos) + glm::vec3(foliageRandomLocations[j].x * 10, 0, foliageRandomLocations[j].z * 10);
+			glm::vec3 translation = glm::vec3(patchesMaxLOD[i].pos) + glm::vec3(foliageRandomTransforms[j][3].x * 10, 0, foliageRandomTransforms[j][3].z * 10);
 			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
 			//glm::mat4 translationMatrix = glm::mat4(1.0);
 			//glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
