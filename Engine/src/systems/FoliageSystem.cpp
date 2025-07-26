@@ -28,7 +28,7 @@ bool FoliageSystem::init()
 	//auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass.obj"); // TODO use single blade model
 	ModelImporter::ModelImportSettings settings;
 	settings.isTransient = true;
-	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/scene.gltf", settings);
+	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade_v2.fbx", settings);
 
 	//auto mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
 
@@ -62,7 +62,8 @@ bool FoliageSystem::init()
 
 		glm::mat4 translate = glm::translate(glm::mat4(1.0), glm::vec3(xoffset, 0.0f, yoffset));
 		glm::mat4 scale = glm::scale(glm::mat4(1.0), glm::vec3(1, scaleFactor, 1));
-		glm::mat4 rot = glm::rotate(glm::mat4(1.0), yawRotationFactor, glm::vec3(0,1,0));
+		glm::mat4 rot = glm::mat4(1.0);
+		//glm::mat4 rot = glm::rotate(glm::mat4(1.0), yawRotationFactor, glm::vec3(0,1,0));
 
 		glm::mat4 trans = translate * rot * scale;
 
@@ -322,6 +323,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 	glEnable(GL_DEPTH_TEST); 
 	glDepthMask(GL_TRUE);
+	//glEnable(GL_CULL_FACE);
 	
 	std::vector<FoliagePatch> patchesMaxLOD;
 	for (int i = 0; i < visiblePatches.size(); i++)
