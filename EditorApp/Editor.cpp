@@ -2429,7 +2429,14 @@ void RenderInspectorWindow(float width, float height)
 				foliage.m_foliageSpreadMap = Resource<Texture>(uuid);
 				});
 
+			ImGui::ColorEdit3("Bottom Color", (float*)&foliage.colorA);
+			ImGui::ColorEdit3("Top Color", (float*)&foliage.colorB);
 			ImGui::DragFloat("Density", &foliage.density, 0.01f, 0.0f, 1.0f);
+			ImGui::DragFloat("Width", &foliage.width, 0.01f, 1.0f);
+			ImGui::DragFloat("Height", &foliage.height, 0.01f, 1.0f);
+			ImGui::DragInt("Patch Width", &foliage.patchWidth);
+			ImGui::DragInt("Patch Height", &foliage.patchHeight);
+			ImGui::DragInt("Pixel Per Patch", &foliage.pixelPerPatch);
 
 			if (ImGui::Button("build"))
 			{
