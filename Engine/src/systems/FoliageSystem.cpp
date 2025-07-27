@@ -94,6 +94,7 @@ bool FoliageSystem::init()
 	Texture::TextureImportSettings tSettings;
 	tSettings.flip = true;
 	grassTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
+	windNoise = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png");
 
 	return true;
 }
@@ -346,6 +347,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 			foliageShader->setUniformValue("patchPosition", visiblePatches[i].pos);
 			foliageShader->setUniformValue("patchSize", glm::vec2(visiblePatches[i].width, visiblePatches[i].height));
 			foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
+			foliageShader->setTextureInShader(windNoise, "windNoise", 0);
 			foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 		
 			auto& grassBlade = m_grassBlade;

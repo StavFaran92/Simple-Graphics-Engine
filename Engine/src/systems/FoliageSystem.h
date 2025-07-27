@@ -60,4 +60,5 @@ private:
 	std::vector<glm::mat4>foliageRandomTransforms;
 	//std::vector<glm::vec3>foliageRandomLocations;
 	Resource<Texture>grassTexture;
+	Resource<Texture>windNoise;
 };
