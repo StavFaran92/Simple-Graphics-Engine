@@ -4,29 +4,11 @@
 #include "geometry/MeshCollection.h"
 #include "component/FoliageComponent.h"
 
-struct FoliagePatch
-{
-	glm::vec3 pos{};
-	float density = 0;
-	int idx = 0;
-	int idy = 0;
-	int width = 10;
-	int height = 10;
-	int LOD = 0;
-};
-
 class FoliageSystem
 {
 public:
 	FoliageSystem();
 	bool init();
-
-	Resource<MeshCollection> getGrassBladeMesh();
-	void setMeshLocations(const std::vector<glm::vec4>& locations);
-	int getCount() const;
-	Resource<Shader>& getFoliageShader();
-	unsigned int getInputSSBO() const;
-	unsigned int getOutputSSBO() const;
 
 	void setFrustum(Frustum& frustum);
 	void setView(glm::vec3 pos, glm::vec3 front);
@@ -51,7 +33,7 @@ private:
 	unsigned int m_randomPatchSampleUBO;
 	unsigned int m_patchOffsetUBO;
 
-	std::vector<FoliagePatch> m_patches;
+	//std::vector<FoliagePatch> m_patches;
 	glm::vec3 m_camPos;
 	glm::vec3 m_camFront;
 
