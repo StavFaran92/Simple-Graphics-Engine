@@ -11,6 +11,7 @@
 #include <GL/glew.h>
 #include "core/Random.h"
 #include "systems/BuiltInMeshes.h"
+#include "systems/TimeManager.h"
 #include <glm/ext.hpp>
 
 FoliageSystem::FoliageSystem()
@@ -74,7 +75,7 @@ bool FoliageSystem::init()
 	glGenBuffers(1, &m_randomPatchSampleUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, m_randomPatchSampleUBO);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * foliageRandomTransforms.size(), foliageRandomTransforms.data(), GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_randomPatchSampleUBO);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 4, m_randomPatchSampleUBO);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -345,6 +346,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 			foliageShader->setUniformValue("patchPosition", visiblePatches[i].pos);
 			foliageShader->setUniformValue("patchSize", glm::vec2(visiblePatches[i].width, visiblePatches[i].height));
 			foliageShader->setUniformValue("patchCount", glm::vec2(10, 10));
+			foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 		
 			auto& grassBlade = m_grassBlade;
 			auto vao = grassBlade->getPrimaryMesh()->getVAO();
