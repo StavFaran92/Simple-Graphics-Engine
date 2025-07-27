@@ -50,7 +50,8 @@ void main()
     float posZ = localModel[3][2];
     float height = localModel[3][1];
 
-    vec4 wind = texture(windNoise, vec2(posX, posZ) * time) * .05;
+    vec2 windUV = vec2(posX, posZ) * 0.05 + vec2(time * 0.02, time * 0.02);
+    vec4 wind = texture(windNoise, windUV);
 
     localModel[3][0] += wind.r * aPos.y;
     localModel[3][2] += wind.g * aPos.y;
