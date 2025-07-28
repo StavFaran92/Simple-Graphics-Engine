@@ -28,6 +28,7 @@ layout(std140, binding = 4) uniform RandomPatchSample { // todo give better name
 uniform vec3 patchPosition;
 uniform vec2 patchSize;
 uniform vec2 patchCount;
+uniform vec2 patchID;
 uniform sampler2D windNoise;
 
 uniform float time;
@@ -38,11 +39,8 @@ out vec3 fragPos;
 void main()                                                                         
 { 
     int insID = gl_InstanceID;
-    int patchID = insID / 255;
     int invocationID = insID % 255;
-    int patchX = patchID % int(patchCount.x);
-    int patchY = patchID / int(patchCount.y);
-    vec4 patchOffset = vec4(patchX, 0.0, patchY, 0.0);
+    vec4 patchOffset = vec4(patchID.x, 0.0, patchID.y, 0.0);
     mat4 localModel = randomPatchSample[invocationID];
     localModel[3] += vec4(patchPosition, 0.0) + patchOffset;
 

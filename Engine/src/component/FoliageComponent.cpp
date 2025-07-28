@@ -16,6 +16,8 @@ void FoliageComponent::build()
 		{
 			FoliagePatch patch;
 			patch.pos = glm::vec3(i * patchWidth, 0, j * patchHeight);
+			patch.idx = j;
+			patch.idy = i;
 			m_patches.push_back(patch);
 
 		}
