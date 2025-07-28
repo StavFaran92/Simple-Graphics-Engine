@@ -43,15 +43,15 @@ void main()
     vec4 patchOffset = vec4(patchID.x, 0.0, patchID.y, 0.0);
     vec4 vPos = randomPatchSample[invocationID] * vec4(patchSize.x, 0, patchSize.y, 0) + vec4(patchPosition, 0.0) + patchOffset;
 
-    float posX = vPos[0];
-    float posZ = vPos[2];
-    float height = vPos[1];
+    float posX = vPos.x;
+    float posZ = vPos.z;
+    float height = vPos.y;
 
     vec2 windUV = vec2(posX, posZ) * 0.05 + vec2(time * 0.02, time * 0.02);
     vec4 wind = texture(windNoise, windUV);
 
-    vPos[0] += wind.r * aPos.y;
-    vPos[2] += wind.g * aPos.y;
+    vPos.x += wind.r * aPos.y;
+    vPos.z += wind.g * aPos.y;
 
     mat4 localModel = mat4(1.0);
     localModel[3] = vPos;

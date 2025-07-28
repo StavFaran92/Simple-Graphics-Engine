@@ -161,10 +161,11 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 			foliageShader->setUniformValue("patchPosition", visiblePatches[i].pos);
 			foliageShader->setUniformValue("patchIDx", visiblePatches[i].idx);
 			foliageShader->setUniformValue("patchIDy", visiblePatches[i].idy);
+			foliageShader->setUniformValue("patchDensity", visiblePatches[i].density);
 
 			auto& grassBlade = m_grassBlade;
 			auto vao = grassBlade->getPrimaryMesh()->getVAO();
-			RenderCommand::drawInstanced(vao, 255 * foliage.patchWidth * foliage.patchHeight);
+			RenderCommand::drawInstanced(vao, visiblePatches[i].density * 255 * foliage.patchWidth * foliage.patchHeight);
 		}
 		else
 		{

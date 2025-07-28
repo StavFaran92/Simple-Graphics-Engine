@@ -3,9 +3,12 @@
 #include "component/Transformation.h"
 #include "systems/FoliageSystem.h"
 #include "core/Random.h"
+#include <GL/glew.h>
 
 void FoliageComponent::build()
 {
+	
+
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
 
 	m_patches.clear();
@@ -22,6 +25,17 @@ void FoliageComponent::build()
 
 		}
 
+	}
+
+	m_foliageSpreadMap->bind();
+	std::vector<GLubyte> pixels(m_foliageSpreadMap->getWidth() * m_foliageSpreadMap->getHeight() * m_foliageSpreadMap->getBitDepth());
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+
+	for (auto& p : m_patches)
+	{
+		int index = (p.idy * width + p.idx) * 3;
+		GLubyte r = pixels[index];
+		p.density = r / 255.f;
 	}
 }
 
