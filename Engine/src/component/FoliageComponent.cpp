@@ -26,12 +26,13 @@ void FoliageComponent::build()
 	}
 
 	m_foliageSpreadMap->bind();
-	std::vector<GLubyte> pixels(m_foliageSpreadMap->getWidth() * m_foliageSpreadMap->getHeight());
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
+	std::vector<GLubyte> pixels(m_foliageSpreadMap->getWidth() * m_foliageSpreadMap->getHeight() * m_foliageSpreadMap->getBitDepth());
+	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glGetTexImage(GL_TEXTURE_2D, 0, m_foliageSpreadMap->getData().format, GL_UNSIGNED_BYTE, pixels.data());
 
 	for (auto& p : m_patches)
 	{
-		int index = (p.idy * width + p.idx);
+		int index = (p.idy * width + p.idx) * m_foliageSpreadMap->getBitDepth();
 		//index = index % (int)m_patchCount.x * (int)m_patchCount.y;
 		GLubyte r = pixels[index];
 		p.density = r / 255.f;

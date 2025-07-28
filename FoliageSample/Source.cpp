@@ -133,9 +133,9 @@ public:
 		Entity grass = Engine::get()->getContext()->getActiveScene()->createEntity("Grass");
 		auto& foliage = grass.addComponent<FoliageComponent>();
 		foliage.density = 1 / 255.f;
-		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/sample_grass_spread.png");
-		foliage.width = 4;
-		foliage.height = 2;
+		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_50x50.png");
+		foliage.width = 50;
+		foliage.height = 50;
 		foliage.build();
 
 		
