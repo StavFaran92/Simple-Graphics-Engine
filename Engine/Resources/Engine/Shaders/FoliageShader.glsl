@@ -115,8 +115,8 @@ void main()
     // vec3 color = ambient + diffuse + specular;
 
     // Base grass color
-    vec3 bottomColor = vec3(0.1, 0.3, 0.1); // darker green
-    vec3 topColor    = vec3(0.4, 0.8, 0.3); // lighter green
+    vec3 bottomColor = colorA; // darker green
+    vec3 topColor    = colorB; // lighter green
 
     // Set expected height range for blending
     float minY = 0.0;

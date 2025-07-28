@@ -8,6 +8,8 @@ void FoliageComponent::build()
 {
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
 
+	m_patches.clear();
+	m_patches.reserve(m_patchCount.x * m_patchCount.y);
 	for (int i = 0; i < m_patchCount.x; i++)
 	{
 		for (int j = 0; j < m_patchCount.y; j++)
