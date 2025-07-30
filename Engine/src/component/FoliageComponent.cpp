@@ -32,11 +32,33 @@ void FoliageComponent::build()
 
 	for (auto& p : m_patches)
 	{
-		int index = (p.idy * width + p.idx) * m_foliageSpreadMap->getBitDepth();
-		//index = index % (int)m_patchCount.x * (int)m_patchCount.y;
-		GLubyte r = pixels[index];
-		p.density = r / 255.f;
+		for (int i = 0; i < pixelPerPatch; i++)
+		{
+			for (int j = 0; j < pixelPerPatch; j++)
+			{
+				// Sample density
+				int index = ((p.idy + j) * width + p.idx + i) * m_foliageSpreadMap->getBitDepth();
+				float density = (float)pixels[index] / 255.f;
+
+				int instanceCount = density * 255; // times max instances per texel
+				p.instanceCount += instanceCount;
+				for (int k = 0; k < instanceCount; ++k) 
+				{
+					p.instancesData.push_back(glm::vec4(i * patchWidth, 0, j * patchHeight, 0));
+				}
+			}
+		}
+		//p.density = r / 255.f;
 	}
+
+	if (m_patchInstanceDataSSBO)
+	{
+		glDeleteBuffers(1, &m_patchInstanceDataSSBO);
+	}
+	glGenBuffers(1, &m_patchInstanceDataSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_patchInstanceDataSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * 255 * patchWidth * patchHeight, nullptr, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_patchInstanceDataSSBO);
 }
 
 glm::vec2 FoliageComponent::getPatchCount() const

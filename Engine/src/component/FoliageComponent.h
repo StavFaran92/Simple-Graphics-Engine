@@ -11,6 +11,8 @@ struct FoliagePatch
 	int idx = 0;
 	int idy = 0;
 	int LOD = 0;
+	std::vector<glm::vec4> instancesData;
+	int instanceCount = 0;
 };
 
 struct EngineAPI FoliageComponent : public Component
@@ -37,4 +39,5 @@ private:
 
 	std::vector<FoliagePatch> m_patches;
 	glm::vec2 m_patchCount;
+	unsigned int m_patchInstanceDataSSBO;
 };

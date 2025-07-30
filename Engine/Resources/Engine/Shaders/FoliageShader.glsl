@@ -13,9 +13,13 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 norm;
 // layout (location = 4) in vec3 instancePos; 
 
-// layout(std430, binding = 0) buffer InstanceData {
-//     vec4 instancePos[];
-// };
+struct PatchInstance {
+    vec4 offsetInPatch;
+};
+
+layout(std430, binding = 0) buffer PatchInstanceData {
+    vec4 instanceData[];
+};
 
 layout(std140, binding = 4) uniform RandomPatchSample { // todo give better name
     vec4 randomPatchSample[255]; 
@@ -39,7 +43,7 @@ out vec3 fragPos;
 void main()                                                                         
 { 
     int invocationID = gl_InstanceID % 255;
-    vec4 vPos = randomPatchSample[invocationID] * vec4(patchSize.x, 0, patchSize.y, 0) + vec4(patchPosition, 0.0);
+    vec4 vPos = randomPatchSample[invocationID] * vec4(patchSize.x, 0, patchSize.y, 0) + vec4(patchPosition, 0.0) + instanceData[gl_InstanceID];
 
     float posX = vPos.x;
     float posZ = vPos.z;

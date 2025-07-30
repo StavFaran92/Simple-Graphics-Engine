@@ -32,6 +32,7 @@ private:
 	unsigned int m_frustumUBO;
 	unsigned int m_randomPatchSampleUBO;
 	unsigned int m_patchOffsetUBO;
+	unsigned int m_patchInstanceDataSSBO;
 
 	//std::vector<FoliagePatch> m_patches;
 	glm::vec3 m_camPos;
