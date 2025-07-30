@@ -38,10 +38,8 @@ out vec3 fragPos;
                                                                                     
 void main()                                                                         
 { 
-    int insID = gl_InstanceID;
-    int invocationID = insID % 255;
-    vec4 patchOffset = vec4(patchID.x, 0.0, patchID.y, 0.0);
-    vec4 vPos = randomPatchSample[invocationID] * vec4(patchSize.x, 0, patchSize.y, 0) + vec4(patchPosition, 0.0) + patchOffset;
+    int invocationID = gl_InstanceID % 255;
+    vec4 vPos = randomPatchSample[invocationID] * vec4(patchSize.x, 0, patchSize.y, 0) + vec4(patchPosition, 0.0);
 
     float posX = vPos.x;
     float posZ = vPos.z;
