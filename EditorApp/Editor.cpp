@@ -65,6 +65,7 @@ Entity g_editorCamera;
 uint32_t g_previewWindowID = 0;
 
 std::function<void(std::string uuid)> assetTextureSelectCB;
+std::function<void(Entity e)> entitySelectCB;
 Resource<Texture> selectedAssetTexture;
 
 static std::shared_ptr<TextureSampler> g_selectedSampler;
@@ -74,6 +75,17 @@ static void addTextureEditWidget(std::shared_ptr<Material> mat, const std::strin
 void AddColoredLabel(const char* label);
 static void displayTransformation(Transformation& transform, bool& isChanged);
 static void displaySelectMeshWindow();
+
+// Define a structure to represent an object in the scene hierarchy
+struct SceneObject {
+	std::string name;
+	Entity e;
+	// Add any other properties as needed
+};
+
+// Define a vector to store scene objects
+std::vector<SceneObject> sceneObjects
+{};
 
 struct EntityState
 {
@@ -399,6 +411,58 @@ static void displayTransformation(Transformation& transform, bool& isChanged)
 
 }
 
+static void displayEntitySelectPopup()
+{
+	if (ImGui::BeginPopup("EntitySelectPopup")) {
+
+		
+
+		ImGui::Text("Available Entities:");
+
+		ImGui::Separator();
+
+		static Entity selectedEntity = Entity::EmptyEntity;
+
+		for (int i = 0; i < sceneObjects.size(); ++i)
+		{
+			auto& sceneObject = sceneObjects[i];
+			auto& obj = sceneObject.e.getComponent<ObjectComponent>();
+
+			bool isSelected = (selectedEntity == sceneObject.e);
+
+			if (ImGui::Selectable(obj.name.c_str(), &isSelected))
+			{
+				selectedEntity = sceneObject.e;
+			}
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK")) {
+			if (selectedEntity != Entity::EmptyEntity)
+			{
+				entitySelectCB(selectedEntity);
+
+			}
+			ImGui::CloseCurrentPopup();
+			Entity selectedEntity = Entity::EmptyEntity;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel")) {
+			ImGui::CloseCurrentPopup();
+			Entity selectedEntity = Entity::EmptyEntity;
+		}
+
+
+
+		ImGui::EndPopup();
+	}
+
+}
+
+
 static void displayAssetTextureSelectPopup()
 {
 	if (ImGui::BeginPopup("EditTexturePopup")) {
@@ -664,18 +728,6 @@ static void displaySelectShaderWindow(std::string& uuid)
 		ImGui::End();
 	}
 }
-
-
-// Define a structure to represent an object in the scene hierarchy
-struct SceneObject {
-	std::string name;
-	Entity e;
-	// Add any other properties as needed
-};
-
-// Define a vector to store scene objects
-std::vector<SceneObject> sceneObjects
-{};
 
 void updateScene()
 {
@@ -2437,6 +2489,16 @@ void RenderInspectorWindow(float width, float height)
 			ImGui::DragInt("Patch Width", &foliage.patchWidth);
 			ImGui::DragInt("Patch Height", &foliage.patchHeight);
 			ImGui::DragInt("Pixel Per Patch", &foliage.pixelPerPatch);
+
+			if (ImGui::Button("Select Terrain"))
+			{
+				ImGui::OpenPopup("EntitySelectPopup");
+				entitySelectCB = [&foliage](Entity e) {
+					foliage.terrainRef = e;
+					};
+			}
+
+			displayEntitySelectPopup();
 
 			if (ImGui::Button("build"))
 			{

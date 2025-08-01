@@ -5,6 +5,8 @@
 #include "core/Random.h"
 #include <GL/glew.h>
 
+#include "component/Terrain.h"
+
 void FoliageComponent::build()
 {
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
@@ -23,6 +25,12 @@ void FoliageComponent::build()
 
 		}
 
+	}
+
+	Terrain* terrain = nullptr;
+	if (terrainRef != Entity::EmptyEntity)
+	{
+		terrain = terrainRef.tryGetComponent<Terrain>();
 	}
 
 	m_foliageSpreadMap->bind();
@@ -50,6 +58,13 @@ void FoliageComponent::build()
 					pos = glm::vec3(p.pos);									// Offset by patch position
 					pos += glm::vec3(i * patchWidth, 0, j * patchHeight);	// Offset by texel chunk
 					pos += foliageSystem->getRandomLocation(k) * glm::vec3(patchWidth, 0, patchHeight);
+
+					if (terrain)
+					{
+						float height = terrain->getHeightAtPoint(pos.x, pos.z);
+						pos.y += height;
+					}
+
 					p.instancesData.push_back(glm::vec4(pos, 1.0));
 				}
 			}
