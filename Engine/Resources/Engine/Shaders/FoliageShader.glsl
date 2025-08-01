@@ -21,9 +21,9 @@ layout(std430, binding = 0) buffer PatchInstanceData {
     vec4 instanceData[];
 };
 
-layout(std140, binding = 4) uniform RandomPatchSample { // todo give better name
-    vec4 randomPatchSample[255]; 
-};
+// layout(std140, binding = 4) uniform RandomPatchSample { // todo give better name
+//     vec4 randomPatchSample[255]; 
+// };
 
 // layout(std140, binding = 1) uniform PatchOffset { // todo give better name
 //     vec4 patchOffset[10*10]; 
@@ -42,8 +42,7 @@ out vec3 fragPos;
                                                                                     
 void main()                                                                         
 { 
-    int invocationID = gl_InstanceID % 255;
-    vec4 vPos = randomPatchSample[invocationID] * vec4(patchSize.x, 0, patchSize.y, 0) + vec4(patchPosition, 0.0) + instanceData[gl_InstanceID];
+    vec4 vPos = instanceData[gl_InstanceID];
 
     float posX = vPos.x;
     float posZ = vPos.z;

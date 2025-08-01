@@ -35,6 +35,8 @@ struct EngineAPI FoliageComponent : public Component
 	float width = 10;
 	float height = 10;
 
+	Entity terrainRef = Entity::EmptyEntity;
+
 private:
 
 	std::vector<FoliagePatch> m_patches;

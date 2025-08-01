@@ -30,6 +30,8 @@ void FoliageComponent::build()
 	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glGetTexImage(GL_TEXTURE_2D, 0, m_foliageSpreadMap->getData().format, GL_UNSIGNED_BYTE, pixels.data());
 
+	auto foliageSystem = Engine::get()->getSubSystem<FoliageSystem>();
+
 	for (auto& p : m_patches)
 	{
 		for (int i = 0; i < pixelPerPatch; i++)
@@ -44,7 +46,11 @@ void FoliageComponent::build()
 				p.instanceCount += instanceCount;
 				for (int k = 0; k < instanceCount; ++k) 
 				{
-					p.instancesData.push_back(glm::vec4(i * patchWidth, 0, j * patchHeight, 0));
+					glm::vec3 pos;
+					pos = glm::vec3(p.pos);									// Offset by patch position
+					pos += glm::vec3(i * patchWidth, 0, j * patchHeight);	// Offset by texel chunk
+					pos += foliageSystem->getRandomLocation(k) * glm::vec3(patchWidth, 0, patchHeight);
+					p.instancesData.push_back(glm::vec4(pos, 1.0));
 				}
 			}
 		}

@@ -49,13 +49,13 @@ bool FoliageSystem::init()
 		glm::mat4 trans = translate * rot * scale;
 
 		//foliageRandomTransforms.push_back(trans);
-		foliageRandomLocations.push_back(glm::vec4(xoffset, 0.0f, yoffset, 0.f));
+		foliageRandomLocations.push_back(glm::vec3(xoffset, 0.0f, yoffset));
 	}
 
-	glGenBuffers(1, &m_randomPatchSampleUBO);
-	glBindBuffer(GL_UNIFORM_BUFFER, m_randomPatchSampleUBO);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageRandomLocations.size(), foliageRandomLocations.data(), GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 4, m_randomPatchSampleUBO);
+	//glGenBuffers(1, &m_randomPatchSampleUBO);
+	//glBindBuffer(GL_UNIFORM_BUFFER, m_randomPatchSampleUBO);
+	//glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageRandomLocations.size(), foliageRandomLocations.data(), GL_DYNAMIC_DRAW);
+	//glBindBufferBase(GL_UNIFORM_BUFFER, 4, m_randomPatchSampleUBO);
 
 	Texture::TextureImportSettings tSettings;
 	tSettings.flip = true;
@@ -84,6 +84,12 @@ void FoliageSystem::setView(glm::vec3 pos, glm::vec3 front)
 {
 	m_camPos = pos;
 	m_camFront = front;
+}
+
+glm::vec3 FoliageSystem::getRandomLocation(int instanceID) const
+{
+	size_t size = foliageRandomLocations.size();
+	return foliageRandomLocations[instanceID % size];
 }
 
 float getSignedDistanceToPlane(glm::vec3 pos, const Plane& plane)
