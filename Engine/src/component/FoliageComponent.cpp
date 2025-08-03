@@ -21,7 +21,7 @@ void FoliageComponent::build()
 		for (int j = 0; j < m_patchCount.x; j++) // Cols
 		{
 			FoliagePatch patch;
-			patch.pos = glm::vec3(i * patchWidth - width / 2. + .5f, 0, j * patchHeight - height / 2.);
+			patch.pos = glm::vec3(i * patchWidth - width / 2., 0, j * patchHeight - height / 2.);
 			patch.idx = j;
 			patch.idy = i;
 			m_patches.push_back(patch);
