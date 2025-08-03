@@ -10,6 +10,9 @@
 void FoliageComponent::build()
 {
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
+	pixelPerPatch = width / m_patchCount.x;
+
+	glm::vec2 ratio = glm::vec2(m_foliageSpreadMap->getWidth() / width, m_foliageSpreadMap->getHeight() / height);
 
 	m_patches.clear();
 	m_patches.reserve(m_patchCount.x * m_patchCount.y);
@@ -48,9 +51,20 @@ void FoliageComponent::build()
 			for (int j = 0; j < pixelPerPatch; j++)
 			{
 				// Sample density
-				int index = (((p.idy * pixelPerPatch + i) % m_foliageSpreadMap->getHeight()) * m_foliageSpreadMap->getWidth() + 
-					(p.idx * pixelPerPatch + j) % m_foliageSpreadMap->getWidth()) ;
-				float density = (float)pixels[index % pixels.size()] / 255.f;
+				int xOffset = p.idx * pixelPerPatch + j;
+				int yOffset = p.idy * pixelPerPatch + i;
+
+				float xRelativeToImageOffset = xOffset * ratio.x;
+				float yRelativeToImageOffset = yOffset * ratio.y;
+
+				int xModOffset = (int)xRelativeToImageOffset % m_foliageSpreadMap->getHeight();
+				int yModOffset = (int)yRelativeToImageOffset % m_foliageSpreadMap->getWidth();
+
+				int xIndexOffset = xModOffset * m_foliageSpreadMap->getWidth();
+				int yIndexOffset = yModOffset;
+
+				int index = (xIndexOffset + yIndexOffset) % pixels.size();
+				float density = (float)pixels[index] / 255.f;
 
 				int instanceCount = density * 255; // times max instances per texel
 				p.instanceCount += instanceCount;

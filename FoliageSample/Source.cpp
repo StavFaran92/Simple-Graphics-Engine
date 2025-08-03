@@ -150,7 +150,7 @@ public:
 		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_10x10.png");
 		foliage.width = 20;
 		foliage.height = 20;
-		foliage.pixelPerPatch = 2;
+		//foliage.pixelPerPatch = 2;
 		//foliage.terrainRef = terrainEnt;
 		foliage.build();
 
