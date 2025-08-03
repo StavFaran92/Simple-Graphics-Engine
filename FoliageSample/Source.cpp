@@ -123,7 +123,7 @@ public:
 
 		//Entity terrainEnt = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
 		////auto terrain = Terrain::generateTerrain(100, 100, 64, "C:/Users/Stav/Downloads/HeightMap.png");
-		//auto& terrain = terrainEnt.addComponent<Terrain>(Terrain::generateTerrain(50, 50, 10, FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_10x10.png"));
+		//auto& terrain = terrainEnt.addComponent<Terrain>(Terrain::generateTerrain(20, 20, 1, FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_10x10.png"));
 
 		//terrain.m_textureCount = 1;
 
@@ -150,6 +150,7 @@ public:
 		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_10x10.png");
 		foliage.width = 20;
 		foliage.height = 20;
+		foliage.pixelPerPatch = 2;
 		//foliage.terrainRef = terrainEnt;
 		foliage.build();
 

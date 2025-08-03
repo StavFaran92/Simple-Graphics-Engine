@@ -18,7 +18,7 @@ void FoliageComponent::build()
 		for (int j = 0; j < m_patchCount.x; j++) // Cols
 		{
 			FoliagePatch patch;
-			patch.pos = glm::vec3(i * patchWidth, 0, j * patchHeight);
+			patch.pos = glm::vec3(i * patchWidth - width / 2. + .5f, 0, j * patchHeight - height / 2.);
 			patch.idx = j;
 			patch.idy = i;
 			m_patches.push_back(patch);
@@ -48,7 +48,8 @@ void FoliageComponent::build()
 			for (int j = 0; j < pixelPerPatch; j++)
 			{
 				// Sample density
-				int index = ((p.idy % m_foliageSpreadMap->getHeight() + j) * m_foliageSpreadMap->getWidth() + p.idx % m_foliageSpreadMap->getWidth() + i) ;
+				int index = (((p.idy * pixelPerPatch + i) % m_foliageSpreadMap->getHeight()) * m_foliageSpreadMap->getWidth() + 
+					(p.idx * pixelPerPatch + j) % m_foliageSpreadMap->getWidth()) ;
 				float density = (float)pixels[index % pixels.size()] / 255.f;
 
 				int instanceCount = density * 255; // times max instances per texel
@@ -57,8 +58,8 @@ void FoliageComponent::build()
 				{
 					glm::vec3 pos;
 					pos = glm::vec3(p.pos);									// Offset by patch position
-					pos += glm::vec3(i * patchWidth, 0, j * patchHeight);	// Offset by texel chunk
-					pos += foliageSystem->getRandomLocation(k) * glm::vec3(patchWidth, 0, patchHeight);
+					pos += glm::vec3((float)i * patchWidth / pixelPerPatch, 0, (float)j * patchHeight / pixelPerPatch);	// Offset by texel chunk
+					pos += foliageSystem->getRandomLocation(k) * glm::vec3((float)patchWidth / pixelPerPatch, 0, (float)patchHeight / pixelPerPatch);
 
 					if (terrain)
 					{
@@ -79,7 +80,7 @@ void FoliageComponent::build()
 	}
 	glGenBuffers(1, &m_patchInstanceDataSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_patchInstanceDataSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * 255 * patchWidth * patchHeight, nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * 255 * pixelPerPatch * pixelPerPatch, nullptr, GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_patchInstanceDataSSBO);
 }
 
