@@ -34,9 +34,10 @@ void FoliageComponent::build()
 	}
 
 	m_foliageSpreadMap->bind();
-	std::vector<GLubyte> pixels(m_foliageSpreadMap->getWidth() * m_foliageSpreadMap->getHeight() * m_foliageSpreadMap->getBitDepth());
-	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glGetTexImage(GL_TEXTURE_2D, 0, m_foliageSpreadMap->getData().format, GL_UNSIGNED_BYTE, pixels.data());
+	std::vector<GLubyte> pixels(m_foliageSpreadMap->getWidth() * m_foliageSpreadMap->getHeight());
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
 
 	auto foliageSystem = Engine::get()->getSubSystem<FoliageSystem>();
 
@@ -47,8 +48,8 @@ void FoliageComponent::build()
 			for (int j = 0; j < pixelPerPatch; j++)
 			{
 				// Sample density
-				int index = ((p.idy + j) * width + p.idx + i) * m_foliageSpreadMap->getBitDepth();
-				float density = (float)pixels[index] / 255.f;
+				int index = ((p.idy % m_foliageSpreadMap->getHeight() + j) * m_foliageSpreadMap->getWidth() + p.idx % m_foliageSpreadMap->getWidth() + i) ;
+				float density = (float)pixels[index % pixels.size()] / 255.f;
 
 				int instanceCount = density * 255; // times max instances per texel
 				p.instanceCount += instanceCount;
