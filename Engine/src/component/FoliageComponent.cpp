@@ -66,7 +66,7 @@ void FoliageComponent::build()
 				int index = (xIndexOffset + yIndexOffset) % pixels.size();
 				float density = (float)pixels[index] / 255.f;
 
-				int instanceCount = density * 255; // times max instances per texel
+				int instanceCount = density * globalDensity * 255 ; // times max instances per texel
 				p.instanceCount += instanceCount;
 				for (int k = 0; k < instanceCount; ++k) 
 				{

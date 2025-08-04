@@ -26,7 +26,7 @@ struct EngineAPI FoliageComponent : public Component
 	const std::vector<FoliagePatch>& getPatches() const;
 
 	Resource<Texture> m_foliageSpreadMap;
-	float density = 0.2f;
+	float globalDensity = 0.2f;
 	glm::vec3 colorA = glm::vec3(0.1, 0.3, 0.1);
 	glm::vec3 colorB = glm::vec3(0.4, 0.8, 0.3);
 	int patchWidth = 10;
