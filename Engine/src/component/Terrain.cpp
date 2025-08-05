@@ -185,7 +185,7 @@ float Terrain::getHeightAtPoint(float x, float y) const
 
 	// Access heightmap data
 	unsigned char* pixels = static_cast<unsigned char*>(m_heightmap.get()->getData().data);
-	int stride = m_heightmap.get()->getWidth() * m_heightmap.get()->getData().bpp;
+	int stride = m_heightmap.get()->getWidth();
 
 	// Compute floor values
 	int floorX = static_cast<int>(floor(normalizedX));
@@ -196,19 +196,20 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	float offsetY = flippedY - floorY;
 
 	// Get pixel values
-	int indexP0 = floorY * stride + floorX * m_heightmap.get()->getData().bpp;
-	int indexP1 = floorY * stride + (floorX + 1) * m_heightmap.get()->getData().bpp;
-	int indexP2 = (floorY - 1) * stride + floorX * m_heightmap.get()->getData().bpp;
-	int indexP3 = (floorY - 1) * stride + (floorX + 1) * m_heightmap.get()->getData().bpp;
+	int indexP0 = (floorY * stride + floorX) * m_heightmap.get()->getData().bpp;
+	int indexP1 = (floorY * stride + (floorX + 1)) * m_heightmap.get()->getData().bpp;
+	int indexP2 = ((floorY + 1) * stride + floorX) * m_heightmap.get()->getData().bpp;
+	int indexP3 = ((floorY + 1) * stride + (floorX + 1)) * m_heightmap.get()->getData().bpp;
 
-	//     P2  +--------+  P3
-	//         |      / |
-	//         | T1  /  |
-	//         |    /   |
-	//         |   /    |
-	//         |  /     |
-	//         | /   T2 |
-	//     P0  |/_______|  P1
+	//     P0  +--------+  P1
+	//         |\       |
+	//         | \   T2 |
+	//         |  \     |
+	//         |   \    |
+	//         |    \   |
+	//         |  T1 \  |
+	//         |      \ |
+	//     P2  |_______\|  P3
 
 	float P0 = pixels[indexP0];
 	float P1 = pixels[indexP1];

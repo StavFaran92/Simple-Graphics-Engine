@@ -73,6 +73,7 @@ void FoliageComponent::build()
 					glm::vec3 pos;
 					pos = glm::vec3(p.pos);									// Offset by patch position
 					pos += glm::vec3((float)i * patchWidth / pixelPerPatch, 0, (float)j * patchHeight / pixelPerPatch);	// Offset by texel chunk
+					//pos += glm::vec3(.5, 0, .5);
 					pos += foliageSystem->getRandomLocation(k) * glm::vec3((float)patchWidth / pixelPerPatch, 0, (float)patchHeight / pixelPerPatch);
 
 					if (terrain)
