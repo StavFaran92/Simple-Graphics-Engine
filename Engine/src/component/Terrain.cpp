@@ -165,12 +165,46 @@ int Terrain::getTextureCount() const
 	return m_textureCount;
 }
 
+std::array<float, 4> getCornersSafe(
+	const unsigned char* pixels,
+	int floorX, int floorY,
+	int stride, int bpp,
+	int width, int height
+) {
+	auto getIndex = [&](int x, int y) -> int {
+		return (y * stride + x) * bpp;
+		};
+
+	int indexP0 = getIndex(floorX, floorY);
+	int indexP1 = getIndex(floorX + 1, floorY);
+	int indexP2 = getIndex(floorX, floorY + 1);
+	int indexP3 = getIndex(floorX + 1, floorY + 1);
+
+	int totalBytes = width * height * bpp;
+
+	auto safe = [&](int idx) -> float {
+		if (idx >= 0 && idx < totalBytes) {
+			return pixels[idx];
+		}
+		else {
+			return pixels[indexP0];
+		}
+		};
+
+	return {
+		safe(indexP0),
+		safe(indexP1),
+		safe(indexP2),
+		safe(indexP3)
+	};
+}
+
 float Terrain::getHeightAtPoint(float x, float y) const
 {
 	
 	// offset to match heightmap
-	x += m_width / 2;
-	y += m_height / 2;
+	x += m_width / 2.f;
+	y += m_height / 2.f;
 
 	if (x < 0 || x >= m_width || y < 0 || y >= m_height) {
 		return 0.0f;
@@ -196,10 +230,6 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	float offsetY = flippedY - floorY;
 
 	// Get pixel values
-	int indexP0 = (floorY * stride + floorX) * m_heightmap.get()->getData().bpp;
-	int indexP1 = (floorY * stride + (floorX + 1)) * m_heightmap.get()->getData().bpp;
-	int indexP2 = ((floorY + 1) * stride + floorX) * m_heightmap.get()->getData().bpp;
-	int indexP3 = ((floorY + 1) * stride + (floorX + 1)) * m_heightmap.get()->getData().bpp;
 
 	//     P0  +--------+  P1
 	//         |\       |
@@ -211,10 +241,14 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	//         |      \ |
 	//     P2  |_______\|  P3
 
-	float P0 = pixels[indexP0];
-	float P1 = pixels[indexP1];
-	float P2 = pixels[indexP2];
-	float P3 = pixels[indexP3];
+	auto [P0, P1, P2, P3] = getCornersSafe(
+		pixels,
+		floorX, floorY,
+		stride,
+		m_heightmap.get()->getBitDepth(),
+		m_heightmap.get()->getWidth(),
+		m_heightmap.get()->getHeight()
+	);
 
 	float lerpX = 0.0f;
 	float lerpY = 0.0f;
