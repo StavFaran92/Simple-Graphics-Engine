@@ -51,12 +51,11 @@ void main()
     vec2 windUV = vec2(posX, posZ) * 0.05 + vec2(time * 0.02, time * 0.02);
     vec4 wind = texture(windNoise, windUV);
 
-    vPos.x += wind.r * aPos.y;
-    vPos.z += wind.g * aPos.y;
+    // vPos.x += wind.r * aPos.y;
+    // vPos.z += wind.g * aPos.y;
 
     mat4 localModel = mat4(1.0);
     localModel[3] = vPos;
-    localModel[3][3] = 1;
     Normal = norm;
     fragPos = aPos;
     gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
