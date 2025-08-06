@@ -62,6 +62,11 @@ bool FoliageSystem::init()
 	grassTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
 	windNoise = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png");
 
+	Texture::TextureImportSettings noiseSettings;
+	//noiseSettings.params[GL_TEXTURE_WRAP_S] = GL_MIRRORED_REPEAT;
+	//noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
+	noiseTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
+
 	return true;
 }
 
@@ -155,6 +160,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageShader->setUniformValue("patchCount", foliage.getPatchCount());
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
 	foliageShader->setTextureInShader(foliage.m_foliageSpreadMap, "densityMap", 1);
+	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);
 	foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 
 	auto scale = glm::scale(glm::mat4(1.0), glm::vec3(1.f));

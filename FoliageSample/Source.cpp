@@ -123,7 +123,7 @@ public:
 
 		Entity terrainEnt = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
 		//auto terrain = Terrain::generateTerrain(100, 100, 64, "C:/Users/Stav/Downloads/HeightMap.png");
-		auto& terrain = terrainEnt.addComponent<Terrain>(Terrain::generateTerrain(10, 10, 10, FOLIAGE_ROOT_DIR + "Content/Textures/tower.png"));
+		auto& terrain = terrainEnt.addComponent<Terrain>(Terrain::generateTerrain(50, 50, 2, FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_50x50.png"));
 
 		terrain.m_textureCount = 1;
 
@@ -148,10 +148,10 @@ public:
 		auto& foliage = grass.addComponent<FoliageComponent>();
 		foliage.globalDensity = 1;// / 255.f;
 		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/all_white.png");
-		foliage.width = 10;
-		foliage.height = 10;
-		foliage.patchWidth = 1;
-		foliage.patchHeight = 1;
+		foliage.width = 50;
+		foliage.height = 50;
+		foliage.patchWidth = 10;
+		foliage.patchHeight = 10;
 		//foliage.pixelPerPatch = 2;
 		foliage.terrainRef = terrainEnt;
 		foliage.build();

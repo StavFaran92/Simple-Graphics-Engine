@@ -46,4 +46,5 @@ private:
 	std::vector<glm::vec3>foliageRandomLocations;
 	Resource<Texture>grassTexture;
 	Resource<Texture>windNoise;
+	Resource<Texture>noiseTexture;
 };

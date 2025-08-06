@@ -62,7 +62,7 @@ void main()
     localModel[3] = vPos;
     localModel *= scale;
     Normal = norm;
-    fragPos = aPos;
+    fragPos = vec3(vPos);
     gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
                                   
 }
@@ -81,6 +81,8 @@ out vec4 FragColor;
 uniform vec3 colorA;
 uniform vec3 colorB;
 uniform vec3 viewDir;
+
+uniform sampler2D noiseTexture;
 
 in vec3 Normal;
 in vec3 fragPos;
@@ -132,7 +134,16 @@ void main()
     float t = clamp((fragPos.y - minY) / (maxY - minY), 0.0, 1.0);
 
     // Final graded color
-    vec3 color = mix(bottomColor, topColor, t);
+    vec3 baseColor = mix(bottomColor, topColor, t);
+
+    vec2 uv = vec2(fragPos.x, fragPos.z) * .1;
+    vec3 dryColorA = vec3(0.6, 0.5, 0.1);
+    vec3 dryColorB = vec3(0.9f, 0.8f, 0.3f);
+
+    float dryFactor = texture(noiseTexture, uv).r;
+    vec3 dryColor = mix(dryColorA, dryColorB, t);
+
+    vec3 color = mix(baseColor, dryColor, dryFactor);
 
     // vec3 L = normalize(-sunLightDir);
     // float diff = max(dot(normalize(Normal), L), 0.0);
