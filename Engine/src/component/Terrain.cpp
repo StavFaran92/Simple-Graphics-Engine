@@ -187,7 +187,14 @@ std::array<float, 4> getCornersSafe(
 			return pixels[idx];
 		}
 		else {
-			return pixels[indexP0];
+			if (indexP0 >= 0)
+			{
+				return pixels[indexP0];
+			}
+			else
+			{
+				return 0.f;
+			}
 		}
 		};
 
@@ -213,6 +220,9 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	// Convert from world space to heightmap space
 	float normalizedX = x / m_width * m_heightmap.get()->getWidth();
 	float normalizedY = y / m_height * m_heightmap.get()->getHeight();
+
+	normalizedX -= .5;
+	normalizedY -= .5;
 
 	// Flip Y axis
 	float flippedY = normalizedY;// m_heightmap.get()->getHeight() - 1 - normalizedY;

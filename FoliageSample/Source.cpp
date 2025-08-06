@@ -146,7 +146,7 @@ public:
 
 		Entity grass = Engine::get()->getContext()->getActiveScene()->createEntity("Grass");
 		auto& foliage = grass.addComponent<FoliageComponent>();
-		foliage.globalDensity = 1 / 255.f;
+		foliage.globalDensity = 1;// / 255.f;
 		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/all_white.png");
 		foliage.width = 10;
 		foliage.height = 10;

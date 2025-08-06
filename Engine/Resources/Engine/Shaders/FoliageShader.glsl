@@ -60,7 +60,7 @@ void main()
 
     mat4 localModel = mat4(1.0);
     localModel[3] = vPos;
-    localModel *= scale;
+    // localModel *= scale;
     Normal = norm;
     fragPos = aPos;
     gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
