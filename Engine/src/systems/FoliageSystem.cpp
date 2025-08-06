@@ -157,8 +157,8 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageShader->setTextureInShader(foliage.m_foliageSpreadMap, "densityMap", 1);
 	foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 
-	auto scale = glm::scale(glm::mat4(1.0), glm::vec3(.1));
-	//foliageShader->setUniformValue("scale", scale);
+	auto scale = glm::scale(glm::mat4(1.0), glm::vec3(1.f));
+	foliageShader->setUniformValue("scale", scale);
 	
 	std::vector<FoliagePatch> patchesMaxLOD;
 	for (int i = 0; i < visiblePatches.size(); i++)
