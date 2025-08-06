@@ -156,6 +156,9 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
 	foliageShader->setTextureInShader(foliage.m_foliageSpreadMap, "densityMap", 1);
 	foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
+
+	auto scale = glm::scale(glm::mat4(1.0), glm::vec3(.1));
+	foliageShader->setUniformValue("scale", scale);
 	
 	std::vector<FoliagePatch> patchesMaxLOD;
 	for (int i = 0; i < visiblePatches.size(); i++)
@@ -172,7 +175,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * visiblePatches[i].instanceCount, visiblePatches[i].instancesData.data());
 
-			auto& grassBlade = m_grassBlade;
+			auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
 			auto vao = grassBlade->getPrimaryMesh()->getVAO();
 			RenderCommand::drawInstanced(vao, visiblePatches[i].instanceCount);
 		}

@@ -35,6 +35,8 @@ uniform vec2 patchCount;
 uniform vec2 patchID;
 uniform sampler2D windNoise;
 
+uniform mat4 scale;
+
 uniform float time;
 
 out vec3 Normal;
@@ -54,8 +56,11 @@ void main()
     // vPos.x += wind.r * aPos.y;
     // vPos.z += wind.g * aPos.y;
 
+    
+
     mat4 localModel = mat4(1.0);
     localModel[3] = vPos;
+    localModel *= scale;
     Normal = norm;
     fragPos = aPos;
     gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
