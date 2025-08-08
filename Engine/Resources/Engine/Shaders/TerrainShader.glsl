@@ -112,7 +112,11 @@ void main()
     texCoord = (t1 - t0) * v + t0;
 
     // lookup texel at patch coordinate for height and scale
-    height = texture(heightMap, texCoord).r;
+    // Clamp to avoid sampling outside due to interpolation and fractional spacing
+    vec2 texSize = textureSize(heightMap, 0);
+    vec2 halfTexel = 0.5 / texSize;
+    vec2 clampedUV = clamp(texCoord, halfTexel, 1.0 - halfTexel);
+    height = texture(heightMap, clampedUV).r;
 
     // get point position
     vec4 p00 = gl_in[0].gl_Position;
