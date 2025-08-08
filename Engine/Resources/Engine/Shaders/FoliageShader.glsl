@@ -136,7 +136,7 @@ void main()
     // Final graded color
     vec3 baseColor = mix(bottomColor, topColor, t);
 
-    vec2 uv = vec2(fragPos.x, fragPos.z) * .1;
+    vec2 uv = vec2(fragPos.x, fragPos.z) * .01;
     vec3 dryColorA = vec3(0.6, 0.5, 0.1);
     vec3 dryColorB = vec3(0.9f, 0.8f, 0.3f);
 

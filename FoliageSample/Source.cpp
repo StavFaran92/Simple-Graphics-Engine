@@ -123,7 +123,7 @@ public:
 
 		Entity terrainEnt = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
 		//auto terrain = Terrain::generateTerrain(100, 100, 64, "C:/Users/Stav/Downloads/HeightMap.png");
-		auto& terrain = terrainEnt.addComponent<Terrain>(Terrain::generateTerrain(50, 50, 2, FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_50x50.png"));
+		auto& terrain = terrainEnt.addComponent<Terrain>(Terrain::generateTerrain(50, 50, 10, FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_50x50.png"));
 
 		terrain.m_textureCount = 1;
 
