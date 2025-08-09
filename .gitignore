@@ -24,6 +24,7 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
+[Rr]elease/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
@@ -47,6 +48,7 @@ nunit-*.xml
 
 # Build Results of an ATL Project
 [Dd]ebugPS/
+[Rr]eleasePS/
 dlldata.c
 
 # Benchmark Results
