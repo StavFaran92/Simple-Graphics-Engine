@@ -45,8 +45,7 @@ def main():
     copy_folder(folder_to_game, assets_dest)
 
     # Step 3: Copy only DLLs and the executable from bin/Release next to the executable
-    root_dir = os.path.abspath(os.path.join(solution_dir, ".."))
-    bin_release_src = os.path.join(root_dir, "bin", "Release")
+    bin_release_src = os.path.join(solution_dir, "bin", "Release")
     if os.path.isdir(bin_release_src):
         for item in os.listdir(bin_release_src):
             src_path = os.path.join(bin_release_src, item)
