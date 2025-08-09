@@ -2915,9 +2915,10 @@ class GUI_Helper : public GuiMenu {
 
                                                 // Determine output folder for the build
                                                 std::string outputFolder = Engine::get()->getInitParams().projectDir + "/../Release";
+                                                std::string solutionDir = Engine::get()->getInitParams().projectDir + "/../build";
 
-                                                // Command to execute the Python script with project and output paths
-                                                std::string command = "python \"" + pythonScriptPath + "\" \"" + Engine::get()->getInitParams().projectDir + "\" \"" + outputFolder + "\"";
+                                                // Command to execute the Python script with project, output, and solution paths
+                                                std::string command = "python \"" + pythonScriptPath + "\" \"" + Engine::get()->getInitParams().projectDir + "\" \"" + outputFolder + "\" \"" + solutionDir + "\"";
 
                                                 // Run the command
                                                 std::system(command.c_str());

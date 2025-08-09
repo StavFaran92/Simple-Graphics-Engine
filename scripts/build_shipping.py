@@ -25,17 +25,16 @@ def build_project(msbuild_path, project_path):
 
 
 def main():
-    if len(sys.argv) < 3:
-        print("Error: folder_to_game and output_folder paths not provided.")
+    if len(sys.argv) < 4:
+        print("Error: folder_to_game, output_folder, and solution_dir paths not provided.")
         sys.exit(1)
 
     folder_to_game = sys.argv[1]
     output_folder = sys.argv[2]
-
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    solution_dir = sys.argv[3]
 
     msbuild_path = r"C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
-    project_path = os.path.join(script_dir, "..", "Game", "Game.vcxproj")
+    project_path = os.path.join(solution_dir, "Game", "Game.vcxproj")
 
     # Step 1: Build the project
     build_project(msbuild_path, project_path)
@@ -46,7 +45,8 @@ def main():
     copy_folder(folder_to_game, assets_dest)
 
     # Step 3: Copy only DLLs and the executable from bin/Release next to the executable
-    bin_release_src = os.path.join(script_dir, "..", "bin", "Release")
+    root_dir = os.path.abspath(os.path.join(solution_dir, ".."))
+    bin_release_src = os.path.join(root_dir, "bin", "Release")
     if os.path.isdir(bin_release_src):
         for item in os.listdir(bin_release_src):
             src_path = os.path.join(bin_release_src, item)
