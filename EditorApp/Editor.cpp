@@ -1471,8 +1471,10 @@ void RenderViewWindow(float width, float height)
 		!ImGui::IsPopupOpen(1, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
 	{
 
-		if (!ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-		{
+               // Prevent deselection when interacting with ImGui widgets (e.g., gizmo mode buttons)
+               // Only perform object picking when ImGui isn't consuming the mouse input
+               if (!ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::GetIO().WantCaptureMouse)
+               {
 			ImVec2 mousePos = ImGui::GetMousePos();
 			ImVec2 windowPos = ImGui::GetWindowPos();
 			ImVec2 windowSize = ImGui::GetWindowSize();
