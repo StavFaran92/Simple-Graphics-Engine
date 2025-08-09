@@ -19,7 +19,7 @@ public:
 
 		const float step = 1.0f;
 		const int gridSize = 50;
-		const float halfSize = (gridSize - 1) * step * 0.5f;
+		const float halfSize = (gridSize-1) * step * 0.5f;
 
 		std::vector<Vertex> vertices;
 		vertices.reserve(gridSize * 2);

@@ -13,13 +13,17 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 norm;
 // layout (location = 4) in vec3 instancePos; 
 
-// layout(std430, binding = 0) buffer InstanceData {
-//     vec4 instancePos[];
-// };
-
-layout(std140, binding = 4) uniform RandomPatchSample { // todo give better name
-    vec4 randomPatchSample[255]; 
+struct PatchInstance {
+    vec4 offsetInPatch;
 };
+
+layout(std430, binding = 0) buffer PatchInstanceData {
+    vec4 instanceData[];
+};
+
+// layout(std140, binding = 4) uniform RandomPatchSample { // todo give better name
+//     vec4 randomPatchSample[255]; 
+// };
 
 // layout(std140, binding = 1) uniform PatchOffset { // todo give better name
 //     vec4 patchOffset[10*10]; 
@@ -31,6 +35,8 @@ uniform vec2 patchCount;
 uniform vec2 patchID;
 uniform sampler2D windNoise;
 
+uniform mat4 scale;
+
 uniform float time;
 
 out vec3 Normal;
@@ -38,8 +44,7 @@ out vec3 fragPos;
                                                                                     
 void main()                                                                         
 { 
-    int invocationID = gl_InstanceID % 255;
-    vec4 vPos = randomPatchSample[invocationID] * vec4(patchSize.x, 0, patchSize.y, 0) + vec4(patchPosition, 0.0);
+    vec4 vPos = instanceData[gl_InstanceID];
 
     float posX = vPos.x;
     float posZ = vPos.z;
@@ -48,14 +53,16 @@ void main()
     vec2 windUV = vec2(posX, posZ) * 0.05 + vec2(time * 0.02, time * 0.02);
     vec4 wind = texture(windNoise, windUV);
 
-    vPos.x += wind.r * aPos.y;
-    vPos.z += wind.g * aPos.y;
+    vPos.x += (wind.r - .5) * aPos.y* aPos.y;
+    vPos.z += (wind.g - .5) * aPos.y* aPos.y;
+
+    
 
     mat4 localModel = mat4(1.0);
     localModel[3] = vPos;
-    localModel[3][3] = 1;
+    localModel *= scale;
     Normal = norm;
-    fragPos = aPos;
+    fragPos = vec3(vPos);
     gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
                                   
 }
@@ -74,6 +81,8 @@ out vec4 FragColor;
 uniform vec3 colorA;
 uniform vec3 colorB;
 uniform vec3 viewDir;
+
+uniform sampler2D noiseTexture;
 
 in vec3 Normal;
 in vec3 fragPos;
@@ -125,7 +134,16 @@ void main()
     float t = clamp((fragPos.y - minY) / (maxY - minY), 0.0, 1.0);
 
     // Final graded color
-    vec3 color = mix(bottomColor, topColor, t);
+    vec3 baseColor = mix(bottomColor, topColor, t);
+
+    vec2 uv = vec2(fragPos.x, fragPos.z) * .01;
+    vec3 dryColorA = vec3(0.6, 0.5, 0.1);
+    vec3 dryColorB = vec3(0.9f, 0.8f, 0.3f);
+
+    float dryFactor = texture(noiseTexture, uv).r;
+    vec3 dryColor = mix(dryColorA, dryColorB, t);
+
+    vec3 color = mix(baseColor, dryColor, dryFactor);
 
     // vec3 L = normalize(-sunLightDir);
     // float diff = max(dot(normalize(Normal), L), 0.0);

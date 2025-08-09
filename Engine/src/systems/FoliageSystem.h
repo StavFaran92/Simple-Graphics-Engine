@@ -13,6 +13,8 @@ public:
 	void setFrustum(Frustum& frustum);
 	void setView(glm::vec3 pos, glm::vec3 front);
 
+	glm::vec3 getRandomLocation(int instanceID) const;
+
 	void drawFoliage(FoliageComponent& foliage);
 
 private:
@@ -32,6 +34,7 @@ private:
 	unsigned int m_frustumUBO;
 	unsigned int m_randomPatchSampleUBO;
 	unsigned int m_patchOffsetUBO;
+	unsigned int m_patchInstanceDataSSBO;
 
 	//std::vector<FoliagePatch> m_patches;
 	glm::vec3 m_camPos;
@@ -40,7 +43,8 @@ private:
 	Frustum m_frustum;
 
 	//std::vector<glm::mat4>foliageRandomTransforms;
-	std::vector<glm::vec4>foliageRandomLocations;
+	std::vector<glm::vec3>foliageRandomLocations;
 	Resource<Texture>grassTexture;
 	Resource<Texture>windNoise;
+	Resource<Texture>noiseTexture;
 };

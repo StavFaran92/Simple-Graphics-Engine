@@ -17,7 +17,7 @@ Entity Terrain::createTerrain(int width, int height, float scale, Resource<Textu
 {
 	auto terrainEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
 
-	auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
+    auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
 	terrainComponent.m_textureCount = 1;
 
 	auto& grassTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
@@ -30,7 +30,13 @@ Entity Terrain::createTerrain(int width, int height, float scale, Resource<Textu
 
 Terrain Terrain::generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath)
 {
-	auto heightMap = Texture::importTexture2D(heightMapFilepath);
+    // Ensure height sampling does not wrap at borders so terrain edges use edge heights
+    Texture::TextureImportSettings settings;
+    settings.params[GL_TEXTURE_WRAP_S] = GL_CLAMP_TO_EDGE;
+    settings.params[GL_TEXTURE_WRAP_T] = GL_CLAMP_TO_EDGE;
+    settings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
+    settings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
+    auto heightMap = Texture::importTexture2D(heightMapFilepath, settings);
 
 	return generateTerrain(width, height, scale, heightMap);
 }
@@ -165,12 +171,53 @@ int Terrain::getTextureCount() const
 	return m_textureCount;
 }
 
+std::array<float, 4> getCornersSafe(
+	const unsigned char* pixels,
+	int floorX, int floorY,
+	int stride, int bpp,
+	int width, int height
+) {
+	auto getIndex = [&](int x, int y) -> int {
+		return (y * stride + x) * bpp;
+		};
+
+	int indexP0 = getIndex(floorX, floorY);
+	int indexP1 = getIndex(floorX + 1, floorY);
+	int indexP2 = getIndex(floorX, floorY + 1);
+	int indexP3 = getIndex(floorX + 1, floorY + 1);
+
+	int totalBytes = width * height * bpp;
+
+	auto safe = [&](int idx) -> float {
+		if (idx >= 0 && idx < totalBytes) {
+			return pixels[idx];
+		}
+		else {
+			if (indexP0 >= 0)
+			{
+				return pixels[indexP0];
+			}
+			else
+			{
+				return 0.f;
+			}
+		}
+		};
+
+	return {
+		safe(indexP0),
+		safe(indexP1),
+		safe(indexP2),
+		safe(indexP3)
+	};
+}
+
 float Terrain::getHeightAtPoint(float x, float y) const
 {
 	
 	// offset to match heightmap
-	x += m_width / 2;
-	y += m_height / 2;
+	x += m_width / 2.f;
+	y += m_height / 2.f;
 
 	if (x < 0 || x >= m_width || y < 0 || y >= m_height) {
 		return 0.0f;
@@ -180,12 +227,15 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	float normalizedX = x / m_width * m_heightmap.get()->getWidth();
 	float normalizedY = y / m_height * m_heightmap.get()->getHeight();
 
+	normalizedX -= .5;
+	normalizedY -= .5;
+
 	// Flip Y axis
 	float flippedY = normalizedY;// m_heightmap.get()->getHeight() - 1 - normalizedY;
 
 	// Access heightmap data
 	unsigned char* pixels = static_cast<unsigned char*>(m_heightmap.get()->getData().data);
-	int stride = m_heightmap.get()->getWidth() * m_heightmap.get()->getData().bpp;
+	int stride = m_heightmap.get()->getWidth();
 
 	// Compute floor values
 	int floorX = static_cast<int>(floor(normalizedX));
@@ -196,24 +246,25 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	float offsetY = flippedY - floorY;
 
 	// Get pixel values
-	int indexP0 = floorY * stride + floorX * m_heightmap.get()->getData().bpp;
-	int indexP1 = floorY * stride + (floorX + 1) * m_heightmap.get()->getData().bpp;
-	int indexP2 = (floorY - 1) * stride + floorX * m_heightmap.get()->getData().bpp;
-	int indexP3 = (floorY - 1) * stride + (floorX + 1) * m_heightmap.get()->getData().bpp;
 
-	//     P2  +--------+  P3
-	//         |      / |
-	//         | T1  /  |
-	//         |    /   |
-	//         |   /    |
-	//         |  /     |
-	//         | /   T2 |
-	//     P0  |/_______|  P1
+	//     P0  +--------+  P1
+	//         |\       |
+	//         | \   T2 |
+	//         |  \     |
+	//         |   \    |
+	//         |    \   |
+	//         |  T1 \  |
+	//         |      \ |
+	//     P2  |_______\|  P3
 
-	float P0 = pixels[indexP0];
-	float P1 = pixels[indexP1];
-	float P2 = pixels[indexP2];
-	float P3 = pixels[indexP3];
+	auto [P0, P1, P2, P3] = getCornersSafe(
+		pixels,
+		floorX, floorY,
+		stride,
+		m_heightmap.get()->getBitDepth(),
+		m_heightmap.get()->getWidth(),
+		m_heightmap.get()->getHeight()
+	);
 
 	float lerpX = 0.0f;
 	float lerpY = 0.0f;

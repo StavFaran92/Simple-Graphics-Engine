@@ -121,6 +121,20 @@ public:
 		//skyboxComponent.setSkybox(skyboxTexture);
 		//skyboxComponent.build();
 
+		Entity terrainEnt = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
+		//auto terrain = Terrain::generateTerrain(100, 100, 64, "C:/Users/Stav/Downloads/HeightMap.png");
+		auto& terrain = terrainEnt.addComponent<Terrain>(Terrain::generateTerrain(50, 50, 10, FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_50x50.png"));
+
+		terrain.m_textureCount = 1;
+
+		{
+			auto texture = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/Ground037_1K-JPG_Color.jpg");
+			terrain.setTexture(0, texture);
+			terrain.setTextureBlend(0, 1.f);
+			terrain.setTextureScaleX(0, 10.f);
+			terrain.setTextureScaleY(0, 10.f);
+		}
+
 
 
 		auto editorCamera = Engine::get()->getContext()->getActiveScene()->createEntity("Camera");
@@ -132,10 +146,14 @@ public:
 
 		Entity grass = Engine::get()->getContext()->getActiveScene()->createEntity("Grass");
 		auto& foliage = grass.addComponent<FoliageComponent>();
-		foliage.density = 1 / 255.f;
-		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/perlin_greyscale_50x50.png");
+		foliage.globalDensity = 1;// / 255.f;
+		foliage.m_foliageSpreadMap = Texture::importTexture2D(FOLIAGE_ROOT_DIR + "Content/Textures/all_white.png");
 		foliage.width = 50;
 		foliage.height = 50;
+		foliage.patchWidth = 10;
+		foliage.patchHeight = 10;
+		//foliage.pixelPerPatch = 2;
+		foliage.terrainRef = terrainEnt;
 		foliage.build();
 
 		

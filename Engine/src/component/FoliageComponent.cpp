@@ -5,9 +5,14 @@
 #include "core/Random.h"
 #include <GL/glew.h>
 
+#include "component/Terrain.h"
+
 void FoliageComponent::build()
 {
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
+	pixelPerPatch = width / m_patchCount.x;
+
+	glm::vec2 ratio = glm::vec2(m_foliageSpreadMap->getWidth() / width, m_foliageSpreadMap->getHeight() / height);
 
 	m_patches.clear();
 	m_patches.reserve(m_patchCount.x * m_patchCount.y);
@@ -16,7 +21,7 @@ void FoliageComponent::build()
 		for (int j = 0; j < m_patchCount.x; j++) // Cols
 		{
 			FoliagePatch patch;
-			patch.pos = glm::vec3(i * patchWidth, 0, j * patchHeight);
+			patch.pos = glm::vec3(i * patchWidth - width / 2., 0, j * patchHeight - height / 2.);
 			patch.idx = j;
 			patch.idy = i;
 			m_patches.push_back(patch);
@@ -25,18 +30,75 @@ void FoliageComponent::build()
 
 	}
 
+	Terrain* terrain = nullptr;
+	if (terrainRef != Entity::EmptyEntity)
+	{
+		terrain = terrainRef.tryGetComponent<Terrain>();
+	}
+
 	m_foliageSpreadMap->bind();
-	std::vector<GLubyte> pixels(m_foliageSpreadMap->getWidth() * m_foliageSpreadMap->getHeight() * m_foliageSpreadMap->getBitDepth());
-	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glGetTexImage(GL_TEXTURE_2D, 0, m_foliageSpreadMap->getData().format, GL_UNSIGNED_BYTE, pixels.data());
+	std::vector<GLubyte> pixels(m_foliageSpreadMap->getWidth() * m_foliageSpreadMap->getHeight());
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+
+	auto foliageSystem = Engine::get()->getSubSystem<FoliageSystem>();
 
 	for (auto& p : m_patches)
 	{
-		int index = (p.idy * width + p.idx) * m_foliageSpreadMap->getBitDepth();
-		//index = index % (int)m_patchCount.x * (int)m_patchCount.y;
-		GLubyte r = pixels[index];
-		p.density = r / 255.f;
+		for (int i = 0; i < pixelPerPatch; i++)
+		{
+			for (int j = 0; j < pixelPerPatch; j++)
+			{
+				// Sample density
+				int xOffset = p.idx * pixelPerPatch + j;
+				int yOffset = p.idy * pixelPerPatch + i;
+
+				float xRelativeToImageOffset = xOffset * ratio.x;
+				float yRelativeToImageOffset = yOffset * ratio.y;
+
+				int xModOffset = (int)xRelativeToImageOffset % m_foliageSpreadMap->getHeight();
+				int yModOffset = (int)yRelativeToImageOffset % m_foliageSpreadMap->getWidth();
+
+				int xIndexOffset = xModOffset * m_foliageSpreadMap->getWidth();
+				int yIndexOffset = yModOffset;
+
+				int index = (xIndexOffset + yIndexOffset) % pixels.size();
+				float density = (float)pixels[index] / 255.f;
+
+				int instanceCount = density * globalDensity * 255 ; // times max instances per texel
+				p.instanceCount += instanceCount;
+				for (int k = 0; k < instanceCount; ++k) 
+				{
+					glm::vec3 pos;
+					pos = glm::vec3(p.pos);									// Offset by patch position
+					pos += glm::vec3((float)i * patchWidth / pixelPerPatch, 0, (float)j * patchHeight / pixelPerPatch);	// Offset by texel chunk
+					
+					pos += foliageSystem->getRandomLocation(k) * glm::vec3((float)patchWidth / pixelPerPatch, 0, (float)patchHeight / pixelPerPatch);
+
+					if (terrain)
+					{
+						float height = terrain->getHeightAtPoint(pos.x, pos.z);
+						pos.y += height;
+					}
+
+					//pos += glm::vec3(.5, 0, .2);
+
+					p.instancesData.push_back(glm::vec4(pos, 1.0));
+				}
+			}
+		}
+		//p.density = r / 255.f;
 	}
+
+	if (m_patchInstanceDataSSBO)
+	{
+		glDeleteBuffers(1, &m_patchInstanceDataSSBO);
+	}
+	glGenBuffers(1, &m_patchInstanceDataSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_patchInstanceDataSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * 255 * pixelPerPatch * pixelPerPatch, nullptr, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_patchInstanceDataSSBO);
 }
 
 glm::vec2 FoliageComponent::getPatchCount() const
