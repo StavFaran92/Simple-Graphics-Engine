@@ -1467,16 +1467,16 @@ void RenderViewWindow(float width, float height)
 		EditorState::Instance().isMouseInSceneView = false;
 	}
 
-        if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive() &&
-                !ImGui::IsPopupOpen(1, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
+        if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
         {
                 // Pre-calculate toolbar size and position
                 float innerWindowWidth = renderViewWindowSize.x - 10;
                 float innerWindowHeight = 35.0f;
                 ImVec2 toolbarPos(startX + 7, 72.0f);
 
-                // Perform object picking only when clicking outside the toolbar
-                if (!ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                // Perform object picking only when clicking outside the toolbar and when no popup is open
+                if (!ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) &&
+                        !ImGui::IsPopupOpen(1, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
                 {
                         ImVec2 mousePos = ImGui::GetMousePos();
                         ImVec2 windowPos = ImGui::GetWindowPos();
@@ -1514,9 +1514,9 @@ void RenderViewWindow(float width, float height)
                 ImGui::SetNextWindowPos(toolbarPos); // Adjust position as needed
                 ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
 
-		// Transformation mode enum and current mode variable
-		enum TransformMode { TRANSLATE, ROTATE, SCALE, UNIVERSAL };
-		static TransformMode currentMode = TRANSLATE;
+                // Transformation mode enum and current mode variable
+                enum TransformMode { TRANSLATE, ROTATE, SCALE, UNIVERSAL };
+                static TransformMode currentMode = TRANSLATE;
 
 		// Gizmo mode variable
 		static ImGuizmo::MODE currentGizmoMode = ImGuizmo::LOCAL;
