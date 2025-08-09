@@ -2913,14 +2913,19 @@ class GUI_Helper : public GuiMenu {
 						// Path to the Python script
 						std::string pythonScriptPath = "../../scripts/build_shipping.py";
 
-						// Command to execute the Python script with folderPath as an argument
-						std::string command = "python \"" + pythonScriptPath + "\" \"" + Engine::get()->getInitParams().projectDir + "\"";
+                                                // Determine asset, output, and solution paths
+                                                std::string assetsFolder = Engine::get()->getInitParams().projectDir;
+                                                std::string outputFolder = std::string(SGE_SOLUTION_DIR) + "/../Release";
+                                                std::string solutionDir = std::string(SGE_SOLUTION_DIR);
 
-						// Run the command
-						std::system(command.c_str());
+                                                // Command to execute the Python script with project, output, and solution paths
+                                                std::string command = "python \"" + pythonScriptPath + "\" \"" + assetsFolder + "\" \"" + outputFolder + "\" \"" + solutionDir + "\"";
 
-						//std::filesystem::create_directories("../Game/data");
-					}
+                                                // Run the command
+                                                std::system(command.c_str());
+
+                                                //std::filesystem::create_directories("../Game/data");
+                                        }
 					if (ImGui::MenuItem("Reload config", "")) {
 						Engine::get()->reloadEngineConfig();
 					}

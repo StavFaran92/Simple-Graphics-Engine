@@ -8,9 +8,10 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE SGE_SHIPPING)
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
-	${CMAKE_SOURCE_DIR}/Engine/src
-	${CMAKE_SOURCE_DIR}/NativeScripts
+target_include_directories(${PROJECT_NAME} PRIVATE
+        ${CMAKE_SOURCE_DIR}/Engine/src
+        ${CMAKE_SOURCE_DIR}/Engine/include
+        ${CMAKE_SOURCE_DIR}/NativeScripts
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE

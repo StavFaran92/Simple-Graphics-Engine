@@ -8,6 +8,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GUI)
 target_compile_definitions(${PROJECT_NAME} PRIVATE SGE_EDITOR)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SGE_SOLUTION_DIR="${CMAKE_BINARY_DIR}")
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 	${CMAKE_SOURCE_DIR}/Engine/include
