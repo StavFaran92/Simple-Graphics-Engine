@@ -1469,13 +1469,12 @@ void RenderViewWindow(float width, float height)
 
         if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
         {
-                // Pre-calculate toolbar size and position
                 float innerWindowWidth = renderViewWindowSize.x - 10;
                 float innerWindowHeight = 35.0f;
                 ImVec2 toolbarPos(startX + 7, 72.0f);
 
-                // Perform object picking only when clicking outside the toolbar and when no popup is open
                 if (!ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) &&
+                        !ImGui::IsAnyItemHovered() &&
                         !ImGui::IsPopupOpen(1, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
                 {
                         ImVec2 mousePos = ImGui::GetMousePos();
@@ -1484,10 +1483,8 @@ void RenderViewWindow(float width, float height)
 
                         bool mouseInsideWindow = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
                                                 mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
-                        bool mouseOverToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
-                                                mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
 
-                        if (mouseInsideWindow && !mouseOverToolbar)
+                        if (mouseInsideWindow)
                         {
                                 int alteredX = (mousePos.x - startX) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
                                 int alteredY = (mousePos.y - 65) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
@@ -1511,8 +1508,8 @@ void RenderViewWindow(float width, float height)
                         }
                 }
 
-                ImGui::SetNextWindowPos(toolbarPos); // Adjust position as needed
-                ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
+                ImGui::SetNextWindowPos(toolbarPos);
+                ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight));
 
                 // Transformation mode enum and current mode variable
                 enum TransformMode { TRANSLATE, ROTATE, SCALE, UNIVERSAL };
