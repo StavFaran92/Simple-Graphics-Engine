@@ -1467,53 +1467,52 @@ void RenderViewWindow(float width, float height)
 		EditorState::Instance().isMouseInSceneView = false;
 	}
 
-	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive() && 
-		!ImGui::IsPopupOpen(1, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
-	{
+        if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive() &&
+                !ImGui::IsPopupOpen(1, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
+        {
+                // Pre-calculate toolbar size and position
+                float innerWindowWidth = renderViewWindowSize.x - 10;
+                float innerWindowHeight = 35.0f;
+                ImVec2 toolbarPos(startX + 7, 72.0f);
 
-               // Prevent deselection when interacting with ImGui widgets (e.g., gizmo mode buttons)
-               // Only perform object picking when ImGui isn't consuming the mouse input
-               if (!ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::GetIO().WantCaptureMouse)
-               {
-			ImVec2 mousePos = ImGui::GetMousePos();
-			ImVec2 windowPos = ImGui::GetWindowPos();
-			ImVec2 windowSize = ImGui::GetWindowSize();
+                // Perform object picking only when clicking outside the toolbar
+                if (!ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                {
+                        ImVec2 mousePos = ImGui::GetMousePos();
+                        ImVec2 windowPos = ImGui::GetWindowPos();
+                        ImVec2 windowSize = ImGui::GetWindowSize();
 
-			// Check if the mouse is within the window bounds
-			if (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
-				mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y)
-			{
-				// We alter the mouse position from small window into full screen (the renderered object pick texture)
-				int alteredX = (mousePos.x - startX) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
-				int alteredY = (mousePos.y - 65) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
-				int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
+                        bool mouseInsideWindow = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
+                                                mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
+                        bool mouseOverToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
+                                                mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
 
-				if (selectedID == -1)
-				{
-					state.selectEntity(Entity::EmptyEntity);
+                        if (mouseInsideWindow && !mouseOverToolbar)
+                        {
+                                int alteredX = (mousePos.x - startX) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
+                                int alteredY = (mousePos.y - 65) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
+                                int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
 
-				}
-				else
-				{
+                                if (selectedID == -1)
+                                {
+                                        state.selectEntity(Entity::EmptyEntity);
+                                }
+                                else
+                                {
+                                        for (auto& sceneObj : sceneObjects)
+                                        {
+                                                if (sceneObj.e.handlerID() == selectedID)
+                                                {
+                                                        state.selectEntity(sceneObj.e);
+                                                        break;
+                                                }
+                                        }
+                                }
+                        }
+                }
 
-					for (auto& sceneObj : sceneObjects)
-					{
-						if (sceneObj.e.handlerID() == selectedID)
-						{
-							state.selectEntity(sceneObj.e);
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		
-		// Define the size and position of the inner window
-		float innerWindowWidth = renderViewWindowSize.x - 10;
-		float innerWindowHeight = 35.0f;
-		ImGui::SetNextWindowPos(ImVec2(startX + 7, 72)); // Adjust position as needed
-		ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
+                ImGui::SetNextWindowPos(toolbarPos); // Adjust position as needed
+                ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
 
 		// Transformation mode enum and current mode variable
 		enum TransformMode { TRANSLATE, ROTATE, SCALE, UNIVERSAL };
