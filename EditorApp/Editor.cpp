@@ -250,9 +250,11 @@ static void displayComponent(const std::string& componentName, std::function<voi
 			ImGui::PopID();
 		}
 
-		ImGui::Indent(5); // Indent by 10 pixels
-		func(component);
-		ImGui::Unindent(5); // Remove the indent
+                ImGui::Indent(5); // Indent by 10 pixels
+                BEGIN_IMGUI_TABLE(componentName.c_str());
+                func(component);
+                END_IMGUI_TABLE();
+                ImGui::Unindent(5); // Remove the indent
 
 		ImVec2 endPosCursor = ImGui::GetCursorPos(); // Capture the cursor position before adding the separator
 		ImVec2 endPos = ImVec2(startPos.x + ImGui::GetContentRegionAvail().x, startPos.y + (endPosCursor.y - startPosCursor.y));
@@ -384,14 +386,12 @@ static void displayTransformation(Transformation& transform, bool& isChanged)
 	auto& localTransform = transform.getLocalTransformation();
 	ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localTransform), matrixTranslation, matrixRotation, matrixScale);
 
-	BEGIN_IMGUI_TABLE("Transform");
-
-	addTableRow("Position", [&](std::string id) {
-		if (ImGui::DragFloat3(id.c_str(), matrixTranslation, .1f)) {
-			transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
-			isChanged = true;
-		}
-	});
+        addTableRow("Position", [&](std::string id) {
+                if (ImGui::DragFloat3(id.c_str(), matrixTranslation, .1f)) {
+                        transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
+                        isChanged = true;
+                }
+        });
 
 	addTableRow("Rotation", [&](std::string id) {
 		if (ImGui::DragFloat3(id.c_str(), matrixRotation), .001f, 0.f, 180.f) {
@@ -400,14 +400,12 @@ static void displayTransformation(Transformation& transform, bool& isChanged)
 		}
 	});
 
-	addTableRow("Scale", [&](std::string id) {
-		if (ImGui::DragFloat3(id.c_str(), matrixScale, .1f)) {
-			transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
-			isChanged = true;
-		}
-	});
-
-	END_IMGUI_TABLE();
+        addTableRow("Scale", [&](std::string id) {
+                if (ImGui::DragFloat3(id.c_str(), matrixScale, .1f)) {
+                        transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
+                        isChanged = true;
+                }
+        });
 
 }
 
@@ -1948,88 +1946,97 @@ void RenderInspectorWindow(float width, float height)
 			displayTransformation(transform, isChanged);
 		});
 
-		displayComponent<PhysicsComponent>("Physics", [](PhysicsComponent& rBody) {
-			ImGui::Combo("##Type", (int*)&rBody.type, rigidyBodyTypesStrList, IM_ARRAYSIZE(rigidyBodyTypesStrList));
-			ImGui::InputFloat("Mass", &rBody.mass);
+               displayComponent<PhysicsComponent>("Physics", [](PhysicsComponent& rBody) {
+                       addTableRow("Type", [&](std::string id) {
+                               ImGui::Combo(id.c_str(), (int*)&rBody.type, rigidyBodyTypesStrList, IM_ARRAYSIZE(rigidyBodyTypesStrList));
+                       });
 
-			ImGui::LabelText("", "Linear Lock");
-			ImGui::PushID("LinearX");
-			ImGui::Checkbox("X", &rBody.isLockedLinearX);
-			ImGui::PopID();
-			ImGui::SameLine();
-			ImGui::PushID("LinearY");
-			ImGui::Checkbox("Y", &rBody.isLockedLinearY);
-			ImGui::PopID();
-			ImGui::SameLine();
-			ImGui::PushID("LinearZ");
-			ImGui::Checkbox("Z", &rBody.isLockedLinearZ);
-			ImGui::PopID();
+                       addTableRow("Mass", [&](std::string id) {
+                               ImGui::InputFloat(id.c_str(), &rBody.mass);
+                       });
 
-			ImGui::LabelText("", "Angular Lock");
-			ImGui::PushID("AngularX");
-			ImGui::Checkbox("X", &rBody.isLockedAngularX);
-			ImGui::PopID();
-			ImGui::SameLine();
-			ImGui::PushID("AngularY");
-			ImGui::Checkbox("Y", &rBody.isLockedAngularY);
-			ImGui::PopID();
-			ImGui::SameLine();
-			ImGui::PushID("AngularZ");
-			ImGui::Checkbox("Z", &rBody.isLockedAngularZ);
-			ImGui::PopID();
+                       addTableRow("Linear Lock", [&](std::string id) {
+                               ImGui::PushID("LinearLock");
+                               ImGui::Checkbox("X", &rBody.isLockedLinearX);
+                               ImGui::SameLine();
+                               ImGui::Checkbox("Y", &rBody.isLockedLinearY);
+                               ImGui::SameLine();
+                               ImGui::Checkbox("Z", &rBody.isLockedLinearZ);
+                               ImGui::PopID();
+                       });
 
-			
+                       addTableRow("Angular Lock", [&](std::string id) {
+                               ImGui::PushID("AngularLock");
+                               ImGui::Checkbox("X", &rBody.isLockedAngularX);
+                               ImGui::SameLine();
+                               ImGui::Checkbox("Y", &rBody.isLockedAngularY);
+                               ImGui::SameLine();
+                               ImGui::Checkbox("Z", &rBody.isLockedAngularZ);
+                               ImGui::PopID();
+                       });
 
-			static const char* colliderTypeNames[] = {
-				"None", "Box", "Sphere", "Terrain", "Mesh", "Capsule"
-			};
+                       static const char* colliderTypeNames[] = {
+                               "None", "Box", "Sphere", "Terrain", "Mesh", "Capsule"
+                       };
 
-			if (ImGui::Combo("Collider Type", (int*)&rBody.colliderType, colliderTypeNames, IM_ARRAYSIZE(colliderTypeNames))) {
-				switch (rBody.colliderType) {
-				case ColliderType::NONE: rBody.collider = 0; break;
-				case ColliderType::BOX: rBody.collider = std::make_shared<CollisionBox>(); break;
-				case ColliderType::SPHERE: rBody.collider = std::make_shared<CollisionSphere>(); break;
-				case ColliderType::TERRAIN: rBody.collider = std::make_shared<CollisionTerrain>(); break;
-				case ColliderType::MESH: rBody.collider = std::make_shared<CollisionMesh>(); break;
-				case ColliderType::CAPSULE: /* when implemented */ break;
-				}
-			}
+                       addTableRow("Collider Type", [&](std::string id) {
+                               if (ImGui::Combo(id.c_str(), (int*)&rBody.colliderType, colliderTypeNames, IM_ARRAYSIZE(colliderTypeNames))) {
+                                       switch (rBody.colliderType) {
+                                       case ColliderType::NONE: rBody.collider = 0; break;
+                                       case ColliderType::BOX: rBody.collider = std::make_shared<CollisionBox>(); break;
+                                       case ColliderType::SPHERE: rBody.collider = std::make_shared<CollisionSphere>(); break;
+                                       case ColliderType::TERRAIN: rBody.collider = std::make_shared<CollisionTerrain>(); break;
+                                       case ColliderType::MESH: rBody.collider = std::make_shared<CollisionMesh>(); break;
+                                       case ColliderType::CAPSULE: /* when implemented */ break;
+                                       }
+                               }
+                       });
 
-			ColliderType type = rBody.colliderType;
+                       ColliderType type = rBody.colliderType;
 
-			if (type == ColliderType::NONE)
-			{
-				return;
-			}
+                       if (type == ColliderType::NONE)
+                       {
+                               return;
+                       }
 
-			ImGui::Combo("##LayerMask", (int*)&rBody.collider->layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+                       addTableRow("LayerMask", [&](std::string id) {
+                               ImGui::Combo(id.c_str(), (int*)&rBody.collider->layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+                       });
 
-			switch (type) {
-			case ColliderType::BOX:
-				if (auto* box = dynamic_cast<CollisionBox*>(rBody.collider.get())) {
-					ImGui::InputFloat3("Extents", &box->extents.x);
-				}
-				break;
-			case ColliderType::SPHERE:
-				if (auto* sphere = dynamic_cast<CollisionSphere*>(rBody.collider.get())) {
-					ImGui::InputFloat("Radius", &sphere->radius);
-				}
-				break;
-			case ColliderType::TERRAIN:
-				ImGui::TextDisabled("Terrain collider has no editable parameters.");
-				break;
-			case ColliderType::MESH:
-				if (auto* mesh = dynamic_cast<CollisionMesh*>(rBody.collider.get())) {
-					ImGui::Checkbox("Convex", &mesh->isConvex);
-					// Optional: display mesh resource name, etc.
-				}
-				break;
-			case ColliderType::CAPSULE:
-				// Handle capsule here if you define its struct
-				ImGui::Text("Capsule collider UI not implemented yet.");
-				break;
-			}
-		});
+                       switch (type) {
+                       case ColliderType::BOX:
+                               if (auto* box = dynamic_cast<CollisionBox*>(rBody.collider.get())) {
+                                       addTableRow("Extents", [&](std::string id) {
+                                               ImGui::InputFloat3(id.c_str(), &box->extents.x);
+                                       });
+                               }
+                               break;
+                       case ColliderType::SPHERE:
+                               if (auto* sphere = dynamic_cast<CollisionSphere*>(rBody.collider.get())) {
+                                       addTableRow("Radius", [&](std::string id) {
+                                               ImGui::InputFloat(id.c_str(), &sphere->radius);
+                                       });
+                               }
+                               break;
+                       case ColliderType::TERRAIN:
+                               addTableRow("", [&](std::string id) {
+                                       ImGui::TextDisabled("Terrain collider has no editable parameters.");
+                               });
+                               break;
+                       case ColliderType::MESH:
+                               if (auto* mesh = dynamic_cast<CollisionMesh*>(rBody.collider.get())) {
+                                       addTableRow("Convex", [&](std::string id) {
+                                               ImGui::Checkbox(id.c_str(), &mesh->isConvex);
+                                       });
+                               }
+                               break;
+                       case ColliderType::CAPSULE:
+                               addTableRow("", [&](std::string id) {
+                                       ImGui::Text("Capsule collider UI not implemented yet.");
+                               });
+                               break;
+                       }
+               });
 
 		//displayComponent<CollisionBoxComponent>("Collision Box", [](CollisionBoxComponent& collisionBox) {
 		//	ImGui::InputFloat("Half Extent", &collisionBox.halfExtent);
@@ -2045,19 +2052,18 @@ void RenderInspectorWindow(float width, float height)
 		//	ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
 		//	});
 
-		displayComponent<PlayerController>("Player Controller", [](PlayerController& controller) {
-			ImGui::TextDisabled("Controller has no editable parameters.");
-			//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-			});
+               displayComponent<PlayerController>("Player Controller", [](PlayerController& controller) {
+                       addTableRow("", [&](std::string id) {
+                               ImGui::TextDisabled("Controller has no editable parameters.");
+                       });
+               });
 
 		displayComponent<MeshComponent>("Mesh", [](MeshComponent& meshComponent) {
 			if (meshComponent.mesh.isEmpty()) return;
 
-			BEGIN_IMGUI_TABLE("Mesh");
-
-			addTableRow("Vertices count:", [&](std::string id) {
-				rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()).c_str());
-			});
+                        addTableRow("Vertices count:", [&](std::string id) {
+                                rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()).c_str());
+                        });
 
 			addTableRowExt("Select Mesh", 
 				[&](std::string id) 
@@ -2070,9 +2076,7 @@ void RenderInspectorWindow(float width, float height)
 				[&](std::string id) 
 				{
 					rightAlignedText(Engine::get()->getSubSystem<Assets>()->getAlias(meshComponent.mesh.getUID()).c_str());
-				});
-
-			END_IMGUI_TABLE();
+                                });
 			
 
 			//ImGui::Text("Number of vertices: %d", (int)meshComponent.mesh.get()->getNumOfVertices());
@@ -2099,61 +2103,67 @@ void RenderInspectorWindow(float width, float height)
 			
 			});
 
-		displayComponent<CameraComponent>("Camera", [](CameraComponent& cameraComponent) {
-			// TBD
-			
-			static const char* projectionMode[] = { "Perspective", "Orthographic" };
-			static int currentProjection = 0; // Index of the selected item
-			currentProjection = cameraComponent.type;
+               displayComponent<CameraComponent>("Camera", [](CameraComponent& cameraComponent) {
+                       static const char* projectionMode[] = { "Perspective", "Orthographic" };
+                       static int currentProjection = 0; // Index of the selected item
+                       currentProjection = cameraComponent.type;
 
-			ImGui::PushItemWidth(150.0f); // Set dropdown width to 150
-			if (ImGui::BeginCombo("##ProjectionMode", projectionMode[currentProjection])) // Label for the combo box
-			{
-				for (int i = 0; i < IM_ARRAYSIZE(projectionMode); i++)
-				{
-					bool isSelected = (currentProjection == i);
-					if (ImGui::Selectable(projectionMode[i], isSelected))
-					{
-						currentProjection = i; // Update selected index
-						cameraComponent.type = (CameraComponent::CamType)currentProjection;
-					}
+                       addTableRow("Projection", [&](std::string id) {
+                               ImGui::PushItemWidth(150.0f);
+                               if (ImGui::BeginCombo(id.c_str(), projectionMode[currentProjection]))
+                               {
+                                       for (int i = 0; i < IM_ARRAYSIZE(projectionMode); i++)
+                                       {
+                                               bool isSelected = (currentProjection == i);
+                                               if (ImGui::Selectable(projectionMode[i], isSelected))
+                                               {
+                                                       currentProjection = i; // Update selected index
+                                                       cameraComponent.type = (CameraComponent::CamType)currentProjection;
+                                               }
 
-					if (isSelected)
-						ImGui::SetItemDefaultFocus(); // Set focus to the current item
-				}
-				ImGui::EndCombo();
-			}
+                                               if (isSelected)
+                                                       ImGui::SetItemDefaultFocus(); // Set focus to the current item
+                                       }
+                                       ImGui::EndCombo();
+                               }
+                               ImGui::PopItemWidth();
+                       });
 
-			ImGui::DragFloat("FOVY", &cameraComponent.fovy);
-			ImGui::DragFloat("aspect", &cameraComponent.aspect);
-			ImGui::DragFloat("z near", &cameraComponent.znear);
-			ImGui::DragFloat("z far", &cameraComponent.zfar);
-			});
+                       addTableRow("FOVY", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &cameraComponent.fovy);
+                       });
+                       addTableRow("aspect", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &cameraComponent.aspect);
+                       });
+                       addTableRow("z near", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &cameraComponent.znear);
+                       });
+                       addTableRow("z far", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &cameraComponent.zfar);
+                       });
+               });
 
-		displayComponent<NativeScriptComponent>("Script", [](NativeScriptComponent& nsc) {
-			// Button to trigger some action
-			if (ImGui::Button("Select Script"))
-			{
-				showScriptSelector = true;
-			}
+               displayComponent<NativeScriptComponent>("Script", [](NativeScriptComponent& nsc) {
+                       addTableRow("Script", [&](std::string id) {
+                               if (ImGui::Button("Select Script"))
+                               {
+                                       showScriptSelector = true;
+                               }
+                               if (nsc.script)
+                               {
+                                       ImGui::SameLine();
+                                       ImGui::Text(nsc.script->name().c_str());
+                               }
+                       });
 
-			std::string selectedScript;
-			displaySelectScriptWindow(selectedScript);
+                       std::string selectedScript;
+                       displaySelectScriptWindow(selectedScript);
 
-			if (!selectedScript.empty())
-			{
-				nsc.script = std::shared_ptr<ScriptableEntity>(NativeScriptsLoader::instance->getScript(selectedScript));
-			}
-
-			
-
-			// Text display field
-			if (nsc.script)
-			{
-				ImGui::SameLine();
-				ImGui::Text(nsc.script->name().c_str());
-			}
-			});
+                       if (!selectedScript.empty())
+                       {
+                               nsc.script = std::shared_ptr<ScriptableEntity>(NativeScriptsLoader::instance->getScript(selectedScript));
+                       }
+               });
 
 		displayComponent<MaterialComponent>("Materials", [](MaterialComponent& materials) {
 			int index = 0;
@@ -2182,26 +2192,35 @@ void RenderInspectorWindow(float width, float height)
 			}
 			});
 
-		displayComponent<DirectionalLight>("Directional Light", [](DirectionalLight& dLight) {
-			auto& color = dLight.getColor();
-			if (ImGui::ColorEdit3("Color", glm::value_ptr(color))) {
-				dLight.SetColor(color);
-			}
-			});
+               displayComponent<DirectionalLight>("Directional Light", [](DirectionalLight& dLight) {
+                       auto& color = dLight.getColor();
+                       addTableRow("Color", [&](std::string id) {
+                               if (ImGui::ColorEdit3(id.c_str(), glm::value_ptr(color))) {
+                                       dLight.SetColor(color);
+                               }
+                       });
+               });
 
-		displayComponent<PointLight>("Point Light", [](PointLight& pLight) {
-			auto& color = pLight.getColor();
-			if (ImGui::ColorEdit3("Color", glm::value_ptr(color))) {
-				pLight.SetColor(color);
-			}
+               displayComponent<PointLight>("Point Light", [](PointLight& pLight) {
+                       auto& color = pLight.getColor();
+                       addTableRow("Color", [&](std::string id) {
+                               if (ImGui::ColorEdit3(id.c_str(), glm::value_ptr(color))) {
+                                       pLight.SetColor(color);
+                               }
+                       });
 
-			Attenuation& attenuation = pLight.getAttenuation();
-			ImGui::LabelText("", "Attenuation");
-			ImGui::DragFloat("constant", &attenuation.constant, 0.01f);
-			ImGui::DragFloat("linear", &attenuation.linear, 0.01f);
-			ImGui::DragFloat("quadratic", &attenuation.quadratic, 0.01f);
-			pLight.SetAttenuation(attenuation);
-		});
+                       Attenuation& attenuation = pLight.getAttenuation();
+                       addTableRow("constant", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &attenuation.constant, 0.01f);
+                       });
+                       addTableRow("linear", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &attenuation.linear, 0.01f);
+                       });
+                       addTableRow("quadratic", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &attenuation.quadratic, 0.01f);
+                       });
+                       pLight.SetAttenuation(attenuation);
+               });
 
 		displayComponent<InstanceBatch>("Instance Batch", [](InstanceBatch& instanceBatch) {
 			auto& transformations = instanceBatch.getTransformations();
@@ -2227,27 +2246,40 @@ void RenderInspectorWindow(float width, float height)
 			}
 			});
 
-		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
-			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](std::string uuid) {
-				skybox.setSkybox(Resource<Texture>(uuid));
-			});
+               displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
+                       addTableRow("Texture", [&](std::string id) {
+                               addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](std::string uuid) {
+                                       skybox.setSkybox(Resource<Texture>(uuid));
+                               });
+                       });
 
-			// Compile Button
-			if (ImGui::Button("Build"))
-			{
-				skybox.build();
-			}
-		});
+                       addTableRow("", [&](std::string id) {
+                               if (ImGui::Button("Build"))
+                               {
+                                       skybox.build();
+                               }
+                       });
+               });
 
-		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
-			addTextureEditWidget(image.image, { 50, 50 }, [&](std::string uuid) {
-				image.image = Resource<Texture>(uuid);
-				});
-			ImGui::DragFloat("posX", &image.position.x);
-			ImGui::DragFloat("posY", &image.position.y);
-			ImGui::DragFloat("sizeX", &image.size.x);
-			ImGui::DragFloat("sizeY", &image.size.y);
-			});
+               displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
+                       addTableRow("Texture", [&](std::string id) {
+                               addTextureEditWidget(image.image, { 50, 50 }, [&](std::string uuid) {
+                                       image.image = Resource<Texture>(uuid);
+                               });
+                       });
+                       addTableRow("posX", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &image.position.x);
+                       });
+                       addTableRow("posY", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &image.position.y);
+                       });
+                       addTableRow("sizeX", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &image.size.x);
+                       });
+                       addTableRow("sizeY", [&](std::string id) {
+                               ImGui::DragFloat(id.c_str(), &image.size.y);
+                       });
+               });
 
 		displayComponent<Animator>("Animator", [](Animator& animator) {
 
