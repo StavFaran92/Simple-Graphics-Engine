@@ -3,47 +3,19 @@ import shutil
 import sys
 import subprocess
 
-def copy_folder_contents(folder_to_game, output_folder):
-    """
-    Copies all contents from folder_to_game to output_folder.
-    Creates the output_folder if it does not exist.
-    """
-    # Ensure output_folder exists, create it if necessary
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-        print(f"Created output folder: {output_folder}")
 
-    # Copy all contents from folder_to_game to output_folder
-    try:
-        # Iterate through all files and subfolders in folder_to_game
-        for item in os.listdir(folder_to_game):
-            src_path = os.path.join(folder_to_game, item)
-            dest_path = os.path.join(output_folder, item)
-
-            # Check if the item is a file or directory
-            if os.path.isdir(src_path):
-                # Recursively copy directories
-                shutil.copytree(src_path, dest_path)
-            else:
-                # Copy files
-                shutil.copy2(src_path, dest_path)
-
-        print(f"All contents copied from {folder_to_game} to {output_folder}")
-    except Exception as e:
-        print(f"Error while copying: {e}")
+def copy_folder(src, dest):
+    """Copy an entire folder to *dest* overwriting existing content."""
+    if os.path.exists(dest):
+        shutil.rmtree(dest)
+    shutil.copytree(src, dest)
+    print(f"Copied {src} -> {dest}")
 
 
-def build_project(msbuild_path, project_path, folder_to_game):
-    """
-    Builds the project using MSBuild and defines the GAME_FOLDER preprocessor macro.
-    """
-    build_command = [
-        msbuild_path, project_path, "/p:Configuration=Release"
-    ]
-
-    # Print the build command for debugging purposes
+def build_project(msbuild_path, project_path):
+    """Build the project using MSBuild."""
+    build_command = [msbuild_path, project_path, "/p:Configuration=Release"]
     print(f"Executing: {' '.join(build_command)}")
-
     try:
         subprocess.check_call(build_command)
         print("Build successful!")
@@ -52,21 +24,37 @@ def build_project(msbuild_path, project_path, folder_to_game):
         sys.exit(1)
 
 
-# Ensure the script receives a folder_to_game argument
-if len(sys.argv) < 2:
-    print("Error: folder_to_game path not provided.")
-    sys.exit(1)
+def main():
+    if len(sys.argv) < 3:
+        print("Error: folder_to_game and output_folder paths not provided.")
+        sys.exit(1)
 
-# Capture folder_to_game from the arguments
-folder_to_game = sys.argv[1]
-output_folder = os.path.join(os.getcwd(), "../Release/data")
+    folder_to_game = sys.argv[1]
+    output_folder = sys.argv[2]
 
-# Define the MSBuild path and project path
-msbuild_path = r"C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
-project_path = r"../Game/Game.vcxproj"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Step 1: Build the project
-build_project(msbuild_path, project_path, folder_to_game)
+    msbuild_path = r"C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
+    project_path = os.path.join(script_dir, "..", "Game", "Game.vcxproj")
 
-# Step 2: Copy the contents after build
-copy_folder_contents(folder_to_game, output_folder)
+    # Step 1: Build the project
+    build_project(msbuild_path, project_path)
+
+    # Step 2: Copy the asset folder into output/data
+    os.makedirs(output_folder, exist_ok=True)
+    assets_dest = os.path.join(output_folder, "data")
+    copy_folder(folder_to_game, assets_dest)
+
+    # Step 3: Copy only DLLs and the executable from bin/Release next to the executable
+    bin_release_src = os.path.join(script_dir, "..", "bin", "Release")
+    if os.path.isdir(bin_release_src):
+        for item in os.listdir(bin_release_src):
+            src_path = os.path.join(bin_release_src, item)
+            if os.path.isfile(src_path) and os.path.splitext(item)[1].lower() in (".dll", ".exe"):
+                shutil.copy2(src_path, output_folder)
+        print(f"Copied DLLs and executables from {bin_release_src} -> {output_folder}")
+
+
+if __name__ == "__main__":
+    main()
+
