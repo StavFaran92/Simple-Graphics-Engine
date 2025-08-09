@@ -1522,8 +1522,9 @@ void RenderViewWindow(float width, float height)
         if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
         {
                 bool isPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+                bool wantsCaptureMouse = ImGui::GetIO().WantCaptureMouse;
 
-                if (!isPopupOpen && !ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                if (!isPopupOpen && !wantsCaptureMouse && !ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
                 {
                         ImVec2 mousePos = ImGui::GetMousePos();
                         ImVec2 windowPos = ImGui::GetWindowPos();
