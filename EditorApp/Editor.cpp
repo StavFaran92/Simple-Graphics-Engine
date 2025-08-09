@@ -1467,15 +1467,15 @@ void RenderViewWindow(float width, float height)
 		EditorState::Instance().isMouseInSceneView = false;
 	}
 
-	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive() && 
-		!ImGui::IsPopupOpen(1, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
-	{
+        if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
+        {
+                bool isPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
 
-		if (!ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-		{
-			ImVec2 mousePos = ImGui::GetMousePos();
-			ImVec2 windowPos = ImGui::GetWindowPos();
-			ImVec2 windowSize = ImGui::GetWindowSize();
+                if (!isPopupOpen && !ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                {
+                        ImVec2 mousePos = ImGui::GetMousePos();
+                        ImVec2 windowPos = ImGui::GetWindowPos();
+                        ImVec2 windowSize = ImGui::GetWindowSize();
 
 			// Check if the mouse is within the window bounds
 			if (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
@@ -1507,11 +1507,11 @@ void RenderViewWindow(float width, float height)
 		}
 
 		
-		// Define the size and position of the inner window
-		float innerWindowWidth = renderViewWindowSize.x - 10;
-		float innerWindowHeight = 35.0f;
-		ImGui::SetNextWindowPos(ImVec2(startX + 7, 72)); // Adjust position as needed
-		ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
+                // Define the size and position of the inner window
+                float innerWindowWidth = renderViewWindowSize.x - 10;
+                float innerWindowHeight = 35.0f;
+                ImGui::SetNextWindowPos(ImVec2(startX + 7, 72)); // Adjust position as needed
+                ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
 
 		// Transformation mode enum and current mode variable
 		enum TransformMode { TRANSLATE, ROTATE, SCALE, UNIVERSAL };
