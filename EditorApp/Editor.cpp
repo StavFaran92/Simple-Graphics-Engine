@@ -251,9 +251,7 @@ static void displayComponent(const std::string& componentName, std::function<voi
 		}
 
                 ImGui::Indent(5); // Indent by 10 pixels
-                BEGIN_IMGUI_TABLE(componentName.c_str());
                 func(component);
-                END_IMGUI_TABLE();
                 ImGui::Unindent(5); // Remove the indent
 
 		ImVec2 endPosCursor = ImGui::GetCursorPos(); // Capture the cursor position before adding the separator
@@ -386,6 +384,8 @@ static void displayTransformation(Transformation& transform, bool& isChanged)
 	auto& localTransform = transform.getLocalTransformation();
 	ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localTransform), matrixTranslation, matrixRotation, matrixScale);
 
+        BEGIN_IMGUI_TABLE("Transform");
+
         addTableRow("Position", [&](std::string id) {
                 if (ImGui::DragFloat3(id.c_str(), matrixTranslation, .1f)) {
                         transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
@@ -406,6 +406,8 @@ static void displayTransformation(Transformation& transform, bool& isChanged)
                         isChanged = true;
                 }
         });
+
+        END_IMGUI_TABLE();
 
 }
 
@@ -1947,6 +1949,8 @@ void RenderInspectorWindow(float width, float height)
 		});
 
                displayComponent<PhysicsComponent>("Physics", [](PhysicsComponent& rBody) {
+                       BEGIN_IMGUI_TABLE("Physics");
+
                        addTableRow("Type", [&](std::string id) {
                                ImGui::Combo(id.c_str(), (int*)&rBody.type, rigidyBodyTypesStrList, IM_ARRAYSIZE(rigidyBodyTypesStrList));
                        });
@@ -1996,6 +2000,7 @@ void RenderInspectorWindow(float width, float height)
 
                        if (type == ColliderType::NONE)
                        {
+                               END_IMGUI_TABLE();
                                return;
                        }
 
@@ -2025,9 +2030,9 @@ void RenderInspectorWindow(float width, float height)
                                break;
                        case ColliderType::MESH:
                                if (auto* mesh = dynamic_cast<CollisionMesh*>(rBody.collider.get())) {
-                                       addTableRow("Convex", [&](std::string id) {
-                                               ImGui::Checkbox(id.c_str(), &mesh->isConvex);
-                                       });
+                               addTableRow("Convex", [&](std::string id) {
+                                       ImGui::Checkbox(id.c_str(), &mesh->isConvex);
+                               });
                                }
                                break;
                        case ColliderType::CAPSULE:
@@ -2036,6 +2041,8 @@ void RenderInspectorWindow(float width, float height)
                                });
                                break;
                        }
+
+                       END_IMGUI_TABLE();
                });
 
 		//displayComponent<CollisionBoxComponent>("Collision Box", [](CollisionBoxComponent& collisionBox) {
@@ -2053,13 +2060,17 @@ void RenderInspectorWindow(float width, float height)
 		//	});
 
                displayComponent<PlayerController>("Player Controller", [](PlayerController& controller) {
+                       BEGIN_IMGUI_TABLE("Player Controller");
                        addTableRow("", [&](std::string id) {
                                ImGui::TextDisabled("Controller has no editable parameters.");
                        });
+                       END_IMGUI_TABLE();
                });
 
-		displayComponent<MeshComponent>("Mesh", [](MeshComponent& meshComponent) {
-			if (meshComponent.mesh.isEmpty()) return;
+               displayComponent<MeshComponent>("Mesh", [](MeshComponent& meshComponent) {
+                        if (meshComponent.mesh.isEmpty()) return;
+
+                        BEGIN_IMGUI_TABLE("Mesh");
 
                         addTableRow("Vertices count:", [&](std::string id) {
                                 rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()).c_str());
@@ -2098,12 +2109,14 @@ void RenderInspectorWindow(float width, float height)
 			//ImGui::SameLine();
 
 			// Text display field
-			//ImGui::Text(Engine::get()->getSubSystem<Assets>()->getAlias(meshComponent.mesh.getUID()).c_str());
+                        //ImGui::Text(Engine::get()->getSubSystem<Assets>()->getAlias(meshComponent.mesh.getUID()).c_str());
 
-			
-			});
+                        END_IMGUI_TABLE();
+               });
 
                displayComponent<CameraComponent>("Camera", [](CameraComponent& cameraComponent) {
+                       BEGIN_IMGUI_TABLE("Camera");
+
                        static const char* projectionMode[] = { "Perspective", "Orthographic" };
                        static int currentProjection = 0; // Index of the selected item
                        currentProjection = cameraComponent.type;
@@ -2141,9 +2154,12 @@ void RenderInspectorWindow(float width, float height)
                        addTableRow("z far", [&](std::string id) {
                                ImGui::DragFloat(id.c_str(), &cameraComponent.zfar);
                        });
+
+                       END_IMGUI_TABLE();
                });
 
                displayComponent<NativeScriptComponent>("Script", [](NativeScriptComponent& nsc) {
+                       BEGIN_IMGUI_TABLE("Script");
                        addTableRow("Script", [&](std::string id) {
                                if (ImGui::Button("Select Script"))
                                {
@@ -2163,6 +2179,8 @@ void RenderInspectorWindow(float width, float height)
                        {
                                nsc.script = std::shared_ptr<ScriptableEntity>(NativeScriptsLoader::instance->getScript(selectedScript));
                        }
+
+                       END_IMGUI_TABLE();
                });
 
 		displayComponent<MaterialComponent>("Materials", [](MaterialComponent& materials) {
@@ -2193,15 +2211,18 @@ void RenderInspectorWindow(float width, float height)
 			});
 
                displayComponent<DirectionalLight>("Directional Light", [](DirectionalLight& dLight) {
+                       BEGIN_IMGUI_TABLE("Directional Light");
                        auto& color = dLight.getColor();
                        addTableRow("Color", [&](std::string id) {
                                if (ImGui::ColorEdit3(id.c_str(), glm::value_ptr(color))) {
                                        dLight.SetColor(color);
                                }
                        });
+                       END_IMGUI_TABLE();
                });
 
                displayComponent<PointLight>("Point Light", [](PointLight& pLight) {
+                       BEGIN_IMGUI_TABLE("Point Light");
                        auto& color = pLight.getColor();
                        addTableRow("Color", [&](std::string id) {
                                if (ImGui::ColorEdit3(id.c_str(), glm::value_ptr(color))) {
@@ -2220,6 +2241,7 @@ void RenderInspectorWindow(float width, float height)
                                ImGui::DragFloat(id.c_str(), &attenuation.quadratic, 0.01f);
                        });
                        pLight.SetAttenuation(attenuation);
+                       END_IMGUI_TABLE();
                });
 
 		displayComponent<InstanceBatch>("Instance Batch", [](InstanceBatch& instanceBatch) {
@@ -2247,6 +2269,7 @@ void RenderInspectorWindow(float width, float height)
 			});
 
                displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
+                       BEGIN_IMGUI_TABLE("Skybox");
                        addTableRow("Texture", [&](std::string id) {
                                addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](std::string uuid) {
                                        skybox.setSkybox(Resource<Texture>(uuid));
@@ -2259,9 +2282,11 @@ void RenderInspectorWindow(float width, float height)
                                        skybox.build();
                                }
                        });
+                       END_IMGUI_TABLE();
                });
 
                displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
+                       BEGIN_IMGUI_TABLE("Image");
                        addTableRow("Texture", [&](std::string id) {
                                addTextureEditWidget(image.image, { 50, 50 }, [&](std::string uuid) {
                                        image.image = Resource<Texture>(uuid);
@@ -2279,6 +2304,7 @@ void RenderInspectorWindow(float width, float height)
                        addTableRow("sizeY", [&](std::string id) {
                                ImGui::DragFloat(id.c_str(), &image.size.y);
                        });
+                       END_IMGUI_TABLE();
                });
 
 		displayComponent<Animator>("Animator", [](Animator& animator) {
