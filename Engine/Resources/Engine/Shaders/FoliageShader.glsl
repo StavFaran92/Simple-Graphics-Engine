@@ -23,6 +23,7 @@ layout(std430, binding = 0) buffer PatchInstanceData {
 uniform sampler2D windNoise;
 uniform mat4 scale;
 uniform float time;
+uniform mat4 rotation;
 
 out vec3 Normal;
 out vec3 fragPos;
@@ -48,6 +49,7 @@ void main()
     mat4 localModel = mat4(1.0);
     localModel[3] = vPos;
     localModel *= scale;
+    localModel *= rotation;
     Normal = norm;
     fragPos = vec3(vPos);
     gl_Position = projection * view * localModel * vec4(aPos, 1.0); 

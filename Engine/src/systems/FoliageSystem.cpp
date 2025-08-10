@@ -175,6 +175,11 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);
 	foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 
+	float phi = -atan2f(m_camFront.z, m_camFront.x);
+	glm::quat q(glm::vec3(0.f, phi + Constants::PI / 2, 0.f));
+	glm::mat4 rotationMatrix = glm::mat4_cast(q);
+	foliageShader->setUniformValue("rotation", rotationMatrix);
+
 	auto scale = glm::scale(glm::mat4(1.0), glm::vec3(1.f));
 	foliageShader->setUniformValue("scale", scale);
 	
