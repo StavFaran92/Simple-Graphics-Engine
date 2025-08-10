@@ -106,6 +106,47 @@ void Scene::setPrimaryCamera(Entity e)
 //	m_activeCamera = camera;
 //}
 
+void Scene::onWindowResize(int width, int height)
+{
+        float aspect = static_cast<float>(width) / static_cast<float>(height);
+
+        auto camView = m_registry->get().view<CameraComponent>();
+        for (auto [entity, cam] : camView.each())
+        {
+                cam.aspect = aspect;
+        }
+
+        if (m_primaryCamera.valid() && m_primaryCamera.HasComponent<CameraComponent>())
+        {
+                auto& cam = m_primaryCamera.getComponent<CameraComponent>();
+                m_defaultPerspectiveProjection = glm::perspective(cam.fovy, aspect, cam.znear, cam.zfar);
+        }
+        else
+        {
+                m_defaultPerspectiveProjection = glm::perspective(45.0f, aspect, 0.1f, 1000.0f);
+        }
+
+        m_renderTargetTexture = Texture::createEmptyTexture(width, height);
+        m_renderTargetRBO = std::make_shared<RenderBufferObject>(width, height);
+
+        m_renderTargetFBO->bind();
+        m_renderTargetFBO->attachTexture(m_renderTargetTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
+        unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };
+        glDrawBuffers(1, attachments);
+        m_renderTargetFBO->attachRenderBuffer(m_renderTargetRBO->GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
+        m_renderTargetFBO->unbind();
+
+        m_deferredRenderer = std::make_shared<DeferredRenderer>(m_renderTargetFBO, this);
+        m_deferredRenderer->init();
+        m_forwardRenderer = std::make_shared<Renderer>(m_renderTargetFBO, this);
+        m_forwardRenderer->init();
+
+        if (m_postProcessProjector)
+        {
+                m_postProcessProjector->init(width, height);
+        }
+}
+
 void Scene::init(Context* context)
 {
 	m_context = context;

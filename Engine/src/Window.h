@@ -17,14 +17,15 @@ public:
 	int init();
 
 	inline int getWidth() { return m_width; }
-	inline int getHeight() { return m_height; }
+        inline int getHeight() { return m_height; }
 
-	void close();
+        void close();
 
-	void SwapBuffer();
-	void update();
-	void lockMouse() { m_isMouseLocked = true; }
-	void unlockMouse() { m_isMouseLocked = false; }
+        void SwapBuffer();
+        void update();
+        void resize(int width, int height);
+        void lockMouse() { m_isMouseLocked = true; }
+        void unlockMouse() { m_isMouseLocked = false; }
 
 	SDL_Window* GetWindow() { return m_mainWindow; }
 	SDL_GLContext GetContext() { return m_glContext; }

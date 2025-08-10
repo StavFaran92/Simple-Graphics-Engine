@@ -32,7 +32,7 @@ int Window::init()
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 
-	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN);
+        SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
 	m_width = SCREEN_WIDTH;
 	m_height = SCREEN_HEIGHT;
@@ -116,9 +116,18 @@ inline void Window::SwapBuffer()
 }
 
 void Window::update()
-{ 
-	if (m_isMouseLocked)
-		SDL_WarpMouseInWindow(m_mainWindow, m_halfWidth, m_halfHeight); 
+{
+        if (m_isMouseLocked)
+                SDL_WarpMouseInWindow(m_mainWindow, m_halfWidth, m_halfHeight);
+}
+
+void Window::resize(int width, int height)
+{
+        m_width = width;
+        m_height = height;
+        m_halfWidth = m_width / 2.f;
+        m_halfHeight = m_height / 2.f;
+        glViewport(0, 0, width, height);
 }
 
 void* Window::GetNativeWindow()
