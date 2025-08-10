@@ -104,12 +104,14 @@ public:
 
 	glm::mat4 getProjection() const;
 
-	Entity getActiveCamera() const;
-	void setPrimaryCamera(Entity e);
+        Entity getActiveCamera() const;
+        void setPrimaryCamera(Entity e);
 
-	void startSimulation();
-	void stopSimulation();
-	bool isSimulationActive() const;
+        void onWindowResize(int width, int height);
+
+        void startSimulation();
+        void stopSimulation();
+        bool isSimulationActive() const;
 
 	Entity getEntityByName(const std::string& name) const;
 

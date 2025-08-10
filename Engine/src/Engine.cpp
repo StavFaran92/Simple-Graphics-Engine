@@ -470,6 +470,19 @@ void Engine::handleEvents(SDL_Event& e, bool& quit)
             quit = true;
         }
 
+        if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED)
+        {
+            m_window->resize(e.window.data1, e.window.data2);
+            if (m_context)
+            {
+                auto activeScene = m_context->getActiveScene();
+                if (activeScene)
+                {
+                    activeScene->onWindowResize(e.window.data1, e.window.data2);
+                }
+            }
+        }
+
 
         m_eventSystem->dispatch(e);
     }
