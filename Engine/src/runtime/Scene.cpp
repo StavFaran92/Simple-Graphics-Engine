@@ -38,6 +38,7 @@
 #include "utils/EquirectangularToCubemapConverter.h"
 #include "systems/CommonTextures.h"
 #include "render/RenderCommand.h"
+#include "glm/ext.hpp"
 #include "render/IBL.h"
 #include "core/Registry.h"
 #include "physics/Physics.h"
@@ -803,10 +804,37 @@ void Scene::removeEntity(const Entity& e)
 
 glm::mat4 Scene::getGameCameraView() const
 {
-	auto& primaryCamera = getGameCamera().getComponent<CameraComponent>();
-	auto& primaryCameraTransform = getGameCamera().getComponent<Transformation>();
+        auto& primaryCamera = getGameCamera().getComponent<CameraComponent>();
+        auto& primaryCameraTransform = getGameCamera().getComponent<Transformation>();
 
-	return glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
+        return glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
+}
+
+void Scene::onWindowResize(int w, int h)
+{
+        for (auto& [name, view] : m_renderViews)
+        {
+                view->resize(w, h);
+        }
+        if (m_highlightRenderView)
+        {
+                m_highlightRenderView->resize(w, h);
+        }
+
+        m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)w / h, 0.1f, 1000.0f);
+        m_defaultUIProjection = glm::ortho(0.0f, (float)w, (float)h, 0.0f, -1.0f, 1.0f);
+
+        auto& reg = m_registry->getRegistry();
+        auto view = reg.view<CameraComponent>();
+        for (auto entity : view)
+        {
+                view.get<CameraComponent>(entity).aspect = (float)w / h;
+        }
+
+        if (m_postProcessProjector)
+        {
+                m_postProcessProjector->init(w, h);
+        }
 }
 
 

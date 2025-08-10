@@ -522,6 +522,16 @@ void Engine::handleEvents(bool& quit)
 
         m_imguiHandler->proccessEvents(e);
 
+        if (e.type == SDL_WINDOWEVENT &&
+            (e.window.event == SDL_WINDOWEVENT_RESIZED || e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED))
+        {
+            m_window->resize(e.window.data1, e.window.data2);
+            if (m_context && m_context->getActiveScene())
+            {
+                m_context->getActiveScene()->onWindowResize(e.window.data1, e.window.data2);
+            }
+        }
+
         //User requests quit
         if (e.type == SDL_QUIT)
         {

@@ -118,12 +118,14 @@ public:
 	unsigned int getRenderViewTextureID(const std::string& name) const;
 
 	unsigned int getGameRenderViewTextureID() const;
-	unsigned int getGameRenderViewFrameBufferID() const;
+        unsigned int getGameRenderViewFrameBufferID() const;
 
-	Entity getGameCamera() const;
-	void setGameCamera(Entity e);
+        Entity getGameCamera() const;
+        void setGameCamera(Entity e);
 
-	glm::mat4 getGameCameraView() const;
+        glm::mat4 getGameCameraView() const;
+
+        void onWindowResize(int w, int h);
 
 private:
 	// -------------------- Methods -------------------- //
