@@ -685,7 +685,10 @@ void displayentityName(const Entity& e)
 {
 	auto& obj = e.getComponent<ObjectComponent>();
 
-	ImGui::Selectable(obj.name.c_str(), (selectedEntity == e));
+        // Prevent popups from closing when selecting an entity.
+        // This allows selection dialogs (e.g., choosing terrain for foliage)
+        // to remain open until the user confirms or cancels.
+        ImGui::Selectable(obj.name.c_str(), (selectedEntity == e), ImGuiSelectableFlags_DontClosePopups);
 
 	if (ImGui::IsItemClicked())
 	{
