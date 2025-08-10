@@ -2492,7 +2492,7 @@ void RenderInspectorWindow(float width, float height)
 			ImGui::DragFloat("Height", &foliage.height, 0.01f, 1.0f);
 			ImGui::DragInt("Patch Width", &foliage.patchWidth);
 			ImGui::DragInt("Patch Height", &foliage.patchHeight);
-			ImGui::DragInt("Pixel Per Patch", &foliage.pixelPerPatch);
+			//ImGui::DragInt("Pixel Per Patch", &foliage.pixelPerPatch);
 
 			if (ImGui::Button("Select Terrain"))
 			{
@@ -2913,19 +2913,19 @@ class GUI_Helper : public GuiMenu {
 						// Path to the Python script
 						std::string pythonScriptPath = "../../scripts/build_shipping.py";
 
-                                                // Determine asset, output, and solution paths
-                                                std::string assetsFolder = Engine::get()->getInitParams().projectDir;
-                                                std::string outputFolder = std::string(SGE_SOLUTION_DIR) + "/../Release";
-                                                std::string solutionDir = std::string(SGE_SOLUTION_DIR);
+                        // Determine asset, output, and solution paths
+                        std::string assetsFolder = Engine::get()->getInitParams().projectDir;
+                        std::string outputFolder = std::string(SGE_SOLUTION_DIR) + "/../Release";
+                        std::string solutionDir = std::string(SGE_SOLUTION_DIR);
 
-                                                // Command to execute the Python script with project, output, and solution paths
-                                                std::string command = "python \"" + pythonScriptPath + "\" \"" + assetsFolder + "\" \"" + outputFolder + "\" \"" + solutionDir + "\"";
+                        // Command to execute the Python script with project, output, and solution paths
+                        std::string command = "python \"" + pythonScriptPath + "\" \"" + assetsFolder + "\" \"" + outputFolder + "\" \"" + solutionDir + "\"";
 
-                                                // Run the command
-                                                std::system(command.c_str());
+                        // Run the command
+                        std::system(command.c_str());
 
-                                                //std::filesystem::create_directories("../Game/data");
-                                        }
+                        //std::filesystem::create_directories("../Game/data");
+					}
 					if (ImGui::MenuItem("Reload config", "")) {
 						Engine::get()->reloadEngineConfig();
 					}

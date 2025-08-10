@@ -41,10 +41,12 @@ uniform float time;
 
 out vec3 Normal;
 out vec3 fragPos;
+out vec3 fragPosObjSpace;
                                                                                     
 void main()                                                                         
 { 
     vec4 vPos = instanceData[gl_InstanceID];
+    fragPosObjSpace = aPos;
 
     float posX = vPos.x;
     float posZ = vPos.z;
@@ -86,6 +88,7 @@ uniform sampler2D noiseTexture;
 
 in vec3 Normal;
 in vec3 fragPos;
+in vec3 fragPosObjSpace;
 
 // uniform vec3 color;
 
@@ -131,7 +134,7 @@ void main()
     float maxY = 1.5; // adjust to match your scene/object scale
 
     // Interpolation factor
-    float t = clamp((fragPos.y - minY) / (maxY - minY), 0.0, 1.0);
+    float t = clamp((fragPosObjSpace.y - minY) / (maxY - minY), 0.0, 1.0);
 
     // Final graded color
     vec3 baseColor = mix(bottomColor, topColor, t);

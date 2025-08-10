@@ -60,12 +60,24 @@ bool FoliageSystem::init()
 	Texture::TextureImportSettings tSettings;
 	tSettings.flip = true;
 	grassTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
-	windNoise = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png");
 
-	Texture::TextureImportSettings noiseSettings;
-	//noiseSettings.params[GL_TEXTURE_WRAP_S] = GL_MIRRORED_REPEAT;
-	//noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
-	noiseTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
+	{
+		Texture::TextureImportSettings noiseSettings;
+		noiseSettings.params[GL_TEXTURE_WRAP_S] = GL_MIRRORED_REPEAT;
+		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
+		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
+		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
+		windNoise = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings);
+	}
+
+	{
+		Texture::TextureImportSettings noiseSettings;
+		noiseSettings.params[GL_TEXTURE_WRAP_S] = GL_MIRRORED_REPEAT;
+		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
+		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
+		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
+		noiseTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
+	}
 
 	return true;
 }
