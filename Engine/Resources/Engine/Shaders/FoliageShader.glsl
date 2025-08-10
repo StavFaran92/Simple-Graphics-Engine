@@ -11,7 +11,6 @@
                                                                                     
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 norm;
-// layout (location = 4) in vec3 instancePos; 
 
 struct PatchInstance {
     vec4 offsetInPatch;
@@ -21,22 +20,8 @@ layout(std430, binding = 0) buffer PatchInstanceData {
     vec4 instanceData[];
 };
 
-// layout(std140, binding = 4) uniform RandomPatchSample { // todo give better name
-//     vec4 randomPatchSample[255]; 
-// };
-
-// layout(std140, binding = 1) uniform PatchOffset { // todo give better name
-//     vec4 patchOffset[10*10]; 
-// };
-
-uniform vec3 patchPosition;
-uniform vec2 patchSize;
-uniform vec2 patchCount;
-uniform vec2 patchID;
 uniform sampler2D windNoise;
-
 uniform mat4 scale;
-
 uniform float time;
 
 out vec3 Normal;
@@ -147,6 +132,8 @@ void main()
     vec3 dryColor = mix(dryColorA, dryColorB, t);
 
     vec3 color = mix(baseColor, dryColor, dryFactor);
+
+    color = color * (1.0 - abs(0.5 - fragPosObjSpace.x)) * 2.0;
 
     // vec3 L = normalize(-sunLightDir);
     // float diff = max(dot(normalize(Normal), L), 0.0);
