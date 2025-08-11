@@ -69,7 +69,7 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const ModelImportSettings& settings)
+ModelImporter::ModelInfo ModelImporter::import(const std::string& path, ModelImportSettings settings)
 {
 	if (!std::filesystem::exists(path))
 	{
@@ -78,6 +78,12 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 	}
 
 	auto fileDir = std::filesystem::path(path).parent_path().string();
+	std::string fileName;
+
+	if (settings.name.empty())
+	{
+		settings.name = std::filesystem::path(path).filename().stem().string();
+	}
 
 	// read scene from file
 	 const aiScene* scene = m_importer->ReadFile(path,
@@ -206,6 +212,8 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 	}
 	else
 	{
+		assert(!settings.name.empty());
+
 		mInfo.mesh = Factory<MeshCollection>::createUsingCustomUUID(settings.name);
 
 		// Formats such as obj and GLTF cause issues with the engine meshes,
@@ -224,10 +232,6 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, const Mo
 	aInfo.uuid = mInfo.mesh.getUID();
 	aInfo.aType = AssetType::MESH;
 	aInfo.name = settings.name;
-	if (aInfo.name.empty())
-	{
-		aInfo.name = std::filesystem::path(path).filename().string();
-	}
 
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 

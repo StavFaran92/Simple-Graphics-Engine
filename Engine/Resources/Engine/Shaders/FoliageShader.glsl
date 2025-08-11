@@ -11,6 +11,7 @@
                                                                                     
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 norm;
+layout (location = 2) in vec2 tex;
 
 struct PatchInstance {
     vec4 offsetInPatch;
@@ -28,6 +29,7 @@ uniform mat4 rotation;
 out vec3 Normal;
 out vec3 fragPos;
 out vec3 fragPosObjSpace;
+out vec2 uv;
                                                                                     
 void main()                                                                         
 { 
@@ -51,6 +53,7 @@ void main()
     localModel *= scale;
     localModel *= rotation;
     Normal = norm;
+    uv = tex;
     fragPos = vec3(vPos);
     gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
                                   
@@ -76,8 +79,14 @@ uniform sampler2D noiseTexture;
 in vec3 Normal;
 in vec3 fragPos;
 in vec3 fragPosObjSpace;
+in vec2 uv;
 
 // uniform vec3 color;
+
+float edgeFalloff(float x)
+{
+    return clamp(x + .5, 0.0, 1.0) ;
+}
 
 void main() 
 {
@@ -126,16 +135,16 @@ void main()
     // Final graded color
     vec3 baseColor = mix(bottomColor, topColor, t);
 
-    vec2 uv = vec2(fragPos.x, fragPos.z) * .01;
+    vec2 XZ = vec2(fragPos.x, fragPos.z) * .01;
     vec3 dryColorA = vec3(0.6, 0.5, 0.1);
     vec3 dryColorB = vec3(0.9f, 0.8f, 0.3f);
 
-    float dryFactor = texture(noiseTexture, uv).r;
+    float dryFactor = texture(noiseTexture, XZ).r;
     vec3 dryColor = mix(dryColorA, dryColorB, t);
 
     vec3 color = mix(baseColor, dryColor, dryFactor);
 
-    color = color * (1.0 - abs(0.5 - fragPosObjSpace.x)) * 2.0;
+    color = .9 * color + .1 * edgeFalloff(clamp(uv.x, 0.0, 1.0));
 
     // vec3 L = normalize(-sunLightDir);
     // float diff = max(dot(normalize(Normal), L), 0.0);
