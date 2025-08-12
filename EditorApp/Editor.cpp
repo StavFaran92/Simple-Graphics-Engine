@@ -2869,10 +2869,8 @@ class GUI_Helper : public GuiMenu {
 		// Render menu bar
 		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::BeginMainMenuBar())
-			{
-				if (ImGui::BeginMenu("File")) 
-				{ // Start of File dropdown
+			if (ImGui::BeginMenu("File"))
+			{ // Start of File dropdown
 					if (ImGui::MenuItem("Open Project", "Ctrl+O")) {
 
 
@@ -2948,9 +2946,6 @@ class GUI_Helper : public GuiMenu {
 					// Help menu items
 					ImGui::EndMenu();
 				}
-				ImGui::EndMainMenuBar();
-			}
-			
 			ImGui::EndMainMenuBar();
 		}
 
@@ -2961,17 +2956,18 @@ class GUI_Helper : public GuiMenu {
 			dockspace_initialized = true;
 			ImGui::DockBuilderRemoveNode(dockspace_id);
 			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
-			ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
+			ImGui::DockBuilderSetNodePos(dockspace_id, ImGui::GetMainViewport()->WorkPos);
+			ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->WorkSize);
 
-		ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
-		ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
-		ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
-		float topHeight = ImGui::GetFrameHeightWithSpacing() + ImGui::GetStyle().WindowPadding.y * 2.0f;
-		ImVec2 viewportSize = ImGui::GetMainViewport()->Size;
-		ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, topHeight / viewportSize.y, nullptr, &dockspace_id);
+			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
+			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+			ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
+			float topHeight = ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2.0f;
+			ImVec2 viewportSize = ImGui::GetMainViewport()->WorkSize;
+			ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, topHeight / viewportSize.y, nullptr, &dockspace_id);
 
 			if (ImGuiDockNode* topNode = ImGui::DockBuilderGetNode(dock_id_top))
-{
+{ 
 				topNode->LocalFlags |= ImGuiDockNodeFlags_NoTabBar | ImGuiDockNodeFlags_NoResize | ImGuiDockNodeFlags_NoDockingOverMe;
 }
 
