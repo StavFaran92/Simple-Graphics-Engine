@@ -304,34 +304,33 @@ while (!targetAABB.isOnFrustum(fakeFrustum))
 
 void RenderSimulationControlView(float width, float height)
 {
-	float windowWidth = width * 0.7f - 10;
-	float windowHeight = 35;
-	float startX = width * 0.15f + 10; // Add a gap of 10 pixels
-	ImGui::SetNextWindowPos(ImVec2(startX, 25)); // Adjust vertical position to make space for the menu bar
-	ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight));
+        (void)width;
+        (void)height;
 
-	ImGui::Begin("Centered Buttons", nullptr, ImGuiWindowFlags_NoDecoration);
+        ImGui::Begin("Simulation Controls", nullptr, style);
 
-	// Center align the buttons
-	ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
+        float windowWidth = ImGui::GetContentRegionAvail().x;
+        ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
 
+        // Draw the button based on the current state
+        if (startButtonPressed)
+        {
+                if (ImGui::Button("STOP", ImVec2(70, 0)))
+                {
+                        // Handle stop button click
+                        stopSimulation();
+                }
+        }
+        else
+        {
+                if (ImGui::Button("START", ImVec2(70, 0)))
+                {
+                        // Handle start button click
+                        startsimulation();
+                }
+        }
 
-
-	// Draw the button based on the current state
-	if (startButtonPressed) {
-		if (ImGui::Button("STOP", ImVec2(70, 0))) {
-			// Handle stop button click
-			stopSimulation();
-		}
-	}
-	else {
-		if (ImGui::Button("START", ImVec2(70, 0))) {
-			// Handle start button click
-			startsimulation();
-		}
-	}
-
-	ImGui::End(); // End the window
+        ImGui::End(); // End the window
 }
 
 static void addTableRow(const std::string& rowName, std::function<void(std::string id)> func)
@@ -1462,17 +1461,15 @@ void RenderSceneHierarchyWindow(float width, float height)
 		ImGui::EndPopup();
 	}
 
-       // Calculate the size of the list box accounting for padding
-       ImVec2 windowSize = ImGui::GetContentRegionAvail();
-       ImVec2 listBoxSize(windowSize.x - 20, windowSize.y - 70);
+        ImVec2 listBoxSize = ImGui::GetContentRegionAvail();
 
         // Render list view
         if (ImGui::BeginListBox("##Objects", listBoxSize))
-	{
-		// Iterate through each scene object and render it as a selectable item in the list
-		displaySceneObjects();
-		ImGui::EndListBox();
-	}
+        {
+                // Iterate through each scene object and render it as a selectable item in the list
+                displaySceneObjects();
+                ImGui::EndListBox();
+        }
 
 	ImGui::End();
 }
@@ -2962,10 +2959,12 @@ class GUI_Helper : public GuiMenu {
                         ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
                         ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
                         ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
+                        ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.1f, nullptr, &dockspace_id);
 
                         ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
                         ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
                         ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
+                        ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
                         ImGui::DockBuilderDockWindow("View", dockspace_id);
                         ImGui::DockBuilderFinish(dockspace_id);
                 }
