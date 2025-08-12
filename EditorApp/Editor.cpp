@@ -312,13 +312,15 @@ void RenderSimulationControlView(float width, float height)
 
 	ImGui::Begin("Simulation Controls", nullptr, simWindowFlags);
 
-	float windowWidth = ImGui::GetContentRegionAvail().x;
-	ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
+	ImVec2 avail = ImGui::GetContentRegionAvail();
+	float buttonWidth = 70.0f;
+	float buttonHeight = ImGui::GetFrameHeight();
+	ImGui::SetCursorPos(ImVec2((avail.x - buttonWidth) * 0.5f, (avail.y - buttonHeight) * 0.5f));
 
 	// Draw the button based on the current state
 	if (startButtonPressed)
 	{
-		if (ImGui::Button("STOP", ImVec2(70, 0)))
+	if (ImGui::Button("STOP", ImVec2(buttonWidth, 0)))
 		{
 			// Handle stop button click
 			stopSimulation();
@@ -326,7 +328,7 @@ void RenderSimulationControlView(float width, float height)
 	}
 	else
 	{
-		if (ImGui::Button("START", ImVec2(70, 0)))
+	if (ImGui::Button("START", ImVec2(buttonWidth, 0)))
 		{
 			// Handle start button click
 			startsimulation();
