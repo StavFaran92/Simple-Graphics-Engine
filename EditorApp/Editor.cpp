@@ -59,8 +59,13 @@ static bool startButtonPressed = false;
 static std::string selectedTextureName;
 static bool showTextureDisplayWindow = false;
 
-static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
-static const ImGuiWindowFlags simWindowFlags = windowFlags | ImGuiWindowFlags_NoResize;
+static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | 
+											ImGuiWindowFlags_NoCollapse | 
+											ImGuiWindowFlags_NoFocusOnAppearing | 
+											ImGuiWindowFlags_NoTitleBar | 
+											ImGuiWindowFlags_NoScrollbar | 
+											ImGuiWindowFlags_NoScrollWithMouse |
+											ImGuiWindowFlags_NoMove;
 
 Entity g_primaryCamera;
 Entity g_editorCamera;
@@ -202,29 +207,29 @@ static void startsimulation()
 
 }
 
-static void displayWindowHeader(const std::string& name)
-{
-	ImVec2 region = ImGui::GetContentRegionAvail();
-	float headerHeight = 24.0f;
-
-	// Header style
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(50, 50, 50, 255));
-	ImGui::BeginChild(name.c_str(), ImVec2(region.x, headerHeight), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-
-	// Vertical center calculation
-	float textHeight = ImGui::GetFontSize();
-	float textY = (headerHeight - textHeight) * 0.5f;
-
-	// Horizontal padding
-	float paddingLeft = 8.0f;
-
-	// Set cursor position inside child window
-	ImGui::SetCursorPos(ImVec2(paddingLeft, textY));
-	ImGui::TextUnformatted(name.c_str());
-
-	ImGui::EndChild();
-	ImGui::PopStyleColor();
-}
+//static void displayWindowHeader(const std::string& name)
+//{
+//	ImVec2 region = ImGui::GetContentRegionAvail();
+//	float headerHeight = 24.0f;
+//
+//	// Header style
+//	ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(50, 50, 50, 255));
+//	ImGui::BeginChild(name.c_str(), ImVec2(region.x, headerHeight), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+//
+//	// Vertical center calculation
+//	float textHeight = ImGui::GetFontSize();
+//	float textY = (headerHeight - textHeight) * 0.5f;
+//
+//	// Horizontal padding
+//	float paddingLeft = 8.0f;
+//
+//	// Set cursor position inside child window
+//	ImGui::SetCursorPos(ImVec2(paddingLeft, textY));
+//	ImGui::TextUnformatted(name.c_str());
+//
+//	ImGui::EndChild();
+//	ImGui::PopStyleColor();
+//}
 
 template<typename T> 
 static void displayComponent(const std::string& componentName, std::function<void(T&)> func)
@@ -305,12 +310,9 @@ while (!targetAABB.isOnFrustum(fakeFrustum))
 	transform.setLocalPosition(targetLocation);
 }
 
-void RenderSimulationControlView(float width, float height)
+void RenderSimulationControlView()
 {
-	(void)width;
-	(void)height;
-
-	ImGui::Begin("Simulation Controls", nullptr, simWindowFlags);
+	ImGui::Begin("Simulation Controls", nullptr, windowFlags | ImGuiWindowFlags_NoResize);
 
 	float windowWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
@@ -1366,13 +1368,11 @@ void displaySceneObjects()
 	ImGui::EndChild(); // End background drop zone
 }
 
-void RenderSceneHierarchyWindow(float width, float height)
+void RenderSceneHierarchyWindow()
 {
-	(void)width;
-	(void)height;
 	ImGui::Begin("Scene Hierarchy", nullptr, windowFlags);
 
-	displayWindowHeader("Scene Hierarchy");
+	//displayWindowHeader("Scene Hierarchy");
 
 	float windowWidth = ImGui::GetContentRegionAvail().x;
 	if (ImGui::Button("+", ImVec2(windowWidth, 0)))
@@ -1477,11 +1477,9 @@ void RenderSceneHierarchyWindow(float width, float height)
 	ImGui::End();
 }
 
-void RenderViewWindow(float width, float height)
+void RenderViewWindow()
 {
-	(void)width;
-	(void)height;
-	ImGui::Begin("View", nullptr, windowFlags | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::Begin("View", nullptr, windowFlags);
 
 	ImVec2 windowPos = ImGui::GetWindowPos();
 
@@ -1501,7 +1499,6 @@ void RenderViewWindow(float width, float height)
 		activeViewID = Engine::get()->getContext()->getActiveScene()->getRenderViewTextureID("Editor View");
 	}
 
-	//unsigned int activeViewID = Engine::get()->getContext()->getActiveScene()->getRenderViewTextureID("Editor View");
 	ImGui::Image(reinterpret_cast<ImTextureID>(activeViewID), imageSize, ImVec2(0, 1), ImVec2(1, 0));
 
 	ImVec2 mousePos = ImGui::GetMousePos();
@@ -1521,9 +1518,9 @@ void RenderViewWindow(float width, float height)
 	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
 	{
 		// Define the size and position of the inner window
-		float innerWindowWidth = renderViewWindowSize.x - 10;
+		float innerWindowWidth = renderViewWindowSize.x;
 		float innerWindowHeight = 35.0f;
-		ImVec2 toolbarPos(windowPos.x + 7, windowPos.y + 7);
+		ImVec2 toolbarPos(windowPos.x + 10, windowPos.y + 30);
 
 		bool isPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
 
@@ -1581,7 +1578,7 @@ void RenderViewWindow(float width, float height)
 
 		
 
-		if (ImGui::BeginChild("TransformWindow", ImVec2(innerWindowWidth, innerWindowHeight), true))
+		if (ImGui::BeginChild("TransformWindow", ImVec2(innerWindowWidth, innerWindowHeight), true, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
 		{
 			// Radio buttons for transformation mode
 			ImGui::RadioButton("Translate", (int*)&currentMode, TRANSLATE);
@@ -1930,15 +1927,13 @@ void rightAlignedText(const std::string& text) {
 
 static bool showWindow = true;
 
-void RenderInspectorWindow(float width, float height)
+void RenderInspectorWindow()
 {
 	auto assets = Engine::get()->getSubSystem<Assets>();
 
-	(void)width;
-	(void)height;
 	ImGui::Begin("Inspector", &showWindow, windowFlags);
 
-	displayWindowHeader("Inspector");
+	//displayWindowHeader("Inspector");
 
 	float windowWidth = ImGui::GetContentRegionAvail().x;
 
@@ -2635,14 +2630,10 @@ void RenderInspectorWindow(float width, float height)
 	ImGui::End();
 }
 
-void RenderAssetViewWindow(float width, float height) {
+void RenderAssetViewWindow() {
 	auto assets = Engine::get()->getSubSystem<Assets>();
-	(void)width;
-	(void)height;
+
 	ImGui::Begin("Asset View", nullptr, windowFlags);
-
-	displayWindowHeader("Assets");
-
 
 	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
 
@@ -2952,7 +2943,7 @@ class GUI_Helper : public GuiMenu {
 			ImGui::EndMainMenuBar();
 		}
 
-		ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+		ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoWindowMenuButton | ImGuiDockNodeFlags_NoCloseButton);
 		static bool dockspace_initialized = false;
 		if (!dockspace_initialized)
 		{
@@ -2964,7 +2955,7 @@ class GUI_Helper : public GuiMenu {
 			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
 			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
 			ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
-			ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.1f, nullptr, &dockspace_id);
+			ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.05f, nullptr, &dockspace_id);
 
 			if (ImGuiDockNode* topNode = ImGui::DockBuilderGetNode(dock_id_top))
 {
@@ -2980,11 +2971,11 @@ class GUI_Helper : public GuiMenu {
 		}
 
 		// Render UI
-		RenderSimulationControlView(screenWidth, screenHeight);
-		RenderViewWindow(screenWidth, screenHeight);
-		RenderSceneHierarchyWindow(screenWidth, screenHeight);
-		RenderInspectorWindow(screenWidth, screenHeight);
-		RenderAssetViewWindow(screenWidth, screenHeight); // Add the Asset View window
+		RenderSimulationControlView();
+		RenderViewWindow();
+		RenderSceneHierarchyWindow();
+		RenderInspectorWindow();
+		RenderAssetViewWindow();
 		ShowTextureCreatorWindow();
 		ShowShaderCreatorWindow();
 		ShowTextureDisplayWindow();
@@ -3024,7 +3015,7 @@ void setStyleAndColors()
 	colors[ImGuiCol_TabHovered] = ImVec4(0.27f, 0.53f, 0.90f, 1.00f);
 	colors[ImGuiCol_TabActive] = ImVec4(0.22f, 0.48f, 0.80f, 1.00f);
 	colors[ImGuiCol_TabUnfocused] = ImVec4(0.13f, 0.15f, 0.18f, 1.00f);
-	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.20f, 0.43f, 0.70f, 1.00f);
+	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.196f, 0.196f, 0.196f, 1.0f);
 
 	// Buttons (more vivid, professional tone)
 	colors[ImGuiCol_Button] = ImVec4(0.18f, 0.22f, 0.30f, 1.00f);
