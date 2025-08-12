@@ -59,7 +59,13 @@ static bool startButtonPressed = false;
 static std::string selectedTextureName;
 static bool showTextureDisplayWindow = false;
 
-static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus |
+	ImGuiWindowFlags_NoCollapse |
+	ImGuiWindowFlags_NoFocusOnAppearing |
+	ImGuiWindowFlags_NoTitleBar |
+	ImGuiWindowFlags_NoScrollbar |
+	ImGuiWindowFlags_NoMove |
+	ImGuiWindowFlags_NoDocking;
 static const ImGuiWindowFlags simWindowFlags = windowFlags | ImGuiWindowFlags_NoResize;
 
 Entity g_primaryCamera;
