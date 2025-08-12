@@ -57,7 +57,7 @@ void RenderCommand::setViewport(int x, int y, int w, int h)
 
 void RenderCommand::copyFrameBufferData(unsigned int src, unsigned int dst, int bufferBit)
 {
-        auto graphics = Engine::get()->getSubSystem<Graphics>();
+    auto graphics = Engine::get()->getSubSystem<Graphics>();
 
 	// Bind G-Buffer as src
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, src);
@@ -65,34 +65,34 @@ void RenderCommand::copyFrameBufferData(unsigned int src, unsigned int dst, int 
 	// Bind default buffer as dest
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst);
 
-        auto renderView = graphics->renderView;
+    auto renderView = graphics->renderView;
 
-        assert(renderView);
+    assert(renderView);
 
-        auto& viewport = renderView->getViewport();
+    auto& viewport = renderView->getViewport();
 
-        int destW = viewport.w;
-        int destH = viewport.h;
+    int destW = viewport.w;
+    int destH = viewport.h;
 
-        // If copying to the default framebuffer, use the window dimensions as
-        // the destination size to ensure the final image covers the window.
-        if (dst == 0)
+    // If copying to the default framebuffer, use the window dimensions as
+    // the destination size to ensure the final image covers the window.
+    if (dst == 0)
+    {
+        auto window = Engine::get()->getWindow();
+        if (window)
         {
-                auto window = Engine::get()->getWindow();
-                if (window)
-                {
-                        destW = window->getWidth();
-                        destH = window->getHeight();
-                }
+            destW = window->getWidth();
+            destH = window->getHeight();
         }
+    }
 
-        // Copy src to dest
-        glBlitFramebuffer(0, 0, viewport.w, viewport.h,
-                0, 0, destW, destH,
-                bufferBit, GL_NEAREST);
+    // Copy src to dest
+    glBlitFramebuffer(0, 0, viewport.w, viewport.h,
+            0, 0, destW, destH,
+            bufferBit, GL_NEAREST);
 
 
-        glBindFramebuffer(GL_FRAMEBUFFER, dst);
+    glBindFramebuffer(GL_FRAMEBUFFER, dst);
 }
 
 //void RenderCommand::drawIndexed(const VertexArrayObject* vao)

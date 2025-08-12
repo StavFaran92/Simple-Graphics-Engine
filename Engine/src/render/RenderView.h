@@ -39,14 +39,14 @@ public:
 	unsigned int getRenderTargetTextureID() const;
 	Resource<Texture> getRenderTargetTexture() const;
 
-        unsigned int getRenderTargetFrameBufferID() const;
+    unsigned int getRenderTargetFrameBufferID() const;
 
-        void setTexture(Resource<Texture> texture);
+    void setTexture(Resource<Texture> texture);
 
-        void resize(int w, int h);
+    void resize(int w, int h);
 
-        void bind();
-        void unbind();
+    void bind();
+    void unbind();
 
 	void swapToAdditionalTarget();
 	void swapBackToMainTarget();

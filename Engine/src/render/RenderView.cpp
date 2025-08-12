@@ -71,10 +71,10 @@ void RenderView::setTexture(Resource<Texture> texture)
 
 void RenderView::resize(int w, int h)
 {
-        m_viewport.w = w;
-        m_viewport.h = h;
-        renderTargets[0] = RenderTarget(m_viewport);
-        renderTargets[1] = RenderTarget(m_viewport);
+    m_viewport.w = w;
+    m_viewport.h = h;
+    renderTargets[0] = RenderTarget(m_viewport);
+    renderTargets[1] = RenderTarget(m_viewport);
 }
 
 void RenderView::bind()
