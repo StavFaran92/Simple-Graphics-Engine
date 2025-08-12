@@ -1462,8 +1462,9 @@ void RenderSceneHierarchyWindow(float width, float height)
 		ImGui::EndPopup();
 	}
 
-	// Calculate the size of the list box accounting for padding
-	ImVec2 listBoxSize(windowSize.x - 20, windowSize.y - 70);
+       // Calculate the size of the list box accounting for padding
+       ImVec2 windowSize = ImGui::GetContentRegionAvail();
+       ImVec2 listBoxSize(windowSize.x - 20, windowSize.y - 70);
 
         // Render list view
         if (ImGui::BeginListBox("##Objects", listBoxSize))
