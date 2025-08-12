@@ -60,6 +60,7 @@ static std::string selectedTextureName;
 static bool showTextureDisplayWindow = false;
 
 static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+static const ImGuiWindowFlags simWindowFlags = windowFlags | ImGuiWindowFlags_NoResize;
 
 Entity g_primaryCamera;
 Entity g_editorCamera;
@@ -309,7 +310,7 @@ void RenderSimulationControlView(float width, float height)
 	(void)width;
 	(void)height;
 
-	ImGui::Begin("Simulation Controls", nullptr, windowFlags);
+	ImGui::Begin("Simulation Controls", nullptr, simWindowFlags);
 
 	float windowWidth = ImGui::GetContentRegionAvail().x;
 	ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
@@ -1665,7 +1666,9 @@ void RenderViewWindow(float width, float height)
 			const float* projectionPtr = glm::value_ptr(projection);
 
 			ImGuizmo::SetDrawlist();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, renderViewWindowSize.x, renderViewWindowSize.y);
+			ImVec2 winPos = ImGui::GetWindowPos();
+			ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+			ImGuizmo::SetRect(winPos.x + contentMin.x, winPos.y + contentMin.y, renderViewWindowSize.x, renderViewWindowSize.y);
 
 			// Set the operation mode based on the selected radio button
 			ImGuizmo::OPERATION operationMode = ImGuizmo::TRANSLATE;
@@ -2962,6 +2965,11 @@ class GUI_Helper : public GuiMenu {
 			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
 			ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
 			ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.1f, nullptr, &dockspace_id);
+
+			if (ImGuiDockNode* topNode = ImGui::DockBuilderGetNode(dock_id_top))
+{
+				topNode->LocalFlags |= ImGuiDockNodeFlags_NoTabBar | ImGuiDockNodeFlags_NoResize | ImGuiDockNodeFlags_NoDockingOverMe;
+}
 
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
 			ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
