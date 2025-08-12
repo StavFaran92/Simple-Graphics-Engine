@@ -61,12 +61,20 @@ Resource<Texture> RenderView::getRenderTargetTexture() const
 
 unsigned int RenderView::getRenderTargetFrameBufferID() const
 {
-	return renderTargets[0].m_renderTargetFBO->getID();
+        return renderTargets[0].m_renderTargetFBO->getID();
 }
 
 void RenderView::setTexture(Resource<Texture> texture)
 {
-	renderTargets[0].m_renderTargetFBO->attachTexture(texture.get()->getID(), GL_COLOR_ATTACHMENT0);
+        renderTargets[0].m_renderTargetFBO->attachTexture(texture.get()->getID(), GL_COLOR_ATTACHMENT0);
+}
+
+void RenderView::resize(int w, int h)
+{
+    m_viewport.w = w;
+    m_viewport.h = h;
+    renderTargets[0] = RenderTarget(m_viewport);
+    renderTargets[1] = RenderTarget(m_viewport);
 }
 
 void RenderView::bind()

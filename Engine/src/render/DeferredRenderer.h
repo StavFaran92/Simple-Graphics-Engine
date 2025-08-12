@@ -23,6 +23,8 @@ public:
 	void renderSceneUsingCustomShader(Scene* scene);
 	void setUniforms(Shader* shader);
 
+	void resize(int w, int h);
+
 	const FrameBufferObject& getGBuffer() const;
 
 private:
