@@ -738,7 +738,7 @@ void updateScene()
 	}
 }
 
-auto style = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+auto style = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
 
 void AddColoredLabel(const char* label) 
 {
@@ -1367,10 +1367,10 @@ void displaySceneObjects()
 void RenderSceneHierarchyWindow(float width, float height)
 {
 	float windowWidth = width * 0.15f;
-	ImVec2 windowPos(5, 25); // Adjust vertical position to make space for the menu bar
-	ImVec2 windowSize(windowWidth, height * 0.7f);
-	ImGui::SetNextWindowPos(windowPos);
-	ImGui::SetNextWindowSize(windowSize);
+        ImVec2 windowPos(5, 25); // Adjust vertical position to make space for the menu bar
+        ImVec2 windowSize(windowWidth, height * 0.7f);
+        ImGui::SetNextWindowPos(windowPos, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
 	ImGui::Begin("Scene Hierarchy", nullptr, style);
 
 	displayWindowHeader("Scene Hierarchy");
@@ -1467,10 +1467,8 @@ void RenderSceneHierarchyWindow(float width, float height)
 	// Calculate the size of the list box accounting for padding
 	ImVec2 listBoxSize(windowSize.x - 20, windowSize.y - 70);
 
-	ImGui::SetNextWindowSize(listBoxSize);
-
-	// Render list view
-	if (ImGui::BeginListBox("##Objects", listBoxSize)) 
+        // Render list view
+        if (ImGui::BeginListBox("##Objects", listBoxSize))
 	{
 		// Iterate through each scene object and render it as a selectable item in the list
 		displaySceneObjects();
@@ -1482,14 +1480,17 @@ void RenderSceneHierarchyWindow(float width, float height)
 
 void RenderViewWindow(float width, float height) 
 {
-	ImVec2 renderViewWindowSize(width * 0.7f - 10, height * 0.7f - 40);
-	float startX = width * 0.15f + 10; // Add a gap of 10 pixels
-	ImGui::SetNextWindowPos(ImVec2(startX, 65)); // Adjust vertical position to make space for the menu bar
-	ImGui::SetNextWindowSize(ImVec2(renderViewWindowSize.x, renderViewWindowSize.y));
-	ImGui::Begin("View", nullptr, style | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDecoration);
-	
-	// Display the texture
-	ImVec2 imageSize(renderViewWindowSize.x, renderViewWindowSize.y);
+        ImVec2 initialSize(width * 0.7f - 10, height * 0.7f - 40);
+        float startX = width * 0.15f + 10; // Add a gap of 10 pixels
+        ImGui::SetNextWindowPos(ImVec2(startX, 65), ImGuiCond_FirstUseEver); // Adjust vertical position to make space for the menu bar
+        ImGui::SetNextWindowSize(initialSize, ImGuiCond_FirstUseEver);
+        ImGui::Begin("View", nullptr, style | ImGuiWindowFlags_NoScrollWithMouse);
+
+        // Get the current window size to support resizing
+        ImVec2 renderViewWindowSize = ImGui::GetContentRegionAvail();
+
+        // Display the texture
+        ImVec2 imageSize(renderViewWindowSize.x, renderViewWindowSize.y);
 
 	unsigned int activeViewID = 0;
 	if (Engine::get()->getContext()->getActiveScene()->isSimulationActive())
@@ -1933,11 +1934,11 @@ void RenderInspectorWindow(float width, float height)
 {
 	auto assets = Engine::get()->getSubSystem<Assets>();
 
-	float windowWidth = width * 0.15f - 5;
-	float startX = width * 0.85f + 5; // Add a gap of 5 pixels
-	ImGui::SetNextWindowPos(ImVec2(startX, 25)); // Adjust vertical position to make space for the menu bar
-	ImGui::SetNextWindowSize(ImVec2(windowWidth - 5, height * 0.7f));
-	ImGui::Begin("Inspector", &showWindow, style | ImGuiWindowFlags_NoScrollbar);
+        float windowWidth = width * 0.15f - 5;
+        float startX = width * 0.85f + 5; // Add a gap of 5 pixels
+        ImGui::SetNextWindowPos(ImVec2(startX, 25), ImGuiCond_FirstUseEver); // Adjust vertical position to make space for the menu bar
+        ImGui::SetNextWindowSize(ImVec2(windowWidth - 5, height * 0.7f), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Inspector", &showWindow, style);
 
 	displayWindowHeader("Inspector");
 
@@ -2638,12 +2639,12 @@ void RenderAssetViewWindow(float width, float height) {
 	
 
 	auto assets = Engine::get()->getSubSystem<Assets>();
-	float windowWidth = width - 10;
-	float startX = 5; // Add a gap of 5 pixels
-	float startY = height * 0.7f + 30; // Adjust vertical position to place it below the "Scene Hierarchy" window
-	ImGui::SetNextWindowPos(ImVec2(startX, startY));
-	ImGui::SetNextWindowSize(ImVec2(windowWidth, height * 0.3f - 35)); // Adjust height as needed
-	ImGui::Begin("Asset View", nullptr, style);
+        float windowWidth = width - 10;
+        float startX = 5; // Add a gap of 5 pixels
+        float startY = height * 0.7f + 30; // Adjust vertical position to place it below the "Scene Hierarchy" window
+        ImGui::SetNextWindowPos(ImVec2(startX, startY), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(windowWidth, height * 0.3f - 35), ImGuiCond_FirstUseEver); // Adjust height as needed
+        ImGui::Begin("Asset View", nullptr, style);
 	ImVec2 listBoxSize(windowWidth, height * 0.3f - 35);
 
 
