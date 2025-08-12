@@ -816,13 +816,18 @@ void Scene::onWindowResize(int w, int h)
         {
                 view->resize(w, h);
         }
-        if (m_highlightRenderView)
-        {
-                m_highlightRenderView->resize(w, h);
-        }
+       if (m_highlightRenderView)
+       {
+               m_highlightRenderView->resize(w, h);
+       }
 
-        m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)w / h, 0.1f, 1000.0f);
-        m_defaultUIProjection = glm::ortho(0.0f, (float)w, (float)h, 0.0f, -1.0f, 1.0f);
+       if (m_deferredRenderer)
+       {
+               m_deferredRenderer->resize(w, h);
+       }
+
+       m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)w / h, 0.1f, 1000.0f);
+       m_defaultUIProjection = glm::ortho(0.0f, (float)w, (float)h, 0.0f, -1.0f, 1.0f);
 
         auto& reg = m_registry->getRegistry();
         auto view = reg.view<CameraComponent>();
