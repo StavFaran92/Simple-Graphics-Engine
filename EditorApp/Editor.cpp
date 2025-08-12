@@ -1366,16 +1366,14 @@ void displaySceneObjects()
 
 void RenderSceneHierarchyWindow(float width, float height)
 {
-	float windowWidth = width * 0.15f;
-        ImVec2 windowPos(5, 25); // Adjust vertical position to make space for the menu bar
-        ImVec2 windowSize(windowWidth, height * 0.7f);
-        ImGui::SetNextWindowPos(windowPos, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
-	ImGui::Begin("Scene Hierarchy", nullptr, style);
+        (void)width;
+        (void)height;
+        ImGui::Begin("Scene Hierarchy", nullptr, style);
 
-	displayWindowHeader("Scene Hierarchy");
+        displayWindowHeader("Scene Hierarchy");
 
-	if (ImGui::Button("+", ImVec2(windowWidth, 0)))
+        float windowWidth = ImGui::GetContentRegionAvail().x;
+        if (ImGui::Button("+", ImVec2(windowWidth, 0)))
 	{
 		ImGui::OpenPopup("AddObjectToScenePopup");
 	}
@@ -1478,13 +1476,13 @@ void RenderSceneHierarchyWindow(float width, float height)
 	ImGui::End();
 }
 
-void RenderViewWindow(float width, float height) 
+void RenderViewWindow(float width, float height)
 {
-        ImVec2 initialSize(width * 0.7f - 10, height * 0.7f - 40);
-        float startX = width * 0.15f + 10; // Add a gap of 10 pixels
-        ImGui::SetNextWindowPos(ImVec2(startX, 65), ImGuiCond_FirstUseEver); // Adjust vertical position to make space for the menu bar
-        ImGui::SetNextWindowSize(initialSize, ImGuiCond_FirstUseEver);
+        (void)width;
+        (void)height;
         ImGui::Begin("View", nullptr, style | ImGuiWindowFlags_NoScrollWithMouse);
+
+        ImVec2 windowPos = ImGui::GetWindowPos();
 
         // Get the current window size to support resizing
         ImVec2 renderViewWindowSize = ImGui::GetContentRegionAvail();
@@ -1505,9 +1503,8 @@ void RenderViewWindow(float width, float height)
 	//unsigned int activeViewID = Engine::get()->getContext()->getActiveScene()->getRenderViewTextureID("Editor View");
 	ImGui::Image(reinterpret_cast<ImTextureID>(activeViewID), imageSize, ImVec2(0, 1), ImVec2(1, 0));
 
-	ImVec2 mousePos = ImGui::GetMousePos();
-	ImVec2 windowPos = ImGui::GetWindowPos();
-	ImVec2 windowSize = ImGui::GetWindowSize();
+        ImVec2 mousePos = ImGui::GetMousePos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
 
 	// Check if the mouse is within the window bounds
 	if (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
@@ -1525,7 +1522,7 @@ void RenderViewWindow(float width, float height)
                 // Define the size and position of the inner window
                 float innerWindowWidth = renderViewWindowSize.x - 10;
                 float innerWindowHeight = 35.0f;
-                ImVec2 toolbarPos(startX + 7, 72.0f);
+                ImVec2 toolbarPos(windowPos.x + 7, windowPos.y + 7);
 
                 bool isPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
 
@@ -1543,8 +1540,8 @@ void RenderViewWindow(float width, float height)
                         if (mouseInsideWindow && !mouseInsideToolbar)
                         {
                                 // We alter the mouse position from small window into full screen (the renderered object pick texture)
-                                int alteredX = (mousePos.x - startX) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
-                                int alteredY = (mousePos.y - 65) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
+                                int alteredX = (mousePos.x - windowPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
+                                int alteredY = (mousePos.y - windowPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
                                 int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
 
                                 if (selectedID == -1)
@@ -1930,17 +1927,17 @@ void rightAlignedText(const std::string& text) {
 
 static bool showWindow = true;
 
-void RenderInspectorWindow(float width, float height) 
+void RenderInspectorWindow(float width, float height)
 {
-	auto assets = Engine::get()->getSubSystem<Assets>();
+        auto assets = Engine::get()->getSubSystem<Assets>();
 
-        float windowWidth = width * 0.15f - 5;
-        float startX = width * 0.85f + 5; // Add a gap of 5 pixels
-        ImGui::SetNextWindowPos(ImVec2(startX, 25), ImGuiCond_FirstUseEver); // Adjust vertical position to make space for the menu bar
-        ImGui::SetNextWindowSize(ImVec2(windowWidth - 5, height * 0.7f), ImGuiCond_FirstUseEver);
+        (void)width;
+        (void)height;
         ImGui::Begin("Inspector", &showWindow, style);
 
-	displayWindowHeader("Inspector");
+        displayWindowHeader("Inspector");
+
+        float windowWidth = ImGui::GetContentRegionAvail().x;
 
 	if (state.getSelectedEntity() != Entity::EmptyEntity)
 	{
@@ -2636,20 +2633,12 @@ void RenderInspectorWindow(float width, float height)
 }
 
 void RenderAssetViewWindow(float width, float height) {
-	
-
-	auto assets = Engine::get()->getSubSystem<Assets>();
-        float windowWidth = width - 10;
-        float startX = 5; // Add a gap of 5 pixels
-        float startY = height * 0.7f + 30; // Adjust vertical position to place it below the "Scene Hierarchy" window
-        ImGui::SetNextWindowPos(ImVec2(startX, startY), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(ImVec2(windowWidth, height * 0.3f - 35), ImGuiCond_FirstUseEver); // Adjust height as needed
+        auto assets = Engine::get()->getSubSystem<Assets>();
+        (void)width;
+        (void)height;
         ImGui::Begin("Asset View", nullptr, style);
-	ImVec2 listBoxSize(windowWidth, height * 0.3f - 35);
 
-
-
-	displayWindowHeader("Assets");
+        displayWindowHeader("Assets");
 
 
 	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
@@ -2873,10 +2862,10 @@ class GUI_Helper : public GuiMenu {
 
 
 		// Render menu bar
-		if (ImGui::BeginMainMenuBar()) 
-		{
-			if (ImGui::BeginMainMenuBar()) 
-			{
+                if (ImGui::BeginMainMenuBar())
+                {
+                        if (ImGui::BeginMainMenuBar())
+                        {
 				if (ImGui::BeginMenu("File")) 
 				{ // Start of File dropdown
 					if (ImGui::MenuItem("Open Project", "Ctrl+O")) {
@@ -2957,18 +2946,38 @@ class GUI_Helper : public GuiMenu {
 				ImGui::EndMainMenuBar();
 			}
 			
-			ImGui::EndMainMenuBar();
-		}
-		
-		// Render UI
-		RenderSimulationControlView(screenWidth, screenHeight);
-		RenderViewWindow(screenWidth, screenHeight);
-		RenderSceneHierarchyWindow(screenWidth, screenHeight);
-		RenderInspectorWindow(screenWidth, screenHeight);
-		RenderAssetViewWindow(screenWidth, screenHeight); // Add the Asset View window
-		ShowTextureCreatorWindow();
-		ShowShaderCreatorWindow();
-		ShowTextureDisplayWindow();
+                        ImGui::EndMainMenuBar();
+                }
+
+                ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+                static bool dockspace_initialized = false;
+                if (!dockspace_initialized)
+                {
+                        dockspace_initialized = true;
+                        ImGui::DockBuilderRemoveNode(dockspace_id);
+                        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+                        ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
+
+                        ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
+                        ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+                        ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
+
+                        ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
+                        ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
+                        ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
+                        ImGui::DockBuilderDockWindow("View", dockspace_id);
+                        ImGui::DockBuilderFinish(dockspace_id);
+                }
+
+                // Render UI
+                RenderSimulationControlView(screenWidth, screenHeight);
+                RenderViewWindow(screenWidth, screenHeight);
+                RenderSceneHierarchyWindow(screenWidth, screenHeight);
+                RenderInspectorWindow(screenWidth, screenHeight);
+                RenderAssetViewWindow(screenWidth, screenHeight); // Add the Asset View window
+                ShowTextureCreatorWindow();
+                ShowShaderCreatorWindow();
+                ShowTextureDisplayWindow();
 
 		DisplayDebugInfoWindow();
 		
