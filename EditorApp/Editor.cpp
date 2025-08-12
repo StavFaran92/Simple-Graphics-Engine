@@ -19,9 +19,9 @@
 #include <imgui_stdlib.h>
 
 #define BEGIN_IMGUI_TABLE(name) \
-    if (ImGui::BeginTable(name, 2, ImGuiTableFlags_None)) { \
-        ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch, 0.4f); \
-        ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.6f);
+	if (ImGui::BeginTable(name, 2, ImGuiTableFlags_None)) { \
+	ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch, 0.4f); \
+	ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.6f);
 
 #define END_IMGUI_TABLE() ImGui::EndTable(); };
 
@@ -58,6 +58,8 @@ static bool startButtonPressed = false;
 
 static std::string selectedTextureName;
 static bool showTextureDisplayWindow = false;
+
+static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
 
 Entity g_primaryCamera;
 Entity g_editorCamera;
@@ -304,33 +306,33 @@ while (!targetAABB.isOnFrustum(fakeFrustum))
 
 void RenderSimulationControlView(float width, float height)
 {
-        (void)width;
-        (void)height;
+	(void)width;
+	(void)height;
 
-        ImGui::Begin("Simulation Controls", nullptr, style);
+	ImGui::Begin("Simulation Controls", nullptr, windowFlags);
 
-        float windowWidth = ImGui::GetContentRegionAvail().x;
-        ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
+	float windowWidth = ImGui::GetContentRegionAvail().x;
+	ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
 
-        // Draw the button based on the current state
-        if (startButtonPressed)
-        {
-                if (ImGui::Button("STOP", ImVec2(70, 0)))
-                {
-                        // Handle stop button click
-                        stopSimulation();
-                }
-        }
-        else
-        {
-                if (ImGui::Button("START", ImVec2(70, 0)))
-                {
-                        // Handle start button click
-                        startsimulation();
-                }
-        }
+	// Draw the button based on the current state
+	if (startButtonPressed)
+	{
+		if (ImGui::Button("STOP", ImVec2(70, 0)))
+		{
+			// Handle stop button click
+			stopSimulation();
+		}
+	}
+	else
+	{
+		if (ImGui::Button("START", ImVec2(70, 0)))
+		{
+			// Handle start button click
+			startsimulation();
+		}
+	}
 
-        ImGui::End(); // End the window
+	ImGui::End(); // End the window
 }
 
 static void addTableRow(const std::string& rowName, std::function<void(std::string id)> func)
@@ -737,7 +739,7 @@ void updateScene()
 	}
 }
 
-auto style = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+
 
 void AddColoredLabel(const char* label) 
 {
@@ -1365,14 +1367,14 @@ void displaySceneObjects()
 
 void RenderSceneHierarchyWindow(float width, float height)
 {
-        (void)width;
-        (void)height;
-        ImGui::Begin("Scene Hierarchy", nullptr, style);
+	(void)width;
+	(void)height;
+	ImGui::Begin("Scene Hierarchy", nullptr, windowFlags);
 
-        displayWindowHeader("Scene Hierarchy");
+	displayWindowHeader("Scene Hierarchy");
 
-        float windowWidth = ImGui::GetContentRegionAvail().x;
-        if (ImGui::Button("+", ImVec2(windowWidth, 0)))
+	float windowWidth = ImGui::GetContentRegionAvail().x;
+	if (ImGui::Button("+", ImVec2(windowWidth, 0)))
 	{
 		ImGui::OpenPopup("AddObjectToScenePopup");
 	}
@@ -1461,32 +1463,32 @@ void RenderSceneHierarchyWindow(float width, float height)
 		ImGui::EndPopup();
 	}
 
-        ImVec2 listBoxSize = ImGui::GetContentRegionAvail();
+	ImVec2 listBoxSize = ImGui::GetContentRegionAvail();
 
-        // Render list view
-        if (ImGui::BeginListBox("##Objects", listBoxSize))
-        {
-                // Iterate through each scene object and render it as a selectable item in the list
-                displaySceneObjects();
-                ImGui::EndListBox();
-        }
+	// Render list view
+	if (ImGui::BeginListBox("##Objects", listBoxSize))
+	{
+		// Iterate through each scene object and render it as a selectable item in the list
+		displaySceneObjects();
+		ImGui::EndListBox();
+	}
 
 	ImGui::End();
 }
 
 void RenderViewWindow(float width, float height)
 {
-        (void)width;
-        (void)height;
-        ImGui::Begin("View", nullptr, style | ImGuiWindowFlags_NoScrollWithMouse);
+	(void)width;
+	(void)height;
+	ImGui::Begin("View", nullptr, windowFlags | ImGuiWindowFlags_NoScrollWithMouse);
 
-        ImVec2 windowPos = ImGui::GetWindowPos();
+	ImVec2 windowPos = ImGui::GetWindowPos();
 
-        // Get the current window size to support resizing
-        ImVec2 renderViewWindowSize = ImGui::GetContentRegionAvail();
+	// Get the current window size to support resizing
+	ImVec2 renderViewWindowSize = ImGui::GetContentRegionAvail();
 
-        // Display the texture
-        ImVec2 imageSize(renderViewWindowSize.x, renderViewWindowSize.y);
+	// Display the texture
+	ImVec2 imageSize(renderViewWindowSize.x, renderViewWindowSize.y);
 
 	unsigned int activeViewID = 0;
 	if (Engine::get()->getContext()->getActiveScene()->isSimulationActive())
@@ -1501,8 +1503,8 @@ void RenderViewWindow(float width, float height)
 	//unsigned int activeViewID = Engine::get()->getContext()->getActiveScene()->getRenderViewTextureID("Editor View");
 	ImGui::Image(reinterpret_cast<ImTextureID>(activeViewID), imageSize, ImVec2(0, 1), ImVec2(1, 0));
 
-        ImVec2 mousePos = ImGui::GetMousePos();
-        ImVec2 windowSize = ImGui::GetWindowSize();
+	ImVec2 mousePos = ImGui::GetMousePos();
+	ImVec2 windowSize = ImGui::GetWindowSize();
 
 	// Check if the mouse is within the window bounds
 	if (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
@@ -1515,55 +1517,55 @@ void RenderViewWindow(float width, float height)
 		EditorState::Instance().isMouseInSceneView = false;
 	}
 
-        if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
-        {
-                // Define the size and position of the inner window
-                float innerWindowWidth = renderViewWindowSize.x - 10;
-                float innerWindowHeight = 35.0f;
-                ImVec2 toolbarPos(windowPos.x + 7, windowPos.y + 7);
+	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
+	{
+		// Define the size and position of the inner window
+		float innerWindowWidth = renderViewWindowSize.x - 10;
+		float innerWindowHeight = 35.0f;
+		ImVec2 toolbarPos(windowPos.x + 7, windowPos.y + 7);
 
-                bool isPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+		bool isPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
 
-                if (!isPopupOpen && !ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered())
-                {
-                        ImVec2 mousePos = ImGui::GetMousePos();
-                        ImVec2 windowPos = ImGui::GetWindowPos();
-                        ImVec2 windowSize = ImGui::GetWindowSize();
+		if (!isPopupOpen && !ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered())
+		{
+			ImVec2 mousePos = ImGui::GetMousePos();
+			ImVec2 windowPos = ImGui::GetWindowPos();
+			ImVec2 windowSize = ImGui::GetWindowSize();
 
-                        bool mouseInsideWindow = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
-                                mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
-                        bool mouseInsideToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
-                                mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
+			bool mouseInsideWindow = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
+				mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
+			bool mouseInsideToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
+				mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
 
-                        if (mouseInsideWindow && !mouseInsideToolbar)
-                        {
-                                // We alter the mouse position from small window into full screen (the renderered object pick texture)
-                                int alteredX = (mousePos.x - windowPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
-                                int alteredY = (mousePos.y - windowPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
-                                int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
+			if (mouseInsideWindow && !mouseInsideToolbar)
+			{
+				// We alter the mouse position from small window into full screen (the renderered object pick texture)
+				int alteredX = (mousePos.x - windowPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
+				int alteredY = (mousePos.y - windowPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
+				int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
 
-                                if (selectedID == -1)
-                                {
-                                        state.selectEntity(Entity::EmptyEntity);
+				if (selectedID == -1)
+				{
+					state.selectEntity(Entity::EmptyEntity);
 
-                                }
-                                else
-                                {
+				}
+				else
+				{
 
-                                        for (auto& sceneObj : sceneObjects)
-                                        {
-                                                if (sceneObj.e.handlerID() == selectedID)
-                                                {
-                                                        state.selectEntity(sceneObj.e);
-                                                        break;
-                                                }
-                                        }
-                                }
-                        }
-                }
+					for (auto& sceneObj : sceneObjects)
+					{
+						if (sceneObj.e.handlerID() == selectedID)
+						{
+							state.selectEntity(sceneObj.e);
+							break;
+						}
+					}
+				}
+			}
+		}
 
-                ImGui::SetNextWindowPos(toolbarPos); // Adjust position as needed
-                ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
+		ImGui::SetNextWindowPos(toolbarPos); // Adjust position as needed
+		ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
 
 		// Transformation mode enum and current mode variable
 		enum TransformMode { TRANSLATE, ROTATE, SCALE, UNIVERSAL };
@@ -1927,15 +1929,15 @@ static bool showWindow = true;
 
 void RenderInspectorWindow(float width, float height)
 {
-        auto assets = Engine::get()->getSubSystem<Assets>();
+	auto assets = Engine::get()->getSubSystem<Assets>();
 
-        (void)width;
-        (void)height;
-        ImGui::Begin("Inspector", &showWindow, style);
+	(void)width;
+	(void)height;
+	ImGui::Begin("Inspector", &showWindow, windowFlags);
 
-        displayWindowHeader("Inspector");
+	displayWindowHeader("Inspector");
 
-        float windowWidth = ImGui::GetContentRegionAvail().x;
+	float windowWidth = ImGui::GetContentRegionAvail().x;
 
 	if (state.getSelectedEntity() != Entity::EmptyEntity)
 	{
@@ -2073,7 +2075,7 @@ void RenderInspectorWindow(float width, float height)
 
 			//ImGui::Text("Number of vertices: %d", (int)meshComponent.mesh.get()->getNumOfVertices());
 
-			 //Button to trigger some action
+			//Button to trigger some action
 			//if (ImGui::Button("Select Mesh")) 
 			//{
 			//	showMeshSelector = true;
@@ -2631,12 +2633,12 @@ void RenderInspectorWindow(float width, float height)
 }
 
 void RenderAssetViewWindow(float width, float height) {
-        auto assets = Engine::get()->getSubSystem<Assets>();
-        (void)width;
-        (void)height;
-        ImGui::Begin("Asset View", nullptr, style);
+	auto assets = Engine::get()->getSubSystem<Assets>();
+	(void)width;
+	(void)height;
+	ImGui::Begin("Asset View", nullptr, windowFlags);
 
-        displayWindowHeader("Assets");
+	displayWindowHeader("Assets");
 
 
 	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
@@ -2860,10 +2862,10 @@ class GUI_Helper : public GuiMenu {
 
 
 		// Render menu bar
-                if (ImGui::BeginMainMenuBar())
-                {
-                        if (ImGui::BeginMainMenuBar())
-                        {
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMainMenuBar())
+			{
 				if (ImGui::BeginMenu("File")) 
 				{ // Start of File dropdown
 					if (ImGui::MenuItem("Open Project", "Ctrl+O")) {
@@ -2901,18 +2903,18 @@ class GUI_Helper : public GuiMenu {
 						// Path to the Python script
 						std::string pythonScriptPath = "../../scripts/build_shipping.py";
 
-                        // Determine asset, output, and solution paths
-                        std::string assetsFolder = Engine::get()->getInitParams().projectDir;
-                        std::string outputFolder = std::string(SGE_SOLUTION_DIR) + "/../Release";
-                        std::string solutionDir = std::string(SGE_SOLUTION_DIR);
+			// Determine asset, output, and solution paths
+			std::string assetsFolder = Engine::get()->getInitParams().projectDir;
+			std::string outputFolder = std::string(SGE_SOLUTION_DIR) + "/../Release";
+			std::string solutionDir = std::string(SGE_SOLUTION_DIR);
 
-                        // Command to execute the Python script with project, output, and solution paths
-                        std::string command = "python \"" + pythonScriptPath + "\" \"" + assetsFolder + "\" \"" + outputFolder + "\" \"" + solutionDir + "\"";
+			// Command to execute the Python script with project, output, and solution paths
+			std::string command = "python \"" + pythonScriptPath + "\" \"" + assetsFolder + "\" \"" + outputFolder + "\" \"" + solutionDir + "\"";
 
-                        // Run the command
-                        std::system(command.c_str());
+			// Run the command
+			std::system(command.c_str());
 
-                        //std::filesystem::create_directories("../Game/data");
+			//std::filesystem::create_directories("../Game/data");
 					}
 					if (ImGui::MenuItem("Reload config", "")) {
 						Engine::get()->reloadEngineConfig();
@@ -2944,40 +2946,40 @@ class GUI_Helper : public GuiMenu {
 				ImGui::EndMainMenuBar();
 			}
 			
-                        ImGui::EndMainMenuBar();
-                }
+			ImGui::EndMainMenuBar();
+		}
 
-                ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
-                static bool dockspace_initialized = false;
-                if (!dockspace_initialized)
-                {
-                        dockspace_initialized = true;
-                        ImGui::DockBuilderRemoveNode(dockspace_id);
-                        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
-                        ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
+		ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+		static bool dockspace_initialized = false;
+		if (!dockspace_initialized)
+		{
+			dockspace_initialized = true;
+			ImGui::DockBuilderRemoveNode(dockspace_id);
+			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+			ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
 
-                        ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
-                        ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
-                        ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
-                        ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.1f, nullptr, &dockspace_id);
+			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
+			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+			ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
+			ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.1f, nullptr, &dockspace_id);
 
-                        ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
-                        ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-                        ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
-                        ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
-                        ImGui::DockBuilderDockWindow("View", dockspace_id);
-                        ImGui::DockBuilderFinish(dockspace_id);
-                }
+			ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
+			ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
+			ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
+			ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
+			ImGui::DockBuilderDockWindow("View", dockspace_id);
+			ImGui::DockBuilderFinish(dockspace_id);
+		}
 
-                // Render UI
-                RenderSimulationControlView(screenWidth, screenHeight);
-                RenderViewWindow(screenWidth, screenHeight);
-                RenderSceneHierarchyWindow(screenWidth, screenHeight);
-                RenderInspectorWindow(screenWidth, screenHeight);
-                RenderAssetViewWindow(screenWidth, screenHeight); // Add the Asset View window
-                ShowTextureCreatorWindow();
-                ShowShaderCreatorWindow();
-                ShowTextureDisplayWindow();
+		// Render UI
+		RenderSimulationControlView(screenWidth, screenHeight);
+		RenderViewWindow(screenWidth, screenHeight);
+		RenderSceneHierarchyWindow(screenWidth, screenHeight);
+		RenderInspectorWindow(screenWidth, screenHeight);
+		RenderAssetViewWindow(screenWidth, screenHeight); // Add the Asset View window
+		ShowTextureCreatorWindow();
+		ShowShaderCreatorWindow();
+		ShowTextureDisplayWindow();
 
 		DisplayDebugInfoWindow();
 		
