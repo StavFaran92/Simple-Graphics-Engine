@@ -25,9 +25,9 @@ glm::mat4 Transformation::getLocalTransformation() const
 	return translationMatrix * rotationMatrix * scaleMatrix;
 }
 
-void Transformation::setParent(Entity parent)
+void Transformation::setParent(Entity newParent)
 {
-	if (parent != Entity::EmptyEntity)
+	if (m_parent != Entity::EmptyEntity)
 	{
 		removeParent();
 	}
@@ -40,7 +40,7 @@ void Transformation::setParent(Entity parent)
 	// i decompose PG(x)-1*L(x) into parts and set each one
 	// for opposite I take L(x) = PG(x)*L(x) to undo my changes.
 
-	auto& pTransform = parent.getComponent<Transformation>();
+	auto& pTransform = newParent.getComponent<Transformation>();
 	glm::mat4& L = getLocalTransformation();
 	glm::mat4& PG = pTransform.getWorldTransformation();
 
@@ -56,16 +56,16 @@ void Transformation::setParent(Entity parent)
 	setLocalRotation(rotation);
 	setLocalPosition(translation);
 
-	parent = parent;
+	m_parent = newParent;
 	pTransform.addChild(entity);
 }
 
 void Transformation::removeParent()
 {
-	if (parent.handlerID() == Entity::EmptyEntity.handlerID())
+	if (m_parent.handlerID() == Entity::EmptyEntity.handlerID())
 		return;
 
-	auto& pTransform = parent.getComponent<Transformation>();
+	auto& pTransform = m_parent.getComponent<Transformation>();
 	glm::mat4& L = getLocalTransformation();
 	glm::mat4& PG = pTransform.getWorldTransformation();
 
@@ -83,12 +83,12 @@ void Transformation::removeParent()
 
 	
 	pTransform.removeChild(entity);
-	parent = Entity::EmptyEntity;
+	m_parent = Entity::EmptyEntity;
 }
 
 Entity Transformation::getParent() const
 {
-	return parent;
+	return m_parent;
 }
 
 Entity Transformation::getRoot() const
@@ -109,7 +109,7 @@ void Transformation::update()
 		return;
 	}
 
-	for (auto& [_,child] : children)
+	for (auto& [_,child] : m_children)
 	{
 		child.getComponent<Transformation>().update();
 	}
@@ -121,9 +121,9 @@ void Transformation::forceUpdate()
 	m_globalRotation = localRotation;
 	m_globalScale = localScale;
 
-	if (parent.valid())
+	if (m_parent.valid())
 	{
-		auto& pTransform = parent.getComponent<Transformation>();
+		auto& pTransform = m_parent.getComponent<Transformation>();
 		m_modelMatrix = pTransform.getWorldTransformation() * m_modelMatrix;
 		m_globalRotation = pTransform.getWorldRotation() * m_globalRotation;
 		m_globalScale *= pTransform.getWorldScale();
@@ -131,7 +131,7 @@ void Transformation::forceUpdate()
 
 	m_isDirty = false;
 
-	for (auto& [_, child] : children)
+	for (auto& [_, child] : m_children)
 	{
 		child.getComponent<Transformation>().forceUpdate();
 	}
@@ -139,12 +139,12 @@ void Transformation::forceUpdate()
 
 void Transformation::addChild(Entity entity)
 {
-	children[entity.handlerID()] = entity;
+	m_children[entity.handlerID()] = entity;
 }
 
 void Transformation::removeChild(Entity entity)
 {
-	children.erase(entity.handlerID());
+	m_children.erase(entity.handlerID());
 }
 
 glm::mat4 Transformation::calculateModelMatrix()
@@ -158,7 +158,7 @@ glm::mat4 Transformation::calculateModelMatrix()
 
 std::unordered_map<entity_id, Entity> Transformation::getChildren()
 {
-	return children;
+	return m_children;
 }
 
 void Transformation::setLocalPosition(glm::vec3 pos)

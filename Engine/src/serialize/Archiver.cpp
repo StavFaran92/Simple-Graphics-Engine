@@ -41,7 +41,7 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 		auto& transform = entityHandler.addComponent<Transformation>(serializedEnt.transform.value());
 		transform.entity.setRegistry(&scene.getRegistry());
 		transform.root.setRegistry(&scene.getRegistry());
-		transform.parent.setRegistry(&scene.getRegistry());
+		transform.m_parent.setRegistry(&scene.getRegistry());
 
 		for (auto [_, entity] : serializedEnt.transform.value().getChildren())
 		{

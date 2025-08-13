@@ -117,10 +117,10 @@ public:
 		SERIALIZED_MEMBER(localTranslation); 
 		SERIALIZED_MEMBER(localRotation);
 		SERIALIZED_MEMBER(localScale); 
-		SERIALIZED_MEMBER(parent); 
+		SERIALIZED_MEMBER(m_parent); 
 		SERIALIZED_MEMBER(entity); 
 		SERIALIZED_MEMBER(root); 
-		SERIALIZED_MEMBER(children);
+		SERIALIZED_MEMBER(m_children);
 	}
 
 private:
@@ -133,10 +133,10 @@ private:
 	glm::vec3 localTranslation;
 	glm::quat localRotation;
 	glm::vec3 localScale;
-	Entity parent = Entity::EmptyEntity;
+	Entity m_parent = Entity::EmptyEntity;
 	Entity entity = Entity::EmptyEntity;
 	Entity root = Entity::EmptyEntity;
-	std::unordered_map<entity_id, Entity> children{};
+	std::unordered_map<entity_id, Entity> m_children{};
 
 private:
 	glm::quat m_globalRotation;
