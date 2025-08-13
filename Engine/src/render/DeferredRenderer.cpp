@@ -191,7 +191,7 @@ void DeferredRenderer::render()
 
     if (graphics->material)
     {
-        graphics->material->use(graphics->shader);
+	graphics->material->use(graphics->shader);
     }
 
 	// Draw
@@ -402,4 +402,45 @@ void DeferredRenderer::renderScene(Scene* scene)
 const FrameBufferObject& DeferredRenderer::getGBuffer() const
 {
 	return m_gBuffer;
+}
+
+void DeferredRenderer::resize(int w, int h)
+{
+	m_renderBuffer = RenderBufferObject(w, h);
+
+	m_gBuffer.bind();
+
+	m_positionTexture = Texture::createEmptyTexture(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_gBuffer.attachTexture(m_positionTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
+
+	m_normalTexture = Texture::createEmptyTexture(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_gBuffer.attachTexture(m_normalTexture.get()->getID(), GL_COLOR_ATTACHMENT1);
+
+	m_albedoTexture = Texture::createEmptyTexture(w, h, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_gBuffer.attachTexture(m_albedoTexture.get()->getID(), GL_COLOR_ATTACHMENT2);
+
+	m_MRATexture = Texture::createEmptyTexture(w, h, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_gBuffer.attachTexture(m_MRATexture.get()->getID(), GL_COLOR_ATTACHMENT3);
+
+	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glDrawBuffers(4, attachments);
+
+	m_gBuffer.attachRenderBuffer(m_renderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
+	m_gBuffer.unbind();
+
+	m_ssaoRenderBuffer = RenderBufferObject(w, h);
+	m_ssaoFBO.bind();
+	m_ssaoColorBuffer = Texture::createEmptyTexture(w, h, GL_RED, GL_RED, GL_FLOAT);
+	m_ssaoFBO.attachTexture(m_ssaoColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
+	unsigned int ssaoAttachments[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, ssaoAttachments);
+	m_ssaoFBO.attachRenderBuffer(m_ssaoRenderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
+	m_ssaoFBO.unbind();
+
+	m_ssaoBlurRenderBuffer = RenderBufferObject(w, h);
+	m_ssaoBlurFBO.bind();
+	m_ssaoBlurColorBuffer = Texture::createEmptyTexture(w, h, GL_RED, GL_RED, GL_FLOAT);
+	m_ssaoBlurFBO.attachTexture(m_ssaoBlurColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
+	m_ssaoBlurFBO.attachRenderBuffer(m_ssaoBlurRenderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
+	m_ssaoBlurFBO.unbind();
 }

@@ -101,4 +101,5 @@ std::shared_ptr<VertexBufferObject> VertexArrayObject::getBufferByID(unsigned in
 			return buffer;
 		}
 	}
+	return nullptr;
 }
