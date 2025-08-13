@@ -18,6 +18,11 @@ public:
         return dis(gen);
     }
 
+    std::mt19937 getGenerator() const
+    {
+        return gen;
+    }
+
 private:
     // Mersenne Twister pseudo-random number generator
     std::mt19937 gen;
