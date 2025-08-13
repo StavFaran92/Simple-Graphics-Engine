@@ -177,11 +177,11 @@ bool Mesh::build(MeshData& mData)
 
 	delete[] vertices;
 
+	m_positions = mData.m_positions;
 	m_vao->attachBuffer(vbo, m_ibo.get());
 	m_vao->setVertexCount(m_positions.size());
 	m_vao->build();
 
-	m_positions = mData.m_positions;
 
 	glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
 	glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
