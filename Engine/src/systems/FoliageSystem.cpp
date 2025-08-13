@@ -12,6 +12,7 @@
 #include "core/Random.h"
 #include "systems/BuiltInMeshes.h"
 #include "systems/TimeManager.h"
+#include "component/Terrain.h"
 #include <glm/ext.hpp>
 
 FoliageSystem::FoliageSystem()
@@ -168,8 +169,6 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageShader->setUniformValue("projection", *graphics->projection);
 	foliageShader->setUniformValue("colorA", foliage.colorA);
 	foliageShader->setUniformValue("colorB", foliage.colorB);
-	foliageShader->setUniformValue("patchSize", glm::vec2(foliage.patchWidth, foliage.patchHeight));
-	foliageShader->setUniformValue("patchCount", foliage.getPatchCount());
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
 	foliageShader->setTextureInShader(foliage.m_foliageSpreadMap, "densityMap", 1);
 	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);
@@ -193,18 +192,13 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 		if (distance < maxFoliageViewDistance)
 		{
-			foliageShader->setUniformValue("patchPosition", visiblePatches[i].pos);
-			foliageShader->setUniformValue("patchIDx", visiblePatches[i].idx);
-			foliageShader->setUniformValue("patchIDy", visiblePatches[i].idy);
-			foliageShader->setUniformValue("patchDensity", visiblePatches[i].density);
-
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * visiblePatches[i].instanceCount, visiblePatches[i].instancesData.data());
 
 			//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
 			auto& grassBlade = m_grassBlade;
 			auto vao = grassBlade->getPrimaryMesh()->getVAO();
 
-			float density = std::max(0.f, maxFoliageViewDistance - distance) / maxFoliageViewDistance;
+			float density = std::max(0.f, 150 - distance) / 150;
 			RenderCommand::drawInstanced(vao, visiblePatches[i].instanceCount * density);
 		}
 		else
@@ -225,35 +219,41 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageMAXLODShader->setUniformValue("colorB", foliage.colorB);
 	
 	// TODO FIX
-	//for (int i = patchesMaxLOD.size()-1; i >= 0 ; i--)
-	//{
-	//	foliageMAXLODShader->setUniformValue("patchSize", glm::vec2(foliage.patchWidth, foliage.patchHeight));
-	//	foliageMAXLODShader->setUniformValue("patchCount", glm::vec2(10, 10));
-	//	foliageMAXLODShader->setTextureInShader(grassTexture, "grassTexture", 0);
+	for (int i = patchesMaxLOD.size()-1; i >= 0 ; i--)
+	{
+		foliageMAXLODShader->setUniformValue("patchSize", glm::vec2(foliage.patchWidth, foliage.patchHeight));
+		foliageMAXLODShader->setUniformValue("patchCount", glm::vec2(10, 10));
+		foliageMAXLODShader->setTextureInShader(grassTexture, "grassTexture", 0);
 
-	//	for (int j = 0; j < 100; j++)
-	//	{
-	//		glm::vec3 translation = glm::vec3(patchesMaxLOD[i].pos) + glm::vec3(foliageRandomLocations[j].x * 10, 0, foliageRandomLocations[j].z * 10);
-	//		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
-	//		//glm::mat4 translationMatrix = glm::mat4(1.0);
-	//		//glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
-	//		
-	//		float phi = -atan2f(m_camFront.z, m_camFront.x);
-	//		glm::quat q(glm::vec3(0.f, phi + Constants::PI / 2, 0.f));
-	//		glm::mat4 rotationMatrix = glm::mat4_cast(q);
-	//		//glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(visiblePatches[i].width, 1, visiblePatches[i].height));
+		for (int j = 0; j < 100; j++)
+		{
+			float posX = patchesMaxLOD[i].pos.x + foliageRandomLocations[j].x * foliage.patchWidth;
+			float posZ = patchesMaxLOD[i].pos.z + foliageRandomLocations[j].z * foliage.patchHeight;
+			float height = foliage.terrainRef.getComponent<Terrain>().getHeightAtPoint(posX, posZ);
 
-	//		glm::mat4 model = translationMatrix * rotationMatrix /** scaleMatrix*/;
+			glm::vec3 translation = glm::vec3(patchesMaxLOD[i].pos) + glm::vec3(
+				foliageRandomLocations[j].x * foliage.patchWidth, 
+				height, 
+				foliageRandomLocations[j].z * foliage.patchHeight);
+			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+			//glm::mat4 translationMatrix = glm::mat4(1.0);
+			//glm::mat4 rotationMatrix = glm::mat4_cast(localRotation);
+			
+			float phi = -atan2f(m_camFront.z, m_camFront.x);
+			glm::quat q(glm::vec3(0.f, phi + Constants::PI / 2, 0.f));
+			glm::mat4 rotationMatrix = glm::mat4_cast(q);
+			//glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(visiblePatches[i].width, 1, visiblePatches[i].height));
+
+			glm::mat4 model = translationMatrix * rotationMatrix /** scaleMatrix*/;
 
 
-	//		foliageShader->setUniformValue("model", model);
+			foliageMAXLODShader->setUniformValue("model", model);
 
 
 
-	//		auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
-	//		auto vao = grassBlade->getPrimaryMesh()->getVAO();
-	//		RenderCommand::draw(vao);
-	//	}
-	//}
-	//RenderCommand::draw(vao);
+			auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
+			auto vao = grassBlade->getPrimaryMesh()->getVAO();
+			RenderCommand::draw(vao);
+		}
+	}
 }
