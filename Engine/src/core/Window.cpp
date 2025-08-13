@@ -36,11 +36,20 @@ int Window::init()
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
+	// Get usable bounds of primary display
+	SDL_Rect usable{};
+	SDL_GetDisplayUsableBounds(0, &usable); // excludes taskbar/dock
 
-        SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	//Choose a ratio for the initial window
+	float ratio = 0.8f;
+	int winW = int(usable.w * ratio);
+	int winH = int(usable.h * ratio);
 
-	m_width = SCREEN_WIDTH;
-	m_height = SCREEN_HEIGHT;
+	// Enforce min size/aspect
+	m_width = SDL_max(winW, 960);
+	m_height = SDL_max(winH, 540);
+
+	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
 	if (Engine::get()->getInitParams().fullScreen || Engine::get()->getInitParams().shipping)
 	{
@@ -61,6 +70,8 @@ int Window::init()
 		logError("Window could not be created! SDL Error: {}", SDL_GetError());
 		return false;
 	}
+
+	SDL_SetWindowMinimumSize(m_mainWindow, 800, 450);
 	
 	//Create context
 	m_glContext = SDL_GL_CreateContext(m_mainWindow);

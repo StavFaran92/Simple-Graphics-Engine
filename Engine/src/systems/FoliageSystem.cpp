@@ -182,6 +182,8 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 	auto scale = glm::scale(glm::mat4(1.0), glm::vec3(1.f));
 	foliageShader->setUniformValue("scale", scale);
+
+	foliageShader->setUniformValue("viewDir", m_camFront);
 	
 	std::vector<FoliagePatch> patchesMaxLOD;
 	for (int i = 0; i < visiblePatches.size(); i++)
