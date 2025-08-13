@@ -1356,7 +1356,7 @@ void displaySceneObjects()
 		auto& transform = sceneObject.e.getComponent<Transformation>();
 
 		// if has parent it will be rendered in the recursive call (can be optimized if needed)
-		if (transform.getParent() != Entity::EmptyEntity) 
+		if (transform.getParent().valid()) 
 			continue;
 
 		ImGui::PushID(i); // Push a unique ID to avoid ImGui ID conflicts
