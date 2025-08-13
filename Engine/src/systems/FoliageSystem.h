@@ -47,4 +47,6 @@ private:
 	Resource<Texture>grassTexture;
 	Resource<Texture>windNoise;
 	Resource<Texture>noiseTexture;
+
+	int maxFoliageViewDistance = 100;
 };

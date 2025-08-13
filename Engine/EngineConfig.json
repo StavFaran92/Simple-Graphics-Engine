@@ -5,8 +5,8 @@
     "RenderDeferredPass": true,
     "RenderCustomShadersPass": false,
     "RenderSkyboxPass": true,
-    "RenderTerrainPass": true,
+    "RenderTerrainPass": false,
     "RenderVolumetricsPass": true,
-    "RenderWireframeGrid": true
+    "RenderWireframeGrid": false
   }
 }
