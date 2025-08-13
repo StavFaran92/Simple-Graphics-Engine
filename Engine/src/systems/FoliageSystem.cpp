@@ -198,15 +198,24 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 			auto& grassBlade = m_grassBlade;
 			auto vao = grassBlade->getPrimaryMesh()->getVAO();
 
-			float density = std::max(0.f, 150 - distance) / 150;
+			float density = std::max(0.f, maxFoliageViewDistance - distance) / maxFoliageViewDistance;
 			RenderCommand::drawInstanced(vao, visiblePatches[i].instanceCount * density);
 		}
-		else
-		{
-			patchesMaxLOD.insert(patchesMaxLOD.begin(), visiblePatches.begin() + i, visiblePatches.end());
 
-			break;
+		if(distance > minFoliageQuadViewDistance)
+		{
+			if (distance > maxFoliageViewDistance)
+			{
+				patchesMaxLOD.insert(patchesMaxLOD.begin(), visiblePatches.begin() + i, visiblePatches.end());
+				break;
+			}
+			else
+			{
+				patchesMaxLOD.push_back(*(visiblePatches.begin() + i));
+			}
 		}
+
+		
 	}
 
 	//glDisable(GL_DEPTH_TEST); 
