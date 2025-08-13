@@ -1501,12 +1501,15 @@ void RenderViewWindow()
 
 	ImGui::Image(reinterpret_cast<ImTextureID>(activeViewID), imageSize, ImVec2(0, 1), ImVec2(1, 0));
 
-	ImVec2 mousePos = ImGui::GetMousePos();
-	ImVec2 windowSize = ImGui::GetWindowSize();
+	// Calculate the top left position of the rendered image within the window
+	ImVec2 viewportOffset = ImGui::GetWindowContentRegionMin();
+	ImVec2 viewportPos{ windowPos.x + viewportOffset.x, windowPos.y + viewportOffset.y };
 
-	// Check if the mouse is within the window bounds
-	if (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
-		mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y)
+	ImVec2 mousePos = ImGui::GetMousePos();
+
+	// Check if the mouse is within the viewport bounds
+	if (mousePos.x >= viewportPos.x && mousePos.x <= viewportPos.x + renderViewWindowSize.x &&
+		mousePos.y >= viewportPos.y && mousePos.y <= viewportPos.y + renderViewWindowSize.y)
 	{
 		EditorState::Instance().isMouseInSceneView = true;
 	}
@@ -1528,18 +1531,19 @@ void RenderViewWindow()
 		{
 			ImVec2 mousePos = ImGui::GetMousePos();
 			ImVec2 windowPos = ImGui::GetWindowPos();
-			ImVec2 windowSize = ImGui::GetWindowSize();
+			ImVec2 viewportOffset = ImGui::GetWindowContentRegionMin();
+			ImVec2 viewportPos{ windowPos.x + viewportOffset.x, windowPos.y + viewportOffset.y };
 
-			bool mouseInsideWindow = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
-				mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
+			bool mouseInsideViewport = (mousePos.x >= viewportPos.x && mousePos.x <= viewportPos.x + renderViewWindowSize.x &&
+				mousePos.y >= viewportPos.y && mousePos.y <= viewportPos.y + renderViewWindowSize.y);
 			bool mouseInsideToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
 				mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
 
-			if (mouseInsideWindow && !mouseInsideToolbar)
+			if (mouseInsideViewport && !mouseInsideToolbar)
 			{
 				// We alter the mouse position from small window into full screen (the renderered object pick texture)
-				int alteredX = (mousePos.x - windowPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
-				int alteredY = (mousePos.y - windowPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
+				int alteredX = (mousePos.x - viewportPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
+				int alteredY = (mousePos.y - viewportPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
 				int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
 
 				if (selectedID == -1)
