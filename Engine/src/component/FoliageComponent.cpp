@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 
 #include "component/Terrain.h"
+#include <algorithm>
 
 void FoliageComponent::build()
 {
@@ -86,6 +87,8 @@ void FoliageComponent::build()
 
 					p.instancesData.push_back(glm::vec4(pos, 1.0));
 				}
+				auto& gen = Engine::get()->getRandomSystem()->getGenerator();
+				std::shuffle(p.instancesData.begin(), p.instancesData.end(), gen);
 			}
 		}
 		//p.density = r / 255.f;

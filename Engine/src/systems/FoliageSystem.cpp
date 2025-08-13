@@ -191,7 +191,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 		float distance = glm::dot(visiblePatches[i].pos - m_camPos, m_camFront);
 
-		if (distance < 100)
+		if (distance < maxFoliageViewDistance)
 		{
 			foliageShader->setUniformValue("patchPosition", visiblePatches[i].pos);
 			foliageShader->setUniformValue("patchIDx", visiblePatches[i].idx);
@@ -203,7 +203,9 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 			//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
 			auto& grassBlade = m_grassBlade;
 			auto vao = grassBlade->getPrimaryMesh()->getVAO();
-			RenderCommand::drawInstanced(vao, visiblePatches[i].instanceCount);
+
+			float density = std::max(0.f, maxFoliageViewDistance - distance) / maxFoliageViewDistance;
+			RenderCommand::drawInstanced(vao, visiblePatches[i].instanceCount * density);
 		}
 		else
 		{
