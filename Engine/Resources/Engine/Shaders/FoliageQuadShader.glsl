@@ -101,23 +101,40 @@ void main()
     // float diff = max(dot(normalize(Normal), L), 0.0);
 
     // color *= diff * 0.8 + 0.2; // keep a little base light
+    
+    vec3 bottomColor = colorA; // darker green
+    vec3 topColor    = colorB; // lighter green
 
-    vec4 texColor = texture(grassTexture, texCoords.xy);
+    float minY = -1.0;
+    float maxY = 1.0; // adjust to match your scene/object scale
+
+    
+
+    // Final graded color
+    vec4 texColor = texture(grassTexture, texCoords.xy).rgba;
+
+    if (texColor.a <= 0.0) 
+        discard;
+
+    float intensity = (texColor.r + texColor.g + texColor.b) / 3.0;
+
 
     // Convert to grayscale brightness (or use texColor.g if it's a grass texture)
-    float t = dot(texColor.rgb, vec3(0.299, 0.587, 0.114)); // standard luminance
+    // float t = dot(texColor.rgb, vec3(0.299, 0.587, 0.114)); // standard luminance
 
     // Optional: Clamp or adjust range
-    t = clamp(t, 0.0, 1.0);
+    // t = clamp(t, 0.0, 1.0);
 
     // Define your gradient
-    vec3 bottomColor = vec3(0.1, 0.3, 0.1);
-    vec3 topColor    = vec3(0.4, 0.8, 0.3);
+    // vec3 bottomColor = vec3(0.1, 0.3, 0.1);
+    // vec3 topColor    = vec3(0.4, 0.8, 0.3);
 
     // Interpolate
-    vec3 finalColor = mix(bottomColor, topColor, t);
+    float t = clamp((fragPos.y - minY) / (maxY - minY), 0.0, 1.0);
+    vec3 finalColor = mix(bottomColor, topColor, t);// * intensity;
 
     FragColor = vec4(finalColor, texColor.a);
+    // FragColor = vec4(vec3(texColor.r), 1.0);
 
     // FragColor = vec4(texture(grassTexture, texCoords.xy)); 
 }
