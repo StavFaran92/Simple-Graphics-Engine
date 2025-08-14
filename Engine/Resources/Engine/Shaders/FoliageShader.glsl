@@ -137,9 +137,10 @@ void main()
 
     vec2 XZ = vec2(fragPos.x, fragPos.z) * .01;
     vec3 dryColorA = vec3(0.6, 0.5, 0.1);
-    vec3 dryColorB = vec3(0.9f, 0.8f, 0.3f);
+    vec3 dryColorB = vec3(0.9, 0.8, 0.3);
 
     float dryFactor = texture(noiseTexture, XZ).r;
+    dryFactor = 0.0;
     vec3 dryColor = mix(dryColorA, dryColorB, t);
 
     vec3 color = mix(baseColor, dryColor, dryFactor);

@@ -159,8 +159,8 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		return da < db; // (front-to-back)
 		});
 
-	glEnable(GL_DEPTH_TEST); 
-	glDepthMask(GL_TRUE);
+	//glEnable(GL_DEPTH_TEST); 
+	//glDepthMask(GL_TRUE);
 	//glEnable(GL_CULL_FACE);
 
 	auto& foliageShader = m_foliageShader;
@@ -219,7 +219,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	}
 
 	//glDisable(GL_DEPTH_TEST); 
-	glDepthMask(GL_FALSE); //For max LOD grass i need to turn depth write off to get correct alpha blend
+	//glDepthMask(GL_FALSE); //For max LOD grass i need to turn depth write off to get correct alpha blend
 	auto& foliageMAXLODShader = m_foliageQuadShader;
 	foliageMAXLODShader->use();
 	foliageMAXLODShader->setUniformValue("view", *graphics->view);
