@@ -15,7 +15,11 @@ layout (location = 2) in vec2 aTexcoords;
 uniform vec3 patchPosition;
 uniform vec2 patchSize;
 uniform vec2 patchCount;
+uniform mat4 rotation;
 
+layout(std430, binding = 0) buffer PatchInstanceData {
+    vec4 instanceData[];
+};
 
 
 out vec3 fragPos;
@@ -23,9 +27,15 @@ out vec2 texCoords;
                                                                                     
 void main()                                                                         
 { 
+    vec4 vPos = instanceData[gl_InstanceID];
+    mat4 localModel = mat4(1.0);
+    localModel[3] = vPos;
+    // localModel *= scale;
+    localModel *= rotation;
+
     fragPos = aPos;
     texCoords = aTexcoords;
-    gl_Position = projection * view * model * vec4(aPos, 1.0); 
+    gl_Position = projection * view * localModel * vec4(aPos, 1.0); 
                                   
 }
 
