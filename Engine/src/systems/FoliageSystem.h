@@ -48,6 +48,6 @@ private:
 	Resource<Texture>windNoise;
 	Resource<Texture>noiseTexture;
 
-	int maxFoliageViewDistance = 150;
-	int minFoliageQuadViewDistance = 120;
+	int maxFoliageViewDistance = 100;
+	int minFoliageQuadViewDistance = 50;
 };
