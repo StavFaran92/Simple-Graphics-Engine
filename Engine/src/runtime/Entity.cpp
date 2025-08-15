@@ -89,3 +89,15 @@ Entity Entity::getChildByName(const std::string& name)
     logWarning("Could not find child with name {}", name);
     return Entity::EmptyEntity;
 }
+
+void Entity::remove()
+{
+    auto& trans = getComponent<Transformation>();
+    trans.removeParent();
+    for (auto [eid, child] : trans.getChildren())
+    {
+        child.remove();
+    }
+
+    m_registry->removeEntity(*this);
+}

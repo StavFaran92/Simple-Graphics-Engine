@@ -276,7 +276,14 @@ void Scene::update(float deltaTime)
 				continue;
 			}
 
-			nsc.script->onUpdate(deltaTime);
+			try
+			{
+				nsc.script->onUpdate(deltaTime);
+			}
+			catch (const std::exception& e)
+			{
+				logError("Native Script Error occured: {}" , e.what());
+			}
 		}
 
 		// Physics
@@ -935,7 +942,16 @@ void Scene::startSimulation()
 		}
 
 		nsc.script->entity = Entity(entity, &getRegistry());
-		nsc.script->onCreate();
+
+		try
+		{
+			nsc.script->onCreate();
+		}
+		catch (const std::exception& e)
+		{
+			logError("Native Script Error occured: {}", e.what());
+		}
+		
 
 		//nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
 	}
@@ -956,7 +972,14 @@ void Scene::stopSimulation()
 
 	for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())
 	{
-		nsc.script->onDestroy();
+		try
+		{
+			nsc.script->onDestroy();
+		}
+		catch (const std::exception& e)
+		{
+			logError("Native Script Error occured: ", e.what());
+		}
 		//gameEventLayer->unsubscribe(nsc.script); // TODO fix, ican simply remove the layer instead of all the scripts from the layer
 	}
 

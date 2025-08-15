@@ -211,10 +211,7 @@ public:
 
     }
 
-    void remove()
-    {
-        m_registry->removeEntity(*this);
-    }
+    void remove();
 
     //TODO fix this , 
     // In conjuction with set parent this will cause hard to debug issues.
