@@ -16,6 +16,7 @@ uniform vec3 patchPosition;
 uniform vec2 patchSize;
 uniform vec2 patchCount;
 uniform mat4 rotation;
+uniform vec4 offset;
 
 layout(std430, binding = 0) buffer PatchInstanceData {
     vec4 instanceData[];
@@ -29,7 +30,7 @@ void main()
 { 
     vec4 vPos = instanceData[gl_InstanceID];
     mat4 localModel = mat4(1.0);
-    localModel[3] = vPos;
+    localModel[3] = vPos + offset;
     // localModel *= scale;
     localModel *= rotation;
 
@@ -123,7 +124,7 @@ void main()
     // Final graded color
     vec4 texColor = texture(grassTexture, texCoords.xy).rgba;
 
-    if (texColor.a <= 0.0) 
+    if (texColor.a < 0.9) 
         discard;
 
     float intensity = (texColor.r + texColor.g + texColor.b) / 3.0;

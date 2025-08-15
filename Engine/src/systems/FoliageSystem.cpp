@@ -232,6 +232,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageMAXLODShader->setUniformValue("patchCount", glm::vec2(10, 10));
 	foliageMAXLODShader->setTextureInShader(grassTexture, "grassTexture", 0);
 	foliageMAXLODShader->setUniformValue("rotation", rotationMatrix);
+	foliageMAXLODShader->setUniformValue("offset", glm::vec4(0, .5, 0, 0));
 	auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
 	auto vao = grassBlade->getPrimaryMesh()->getVAO();
 	
