@@ -58,9 +58,12 @@ bool FoliageSystem::init()
 	//glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * foliageRandomLocations.size(), foliageRandomLocations.data(), GL_DYNAMIC_DRAW);
 	//glBindBufferBase(GL_UNIFORM_BUFFER, 4, m_randomPatchSampleUBO);
 
-	Texture::TextureImportSettings tSettings;
-	tSettings.flip = true;
-	grassTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
+	{
+		Texture::TextureImportSettings tSettings;
+		tSettings.flip = true;
+		tSettings.isTransient = true;
+		grassTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
+	}
 
 	{
 		Texture::TextureImportSettings noiseSettings;
@@ -68,6 +71,7 @@ bool FoliageSystem::init()
 		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
+		noiseSettings.isTransient = true;
 		windNoise = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings);
 	}
 
@@ -77,6 +81,7 @@ bool FoliageSystem::init()
 		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
+		noiseSettings.isTransient = true;
 		noiseTexture = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
 	}
 
