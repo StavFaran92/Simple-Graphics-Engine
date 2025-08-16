@@ -287,6 +287,12 @@ void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> 
 
 Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, const TextureImportSettings& settings)
 {
+	if (fileLocation.empty())
+	{
+		logWarning("Invalid texture name, cannot be empty.");
+		return Resource<Texture>::empty;
+	}
+
 	Texture::TextureData textureData;
 
 	textureData.target = GL_TEXTURE_2D;
@@ -316,6 +322,11 @@ Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, cons
 
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
+
+		if (!aInfo.isValid)
+		{
+			return Resource<Texture>::empty;
+		}
 	}
 
 	return texture;
