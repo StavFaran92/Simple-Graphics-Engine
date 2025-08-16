@@ -93,6 +93,17 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 		return {};
 	}
 
+	const auto& allAssetsOfType = getAllAssetsOfType(aInfo.aType);
+	for (const auto& asset : allAssetsOfType)
+	{
+		// Should add override option in settings
+		if (asset.name == aInfo.name)
+		{
+			logWarning("Asset name must be unique, abort asset import");
+			return {};
+		}
+	}
+
 	std::string fullName = std::filesystem::path(path).filename().string();
 	std::string name = fullName.substr(0, fullName.find_first_of('.'));
 	std::string ext = std::filesystem::path(path).extension().string();
