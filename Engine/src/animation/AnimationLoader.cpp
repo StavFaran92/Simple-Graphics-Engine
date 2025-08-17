@@ -104,12 +104,17 @@ Resource<Animation> AnimationLoader::load(const std::string & path, Resource<Ani
     return animation;
 }
 
-Resource<Animation> AnimationLoader::import(const std::string& path, const AnimationImportSettings& settings)
+Resource<Animation> AnimationLoader::import(const std::string& path, AnimationImportSettings settings)
 {
     if (!std::filesystem::exists(path))
     {
         logError("File doesn't exists: " + path);
         return Resource<Animation>::empty;
+    }
+
+    if (settings.name.empty())
+    {
+        settings.name = std::filesystem::path(path).filename().stem().string();
     }
 
     auto animation = Factory<Animation>::create();
@@ -127,7 +132,7 @@ Resource<Animation> AnimationLoader::import(const std::string& path, const Anima
 
     auto& projectDir = Engine::get()->getProjectDirectory();
     Assimp::Exporter exporter;
-    const std::string relativeFilepath = "/" + animation.getUID() + ".dae";
+    const std::string relativeFilepath = "/" + settings.name + ".dae";
     const std::string savedFilePath = projectDir + "/" + relativeFilepath;
     exporter.Export(scene, "collada", savedFilePath);
 
@@ -136,10 +141,6 @@ Resource<Animation> AnimationLoader::import(const std::string& path, const Anima
     aInfo.aType = AssetType::ANIMATION;
     aInfo.filePath = relativeFilepath;
     aInfo.name = settings.name;
-    if (aInfo.name.empty())
-    {
-        aInfo.name = std::filesystem::path(path).filename().string();
-    }
     Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
     load(savedFilePath, animation);

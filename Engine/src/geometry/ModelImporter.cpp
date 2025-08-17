@@ -99,8 +99,6 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, ModelImp
 		return {};
 	}
 
-	
-
 	auto metadata = scene->mMetaData;
 	if (metadata) {
 		for (unsigned int i = 0; i < metadata->mNumProperties; ++i) {
@@ -204,7 +202,7 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, ModelImp
 		}
 
 		// TODO I should probably copy the file instead of export (issue with GLTF and bin)
-		std::string relativeFilePath = MeshExporter::exportMesh(mInfo.mesh, scene);
+		std::string relativeFilePath = MeshExporter::exportMesh(settings.name, mInfo.mesh, scene);
 		aInfo.filePath = relativeFilePath;
 		aInfo.origFilePath = path;
 

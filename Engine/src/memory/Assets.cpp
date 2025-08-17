@@ -115,7 +115,7 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 	{
 		// Save asset in resource folder
 		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string relativeFilepath = "/" + uid + ext;
+		const std::string relativeFilepath = "/" + fullName;
 		const std::string savedFilePath = projectDir + relativeFilepath;
 		std::filesystem::copy_file(path, savedFilePath);
 
@@ -127,7 +127,7 @@ AssetInfo Assets::importAsset(AssetInfo aInfo)
 
 	aInfo.isValid = true;
 
-	m_assets[uid] = aInfo;
+	m_assets[name] = aInfo;
 
 	logInfo("Successfully imported asset: '" + path + "' into: '" + aInfo.name + "'.");
 
@@ -155,7 +155,7 @@ AssetInfo Assets::addAsset(AssetInfo aInfo)
 		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 	}
 
-	m_assets[uid] = aInfo;
+	m_assets[aInfo.name] = aInfo;
 
 	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
 
@@ -188,7 +188,7 @@ void Assets::load()
 		UUID uuid = asset.uuid;
 		Engine::get()->getResourceManager()->incRef(uuid);
 		Texture::loadTexture2D(asset);
-		m_assets[uuid] = asset;
+		m_assets[asset.name] = asset;
 	}
 
 	// Load meshes
@@ -204,7 +204,7 @@ void Assets::load()
 		Engine::get()->getResourceManager()->incRef(uuid);
 		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
 		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
-		m_assets[uuid] = asset;
+		m_assets[asset.name] = asset;
 	}
 
 	// Load animations
@@ -218,7 +218,7 @@ void Assets::load()
 		Engine::get()->getResourceManager()->incRef(uuid);
 		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
 		Engine::get()->getSubSystem<AnimationLoader>()->load(filepath, anim);
-		m_assets[uuid] = asset;
+		m_assets[asset.name] = asset;
 	}
 
 	// Load Shaders
@@ -235,7 +235,7 @@ void Assets::load()
 		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
 		Shader::load(shader, filepath, shaderOverride);
 
-		m_assets[uuid] = asset;
+		m_assets[asset.name] = asset;
 	}
 }
 
