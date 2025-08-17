@@ -375,7 +375,7 @@ void Texture::addTexture2D(const std::string& name, Resource<Texture> texture)
 	texture->m_data.bpp = 3;
 
 	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string relativeFilepath = "/" + texture.getUID() + ".png";
+	const std::string relativeFilepath = "/" + name + ".png";
 	std::string savedFileLocation = projectDir + relativeFilepath;
 	writeTexture2D(savedFileLocation, texture);
 
