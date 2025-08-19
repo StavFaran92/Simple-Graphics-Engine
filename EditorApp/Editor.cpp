@@ -75,6 +75,7 @@ uint32_t g_previewWindowID = 0;
 std::function<void(std::string uuid)> assetTextureSelectCB;
 std::function<void(Entity e)> entitySelectCB;
 Resource<Texture> selectedAssetTexture;
+fs::path selectedAsset;
 
 static std::shared_ptr<TextureSampler> g_selectedSampler;
 static std::shared_ptr<TextureSampler> g_previousSampler;
@@ -2741,6 +2742,7 @@ void RenderAssetViewWindow() {
 		{
 			if (!assets->hasAsset(filename)) continue;
 
+			ImGui::PushID(filename.c_str());
 			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
 
 			const AssetInfo& aInfo = assets->getAsset(filename);
@@ -2778,12 +2780,39 @@ void RenderAssetViewWindow() {
 
 			ImGui::EndGroup();
 
+			if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+			{
+				selectedAsset = entry.path();
+			}
+			if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+			{
+				selectedAsset = entry.path();
+				ImGui::OpenPopup("AssetContextMenu");
+			}
+
+			ImGui::PopID();
+
 			//ImGui::Separator(); // nice line between items
 
 			ImGui::NextColumn(); // move to next grid slot
 		}
 
-
+		if (ImGui::BeginPopup("AssetContextMenu"))
+		{
+			if (ImGui::MenuItem("Open"))
+			{
+				// TODO: Implement asset opening
+			}
+			if (ImGui::MenuItem("Rename"))
+			{
+				// TODO: Implement asset renaming
+			}
+			if (ImGui::MenuItem("Delete"))
+			{
+				// TODO: Implement asset deletion
+			}
+			ImGui::EndPopup();
+		}
 
 		// Double click to open
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
