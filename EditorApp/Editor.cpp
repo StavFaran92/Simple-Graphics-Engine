@@ -17,6 +17,9 @@
 #include "EditorState.h"
 
 #include <imgui_stdlib.h>
+#include "core/Logger.h"
+#include <vector>
+#include <mutex>
 
 #define BEGIN_IMGUI_TABLE(name) \
 	if (ImGui::BeginTable(name, 2, ImGuiTableFlags_None)) { \
@@ -56,8 +59,20 @@ static bool showShaderCreateWindow = false;
 
 static bool startButtonPressed = false;
 
+// Console log storage
+static std::vector<std::string> g_consoleLog;
+static std::mutex g_consoleMutex;
+static bool g_scrollConsole = false;
+
 static std::string selectedTextureName;
 static bool showTextureDisplayWindow = false;
+
+static void appendConsoleLog(const std::string& msg)
+{
+        std::lock_guard<std::mutex> lock(g_consoleMutex);
+        g_consoleLog.push_back(msg);
+        g_scrollConsole = true;
+}
 
 static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | 
 											ImGuiWindowFlags_NoCollapse | 
@@ -2798,6 +2813,24 @@ void RenderAssetViewWindow() {
 	ImGui::EndChild(); // end scrollable region
 }
 
+void RenderConsoleWindow()
+{
+        ImGui::Begin("Console", nullptr, windowFlags);
+
+        std::lock_guard<std::mutex> lock(g_consoleMutex);
+        for (const auto& line : g_consoleLog)
+        {
+                ImGui::TextUnformatted(line.c_str());
+        }
+        if (g_scrollConsole)
+        {
+                ImGui::SetScrollHereY(1.0f);
+                g_scrollConsole = false;
+        }
+
+        ImGui::End();
+}
+
 void DisplayDebugInfoWindow()
 {
 	//if (displayDebugInfoWindow)
@@ -2969,21 +3002,23 @@ class GUI_Helper : public GuiMenu {
 
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
 			ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-			ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
-			ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
-			ImGui::DockBuilderDockWindow("View", dockspace_id);
-			ImGui::DockBuilderFinish(dockspace_id);
-		}
+                        ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
+                        ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
+                        ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
+                        ImGui::DockBuilderDockWindow("View", dockspace_id);
+                        ImGui::DockBuilderFinish(dockspace_id);
+                }
 
 		// Render UI
 		RenderSimulationControlView();
 		RenderViewWindow();
 		RenderSceneHierarchyWindow();
 		RenderInspectorWindow();
-		RenderAssetViewWindow();
-		ShowTextureCreatorWindow();
-		ShowShaderCreatorWindow();
-		ShowTextureDisplayWindow();
+                RenderAssetViewWindow();
+                RenderConsoleWindow();
+                ShowTextureCreatorWindow();
+                ShowShaderCreatorWindow();
+                ShowTextureDisplayWindow();
 
 		DisplayDebugInfoWindow();
 		
@@ -3070,11 +3105,13 @@ public:
 		
 		ImGui::SetCurrentContext((ImGuiContext * )Engine::get()->getImguiHandler()->getCurrentContext());
 
-		setStyleAndColors();
+                setStyleAndColors();
 
-		NativeScriptsLoader::instance->init();
+                NativeScriptsLoader::instance->init();
 
-		Engine::get()->getEventSystem()->pushLayer(uiLayer);
+                Logger::setCallback(appendConsoleLog);
+
+                Engine::get()->getEventSystem()->pushLayer(uiLayer);
 
 		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");

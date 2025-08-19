@@ -5,43 +5,36 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <functional>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
 #include "core/Core.h"
 
+class CallbackSink_mt; // Forward declaration
+
 class EngineAPI Logger
 {
 public:
     // Initializes logger. If filePath is empty, logs to console only.
-    static void init(const std::string& filePath = "")
-    {
-        std::vector<spdlog::sink_ptr> sinks;
-
-        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        consoleSink->set_pattern("[%T] [%^%l%$] %v");
-        sinks.push_back(consoleSink);
-
-        if (!filePath.empty())
-        {
-            auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath, true);
-            fileSink->set_pattern("[%Y-%m-%d %T] [%l] %v");
-            sinks.push_back(fileSink);
-        }
-
-        s_logger = std::make_shared<spdlog::logger>("Engine", sinks.begin(), sinks.end());
-        s_logger->set_level(spdlog::level::trace);
-        spdlog::register_logger(s_logger);
-    }
+    static void init(const std::string& filePath = "");
 
     static std::shared_ptr<spdlog::logger>& get()
     {
         return s_logger;
     }
 
+    // Register a callback invoked for each log message
+    static void setCallback(std::function<void(const std::string&)> cb);
+
 private:
+    static void invokeCallback(const std::string& msg);
+
     static std::shared_ptr<spdlog::logger> s_logger;
+    static std::function<void(const std::string&)> s_callback;
+
+    friend class CallbackSink_mt;
 };
 
 // Macros
