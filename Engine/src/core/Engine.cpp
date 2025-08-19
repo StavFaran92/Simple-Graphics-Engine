@@ -204,25 +204,22 @@ bool Engine::init(const InitParams& initParams)
 
     m_randomSystem = std::make_shared<RandomNumberGenerator>();
 
+    // Create or Load project asset registry
+    std::shared_ptr<ProjectAssetRegistry> par;
     if (initParams.loadExistingProject)
     {
-        loadProject(m_projectDirectory);
+        par = ProjectAssetRegistry::parse(m_projectDirectory);
     }
     else
-    {
-        // Create a new Project       
-        auto& par = ProjectAssetRegistry::create(initParams.projectDir);;
-        m_context = std::make_shared<Context>(par);
-
-        m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
-        m_commonShaders = std::make_shared<CommonShaders>();
-        m_builtInMeshes = std::make_shared<BuiltInMeshes>();
-        m_defaultMaterial = std::make_shared<Material>();
-        
-        createStartupScene(m_context, initParams);
-
-        saveProject();
+    {   
+        par = ProjectAssetRegistry::create(initParams.projectDir);
     }
+
+    m_context = std::make_shared<Context>(par);
+    m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
+    m_commonShaders = std::make_shared<CommonShaders>();
+    m_builtInMeshes = std::make_shared<BuiltInMeshes>();
+    m_defaultMaterial = std::make_shared<Material>();
 
     auto foliageSystem = new FoliageSystem();
     foliageSystem->init();
@@ -232,6 +229,16 @@ bool Engine::init(const InitParams& initParams)
     {
         logError("Object picker failed to init!");
         return false;
+    }
+
+    if (initParams.loadExistingProject)
+    {
+        loadProject(m_projectDirectory);
+    }
+    else
+    {
+        createStartupScene(m_context, initParams);
+        saveProject();
     }
 
     if (initParams.startSimulationOnStartup)
@@ -466,17 +473,6 @@ void Engine::loadProject(const std::string& dirPath)
 {
     m_projectDirectory = dirPath;
 
-
-    auto& par = ProjectAssetRegistry::parse(dirPath);
-    auto& filePath = par->getFilepath();
-    m_context = std::make_shared<Context>(par);
-
-    m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
-    m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
-    m_commonShaders = std::make_shared<CommonShaders>();
-    m_builtInMeshes = std::make_shared<BuiltInMeshes>();
-    m_defaultMaterial = std::make_shared<Material>();
-
     // This is a shit hack I must fix,
     // I cannot put camera in built in meshes since it also containts material and texture data I need.
     ModelImporter::ModelImportSettings settings;
@@ -484,7 +480,8 @@ void Engine::loadProject(const std::string& dirPath)
     settings.name = "SGE_MAIN_CAMERA";
     auto modelInfo = getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj", settings);
 
-    m_projectManager->loadProject(filePath, m_context);
+    
+    m_projectManager->loadProject(getContext()->getProjectAssetRegistry()->getFilepath(), m_context);
 }
 
 void Engine::saveProject()

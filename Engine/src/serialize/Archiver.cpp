@@ -24,10 +24,11 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	serializedEntity.physics = getComponentIfExists<PhysicsComponent>(e);
 	serializedEntity.skybox = getComponentIfExists<SkyboxComponent>(e);
 	serializedEntity.transform = getComponentIfExists<Transformation>(e);
-	serializedEntity.animator = getComponentIfExists<Animator>(e);
-	serializedEntity.terrain = getComponentIfExists<Terrain>(e);
-	serializedEntity.testComponent = getComponentIfExists<TestComp>(e);
-	serializedEntity.shader = getComponentIfExists<ShaderComponent>(e);
+        serializedEntity.animator = getComponentIfExists<Animator>(e);
+        serializedEntity.terrain = getComponentIfExists<Terrain>(e);
+        serializedEntity.testComponent = getComponentIfExists<TestComp>(e);
+        serializedEntity.shader = getComponentIfExists<ShaderComponent>(e);
+        serializedEntity.foliage = getComponentIfExists<FoliageComponent>(e);
 
 	return serializedEntity;
 }
@@ -140,11 +141,18 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 		entityHandler.addComponent<TestComp>(serializedEnt.testComponent.value());
 	}
 
-	if (serializedEnt.shader)
-	{
-		auto& shader = entityHandler.addComponent<ShaderComponent>(serializedEnt.shader.value());
-		shader.update();
-	}
+    if (serializedEnt.shader)
+    {
+        auto& shader = entityHandler.addComponent<ShaderComponent>(serializedEnt.shader.value());
+        shader.update();
+    }
+
+    if (serializedEnt.foliage)
+    {
+        auto& foliage = entityHandler.addComponent<FoliageComponent>(serializedEnt.foliage.value());
+        foliage.terrainRef.setRegistry(&scene.getRegistry());
+        foliage.build();
+    }
 }
 
 SerializedScene Archiver::serializeScene(Scene* scene)
