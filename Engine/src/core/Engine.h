@@ -98,7 +98,7 @@ public:
 
     
     
-    void loadProject(const std::string& filePath);
+    void loadProject(const std::string& dirPath);
     void saveProject();
     std::string getProjectDirectory() const;
 

@@ -141,18 +141,18 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 		entityHandler.addComponent<TestComp>(serializedEnt.testComponent.value());
 	}
 
-        if (serializedEnt.shader)
-        {
-                auto& shader = entityHandler.addComponent<ShaderComponent>(serializedEnt.shader.value());
-                shader.update();
-        }
+    if (serializedEnt.shader)
+    {
+        auto& shader = entityHandler.addComponent<ShaderComponent>(serializedEnt.shader.value());
+        shader.update();
+    }
 
-        if (serializedEnt.foliage)
-        {
-                auto& foliage = entityHandler.addComponent<FoliageComponent>(serializedEnt.foliage.value());
-                foliage.terrainRef.setRegistry(&scene.getRegistry());
-                foliage.build();
-        }
+    if (serializedEnt.foliage)
+    {
+        auto& foliage = entityHandler.addComponent<FoliageComponent>(serializedEnt.foliage.value());
+        foliage.terrainRef.setRegistry(&scene.getRegistry());
+        foliage.build();
+    }
 }
 
 SerializedScene Archiver::serializeScene(Scene* scene)
