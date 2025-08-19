@@ -59,15 +59,44 @@ static bool showShaderCreateWindow = false;
 
 static bool startButtonPressed = false;
 
+struct Message
+{
+	spdlog::level::level_enum level;
+	std::string msg;
+};
+
+inline ImVec4 LogLevelToColor(spdlog::level::level_enum level)
+{
+	switch (level)
+	{
+	case spdlog::level::trace:
+		return ImVec4(0.7f, 0.7f, 0.7f, 1.0f); // light gray
+	case spdlog::level::debug:
+		return ImVec4(0.3f, 0.8f, 0.3f, 1.0f); // green
+	case spdlog::level::info:
+		return ImVec4(0.2f, 0.6f, 1.0f, 1.0f); // blue
+	case spdlog::level::warn:
+		return ImVec4(1.0f, 0.8f, 0.2f, 1.0f); // yellow/orange
+	case spdlog::level::err:
+		return ImVec4(1.0f, 0.3f, 0.3f, 1.0f); // red
+	case spdlog::level::critical:
+		return ImVec4(0.9f, 0.1f, 0.1f, 1.0f); // dark red
+	case spdlog::level::off:
+		return ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // white (disabled)
+	default:
+		return ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // fallback white
+	}
+}
+
 // Console log storage
-static std::vector<std::string> g_consoleLog;
+static std::vector<Message> g_consoleLog;
 static std::mutex g_consoleMutex;
 static bool g_scrollConsole = false;
 
-static void appendConsoleLog(const std::string& msg)
+static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
 	std::lock_guard<std::mutex> lock(g_consoleMutex);
-	g_consoleLog.push_back(msg);
+	g_consoleLog.push_back({ level, msg });
 	g_scrollConsole = true;
 }
 
@@ -2837,7 +2866,8 @@ void RenderConsoleWindow()
         std::lock_guard<std::mutex> lock(g_consoleMutex);
         for (const auto& line : g_consoleLog)
         {
-            ImGui::TextUnformatted(line.c_str());
+
+            ImGui::TextColored(LogLevelToColor(line.level), line.msg.c_str());
         }
         if (g_scrollConsole)
         {

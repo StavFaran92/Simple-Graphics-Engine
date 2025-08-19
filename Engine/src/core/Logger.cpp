@@ -3,7 +3,7 @@
 #include <mutex>
 
 std::shared_ptr<spdlog::logger> Logger::s_logger;
-std::function<void(const std::string&)> Logger::s_callback;
+std::function<void(spdlog::level::level_enum, const std::string&)> Logger::s_callback;
 
 // Custom sink that forwards log messages to the registered callback
 class CallbackSink_mt : public spdlog::sinks::base_sink<std::mutex>
@@ -18,7 +18,7 @@ protected:
     {
         spdlog::memory_buf_t formatted;
         this->formatter_->format(msg, formatted);
-        Logger::invokeCallback(std::string(formatted.begin(), formatted.end()));
+        Logger::invokeCallback(msg.level, std::string(formatted.begin(), formatted.end()));
     }
 
     void flush_() override {}
@@ -47,16 +47,16 @@ void Logger::init(const std::string& filePath)
     spdlog::register_logger(s_logger);
 }
 
-void Logger::setCallback(std::function<void(const std::string&)> cb)
+void Logger::setCallback(std::function<void(spdlog::level::level_enum, const std::string&)> cb)
 {
     s_callback = std::move(cb);
 }
 
-void Logger::invokeCallback(const std::string& msg)
+void Logger::invokeCallback(spdlog::level::level_enum level, const std::string& msg)
 {
     if (s_callback)
     {
-        s_callback(msg);
+        s_callback(level, msg);
     }
 }
 

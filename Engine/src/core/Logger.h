@@ -26,13 +26,13 @@ public:
     }
 
     // Register a callback invoked for each log message
-    static void setCallback(std::function<void(const std::string&)> cb);
+    static void setCallback(std::function<void(spdlog::level::level_enum, const std::string&)> cb);
 
 private:
-    static void invokeCallback(const std::string& msg);
+    static void invokeCallback(spdlog::level::level_enum level, const std::string& msg);
 
     static std::shared_ptr<spdlog::logger> s_logger;
-    static std::function<void(const std::string&)> s_callback;
+    static std::function<void(spdlog::level::level_enum, const std::string&)> s_callback;
 
     friend class CallbackSink_mt;
 };
