@@ -8,6 +8,11 @@ std::function<void(const std::string&)> Logger::s_callback;
 // Custom sink that forwards log messages to the registered callback
 class CallbackSink_mt : public spdlog::sinks::base_sink<std::mutex>
 {
+public:
+    CallbackSink_mt()
+    {
+        set_pattern("[%T] [%^%l%$] %v");
+    }
 protected:
     void sink_it_(const spdlog::details::log_msg& msg) override
     {
@@ -30,7 +35,7 @@ void Logger::init(const std::string& filePath)
     if (!filePath.empty())
     {
         auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath, true);
-        fileSink->set_pattern("[%Y-%m-%d %T] [%l] %v");
+        fileSink->set_pattern("[%T] [%^%l%$] %v");
         sinks.push_back(fileSink);
     }
 

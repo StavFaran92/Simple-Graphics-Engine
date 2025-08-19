@@ -64,15 +64,28 @@ static std::vector<std::string> g_consoleLog;
 static std::mutex g_consoleMutex;
 static bool g_scrollConsole = false;
 
+static void appendConsoleLog(const std::string& msg)
+{
+	std::lock_guard<std::mutex> lock(g_consoleMutex);
+	g_consoleLog.push_back(msg);
+	g_scrollConsole = true;
+}
+
+class ConsoleLoggerRegister
+{
+public:
+	ConsoleLoggerRegister()
+	{
+		Logger::setCallback(appendConsoleLog);
+	}
+};
+
+static ConsoleLoggerRegister clr;
+
 static std::string selectedTextureName;
 static bool showTextureDisplayWindow = false;
 
-static void appendConsoleLog(const std::string& msg)
-{
-        std::lock_guard<std::mutex> lock(g_consoleMutex);
-        g_consoleLog.push_back(msg);
-        g_scrollConsole = true;
-}
+
 
 static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | 
 											ImGuiWindowFlags_NoCollapse | 
@@ -2815,17 +2828,21 @@ void RenderAssetViewWindow() {
 
 void RenderConsoleWindow()
 {
-        ImGui::Begin("Console", nullptr, windowFlags);
+        ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus |
+											ImGuiWindowFlags_NoCollapse |
+											ImGuiWindowFlags_NoFocusOnAppearing |
+											ImGuiWindowFlags_NoTitleBar |
+											ImGuiWindowFlags_NoMove);
 
         std::lock_guard<std::mutex> lock(g_consoleMutex);
         for (const auto& line : g_consoleLog)
         {
-                ImGui::TextUnformatted(line.c_str());
+            ImGui::TextUnformatted(line.c_str());
         }
         if (g_scrollConsole)
         {
-                ImGui::SetScrollHereY(1.0f);
-                g_scrollConsole = false;
+            ImGui::SetScrollHereY(1.0f);
+            g_scrollConsole = false;
         }
 
         ImGui::End();
@@ -3014,11 +3031,11 @@ class GUI_Helper : public GuiMenu {
 		RenderViewWindow();
 		RenderSceneHierarchyWindow();
 		RenderInspectorWindow();
-                RenderAssetViewWindow();
-                RenderConsoleWindow();
-                ShowTextureCreatorWindow();
-                ShowShaderCreatorWindow();
-                ShowTextureDisplayWindow();
+        RenderAssetViewWindow();
+        RenderConsoleWindow();
+        ShowTextureCreatorWindow();
+        ShowShaderCreatorWindow();
+        ShowTextureDisplayWindow();
 
 		DisplayDebugInfoWindow();
 		
@@ -3097,7 +3114,6 @@ static bool debugTerrainFlag = false;
 class EditorApp : public Application
 {
 public:
-
 	void start() override
 	{
 
@@ -3105,13 +3121,11 @@ public:
 		
 		ImGui::SetCurrentContext((ImGuiContext * )Engine::get()->getImguiHandler()->getCurrentContext());
 
-                setStyleAndColors();
+        setStyleAndColors();
 
-                NativeScriptsLoader::instance->init();
+        NativeScriptsLoader::instance->init();
 
-                Logger::setCallback(appendConsoleLog);
-
-                Engine::get()->getEventSystem()->pushLayer(uiLayer);
+        Engine::get()->getEventSystem()->pushLayer(uiLayer);
 
 		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
