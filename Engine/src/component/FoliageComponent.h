@@ -28,15 +28,15 @@ struct EngineAPI FoliageComponent : public Component
 
         template <class Archive>
         void serialize(Archive& archive) {
-                SERIALIZED_MEMBER(m_foliageSpreadMap);
-                SERIALIZED_MEMBER(globalDensity);
-                SERIALIZED_MEMBER(colorA);
-                SERIALIZED_MEMBER(colorB);
-                SERIALIZED_MEMBER(patchWidth);
-                SERIALIZED_MEMBER(patchHeight);
-                SERIALIZED_MEMBER(width);
-                SERIALIZED_MEMBER(height);
-                SERIALIZED_MEMBER(terrainRef);
+            SERIALIZED_MEMBER(m_foliageSpreadMap);
+            SERIALIZED_MEMBER(globalDensity);
+            SERIALIZED_MEMBER(colorA);
+            SERIALIZED_MEMBER(colorB);
+            SERIALIZED_MEMBER(patchWidth);
+            SERIALIZED_MEMBER(patchHeight);
+            SERIALIZED_MEMBER(width);
+            SERIALIZED_MEMBER(height);
+            SERIALIZED_MEMBER(terrainRef);
         }
 
 	Resource<Texture> m_foliageSpreadMap;

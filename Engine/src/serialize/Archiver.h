@@ -82,11 +82,11 @@ struct SerializedEntity
 	std::optional<ObjectComponent> obj;
 	std::optional<SkyboxComponent> skybox;
 	std::optional<ImageComponent> image;
-        std::optional<Animator> animator;
-        std::optional<Terrain> terrain;
-        std::optional<TestComp> testComponent;
-        std::optional<ShaderComponent> shader;
-        std::optional<FoliageComponent> foliage;
+    std::optional<Animator> animator;
+    std::optional<Terrain> terrain;
+    std::optional<TestComp> testComponent;
+    std::optional<ShaderComponent> shader;
+    std::optional<FoliageComponent> foliage;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -104,12 +104,12 @@ struct SerializedEntity
 		SERIALIZED_MEMBER(obj);
 		SERIALIZED_MEMBER(skybox);
 		SERIALIZED_MEMBER(image);
-                SERIALIZED_MEMBER(animator);
-                SERIALIZED_MEMBER(terrain);
-                SERIALIZED_MEMBER(testComponent);
-                SERIALIZED_MEMBER(shader);
-                SERIALIZED_MEMBER(foliage);
-        }
+        SERIALIZED_MEMBER(animator);
+        SERIALIZED_MEMBER(terrain);
+        SERIALIZED_MEMBER(testComponent);
+        SERIALIZED_MEMBER(shader);
+		SERIALIZED_MEMBER_OPTIONAL(foliage, {});
+	}
 };
 
 struct SerializedScene
