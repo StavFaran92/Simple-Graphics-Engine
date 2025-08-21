@@ -91,14 +91,7 @@ public:
     const InitParams& getInitParams() const;
     EventLayerStack* getEventLayerStack() const;
     const EngineConfig& getConfig() const;
-    MemoryPool<Asset>& getMemoryPool() const;
-    //template<typename T>MemoryPool<T>* getMemoryPool() const { return 0; };
-    //template<>MemoryPool<Texture>* getMemoryPool() const { return m_memoryPoolTexture.get(); }
-    //template<>MemoryPool<MeshCollection>* getMemoryPool() const { return m_memoryPoolMeshCollection.get(); }
-    //template<>MemoryPool<Animation>* getMemoryPool() const { return m_memoryPoolAnimation.get(); }
-    //template<>MemoryPool<Shader>* getMemoryPool() const { return m_memoryPoolShader.get(); }
-
-    
+    MemoryPool<Asset>& getMemoryPool() const;    
     
     void loadProject(const std::string& dirPath);
     void saveProject();
@@ -177,17 +170,12 @@ protected:
     std::shared_ptr<RandomNumberGenerator> m_randomSystem;
     std::shared_ptr<ShaderLoader> m_shaderLoader;
     std::shared_ptr<ResourceManager> m_resourceManager;
-    //std::shared_ptr<MemoryPool<Texture>> m_memoryPoolTexture;
-    //std::shared_ptr<MemoryPool<MeshCollection>> m_memoryPoolMeshCollection;
-    //std::shared_ptr<MemoryPool<Animation>> m_memoryPoolAnimation;
-    //std::shared_ptr<MemoryPool<Shader>> m_memoryPoolShader;
     std::shared_ptr<ProjectManager> m_projectManager;
     std::shared_ptr<CommonShaders> m_commonShaders;
     std::shared_ptr<BuiltInMeshes> m_builtInMeshes;
     std::shared_ptr<CommonTextures> m_commonTextures;
     std::shared_ptr<Assets> m_assets;
     std::shared_ptr<EngineConfig> m_engineConfig;
-    //std::shared_ptr<MemoryManager> m_memoryManager;
     std::shared_ptr<MemoryPool<Asset>> m_memoryPool;
 
     InitParams m_initParams;
