@@ -25,8 +25,8 @@ public:
 	int getBoneID(const std::string& boneName) const;
 
 	// Inherited via Asset
-	void import(const std::string& fileLocation, const ImportSettings& settings) override;
-	void load(AssetInfo aInfo) override;
+	Resource<Asset> import(const std::string& fileLocation, const ImportSettings& settings) override;
+	Resource<Asset> load(AssetInfo aInfo) override;
 	
 
 private:

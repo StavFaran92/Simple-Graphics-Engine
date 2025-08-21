@@ -208,12 +208,14 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 }
 
-void Texture::import(const std::string& fileLocation, const ImportSettings& settings)
+Resource<Asset> Texture::import(const std::string& fileLocation, const ImportSettings& settings)
 {
+	return {};
 }
 
-void Texture::load(AssetInfo aInfo)
+Resource<Asset> Texture::load(AssetInfo aInfo)
 {
+	return {};
 }
 
 Texture::~Texture()

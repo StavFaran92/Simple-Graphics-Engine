@@ -89,3 +89,13 @@ void Animation::load(UUID uid, const std::string& path)
 	Engine::get()->getSubSystem<AnimationLoader>()->load(path, Resource<Animation>(uid));
 
 }
+
+Resource<Asset> Animation::import(const std::string& fileLocation, const ImportSettings& settings)
+{
+	return Resource<Asset>();
+}
+
+Resource<Asset> Animation::load(AssetInfo aInfo)
+{
+	return Resource<Asset>();
+}

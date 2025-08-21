@@ -240,12 +240,14 @@ void Mesh::calculateNormals()
 	//}
 }
 
-void Mesh::import(const std::string& fileLocation, const ImportSettings& settings)
+Resource<Asset> Mesh::import(const std::string& fileLocation, const ImportSettings& settings)
 {
+	return {};
 }
 
-void Mesh::load(AssetInfo aInfo)
+Resource<Asset> Mesh::load(AssetInfo aInfo)
 {
+	return {};
 }
 
 void Mesh::clearMesh()

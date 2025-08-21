@@ -132,4 +132,5 @@ private:
 	mutable Asset* m_cache = nullptr;
 };
 
-inline Resource<Asset> Resource<Asset>::empty;
+template<typename T>
+inline Resource<T> Resource<T>::empty;

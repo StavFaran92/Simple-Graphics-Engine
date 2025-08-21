@@ -29,6 +29,16 @@ Shader::Shader(const std::string& glslFilePath) :
 	recompile();
 }
 
+Resource<Asset> Shader::import(const std::string& fileLocation, const ImportSettings& settings)
+{
+	return Resource<Asset>();
+}
+
+Resource<Asset> Shader::load(AssetInfo aInfo)
+{
+	return Resource<Asset>();
+}
+
 void Shader::init()
 {
 
