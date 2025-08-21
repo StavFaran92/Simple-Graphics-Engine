@@ -5,8 +5,7 @@
 #include <unordered_map>
 #include "glm/glm.hpp"
 #include "component/Component.h"
-
-class Animation;
+#include "animation/Animation.h"
 
 class EngineAPI Animator : public Component
 {

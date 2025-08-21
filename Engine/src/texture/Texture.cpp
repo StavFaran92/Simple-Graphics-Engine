@@ -208,6 +208,14 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 }
 
+void Texture::import(const std::string& fileLocation, const ImportSettings& settings)
+{
+}
+
+void Texture::load(AssetInfo aInfo)
+{
+}
+
 Texture::~Texture()
 {
 	logInfo( __FUNCTION__ );
@@ -347,7 +355,7 @@ Resource<Texture> Texture::loadTexture2D(AssetInfo aInfo)
 	// Create texture
 	Texture* texture = new Texture();
 	texture->build(textureData);
-	Engine::get()->getMemoryPool<Texture>()->add(aInfo.uuid, texture);
+	Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
 
 	texture->m_attributes = attributes;
 

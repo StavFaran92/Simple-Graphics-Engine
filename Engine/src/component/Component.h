@@ -13,6 +13,7 @@
 #include "cereal/types/optional.hpp"
 #include "physics/Colliders.h"
 #include "serialize/CerealHelpers.h"
+#include "geometry/MeshCollection.h"
 
 /**
 HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE

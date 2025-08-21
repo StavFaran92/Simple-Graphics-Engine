@@ -30,6 +30,8 @@ private:
     template<class T>friend class Resource;
     T* get(UUID uid)
     {
+        //static_assert(std::is_base_of<T, K>::value, "K must derive from T");
+
         auto iter = m_memory.find(uid);
         if (iter == m_memory.end())
         {

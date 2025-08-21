@@ -24,7 +24,8 @@ public:
 	{
 		Engine::get()->getResourceManager()->incRef(uid);
 
-		if(!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
+		if(!isEmpty()) 
+			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	};
 
 	Resource(const Resource<T>& other) 
@@ -35,7 +36,8 @@ public:
 			Engine::get()->getResourceManager()->incRef(other.uuid);
 		}
 
-		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
+		if (!isEmpty()) 
+			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	};
 
 	Resource<T>& operator=(const Resource<T>& other)
@@ -50,7 +52,8 @@ public:
 		{
 			Engine::get()->getResourceManager()->incRef(other.uuid);
 		}
-		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
+		if (!isEmpty()) 
+			m_cache = Engine::get()->getMemoryPool().get(uuid);
 
 		return *this;
 	};
@@ -59,14 +62,16 @@ public:
 	{
 		uuid = other.uuid;
 		other.uuid = EMPTY_UUID;
-		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
+		if (!isEmpty()) 
+			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	};
 
 	Resource<T>& operator=(Resource<T>&& other)
 	{
 		uuid = other.uuid;
 		other.uuid = EMPTY_UUID;
-		if (!isEmpty()) m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
+		if (!isEmpty()) 
+			m_cache = Engine::get()->getMemoryPool().get(uuid);
 
 		return *this;
 	};
@@ -78,8 +83,7 @@ public:
 
 	inline T* get() const
 	{
-		m_cache = Engine::get()->getMemoryPool<T>()->get(uuid);
-		return m_cache;
+		return static_cast<T*>(Engine::get()->getMemoryPool().get(uuid));
 	}
 
 	inline UUID getUID() const 
@@ -117,7 +121,7 @@ private:
 		{
 			if (uuid != EMPTY_UUID)
 			{
-				Engine::get()->getMemoryPool<T>()->erase(uuid);
+				Engine::get()->getMemoryPool().erase(uuid);
 			}
 
 			uuid = EMPTY_UUID;
@@ -125,8 +129,7 @@ private:
 	}
 private:
 	UUID uuid = EMPTY_UUID;
-	mutable T* m_cache = nullptr;
+	mutable Asset* m_cache = nullptr;
 };
 
-template<typename T>
-inline Resource<T> Resource<T>::empty;
+inline Resource<Asset> Resource<Asset>::empty;

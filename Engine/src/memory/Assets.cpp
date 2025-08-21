@@ -72,7 +72,7 @@ Resource<T> Assets::loadAsset(UUID uid, const std::string& path)
 	auto& res = Resource<T>(uid);
 
 	// add asset to memory pool
-	Engine::get()->getMemoryPool<T>()->add(uid, res.get());
+	Engine::get()->getMemoryPool().add(uid, res.get());
 
 	AssetType aType = getAssetType<T>();
 	m_assets[aType].insert(uid);
@@ -197,7 +197,7 @@ void Assets::load()
 	{
 		UUID uuid = asset.uuid;
 		MeshCollection* meshPtr = new MeshCollection();
-		Engine::get()->getMemoryPool<MeshCollection>()->add(uuid, meshPtr);
+		Engine::get()->getMemoryPool().add(uuid, meshPtr);
 		Resource<MeshCollection> generatedMesh(uuid);
 		ModelImporter::ModelInfo mInfo;
 		mInfo.mesh = generatedMesh;
@@ -213,7 +213,7 @@ void Assets::load()
 	{
 		UUID uuid = asset.uuid;
 		Animation* animPtr = new Animation();
-		Engine::get()->getMemoryPool<Animation>()->add(uuid, animPtr);
+		Engine::get()->getMemoryPool().add(uuid, animPtr);
 		Resource<Animation> anim(uuid);
 		Engine::get()->getResourceManager()->incRef(uuid);
 		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
@@ -229,7 +229,7 @@ void Assets::load()
 		std::string shaderOverrideStr = asset.attributes.at("shader_override");
 		ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
 		Shader* shaderPtr = new Shader();
-		Engine::get()->getMemoryPool<Shader>()->add(uuid, shaderPtr);
+		Engine::get()->getMemoryPool().add(uuid, shaderPtr);
 		Resource<Shader> shader(uuid);
 		Engine::get()->getResourceManager()->incRef(uuid);
 		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;

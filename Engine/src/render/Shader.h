@@ -7,6 +7,7 @@
 #include <memory>
 #include <queue>
 #include <variant>
+#include "memory/Asset.h"
 
 #include "core/Core.h"
 
@@ -26,7 +27,7 @@ class Texture;
 
 using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned int, glm::mat3, glm::mat4>;
 
-class EngineAPI Shader : public std::enable_shared_from_this<Shader>
+class EngineAPI Shader : public Asset, std::enable_shared_from_this<Shader>
 {
 public:
 
@@ -83,6 +84,10 @@ public:
 
 	/** Constructor */
 	Shader(const std::string& glslFilePath);
+
+	// Inherited via Asset
+	void import(const std::string& fileLocation, const ImportSettings& settings) override;
+	void load(AssetInfo aInfo) override;
 
 protected:
 	

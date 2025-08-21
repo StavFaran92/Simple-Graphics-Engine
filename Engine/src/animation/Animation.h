@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "glm/glm.hpp"
 #include "memory/UUID.h"
+#include "memory/Asset.h"
 
 class Bone;
 
@@ -18,7 +19,7 @@ struct MeshNodeData
 	std::vector<MeshNodeData> children;
 };
 
-class Animation
+class Animation : public Asset
 {
 public:
 	Animation();
@@ -29,6 +30,10 @@ public:
 
 	static bool preprocess(const std::string& path);
 	static void load(UUID uid, const std::string& path);
+
+	// Inherited via Asset
+	void import(const std::string& fileLocation, const ImportSettings& settings) override;
+	void load(AssetInfo aInfo) override;
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);
 

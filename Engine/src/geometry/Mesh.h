@@ -5,6 +5,7 @@
 #include "core/Core.h"
 #include "render/Shader.h"
 #include "memory/Resource.h"
+#include "memory/Asset.h"
 
 class VertexBufferObject;
 class ElementBufferObject;
@@ -40,7 +41,7 @@ struct MeshData;
  * it can be used to manipulate an existing Mesh data or to generate one yourself.
  * It should be used with the MeshBuilder class.
  */
-class EngineAPI Mesh
+class EngineAPI Mesh : public Asset
 {
 public:
 	// -------------------- Methods -------------------- //
@@ -127,4 +128,8 @@ private:
 
 	AABB m_aabb;
 	int materialIndex{};
+
+	// Inherited via Asset
+	void import(const std::string& fileLocation, const ImportSettings& settings) override;
+	void load(AssetInfo aInfo) override;
 };

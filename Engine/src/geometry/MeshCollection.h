@@ -5,8 +5,9 @@
 #include "core/Core.h"
 #include "geometry/Mesh.h"
 #include "memory/Resource.h"
+#include "memory/Asset.h"
 
-class EngineAPI MeshCollection
+class EngineAPI MeshCollection : public Asset
 {
 public:
 	void addMesh(const std::shared_ptr<Mesh>& mesh);
@@ -22,6 +23,10 @@ public:
 	std::vector<glm::mat4> getBoneOffsets() const;
 
 	int getBoneID(const std::string& boneName) const;
+
+	// Inherited via Asset
+	void import(const std::string& fileLocation, const ImportSettings& settings) override;
+	void load(AssetInfo aInfo) override;
 	
 
 private:

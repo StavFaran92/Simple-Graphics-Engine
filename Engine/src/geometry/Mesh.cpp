@@ -240,6 +240,14 @@ void Mesh::calculateNormals()
 	//}
 }
 
+void Mesh::import(const std::string& fileLocation, const ImportSettings& settings)
+{
+}
+
+void Mesh::load(AssetInfo aInfo)
+{
+}
+
 void Mesh::clearMesh()
 {
 	m_positions.clear();

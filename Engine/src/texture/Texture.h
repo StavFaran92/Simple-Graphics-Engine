@@ -9,10 +9,11 @@
 #include "core/ApplicationConstants.h"
 #include "core/Configurations.h"
 #include "memory/Resource.h"
+#include "memory/Asset.h"
 
 struct AssetInfo;
 
-class EngineAPI Texture
+class EngineAPI Texture : public Asset
 {
 public:
 	enum class TextureType
@@ -279,4 +280,8 @@ private:
 	TextureData m_data;
 
 	TextureAssetAttributes m_attributes;
+
+	// Inherited via Asset
+	void import(const std::string& fileLocation, const ImportSettings& settings) override;
+	void load(AssetInfo aInfo) override;
 };
