@@ -73,22 +73,22 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 
 	ComponentSerializer::deserializeComponents(serializedEnt.components, entityHandler);
 
-	for (const auto& c : serializedEnt.components)
-	{
-		if (auto tc = std::dynamic_pointer_cast<Transformation>(c))
-		{
-			auto& transform = entityHandler.addComponent<Transformation>(*tc);
-			transform.entity.setRegistry(&scene.getRegistry());
-			transform.root.setRegistry(&scene.getRegistry());
-			transform.m_parent.setRegistry(&scene.getRegistry());
+	//for (const auto& c : serializedEnt.components)
+	//{
+	//	if (auto tc = std::dynamic_pointer_cast<Transformation>(c))
+	//	{
+	//		auto& transform = entityHandler.addComponent<Transformation>(*tc);
+	//		transform.entity.setRegistry(&scene.getRegistry());
+	//		transform.root.setRegistry(&scene.getRegistry());
+	//		transform.m_parent.setRegistry(&scene.getRegistry());
 
-			for (auto [_, entity] : tc->getChildren())
-			{
-				Entity eChild(entity.handler(), &scene.getRegistry());
-				transform.addChild(eChild);
-			}
-		}
-	}
+	//		for (auto [_, entity] : tc->getChildren())
+	//		{
+	//			Entity eChild(entity.handler(), &scene.getRegistry());
+	//			transform.addChild(eChild);
+	//		}
+	//	}
+	//}
 
 	//if (serializedEnt.transform)
 	//{

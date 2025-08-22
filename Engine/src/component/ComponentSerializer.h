@@ -7,7 +7,7 @@ class ComponentSerializer
 {
 public:
 	using SerializeFn = std::function<std::shared_ptr<Component>(const Entity& e)>;
-	using DeserializeFn = std::function<Entity(std::shared_ptr<const Component>)>;
+	using DeserializeFn = std::function<void(std::shared_ptr<Component>, Entity)>;
 
 	static void registerSerializeFunc(const SerializeFn& fn);
 	static void serializeComponents(const Entity& e, std::vector<std::shared_ptr<Component>>& components);
