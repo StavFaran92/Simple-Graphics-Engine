@@ -9,7 +9,24 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 {
 	SerializedEntity serializedEntity;
 	serializedEntity.entity = e.handler();
-	serializedEntity.components.push_back(getComponentIfExists2<TestComp>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<TestComp>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<CameraComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<PlayerController>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<DirectionalLight>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<ImageComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<MaterialComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<MeshComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<NativeScriptComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<ObjectComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<PointLight>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<RenderableComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<PhysicsComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<SkyboxComponent>(e));
+	serializedEntity.components.push_back(getComponentIfExists2<Transformation>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<Animator>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<Terrain>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<ShaderComponent>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<FoliageComponent>(e));
 
 	serializedEntity.camera = getComponentIfExists<CameraComponent>(e);
 	//serializedEntity.collisionBox = getComponentIfExists<CollisionBoxComponent>(e);
@@ -25,7 +42,7 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	serializedEntity.renderableComponent = getComponentIfExists<RenderableComponent>(e);
 	serializedEntity.physics = getComponentIfExists<PhysicsComponent>(e);
 	serializedEntity.skybox = getComponentIfExists<SkyboxComponent>(e);
-	serializedEntity.transform = getComponentIfExists<Transformation>(e);
+	//serializedEntity.transform = getComponentIfExists<Transformation>(e);
         serializedEntity.animator = getComponentIfExists<Animator>(e);
         serializedEntity.terrain = getComponentIfExists<Terrain>(e);
         
@@ -39,19 +56,33 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 {
 	auto e = scene.getRegistry().getRegistry().create(serializedEnt.entity);
 	auto entityHandler = Entity(e, &scene.getRegistry());
-	if (serializedEnt.transform)
-	{
-		auto& transform = entityHandler.addComponent<Transformation>(serializedEnt.transform.value());
-		transform.entity.setRegistry(&scene.getRegistry());
-		transform.root.setRegistry(&scene.getRegistry());
-		transform.m_parent.setRegistry(&scene.getRegistry());
 
-		for (auto [_, entity] : serializedEnt.transform.value().getChildren())
+	
+
+	for (const auto& c : serializedEnt.components)
+	{
+		if (auto tc = std::dynamic_pointer_cast<Transformation>(c))
 		{
-			Entity eChild(entity.handler(), &scene.getRegistry());
-			transform.addChild(eChild);
+			auto& transform = entityHandler.addComponent<Transformation>(*tc);
+			transform.entity.setRegistry(&scene.getRegistry());
+			transform.root.setRegistry(&scene.getRegistry());
+			transform.m_parent.setRegistry(&scene.getRegistry());
+
+			for (auto [_, entity] : tc->getChildren())
+			{
+				Entity eChild(entity.handler(), &scene.getRegistry());
+				transform.addChild(eChild);
+			}
 		}
 	}
+
+	//if (serializedEnt.transform)
+	//{
+	//	
+	//}
+
+
+
 	if (serializedEnt.dLight)
 	{
 		entityHandler.addComponent<DirectionalLight>(serializedEnt.dLight.value());
@@ -138,13 +169,7 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 		entityHandler.addComponent<Terrain>(serializedEnt.terrain.value());
 	}
 
-	for (const auto& c : serializedEnt.components)
-	{
-		auto tc = std::dynamic_pointer_cast<TestComp>(c);
-
-		if(tc)
-			entityHandler.addComponent<TestComp>(*tc);
-	}
+	
 
 	//if ()
 	//{

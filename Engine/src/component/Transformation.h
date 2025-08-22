@@ -147,3 +147,6 @@ private:
 
 	bool m_isDirty = true;
 };
+
+CEREAL_REGISTER_TYPE(Transformation);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, Transformation)

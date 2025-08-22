@@ -72,7 +72,7 @@ std::shared_ptr<T> getComponentIfExists2(const Entity& e)
 	std::shared_ptr<T> c;
 	if (e.HasComponent<T>())
 	{
-		c = std::shared_ptr<T>(e.tryGetComponent<T>(), [](T*) {});
+		c = std::make_shared<T>(e.getComponent<T>());
 	}
 	return c;
 }
@@ -82,7 +82,7 @@ struct SerializedEntity
 	entt::entity entity;
 	std::vector<std::shared_ptr<Component>> components;
 
-	std::optional<Transformation> transform;
+	//std::optional<Transformation> transform;
 	std::optional<PhysicsComponent> physics;
 	std::optional<PlayerController> playerController;
 	std::optional<MeshComponent> mesh;
@@ -106,7 +106,7 @@ struct SerializedEntity
 		SERIALIZED_MEMBER(entity);
 		SERIALIZED_MEMBER(components);
 
-		SERIALIZED_MEMBER(transform);
+		//SERIALIZED_MEMBER(transform);
 		SERIALIZED_MEMBER(physics);
 		SERIALIZED_MEMBER(playerController);
 		SERIALIZED_MEMBER(mesh);
