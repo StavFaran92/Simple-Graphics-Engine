@@ -9,8 +9,10 @@
 #include "component/ComponentSerializer.h"
 
 #include "component/Component.h"
+#include "runtime/Scene.h"
 
-static ComponentFnRegister<Transformation> serializeRegister(getComponentIfExists<Transformation>);
+static ComponentSerializeFnRegister<Transformation> serializeRegister(getComponentIfExists<Transformation>);
+static ComponentDeserializeFnRegister<Transformation> deserializeRegister(Transformation::attachToEntity);
 
 glm::mat4 Transformation::getWorldTransformation() const
 {
@@ -165,6 +167,23 @@ glm::mat4 Transformation::calculateModelMatrix()
 std::unordered_map<entity_id, Entity> Transformation::getChildren()
 {
 	return m_children;
+}
+
+void Transformation::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	if (auto tc = std::dynamic_pointer_cast<Transformation>(c))
+	{
+		auto& transform = entityHandler.addComponent<Transformation>(*tc);
+		transform.entity.setRegistry(&scene.getRegistry());
+		transform.root.setRegistry(&scene.getRegistry());
+		transform.m_parent.setRegistry(&scene.getRegistry());
+
+		for (auto [_, entity] : tc->getChildren())
+		{
+			Entity eChild(entity.handler(), &scene.getRegistry());
+			transform.addChild(eChild);
+		}
+	}
 }
 
 void Transformation::setLocalPosition(glm::vec3 pos)
