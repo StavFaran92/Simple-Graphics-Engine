@@ -30,10 +30,6 @@ public:
 
 	static bool preprocess(const std::string& path);
 	static void load(UUID uid, const std::string& path);
-
-	// Inherited via Asset
-	Resource<Asset> import(const std::string& fileLocation, const ImportSettings& settings) override;
-	Resource<Asset> load(AssetInfo aInfo) override;
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);
 

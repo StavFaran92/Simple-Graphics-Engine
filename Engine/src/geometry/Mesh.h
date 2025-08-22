@@ -128,8 +128,4 @@ private:
 
 	AABB m_aabb;
 	int materialIndex{};
-
-	// Inherited via Asset
-	Resource<Asset> import(const std::string& fileLocation, const ImportSettings& settings) override;
-	Resource<Asset> load(AssetInfo aInfo) override;
 };

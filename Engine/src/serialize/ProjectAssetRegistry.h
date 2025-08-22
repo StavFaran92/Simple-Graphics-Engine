@@ -25,9 +25,7 @@ public:
 	void addAssetRegistry(AssetInfo asset);
 	void addAssociation(std::string name, UUID uuid);
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
-	//std::vector<UUID> getMeshList() const;
-	//std::vector<UUID> getTextureList() const;
-	//std::vector<UUID> getAnimationList() const;
+	std::vector<AssetInfo> getAllAssets() const;
 	std::unordered_map<std::string, UUID> getAssociations() const;
 
 

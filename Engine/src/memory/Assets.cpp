@@ -10,6 +10,7 @@
 #include "geometry/ModelImporter.h"
 #include "core/Factory.h"
 #include "render/ShaderBuilder.h"
+#include "memory/AssetFactory.h"
 
 #include <filesystem>
 
@@ -138,11 +139,27 @@ std::vector<AssetInfo> Assets::getAllAssetsOfType(AssetType aType) const
 	return result;
 }
 
+std::vector<AssetInfo> Assets::getAllAssets() const
+{
+	std::vector<AssetInfo> result;
+	for (const auto& asset : m_assets)
+	{
+		result.push_back(asset.second);
+	}
+	return result;
+}
+
 void Assets::load()
 {
 	auto par = Engine::get()->getContext()->getProjectAssetRegistry();
 
-	
+	std::vector<AssetInfo> assets = par->getAllAssets();
+
+	for (const auto& asset : assets)
+	{
+		AssetFactory::loadAsset(asset);
+		m_assets[asset.name] = asset;
+	}
 
 	// Load textures
 	std::vector<AssetInfo> textureAssets = par->getAllAssetsOfType(AssetType::TEXTURE);

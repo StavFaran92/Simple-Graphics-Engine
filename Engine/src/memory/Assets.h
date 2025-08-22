@@ -39,6 +39,8 @@ public:
 
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 
+	std::vector<AssetInfo> getAllAssets() const;
+
 	void load();
 
 	AssetInfo getAsset(UUID uuid) const;

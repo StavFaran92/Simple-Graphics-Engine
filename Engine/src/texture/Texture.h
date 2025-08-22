@@ -13,6 +13,12 @@
 
 struct AssetInfo;
 
+class TextureAssetRegister
+{
+public:
+	TextureAssetRegister();
+};
+
 class EngineAPI Texture : public Asset
 {
 public:
@@ -266,6 +272,8 @@ public:
 
 	static Resource<Texture> importTexture3D(const std::string& fileLocation);
 
+	static Resource<Texture> import(const std::string& fileLocation, const ImportSettings& settings);
+	static Resource<Texture> load(AssetInfo aInfo);
 
 	/**  Destructor */
 	~Texture();
@@ -281,7 +289,9 @@ private:
 
 	TextureAssetAttributes m_attributes;
 
+	static TextureAssetRegister textureAssetRegister;
+
 	// Inherited via Asset
-	Resource<Asset> import(const std::string& fileLocation, const ImportSettings& settings) override;
-	Resource<Asset> load(AssetInfo aInfo) override;
+	
+	//Resource<Asset> load(AssetInfo aInfo) override;
 };

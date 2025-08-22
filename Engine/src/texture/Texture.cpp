@@ -21,6 +21,15 @@
 
 #include "memory/Assets.h"
 
+#include "memory/AssetFactory.h"
+
+TextureAssetRegister::TextureAssetRegister()
+{
+	AssetFactory::registerLoadFunc(AssetType::TEXTURE, Texture::load);
+}
+
+TextureAssetRegister Texture::textureAssetRegister;
+
 Texture::Texture()
 	:m_id(0), m_slot(0)
 {
@@ -208,15 +217,20 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 }
 
-Resource<Asset> Texture::import(const std::string& fileLocation, const ImportSettings& settings)
+Resource<Texture> Texture::import(const std::string& fileLocation, const ImportSettings& settings)
 {
 	return {};
 }
 
-Resource<Asset> Texture::load(AssetInfo aInfo)
+Resource<Texture> Texture::load(AssetInfo aInfo)
 {
-	return {};
+	return Resource<Texture>();
 }
+
+//Resource<Asset> Texture::load(AssetInfo aInfo)
+//{
+//	return {};
+//}
 
 Texture::~Texture()
 {
