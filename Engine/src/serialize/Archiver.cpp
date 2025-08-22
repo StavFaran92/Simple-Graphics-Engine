@@ -9,6 +9,8 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 {
 	SerializedEntity serializedEntity;
 	serializedEntity.entity = e.handler();
+	serializedEntity.components.push_back(getComponentIfExists2<TestComp>(e));
+
 	serializedEntity.camera = getComponentIfExists<CameraComponent>(e);
 	//serializedEntity.collisionBox = getComponentIfExists<CollisionBoxComponent>(e);
 	//serializedEntity.collisionSphere = getComponentIfExists<CollisionSphereComponent>(e);
@@ -26,7 +28,7 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	serializedEntity.transform = getComponentIfExists<Transformation>(e);
         serializedEntity.animator = getComponentIfExists<Animator>(e);
         serializedEntity.terrain = getComponentIfExists<Terrain>(e);
-        serializedEntity.testComponent = getComponentIfExists<TestComp>(e);
+        
         serializedEntity.shader = getComponentIfExists<ShaderComponent>(e);
         serializedEntity.foliage = getComponentIfExists<FoliageComponent>(e);
 
@@ -136,10 +138,18 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 		entityHandler.addComponent<Terrain>(serializedEnt.terrain.value());
 	}
 
-	if (serializedEnt.testComponent)
+	for (const auto& c : serializedEnt.components)
 	{
-		entityHandler.addComponent<TestComp>(serializedEnt.testComponent.value());
+		auto tc = std::dynamic_pointer_cast<TestComp>(c);
+
+		if(tc)
+			entityHandler.addComponent<TestComp>(*tc);
 	}
+
+	//if ()
+	//{
+	//	entityHandler.addComponent<TestComp>(serializedEnt.testComponent.value());
+	//}
 
     if (serializedEnt.shader)
     {

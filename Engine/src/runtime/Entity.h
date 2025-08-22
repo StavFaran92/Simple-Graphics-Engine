@@ -107,7 +107,7 @@ public:
     }
 
     template<typename T>
-    T* tryGetComponent()
+    T* tryGetComponent() const
     {
         assert(valid() && "Invalid entity.");
         return m_registry->getRegistry().try_get<T>(m_entity);

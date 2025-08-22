@@ -31,7 +31,11 @@ class Mesh;
 
 struct EngineAPI Component
 {
+	virtual ~Component() = default;
 
+	template <class Archive>
+	void serialize(Archive& archive) {
+	}
 };
 
 struct EngineAPI TagComponent : public Component
@@ -491,7 +495,12 @@ struct TestComp : public Component
 
 	int test = 0;
 	int test2 = 0;
+
+	
 };
+
+CEREAL_REGISTER_TYPE(TestComp);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, TestComp)
 
 struct VolumeComponent : public Component
 {

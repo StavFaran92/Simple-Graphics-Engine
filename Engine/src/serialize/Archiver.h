@@ -66,9 +66,22 @@ std::optional<T> getComponentIfExists(const Entity& e)
 	return c;
 }
 
+template<typename T>
+std::shared_ptr<T> getComponentIfExists2(const Entity& e)
+{
+	std::shared_ptr<T> c;
+	if (e.HasComponent<T>())
+	{
+		c = std::shared_ptr<T>(e.tryGetComponent<T>(), [](T*) {});
+	}
+	return c;
+}
+
 struct SerializedEntity
 {
 	entt::entity entity;
+	std::vector<std::shared_ptr<Component>> components;
+
 	std::optional<Transformation> transform;
 	std::optional<PhysicsComponent> physics;
 	std::optional<PlayerController> playerController;
@@ -84,13 +97,15 @@ struct SerializedEntity
 	std::optional<ImageComponent> image;
     std::optional<Animator> animator;
     std::optional<Terrain> terrain;
-    std::optional<TestComp> testComponent;
+    //std::optional<TestComp> testComponent;
     std::optional<ShaderComponent> shader;
     std::optional<FoliageComponent> foliage;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(entity);
+		SERIALIZED_MEMBER(components);
+
 		SERIALIZED_MEMBER(transform);
 		SERIALIZED_MEMBER(physics);
 		SERIALIZED_MEMBER(playerController);
@@ -106,7 +121,7 @@ struct SerializedEntity
 		SERIALIZED_MEMBER(image);
         SERIALIZED_MEMBER(animator);
         SERIALIZED_MEMBER(terrain);
-        SERIALIZED_MEMBER(testComponent);
+        //SERIALIZED_MEMBER(testComponent);
         SERIALIZED_MEMBER(shader);
 		SERIALIZED_MEMBER_OPTIONAL(foliage, {});
 	}
