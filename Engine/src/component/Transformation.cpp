@@ -11,8 +11,7 @@
 #include "component/Component.h"
 #include "runtime/Scene.h"
 
-static ComponentSerializeFnRegister<Transformation> serializeRegister(getComponentIfExists<Transformation>);
-static ComponentDeserializeFnRegister<Transformation> deserializeRegister(Transformation::attachToEntity);
+
 
 glm::mat4 Transformation::getWorldTransformation() const
 {

@@ -53,6 +53,12 @@ std::shared_ptr<Component> getComponentIfExists(const Entity& e)
 	return c;
 }
 
+#define REGISTER_COMPONENT(TYPE) \
+    CEREAL_REGISTER_TYPE(TYPE); \
+    CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, TYPE); \
+    inline ComponentSerializeFnRegister<TYPE> TYPE##_serializeRegister(getComponentIfExists<TYPE>); \
+    inline ComponentDeserializeFnRegister<TYPE> TYPE##_deserializeRegister(TYPE::attachToEntity);
+
 struct EngineAPI TagComponent : public Component
 {
 	std::string tag;

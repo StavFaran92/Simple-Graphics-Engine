@@ -3,7 +3,7 @@
 #include "runtime/Entity.h"
 #include "component/Component.h"
 
-class ComponentSerializer
+class EngineAPI ComponentSerializer
 {
 public:
 	using SerializeFn = std::function<std::shared_ptr<Component>(const Entity& e)>;

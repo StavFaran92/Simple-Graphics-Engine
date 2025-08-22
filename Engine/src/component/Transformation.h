@@ -11,6 +11,7 @@
 #include "runtime/Entity.h"
 #include "component/Component.h"
 #include "serialize/CerealHelpers.h"
+#include "component/ComponentSerializer.h"
 
 class EngineAPI Transformation : public Component
 {
@@ -150,5 +151,4 @@ private:
 	bool m_isDirty = true;
 };
 
-CEREAL_REGISTER_TYPE(Transformation);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, Transformation)
+REGISTER_COMPONENT(Transformation)
