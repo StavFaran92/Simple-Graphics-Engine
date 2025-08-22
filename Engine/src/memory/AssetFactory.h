@@ -12,5 +12,13 @@ public:
 	static void registerLoadFunc(AssetType aType, const LoadFn& fn);
 
 private:
-	static std::map<AssetType, LoadFn> loadFunctionsRegistry;
+
+	// Magic static
+	static std::map<AssetType, LoadFn>& getLoadFunctionRegistry() {
+		static std::map<AssetType, LoadFn> loadFunctionsRegistry;
+		return loadFunctionsRegistry;
+	}
+
+private:
+	
 };

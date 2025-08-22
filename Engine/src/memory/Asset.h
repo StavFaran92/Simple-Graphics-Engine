@@ -3,11 +3,27 @@
 #include <string>
 
 #include "Assets.h"
+#include "AssetFactory.h"
 
 class ImportSettings
 {
 
 };
+
+template<AssetType T>
+class AssetFnRegister
+{
+public:
+	AssetFnRegister(const AssetFactory::LoadFn& fn)
+	{
+		AssetFactory::registerLoadFunc(T, fn);
+	}
+
+	static AssetFnRegister<T> staticRegister;
+};
+
+template<AssetType T>
+AssetFnRegister<T> AssetFnRegister<T>::staticRegister;
 
 class Asset
 {

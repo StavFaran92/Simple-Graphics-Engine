@@ -1,6 +1,9 @@
 #include "animation/Animation.h"
 
 #include "animation/Bone.h"
+#include "animation/AnimationLoader.h"
+
+static AssetFnRegister<AssetType::ANIMATION> assetRegister(Animation::load);
 
 Animation::Animation()
 {
@@ -83,9 +86,21 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-#include "animation/AnimationLoader.h"
-void Animation::load(UUID uid, const std::string& path)
-{
-	Engine::get()->getSubSystem<AnimationLoader>()->load(path, Resource<Animation>(uid));
+//#include "animation/AnimationLoader.h"
+//void Animation::load(UUID uid, const std::string& path)
+//{
+//	Engine::get()->getSubSystem<AnimationLoader>()->load(path, Resource<Animation>(uid));
+//
+//}
 
+Resource<Animation> Animation::load(AssetInfo aInfo)
+{
+	UUID uuid = aInfo.uuid;
+	Animation* animPtr = new Animation();
+	Engine::get()->getMemoryPool().add(uuid, animPtr);
+	Resource<Animation> anim(uuid);
+	Engine::get()->getResourceManager()->incRef(uuid);
+	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	Engine::get()->getSubSystem<AnimationLoader>()->load(filepath, anim);
+	return anim;
 }

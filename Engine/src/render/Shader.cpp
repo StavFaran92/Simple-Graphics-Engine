@@ -29,6 +29,24 @@ Shader::Shader(const std::string& glslFilePath) :
 	recompile();
 }
 
+Resource<Shader> Shader::load(AssetInfo aInfo)
+{
+	UUID uuid = aInfo.uuid;
+	std::string shaderOverrideStr = aInfo.attributes.at("shader_override");
+	ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
+	Shader* shaderPtr = new Shader();
+	Engine::get()->getMemoryPool().add(uuid, shaderPtr);
+	Resource<Shader> shader(uuid);
+	Engine::get()->getResourceManager()->incRef(uuid);
+	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	shader->m_isShaderOverride = true;
+	shader->shaderOverride = shaderOverride;
+	shader->m_glslFilePath = filepath;
+	shader->recompile();
+
+	return shader;
+}
+
 void Shader::init()
 {
 
@@ -515,15 +533,15 @@ Resource<Shader> Shader::createOverrideShader(const std::string& name, const std
 	return shader;
 }
 
-Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)
-{
-	shader->m_isShaderOverride = true;
-	shader->shaderOverride = shaderOverride;
-	shader->m_glslFilePath = filepath;
-	shader->recompile();
-
-	return shader;
-}
+//Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)
+//{
+//	shader->m_isShaderOverride = true;
+//	shader->shaderOverride = shaderOverride;
+//	shader->m_glslFilePath = filepath;
+//	shader->recompile();
+//
+//	return shader;
+//}
 
 ShaderOverride Shader::getShaderOverrideFromStr(const std::string& shaderOverride)
 {

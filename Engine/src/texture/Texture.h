@@ -13,11 +13,11 @@
 
 struct AssetInfo;
 
-class TextureAssetRegister
-{
-public:
-	TextureAssetRegister();
-};
+//class TextureAssetRegister
+//{
+//public:
+//	TextureAssetRegister();
+//};
 
 class EngineAPI Texture : public Asset
 {
@@ -288,8 +288,6 @@ private:
 	TextureData m_data;
 
 	TextureAssetAttributes m_attributes;
-
-	static TextureAssetRegister textureAssetRegister;
 
 	// Inherited via Asset
 	

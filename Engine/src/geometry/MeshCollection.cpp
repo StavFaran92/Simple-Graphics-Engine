@@ -1,5 +1,9 @@
 #include "geometry/MeshCollection.h"
 
+#include "geometry/ModelImporter.h"
+
+static AssetFnRegister<AssetType::MESH> textureAssetRegister(MeshCollection::load);
+
 void MeshCollection::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
 	m_meshes.push_back(mesh);
@@ -60,5 +64,14 @@ Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation,
 
 Resource<MeshCollection> MeshCollection::load(AssetInfo aInfo)
 {
-	return Resource<MeshCollection>();
+	UUID uuid = aInfo.uuid;
+	MeshCollection* meshPtr = new MeshCollection();
+	Engine::get()->getMemoryPool().add(uuid, meshPtr);
+	Resource<MeshCollection> generatedMesh(uuid);
+	ModelImporter::ModelInfo mInfo;
+	mInfo.mesh = generatedMesh;
+	Engine::get()->getResourceManager()->incRef(uuid);
+	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
+	return generatedMesh;
 }

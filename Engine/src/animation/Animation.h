@@ -29,7 +29,9 @@ public:
 	void build(const std::string& name, float duration, float ticksPerSecond, MeshNodeData& rootNode, std::unordered_map<std::string, std::shared_ptr<Bone>>& bones);
 
 	static bool preprocess(const std::string& path);
-	static void load(UUID uid, const std::string& path);
+	//static void load(UUID uid, const std::string& path);
+
+	static Resource<Animation> load(AssetInfo aInfo);
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);
 

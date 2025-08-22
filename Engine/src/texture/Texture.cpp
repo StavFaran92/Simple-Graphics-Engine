@@ -23,12 +23,7 @@
 
 #include "memory/AssetFactory.h"
 
-TextureAssetRegister::TextureAssetRegister()
-{
-	AssetFactory::registerLoadFunc(AssetType::TEXTURE, Texture::load);
-}
-
-TextureAssetRegister Texture::textureAssetRegister;
+static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(Texture::load);
 
 Texture::Texture()
 	:m_id(0), m_slot(0)
@@ -224,7 +219,7 @@ Resource<Texture> Texture::import(const std::string& fileLocation, const ImportS
 
 Resource<Texture> Texture::load(AssetInfo aInfo)
 {
-	return Resource<Texture>();
+	return Texture::loadTexture2D(aInfo);
 }
 
 //Resource<Asset> Texture::load(AssetInfo aInfo)
@@ -376,6 +371,7 @@ Resource<Texture> Texture::loadTexture2D(AssetInfo aInfo)
 	texture->m_attributes = attributes;
 
 	auto& res = Resource<Texture>(aInfo.uuid);
+	Engine::get()->getResourceManager()->incRef(aInfo.uuid);
 
 
 	return res;

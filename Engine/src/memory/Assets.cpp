@@ -160,63 +160,6 @@ void Assets::load()
 		AssetFactory::loadAsset(asset);
 		m_assets[asset.name] = asset;
 	}
-
-	// Load textures
-	std::vector<AssetInfo> textureAssets = par->getAllAssetsOfType(AssetType::TEXTURE);
-	for (const auto& asset : textureAssets)
-	{
-		UUID uuid = asset.uuid;
-		Engine::get()->getResourceManager()->incRef(uuid);
-		Texture::loadTexture2D(asset);
-		m_assets[asset.name] = asset;
-	}
-
-	// Load meshes
-	std::vector<AssetInfo> meshAssets = par->getAllAssetsOfType(AssetType::MESH);
-	for (const auto& asset : meshAssets)
-	{
-		UUID uuid = asset.uuid;
-		MeshCollection* meshPtr = new MeshCollection();
-		Engine::get()->getMemoryPool().add(uuid, meshPtr);
-		Resource<MeshCollection> generatedMesh(uuid);
-		ModelImporter::ModelInfo mInfo;
-		mInfo.mesh = generatedMesh;
-		Engine::get()->getResourceManager()->incRef(uuid);
-		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
-		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
-		m_assets[asset.name] = asset;
-	}
-
-	// Load animations
-	std::vector<AssetInfo> animationNameList = par->getAllAssetsOfType(AssetType::ANIMATION);
-	for (const auto& asset : animationNameList)
-	{
-		UUID uuid = asset.uuid;
-		Animation* animPtr = new Animation();
-		Engine::get()->getMemoryPool().add(uuid, animPtr);
-		Resource<Animation> anim(uuid);
-		Engine::get()->getResourceManager()->incRef(uuid);
-		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
-		Engine::get()->getSubSystem<AnimationLoader>()->load(filepath, anim);
-		m_assets[asset.name] = asset;
-	}
-
-	// Load Shaders
-	std::vector<AssetInfo> shaderAssets = par->getAllAssetsOfType(AssetType::SHADER);
-	for (const auto& asset : shaderAssets)
-	{
-		UUID uuid = asset.uuid;
-		std::string shaderOverrideStr = asset.attributes.at("shader_override");
-		ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
-		Shader* shaderPtr = new Shader();
-		Engine::get()->getMemoryPool().add(uuid, shaderPtr);
-		Resource<Shader> shader(uuid);
-		Engine::get()->getResourceManager()->incRef(uuid);
-		const std::string filepath = Engine::get()->getProjectDirectory() + asset.filePath;
-		Shader::load(shader, filepath, shaderOverride);
-
-		m_assets[asset.name] = asset;
-	}
 }
 
 AssetInfo Assets::getAsset(UUID uuid) const

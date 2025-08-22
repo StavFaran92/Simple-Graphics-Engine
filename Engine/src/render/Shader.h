@@ -67,7 +67,7 @@ public:
 	static Resource<Shader> import(const std::string& filepath);
 	static Resource<Shader> create(const std::string& filepath);
 	static Resource<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient = false);
-	static Resource<Shader> load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride);
+	//static Resource<Shader> load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride);
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);
 	static std::string getShaderOverrideAsStr(ShaderOverride shaderOverride);
@@ -84,6 +84,8 @@ public:
 
 	/** Constructor */
 	Shader(const std::string& glslFilePath);
+
+	static Resource<Shader> load(AssetInfo aInfo);
 
 protected:
 	
