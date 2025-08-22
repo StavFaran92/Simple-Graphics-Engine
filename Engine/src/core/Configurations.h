@@ -93,6 +93,7 @@ enum AssetType : int
 	MESH,
 	ANIMATION,
 	SHADER,
+	PREFAB,
 
 	TOTAL_ASSET_TYPE_COUNT
 };
@@ -103,5 +104,17 @@ static const std::map<AssetType, std::string> g_assetTypeToStr
 	{ AssetType::TEXTURE,		"textures"		},
 	{ AssetType::MESH,			"meshes"		},
 	{ AssetType::ANIMATION,		"animations"	},
-	{ AssetType::SHADER,		"shaders"		}
+	{ AssetType::SHADER,		"shaders"		},
+	{ AssetType::PREFAB,		"prefabs"		},
 };
+
+static std::string getAssetTypeAsStr(AssetType aType)
+{
+	auto iter = g_assetTypeToStr.find(aType);
+	if (g_assetTypeToStr.find(aType) == g_assetTypeToStr.end())
+	{
+		return "N/A";
+	}
+	return iter->second;
+
+}

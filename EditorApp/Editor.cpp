@@ -34,15 +34,6 @@ static std::unordered_map<std::string, Resource<Texture>> icons;
 
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 
-static std::string getAssetTypeAsStr(AssetType aType)
-{
-	if (aType == AssetType::MESH) return "Mesh";
-	if (aType == AssetType::TEXTURE) return "Texture";
-	if (aType == AssetType::SHADER) return "Shader";
-	if (aType == AssetType::ANIMATION) return "Animation";
-	return "N/A";
-}
-
 namespace fs = std::filesystem;
 
 static bool ShowLightCreatorWindow = false;
@@ -2819,6 +2810,10 @@ void RenderAssetViewWindow() {
 			{
 				iconID = icons.at("shader")->getID();
 			}
+			else if (aInfo.aType == AssetType::PREFAB)
+			{
+				iconID = icons.at("prefab")->getID();
+			}
 
 			// Create a small icon
 			ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
@@ -3014,6 +3009,11 @@ class GUI_Helper : public GuiMenu {
 							showShaderCreateWindow = true;
 
 						}
+
+						if (ImGui::MenuItem("Prefab")) {
+							Prefab::import("", {});
+
+						}
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenu();
@@ -3205,6 +3205,7 @@ public:
 		icons["animation"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);
 		icons["shader"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-100.png", settings);
 		icons["folder"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
+		icons["prefab"] = Texture::importTexture2D(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png", settings);
 	}
 
 	void update(float deltaTime) override

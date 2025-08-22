@@ -116,17 +116,6 @@ void ProjectAssetRegistry::save()
 	sync();
 }
 
-std::string getAssetTypeAsStr(AssetType aType)
-{
-	auto iter = g_assetTypeToStr.find(aType);
-	if (g_assetTypeToStr.find(aType) == g_assetTypeToStr.end())
-	{
-		return "N/A";
-	}
-	return iter->second;
-	
-}
-
 void ProjectAssetRegistry::addAssetRegistry(AssetInfo asset)
 {
 	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
