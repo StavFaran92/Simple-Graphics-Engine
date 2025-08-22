@@ -2,13 +2,27 @@
 
 #include "runtime/Scene.h"
 #include "systems/BuiltInMeshes.h"
+#include "component/ComponentSerializer.h"
 
 Archiver* Archiver::instance = new Archiver();
+
+template<typename T>
+std::optional<T> getComponentIfExistsOpt(const Entity& e)
+{
+	std::optional<T> c;
+	if (e.HasComponent<T>())
+	{
+		c = e.getComponent<T>();
+	}
+	return c;
+}
 
 SerializedEntity Archiver::serializeEntity(Entity e)
 {
 	SerializedEntity serializedEntity;
 	serializedEntity.entity = e.handler();
+
+	ComponentSerializer::serializeComponents(e, serializedEntity.components);
 	//serializedEntity.components.push_back(getComponentIfExists2<TestComp>(e));
 	//serializedEntity.components.push_back(getComponentIfExists2<CameraComponent>(e));
 	//serializedEntity.components.push_back(getComponentIfExists2<PlayerController>(e));
@@ -22,32 +36,32 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	//serializedEntity.components.push_back(getComponentIfExists2<RenderableComponent>(e));
 	//serializedEntity.components.push_back(getComponentIfExists2<PhysicsComponent>(e));
 	//serializedEntity.components.push_back(getComponentIfExists2<SkyboxComponent>(e));
-	serializedEntity.components.push_back(getComponentIfExists2<Transformation>(e));
+	//serializedEntity.components.push_back(getComponentIfExists2<Transformation>(e));
 	//serializedEntity.components.push_back(getComponentIfExists2<Animator>(e));
 	//serializedEntity.components.push_back(getComponentIfExists2<Terrain>(e));
 	//serializedEntity.components.push_back(getComponentIfExists2<ShaderComponent>(e));
 	//serializedEntity.components.push_back(getComponentIfExists2<FoliageComponent>(e));
 
-	serializedEntity.camera = getComponentIfExists<CameraComponent>(e);
-	//serializedEntity.collisionBox = getComponentIfExists<CollisionBoxComponent>(e);
-	//serializedEntity.collisionSphere = getComponentIfExists<CollisionSphereComponent>(e);
-	serializedEntity.playerController = getComponentIfExists<PlayerController>(e);
-	serializedEntity.dLight = getComponentIfExists<DirectionalLight>(e);
-	serializedEntity.image = getComponentIfExists<ImageComponent>(e);
-	serializedEntity.mat = getComponentIfExists<MaterialComponent>(e);
-	serializedEntity.mesh = getComponentIfExists<MeshComponent>(e);
-	serializedEntity.nsc = getComponentIfExists<NativeScriptComponent>(e);
-	serializedEntity.obj = getComponentIfExists<ObjectComponent>(e);
-	serializedEntity.pLight = getComponentIfExists<PointLight>(e);
-	serializedEntity.renderableComponent = getComponentIfExists<RenderableComponent>(e);
-	serializedEntity.physics = getComponentIfExists<PhysicsComponent>(e);
-	serializedEntity.skybox = getComponentIfExists<SkyboxComponent>(e);
-	//serializedEntity.transform = getComponentIfExists<Transformation>(e);
-        serializedEntity.animator = getComponentIfExists<Animator>(e);
-        serializedEntity.terrain = getComponentIfExists<Terrain>(e);
-        
-        serializedEntity.shader = getComponentIfExists<ShaderComponent>(e);
-        serializedEntity.foliage = getComponentIfExists<FoliageComponent>(e);
+	//serializedEntity.camera = getComponentIfExists<CameraComponent>(e);
+	////serializedEntity.collisionBox = getComponentIfExists<CollisionBoxComponent>(e);
+	////serializedEntity.collisionSphere = getComponentIfExists<CollisionSphereComponent>(e);
+	//serializedEntity.playerController = getComponentIfExists<PlayerController>(e);
+	//serializedEntity.dLight = getComponentIfExists<DirectionalLight>(e);
+	//serializedEntity.image = getComponentIfExists<ImageComponent>(e);
+	//serializedEntity.mat = getComponentIfExists<MaterialComponent>(e);
+	//serializedEntity.mesh = getComponentIfExists<MeshComponent>(e);
+	//serializedEntity.nsc = getComponentIfExists<NativeScriptComponent>(e);
+	//serializedEntity.obj = getComponentIfExists<ObjectComponent>(e);
+	//serializedEntity.pLight = getComponentIfExists<PointLight>(e);
+	//serializedEntity.renderableComponent = getComponentIfExists<RenderableComponent>(e);
+	//serializedEntity.physics = getComponentIfExists<PhysicsComponent>(e);
+	//serializedEntity.skybox = getComponentIfExists<SkyboxComponent>(e);
+	////serializedEntity.transform = getComponentIfExists<Transformation>(e);
+ //       serializedEntity.animator = getComponentIfExists<Animator>(e);
+ //       serializedEntity.terrain = getComponentIfExists<Terrain>(e);
+ //       
+ //       serializedEntity.shader = getComponentIfExists<ShaderComponent>(e);
+ //       serializedEntity.foliage = getComponentIfExistsOpt<FoliageComponent>(e);
 
 	return serializedEntity;
 }
@@ -57,7 +71,7 @@ void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 	auto e = scene.getRegistry().getRegistry().create(serializedEnt.entity);
 	auto entityHandler = Entity(e, &scene.getRegistry());
 
-	
+	ComponentSerializer::deserializeComponents(serializedEnt.components, entityHandler);
 
 	for (const auto& c : serializedEnt.components)
 	{

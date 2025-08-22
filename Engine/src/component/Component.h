@@ -29,14 +29,29 @@ class Scene;
 class Mesh;
 
 
+
 struct EngineAPI Component
 {
+protected:
 	virtual ~Component() = default;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
 	}
+
+	
 };
+
+template<typename T>
+std::shared_ptr<Component> getComponentIfExists(const Entity& e)
+{
+	std::shared_ptr<Component> c;
+	if (e.HasComponent<T>())
+	{
+		c = std::make_shared<T>(e.getComponent<T>());
+	}
+	return c;
+}
 
 struct EngineAPI TagComponent : public Component
 {

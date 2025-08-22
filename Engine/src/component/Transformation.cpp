@@ -6,6 +6,12 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/matrix_decompose.hpp"
 
+#include "component/ComponentSerializer.h"
+
+#include "component/Component.h"
+
+static ComponentFnRegister<Transformation> serializeRegister(getComponentIfExists<Transformation>);
+
 glm::mat4 Transformation::getWorldTransformation() const
 {
 	return m_modelMatrix;

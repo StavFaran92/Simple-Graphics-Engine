@@ -55,27 +55,18 @@ namespace glm
 	}
 };
 
-template<typename T>
-std::optional<T> getComponentIfExists(const Entity& e)
-{
-	std::optional<T> c;
-	if (e.HasComponent<T>())
-	{
-		c = e.getComponent<T>();
-	}
-	return c;
-}
 
-template<typename T>
-std::shared_ptr<T> getComponentIfExists2(const Entity& e)
-{
-	std::shared_ptr<T> c;
-	if (e.HasComponent<T>())
-	{
-		c = std::make_shared<T>(e.getComponent<T>());
-	}
-	return c;
-}
+
+//template<typename T>
+//std::shared_ptr<T> getComponentIfExists2(const Entity& e)
+//{
+//	std::shared_ptr<T> c;
+//	if (e.HasComponent<T>())
+//	{
+//		c = std::make_shared<T>(e.getComponent<T>());
+//	}
+//	return c;
+//}
 
 struct SerializedEntity
 {

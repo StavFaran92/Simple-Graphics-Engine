@@ -112,6 +112,7 @@ public:
 
 	std::unordered_map<entity_id, Entity> getChildren();
 
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(localTranslation); 
