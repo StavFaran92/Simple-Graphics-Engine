@@ -32,7 +32,7 @@ class Mesh;
 
 struct EngineAPI Component
 {
-protected:
+public:
 	virtual ~Component() = default;
 
 	template <class Archive>
