@@ -51,12 +51,10 @@ std::shared_ptr<ProjectAssetRegistry> ProjectAssetRegistry::create(const std::st
 
 	std::shared_ptr<ProjectAssetRegistry> par = std::make_shared<ProjectAssetRegistry>(filename);
 
-	// Create JSON object with empty arrays for meshes and textures
-	par->m_assetRegistry["meshes"] = nlohmann::json::array();
-	par->m_assetRegistry["textures"] = nlohmann::json::array();
-	par->m_assetRegistry["animations"] = nlohmann::json::array();
-	par->m_assetRegistry["shaders"] = nlohmann::json::array();
-	par->m_assetRegistry["association"] = nlohmann::json::array();
+	for (auto&[_, name] : g_assetTypeToStr)
+	{
+		par->m_assetRegistry[name] = nlohmann::json::array();
+	}
 
 	// Write JSON data to file
 	std::ofstream outputFile(filename);
@@ -120,11 +118,13 @@ void ProjectAssetRegistry::save()
 
 std::string getAssetTypeAsStr(AssetType aType)
 {
-	if (aType == AssetType::MESH) return "meshes";
-	if (aType == AssetType::TEXTURE) return "textures";
-	if (aType == AssetType::SHADER) return "shaders";
-	if (aType == AssetType::ANIMATION) return "animations";
-	return "N/A";
+	auto iter = g_assetTypeToStr.find(aType);
+	if (g_assetTypeToStr.find(aType) == g_assetTypeToStr.end())
+	{
+		return "N/A";
+	}
+	return iter->second;
+	
 }
 
 void ProjectAssetRegistry::addAssetRegistry(AssetInfo asset)
@@ -178,33 +178,6 @@ std::vector<AssetInfo> ProjectAssetRegistry::getAllAssets() const
 
 	return result;
 }
-
-//std::vector<UUID> ProjectAssetRegistry::getMeshList() const
-//{
-//    if (!m_assetRegistry.contains("meshes"))
-//    {
-//        return {};
-//    }
-//    return m_assetRegistry["meshes"].get<const std::vector<UUID>>();
-//}
-//
-//std::vector<UUID> ProjectAssetRegistry::getTextureList() const
-//{
-//    if (!m_assetRegistry.contains("textures"))
-//    {
-//        return {};
-//    }
-//	return m_assetRegistry["textures"].get<std::vector<ProjectAssetRegistry::TextureAsset>>();
-//}
-//
-//std::vector<UUID> ProjectAssetRegistry::getAnimationList() const
-//{
-//    if (!m_assetRegistry.contains("animations"))
-//    {
-//        return {};
-//    }
-//    return m_assetRegistry["animations"].get<std::vector<std::string>>();
-//}
 
 std::unordered_map<std::string, UUID> ProjectAssetRegistry::getAssociations() const
 {

@@ -86,11 +86,22 @@ struct Color
 	unsigned char b;
 };
 
-enum class AssetType
+enum AssetType : int
 {
-	NONE,
+	NONE = 0,
 	TEXTURE,
 	MESH,
 	ANIMATION,
-	SHADER
+	SHADER,
+
+	TOTAL_ASSET_TYPE_COUNT
+};
+
+static const std::map<AssetType, std::string> g_assetTypeToStr
+{
+	{ AssetType::NONE,			"N/A"			},
+	{ AssetType::TEXTURE,		"textures"		},
+	{ AssetType::MESH,			"meshes"		},
+	{ AssetType::ANIMATION,		"animations"	},
+	{ AssetType::SHADER,		"shaders"		}
 };
