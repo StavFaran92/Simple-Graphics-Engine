@@ -10,7 +10,7 @@
 #include "memory/Resource.h"
 #include "runtime/Scene.h"
 #include "runtime/Entity.h"
-#include "component/Component.h"
+#include "component/MeshComponent.h"
 #include "texture/Texture.h"
 #include "geometry/MeshCollection.h"
 #include "render/Renderer.h"

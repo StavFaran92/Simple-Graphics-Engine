@@ -12,7 +12,7 @@
 #include "memory/Resource.h"
 #include "render/Material.h"
 #include "runtime/Entity.h"
-#include "component/Component.h"
+#include "component/Transformation.h"
 #include "render/Shader.h"
 #include "core/Engine.h"
 #include "core/CacheSystem.h"

@@ -8,7 +8,6 @@
 #include "component/Transformation.h"
 #include "render/Material.h"
 #include <GL/glew.h>
-#include "component/Component.h"
 #include "core/Engine.h"
 
 void SkyboxRenderer::render()

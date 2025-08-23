@@ -9,7 +9,9 @@
 #include "core/Engine.h"
 #include "runtime/Context.h"
 #include "runtime/Entity.h"
-#include "component/Component.h"
+#include "component/RenderableComponent.h"
+#include "component/ObjectComponent.h"
+#include "component/MeshComponent.h"
 #include "render/RenderCommand.h"
 #include <GL/glew.h>
 #include "geometry/MeshCollection.h"

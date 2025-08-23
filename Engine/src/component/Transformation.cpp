@@ -1,4 +1,5 @@
 #include "component/Transformation.h"
+#include "component/Transformation.h"
 #include<glm/gtx/quaternion.hpp>
 #include "utils/LinearAlgebraUtil.h"
 #include "core/Logger.h"
@@ -8,7 +9,6 @@
 
 #include "component/ComponentSerializer.h"
 
-#include "component/Component.h"
 #include "runtime/Scene.h"
 
 
