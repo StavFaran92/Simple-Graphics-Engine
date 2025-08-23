@@ -62,4 +62,5 @@
 #include "camera/CameraControllerFreeLook.h"
 #include "component/MeshComponent.h"
 #include "component/MaterialComponent.h"
+#include "component/ShaderComponent.h"
 #include "runtime/Prefab.h"

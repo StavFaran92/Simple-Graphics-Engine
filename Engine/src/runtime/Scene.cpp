@@ -61,6 +61,7 @@
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
+#include "component/ShaderComponent.h"
 
 struct PlaneGPU {
 	glm::vec3 normal;

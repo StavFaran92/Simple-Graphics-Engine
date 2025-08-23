@@ -5,6 +5,7 @@
 #include "runtime/Scene.h"
 #include "geometry/ModelImporter.h"
 #include "component/MeshComponent.h"
+#include "component/ShaderComponent.h"
 
 Entity WaterSystem::createPool()
 {

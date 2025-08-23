@@ -89,7 +89,7 @@ struct SerializedEntity
     std::optional<Animator> animator;
     std::optional<Terrain> terrain;
     //std::optional<TestComp> testComponent;
-    std::optional<ShaderComponent> shader;
+    //std::optional<ShaderComponent> shader;
     std::optional<FoliageComponent> foliage;
 
 	template <class Archive>
@@ -113,7 +113,7 @@ struct SerializedEntity
         SERIALIZED_MEMBER(animator);
         SERIALIZED_MEMBER(terrain);
         //SERIALIZED_MEMBER(testComponent);
-        SERIALIZED_MEMBER(shader);
+        //SERIALIZED_MEMBER(shader);
 		SERIALIZED_MEMBER_OPTIONAL(foliage, {});
 	}
 };
