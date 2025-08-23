@@ -58,12 +58,6 @@ void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity 
 //    attachSimple<MeshComponent>(c, entityHandler);
 //}
 
-void MaterialComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-    (void)scene;
-    attachSimple<MaterialComponent>(c, entityHandler);
-}
-
 void ObjectComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
 	if (auto oc = std::dynamic_pointer_cast<ObjectComponent>(c))
@@ -99,14 +93,6 @@ void PlayerController::attachToEntity(std::shared_ptr<Component> c, Entity entit
 {
         (void)scene;
         attachSimple<PlayerController>(c, entityHandler);
-}
-
-MaterialComponent::MaterialComponent()
-{
-	auto mat = Engine::get()->getDefaultMaterial()->clone();
-
-	//auto mat = std::make_shared<Material>(*Engine::get()->getDefaultMaterial().get());
-	materials[0] = mat;
 }
 
 InstanceBatch::InstanceBatch()

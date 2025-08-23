@@ -40,6 +40,7 @@
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
+#include "component/MaterialComponent.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"

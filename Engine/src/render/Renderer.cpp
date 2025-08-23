@@ -29,6 +29,7 @@
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"
 #include "component/MeshComponent.h"
+#include "component/MaterialComponent.h"
 
 
 Renderer::Renderer(Scene* scene)

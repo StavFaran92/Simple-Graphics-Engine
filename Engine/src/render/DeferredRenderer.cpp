@@ -22,6 +22,7 @@
 #include "render/RenderView.h"
 #include "utils/DebugHelper.h"
 #include "component/MeshComponent.h"
+#include "component/MaterialComponent.h"
 
 static float lerp(float a, float b, float t)
 {
