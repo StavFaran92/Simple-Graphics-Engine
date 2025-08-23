@@ -38,6 +38,7 @@
 #include "core/EngineConfig.h"
 #include "systems/BuiltInMeshes.h"
 #include "systems/FoliageSystem.h"
+#include "component/CameraComponent.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"

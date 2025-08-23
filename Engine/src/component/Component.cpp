@@ -52,12 +52,6 @@ void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity 
 	}
 }
 
-void CameraComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-    (void)scene;
-    attachSimple<CameraComponent>(c, entityHandler);
-}
-
 void MeshComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
     (void)scene;
@@ -186,12 +180,6 @@ void InstanceBatch::build()
 	glVertexAttribDivisor(7, 1);
 	glVertexAttribDivisor(8, 1);
 	glVertexAttribDivisor(9, 1);
-}
-
-glm::mat4 CameraComponent::getProjection() const
-{
-	if (type == CamType::PERSPECTIVE) return glm::perspective(fovy, aspect, znear, zfar);
-	if (type == CamType::ORTHOGRAPHIC) return glm::ortho(-100, 100, -100, 100);
 }
 
 ShaderComponent::ShaderComponent()

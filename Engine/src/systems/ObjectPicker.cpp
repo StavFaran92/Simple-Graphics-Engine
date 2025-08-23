@@ -22,6 +22,7 @@
 #include "component/Transformation.h"
 #include "geometry/MeshCollection.h"
 #include "render/FrameBufferObject.h"
+#include "component/CameraComponent.h"
 
 #include "core/Logger.h"
 

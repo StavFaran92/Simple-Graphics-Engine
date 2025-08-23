@@ -3,6 +3,7 @@
 #include "runtime/Scene.h"
 #include "systems/BuiltInMeshes.h"
 #include "component/ComponentSerializer.h"
+#include "component/CameraComponent.h"
 
 Archiver* Archiver::instance = new Archiver();
 

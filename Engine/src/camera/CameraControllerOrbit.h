@@ -5,6 +5,7 @@
 #include "camera/ICameraController.h"
 #include "component/Component.h"
 #include "core/Subscriber.h"
+#include "component/CameraComponent.h"
 
 class CameraControllerOrbit : public ICameraController
 {
