@@ -25,6 +25,7 @@
 #include "component/MaterialComponent.h"
 #include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
+#include "component/RenderableComponent.h"
 
 static float lerp(float a, float b, float t)
 {

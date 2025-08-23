@@ -6,6 +6,7 @@
 #include "geometry/ModelImporter.h"
 #include "component/MeshComponent.h"
 #include "component/ShaderComponent.h"
+#include "component/RenderableComponent.h"
 
 Entity WaterSystem::createPool()
 {

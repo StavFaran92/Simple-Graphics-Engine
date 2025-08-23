@@ -41,6 +41,7 @@
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
 #include "component/MaterialComponent.h"
+#include "component/RenderableComponent.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"

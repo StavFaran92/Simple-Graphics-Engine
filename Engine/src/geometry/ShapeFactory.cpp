@@ -18,6 +18,7 @@
 #include "systems/BuiltInMeshes.h"
 #include "component/MeshComponent.h"
 #include "component/MaterialComponent.h"
+#include "component/RenderableComponent.h"
 
 Entity ShapeFactory::createEntity(SGE_Regsitry* registry, const std::string& name)
 {

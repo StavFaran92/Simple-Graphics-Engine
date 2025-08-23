@@ -20,6 +20,7 @@
 #include "texture/TextureTransformer.h"
 #include "component/MeshComponent.h"
 #include "component/ObjectComponent.h"
+#include "component/RenderableComponent.h"
 
 #include "core/Engine.h"
 

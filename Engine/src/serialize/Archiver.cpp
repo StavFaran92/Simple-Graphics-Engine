@@ -5,6 +5,7 @@
 #include "component/ComponentSerializer.h"
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
+#include "component/RenderableComponent.h"
 
 Archiver* Archiver::instance = new Archiver();
 
