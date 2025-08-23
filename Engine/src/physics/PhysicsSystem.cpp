@@ -12,6 +12,7 @@
 #include "render/RenderCommand.h"
 #include "systems/BuiltInMeshes.h"
 #include <glm/gtx/quaternion.hpp>
+#include "component/PlayerControllerComponent.h"
 
 using namespace physx;
 

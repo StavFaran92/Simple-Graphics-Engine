@@ -55,66 +55,15 @@ namespace glm
 	}
 };
 
-
-
-//template<typename T>
-//std::shared_ptr<T> getComponentIfExists2(const Entity& e)
-//{
-//	std::shared_ptr<T> c;
-//	if (e.HasComponent<T>())
-//	{
-//		c = std::make_shared<T>(e.getComponent<T>());
-//	}
-//	return c;
-//}
-
 struct SerializedEntity
 {
 	entt::entity entity;
 	std::vector<std::shared_ptr<Component>> components;
 
-	//std::optional<Transformation> transform;
-	//std::optional<PhysicsComponent> physics;
-	std::optional<PlayerController> playerController;
-	//std::optional<MeshComponent> mesh;
-	//std::optional<RenderableComponent> renderableComponent;
-	//std::optional<CameraComponent> camera;
-	//std::optional<NativeScriptComponent> nsc;
-	//std::optional<MaterialComponent> mat;
-	std::optional<DirectionalLight> dLight;
-	std::optional<PointLight> pLight;
-	//std::optional<ObjectComponent> obj;
-	//std::optional<SkyboxComponent> skybox;
-	std::optional<ImageComponent> image;
-    std::optional<Animator> animator;
-    std::optional<Terrain> terrain;
-    //std::optional<TestComp> testComponent;
-    //std::optional<ShaderComponent> shader;
-    std::optional<FoliageComponent> foliage;
-
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(entity);
 		SERIALIZED_MEMBER(components);
-
-		//SERIALIZED_MEMBER(transform);
-		//SERIALIZED_MEMBER(physics);
-		SERIALIZED_MEMBER(playerController);
-		//SERIALIZED_MEMBER(mesh);
-		//SERIALIZED_MEMBER(renderableComponent);
-		//SERIALIZED_MEMBER(camera);
-		//SERIALIZED_MEMBER(nsc);
-		//SERIALIZED_MEMBER(mat);
-		SERIALIZED_MEMBER(dLight);
-		SERIALIZED_MEMBER(pLight);
-		//SERIALIZED_MEMBER(obj);
-		//SERIALIZED_MEMBER(skybox);
-		SERIALIZED_MEMBER(image);
-        SERIALIZED_MEMBER(animator);
-        SERIALIZED_MEMBER(terrain);
-        //SERIALIZED_MEMBER(testComponent);
-        //SERIALIZED_MEMBER(shader);
-		SERIALIZED_MEMBER_OPTIONAL(foliage, {});
 	}
 };
 

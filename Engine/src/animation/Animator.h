@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "glm/glm.hpp"
 #include "component/Component.h"
+#include "component/ComponentSerializer.h"
 #include "animation/Animation.h"
 
 class EngineAPI Animator : public Component
@@ -42,4 +43,4 @@ private:
 
 };
 
-
+REGISTER_COMPONENT(Animator)

@@ -4,8 +4,6 @@
 #include "geometry/MeshCollection.h"
 #include "runtime/Scene.h"
 
-REGISTER_COMPONENT(Animator)
-
 Animator::Animator(Resource<Animation> animation)
 	: m_currentAnimation(animation)
 {

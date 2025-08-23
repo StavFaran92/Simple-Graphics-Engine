@@ -125,16 +125,8 @@ struct EngineAPI ImageComponent : public Component
 	glm::vec2 position;
 	float rotate = 0;
 
-        Resource<Texture> image;
-        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
-};
-
-
-struct CharacterController : public Component
-{
-	CharacterController() = default;
-
-
+    Resource<Texture> image;
+    static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
 
 struct TestComp : public Component
@@ -166,43 +158,3 @@ struct VolumeComponent : public Component
 
 	Resource<Shader> shader;
 };
-
-struct EngineAPI PlayerController : public Component
-{
-	PlayerController() = default;
-
-	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-	}
-
-	void move(glm::vec3 disp)
-	{
-		m_disp = disp;
-	}
-
-	void reset()
-	{
-		m_disp = glm::vec3(0.f);
-	}
-
-    glm::vec3 m_disp{};
-    int controllerIndex = 0;
-    
-};
-
-//REGISTER_COMPONENT(TagComponent)
-//REGISTER_COMPONENT(SkyboxComponent)
-//REGISTER_COMPONENT(RenderableComponent)
-//REGISTER_COMPONENT(NativeScriptComponent)
-//REGISTER_COMPONENT(PhysicsComponent)
-//REGISTER_COMPONENT(CameraComponent)
-//REGISTER_COMPONENT(MeshComponent)
-//REGISTER_COMPONENT(MaterialComponent)
-//REGISTER_COMPONENT(ObjectComponent)
-//REGISTER_COMPONENT(ShaderComponent)
-//REGISTER_COMPONENT(InstanceBatch)
-//REGISTER_COMPONENT(ImageComponent)
-//REGISTER_COMPONENT(PlayerController)
-//REGISTER_COMPONENT(TestComp)

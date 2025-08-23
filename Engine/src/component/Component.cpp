@@ -12,36 +12,10 @@
 #include "render/VertexArrayObject.h"
 #include "component/ComponentSerializer.h"
 
-void TagComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-    (void)scene;
-    attachSimple<TagComponent>(c, entityHandler);
-}
-
-
-
-void TestComp::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-	(void)scene;
-	attachSimple<TestComp>(c, entityHandler);
-}
-
 void InstanceBatch::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
         (void)scene;
         attachSimple<InstanceBatch>(c, entityHandler);
-}
-
-void ImageComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-        (void)scene;
-        attachSimple<ImageComponent>(c, entityHandler);
-}
-
-void PlayerController::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-        (void)scene;
-        attachSimple<PlayerController>(c, entityHandler);
 }
 
 InstanceBatch::InstanceBatch()
