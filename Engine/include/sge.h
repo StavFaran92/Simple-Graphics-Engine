@@ -63,4 +63,5 @@
 #include "component/MeshComponent.h"
 #include "component/MaterialComponent.h"
 #include "component/ShaderComponent.h"
+#include "component/ObjectComponent.h"
 #include "runtime/Prefab.h"

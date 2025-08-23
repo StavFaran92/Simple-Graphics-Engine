@@ -14,6 +14,7 @@
 #include <GL/glew.h>
 #include "geometry/MeshCollection.h"
 #include "component/MeshComponent.h"
+#include "component/ObjectComponent.h"
 
 Resource<Texture> TextureTransformer::flipVertical(Resource<Texture> srcTexture)
 {

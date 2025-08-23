@@ -58,15 +58,6 @@ void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity 
 //    attachSimple<MeshComponent>(c, entityHandler);
 //}
 
-void ObjectComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-	if (auto oc = std::dynamic_pointer_cast<ObjectComponent>(c))
-	{
-		auto& obj = entityHandler.addComponent<ObjectComponent>(*oc);
-		obj.e.setRegistry(&scene.getRegistry());
-	}
-}
-
 void InstanceBatch::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
         (void)scene;

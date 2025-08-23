@@ -62,6 +62,7 @@
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
 #include "component/ShaderComponent.h"
+#include "component/ObjectComponent.h"
 
 struct PlaneGPU {
 	glm::vec3 normal;

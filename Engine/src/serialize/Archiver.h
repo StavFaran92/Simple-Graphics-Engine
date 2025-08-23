@@ -83,7 +83,7 @@ struct SerializedEntity
 	//std::optional<MaterialComponent> mat;
 	std::optional<DirectionalLight> dLight;
 	std::optional<PointLight> pLight;
-	std::optional<ObjectComponent> obj;
+	//std::optional<ObjectComponent> obj;
 	std::optional<SkyboxComponent> skybox;
 	std::optional<ImageComponent> image;
     std::optional<Animator> animator;
@@ -107,7 +107,7 @@ struct SerializedEntity
 		//SERIALIZED_MEMBER(mat);
 		SERIALIZED_MEMBER(dLight);
 		SERIALIZED_MEMBER(pLight);
-		SERIALIZED_MEMBER(obj);
+		//SERIALIZED_MEMBER(obj);
 		SERIALIZED_MEMBER(skybox);
 		SERIALIZED_MEMBER(image);
         SERIALIZED_MEMBER(animator);

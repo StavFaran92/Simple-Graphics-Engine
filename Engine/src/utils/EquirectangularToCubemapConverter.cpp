@@ -19,6 +19,7 @@
 #include "texture/Cubemap.h"
 #include "texture/TextureTransformer.h"
 #include "component/MeshComponent.h"
+#include "component/ObjectComponent.h"
 
 #include "core/Engine.h"
 

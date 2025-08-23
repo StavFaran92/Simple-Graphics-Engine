@@ -24,6 +24,7 @@
 #include "component/MeshComponent.h"
 #include "component/MaterialComponent.h"
 #include "component/ShaderComponent.h"
+#include "component/ObjectComponent.h"
 
 static float lerp(float a, float b, float t)
 {

@@ -3,6 +3,7 @@
 #include "runtime/Entity.h"
 #include "component/Component.h"
 #include "component/Transformation.h"
+#include "component/ObjectComponent.h"
 
 
 entt::registry& SGE_Regsitry::get()
