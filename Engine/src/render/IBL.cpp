@@ -19,6 +19,8 @@
 #include "geometry/MeshCollection.h"
 #include "runtime/Context.h"
 #include "texture/Cubemap.h"
+#include "component/RenderableComponent.h"
+#include "component/ObjectComponent.h"
 
 #include "core/Engine.h"
 

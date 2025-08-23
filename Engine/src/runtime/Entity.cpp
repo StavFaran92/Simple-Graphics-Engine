@@ -1,6 +1,7 @@
 #include "runtime/Entity.h"
 
 #include "component/Transformation.h"
+#include "component/ObjectComponent.h"
 #include <iostream>
 
 Entity Entity::EmptyEntity{};

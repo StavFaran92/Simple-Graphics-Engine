@@ -30,6 +30,9 @@
 #include "geometry/ShapeFactory.h"
 #include "component/MeshComponent.h"
 #include "component/MaterialComponent.h"
+#include "component/RenderableComponent.h"
+#include "component/ObjectComponent.h"
+#include "component/ShaderComponent.h"
 
 
 Renderer::Renderer(Scene* scene)

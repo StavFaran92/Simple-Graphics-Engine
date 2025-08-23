@@ -24,6 +24,7 @@
 #include "render/FrameBufferObject.h"
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
+#include "component/SkyboxComponent.h"
 
 #include "core/Logger.h"
 

@@ -65,6 +65,7 @@
 #include "component/ObjectComponent.h"
 #include "component/SkyboxComponent.h"
 #include "component/NativeScriptComponent.h"
+#include "component/ImageComponent.h"
 
 struct PlaneGPU {
 	glm::vec3 normal;

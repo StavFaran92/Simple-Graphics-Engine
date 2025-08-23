@@ -10,6 +10,7 @@
 #include "component/Component.h"
 
 #include "component/RenderableComponent.h"
+#include "component/ObjectComponent.h"
 
 Entity ScreenQuad::GenerateScreenQuad(SGE_Regsitry* registry)
 {

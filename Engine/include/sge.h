@@ -68,4 +68,5 @@
 #include "component/RenderableComponent.h"
 #include "component/SkyboxComponent.h"
 #include "component/PlayerControllerComponent.h"
+#include "component/ImageComponent.h"
 #include "runtime/Prefab.h"

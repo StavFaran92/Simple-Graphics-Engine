@@ -22,6 +22,7 @@
 #include "geometry/ShapeFactory.h"
 #include "utils/DebugHelper.h"
 #include "component/MeshComponent.h"
+#include "component/RenderableComponent.h"
 
 
 const unsigned int SHADOW_WIDTH = 1024;
