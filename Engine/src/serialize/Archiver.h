@@ -79,7 +79,7 @@ struct SerializedEntity
 	//std::optional<MeshComponent> mesh;
 	std::optional<RenderableComponent> renderableComponent;
 	//std::optional<CameraComponent> camera;
-	std::optional<NativeScriptComponent> nsc;
+	//std::optional<NativeScriptComponent> nsc;
 	//std::optional<MaterialComponent> mat;
 	std::optional<DirectionalLight> dLight;
 	std::optional<PointLight> pLight;
@@ -103,7 +103,7 @@ struct SerializedEntity
 		//SERIALIZED_MEMBER(mesh);
 		SERIALIZED_MEMBER(renderableComponent);
 		//SERIALIZED_MEMBER(camera);
-		SERIALIZED_MEMBER(nsc);
+		//SERIALIZED_MEMBER(nsc);
 		//SERIALIZED_MEMBER(mat);
 		SERIALIZED_MEMBER(dLight);
 		SERIALIZED_MEMBER(pLight);

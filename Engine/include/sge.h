@@ -64,4 +64,5 @@
 #include "component/MaterialComponent.h"
 #include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
+#include "component/NativeScriptComponent.h"
 #include "runtime/Prefab.h"

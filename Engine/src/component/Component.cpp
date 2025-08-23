@@ -39,19 +39,6 @@ void RenderableComponent::attachToEntity(std::shared_ptr<Component> c, Entity en
     attachSimple<RenderableComponent>(c, entityHandler);
 }
 
-void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-	if (auto nc = std::dynamic_pointer_cast<NativeScriptComponent>(c))
-	{
-		auto& nsc = entityHandler.addComponent<NativeScriptComponent>(*nc);
-		nsc.entity.setRegistry(&scene.getRegistry());
-		if (nsc.script)
-		{
-			nsc.script->entity.setRegistry(&scene.getRegistry());
-		}
-	}
-}
-
 //void MeshComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 //{
 //    (void)scene;
