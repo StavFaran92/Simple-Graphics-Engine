@@ -4,6 +4,7 @@
 #include <string>
 #include "core/Core.h"
 #include "component/Component.h"
+#include "component/ComponentSerializer.h"
 
 class Shader;
 

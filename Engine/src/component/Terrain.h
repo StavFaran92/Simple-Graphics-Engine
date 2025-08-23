@@ -5,8 +5,7 @@
 
 #include "core/Core.h"
 #include "component/Component.h"
-//#include "render/TerrainMaterial.h"
-//#include "texture/TextureArray.h"
+#include "component/ComponentSerializer.h"
 
 class Entity;
 
@@ -55,6 +54,8 @@ public:
 
 	int getTextureCount() const;
 
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		archive(m_mesh, m_heightmap, m_width, m_height, m_scale, m_textureCount, m_textureBlends);
@@ -76,7 +77,7 @@ private:
 	Resource<MeshCollection> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
 
-	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+	
 };
 
 REGISTER_COMPONENT(Terrain)

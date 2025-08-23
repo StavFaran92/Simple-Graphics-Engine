@@ -10,20 +10,21 @@
 #include "render/IBL.h"
 #include <GL/glew.h>
 #include "render/VertexArrayObject.h"
+#include "component/ComponentSerializer.h"
 
 template<typename T>
 static void attachSimple(std::shared_ptr<Component> c, Entity entityHandler)
 {
-        if (auto tc = std::dynamic_pointer_cast<T>(c))
-        {
-                entityHandler.addComponent<T>(*tc);
-        }
+    if (auto tc = std::dynamic_pointer_cast<T>(c))
+    {
+		entityHandler.addComponent<T>(*tc);
+    }
 }
 
 void TagComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
-        (void)scene;
-        attachSimple<TagComponent>(c, entityHandler);
+    (void)scene;
+    attachSimple<TagComponent>(c, entityHandler);
 }
 
 void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
@@ -35,10 +36,16 @@ void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entity
 	}
 }
 
+void TestComp::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	(void)scene;
+	attachSimple<TestComp>(c, entityHandler);
+}
+
 void RenderableComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
-        (void)scene;
-        attachSimple<RenderableComponent>(c, entityHandler);
+    (void)scene;
+    attachSimple<RenderableComponent>(c, entityHandler);
 }
 
 void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
@@ -56,26 +63,26 @@ void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity 
 
 void PhysicsComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
-        (void)scene;
-        attachSimple<PhysicsComponent>(c, entityHandler);
+    (void)scene;
+    attachSimple<PhysicsComponent>(c, entityHandler);
 }
 
 void CameraComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
-        (void)scene;
-        attachSimple<CameraComponent>(c, entityHandler);
+    (void)scene;
+    attachSimple<CameraComponent>(c, entityHandler);
 }
 
 void MeshComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
-        (void)scene;
-        attachSimple<MeshComponent>(c, entityHandler);
+    (void)scene;
+    attachSimple<MeshComponent>(c, entityHandler);
 }
 
 void MaterialComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
-        (void)scene;
-        attachSimple<MaterialComponent>(c, entityHandler);
+    (void)scene;
+    attachSimple<MaterialComponent>(c, entityHandler);
 }
 
 void ObjectComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
@@ -357,4 +364,3 @@ void SkyboxComponent::build()
 
 	scene->setIBLData(irradianceMap, prefilterEnvMap);
 }
-

@@ -2,6 +2,7 @@
 
 #include "core/Core.h"
 #include "component/Component.h"
+#include "component/ComponentSerializer.h"
 #include "serialize/CerealHelpers.h"
 #include <vector>
 
@@ -25,6 +26,8 @@ struct EngineAPI FoliageComponent : public Component
 	glm::vec2 getPatchCount() const;
 
 	const std::vector<FoliagePatch>& getPatches() const;
+
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -56,7 +59,8 @@ private:
 	std::vector<FoliagePatch> m_patches;
 	glm::vec2 m_patchCount;
 	unsigned int m_patchInstanceDataSSBO;
-	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+	
 };
+
 
 REGISTER_COMPONENT(FoliageComponent)

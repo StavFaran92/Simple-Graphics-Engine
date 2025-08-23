@@ -14,7 +14,6 @@
 #include "physics/Colliders.h"
 #include "serialize/CerealHelpers.h"
 #include "geometry/MeshCollection.h"
-#include "component/ComponentSerializer.h"
 
 /**
 HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
@@ -66,7 +65,9 @@ struct EngineAPI TagComponent : public Component
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
         std::string tag;
 };
-REGISTER_COMPONENT(TagComponent)
+
+
+
 
 struct EngineAPI SkyboxComponent : public Component
 {
@@ -89,11 +90,13 @@ struct EngineAPI SkyboxComponent : public Component
         Resource<Texture> cubemap;
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
-REGISTER_COMPONENT(SkyboxComponent)
+
 
 struct EngineAPI RenderableComponent : public Component
 {
 	RenderableComponent() = default;
+
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -106,10 +109,9 @@ struct EngineAPI RenderableComponent : public Component
 		Deferred
 	};
 
-        RenderTechnique renderTechnique = RenderTechnique::Deferred;
-        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+    RenderTechnique renderTechnique = RenderTechnique::Deferred;
 };
-REGISTER_COMPONENT(RenderableComponent)
+
 
 struct EngineAPI NativeScriptComponent : public Component
 {
@@ -145,7 +147,7 @@ struct EngineAPI NativeScriptComponent : public Component
 	}
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
-REGISTER_COMPONENT(NativeScriptComponent)
+
 
 struct EngineAPI PhysicsComponent : public Component
 {
@@ -182,7 +184,7 @@ struct EngineAPI PhysicsComponent : public Component
         ColliderType colliderType = ColliderType::NONE;
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
-REGISTER_COMPONENT(PhysicsComponent)
+
 
 //struct EngineAPI RigidBodyComponent : public Component
 //{
@@ -314,7 +316,7 @@ struct EngineAPI CameraComponent : public Component
         glm::vec3 up{ 0,1,0 };
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
-REGISTER_COMPONENT(CameraComponent)
+
 
 struct EngineAPI MeshComponent : public Component
 {
@@ -332,7 +334,7 @@ struct EngineAPI MeshComponent : public Component
         Resource<MeshCollection> mesh = Resource<MeshCollection>::empty;
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
-REGISTER_COMPONENT(MeshComponent)
+
 
 //struct EngineAPI MeshArrayRendererComponent : public Component
 //{
@@ -386,22 +388,26 @@ struct EngineAPI MaterialComponent : public Component
 		return iter->second;
 	}
 
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(materials);
 		SERIALIZED_MEMBER(count);
 	}
 
-        std::map<int, std::shared_ptr<Material>> materials;
-        int count = 0;
-        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+    std::map<int, std::shared_ptr<Material>> materials;
+    int count = 0;
+    
 };
-REGISTER_COMPONENT(MaterialComponent)
+
 
 struct EngineAPI ObjectComponent : public Component
 {
 	ObjectComponent() = default;
 	ObjectComponent(Entity e, const std::string& name) : name(name), e(e) {};
+
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -409,11 +415,11 @@ struct EngineAPI ObjectComponent : public Component
 		SERIALIZED_MEMBER(e);
 	}
 
-        std::string name;
-        Entity e = Entity::EmptyEntity;
-        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+    std::string name;
+    Entity e = Entity::EmptyEntity;
+    
 };
-REGISTER_COMPONENT(ObjectComponent)
+
 
 struct EngineAPI ShaderComponent : public Component
 {
@@ -468,7 +474,7 @@ struct EngineAPI ShaderComponent : public Component
         bool isValid = false;
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
-REGISTER_COMPONENT(ShaderComponent)
+
 
 struct EngineAPI InstanceBatch : public Component
 {
@@ -489,16 +495,18 @@ public:
 	}
 
 	void build();
+
+	std::vector<std::shared_ptr<Transformation>> transformations;
+	Resource<Mesh> mesh;
+	unsigned int m_id = 0;
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 private:
 	
 
 private:
-	std::vector<std::shared_ptr<Transformation>> transformations;
-	Resource<Mesh> mesh;
-        unsigned int m_id = 0;
-        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+
 };
-REGISTER_COMPONENT(InstanceBatch)
+
 
 struct EngineAPI ImageComponent : public Component
 {
@@ -521,7 +529,7 @@ struct EngineAPI ImageComponent : public Component
         Resource<Texture> image;
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
-REGISTER_COMPONENT(ImageComponent)
+
 
 struct CharacterController : public Component
 {
@@ -534,6 +542,9 @@ struct TestComp : public Component
 {
 	TestComp() = default;
 
+
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(test);
@@ -545,9 +556,6 @@ struct TestComp : public Component
 
 	
 };
-
-CEREAL_REGISTER_TYPE(TestComp);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, TestComp)
 
 struct VolumeComponent : public Component
 {
@@ -564,6 +572,8 @@ struct EngineAPI PlayerController : public Component
 {
 	PlayerController() = default;
 
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 	}
@@ -578,8 +588,22 @@ struct EngineAPI PlayerController : public Component
 		m_disp = glm::vec3(0.f);
 	}
 
-        glm::vec3 m_disp{};
-        int controllerIndex = 0;
-        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+    glm::vec3 m_disp{};
+    int controllerIndex = 0;
+    
 };
-REGISTER_COMPONENT(PlayerController)
+
+//REGISTER_COMPONENT(TagComponent)
+//REGISTER_COMPONENT(SkyboxComponent)
+//REGISTER_COMPONENT(RenderableComponent)
+//REGISTER_COMPONENT(NativeScriptComponent)
+//REGISTER_COMPONENT(PhysicsComponent)
+//REGISTER_COMPONENT(CameraComponent)
+//REGISTER_COMPONENT(MeshComponent)
+//REGISTER_COMPONENT(MaterialComponent)
+//REGISTER_COMPONENT(ObjectComponent)
+//REGISTER_COMPONENT(ShaderComponent)
+//REGISTER_COMPONENT(InstanceBatch)
+//REGISTER_COMPONENT(ImageComponent)
+//REGISTER_COMPONENT(PlayerController)
+//REGISTER_COMPONENT(TestComp)

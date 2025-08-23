@@ -3,7 +3,6 @@
 #include "core/Core.h"
 #include "serialize/CerealHelpers.h"
 
-
 struct EngineAPI Attenuation {
 	float constant = 1;
 	float linear = .35f;
@@ -33,6 +32,8 @@ public:
 	void SetAttenuation(Attenuation attenuation);
 	Attenuation getAttenuation() const;
 
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(attenuation);
@@ -41,7 +42,7 @@ public:
 
 private:
 	Attenuation attenuation;
-	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+	
 };
 
 REGISTER_COMPONENT(PointLight)
