@@ -15,6 +15,7 @@
 #include "geometry/MeshCollection.h"
 #include "render/Renderer.h"
 #include "render/Graphics.h"
+#include "component/MeshComponent.h"
 
 #include "GL/glew.h"
 

@@ -39,6 +39,7 @@
 #include "systems/BuiltInMeshes.h"
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
+#include "component/MeshComponent.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"

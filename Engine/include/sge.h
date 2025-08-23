@@ -60,4 +60,5 @@
 #include "component/FoliageComponent.h"
 #include "component/PhysicsComponent.h"
 #include "camera/CameraControllerFreeLook.h"
+#include "component/MeshComponent.h"
 #include "runtime/Prefab.h"

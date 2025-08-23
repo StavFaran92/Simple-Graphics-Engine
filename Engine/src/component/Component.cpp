@@ -52,11 +52,11 @@ void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity 
 	}
 }
 
-void MeshComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-    (void)scene;
-    attachSimple<MeshComponent>(c, entityHandler);
-}
+//void MeshComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+//{
+//    (void)scene;
+//    attachSimple<MeshComponent>(c, entityHandler);
+//}
 
 void MaterialComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {

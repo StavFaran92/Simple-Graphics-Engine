@@ -76,7 +76,7 @@ struct SerializedEntity
 	//std::optional<Transformation> transform;
 	//std::optional<PhysicsComponent> physics;
 	std::optional<PlayerController> playerController;
-	std::optional<MeshComponent> mesh;
+	//std::optional<MeshComponent> mesh;
 	std::optional<RenderableComponent> renderableComponent;
 	//std::optional<CameraComponent> camera;
 	std::optional<NativeScriptComponent> nsc;
@@ -100,7 +100,7 @@ struct SerializedEntity
 		//SERIALIZED_MEMBER(transform);
 		//SERIALIZED_MEMBER(physics);
 		SERIALIZED_MEMBER(playerController);
-		SERIALIZED_MEMBER(mesh);
+		//SERIALIZED_MEMBER(mesh);
 		SERIALIZED_MEMBER(renderableComponent);
 		//SERIALIZED_MEMBER(camera);
 		SERIALIZED_MEMBER(nsc);

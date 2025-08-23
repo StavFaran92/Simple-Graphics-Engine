@@ -16,6 +16,7 @@
 #include "component/Component.h"
 #include "core/CacheSystem.h"
 #include "systems/BuiltInMeshes.h"
+#include "component/MeshComponent.h"
 
 Entity ShapeFactory::createEntity(SGE_Regsitry* registry, const std::string& name)
 {

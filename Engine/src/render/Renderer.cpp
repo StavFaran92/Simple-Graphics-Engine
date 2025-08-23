@@ -28,6 +28,7 @@
 #include "render/ScreenQuad.h"
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"
+#include "component/MeshComponent.h"
 
 
 Renderer::Renderer(Scene* scene)

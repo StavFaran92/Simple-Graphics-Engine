@@ -23,6 +23,7 @@
 #include "geometry/MeshCollection.h"
 #include "render/FrameBufferObject.h"
 #include "component/CameraComponent.h"
+#include "component/MeshComponent.h"
 
 #include "core/Logger.h"
 

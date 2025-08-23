@@ -21,6 +21,7 @@
 #include "geometry/ShapeFactory.h"
 #include "render/RenderView.h"
 #include "utils/DebugHelper.h"
+#include "component/MeshComponent.h"
 
 static float lerp(float a, float b, float t)
 {

@@ -4,6 +4,7 @@
 #include "systems/BuiltInMeshes.h"
 #include "component/ComponentSerializer.h"
 #include "component/CameraComponent.h"
+#include "component/MeshComponent.h"
 
 Archiver* Archiver::instance = new Archiver();
 

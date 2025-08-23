@@ -157,155 +157,22 @@ struct EngineAPI NativeScriptComponent : public Component
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
 
-
-//struct EngineAPI RigidBodyComponent : public Component
+//struct EngineAPI MeshComponent : public Component
 //{
-//
-//	RigidBodyComponent() = default;
-//	RigidBodyComponent(RigidbodyType type, float mass) : type(type), mass(mass) {};
-//
-//	void addForce(glm::vec3 force);
-//	void setForce(glm::vec3 force);
-//
-//	void move(glm::vec3 position);
+//	MeshComponent(const Resource<MeshCollection>& mesh) : mesh(mesh) {};
+//	MeshComponent() = default;
 //
 //	template <class Archive>
 //	void serialize(Archive& archive) {
-//		SERIALIZED_MEMBER("type", type);
-//		SERIALIZED_MEMBER("mass", mass);
+//		SERIALIZED_MEMBER(mesh);
+//		SERIALIZED_MEMBER(materialSlot);
+//
 //	}
 //
-//	bool isLockedLinearX = false;
-//	bool isLockedLinearY = false;
-//	bool isLockedLinearZ = false;
-//	bool isLockedAngularX = false;
-//	bool isLockedAngularY = false;
-//	bool isLockedAngularZ = false;
-//	RigidbodyType type = RigidbodyType::Static;
-//	float mass = 0;
-//	bool isChanged = false;
-//	glm::vec3 m_targetPisition{0};
-//	glm::vec3 m_force{ 0 };
-//	void* simulatedBody = nullptr;
-//};
-//
-//struct EngineAPI CollisionBoxComponent : public Component
-//{
-//	CollisionBoxComponent() = default;
-//	CollisionBoxComponent(float halfExtent) : halfExtent(halfExtent) {};
-//
-//	template <class Archive>
-//	void serialize(Archive& archive) {
-//		SERIALIZED_MEMBER("halfExtent", halfExtent);
-//		SERIALIZED_MEMBER("layerMask", layerMask);
-//	}
-//
-//	float halfExtent = 0;
-//	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
-//};
-//
-//struct EngineAPI CollisionSphereComponent : public Component
-//{
-//	CollisionSphereComponent() = default;
-//	CollisionSphereComponent(float radius) : radius(radius) {};
-//
-//	template <class Archive>
-//	void serialize(Archive& archive) {
-//		SERIALIZED_MEMBER("radius", radius);
-//		SERIALIZED_MEMBER("layerMask", layerMask);
-//	}
-//
-//	float radius = 0;
-//	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
-//};
-//
-//struct EngineAPI CollisionMeshComponent : public Component
-//{
-//	CollisionMeshComponent() = default;
-//
-//	template <class Archive>
-//	void serialize(Archive& archive) {
-//		SERIALIZED_MEMBER("isConvex", isConvex);
-//		SERIALIZED_MEMBER("layerMask", layerMask);
-//	}
-//
-//	bool isConvex = false;
-//	Resource<Mesh> mesh = Resource<Mesh>::empty;
-//	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
-//};
-//
-//struct EngineAPI CollisionTerrainComponent : Component
-//{
-//	CollisionTerrainComponent() = default;
-//
-//	template <class Archive>
-//	void serialize(Archive& archive) {
-//		SERIALIZED_MEMBER("layerMask", layerMask);
-//	}
-//
-//	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
-//};
-
-//struct EngineAPI CameraComponent : public Component
-//{
-//	CameraComponent() = default;
-//
-//	template <class Archive>
-//	void serialize(Archive& archive) {
-//		SERIALIZED_MEMBER(center);
-//		SERIALIZED_MEMBER(up);
-//	}
-//
-//	static CameraComponent createPerspectiveCamera(float fovy, float aspect, float znear, float zfar)
-//	{
-//		CameraComponent cam;
-//		cam.fovy = fovy;
-//		cam.aspect = aspect;
-//		cam.znear = znear;
-//		cam.zfar = zfar;
-//		cam.type = CamType::PERSPECTIVE;
-//		return cam;
-//	}
-//
-//	glm::mat4 getProjection() const;
-//
-//	float fovy = 0;
-//	float aspect = 0;
-//	float znear = 0;
-//        float zfar = 0;
-//
-//        enum CamType
-//        {
-//                PERSPECTIVE,
-//                ORTHOGRAPHIC
-//        };
-//
-//	CamType type;
-//
-//	glm::vec3 front{0,0,-1};
-//	glm::vec3 right;
-//        glm::vec3 center{ 0,0,0 };
-//        glm::vec3 up{ 0,1,0 };
+//	float materialSlot = 0; // todo this will be used (probably as a list) to support multi material models
+//        Resource<MeshCollection> mesh = Resource<MeshCollection>::empty;
 //        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 //};
-
-
-struct EngineAPI MeshComponent : public Component
-{
-	MeshComponent(const Resource<MeshCollection>& mesh) : mesh(mesh) {};
-	MeshComponent() = default;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(mesh);
-		SERIALIZED_MEMBER(materialSlot);
-
-	}
-
-	float materialSlot = 0; // todo this will be used (probably as a list) to support multi material models
-        Resource<MeshCollection> mesh = Resource<MeshCollection>::empty;
-        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
-};
 
 
 //struct EngineAPI MeshArrayRendererComponent : public Component
