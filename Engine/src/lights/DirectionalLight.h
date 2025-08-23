@@ -21,4 +21,7 @@ public:
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(color);
 	}
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+
+REGISTER_COMPONENT(DirectionalLight)

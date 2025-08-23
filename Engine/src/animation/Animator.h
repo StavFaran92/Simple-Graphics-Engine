@@ -37,4 +37,7 @@ public:
 
 private:
 	std::map<std::string, Resource<Animation>> m_animations;
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+
+REGISTER_COMPONENT(Animator)

@@ -3,6 +3,7 @@
 #include "render/Shader.h"
 #include "core/Logger.h"
 #include "component/Transformation.h"
+#include "runtime/Scene.h"
 
 PointLight::PointLight(glm::vec3 color, float aIntensity, float dIntensity, Attenuation attenuation)
 	: Light(color, aIntensity, dIntensity), attenuation(attenuation)
@@ -28,4 +29,13 @@ void PointLight::useLight(Shader& shader, int index)
 	shader.setUniformValue(m_name + "["+std::to_string(index) +"]"+ ".constant", attenuation.constant);
 	shader.setUniformValue(m_name + "["+std::to_string(index) +"]"+ ".linear", attenuation.linear);
 	shader.setUniformValue(m_name + "["+std::to_string(index) +"]"+ ".quadratic", attenuation.quadratic);
+}
+
+void PointLight::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	(void)scene;
+	if (auto pl = std::dynamic_pointer_cast<PointLight>(c))
+	{
+		entityHandler.addComponent<PointLight>(*pl);
+	}
 }

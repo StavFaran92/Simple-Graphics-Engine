@@ -7,7 +7,8 @@
 #include "component/Component.h"
 //#include "render/TerrainMaterial.h"
 //#include "texture/TextureArray.h"
-#include "runtime/Entity.h"
+
+class Entity;
 
 static const int MAX_TEXTURE_COUNT = 4;
 
@@ -74,5 +75,8 @@ public:
 private:
 	Resource<MeshCollection> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
-	
+
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+
+REGISTER_COMPONENT(Terrain)

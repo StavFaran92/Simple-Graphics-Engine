@@ -18,26 +18,26 @@ struct FoliagePatch
 
 struct EngineAPI FoliageComponent : public Component
 {
-        FoliageComponent() = default;
+	FoliageComponent() = default;
 
-        void build();
+	void build();
 
-        glm::vec2 getPatchCount() const;
+	glm::vec2 getPatchCount() const;
 
-        const std::vector<FoliagePatch>& getPatches() const;
+	const std::vector<FoliagePatch>& getPatches() const;
 
-        template <class Archive>
-        void serialize(Archive& archive) {
-            SERIALIZED_MEMBER(m_foliageSpreadMap);
-            SERIALIZED_MEMBER(globalDensity);
-            SERIALIZED_MEMBER(colorA);
-            SERIALIZED_MEMBER(colorB);
-            SERIALIZED_MEMBER(patchWidth);
-            SERIALIZED_MEMBER(patchHeight);
-            SERIALIZED_MEMBER(width);
-            SERIALIZED_MEMBER(height);
-            SERIALIZED_MEMBER(terrainRef);
-        }
+	template <class Archive>
+	void serialize(Archive& archive) {
+	    SERIALIZED_MEMBER(m_foliageSpreadMap);
+	    SERIALIZED_MEMBER(globalDensity);
+	    SERIALIZED_MEMBER(colorA);
+	    SERIALIZED_MEMBER(colorB);
+	    SERIALIZED_MEMBER(patchWidth);
+	    SERIALIZED_MEMBER(patchHeight);
+	    SERIALIZED_MEMBER(width);
+	    SERIALIZED_MEMBER(height);
+	    SERIALIZED_MEMBER(terrainRef);
+	}
 
 	Resource<Texture> m_foliageSpreadMap;
 	float globalDensity = 1.f;
@@ -56,4 +56,7 @@ private:
 	std::vector<FoliagePatch> m_patches;
 	glm::vec2 m_patchCount;
 	unsigned int m_patchInstanceDataSSBO;
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+
+REGISTER_COMPONENT(FoliageComponent)

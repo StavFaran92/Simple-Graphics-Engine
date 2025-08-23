@@ -41,4 +41,7 @@ public:
 
 private:
 	Attenuation attenuation;
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+
+REGISTER_COMPONENT(PointLight)

@@ -7,6 +7,7 @@
 
 #include "component/Terrain.h"
 #include <algorithm>
+#include "runtime/Scene.h"
 
 void FoliageComponent::build()
 {
@@ -111,4 +112,14 @@ glm::vec2 FoliageComponent::getPatchCount() const
 const std::vector<FoliagePatch>& FoliageComponent::getPatches() const
 {
 	return m_patches;
+}
+
+void FoliageComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	if (auto fc = std::dynamic_pointer_cast<FoliageComponent>(c))
+	{
+		auto& foliage = entityHandler.addComponent<FoliageComponent>(*fc);
+		foliage.terrainRef.setRegistry(&scene.getRegistry());
+		foliage.build();
+	}
 }

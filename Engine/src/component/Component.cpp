@@ -11,6 +11,110 @@
 #include <GL/glew.h>
 #include "render/VertexArrayObject.h"
 
+template<typename T>
+static void attachSimple(std::shared_ptr<Component> c, Entity entityHandler)
+{
+        if (auto tc = std::dynamic_pointer_cast<T>(c))
+        {
+                entityHandler.addComponent<T>(*tc);
+        }
+}
+
+void TagComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<TagComponent>(c, entityHandler);
+}
+
+void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	if (auto sc = std::dynamic_pointer_cast<SkyboxComponent>(c))
+	{
+		auto& skyboxComponent = entityHandler.addComponent<SkyboxComponent>(*sc);
+		skyboxComponent.build();
+	}
+}
+
+void RenderableComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<RenderableComponent>(c, entityHandler);
+}
+
+void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	if (auto nc = std::dynamic_pointer_cast<NativeScriptComponent>(c))
+	{
+		auto& nsc = entityHandler.addComponent<NativeScriptComponent>(*nc);
+		nsc.entity.setRegistry(&scene.getRegistry());
+		if (nsc.script)
+		{
+			nsc.script->entity.setRegistry(&scene.getRegistry());
+		}
+	}
+}
+
+void PhysicsComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<PhysicsComponent>(c, entityHandler);
+}
+
+void CameraComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<CameraComponent>(c, entityHandler);
+}
+
+void MeshComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<MeshComponent>(c, entityHandler);
+}
+
+void MaterialComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<MaterialComponent>(c, entityHandler);
+}
+
+void ObjectComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	if (auto oc = std::dynamic_pointer_cast<ObjectComponent>(c))
+	{
+		auto& obj = entityHandler.addComponent<ObjectComponent>(*oc);
+		obj.e.setRegistry(&scene.getRegistry());
+	}
+}
+
+void ShaderComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	(void)scene;
+	if (auto sc = std::dynamic_pointer_cast<ShaderComponent>(c))
+	{
+		auto& shader = entityHandler.addComponent<ShaderComponent>(*sc);
+		shader.update();
+	}
+}
+
+void InstanceBatch::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<InstanceBatch>(c, entityHandler);
+}
+
+void ImageComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<ImageComponent>(c, entityHandler);
+}
+
+void PlayerController::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<PlayerController>(c, entityHandler);
+}
+
 MaterialComponent::MaterialComponent()
 {
 	auto mat = Engine::get()->getDefaultMaterial()->clone();

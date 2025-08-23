@@ -14,6 +14,7 @@
 #include "physics/Colliders.h"
 #include "serialize/CerealHelpers.h"
 #include "geometry/MeshCollection.h"
+#include "component/ComponentSerializer.h"
 
 /**
 HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
@@ -27,6 +28,7 @@ HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
 
 class Scene;
 class Mesh;
+class Entity;
 
 
 
@@ -54,15 +56,17 @@ std::shared_ptr<Component> getComponentIfExists(const Entity& e)
 }
 
 #define REGISTER_COMPONENT(TYPE) \
-    CEREAL_REGISTER_TYPE(TYPE); \
-    CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, TYPE); \
-    inline ComponentSerializeFnRegister<TYPE> TYPE##_serializeRegister(getComponentIfExists<TYPE>); \
-    inline ComponentDeserializeFnRegister<TYPE> TYPE##_deserializeRegister(TYPE::attachToEntity);
+	CEREAL_REGISTER_TYPE(TYPE); \
+	CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, TYPE); \
+	inline ComponentSerializeFnRegister<TYPE> TYPE##_serializeRegister(getComponentIfExists<TYPE>); \
+	inline ComponentDeserializeFnRegister<TYPE> TYPE##_deserializeRegister(TYPE::attachToEntity);
 
 struct EngineAPI TagComponent : public Component
 {
-	std::string tag;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+        std::string tag;
 };
+REGISTER_COMPONENT(TagComponent)
 
 struct EngineAPI SkyboxComponent : public Component
 {
@@ -81,9 +85,11 @@ struct EngineAPI SkyboxComponent : public Component
 	void build();
 	
 
-	Resource<Texture> originalImage;
-	Resource<Texture> cubemap;
+        Resource<Texture> originalImage;
+        Resource<Texture> cubemap;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(SkyboxComponent)
 
 struct EngineAPI RenderableComponent : public Component
 {
@@ -100,8 +106,10 @@ struct EngineAPI RenderableComponent : public Component
 		Deferred
 	};
 
-	RenderTechnique renderTechnique = RenderTechnique::Deferred;
+        RenderTechnique renderTechnique = RenderTechnique::Deferred;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(RenderableComponent)
 
 struct EngineAPI NativeScriptComponent : public Component
 {
@@ -109,10 +117,10 @@ struct EngineAPI NativeScriptComponent : public Component
 	std::shared_ptr<ScriptableEntity> script = nullptr;
 	Entity entity = Entity::EmptyEntity;
 
-	template<typename T, typename... Args>
-	T* bind(Args&&... args)
-	{
-		static_assert(std::is_base_of<ScriptableEntity, T>::value, "T must inherit from ScriptableEntity");
+        template<typename T, typename... Args>
+        T* bind(Args&&... args)
+        {
+                static_assert(std::is_base_of<ScriptableEntity, T>::value, "T must inherit from ScriptableEntity");
 
 		script = std::make_shared< T>(std::forward<Args>(args)...);
 		script->entity = entity;
@@ -135,7 +143,9 @@ struct EngineAPI NativeScriptComponent : public Component
 		SERIALIZED_MEMBER(entity);
 		SERIALIZED_MEMBER(script);
 	}
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(NativeScriptComponent)
 
 struct EngineAPI PhysicsComponent : public Component
 {
@@ -168,9 +178,11 @@ struct EngineAPI PhysicsComponent : public Component
 	glm::vec3 m_force{ 0 };
 	void* simulatedBody = nullptr;
 
-	std::shared_ptr<Collider> collider;
-	ColliderType colliderType = ColliderType::NONE;
+        std::shared_ptr<Collider> collider;
+        ColliderType colliderType = ColliderType::NONE;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(PhysicsComponent)
 
 //struct EngineAPI RigidBodyComponent : public Component
 //{
@@ -286,21 +298,23 @@ struct EngineAPI CameraComponent : public Component
 	float fovy = 0;
 	float aspect = 0;
 	float znear = 0;
-	float zfar = 0;
+        float zfar = 0;
 
-	enum CamType
-	{
-		PERSPECTIVE,
-		ORTHOGRAPHIC
-	};
+        enum CamType
+        {
+                PERSPECTIVE,
+                ORTHOGRAPHIC
+        };
 
 	CamType type;
 
 	glm::vec3 front{0,0,-1};
 	glm::vec3 right;
-	glm::vec3 center{ 0,0,0 };
-	glm::vec3 up{ 0,1,0 };
+        glm::vec3 center{ 0,0,0 };
+        glm::vec3 up{ 0,1,0 };
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(CameraComponent)
 
 struct EngineAPI MeshComponent : public Component
 {
@@ -315,8 +329,10 @@ struct EngineAPI MeshComponent : public Component
 	}
 
 	float materialSlot = 0; // todo this will be used (probably as a list) to support multi material models
-	Resource<MeshCollection> mesh = Resource<MeshCollection>::empty;
+        Resource<MeshCollection> mesh = Resource<MeshCollection>::empty;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(MeshComponent)
 
 //struct EngineAPI MeshArrayRendererComponent : public Component
 //{
@@ -376,9 +392,11 @@ struct EngineAPI MaterialComponent : public Component
 		SERIALIZED_MEMBER(count);
 	}
 
-	std::map<int, std::shared_ptr<Material>> materials;
-	int count = 0;
+        std::map<int, std::shared_ptr<Material>> materials;
+        int count = 0;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(MaterialComponent)
 
 struct EngineAPI ObjectComponent : public Component
 {
@@ -391,9 +409,11 @@ struct EngineAPI ObjectComponent : public Component
 		SERIALIZED_MEMBER(e);
 	}
 
-	std::string name;
-	Entity e = Entity::EmptyEntity;
+        std::string name;
+        Entity e = Entity::EmptyEntity;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(ObjectComponent)
 
 struct EngineAPI ShaderComponent : public Component
 {
@@ -445,8 +465,10 @@ struct EngineAPI ShaderComponent : public Component
 	std::string m_shaderFilePath;
 	ShaderOverride shaderOverride;
 
-	bool isValid = false;
+        bool isValid = false;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(ShaderComponent)
 
 struct EngineAPI InstanceBatch : public Component
 {
@@ -473,8 +495,10 @@ private:
 private:
 	std::vector<std::shared_ptr<Transformation>> transformations;
 	Resource<Mesh> mesh;
-	unsigned int m_id = 0;
+        unsigned int m_id = 0;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(InstanceBatch)
 
 struct EngineAPI ImageComponent : public Component
 {
@@ -494,8 +518,10 @@ struct EngineAPI ImageComponent : public Component
 	glm::vec2 position;
 	float rotate = 0;
 
-	Resource<Texture> image;
+        Resource<Texture> image;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(ImageComponent)
 
 struct CharacterController : public Component
 {
@@ -552,6 +578,8 @@ struct EngineAPI PlayerController : public Component
 		m_disp = glm::vec3(0.f);
 	}
 
-	glm::vec3 m_disp{};
-	int controllerIndex = 0;
+        glm::vec3 m_disp{};
+        int controllerIndex = 0;
+        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
+REGISTER_COMPONENT(PlayerController)

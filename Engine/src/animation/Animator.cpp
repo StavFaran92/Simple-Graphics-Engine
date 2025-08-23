@@ -2,6 +2,7 @@
 
 #include "animation/Animation.h"
 #include "geometry/MeshCollection.h"
+#include "runtime/Scene.h"
 
 Animator::Animator(Resource<Animation> animation)
 	: m_currentAnimation(animation)
@@ -93,4 +94,13 @@ Resource<Animation> Animator::getAnimation(const std::string& name)
 const std::map<std::string, Resource<Animation>>& Animator::getAllAnimations() const
 {
 	return m_animations;
+}
+
+void Animator::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	(void)scene;
+	if (auto ac = std::dynamic_pointer_cast<Animator>(c))
+	{
+		entityHandler.addComponent<Animator>(*ac);
+	}
 }
