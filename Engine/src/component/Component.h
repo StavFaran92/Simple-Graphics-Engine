@@ -54,6 +54,15 @@ std::shared_ptr<Component> getComponentIfExists(const Entity& e)
 	return c;
 }
 
+template<typename T>
+static void attachSimple(std::shared_ptr<Component> c, Entity entityHandler)
+{
+	if (auto tc = std::dynamic_pointer_cast<T>(c))
+	{
+		entityHandler.addComponent<T>(*tc);
+	}
+}
+
 #define REGISTER_COMPONENT(TYPE) \
 	CEREAL_REGISTER_TYPE(TYPE); \
 	CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, TYPE); \
@@ -145,43 +154,6 @@ struct EngineAPI NativeScriptComponent : public Component
 		SERIALIZED_MEMBER(entity);
 		SERIALIZED_MEMBER(script);
 	}
-        static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
-};
-
-
-struct EngineAPI PhysicsComponent : public Component
-{
-
-	PhysicsComponent() = default;
-
-	void addForce(glm::vec3 force);
-	void setForce(glm::vec3 force);
-
-	void move(glm::vec3 position);
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(type);
-		SERIALIZED_MEMBER(mass);
-		SERIALIZED_MEMBER(collider);
-		SERIALIZED_MEMBER(colliderType);
-	}
-
-	bool isLockedLinearX = false;
-	bool isLockedLinearY = false;
-	bool isLockedLinearZ = false;
-	bool isLockedAngularX = false;
-	bool isLockedAngularY = false;
-	bool isLockedAngularZ = false;
-	RigidbodyType type = RigidbodyType::Static;
-	float mass = 0;
-	bool isChanged = false;
-	glm::vec3 m_targetPisition{ 0 };
-	glm::vec3 m_force{ 0 };
-	void* simulatedBody = nullptr;
-
-        std::shared_ptr<Collider> collider;
-        ColliderType colliderType = ColliderType::NONE;
         static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };
 

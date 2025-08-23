@@ -74,7 +74,7 @@ struct SerializedEntity
 	std::vector<std::shared_ptr<Component>> components;
 
 	//std::optional<Transformation> transform;
-	std::optional<PhysicsComponent> physics;
+	//std::optional<PhysicsComponent> physics;
 	std::optional<PlayerController> playerController;
 	std::optional<MeshComponent> mesh;
 	std::optional<RenderableComponent> renderableComponent;
@@ -98,7 +98,7 @@ struct SerializedEntity
 		SERIALIZED_MEMBER(components);
 
 		//SERIALIZED_MEMBER(transform);
-		SERIALIZED_MEMBER(physics);
+		//SERIALIZED_MEMBER(physics);
 		SERIALIZED_MEMBER(playerController);
 		SERIALIZED_MEMBER(mesh);
 		SERIALIZED_MEMBER(renderableComponent);

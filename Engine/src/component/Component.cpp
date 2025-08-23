@@ -12,15 +12,6 @@
 #include "render/VertexArrayObject.h"
 #include "component/ComponentSerializer.h"
 
-template<typename T>
-static void attachSimple(std::shared_ptr<Component> c, Entity entityHandler)
-{
-    if (auto tc = std::dynamic_pointer_cast<T>(c))
-    {
-		entityHandler.addComponent<T>(*tc);
-    }
-}
-
 void TagComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
     (void)scene;
@@ -59,12 +50,6 @@ void NativeScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity 
 			nsc.script->entity.setRegistry(&scene.getRegistry());
 		}
 	}
-}
-
-void PhysicsComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-    (void)scene;
-    attachSimple<PhysicsComponent>(c, entityHandler);
 }
 
 void CameraComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
@@ -201,24 +186,6 @@ void InstanceBatch::build()
 	glVertexAttribDivisor(7, 1);
 	glVertexAttribDivisor(8, 1);
 	glVertexAttribDivisor(9, 1);
-}
-
-void PhysicsComponent::addForce(glm::vec3 force)
-{
-	m_force += force;
-	isChanged = true;
-}
-
-void PhysicsComponent::setForce(glm::vec3 force)
-{
-	m_force = glm::vec3(0);
-	addForce(force);
-}
-
-void PhysicsComponent::move(glm::vec3 position)
-{
-	m_targetPisition = position;
-	isChanged = true;
 }
 
 glm::mat4 CameraComponent::getProjection() const

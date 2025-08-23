@@ -58,5 +58,6 @@
 #include "systems/WaterSystem.h"
 #include "render/RenderCommand.h"
 #include "component/FoliageComponent.h"
+#include "component/PhysicsComponent.h"
 #include "camera/CameraControllerFreeLook.h"
 #include "runtime/Prefab.h"

@@ -8,6 +8,7 @@
 #include "component/Transformation.h"
 #include "core/Configurations.h"
 #include <glm/glm.hpp>
+#include "component/PhysicsComponent.h"
 
 class PhysicsSystem
 {
