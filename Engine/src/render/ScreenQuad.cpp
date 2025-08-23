@@ -7,7 +7,7 @@
 #include "geometry/ShapeFactory.h"
 #include "runtime/Entity.h"
 #include "runtime/Scene.h"
-#include "component/Component.h"
+#include "component/ObjectComponent.h"
 
 #include "component/RenderableComponent.h"
 

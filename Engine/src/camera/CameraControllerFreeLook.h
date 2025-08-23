@@ -3,7 +3,8 @@
 #include <glm/glm.hpp>
 
 #include "camera/ICameraController.h"
-#include "component/Component.h"
+#include "component/CameraComponent.h"
+#include "component/Transformation.h"
 #include "core/Subscriber.h"
 
 class EngineAPI CameraControllerFreeLook : public ICameraController

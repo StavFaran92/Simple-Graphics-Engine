@@ -13,7 +13,7 @@
 #include "render/Shader.h"
 #include "core/Registry.h"
 //#include "component/RenderableComponent.h"
-#include "component/Component.h"
+#include "component/RenderableComponent.h"
 #include "core/CacheSystem.h"
 #include "systems/BuiltInMeshes.h"
 

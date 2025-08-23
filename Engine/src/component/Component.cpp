@@ -1,4 +1,20 @@
 #include "component/Component.h"
+#include "component/TagComponent.h"
+#include "component/SkyboxComponent.h"
+#include "component/RenderableComponent.h"
+#include "component/NativeScriptComponent.h"
+#include "component/PhysicsComponent.h"
+#include "component/CameraComponent.h"
+#include "component/MeshComponent.h"
+#include "component/MaterialComponent.h"
+#include "component/ObjectComponent.h"
+#include "component/ShaderComponent.h"
+#include "component/InstanceBatch.h"
+#include "component/ImageComponent.h"
+#include "component/PlayerController.h"
+#include "component/VolumeComponent.h"
+#include "component/CharacterController.h"
+#include "component/TestComp.h"
 
 #include "core/Engine.h"
 #include "runtime/Context.h"
@@ -121,6 +137,19 @@ void PlayerController::attachToEntity(std::shared_ptr<Component> c, Entity entit
         (void)scene;
         attachSimple<PlayerController>(c, entityHandler);
 }
+
+void VolumeComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<VolumeComponent>(c, entityHandler);
+}
+
+void CharacterController::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+        (void)scene;
+        attachSimple<CharacterController>(c, entityHandler);
+}
+
 
 MaterialComponent::MaterialComponent()
 {

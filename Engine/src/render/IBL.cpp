@@ -13,7 +13,9 @@
 
 #include "render/RenderCommand.h"
 #include "runtime/Entity.h"
-#include "component/Component.h"
+#include "component/RenderableComponent.h"
+#include "component/ObjectComponent.h"
+#include "component/MeshComponent.h"
 #include "geometry/Mesh.h"
 #include "geometry/MeshCollection.h"
 #include "runtime/Context.h"

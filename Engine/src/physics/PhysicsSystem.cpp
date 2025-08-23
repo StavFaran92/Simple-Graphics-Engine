@@ -3,7 +3,7 @@
 #include "core/Logger.h"
 
 #include "physics/PhysXUtils.h"
-#include "component/Component.h"
+#include "component/PhysicsComponent.h"
 #include "physics/Physics.h"
 #include "runtime/Scene.h"
 #include "core/Registry.h"

@@ -5,7 +5,7 @@
 
 #include "core/Core.h"
 #include "render/Shader.h"
-#include "component/Component.h"
+#include "component/ShaderComponent.h"
 
 class EngineAPI CustomShaderBuilder
 {

@@ -1,7 +1,7 @@
 #include "core/Registry.h"
 
 #include "runtime/Entity.h"
-#include "component/Component.h"
+#include "component/ObjectComponent.h"
 #include "component/Transformation.h"
 
 
