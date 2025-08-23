@@ -63,6 +63,7 @@
 #include "component/MeshComponent.h"
 #include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
+#include "component/SkyboxComponent.h"
 #include "component/NativeScriptComponent.h"
 
 struct PlaneGPU {

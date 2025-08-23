@@ -22,6 +22,9 @@
 #include "utils/EquirectangularToCubemapConverter.h"
 #include "texture/TextureTransformer.h"
 #include "render/IBL.h"
+#include "component/SkyboxComponent.h"
+#include "component/RenderableComponent.h"
+#include "component/ObjectComponent.h"
 
 Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
 {

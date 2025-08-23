@@ -66,4 +66,5 @@
 #include "component/ObjectComponent.h"
 #include "component/NativeScriptComponent.h"
 #include "component/RenderableComponent.h"
+#include "component/SkyboxComponent.h"
 #include "runtime/Prefab.h"
