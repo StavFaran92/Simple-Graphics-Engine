@@ -3,10 +3,10 @@
     "RenderShadowMap": true,
     "RenderForwardPass": false,
     "RenderDeferredPass": true,
-    "RenderCustomShadersPass": false,
+    "RenderCustomShadersPass": true,
     "RenderSkyboxPass": true,
-    "RenderTerrainPass": false,
+    "RenderTerrainPass": true,
     "RenderVolumetricsPass": true,
-    "RenderWireframeGrid": false
+    "RenderWireframeGrid": true
   }
 }

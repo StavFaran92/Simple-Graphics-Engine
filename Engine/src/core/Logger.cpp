@@ -5,13 +5,15 @@
 std::shared_ptr<spdlog::logger> Logger::s_logger;
 std::function<void(spdlog::level::level_enum, const std::string&)> Logger::s_callback;
 
+constexpr char* logPattern = "[%H:%M:%S] [%^%l%$] [%s:%#:%!] %v";
+
 // Custom sink that forwards log messages to the registered callback
 class CallbackSink_mt : public spdlog::sinks::base_sink<std::mutex>
 {
 public:
     CallbackSink_mt()
     {
-        set_pattern("[%T] [%^%l%$] %v");
+        set_pattern(logPattern);
     }
 protected:
     void sink_it_(const spdlog::details::log_msg& msg) override
@@ -29,13 +31,13 @@ void Logger::init(const std::string& filePath)
     std::vector<spdlog::sink_ptr> sinks;
 
     auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    consoleSink->set_pattern("[%T] [%^%l%$] %v");
+    consoleSink->set_pattern(logPattern);
     sinks.push_back(consoleSink);
 
     if (!filePath.empty())
     {
         auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath, true);
-        fileSink->set_pattern("[%T] [%^%l%$] %v");
+        fileSink->set_pattern(logPattern);
         sinks.push_back(fileSink);
     }
 

@@ -38,8 +38,8 @@ private:
 };
 
 // Macros
-#define logTrace(...)   Logger::get()->trace(__VA_ARGS__);
-#define logInfo(...)    Logger::get()->info(__VA_ARGS__);
-#define logDebug(...)   Logger::get()->debug(__VA_ARGS__)
-#define logWarning(...) Logger::get()->warn(__VA_ARGS__)
-#define logError(...)   Logger::get()->error(__VA_ARGS__)
+#define logTrace(...)   Logger::get()->log(spdlog::source_loc{__FILE__, __LINE__, __func__}, spdlog::level::trace, __VA_ARGS__)
+#define logInfo(...)    Logger::get()->log(spdlog::source_loc{__FILE__, __LINE__, __func__}, spdlog::level::info, __VA_ARGS__)
+#define logDebug(...)   Logger::get()->log(spdlog::source_loc{__FILE__, __LINE__, __func__}, spdlog::level::debug, __VA_ARGS__)
+#define logWarning(...) Logger::get()->log(spdlog::source_loc{__FILE__, __LINE__, __func__}, spdlog::level::warn, __VA_ARGS__)
+#define logError(...)   Logger::get()->log(spdlog::source_loc{__FILE__, __LINE__, __func__}, spdlog::level::err, __VA_ARGS__)
