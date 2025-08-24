@@ -22,10 +22,10 @@ void FoliageComponent::build()
 	{
 		for (int j = 0; j < m_patchCount.x; j++) // Cols
 		{
-			FoliagePatch patch;
-			patch.pos = glm::vec3(i * patchWidth - width / 2., 0, j * patchHeight - height / 2.);
-			patch.idx = j;
-			patch.idy = i;
+			auto patch = std::make_shared<FoliagePatch>();
+			patch->pos = glm::vec3(i * patchWidth - width / 2., 0, j * patchHeight - height / 2.);
+			patch->idx = j;
+			patch->idy = i;
 			m_patches.push_back(patch);
 
 		}
@@ -53,8 +53,8 @@ void FoliageComponent::build()
 			for (int j = 0; j < pixelPerPatch; j++)
 			{
 				// Sample density
-				int xOffset = p.idx * pixelPerPatch + j;
-				int yOffset = p.idy * pixelPerPatch + i;
+				int xOffset = p->idx * pixelPerPatch + j;
+				int yOffset = p->idy * pixelPerPatch + i;
 
 				float xRelativeToImageOffset = xOffset * ratio.x;
 				float yRelativeToImageOffset = yOffset * ratio.y;
@@ -69,11 +69,11 @@ void FoliageComponent::build()
 				float density = (float)pixels[index] / 255.f;
 
 				int instanceCount = density * globalDensity * 255 ; // times max instances per texel
-				p.instanceCount += instanceCount;
+				p->instanceCount += instanceCount;
 				for (int k = 0; k < instanceCount; ++k) 
 				{
 					glm::vec3 pos;
-					pos = glm::vec3(p.pos);																				// Offset by patch position
+					pos = glm::vec3(p->pos);																				// Offset by patch position
 					pos += glm::vec3((float)i * patchWidth / pixelPerPatch, 0, (float)j * patchHeight / pixelPerPatch);	// Offset by texel chunk
 					pos += foliageSystem->getRandomLocation(k) * glm::vec3((float)patchWidth / pixelPerPatch, 0, (float)patchHeight / pixelPerPatch);
 
@@ -85,10 +85,10 @@ void FoliageComponent::build()
 
 					//pos += glm::vec3(.5, 0, .2);
 
-					p.instancesData.push_back(glm::vec4(pos, 1.0));
+					p->instancesData.push_back(glm::vec4(pos, 1.0));
 				}
 				auto& gen = Engine::get()->getRandomSystem()->getGenerator();
-				std::shuffle(p.instancesData.begin(), p.instancesData.end(), gen);
+				std::shuffle(p->instancesData.begin(), p->instancesData.end(), gen);
 			}
 		}
 		//p.density = r / 255.f;
@@ -109,7 +109,7 @@ glm::vec2 FoliageComponent::getPatchCount() const
 	return m_patchCount;
 }
 
-const std::vector<FoliagePatch>& FoliageComponent::getPatches() const
+const std::vector<std::shared_ptr<FoliagePatch>>& FoliageComponent::getPatches() const
 {
 	return m_patches;
 }

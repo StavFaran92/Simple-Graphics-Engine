@@ -25,7 +25,7 @@ struct EngineAPI FoliageComponent : public Component
 
 	glm::vec2 getPatchCount() const;
 
-	const std::vector<FoliagePatch>& getPatches() const;
+	const std::vector<std::shared_ptr<FoliagePatch>>& getPatches() const;
 
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
@@ -56,7 +56,7 @@ struct EngineAPI FoliageComponent : public Component
 
 private:
 
-	std::vector<FoliagePatch> m_patches;
+	std::vector<std::shared_ptr<FoliagePatch>> m_patches;
 	glm::vec2 m_patchCount;
 	unsigned int m_patchInstanceDataSSBO;
 	

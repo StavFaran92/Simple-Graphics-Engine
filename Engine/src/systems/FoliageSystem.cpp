@@ -147,21 +147,21 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-	std::vector<FoliagePatch> visiblePatches;
+	std::vector<std::shared_ptr<FoliagePatch>> visiblePatches;
 	const auto& patches = foliage.getPatches();
 	visiblePatches.reserve(patches.size());
 	for (int i = 0; i < patches.size(); i++)
 	{
-		if (isInFrustum(m_frustum, patches[i].pos))
+		if (isInFrustum(m_frustum, patches[i]->pos))
 		{
 			visiblePatches.push_back(patches[i]);
 		}
 	}
 
 	// I also need to sort back to front to achieve correct max LOD
-	std::sort(visiblePatches.begin(), visiblePatches.end(), [this](const FoliagePatch& a, const FoliagePatch& b) {
-		float da = glm::dot(glm::vec2(a.pos.x, a.pos.z) - glm::vec2(m_camPos.x, m_camPos.z), glm::vec2(m_camFront.x, m_camFront.z));
-		float db = glm::dot(glm::vec2(b.pos.x, b.pos.z) - glm::vec2(m_camPos.x, m_camPos.z), glm::vec2(m_camFront.x, m_camFront.z));
+	std::sort(visiblePatches.begin(), visiblePatches.end(), [this](const std::shared_ptr<FoliagePatch>& a, const std::shared_ptr < FoliagePatch>& b) {
+		float da = glm::dot(glm::vec2(a->pos.x, a->pos.z) - glm::vec2(m_camPos.x, m_camPos.z), glm::vec2(m_camFront.x, m_camFront.z));
+		float db = glm::dot(glm::vec2(b->pos.x, b->pos.z) - glm::vec2(m_camPos.x, m_camPos.z), glm::vec2(m_camFront.x, m_camFront.z));
 		return da < db; // (front-to-back)
 		});
 
@@ -190,11 +190,11 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 	foliageShader->setUniformValue("viewDir", m_camFront);
 	
-	std::vector<FoliagePatch> patchesMaxLOD;
+	std::vector<std::shared_ptr<FoliagePatch>> patchesMaxLOD;
 	for (int i = 0; i < visiblePatches.size(); i++)
 	{
 
-		float distance = glm::dot(visiblePatches[i].pos - m_camPos, m_camFront);
+		float distance = glm::dot(visiblePatches[i]->pos - m_camPos, m_camFront);
 
 		if (distance < maxFoliageViewDistance)
 		{
@@ -204,9 +204,9 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 			auto vao = grassBlade->getPrimaryMesh()->getVAO();
 
 			float density = std::min(1.0f, std::max(0.f, maxFoliageViewDistance - distance) / maxFoliageViewDistance);
-			int instanceCount = visiblePatches[i].instanceCount * density;
+			int instanceCount = visiblePatches[i]->instanceCount * density;
 
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * instanceCount, visiblePatches[i].instancesData.data());
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * instanceCount, visiblePatches[i]->instancesData.data());
 			RenderCommand::drawInstanced(vao, instanceCount);
 		}
 
@@ -247,7 +247,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 		float density = 1.f;
 		int instanceCount = 1000 * density;
 
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * instanceCount, patchesMaxLOD[i].instancesData.data());
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * instanceCount, patchesMaxLOD[i]->instancesData.data());
 		RenderCommand::drawInstanced(vao, instanceCount);
 	}
 }
