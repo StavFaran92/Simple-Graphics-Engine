@@ -44,7 +44,7 @@ Resource<T> Assets::loadAsset(UUID uid, const std::string& path)
 	return res;
 }
 
-AssetInfo Assets::importAsset(AssetInfo aInfo)
+AssetInfo Assets::importAsset(AssetInfo& aInfo)
 {
 	auto& path = aInfo.origFilePath;
 	auto& uid = aInfo.uuid;

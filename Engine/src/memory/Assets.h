@@ -33,7 +33,7 @@ public:
 	template<typename T>
 	Resource<T> loadAsset(UUID uid, const std::string& path);
 
-	AssetInfo importAsset(AssetInfo assetInfo);
+	AssetInfo importAsset(AssetInfo& assetInfo);
 
 	AssetInfo addAsset(AssetInfo assetInfo);
 
