@@ -198,6 +198,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 		if (distance < maxFoliageViewDistance)
 		{
+			foliageShader->setUniformValue("patchPosition", visiblePatches[i]->pos);
 
 			//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
 			auto& grassBlade = m_grassBlade;
@@ -206,7 +207,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 			float density = std::min(1.0f, std::max(0.f, maxFoliageViewDistance - distance) / maxFoliageViewDistance);
 			int instanceCount = visiblePatches[i]->instanceCount * density;
 
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * instanceCount, visiblePatches[i]->instancesData.data());
+			//glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * instanceCount, visiblePatches[i]->instancesData.data());
 			RenderCommand::drawInstanced(vao, instanceCount);
 		}
 
@@ -228,26 +229,26 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 	//glDisable(GL_DEPTH_TEST); 
 	//glDepthMask(GL_FALSE); //For max LOD grass i need to turn depth write off to get correct alpha blend
-	auto& foliageMAXLODShader = m_foliageQuadShader;
-	foliageMAXLODShader->use();
-	foliageMAXLODShader->setUniformValue("view", *graphics->view);
-	foliageMAXLODShader->setUniformValue("projection", *graphics->projection);
-	foliageMAXLODShader->setUniformValue("colorA", foliage.colorA);
-	foliageMAXLODShader->setUniformValue("colorB", foliage.colorB);
-	foliageMAXLODShader->setUniformValue("patchSize", glm::vec2(foliage.patchWidth, foliage.patchHeight));
-	foliageMAXLODShader->setUniformValue("patchCount", glm::vec2(10, 10));
-	foliageMAXLODShader->setTextureInShader(grassTexture, "grassTexture", 0);
-	foliageMAXLODShader->setUniformValue("rotation", rotationMatrix);
-	foliageMAXLODShader->setUniformValue("offset", glm::vec4(0, .5, 0, 0));
-	auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
-	auto vao = grassBlade->getPrimaryMesh()->getVAO();
-	
-	for (int i = patchesMaxLOD.size()-1; i >= 0 ; i--)
-	{
-		float density = 1.f;
-		int instanceCount = 1000 * density;
+	//auto& foliageMAXLODShader = m_foliageQuadShader;
+	//foliageMAXLODShader->use();
+	//foliageMAXLODShader->setUniformValue("view", *graphics->view);
+	//foliageMAXLODShader->setUniformValue("projection", *graphics->projection);
+	//foliageMAXLODShader->setUniformValue("colorA", foliage.colorA);
+	//foliageMAXLODShader->setUniformValue("colorB", foliage.colorB);
+	//foliageMAXLODShader->setUniformValue("patchSize", glm::vec2(foliage.patchWidth, foliage.patchHeight));
+	//foliageMAXLODShader->setUniformValue("patchCount", glm::vec2(10, 10));
+	//foliageMAXLODShader->setTextureInShader(grassTexture, "grassTexture", 0);
+	//foliageMAXLODShader->setUniformValue("rotation", rotationMatrix);
+	//foliageMAXLODShader->setUniformValue("offset", glm::vec4(0, .5, 0, 0));
+	//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
+	//auto vao = grassBlade->getPrimaryMesh()->getVAO();
+	//
+	//for (int i = patchesMaxLOD.size()-1; i >= 0 ; i--)
+	//{
+	//	float density = 1.f;
+	//	int instanceCount = 1000 * density;
 
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * instanceCount, patchesMaxLOD[i]->instancesData.data());
-		RenderCommand::drawInstanced(vao, instanceCount);
-	}
+	//	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * instanceCount, patchesMaxLOD[i]->instancesData.data());
+	//	RenderCommand::drawInstanced(vao, instanceCount);
+	//}
 }

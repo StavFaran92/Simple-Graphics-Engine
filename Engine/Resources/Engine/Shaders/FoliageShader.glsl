@@ -25,6 +25,7 @@ uniform sampler2D windNoise;
 uniform mat4 scale;
 uniform float time;
 uniform mat4 rotation;
+uniform vec3 patchPosition;
 
 out vec3 Normal;
 out vec3 fragPos;
@@ -34,6 +35,7 @@ out vec2 uv;
 void main()                                                                         
 { 
     vec4 vPos = instanceData[gl_InstanceID];
+    vPos += vec4(patchPosition, 0.0);
     fragPosObjSpace = aPos;
 
     float posX = vPos.x;
