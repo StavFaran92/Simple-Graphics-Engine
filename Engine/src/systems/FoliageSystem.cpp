@@ -148,7 +148,8 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
 	std::vector<FoliagePatch> visiblePatches;
-	const auto patches = foliage.getPatches();
+	const auto& patches = foliage.getPatches();
+	visiblePatches.reserve(patches.size());
 	for (int i = 0; i < patches.size(); i++)
 	{
 		if (isInFrustum(m_frustum, patches[i].pos))
