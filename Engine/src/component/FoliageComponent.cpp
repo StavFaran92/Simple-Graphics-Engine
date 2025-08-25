@@ -70,29 +70,32 @@ void FoliageComponent::build()
 
 				int instanceCount = density * globalDensity * 255 ; // times max instances per texel
 				p->instanceCount += instanceCount;
-				for (int k = 0; k < instanceCount; ++k) 
-				{
-					glm::vec3 pos;
-					pos = glm::vec3(p->pos);																				// Offset by patch position
-					pos += glm::vec3((float)i * patchWidth / pixelPerPatch, 0, (float)j * patchHeight / pixelPerPatch);	// Offset by texel chunk
-					pos += foliageSystem->getRandomLocation(k) * glm::vec3((float)patchWidth / pixelPerPatch, 0, (float)patchHeight / pixelPerPatch);
-
-					if (terrain)
-					{
-						float height = terrain->getHeightAtPoint(pos.x, pos.z);
-						pos.y += height;
-					}
-
-					//pos += glm::vec3(.5, 0, .2);
-
-					p->instancesData.push_back(glm::vec4(pos, 1.0));
-				}
-				auto& gen = Engine::get()->getRandomSystem()->getGenerator();
-				std::shuffle(p->instancesData.begin(), p->instancesData.end(), gen);
 			}
 		}
 		//p.density = r / 255.f;
 	}
+
+	std::vector<glm::vec4> patchInstanceData;
+	size_t totalSize = pixelPerPatch * pixelPerPatch * globalDensity * 255;
+	patchInstanceData.reserve(totalSize);
+
+	for (int i = 0; i < pixelPerPatch; i++)
+	{
+		for (int j = 0; j < pixelPerPatch; j++)
+		{
+			int instanceCount = globalDensity * 255; // times max instances per texel
+			for (int k = 0; k < instanceCount; ++k)
+			{
+				glm::vec3 pos{};
+				pos += glm::vec3((float)i * patchWidth / pixelPerPatch, 0, (float)j * patchHeight / pixelPerPatch);	// Offset by texel chunk
+				pos += foliageSystem->getRandomLocation(k) * glm::vec3((float)patchWidth / pixelPerPatch, 0, (float)patchHeight / pixelPerPatch);
+
+				patchInstanceData.push_back(glm::vec4(pos, 1.0));
+			}
+		}
+	}
+	auto& gen = Engine::get()->getRandomSystem()->getGenerator();
+	std::shuffle(patchInstanceData.begin(), patchInstanceData.end(), gen);
 
 	if (m_patchInstanceDataSSBO)
 	{
@@ -100,7 +103,7 @@ void FoliageComponent::build()
 	}
 	glGenBuffers(1, &m_patchInstanceDataSSBO);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_patchInstanceDataSSBO);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * 255 * pixelPerPatch * pixelPerPatch, nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * patchInstanceData.size(), patchInstanceData.data(), GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_patchInstanceDataSSBO);
 }
 
