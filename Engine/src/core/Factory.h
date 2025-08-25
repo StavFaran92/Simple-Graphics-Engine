@@ -16,7 +16,7 @@ public:
         T* asset = new T(args...);
         auto uid = uuid::generate_uuid_v4();
         Engine::get()->getMemoryPool().add(uid, asset);
-        Engine::get()->getResourceManager()->incRef(uid);
+        //Engine::get()->getResourceManager()->incRef(uid);
         Resource<T> res(uid);
         return res;
     }
@@ -26,7 +26,7 @@ public:
     {
         T* asset = new T(args...);
         Engine::get()->getMemoryPool().add(uid, asset);
-        Engine::get()->getResourceManager()->incRef(uid);
+        //Engine::get()->getResourceManager()->incRef(uid);
         Resource<T> res(uid);
         return res;
     }

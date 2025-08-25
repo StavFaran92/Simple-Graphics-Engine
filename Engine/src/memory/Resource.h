@@ -66,8 +66,9 @@ public:
 			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	};
 
-	Resource<T>& operator=(Resource<T>&& other)
+	Resource<T>& operator=(Resource<T>&& other) noexcept
 	{
+		clean();
 		uuid = other.uuid;
 		other.uuid = EMPTY_UUID;
 		if (!isEmpty()) 
