@@ -15,7 +15,7 @@ public:
 	Material();
 	~Material() = default;
 
-	virtual void use(Resource<Shader> shader);
+	virtual void use(Resource<Shader>& shader);
 
 	virtual void release();
 
@@ -44,8 +44,8 @@ public:
 	}
 
 protected:
-	void setTexturesInShader(Resource<Shader> shader);
-	void setTextureInShader(Resource<Shader> shader, Texture::TextureType ttype, int slot);
+	void setTexturesInShader(Resource<Shader>& shader);
+	void setTextureInShader(Resource<Shader>& shader, Texture::TextureType ttype, int slot);
 
 protected:
 	std::map<Texture::TextureType, std::shared_ptr<TextureSampler>> m_samplers;

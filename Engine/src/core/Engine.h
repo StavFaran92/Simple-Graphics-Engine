@@ -68,7 +68,14 @@ class EngineAPI Engine
 public:
 
     // -------------------- Methods -------------------- //
-    static Engine* get();
+    static inline Engine* get()
+    {
+        if (instance == nullptr)
+        {
+            instance = new Engine();
+        }
+        return instance;
+    }
 
     std::string getRootDir();
 

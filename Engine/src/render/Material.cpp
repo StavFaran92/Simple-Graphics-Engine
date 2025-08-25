@@ -16,7 +16,7 @@ Material::Material()
 	m_samplers[Texture::TextureType::AmbientOcclusion] = std::make_shared<TextureSampler>(1);
 }
 
-void Material::use(Resource<Shader> shader)
+void Material::use(Resource<Shader>& shader)
 {
 	setTexturesInShader(shader);
 }
@@ -46,7 +46,7 @@ bool Material::hasTexture(Texture::TextureType textureType) const
 	return iter != m_samplers.end() && iter->second->texture.get();
 }
 
-void Material::setTextureInShader(Resource<Shader> shader, Texture::TextureType ttype, int slot)
+void Material::setTextureInShader(Resource<Shader>& shader, Texture::TextureType ttype, int slot)
 {
 	auto sampler = getSampler(ttype);
 
@@ -54,7 +54,7 @@ void Material::setTextureInShader(Resource<Shader> shader, Texture::TextureType 
 	glActiveTexture(GL_TEXTURE0 + slot);
 
 	// if texture is empty use dummy texture
-	Resource<Texture> texture = sampler->texture;
+	Resource<Texture>& texture = sampler->texture;
 	if (sampler->texture.isEmpty())
 	{
 		texture = Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1);
@@ -75,7 +75,7 @@ void Material::setTextureInShader(Resource<Shader> shader, Texture::TextureType 
 	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
 }
 
-void Material::setTexturesInShader(Resource<Shader> shader)
+void Material::setTexturesInShader(Resource<Shader>& shader)
 {
 	// It either has diffuse or albedo
 	//setTextureInShader(shader, Texture::Type::Diffuse, 0);

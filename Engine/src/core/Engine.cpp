@@ -265,15 +265,6 @@ Window* Engine::getWindow() const
 Engine::Engine()
 {}
 
-Engine* Engine::get()
-{
-    if (instance == nullptr)
-    {
-        instance = new Engine();
-    }
-    return instance;
-}
-
 std::string Engine::getRootDir()
 {
     return m_resourceManager->getRootDir();
