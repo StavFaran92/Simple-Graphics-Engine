@@ -28,7 +28,6 @@ static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(Texture::load);
 Texture::Texture()
 	:m_id(0), m_slot(0)
 {
-	logDebug("ctor");
 }
 
 Texture::Texture(const Texture& other)
@@ -230,7 +229,6 @@ Resource<Texture> Texture::load(AssetInfo aInfo)
 
 Texture::~Texture()
 {
-	logDebug( __FUNCTION__ );
 	ClearTexture();
 }
 
