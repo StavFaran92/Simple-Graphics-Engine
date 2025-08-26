@@ -3,7 +3,7 @@
 #include "animation/Bone.h"
 #include "animation/AnimationLoader.h"
 
-static AssetFnRegister<AssetType::ANIMATION> assetRegister(Animation::load);
+static AssetFnRegister<AssetType::ANIMATION> assetRegister(Animation::loadInner);
 
 Animation::Animation()
 {
@@ -93,14 +93,12 @@ bool Animation::preprocess(const std::string& path)
 //
 //}
 
-Resource<Animation> Animation::load(AssetInfo aInfo)
+Resource<Animation> Animation::import(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
-	UUID uuid = aInfo.uuid;
-	Animation* animPtr = new Animation();
-	Engine::get()->getMemoryPool().add(uuid, animPtr);
-	Resource<Animation> anim(uuid);
-	Engine::get()->getResourceManager()->incRef(uuid);
-	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	Engine::get()->getSubSystem<AnimationLoader>()->load(filepath, anim);
-	return anim;
+	return Engine::get()->getSubSystem<AnimationLoader>()->import(fileLocation, settings);
+}
+
+Resource<Animation> Animation::loadInner(AssetInfo aInfo)
+{
+	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 }

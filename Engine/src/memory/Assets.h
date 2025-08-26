@@ -17,6 +17,7 @@ struct AssetInfo
 	std::map<std::string, std::string> attributes;
 	std::string name;
 	bool isTransient = false;
+	Resource<Asset> data = Resource<Asset>::empty;
 	//bool isClient = false
 	//timestamp
 	//size
@@ -35,7 +36,7 @@ public:
 
 	AssetInfo importAsset(AssetInfo& assetInfo);
 
-	AssetInfo addAsset(AssetInfo assetInfo);
+	AssetInfo addAsset(AssetInfo& assetInfo);
 
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 

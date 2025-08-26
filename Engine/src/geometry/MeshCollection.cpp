@@ -2,7 +2,7 @@
 
 #include "geometry/ModelImporter.h"
 
-static AssetFnRegister<AssetType::MESH> textureAssetRegister(MeshCollection::load);
+static AssetFnRegister<AssetType::MESH> textureAssetRegister(MeshCollection::loadInner);
 
 void MeshCollection::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
@@ -62,7 +62,7 @@ Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation,
 	return Resource<MeshCollection>();
 }
 
-Resource<MeshCollection> MeshCollection::load(AssetInfo aInfo)
+Resource<MeshCollection> MeshCollection::loadInner(AssetInfo aInfo)
 {
 	UUID uuid = aInfo.uuid;
 	MeshCollection* meshPtr = new MeshCollection();

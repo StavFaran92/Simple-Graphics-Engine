@@ -1125,7 +1125,8 @@ void ShowAnimationImportWindow()
 		return;
 	}
 
-	Engine::get()->getSubSystem<AnimationLoader>()->import(animationPathBuffer.c_str());
+	Animation::import(animationPathBuffer.c_str());
+	//Engine::get()->getSubSystem<AnimationLoader>()->import(animationPathBuffer.c_str());
 
 	animationPathBuffer.clear();
 }

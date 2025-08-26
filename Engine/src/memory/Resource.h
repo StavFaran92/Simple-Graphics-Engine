@@ -112,6 +112,19 @@ public:
 		if(uuid != EMPTY_UUID) clean();
 	}
 
+	template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
+	Resource(const Resource<U>& other) 
+	{
+		uuid = other.getUID();
+		if (other.getUID() != EMPTY_UUID)
+		{
+			Engine::get()->getResourceManager()->incRef(other.getUID());
+		}
+
+		if (!isEmpty())
+			m_cache = Engine::get()->getMemoryPool().get(uuid);
+	}
+
 private:
 	template<typename T>friend class Factory;
 	

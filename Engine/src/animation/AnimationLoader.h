@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include "animation/Animation.h"
 #include "memory/Resource.h"
 
 #include <assimp/Importer.hpp>
@@ -10,20 +9,25 @@
 #include <assimp/Exporter.hpp>
 
 #include "core/Core.h"
+#include "memory/Assets.h"
+
+class Animation;
+
+struct AnimationImportSettings
+{
+	std::string name;
+};
 
 class EngineAPI AnimationLoader
 {
 public:
-	struct AnimationImportSettings
-	{
-		std::string name;
-	};
+	
 
 	AnimationLoader();
 
 	Resource<Animation> import(const std::string& path, AnimationImportSettings settings = {});
 
-	Resource<Animation> load(const std::string& path, Resource<Animation>& animation);
+	Resource<Animation> load(AssetInfo aInfo);
 
 private:
 	Assimp::Importer m_importer;

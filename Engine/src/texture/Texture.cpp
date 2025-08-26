@@ -380,39 +380,6 @@ Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, cons
 		return Resource<Texture>::empty;
 	}
 
-	//Texture::TextureData textureData;
-
-	//textureData.target = GL_TEXTURE_2D;
-	//
-	//// extract texture build data
-	//extractTextureDataFromSettings(settings, textureData);
-	//extractTextureDataFromFile(fileLocation, textureData);
-	//Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
-
-	//AssetInfo aInfo;
-	//aInfo.origFilePath = fileLocation;
-	
-	//aInfo.aType = AssetType::TEXTURE;
-	////aInfo.isTransient = textureData.isTransient;
-
-	//if (!settings.name.empty())
-	//{
-	//	aInfo.name = settings.name;
-	//}
-	//else
-	//{
-	//	aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-
-	//}
-
-	//TextureAssetAttributes attributes;
-	//attributes.flip = textureData.flip;
-	//attributes.genMipMap = textureData.genMipMap;
-	//attributes.isHDR = textureData.isHDR;
-	//attributes.params = textureData.params;
-
-	//aInfo.attributes = attributes.toMap();
-
 	AssetInfo aInfo;
 	aInfo.uuid = uuid::generate_uuid_v4();
 	convertTextureParamsToAssetInfo(fileLocation, settings, aInfo);

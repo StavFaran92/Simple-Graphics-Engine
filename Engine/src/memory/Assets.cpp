@@ -98,7 +98,7 @@ AssetInfo Assets::importAsset(AssetInfo& aInfo)
 	return aInfo;
 }
 
-AssetInfo Assets::addAsset(AssetInfo aInfo)
+AssetInfo Assets::addAsset(AssetInfo& aInfo)
 {
 	auto& path = aInfo.origFilePath;
 	auto& uid = aInfo.uuid;

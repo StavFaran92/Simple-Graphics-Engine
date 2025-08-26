@@ -6,6 +6,7 @@
 #include "serialize/ProjectAssetRegistry.h"
 #include "animation/Bone.h"
 #include "memory/Assets.h"
+#include "animation/Animation.h"
 #include <filesystem>
 
 AnimationLoader::AnimationLoader()
@@ -72,15 +73,19 @@ void readAnimationBones(const aiAnimation* animation, std::unordered_map<std::st
     }
 }
 
-Resource<Animation> AnimationLoader::load(const std::string & path, Resource<Animation>& animation)
+Resource<Animation> AnimationLoader::load(AssetInfo aInfo)
 {
-    if (!std::filesystem::exists(path))
+    std::string filepath;
+    if (aInfo.isTransient)
     {
-        logError("File doesn't exists: " + path);
-        return Resource<Animation>::empty;
+        filepath = aInfo.filePath;
+    }
+    else
+    {
+        filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
     }
 
-    const aiScene* scene = m_importer.ReadFile(path, aiProcess_Triangulate);
+    const aiScene* scene = m_importer.ReadFile(filepath, aiProcess_Triangulate);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -99,9 +104,13 @@ Resource<Animation> AnimationLoader::load(const std::string & path, Resource<Ani
     std::unordered_map<std::string, std::shared_ptr<Bone>> bones;
     readAnimationBones(aiAnimation, bones);
 
-    animation.get()->build(aiAnimation->mName.C_Str(), (float)aiAnimation->mDuration, (float)aiAnimation->mTicksPerSecond, rootNode, bones);
+    Animation* anim = new Animation();
+    anim->build(aiAnimation->mName.C_Str(), (float)aiAnimation->mDuration, (float)aiAnimation->mTicksPerSecond, rootNode, bones);
 
-    return animation;
+    Engine::get()->getMemoryPool().add(aInfo.uuid, anim);
+    auto& res = Resource<Animation>(aInfo.uuid);
+
+    return res;
 }
 
 Resource<Animation> AnimationLoader::import(const std::string& path, AnimationImportSettings settings)
@@ -116,8 +125,6 @@ Resource<Animation> AnimationLoader::import(const std::string& path, AnimationIm
     {
         settings.name = std::filesystem::path(path).filename().stem().string();
     }
-
-    auto animation = Factory<Animation>::create();
 
     const aiScene* scene = m_importer.ReadFile(path, aiProcess_Triangulate);
 
@@ -137,13 +144,18 @@ Resource<Animation> AnimationLoader::import(const std::string& path, AnimationIm
     exporter.Export(scene, "collada", savedFilePath);
 
     AssetInfo aInfo;
-    aInfo.uuid = animation.getUID();
+    aInfo.uuid = uuid::generate_uuid_v4();
     aInfo.aType = AssetType::ANIMATION;
     aInfo.filePath = relativeFilepath;
     aInfo.name = settings.name;
+
+    Resource<Animation> animation = load(aInfo);
+    aInfo.data = animation;
+
     Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
-    load(savedFilePath, animation);
+    //load(savedFilePath, animation);
+    
 
     return animation;
 }

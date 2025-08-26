@@ -43,6 +43,6 @@ public:
 
 	template <typename T>
 	static Resource<T> load(AssetInfo aInfo) {
-		return T::load(aInfo);
+		return T::loadInner(aInfo);
 	}
 };

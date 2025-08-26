@@ -7,6 +7,7 @@
 #include "glm/glm.hpp"
 #include "memory/UUID.h"
 #include "memory/Asset.h"
+#include "animation/AnimationLoader.h"
 
 class Bone;
 
@@ -19,7 +20,7 @@ struct MeshNodeData
 	std::vector<MeshNodeData> children;
 };
 
-class Animation : public Asset
+class EngineAPI Animation : public Asset
 {
 public:
 	Animation();
@@ -31,7 +32,9 @@ public:
 	static bool preprocess(const std::string& path);
 	//static void load(UUID uid, const std::string& path);
 
-	static Resource<Animation> load(AssetInfo aInfo);
+	static Resource<Animation> import(const std::string& fileLocation, const AnimationImportSettings& settings = {});
+	static Resource<Animation> loadInner(AssetInfo aInfo);
+	static Resource<Animation> load(const std::string& fileLocation, const AnimationImportSettings& settings = {});
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);
 
