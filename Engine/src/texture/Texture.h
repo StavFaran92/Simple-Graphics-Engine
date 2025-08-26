@@ -130,7 +130,7 @@ public:
 		bool genMipMap = false;
 		bool flip = false;
 		bool saveOnDisk = true;
-		bool isTransient = false;
+		//bool isTransient = false;
 		std::map<int, int> params;
 	};
 
@@ -266,14 +266,14 @@ public:
 
 	static void writeTexture2D(const std::string& fileLocation, Resource<Texture> texture);
 	static Resource<Texture> importTexture2D(const std::string& fileLocation, const TextureImportSettings & = {});
-	static Resource<Texture> loadTexture2D(AssetInfo aInfo);
 	static void addTexture2D(Resource<Texture> texture);
 	static void addTexture2D(const std::string& name, Resource<Texture> texture);
 
 	static Resource<Texture> importTexture3D(const std::string& fileLocation);
 
 	static Resource<Texture> import(const std::string& fileLocation, const ImportSettings& settings);
-	static Resource<Texture> load(AssetInfo aInfo);
+	static Resource<Texture> loadInner(AssetInfo aInfo);
+	static Resource<Texture> load(const std::string& fileLocation, const TextureImportSettings& settings = {});
 
 	/**  Destructor */
 	~Texture();

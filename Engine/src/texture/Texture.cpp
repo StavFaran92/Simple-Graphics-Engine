@@ -23,7 +23,37 @@
 
 #include "memory/AssetFactory.h"
 
-static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(Texture::load);
+static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(Texture::loadInner);
+
+// Function to determine if the file is HDR based on its extension
+bool isHDRImage(const std::string& filename) {
+	return stbi_is_hdr(filename.c_str());
+}
+
+void convertTextureParamsToAssetInfo(const std::string& fileLocation, const Texture::TextureImportSettings& settings, AssetInfo& outAssetInfo)
+{
+	outAssetInfo.origFilePath = fileLocation;
+	outAssetInfo.filePath = fileLocation;
+	outAssetInfo.aType = AssetType::TEXTURE;
+
+	if (!settings.name.empty())
+	{
+		outAssetInfo.name = settings.name;
+	}
+	else
+	{
+		outAssetInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+
+	}
+
+	Texture::TextureAssetAttributes attributes;
+	attributes.flip = settings.flip;
+	attributes.genMipMap = settings.genMipMap;
+	attributes.isHDR = isHDRImage(fileLocation);
+	attributes.params = settings.params;
+
+	outAssetInfo.attributes = attributes.toMap();
+}
 
 Texture::Texture()
 	:m_id(0), m_slot(0)
@@ -217,9 +247,49 @@ Resource<Texture> Texture::import(const std::string& fileLocation, const ImportS
 	return {};
 }
 
-Resource<Texture> Texture::load(AssetInfo aInfo)
+Resource<Texture> Texture::loadInner(AssetInfo aInfo)
 {
-	return Texture::loadTexture2D(aInfo);
+	std::string filepath;
+	if (aInfo.isTransient)
+	{
+		filepath = aInfo.filePath;
+	}
+	else
+	{
+		filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	}
+
+	Texture::TextureData textureData;
+
+	textureData.target = GL_TEXTURE_2D;
+
+	// extract texture build data
+	TextureAssetAttributes attributes(aInfo.attributes);
+	extractTextureDataFromAttributes(attributes, textureData);
+	extractTextureDataFromFile(filepath, textureData);
+
+	// Create texture
+	Texture* texture = new Texture();
+	texture->build(textureData);
+	Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
+
+	texture->m_attributes = attributes;
+
+	auto& res = Resource<Texture>(aInfo.uuid);
+	Engine::get()->getResourceManager()->incRef(aInfo.uuid);
+
+
+	return res;
+}
+
+Resource<Texture> Texture::load(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
+{
+	AssetInfo aInfo;
+	convertTextureParamsToAssetInfo(fileLocation, settings, aInfo);
+	aInfo.uuid = uuid::generate_uuid_v4();
+	aInfo.isTransient = true;
+
+	return loadInner(aInfo);
 }
 
 //Resource<Asset> Texture::load(AssetInfo aInfo)
@@ -232,10 +302,7 @@ Texture::~Texture()
 	ClearTexture();
 }
 
-// Function to determine if the file is HDR based on its extension
-bool isHDRImage(const std::string& filename) {
-	return stbi_is_hdr(filename.c_str());
-}
+
 
 Texture::TextureAssetAttributes Texture::getTextureAssetAttributes()
 {
@@ -303,6 +370,8 @@ void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> 
 		texture.get()->getBitDepth());
 }
 
+
+
 Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, const TextureImportSettings& settings)
 {
 	if (fileLocation.empty())
@@ -311,69 +380,51 @@ Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, cons
 		return Resource<Texture>::empty;
 	}
 
-	Texture::TextureData textureData;
+	//Texture::TextureData textureData;
 
-	textureData.target = GL_TEXTURE_2D;
+	//textureData.target = GL_TEXTURE_2D;
+	//
+	//// extract texture build data
+	//extractTextureDataFromSettings(settings, textureData);
+	//extractTextureDataFromFile(fileLocation, textureData);
+	//Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
+
+	//AssetInfo aInfo;
+	//aInfo.origFilePath = fileLocation;
 	
-	// extract texture build data
-	extractTextureDataFromSettings(settings, textureData);
-	extractTextureDataFromFile(fileLocation, textureData);
-	Resource<Texture> texture = Texture::create2DTextureFromBuffer(textureData);
+	//aInfo.aType = AssetType::TEXTURE;
+	////aInfo.isTransient = textureData.isTransient;
 
-	if (!settings.isTransient)
+	//if (!settings.name.empty())
+	//{
+	//	aInfo.name = settings.name;
+	//}
+	//else
+	//{
+	//	aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+
+	//}
+
+	//TextureAssetAttributes attributes;
+	//attributes.flip = textureData.flip;
+	//attributes.genMipMap = textureData.genMipMap;
+	//attributes.isHDR = textureData.isHDR;
+	//attributes.params = textureData.params;
+
+	//aInfo.attributes = attributes.toMap();
+
+	AssetInfo aInfo;
+	aInfo.uuid = uuid::generate_uuid_v4();
+	convertTextureParamsToAssetInfo(fileLocation, settings, aInfo);
+
+	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
+
+	if (!aInfo.isValid)
 	{
-		AssetInfo aInfo;
-		aInfo.origFilePath = fileLocation;
-		aInfo.uuid = texture.getUID();
-		aInfo.aType = AssetType::TEXTURE;
-		aInfo.isTransient = textureData.isTransient;
-
-		if (!settings.name.empty())
-		{
-			aInfo.name = settings.name;
-		}
-		else
-		{
-			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-
-		}
-
-		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
-
-		if (!aInfo.isValid)
-		{
-			return Resource<Texture>::empty;
-		}
+		return Resource<Texture>::empty;
 	}
 
-	return texture;
-}
-
-Resource<Texture> Texture::loadTexture2D(AssetInfo aInfo)
-{
-	Texture::TextureData textureData;
-
-	textureData.target = GL_TEXTURE_2D;
-
-	// extract texture build data
-	TextureAssetAttributes attributes(aInfo.attributes);
-	extractTextureDataFromAttributes(attributes, textureData);
-	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	extractTextureDataFromFile(filepath, textureData);
-
-	// Create texture
-	Texture* texture = new Texture();
-	texture->build(textureData);
-	Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
-
-	texture->m_attributes = attributes;
-
-	auto& res = Resource<Texture>(aInfo.uuid);
-	Engine::get()->getResourceManager()->incRef(aInfo.uuid);
-
-
-	return res;
+	return loadInner(aInfo);
 }
 
 void Texture::addTexture2D(Resource<Texture> texture)
@@ -437,7 +488,7 @@ void Texture::extractTextureDataFromSettings(const TextureImportSettings& settin
 
 	textureData.genMipMap = settings.genMipMap;
 	textureData.flip = settings.flip;
-	textureData.isTransient = settings.isTransient;
+	//textureData.isTransient = settings.isTransient;
 	
 }
 
