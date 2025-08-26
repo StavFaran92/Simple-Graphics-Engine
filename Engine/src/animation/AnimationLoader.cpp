@@ -115,17 +115,20 @@ Resource<Animation> AnimationLoader::load(AssetInfo aInfo)
 
 Resource<Animation> AnimationLoader::import(const std::string& path, AnimationImportSettings settings)
 {
+    // Assertion
     if (!std::filesystem::exists(path))
     {
         logError("File doesn't exists: " + path);
         return Resource<Animation>::empty;
     }
 
+    // Data extract
     if (settings.name.empty())
     {
         settings.name = std::filesystem::path(path).filename().stem().string();
     }
 
+    // Copy
     const aiScene* scene = m_importer.ReadFile(path, aiProcess_Triangulate);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -136,26 +139,26 @@ Resource<Animation> AnimationLoader::import(const std::string& path, AnimationIm
 
     assert(scene && scene->mRootNode && scene->HasAnimations());
 
-
+    // Paste
     auto& projectDir = Engine::get()->getProjectDirectory();
     Assimp::Exporter exporter;
     const std::string relativeFilepath = "/" + settings.name + ".dae";
     const std::string savedFilePath = projectDir + "/" + relativeFilepath;
     exporter.Export(scene, "collada", savedFilePath);
 
+    // Add asset to registry
     AssetInfo aInfo;
     aInfo.uuid = uuid::generate_uuid_v4();
     aInfo.aType = AssetType::ANIMATION;
     aInfo.filePath = relativeFilepath;
     aInfo.name = settings.name;
 
+    // Load
     Resource<Animation> animation = load(aInfo);
     aInfo.data = animation;
 
-    Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-
-    //load(savedFilePath, animation);
-    
+    // Add Asset
+    Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);   
 
     return animation;
 }

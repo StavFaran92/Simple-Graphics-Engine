@@ -33,7 +33,6 @@ bool isHDRImage(const std::string& filename) {
 void convertTextureParamsToAssetInfo(const std::string& fileLocation, const Texture::TextureImportSettings& settings, AssetInfo& outAssetInfo)
 {
 	outAssetInfo.origFilePath = fileLocation;
-	outAssetInfo.filePath = fileLocation;
 	outAssetInfo.aType = AssetType::TEXTURE;
 
 	if (!settings.name.empty())
@@ -45,6 +44,8 @@ void convertTextureParamsToAssetInfo(const std::string& fileLocation, const Text
 		outAssetInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
 
 	}
+
+	outAssetInfo.ext = std::filesystem::path(fileLocation).extension().string();
 
 	Texture::TextureAssetAttributes attributes;
 	attributes.flip = settings.flip;
@@ -275,11 +276,7 @@ Resource<Texture> Texture::loadInner(AssetInfo aInfo)
 
 	texture->m_attributes = attributes;
 
-	auto& res = Resource<Texture>(aInfo.uuid);
-	Engine::get()->getResourceManager()->incRef(aInfo.uuid);
-
-
-	return res;
+	return Resource<Texture>(aInfo.uuid);
 }
 
 Resource<Texture> Texture::load(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
@@ -288,6 +285,7 @@ Resource<Texture> Texture::load(const std::string& fileLocation, const TextureIm
 	convertTextureParamsToAssetInfo(fileLocation, settings, aInfo);
 	aInfo.uuid = uuid::generate_uuid_v4();
 	aInfo.isTransient = true;
+	aInfo.filePath = fileLocation;
 
 	return loadInner(aInfo);
 }
@@ -374,24 +372,39 @@ void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> 
 
 Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, const TextureImportSettings& settings)
 {
+	// Assertion
 	if (fileLocation.empty())
 	{
 		logWarning("Invalid texture name, cannot be empty.");
 		return Resource<Texture>::empty;
 	}
 
+	// Data extract
 	AssetInfo aInfo;
 	aInfo.uuid = uuid::generate_uuid_v4();
 	convertTextureParamsToAssetInfo(fileLocation, settings, aInfo);
 
-	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
+	// Copy + Paste
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
+	const std::string savedFilePath = projectDir + relativeFilepath;
+	std::filesystem::copy_file(fileLocation, savedFilePath);
+
+	aInfo.filePath = relativeFilepath;
+
+	// Load
+	Resource<Texture> asset = loadInner(aInfo);
+	aInfo.data = asset;
+
+	// Add Asset
+	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 	if (!aInfo.isValid)
 	{
 		return Resource<Texture>::empty;
 	}
 
-	return loadInner(aInfo);
+	return asset;
 }
 
 void Texture::addTexture2D(Resource<Texture> texture)

@@ -12,6 +12,7 @@ struct AssetInfo
 	UUID uuid;
 	std::string origFilePath;
 	std::string filePath;
+	std::string ext;
 	AssetType aType;
 	bool isValid = false;
 	std::map<std::string, std::string> attributes;
