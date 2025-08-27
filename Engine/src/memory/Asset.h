@@ -7,6 +7,8 @@
 
 struct BaseAssetParameters
 {
+	std::string name;
+
 	virtual ~BaseAssetParameters() = default;
 };
 

@@ -163,7 +163,7 @@ Resource<Asset> AnimationLoader::load(AssetInfo& aInfo)
 //    return animation;
 //}
 
-std::string AnimationLoader::copyFileToResourceFolder(const std::string& path, AssetInfo& aInfo)
+bool AnimationLoader::copyFileToResourceFolder(const std::string& path, AssetInfo& aInfo)
 {
     // Copy
     const aiScene* scene = m_importer.ReadFile(path, aiProcess_Triangulate);
@@ -171,7 +171,7 @@ std::string AnimationLoader::copyFileToResourceFolder(const std::string& path, A
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
-        return "";
+        return false;
     }
 
     assert(scene && scene->mRootNode && scene->HasAnimations());
@@ -179,13 +179,30 @@ std::string AnimationLoader::copyFileToResourceFolder(const std::string& path, A
     // Paste
     auto& projectDir = Engine::get()->getProjectDirectory();
     Assimp::Exporter exporter;
-    const std::string relativeFilepath = "/" + aInfo.name + ".dae";
-    const std::string savedFilePath = projectDir + "/" + relativeFilepath;
-    exporter.Export(scene, "collada", savedFilePath);
+    const std::string savedFilePath = projectDir + "/" + aInfo.filePath;
+    if (exporter.Export(scene, "collada", savedFilePath) != aiReturn_SUCCESS)
+    {
+        logError("Mesh copy failed.");
+        return false;
+    }
 
-    return relativeFilepath;
+    return true;
 }
 
 void AnimationLoader::convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
 {
+    // Data extract
+    if (params.name.empty())
+    {
+        aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+    }
+    else
+    {
+        aInfo.name = params.name;
+    }
+
+    aInfo.aType = AssetType::ANIMATION;
+
+    const std::string relativeFilepath = "/" + aInfo.name + ".dae";
+    aInfo.filePath = relativeFilepath;
 }

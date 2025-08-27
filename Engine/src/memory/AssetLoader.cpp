@@ -1,6 +1,6 @@
 #include "AssetLoader.h"
 
-std::string AssetLoader::copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&)
+bool AssetLoader::copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&)
 {
 	throw std::runtime_error("Not implemented yet");
 }
@@ -10,7 +10,7 @@ Resource<Asset> AssetLoader::import(const std::string& fileLocation, const BaseA
 	// Validate input
 	if (fileLocation.empty())
 	{
-		logWarning("Invalid texture name, cannot be empty.");
+		logError("Invalid texture name, cannot be empty.");
 		return Resource<Asset>::empty;
 	}
 
@@ -20,19 +20,22 @@ Resource<Asset> AssetLoader::import(const std::string& fileLocation, const BaseA
 	convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
 
 	// Copy + Paste
-	copyFileToResourceFolder(fileLocation, aInfo);
+	if (!copyFileToResourceFolder(fileLocation, aInfo))
+	{
+		logError("Failed to copy file from {} to resource folder", fileLocation);
+		return Resource<Asset>::empty;
+	}
 
 	// Load
 	aInfo.data = load(aInfo);
+	if (aInfo.data.isEmpty())
+	{
+		logError("Failed to load file {}", fileLocation);
+		return Resource<Asset>::empty;
+	}
 
 	// Add Asset
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-
-	// Validate output
-	if (!aInfo.isValid)
-	{
-		return Resource<Asset>::empty;
-	}
 
 	return aInfo.data;
 }

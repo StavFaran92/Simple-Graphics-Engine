@@ -16,7 +16,7 @@ class Animation;
 
 struct AnimationImportSettings : BaseAssetParameters
 {
-	std::string name;
+	
 };
 
 class EngineAPI AnimationLoader : public AssetLoader
@@ -30,7 +30,7 @@ public:
 
 	Resource<Asset> load(AssetInfo& aInfo) override;
 
-	std::string copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&) override;
+	bool copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&) override;
 
 private:
 	Assimp::Importer m_importer;
