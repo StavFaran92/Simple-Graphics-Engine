@@ -476,7 +476,6 @@ void Engine::loadProject(const std::string& dirPath)
     // This is a shit hack I must fix,
     // I cannot put camera in built in meshes since it also containts material and texture data I need.
     ModelImporter::ModelImportSettings settings;
-    settings.isTransient = true;
     settings.name = "SGE_MAIN_CAMERA";
     auto modelInfo = getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj", settings);
 

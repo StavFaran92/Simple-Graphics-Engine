@@ -39,3 +39,14 @@ Resource<Asset> AssetLoader::import(const std::string& fileLocation, const BaseA
 
 	return aInfo.data;
 }
+
+Resource<Asset> AssetLoader::loadTransient(const std::string& fileLocation, const BaseAssetParameters& settings)
+{
+	AssetInfo aInfo;
+	convertAssetLoadParamsToAssetInfo(fileLocation, settings, aInfo);
+	aInfo.uuid = uuid::generate_uuid_v4();
+	aInfo.isTransient = true;
+	aInfo.filePath = fileLocation;
+
+	return load(aInfo);
+}

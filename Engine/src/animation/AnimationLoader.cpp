@@ -113,56 +113,6 @@ Resource<Asset> AnimationLoader::load(AssetInfo& aInfo)
     return res;
 }
 
-//Resource<Animation> AnimationLoader::import(const std::string& fileLocation, const BaseAssetParameters& params)
-//{
-//    // Assertion
-//    if (!std::filesystem::exists(path))
-//    {
-//        logError("File doesn't exists: " + path);
-//        return Resource<Animation>::empty;
-//    }
-//
-//    // Data extract
-//    if (settings.name.empty())
-//    {
-//        settings.name = std::filesystem::path(path).filename().stem().string();
-//    }
-//
-//    // Copy
-//    const aiScene* scene = m_importer.ReadFile(path, aiProcess_Triangulate);
-//
-//    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-//    {
-//        logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
-//        return Resource<Animation>::empty;
-//    }
-//
-//    assert(scene && scene->mRootNode && scene->HasAnimations());
-//
-//    // Paste
-//    auto& projectDir = Engine::get()->getProjectDirectory();
-//    Assimp::Exporter exporter;
-//    const std::string relativeFilepath = "/" + settings.name + ".dae";
-//    const std::string savedFilePath = projectDir + "/" + relativeFilepath;
-//    exporter.Export(scene, "collada", savedFilePath);
-//
-//    // Add asset to registry
-//    AssetInfo aInfo;
-//    aInfo.uuid = uuid::generate_uuid_v4();
-//    aInfo.aType = AssetType::ANIMATION;
-//    aInfo.filePath = relativeFilepath;
-//    aInfo.name = settings.name;
-//
-//    // Load
-//    Resource<Animation> animation = load(aInfo);
-//    aInfo.data = animation;
-//
-//    // Add Asset
-//    Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);   
-//
-//    return animation;
-//}
-
 bool AnimationLoader::copyFileToResourceFolder(const std::string& path, AssetInfo& aInfo)
 {
     // Copy
@@ -205,4 +155,5 @@ void AnimationLoader::convertAssetLoadParamsToAssetInfo(const std::string& fileL
 
     const std::string relativeFilepath = "/" + aInfo.name + ".dae";
     aInfo.filePath = relativeFilepath;
+    aInfo.origFilePath = fileLocation;
 }

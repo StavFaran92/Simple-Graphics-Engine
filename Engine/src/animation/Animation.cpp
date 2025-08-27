@@ -98,7 +98,12 @@ Resource<Animation> Animation::import(const std::string& fileLocation, const Ani
 	return Engine::get()->getSubSystem<AnimationLoader>()->import(fileLocation, settings).as<Animation>();
 }
 
-Resource<Animation> Animation::loadInner(AssetInfo aInfo)
+Resource<Animation> Animation::load(AssetInfo& aInfo)
 {
 	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo).as<Animation>();
+}
+
+Resource<Animation> Animation::loadTransient(const std::string& fileLocation, const AnimationImportSettings& settings)
+{
+	return Engine::get()->getSubSystem<AnimationLoader>()->loadTransient(fileLocation, settings).as<Animation>();
 }

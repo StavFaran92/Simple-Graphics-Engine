@@ -11,6 +11,7 @@
 #include "runtime/Entity.h"
 #include "render/Material.h"
 #include "geometry/MeshCollection.h"
+#include "memory/AssetLoader.h"
 
 // Forward declerations
 struct aiNode;
@@ -28,7 +29,7 @@ namespace Assimp
 	class Importer;
 }
 
-class EngineAPI ModelImporter
+class EngineAPI ModelImporter : public AssetLoader
 {
 public:
 	struct ModelImportSession
@@ -47,7 +48,7 @@ public:
 	struct ModelImportSettings
 	{
 		std::string name;
-		bool isTransient = false;
+		//bool isTransient = false;
 	};
 
 	struct ModelInfo
@@ -78,10 +79,10 @@ public:
 	 */
 	ModelInfo loadModelFromFile(const std::string& path, ModelInfo& modelInfo);
 
-	void loadModelFromAssimpScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo);
 private:
 	friend class Engine;
 
+	void loadModelFromAssimpScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo);
 	void processNode(aiNode* node, const aiScene* scene, ModelImportSession& session);
 	void processMesh(aiMesh* mesh, const aiScene* scene, ModelImportSession& session);
 	Resource<Texture> importAiMaterialTexture(aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_set<std::string>& cachedTextures);

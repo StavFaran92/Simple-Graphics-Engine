@@ -13,5 +13,7 @@ public:
 
 	Resource<Asset> import(const std::string& fileLocation, const BaseAssetParameters& params);
 
+	Resource<Asset> loadTransient(const std::string& fileLocation, const BaseAssetParameters& settings);
+
 	virtual Resource<Asset> load(AssetInfo& aInfo) = 0;
 };
