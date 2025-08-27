@@ -73,7 +73,7 @@ void readAnimationBones(const aiAnimation* animation, std::unordered_map<std::st
     }
 }
 
-Resource<Animation> AnimationLoader::load(AssetInfo aInfo)
+Resource<Asset> AnimationLoader::load(AssetInfo& aInfo)
 {
     std::string filepath;
     if (aInfo.isTransient)
@@ -90,7 +90,7 @@ Resource<Animation> AnimationLoader::load(AssetInfo aInfo)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
-        return Resource<Animation>::empty;
+        return Resource<Asset>::empty;
     }
 
     assert(scene && scene->mRootNode && scene->HasAnimations());
@@ -113,28 +113,65 @@ Resource<Animation> AnimationLoader::load(AssetInfo aInfo)
     return res;
 }
 
-Resource<Animation> AnimationLoader::import(const std::string& path, AnimationImportSettings settings)
+//Resource<Animation> AnimationLoader::import(const std::string& fileLocation, const BaseAssetParameters& params)
+//{
+//    // Assertion
+//    if (!std::filesystem::exists(path))
+//    {
+//        logError("File doesn't exists: " + path);
+//        return Resource<Animation>::empty;
+//    }
+//
+//    // Data extract
+//    if (settings.name.empty())
+//    {
+//        settings.name = std::filesystem::path(path).filename().stem().string();
+//    }
+//
+//    // Copy
+//    const aiScene* scene = m_importer.ReadFile(path, aiProcess_Triangulate);
+//
+//    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+//    {
+//        logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
+//        return Resource<Animation>::empty;
+//    }
+//
+//    assert(scene && scene->mRootNode && scene->HasAnimations());
+//
+//    // Paste
+//    auto& projectDir = Engine::get()->getProjectDirectory();
+//    Assimp::Exporter exporter;
+//    const std::string relativeFilepath = "/" + settings.name + ".dae";
+//    const std::string savedFilePath = projectDir + "/" + relativeFilepath;
+//    exporter.Export(scene, "collada", savedFilePath);
+//
+//    // Add asset to registry
+//    AssetInfo aInfo;
+//    aInfo.uuid = uuid::generate_uuid_v4();
+//    aInfo.aType = AssetType::ANIMATION;
+//    aInfo.filePath = relativeFilepath;
+//    aInfo.name = settings.name;
+//
+//    // Load
+//    Resource<Animation> animation = load(aInfo);
+//    aInfo.data = animation;
+//
+//    // Add Asset
+//    Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);   
+//
+//    return animation;
+//}
+
+std::string AnimationLoader::copyFileToResourceFolder(const std::string& path, AssetInfo& aInfo)
 {
-    // Assertion
-    if (!std::filesystem::exists(path))
-    {
-        logError("File doesn't exists: " + path);
-        return Resource<Animation>::empty;
-    }
-
-    // Data extract
-    if (settings.name.empty())
-    {
-        settings.name = std::filesystem::path(path).filename().stem().string();
-    }
-
     // Copy
     const aiScene* scene = m_importer.ReadFile(path, aiProcess_Triangulate);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
-        return Resource<Animation>::empty;
+        return "";
     }
 
     assert(scene && scene->mRootNode && scene->HasAnimations());
@@ -142,23 +179,13 @@ Resource<Animation> AnimationLoader::import(const std::string& path, AnimationIm
     // Paste
     auto& projectDir = Engine::get()->getProjectDirectory();
     Assimp::Exporter exporter;
-    const std::string relativeFilepath = "/" + settings.name + ".dae";
+    const std::string relativeFilepath = "/" + aInfo.name + ".dae";
     const std::string savedFilePath = projectDir + "/" + relativeFilepath;
     exporter.Export(scene, "collada", savedFilePath);
 
-    // Add asset to registry
-    AssetInfo aInfo;
-    aInfo.uuid = uuid::generate_uuid_v4();
-    aInfo.aType = AssetType::ANIMATION;
-    aInfo.filePath = relativeFilepath;
-    aInfo.name = settings.name;
+    return relativeFilepath;
+}
 
-    // Load
-    Resource<Animation> animation = load(aInfo);
-    aInfo.data = animation;
-
-    // Add Asset
-    Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);   
-
-    return animation;
+void AnimationLoader::convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
+{
 }

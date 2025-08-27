@@ -10,25 +10,31 @@
 
 #include "core/Core.h"
 #include "memory/Assets.h"
+#include "memory/AssetLoader.h"
 
 class Animation;
 
-struct AnimationImportSettings
+struct AnimationImportSettings : BaseAssetParameters
 {
 	std::string name;
 };
 
-class EngineAPI AnimationLoader
+class EngineAPI AnimationLoader : public AssetLoader
 {
 public:
 	
 
 	AnimationLoader();
 
-	Resource<Animation> import(const std::string& path, AnimationImportSettings settings = {});
+	//Resource<Asset> import(const std::string& fileLocation, const BaseAssetParameters& params);
 
-	Resource<Animation> load(AssetInfo aInfo);
+	Resource<Asset> load(AssetInfo& aInfo) override;
+
+	std::string copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&) override;
 
 private:
 	Assimp::Importer m_importer;
+
+	// Inherited via AssetLoader
+	void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo) override;
 };

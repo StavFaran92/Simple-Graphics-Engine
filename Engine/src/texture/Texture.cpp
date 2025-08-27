@@ -243,10 +243,10 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 }
 
-Resource<Texture> Texture::import(const std::string& fileLocation, const ImportSettings& settings)
-{
-	return {};
-}
+//Resource<Texture> Texture::import(const std::string& fileLocation, const ImportSettings& settings)
+//{
+//	return {};
+//}
 
 Resource<Texture> Texture::loadInner(AssetInfo aInfo)
 {

@@ -5,9 +5,9 @@
 #include "Assets.h"
 #include "AssetFactory.h"
 
-class ImportSettings
+struct BaseAssetParameters
 {
-
+	virtual ~BaseAssetParameters() = default;
 };
 
 template<AssetType T>
@@ -31,18 +31,18 @@ public:
 	Asset() = default;
 	virtual ~Asset() = default;
 
-	//virtual Resource<Asset> import(const std::string& fileLocation, const ImportSettings& settings) = 0;
+	static Resource<Asset> import(const std::string& fileLocation, const BaseAssetParameters& params);
 
 	//virtual Resource<Asset> load(AssetInfo aInfo) = 0;
 
 	// CRTP
 	template <typename T>
-	static Resource<T> import(const std::string& fileLocation, const ImportSettings& settings) {
-		return T::import(fileLocation, settings);
+	static Resource<T> import(const std::string& fileLocation, const BaseAssetParameters& params) {
+		return T::import(fileLocation, params);
 	}
 
 	template <typename T>
-	static Resource<T> load(AssetInfo aInfo) {
+	static Resource<T> load(AssetInfo& aInfo) {
 		return T::loadInner(aInfo);
 	}
 };

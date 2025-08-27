@@ -112,6 +112,7 @@ public:
 		if(uuid != EMPTY_UUID) clean();
 	}
 
+	// Upcast (texture -> asset)
 	template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
 	Resource(const Resource<U>& other) 
 	{
@@ -123,6 +124,13 @@ public:
 
 		if (!isEmpty())
 			m_cache = Engine::get()->getMemoryPool().get(uuid);
+	}
+
+	// Downcast (Asset -> Texture)
+	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
+	Resource<U> as()
+	{
+		return Resource<U>(uuid);
 	}
 
 private:

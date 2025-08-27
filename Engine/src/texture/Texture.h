@@ -271,7 +271,6 @@ public:
 
 	static Resource<Texture> importTexture3D(const std::string& fileLocation);
 
-	static Resource<Texture> import(const std::string& fileLocation, const ImportSettings& settings);
 	static Resource<Texture> loadInner(AssetInfo aInfo);
 	static Resource<Texture> load(const std::string& fileLocation, const TextureImportSettings& settings = {});
 

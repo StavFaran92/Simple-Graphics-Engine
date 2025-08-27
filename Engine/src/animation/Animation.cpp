@@ -95,10 +95,10 @@ bool Animation::preprocess(const std::string& path)
 
 Resource<Animation> Animation::import(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
-	return Engine::get()->getSubSystem<AnimationLoader>()->import(fileLocation, settings);
+	return Engine::get()->getSubSystem<AnimationLoader>()->import(fileLocation, settings).as<Animation>();
 }
 
 Resource<Animation> Animation::loadInner(AssetInfo aInfo)
 {
-	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
+	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo).as<Animation>();
 }

@@ -24,7 +24,7 @@ public:
 
 	int getBoneID(const std::string& boneName) const;
 
-	static Resource<MeshCollection> import(const std::string& fileLocation, const ImportSettings& settings);
+	//static Resource<MeshCollection> import(const std::string& fileLocation, const ModelImporter::ModelImportSettings& settings);
 	static Resource<MeshCollection> loadInner(AssetInfo aInfo);
 	
 

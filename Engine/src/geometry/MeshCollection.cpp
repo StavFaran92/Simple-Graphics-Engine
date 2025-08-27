@@ -57,10 +57,10 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 	return m_bonesNameToIDMap.at(boneName);
 }
 
-Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ImportSettings& settings)
-{
-	return Resource<MeshCollection>();
-}
+//Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImporter::ModelImportSettings& settings)
+//{
+//	return Resource<MeshCollection>();
+//}
 
 Resource<MeshCollection> MeshCollection::loadInner(AssetInfo aInfo)
 {
