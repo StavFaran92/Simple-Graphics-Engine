@@ -20,7 +20,7 @@ Entity Terrain::createTerrain(int width, int height, float scale, Resource<Textu
 	auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
 	terrainComponent.m_textureCount = 1;
 
-	auto& grassTexture = Texture::load(SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
+	auto& grassTexture = Texture::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
 	terrainComponent.setTexture(0, grassTexture);
 
 	terrainEntity.addComponent<Terrain>(terrainComponent);
@@ -45,7 +45,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, const std::
 	settings.params[GL_TEXTURE_WRAP_T] = GL_CLAMP_TO_EDGE;
 	settings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 	settings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-	auto heightMap = Texture::importTexture2D(heightMapFilepath, settings);
+	auto heightMap = Texture::import(heightMapFilepath, settings);
 
 	return generateTerrain(width, height, scale, heightMap);
 }

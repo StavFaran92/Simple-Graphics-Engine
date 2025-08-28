@@ -35,7 +35,6 @@ public:
 	//static void load(UUID uid, const std::string& path);
 
 	static Resource<Animation> import(const std::string& fileLocation, const AnimationImportSettings& settings = {});
-	static Resource<Animation> load(AssetInfo& aInfo);
 	static Resource<Animation> loadTransient(const std::string& fileLocation, const AnimationImportSettings& settings = {});
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);	

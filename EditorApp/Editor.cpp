@@ -1094,7 +1094,7 @@ void ShowTextureImportWindow()
 		return;
 	}
 
-	Texture::importTexture2D(texturePathBuffer.c_str());
+	Texture::import(texturePathBuffer.c_str());
 
 	texturePathBuffer.clear();
 }
@@ -3200,12 +3200,12 @@ public:
 		
 
 		Texture::TextureImportSettings settings;
-		icons["mesh"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
-		icons["texture"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
-		icons["animation"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);
-		icons["shader"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-100.png", settings);
-		icons["folder"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
-		icons["prefab"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png", settings);
+		icons["mesh"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
+		icons["texture"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
+		icons["animation"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);
+		icons["shader"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-100.png", settings);
+		icons["folder"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
+		icons["prefab"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png", settings);
 	}
 
 	void update(float deltaTime) override

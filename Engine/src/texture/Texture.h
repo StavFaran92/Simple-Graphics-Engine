@@ -124,9 +124,9 @@ public:
 		std::string textureName;
 	};
 
-	struct TextureImportSettings
+	struct TextureImportSettings : public BaseAssetParameters
 	{
-		std::string name;
+		//std::string name;
 		bool genMipMap = false;
 		bool flip = false;
 		bool saveOnDisk = true;
@@ -260,19 +260,19 @@ public:
 
 	TextureAssetAttributes getTextureAssetAttributes();
 
-	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
+	//static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
 	static void extractTextureDataFromSettings(const TextureImportSettings& settings, Texture::TextureData& textureData);
-	static void extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData);
+	//static void extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData);
 
 	static void writeTexture2D(const std::string& fileLocation, Resource<Texture> texture);
-	static Resource<Texture> importTexture2D(const std::string& fileLocation, const TextureImportSettings & = {});
 	static void addTexture2D(Resource<Texture> texture);
 	static void addTexture2D(const std::string& name, Resource<Texture> texture);
 
 	static Resource<Texture> importTexture3D(const std::string& fileLocation);
 
-	static Resource<Texture> loadInner(AssetInfo aInfo);
-	static Resource<Texture> load(const std::string& fileLocation, const TextureImportSettings& settings = {});
+	static Resource<Texture> import(const std::string& fileLocation, const TextureImportSettings & = {});
+	static Resource<Texture> load(AssetInfo aInfo);
+	static Resource<Texture> loadTransient(const std::string& fileLocation, const TextureImportSettings& settings = {});
 
 	/**  Destructor */
 	~Texture();

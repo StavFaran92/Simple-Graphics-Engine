@@ -27,7 +27,7 @@ Entity WaterSystem::createPool()
 	auto& shaderComponent = poolQuad.addComponent<ShaderComponent>();
 	shaderComponent.setShader(shader);
 
-	auto waterNormal = Texture::importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/water_new_height.png");
+	auto waterNormal = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/water_new_height.png");
 	shaderComponent.addTexture("waterNormalSampler", waterNormal);
 
 	return poolQuad;

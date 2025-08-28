@@ -524,7 +524,7 @@ Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiText
 		return Resource<Texture>::empty;
 	}
 
-	auto texture = Texture::importTexture2D(path);
+	auto texture = Texture::import(path);
 
 	cachedTextures.insert(path);
 

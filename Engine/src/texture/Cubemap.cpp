@@ -38,7 +38,7 @@ Texture::TextureData Cubemap::extractCubemapDataFromEquirectangularFile(const st
 {
 
 
-	auto equirectangularMap = Texture::importTexture2D(fileLocation);
+	auto equirectangularMap = Texture::import(fileLocation);
 	
 
 	Texture::TextureData cubemapData;

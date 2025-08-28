@@ -23,38 +23,177 @@
 
 #include "memory/AssetFactory.h"
 
-static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(Texture::loadInner);
+#include "memory/AssetLoader.h"
 
-// Function to determine if the file is HDR based on its extension
-bool isHDRImage(const std::string& filename) {
-	return stbi_is_hdr(filename.c_str());
-}
-
-void convertTextureParamsToAssetInfo(const std::string& fileLocation, const Texture::TextureImportSettings& settings, AssetInfo& outAssetInfo)
+template<>
+struct AssetTraits<Texture>
 {
-	outAssetInfo.origFilePath = fileLocation;
-	outAssetInfo.aType = AssetType::TEXTURE;
-
-	if (!settings.name.empty())
+	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	{
-		outAssetInfo.name = settings.name;
-	}
-	else
-	{
-		outAssetInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-
+		auto& projectDir = Engine::get()->getProjectDirectory();
+		const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
+		const std::string savedFilePath = projectDir + relativeFilepath;
+		return std::filesystem::copy_file(fileLocation, savedFilePath);
 	}
 
-	outAssetInfo.ext = std::filesystem::path(fileLocation).extension().string();
+	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
+	{
+		// Data extract
+		auto tParams = dynamic_cast<const Texture::TextureImportSettings*>(&params);
+		if (!tParams)
+		{
+			throw std::runtime_error("Params specified to Asset load are of incorrect type!");
+		}
 
-	Texture::TextureAssetAttributes attributes;
-	attributes.flip = settings.flip;
-	attributes.genMipMap = settings.genMipMap;
-	attributes.isHDR = isHDRImage(fileLocation);
-	attributes.params = settings.params;
+		auto settings = *tParams; // Just for convinience
 
-	outAssetInfo.attributes = attributes.toMap();
-}
+		aInfo.origFilePath = fileLocation;
+		aInfo.aType = AssetType::TEXTURE;
+
+		if (!settings.name.empty())
+		{
+			aInfo.name = settings.name;
+		}
+		else
+		{
+			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+
+		}
+
+		aInfo.ext = std::filesystem::path(fileLocation).extension().string();
+
+		const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
+		aInfo.filePath = relativeFilepath;
+
+		Texture::TextureAssetAttributes attributes;
+		attributes.flip = settings.flip;
+		attributes.genMipMap = settings.genMipMap;
+		attributes.isHDR = isHDRImage(fileLocation);
+		attributes.params = settings.params;
+
+		aInfo.attributes = attributes.toMap();
+	}
+
+	static Resource<Texture> load(AssetInfo& aInfo)
+	{
+		std::string filepath;
+		if (aInfo.isTransient)
+		{
+			filepath = aInfo.filePath;
+		}
+		else
+		{
+			filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+		}
+
+		Texture::TextureData textureData;
+
+		textureData.target = GL_TEXTURE_2D;
+
+		// extract texture build data
+		Texture::TextureAssetAttributes attributes(aInfo.attributes);
+		extractTextureDataFromAttributes(attributes, textureData);
+		extractTextureDataFromFile(filepath, textureData);
+
+		// Create texture
+		Texture* texture = new Texture();
+		texture->build(textureData);
+		Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
+
+		//texture->m_attributes = attributes;
+
+		return Resource<Texture>(aInfo.uuid);
+	}
+
+	static void extractTextureDataFromAttributes(const Texture::TextureAssetAttributes& attributes, Texture::TextureData& textureData)
+	{
+		if (attributes.genMipMap)
+		{
+			textureData.params = {
+				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+			};
+
+			textureData.genMipMap = true;
+		}
+		else
+		{
+			textureData.params = {
+				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+				{ GL_TEXTURE_WRAP_R, GL_REPEAT},
+				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+			};
+
+			textureData.genMipMap = false;
+		}
+
+		textureData.flip = attributes.flip;
+	}
+
+	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
+	{
+		// Determine if the image is HDR
+		if (isHDRImage(fileLocation))
+		{
+			textureData.isHDR = true;
+		}
+
+		stbi_set_flip_vertically_on_load(textureData.flip);
+
+		if (textureData.isHDR)
+		{
+			textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+		}
+		else
+		{
+			textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+		}
+
+		// load validation
+		if (!textureData.data)
+		{
+			logError("Failed to find: {}", fileLocation.c_str());
+		}
+
+		// Determine format based on bits per pixel (bpp)
+		if (textureData.bpp == 1)
+		{
+			textureData.format = (Texture::Format)GL_RED;
+			textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
+		}
+		else if (textureData.bpp == 3)
+		{
+			textureData.format = (Texture::Format)GL_RGB;
+			textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
+		}
+		else if (textureData.bpp == 4)
+		{
+			textureData.format = (Texture::Format)GL_RGBA;
+			textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
+		}
+		else {
+			throw std::runtime_error("Unsupported texture format!");
+		}
+
+		std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
+		textureData.textureName = textureName;
+
+		textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
+	}
+
+	// Function to determine if the file is HDR based on its extension
+	static bool isHDRImage(const std::string& filename) {
+		return stbi_is_hdr(filename.c_str());
+	}
+};
+
+static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(Texture::load);
+
+
 
 Texture::Texture()
 	:m_id(0), m_slot(0)
@@ -154,6 +293,7 @@ void Texture::build(const TextureData& textureData)
 	m_attributes.flip = textureData.flip;
 	m_attributes.genMipMap = textureData.genMipMap;
 	m_attributes.isHDR = textureData.isHDR;
+	m_attributes.params = textureData.params;
 
 	// generate texture
 	glGenTextures(1, &m_id);
@@ -248,46 +388,42 @@ void Texture::ClearTexture()
 //	return {};
 //}
 
-Resource<Texture> Texture::loadInner(AssetInfo aInfo)
+Resource<Texture> Texture::load(AssetInfo aInfo)
 {
-	std::string filepath;
-	if (aInfo.isTransient)
-	{
-		filepath = aInfo.filePath;
-	}
-	else
-	{
-		filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	}
+	return AssetLoader<Texture>::load(aInfo);
 
-	Texture::TextureData textureData;
+	//std::string filepath;
+	//if (aInfo.isTransient)
+	//{
+	//	filepath = aInfo.filePath;
+	//}
+	//else
+	//{
+	//	filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	//}
 
-	textureData.target = GL_TEXTURE_2D;
+	//Texture::TextureData textureData;
 
-	// extract texture build data
-	TextureAssetAttributes attributes(aInfo.attributes);
-	extractTextureDataFromAttributes(attributes, textureData);
-	extractTextureDataFromFile(filepath, textureData);
+	//textureData.target = GL_TEXTURE_2D;
 
-	// Create texture
-	Texture* texture = new Texture();
-	texture->build(textureData);
-	Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
+	//// extract texture build data
+	//TextureAssetAttributes attributes(aInfo.attributes);
+	//extractTextureDataFromAttributes(attributes, textureData);
+	//extractTextureDataFromFile(filepath, textureData);
 
-	texture->m_attributes = attributes;
+	//// Create texture
+	//Texture* texture = new Texture();
+	//texture->build(textureData);
+	//Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
 
-	return Resource<Texture>(aInfo.uuid);
+	//texture->m_attributes = attributes;
+
+	//return Resource<Texture>(aInfo.uuid);
 }
 
-Resource<Texture> Texture::load(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
+Resource<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
 {
-	AssetInfo aInfo;
-	convertTextureParamsToAssetInfo(fileLocation, settings, aInfo);
-	aInfo.uuid = uuid::generate_uuid_v4();
-	aInfo.isTransient = true;
-	aInfo.filePath = fileLocation;
-
-	return loadInner(aInfo);
+	return AssetLoader<Texture>::loadTransient(fileLocation, settings);
 }
 
 //Resource<Asset> Texture::load(AssetInfo aInfo)
@@ -307,56 +443,56 @@ Texture::TextureAssetAttributes Texture::getTextureAssetAttributes()
 	return m_attributes;;
 }
 
-void Texture::extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
-{
-	// Determine if the image is HDR
-	if (isHDRImage(fileLocation))
-	{
-		textureData.isHDR = true;
-	}
-
-	stbi_set_flip_vertically_on_load(textureData.flip);
-
-	if (textureData.isHDR)
-	{
-		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
-	}
-	else
-	{
-		textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
-	}
-
-	// load validation
-	if (!textureData.data)
-	{
-		logError("Failed to find: {}", fileLocation.c_str());
-	}
-
-	// Determine format based on bits per pixel (bpp)
-	if (textureData.bpp == 1)
-	{
-		textureData.format = (Texture::Format)GL_RED;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
-	}
-	else if (textureData.bpp == 3)
-	{
-		textureData.format = (Texture::Format)GL_RGB;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
-	}
-	else if (textureData.bpp == 4)
-	{
-		textureData.format = (Texture::Format)GL_RGBA;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
-	}
-	else {
-		throw std::runtime_error("Unsupported texture format!");
-	}
-
-	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
-	textureData.textureName = textureName;
-
-	textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
-}
+//void Texture::extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
+//{
+//	// Determine if the image is HDR
+//	if (isHDRImage(fileLocation))
+//	{
+//		textureData.isHDR = true;
+//	}
+//
+//	stbi_set_flip_vertically_on_load(textureData.flip);
+//
+//	if (textureData.isHDR)
+//	{
+//		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+//	}
+//	else
+//	{
+//		textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+//	}
+//
+//	// load validation
+//	if (!textureData.data)
+//	{
+//		logError("Failed to find: {}", fileLocation.c_str());
+//	}
+//
+//	// Determine format based on bits per pixel (bpp)
+//	if (textureData.bpp == 1)
+//	{
+//		textureData.format = (Texture::Format)GL_RED;
+//		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
+//	}
+//	else if (textureData.bpp == 3)
+//	{
+//		textureData.format = (Texture::Format)GL_RGB;
+//		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
+//	}
+//	else if (textureData.bpp == 4)
+//	{
+//		textureData.format = (Texture::Format)GL_RGBA;
+//		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
+//	}
+//	else {
+//		throw std::runtime_error("Unsupported texture format!");
+//	}
+//
+//	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
+//	textureData.textureName = textureName;
+//
+//	textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
+//}
 
 void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> texture)
 {
@@ -370,41 +506,43 @@ void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> 
 
 
 
-Resource<Texture> Texture::importTexture2D(const std::string& fileLocation, const TextureImportSettings& settings)
+Resource<Texture> Texture::import(const std::string& fileLocation, const TextureImportSettings& settings)
 {
-	// Assertion
-	if (fileLocation.empty())
-	{
-		logWarning("Invalid texture name, cannot be empty.");
-		return Resource<Texture>::empty;
-	}
+	return AssetLoader<Texture>::import(fileLocation, settings);
 
-	// Data extract
-	AssetInfo aInfo;
-	aInfo.uuid = uuid::generate_uuid_v4();
-	convertTextureParamsToAssetInfo(fileLocation, settings, aInfo);
+	//// Assertion
+	//if (fileLocation.empty())
+	//{
+	//	logWarning("Invalid texture name, cannot be empty.");
+	//	return Resource<Texture>::empty;
+	//}
 
-	// Copy + Paste
-	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
-	const std::string savedFilePath = projectDir + relativeFilepath;
-	std::filesystem::copy_file(fileLocation, savedFilePath);
+	//// Data extract
+	//AssetInfo aInfo;
+	//aInfo.uuid = uuid::generate_uuid_v4();
+	//convertTextureParamsToAssetInfo(fileLocation, settings, aInfo);
 
-	aInfo.filePath = relativeFilepath;
+	//// Copy + Paste
+	//auto& projectDir = Engine::get()->getProjectDirectory();
+	//const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
+	//const std::string savedFilePath = projectDir + relativeFilepath;
+	//std::filesystem::copy_file(fileLocation, savedFilePath);
 
-	// Load
-	Resource<Texture> asset = loadInner(aInfo);
-	aInfo.data = asset;
+	//aInfo.filePath = relativeFilepath;
 
-	// Add Asset
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+	//// Load
+	//Resource<Texture> asset = load(aInfo);
+	//aInfo.data = asset;
 
-	if (!aInfo.isValid)
-	{
-		return Resource<Texture>::empty;
-	}
+	//// Add Asset
+	//Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
-	return asset;
+	//if (!aInfo.isValid)
+	//{
+	//	return Resource<Texture>::empty;
+	//}
+
+	//return asset;
 }
 
 void Texture::addTexture2D(Resource<Texture> texture)
@@ -472,98 +610,101 @@ void Texture::extractTextureDataFromSettings(const TextureImportSettings& settin
 	
 }
 
-void Texture::extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData)
-{
-	if (attributes.genMipMap)
-	{
-		textureData.params = {
-			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-		};
-
-		textureData.genMipMap = true;
-	}
-	else
-	{
-		textureData.params = {
-			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-			{ GL_TEXTURE_WRAP_R, GL_REPEAT},
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-		};
-
-		textureData.genMipMap = false;
-	}
-
-	textureData.flip = attributes.flip;
-}
+//void Texture::extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData)
+//{
+//	if (attributes.genMipMap)
+//	{
+//		textureData.params = {
+//			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+//			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+//			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+//			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
+//		};
+//
+//		textureData.genMipMap = true;
+//	}
+//	else
+//	{
+//		textureData.params = {
+//			{ GL_TEXTURE_WRAP_S, GL_REPEAT},
+//			{ GL_TEXTURE_WRAP_T, GL_REPEAT},
+//			{ GL_TEXTURE_WRAP_R, GL_REPEAT},
+//			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+//			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+//		};
+//
+//		textureData.genMipMap = false;
+//	}
+//
+//	textureData.flip = attributes.flip;
+//}
 
 Resource<Texture> Texture::importTexture3D(const std::string& fileLocation)
 {
-	Texture::TextureData textureData;
+	// TODO fix
 
-	textureData.target = GL_TEXTURE_3D;
+	//Texture::TextureData textureData;
 
-	Texture::TextureImportSettings settings;
-	settings.name = "VolumeCloud";
+	//textureData.target = GL_TEXTURE_3D;
 
-	// extract texture build data
-	extractTextureDataFromSettings(settings, textureData);
-	extractTextureDataFromFile(fileLocation, textureData);
-	
-	Resource<Texture> texture = Factory<Texture>::create();
+	//Texture::TextureImportSettings settings;
+	//settings.name = "VolumeCloud";
 
-	texture.get()->m_data = textureData;
+	//// extract texture build data
+	//extractTextureDataFromSettings(settings, textureData);
+	//extractTextureDataFromFile(fileLocation, textureData);
+	//
+	//Resource<Texture> texture = Factory<Texture>::create();
 
-	texture.get()->m_attributes.flip = textureData.flip;
-	texture.get()->m_attributes.genMipMap = textureData.genMipMap;
-	texture.get()->m_attributes.isHDR = textureData.isHDR;
+	//texture.get()->m_data = textureData;
 
-	// generate texture
-	glGenTextures(1, &texture.get()->m_id);
-	texture.get()->bind();
+	//texture.get()->m_attributes.flip = textureData.flip;
+	//texture.get()->m_attributes.genMipMap = textureData.genMipMap;
+	//texture.get()->m_attributes.isHDR = textureData.isHDR;
 
-	for (auto& [paramKey, paramValue] : textureData.params)
-	{
-		glTexParameteri(textureData.target, paramKey, paramValue);
-	}
+	//// generate texture
+	//glGenTextures(1, &texture.get()->m_id);
+	//texture.get()->bind();
 
-	int sliceSize = 64;
-	int slicesPerRow = 512 / sliceSize;
+	//for (auto& [paramKey, paramValue] : textureData.params)
+	//{
+	//	glTexParameteri(textureData.target, paramKey, paramValue);
+	//}
 
-	std::vector<unsigned char> volumeData(sliceSize * sliceSize * 64 * 4); // RGBA
-	for (int z = 0; z < 64; ++z) {
-		int tileX = z % slicesPerRow;
-		int tileY = z / slicesPerRow;
+	//int sliceSize = 64;
+	//int slicesPerRow = 512 / sliceSize;
 
-		for (int y = 0; y < sliceSize; ++y) {
-			for (int x = 0; x < sliceSize; ++x) {
-				int srcX = tileX * sliceSize + x;
-				int srcY = tileY * sliceSize + y;
-				int srcIndex = (srcY * 512 + srcX) * 4;
-				int dstIndex = ((z * sliceSize + y) * sliceSize + x) * 4;
+	//std::vector<unsigned char> volumeData(sliceSize * sliceSize * 64 * 4); // RGBA
+	//for (int z = 0; z < 64; ++z) {
+	//	int tileX = z % slicesPerRow;
+	//	int tileY = z / slicesPerRow;
 
-				volumeData[dstIndex + 0] = ((uint8_t*)(textureData.data))[srcIndex + 0];
-				volumeData[dstIndex + 1] = ((uint8_t*)(textureData.data))[srcIndex + 1];
-				volumeData[dstIndex + 2] = ((uint8_t*)(textureData.data))[srcIndex + 2];
-				volumeData[dstIndex + 3] = ((uint8_t*)(textureData.data))[srcIndex + 3];
-			}
-		}
-	}
+	//	for (int y = 0; y < sliceSize; ++y) {
+	//		for (int x = 0; x < sliceSize; ++x) {
+	//			int srcX = tileX * sliceSize + x;
+	//			int srcY = tileY * sliceSize + y;
+	//			int srcIndex = (srcY * 512 + srcX) * 4;
+	//			int dstIndex = ((z * sliceSize + y) * sliceSize + x) * 4;
 
-	glTexImage3D(textureData.target, 0, GL_RGBA8, 64, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, volumeData.data());
+	//			volumeData[dstIndex + 0] = ((uint8_t*)(textureData.data))[srcIndex + 0];
+	//			volumeData[dstIndex + 1] = ((uint8_t*)(textureData.data))[srcIndex + 1];
+	//			volumeData[dstIndex + 2] = ((uint8_t*)(textureData.data))[srcIndex + 2];
+	//			volumeData[dstIndex + 3] = ((uint8_t*)(textureData.data))[srcIndex + 3];
+	//		}
+	//	}
+	//}
 
-	if (textureData.genMipMap)
-	{
-		glGenerateMipmap(textureData.target);
-	}
+	//glTexImage3D(textureData.target, 0, GL_RGBA8, 64, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, volumeData.data());
 
-	texture.get()->unbind();
+	//if (textureData.genMipMap)
+	//{
+	//	glGenerateMipmap(textureData.target);
+	//}
 
-	return texture;
+	//texture.get()->unbind();
+
+	//return texture;
+	return {};
 }
 
 //adi is your love of your life

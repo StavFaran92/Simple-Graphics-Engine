@@ -5,13 +5,6 @@
 #include "Asset.h"
 
 template<typename T>
-struct AssetTraits {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo&);
-	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo);
-	static Resource<T> load(AssetInfo& aInfo);
-};
-
-template<typename T>
 class AssetLoader
 {
 public:
@@ -58,6 +51,11 @@ public:
 		aInfo.isTransient = true;
 		aInfo.filePath = fileLocation;
 
+		return AssetTraits<T>::load(aInfo);
+	}
+
+	static Resource<T> load(AssetInfo& aInfo)
+	{
 		return AssetTraits<T>::load(aInfo);
 	}
 };

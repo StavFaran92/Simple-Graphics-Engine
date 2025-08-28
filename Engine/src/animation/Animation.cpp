@@ -38,7 +38,7 @@ struct AssetTraits<Animation>
 	}
 };
 
-static AssetFnRegister<AssetType::ANIMATION> assetRegister(Animation::load);
+static AssetFnRegister<AssetType::ANIMATION> assetRegister(AssetTraits<Animation>::load);
 
 Animation::Animation()
 {
@@ -131,11 +131,6 @@ bool Animation::preprocess(const std::string& path)
 Resource<Animation> Animation::import(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
 	return AssetLoader<Animation>::import(fileLocation, settings);
-}
-
-Resource<Animation> Animation::load(AssetInfo& aInfo)
-{
-	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 }
 
 Resource<Animation> Animation::loadTransient(const std::string& fileLocation, const AnimationImportSettings& settings)

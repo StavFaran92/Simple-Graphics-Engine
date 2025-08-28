@@ -27,6 +27,13 @@ public:
 template<AssetType T>
 AssetFnRegister<T> AssetFnRegister<T>::staticRegister;
 
+template<typename T>
+struct AssetTraits {
+	static bool copyFiles(const std::string& fileLocation, AssetInfo&);
+	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo);
+	static Resource<T> load(AssetInfo& aInfo);
+};
+
 class Asset
 {
 public:
@@ -45,6 +52,6 @@ public:
 
 	template <typename T>
 	static Resource<T> load(AssetInfo& aInfo) {
-		return T::loadInner(aInfo);
+		return T::load(aInfo);
 	}
 };

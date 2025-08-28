@@ -39,7 +39,7 @@ Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
     }
     else if (texType == TexType::EQUIRECTANGULAR)
     {
-        auto skyboxTexture = Texture::importTexture2D(textureFilepath);
+        auto skyboxTexture = Texture::import(textureFilepath);
         auto& skyboxComponent = skyboxEntity.addComponent<SkyboxComponent>(skyboxTexture);
         skyboxComponent.build();
     }
@@ -55,7 +55,7 @@ Entity Skybox::CreateSkyboxFromEquirectangularMap(const std::string& equirectnag
         scene = Engine::get()->getContext()->getActiveScene().get();
     }
 
-    auto equirectnagularMap = Texture::importTexture2D(equirectnagularMapPath);
+    auto equirectnagularMap = Texture::import(equirectnagularMapPath);
 
     //texture = TextureTransformer::flipVertical(texture);
 
