@@ -53,9 +53,4 @@ public:
 
 		return AssetTraits<T>::load(aInfo);
 	}
-
-	static Resource<T> load(AssetInfo& aInfo)
-	{
-		return AssetTraits<T>::load(aInfo);
-	}
 };

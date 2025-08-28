@@ -271,7 +271,6 @@ public:
 	static Resource<Texture> importTexture3D(const std::string& fileLocation);
 
 	static Resource<Texture> import(const std::string& fileLocation, const TextureImportSettings & = {});
-	static Resource<Texture> load(AssetInfo aInfo);
 	static Resource<Texture> loadTransient(const std::string& fileLocation, const TextureImportSettings& settings = {});
 
 	/**  Destructor */

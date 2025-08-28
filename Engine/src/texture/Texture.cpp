@@ -191,7 +191,7 @@ struct AssetTraits<Texture>
 	}
 };
 
-static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(Texture::load);
+static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(AssetTraits<Texture>::load);
 
 
 
@@ -387,39 +387,6 @@ void Texture::ClearTexture()
 //{
 //	return {};
 //}
-
-Resource<Texture> Texture::load(AssetInfo aInfo)
-{
-	return AssetLoader<Texture>::load(aInfo);
-
-	//std::string filepath;
-	//if (aInfo.isTransient)
-	//{
-	//	filepath = aInfo.filePath;
-	//}
-	//else
-	//{
-	//	filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	//}
-
-	//Texture::TextureData textureData;
-
-	//textureData.target = GL_TEXTURE_2D;
-
-	//// extract texture build data
-	//TextureAssetAttributes attributes(aInfo.attributes);
-	//extractTextureDataFromAttributes(attributes, textureData);
-	//extractTextureDataFromFile(filepath, textureData);
-
-	//// Create texture
-	//Texture* texture = new Texture();
-	//texture->build(textureData);
-	//Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
-
-	//texture->m_attributes = attributes;
-
-	//return Resource<Texture>(aInfo.uuid);
-}
 
 Resource<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
 {

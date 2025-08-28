@@ -121,13 +121,6 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-//#include "animation/AnimationLoader.h"
-//void Animation::load(UUID uid, const std::string& path)
-//{
-//	Engine::get()->getSubSystem<AnimationLoader>()->load(path, Resource<Animation>(uid));
-//
-//}
-
 Resource<Animation> Animation::import(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
 	return AssetLoader<Animation>::import(fileLocation, settings);
