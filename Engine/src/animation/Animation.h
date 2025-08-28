@@ -9,6 +9,8 @@
 #include "memory/Asset.h"
 #include "animation/AnimationLoader.h"
 
+#include <filesystem>
+
 class Bone;
 
 struct MeshNodeData
@@ -36,9 +38,7 @@ public:
 	static Resource<Animation> load(AssetInfo& aInfo);
 	static Resource<Animation> loadTransient(const std::string& fileLocation, const AnimationImportSettings& settings = {});
 private:
-	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);
-
-	
+	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);	
 
 private:
 	std::string m_name;

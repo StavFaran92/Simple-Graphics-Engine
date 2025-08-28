@@ -4,16 +4,60 @@
 #include "Resource.h"
 #include "Asset.h"
 
+template<typename T>
+struct AssetTraits {
+	static bool copyFiles(const std::string& fileLocation, AssetInfo&);
+	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo);
+	static Resource<T> load(AssetInfo& aInfo);
+};
+
+template<typename T>
 class AssetLoader
 {
 public:
-	virtual void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo) = 0;
+	static Resource<T> import(const std::string& fileLocation, const BaseAssetParameters& params)
+	{
+		// Validate input
+		if (fileLocation.empty())
+		{
+			logError("Invalid texture name, cannot be empty.");
+			return Resource<T>::empty;
+		}
 
-	virtual bool copyFileToResourceFolder(const std::string& fileLocation, AssetInfo& aInfo);
+		// Data extract
+		AssetInfo aInfo;
+		aInfo.uuid = uuid::generate_uuid_v4();
+		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
 
-	Resource<Asset> import(const std::string& fileLocation, const BaseAssetParameters& params);
+		// Copy + Paste
+		if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
+		{
+			logError("Failed to copy file from {} to resource folder", fileLocation);
+			return Resource<T>::empty;
+		}
 
-	Resource<Asset> loadTransient(const std::string& fileLocation, const BaseAssetParameters& settings);
+		// Load
+		aInfo.data = AssetTraits<T>::load(aInfo);
+		if (aInfo.data.isEmpty())
+		{
+			logError("Failed to load file {}", fileLocation);
+			return Resource<T>::empty;
+		}
 
-	virtual Resource<Asset> load(AssetInfo& aInfo) = 0;
+		// Add Asset
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+
+		return aInfo.data.as<T>();
+	}
+
+	static Resource<T> loadTransient(const std::string& fileLocation, const BaseAssetParameters& settings)
+	{
+		AssetInfo aInfo;
+		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, settings, aInfo);
+		aInfo.uuid = uuid::generate_uuid_v4();
+		aInfo.isTransient = true;
+		aInfo.filePath = fileLocation;
+
+		return AssetTraits<T>::load(aInfo);
+	}
 };

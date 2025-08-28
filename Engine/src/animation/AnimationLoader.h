@@ -19,18 +19,16 @@ struct AnimationImportSettings : BaseAssetParameters
 	
 };
 
-class EngineAPI AnimationLoader : public AssetLoader
+class EngineAPI AnimationLoader
 {
 public:
 	AnimationLoader();
 
-	Resource<Asset> load(AssetInfo& aInfo) override;
+	Resource<Animation> load(AssetInfo& aInfo);
+
+	bool copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&);
 
 
 private:
 	Assimp::Importer m_importer;
-
-private:
-	bool copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&) override;
-	void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo) override;
 };

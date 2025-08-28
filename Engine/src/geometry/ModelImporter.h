@@ -29,7 +29,7 @@ namespace Assimp
 	class Importer;
 }
 
-class EngineAPI ModelImporter : public AssetLoader
+class EngineAPI ModelImporter
 {
 public:
 	struct ModelImportSession
@@ -48,7 +48,7 @@ public:
 	struct ModelImportSettings
 	{
 		std::string name;
-		//bool isTransient = false;
+		bool isTransient = false;
 	};
 
 	struct ModelInfo

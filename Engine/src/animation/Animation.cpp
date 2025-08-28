@@ -3,7 +3,42 @@
 #include "animation/Bone.h"
 #include "animation/AnimationLoader.h"
 
-static AssetFnRegister<AssetType::ANIMATION> assetRegister(Animation::loadInner);
+#include <filesystem>
+
+template<>
+struct AssetTraits<Animation>
+{
+	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	{
+		return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
+	}
+
+	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
+	{
+		// Data extract
+		if (params.name.empty())
+		{
+			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+		}
+		else
+		{
+			aInfo.name = params.name;
+		}
+
+		aInfo.aType = AssetType::ANIMATION;
+
+		const std::string relativeFilepath = "/" + aInfo.name + ".dae";
+		aInfo.filePath = relativeFilepath;
+		aInfo.origFilePath = fileLocation;
+	}
+
+	static Resource<Animation> load(AssetInfo& aInfo)
+	{
+		return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
+	}
+};
+
+static AssetFnRegister<AssetType::ANIMATION> assetRegister(Animation::load);
 
 Animation::Animation()
 {
@@ -95,15 +130,15 @@ bool Animation::preprocess(const std::string& path)
 
 Resource<Animation> Animation::import(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
-	return Engine::get()->getSubSystem<AnimationLoader>()->import(fileLocation, settings).as<Animation>();
+	return AssetLoader<Animation>::import(fileLocation, settings);
 }
 
 Resource<Animation> Animation::load(AssetInfo& aInfo)
 {
-	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo).as<Animation>();
+	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 }
 
 Resource<Animation> Animation::loadTransient(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
-	return Engine::get()->getSubSystem<AnimationLoader>()->loadTransient(fileLocation, settings).as<Animation>();
+	return AssetLoader<Animation>::loadTransient(fileLocation, settings);
 }

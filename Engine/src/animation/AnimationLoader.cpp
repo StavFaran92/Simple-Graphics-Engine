@@ -73,7 +73,7 @@ void readAnimationBones(const aiAnimation* animation, std::unordered_map<std::st
     }
 }
 
-Resource<Asset> AnimationLoader::load(AssetInfo& aInfo)
+Resource<Animation> AnimationLoader::load(AssetInfo& aInfo)
 {
     std::string filepath;
     if (aInfo.isTransient)
@@ -90,7 +90,7 @@ Resource<Asset> AnimationLoader::load(AssetInfo& aInfo)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
-        return Resource<Asset>::empty;
+        return Resource<Animation>::empty;
     }
 
     assert(scene && scene->mRootNode && scene->HasAnimations());
@@ -137,23 +137,4 @@ bool AnimationLoader::copyFileToResourceFolder(const std::string& path, AssetInf
     }
 
     return true;
-}
-
-void AnimationLoader::convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-{
-    // Data extract
-    if (params.name.empty())
-    {
-        aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-    }
-    else
-    {
-        aInfo.name = params.name;
-    }
-
-    aInfo.aType = AssetType::ANIMATION;
-
-    const std::string relativeFilepath = "/" + aInfo.name + ".dae";
-    aInfo.filePath = relativeFilepath;
-    aInfo.origFilePath = fileLocation;
 }
