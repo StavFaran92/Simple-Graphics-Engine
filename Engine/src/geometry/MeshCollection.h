@@ -6,6 +6,7 @@
 #include "geometry/Mesh.h"
 #include "memory/Resource.h"
 #include "memory/Asset.h"
+#include "geometry/ModelImporter.h"
 
 class EngineAPI MeshCollection : public Asset
 {
@@ -25,7 +26,10 @@ public:
 	int getBoneID(const std::string& boneName) const;
 
 	//static Resource<MeshCollection> import(const std::string& fileLocation, const ModelImporter::ModelImportSettings& settings);
-	static Resource<MeshCollection> loadInner(AssetInfo aInfo);
+	//static Resource<MeshCollection> loadInner(AssetInfo aInfo);
+
+	static Resource<MeshCollection> import(const std::string& fileLocation, const ModelImportSettings& settings = {});
+	static Resource<MeshCollection> loadTransient(const std::string& fileLocation, const ModelImportSettings& settings = {});
 	
 
 private:

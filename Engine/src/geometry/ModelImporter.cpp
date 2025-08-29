@@ -86,7 +86,7 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, ModelImp
 	}
 
 	// read scene from file
-	 const aiScene* scene = m_importer->ReadFile(path,
+	const aiScene* scene = m_importer->ReadFile(path,
 		aiProcess_Triangulate | 
 		aiProcess_GenSmoothNormals | 
 		aiProcess_FlipUVs | 
@@ -98,50 +98,6 @@ ModelImporter::ModelInfo ModelImporter::import(const std::string& path, ModelImp
 		logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
 		return {};
 	}
-
-	auto metadata = scene->mMetaData;
-	if (metadata) {
-		for (unsigned int i = 0; i < metadata->mNumProperties; ++i) {
-			aiString key = metadata->mKeys[i];
-			aiMetadataEntry& entry = metadata->mValues[i];
-
-			std::string valueStr;
-
-			// Handle types manually
-			switch (entry.mType) {
-			case AI_BOOL:
-				valueStr = (*(bool*)entry.mData) ? "true" : "false";
-				break;
-			case AI_INT32:
-				valueStr = std::to_string(*(int32_t*)entry.mData);
-				break;
-			case AI_UINT64:
-				valueStr = std::to_string(*(uint64_t*)entry.mData);
-				break;
-			case AI_FLOAT:
-				valueStr = std::to_string(*(float*)entry.mData);
-				break;
-			case AI_DOUBLE:
-				valueStr = std::to_string(*(double*)entry.mData);
-				break;
-			case AI_AISTRING:
-				valueStr = ((aiString*)entry.mData)->C_Str();
-				break;
-			case AI_AIVECTOR3D:
-			{
-				aiVector3D vec = *(aiVector3D*)entry.mData;
-				valueStr = "(" + std::to_string(vec.x) + ", " + std::to_string(vec.y) + ", " + std::to_string(vec.z) + ")";
-			}
-			break;
-			default:
-				valueStr = "<Unsupported Type>";
-				break;
-			}
-
-			logInfo("metadata - Key: " + std::string(key.C_Str()) + ", Value: " + valueStr);
-		}
-	}
-
 
 	ModelImporter::ModelInfo mInfo;
 
@@ -338,6 +294,81 @@ ModelImporter::ModelInfo ModelImporter::loadModelFromFile(const std::string & pa
 	loadModelFromAssimpScene(scene, path, modelInfo);
 
 	return modelInfo;
+}
+
+bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+{
+	auto fileDir = std::filesystem::path(fileLocation).parent_path().string();
+
+	// read scene from file
+	const aiScene* scene = m_importer->ReadFile(fileLocation,
+		aiProcess_Triangulate |
+		aiProcess_GenSmoothNormals |
+		aiProcess_FlipUVs |
+		aiProcess_CalcTangentSpace |
+		aiProcess_ValidateDataStructure);
+
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	{
+		logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
+		return false;
+	}
+
+	std::unordered_set<std::string> cachedTextures;
+
+	// Import textures
+	if (scene->HasMaterials())
+	{
+		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+		{
+			auto& aMaterial = scene->mMaterials[i];
+
+			auto& diffuse = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures);
+			//if (!diffuse.isEmpty())
+			//{
+			//	mInfo.textures.push_back(diffuse);
+			//}
+
+			auto& normal = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures);
+			//if (!normal.isEmpty())
+			//{
+			//	mInfo.textures.push_back(normal);
+			//}
+		}
+	}
+
+	Resource<MeshCollection> mesh = Factory<MeshCollection>::create();
+
+	if (scene->HasTextures())
+	{
+		aiScene* strippedScene = new aiScene(*scene);
+
+		for (unsigned int i = 0; i < strippedScene->mNumMaterials; ++i)
+		{
+			aiMaterial* mat = strippedScene->mMaterials[i];
+
+			for (int t = aiTextureType_NONE + 1; t <= aiTextureType_UNKNOWN; ++t)
+			{
+				aiTextureType texType = static_cast<aiTextureType>(t);
+
+				unsigned int texCount = mat->GetTextureCount(texType);
+				for (unsigned int index = 0; index < texCount; ++index)
+				{
+					strippedScene->mTextures[index] = nullptr;
+					strippedScene->mNumTextures = 0;
+					// Remove only the texture reference (path binding)
+					//mat->RemoveProperty(AI_MATKEY_TEXTURE(texType, index));
+				}
+			}
+		}
+
+		scene = strippedScene;
+	}
+
+	// TODO I should probably copy the file instead of export (issue with GLTF and bin)
+	MeshExporter::exportMesh(aInfo.name, mesh, scene);
+
+	return true;
 }
 
 void ModelImporter::processNode(aiNode* node, const aiScene* scene, ModelImporter::ModelImportSession& session)

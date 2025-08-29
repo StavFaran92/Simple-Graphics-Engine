@@ -10,7 +10,6 @@
 #include "texture/Texture.h"
 #include "runtime/Entity.h"
 #include "render/Material.h"
-#include "geometry/MeshCollection.h"
 #include "memory/AssetLoader.h"
 
 // Forward declerations
@@ -21,13 +20,20 @@ struct aiMaterial;
 enum aiTextureType;
 class Engine;
 class TextureHandler;
+class MeshCollection;
 class Scene;
-template<typename T>class ObjectHandler;
+template<typename T>class Resource;
 
 namespace Assimp
 {
 	class Importer;
 }
+
+struct ModelImportSettings : public BaseAssetParameters
+{
+	std::string name;
+	bool isTransient = false;
+};
 
 class EngineAPI ModelImporter
 {
@@ -45,11 +51,7 @@ public:
 		Resource<MeshCollection> mesh;
 	};
 
-	struct ModelImportSettings
-	{
-		std::string name;
-		bool isTransient = false;
-	};
+	
 
 	struct ModelInfo
 	{
@@ -78,6 +80,8 @@ public:
 	 * \return A poitner to the newly created model
 	 */
 	ModelInfo loadModelFromFile(const std::string& path, ModelInfo& modelInfo);
+
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo);
 
 private:
 	friend class Engine;

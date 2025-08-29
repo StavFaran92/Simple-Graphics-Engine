@@ -25,7 +25,7 @@ bool FoliageSystem::init()
 	m_foliageShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
 	m_foliageQuadShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl");
 
-	ModelImporter::ModelImportSettings settings;
+	ModelImportSettings settings;
 	settings.isTransient = true;
 	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings);
 	m_grassBlade = modelInfo.mesh;

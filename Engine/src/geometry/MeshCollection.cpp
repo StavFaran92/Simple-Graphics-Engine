@@ -2,7 +2,53 @@
 
 #include "geometry/ModelImporter.h"
 
-static AssetFnRegister<AssetType::MESH> textureAssetRegister(MeshCollection::loadInner);
+#include <filesystem>
+
+template<>
+struct AssetTraits<MeshCollection>
+{
+	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	{
+		return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
+	}
+
+	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
+	{
+		// Data extract
+		if (params.name.empty())
+		{
+			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+		}
+		else
+		{
+			aInfo.name = params.name;
+		}
+
+		aInfo.aType = AssetType::MESH;
+
+		const std::string relativeFilepath = "/" + aInfo.name + ".dae";
+		aInfo.filePath = relativeFilepath;
+		aInfo.origFilePath = fileLocation;
+	}
+
+	static Resource<MeshCollection> load(AssetInfo& aInfo)
+	{
+		UUID uuid = aInfo.uuid;
+		MeshCollection* meshPtr = new MeshCollection();
+		Engine::get()->getMemoryPool().add(uuid, meshPtr);
+		Resource<MeshCollection> generatedMesh(uuid);
+		ModelImporter::ModelInfo mInfo;
+		mInfo.mesh = generatedMesh;
+		Engine::get()->getResourceManager()->incRef(uuid);
+		const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
+		return generatedMesh;
+
+		//return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
+	}
+};
+
+static AssetFnRegister<AssetType::MESH> textureAssetRegister(AssetTraits<MeshCollection>::load);
 
 void MeshCollection::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
@@ -57,21 +103,31 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 	return m_bonesNameToIDMap.at(boneName);
 }
 
+Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImportSettings& settings)
+{
+	return AssetLoader<MeshCollection>::import(fileLocation, settings);
+}
+
+Resource<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, const ModelImportSettings& settings)
+{
+	return AssetLoader<MeshCollection>::loadTransient(fileLocation, settings);
+}
+
 //Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImporter::ModelImportSettings& settings)
 //{
 //	return Resource<MeshCollection>();
 //}
 
-Resource<MeshCollection> MeshCollection::loadInner(AssetInfo aInfo)
-{
-	UUID uuid = aInfo.uuid;
-	MeshCollection* meshPtr = new MeshCollection();
-	Engine::get()->getMemoryPool().add(uuid, meshPtr);
-	Resource<MeshCollection> generatedMesh(uuid);
-	ModelImporter::ModelInfo mInfo;
-	mInfo.mesh = generatedMesh;
-	Engine::get()->getResourceManager()->incRef(uuid);
-	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
-	return generatedMesh;
-}
+//Resource<MeshCollection> MeshCollection::loadInner(AssetInfo aInfo)
+//{
+//	UUID uuid = aInfo.uuid;
+//	MeshCollection* meshPtr = new MeshCollection();
+//	Engine::get()->getMemoryPool().add(uuid, meshPtr);
+//	Resource<MeshCollection> generatedMesh(uuid);
+//	ModelImporter::ModelInfo mInfo;
+//	mInfo.mesh = generatedMesh;
+//	Engine::get()->getResourceManager()->incRef(uuid);
+//	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+//	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
+//	return generatedMesh;
+//}
