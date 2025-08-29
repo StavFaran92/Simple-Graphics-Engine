@@ -80,7 +80,7 @@ struct AssetTraits<Shader>
 			filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
 		}
 
-		shader->m_isShaderOverride = true;
+		shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
 		shader->shaderOverride = shaderOverride;
 		shader->m_glslFilePath = filepath;
 		shader->recompile();
@@ -607,7 +607,7 @@ ShaderOverride Shader::getShaderOverrideFromStr(const std::string& shaderOverrid
 {
 	if (shaderOverride == "PBR") return ShaderOverride::PBR;
 	if (shaderOverride == "Pixel") return ShaderOverride::Pixel;
-	return ShaderOverride::PBR;
+	return ShaderOverride::None;
 }
 
 std::string Shader::getShaderOverrideAsStr(ShaderOverride shaderOverride)
@@ -619,7 +619,7 @@ std::string Shader::getShaderOverrideAsStr(ShaderOverride shaderOverride)
 	case ShaderOverride::Pixel:
 		return "Pixel";
 	}
-	return "N/A";
+	return "None";
 }
 
 void embeddOverrideShaderInUberShader(ShadersInfo& shaderOverrideInfo, ShaderOverride shaderOverride)

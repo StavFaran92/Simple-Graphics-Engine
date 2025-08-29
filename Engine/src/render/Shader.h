@@ -15,6 +15,7 @@
 
 enum class ShaderOverride : int
 {
+	None,
 	PBR,
 	Pixel,
 	Volume,
