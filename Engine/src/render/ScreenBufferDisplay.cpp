@@ -30,7 +30,7 @@ bool ScreenBufferDisplay::init(int windowWidth, int windowHeight)
 	m_quad = ScreenQuad::GenerateScreenQuad(&m_scene->getRegistry());
 	
 	// Generate screen shader
-	m_screenShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/ScreenBufferDisplayShader.glsl");
+	m_screenShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/ScreenBufferDisplayShader.glsl");
 
 	// Generate screen renderer
 	m_renderer = std::make_shared<Renderer2D>();

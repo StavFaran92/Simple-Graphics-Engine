@@ -14,7 +14,80 @@
 #include "memory/Resource.h"
 #include "core/Factory.h"
 #include "memory/Assets.h"
+#include "memory/AssetLoader.h"
 #include "systems/CommonTextures.h"
+
+#include <filesystem>
+
+template<>
+struct AssetTraits<Shader>
+{
+	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	{
+		auto& projectDir = Engine::get()->getProjectDirectory();
+		const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
+		const std::string savedFilePath = projectDir + relativeFilepath;
+		return std::filesystem::copy_file(fileLocation, savedFilePath);
+	}
+
+	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
+	{
+		auto sParams = dynamic_cast<const ShaderLoadParams*>(&params);
+		if (!sParams)
+		{
+			throw std::runtime_error("Params specified to Asset load are of incorrect type!");
+		}
+
+		auto settings = *sParams; // Just for convinience
+
+
+		if (params.name.empty())
+		{
+			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+		}
+		else
+		{
+			aInfo.name = params.name;
+		}
+
+		const std::string relativeFilepath = "/" + aInfo.name + ".glsl";
+		aInfo.filePath = relativeFilepath;
+		aInfo.origFilePath = fileLocation;
+
+		aInfo.aType = AssetType::SHADER;
+
+		aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(sParams->shaderOverride);
+		aInfo.isTransient = sParams->isTransient;
+	}
+
+	static Resource<Shader> load(AssetInfo& aInfo)
+	{
+		UUID uuid = aInfo.uuid;
+		std::string shaderOverrideStr = aInfo.attributes.at("shader_override");
+		ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
+		Shader* shaderPtr = new Shader();
+		Engine::get()->getMemoryPool().add(uuid, shaderPtr);
+		Resource<Shader> shader(uuid);
+		Engine::get()->getResourceManager()->incRef(uuid);
+
+		std::string filepath;
+		if (aInfo.isTransient)
+		{
+			filepath = aInfo.filePath;
+		}
+		else
+		{
+			filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+		}
+
+		shader->m_isShaderOverride = true;
+		shader->shaderOverride = shaderOverride;
+		shader->m_glslFilePath = filepath;
+		shader->recompile();
+
+		return shader;
+	}
+};
 
 uint32_t Shader::s_activeShader = 0;
 
@@ -27,24 +100,6 @@ Shader::Shader(const std::string& glslFilePath) :
 	m_glslFilePath(glslFilePath)
 {
 	recompile();
-}
-
-Resource<Shader> Shader::load(AssetInfo aInfo)
-{
-	UUID uuid = aInfo.uuid;
-	std::string shaderOverrideStr = aInfo.attributes.at("shader_override");
-	ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
-	Shader* shaderPtr = new Shader();
-	Engine::get()->getMemoryPool().add(uuid, shaderPtr);
-	Resource<Shader> shader(uuid);
-	Engine::get()->getResourceManager()->incRef(uuid);
-	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	shader->m_isShaderOverride = true;
-	shader->shaderOverride = shaderOverride;
-	shader->m_glslFilePath = filepath;
-	shader->recompile();
-
-	return shader;
 }
 
 void Shader::init()
@@ -463,11 +518,6 @@ void Shader::setTime(float time)
 	setFloat("time", time);
 }
 
-Resource<Shader> Shader::create(const std::string& filepath)
-{
-	return Factory<Shader>::create(filepath);
-}
-
 void addMacro(std::string& source, const std::string& macro) {
 	std::string macroDefinition = "#define " + macro + "\n";
 	size_t versionPos = source.find("#version");
@@ -531,6 +581,16 @@ Resource<Shader> Shader::createOverrideShader(const std::string& name, const std
 	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo);
 
 	return shader;
+}
+
+Resource<Shader> Shader::import(const std::string& fileLocation, const ShaderLoadParams& settings)
+{
+	return AssetLoader<Shader>::import(fileLocation, settings);
+}
+
+Resource<Shader> Shader::loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings)
+{
+	return AssetLoader<Shader>::loadTransient(fileLocation, settings);
 }
 
 //Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)
@@ -631,18 +691,6 @@ bool Shader::recompile()
 const std::string& Shader::getSourceCode() const
 {
 	return m_sourceCode;
-}
-
-Resource<Shader> Shader::import(const std::string& filepath)
-{
-	Resource<Shader> shader = Factory<Shader>::create(filepath);
-
-	AssetInfo aInfo;
-	aInfo.uuid = shader.getUID();
-	aInfo.origFilePath = filepath;
-	aInfo.aType = AssetType::SHADER;
-	Engine::get()->getSubSystem<Assets>()->importAsset(aInfo); // this is a hack, we should load the copied shader.
-	return shader;
 }
 
 Shader::~Shader() {

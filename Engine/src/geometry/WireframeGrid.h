@@ -53,7 +53,7 @@ public:
 		vao->setVertexCount(vertices.size());
 		vao->build();
 
-		shader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl");
+		shader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl");
 	}
 
 	std::shared_ptr<VertexArrayObject> vao;

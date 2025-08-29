@@ -3,6 +3,7 @@
 #include <string>
 #include "Resource.h"
 #include "Asset.h"
+#include <filesystem>
 
 template<typename T>
 class AssetLoader
@@ -11,9 +12,9 @@ public:
 	static Resource<T> import(const std::string& fileLocation, const BaseAssetParameters& params)
 	{
 		// Validate input
-		if (fileLocation.empty())
+		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
 		{
-			logError("Invalid texture name, cannot be empty.");
+			logError("Invalid asset path specified.");
 			return Resource<T>::empty;
 		}
 
@@ -45,6 +46,13 @@ public:
 
 	static Resource<T> loadTransient(const std::string& fileLocation, const BaseAssetParameters& settings)
 	{
+		// Validate input
+		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+		{
+			logError("Invalid asset path specified.");
+			return Resource<T>::empty;
+		}
+
 		AssetInfo aInfo;
 		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, settings, aInfo);
 		aInfo.uuid = uuid::generate_uuid_v4();

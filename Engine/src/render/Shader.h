@@ -24,8 +24,15 @@ enum class ShaderOverride : int
 struct ShadersInfo;
 template<typename> class Resource;
 class Texture;
+template<typename> class AssetTraits;
 
 using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned int, glm::mat3, glm::mat4>;
+
+struct ShaderLoadParams : public BaseAssetParameters
+{
+	ShaderOverride shaderOverride;
+	bool isTransient = false;
+};
 
 class EngineAPI Shader : public Asset, std::enable_shared_from_this<Shader>
 {
@@ -64,10 +71,9 @@ public:
 
 	const std::string& getSourceCode() const;
 
-	static Resource<Shader> import(const std::string& filepath);
-	static Resource<Shader> create(const std::string& filepath);
 	static Resource<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient = false);
-	//static Resource<Shader> load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride);
+	static Resource<Shader> import(const std::string& fileLocation, const ShaderLoadParams& settings = {});
+	static Resource<Shader> loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings = {});
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);
 	static std::string getShaderOverrideAsStr(ShaderOverride shaderOverride);
@@ -84,8 +90,6 @@ public:
 
 	/** Constructor */
 	Shader(const std::string& glslFilePath);
-
-	static Resource<Shader> load(AssetInfo aInfo);
 
 protected:
 	
@@ -111,6 +115,7 @@ private:
 	void setMat4(const std::string& name, const glm::mat4& v);
 
 	friend class CustomShaderBuilder;
+	friend class AssetTraits<Shader>;
 
 protected:
 	unsigned int m_id;

@@ -22,8 +22,8 @@ FoliageSystem::FoliageSystem()
 
 bool FoliageSystem::init()
 {
-	m_foliageShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
-	m_foliageQuadShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl");
+	m_foliageShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
+	m_foliageQuadShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl");
 
 	ModelImportSettings settings;
 	settings.isTransient = true;
