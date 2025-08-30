@@ -477,7 +477,7 @@ void Engine::loadProject(const std::string& dirPath)
     // I cannot put camera in built in meshes since it also containts material and texture data I need.
     ModelImportSettings settings;
     settings.name = "SGE_MAIN_CAMERA";
-    MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj", settings);
+    MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings);
     
     m_projectManager->loadProject(getContext()->getProjectAssetRegistry()->getFilepath(), m_context);
 }
@@ -559,7 +559,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     ModelImportSettings settings;
     settings.isTransient = true;
     settings.name = "SGE_MAIN_CAMERA";
-    mainCamera.addComponent<MeshComponent>(MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera.obj", settings));
+    mainCamera.addComponent<MeshComponent>(MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings));
     mainCamera.addComponent<RenderableComponent>();
     mainCamera.addComponent<MaterialComponent>();
 
