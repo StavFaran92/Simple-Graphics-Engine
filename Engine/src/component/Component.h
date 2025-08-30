@@ -63,11 +63,20 @@ static void attachSimple(std::shared_ptr<Component> c, Entity entityHandler)
 	}
 }
 
+#ifndef COMPONENT_SERDES
+	#ifdef ENGINE_BUILD_DLL
+		#define COMPONENT_SERDES(TYPE) \
+			inline ComponentSerializeFnRegister<TYPE> TYPE##_serializeRegister(getComponentIfExists<TYPE>); \
+			inline ComponentDeserializeFnRegister<TYPE> TYPE##_deserializeRegister(TYPE::attachToEntity);
+	#else
+		#define COMPONENT_SERDES(TYPE)
+	#endif
+#endif
+
 #define REGISTER_COMPONENT(TYPE) \
 	CEREAL_REGISTER_TYPE(TYPE); \
 	CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, TYPE); \
-	inline ComponentSerializeFnRegister<TYPE> TYPE##_serializeRegister(getComponentIfExists<TYPE>); \
-	inline ComponentDeserializeFnRegister<TYPE> TYPE##_deserializeRegister(TYPE::attachToEntity);
+	COMPONENT_SERDES(TYPE)
 
 struct EngineAPI TagComponent : public Component
 {
