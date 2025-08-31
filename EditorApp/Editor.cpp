@@ -127,7 +127,7 @@ Resource<Texture> selectedAssetTexture;
 static std::shared_ptr<TextureSampler> g_selectedSampler;
 static std::shared_ptr<TextureSampler> g_previousSampler;
 
-static void addTextureEditWidget(std::shared_ptr<Material> mat, const std::string& name, Texture::Type ttype);
+static void addTextureEditWidget(Resource<Material> mat, const std::string& name, Texture::Type ttype);
 void AddColoredLabel(const char* label);
 static void displayTransformation(Transformation& transform, bool& isChanged);
 static void displaySelectMeshWindow();
@@ -1868,7 +1868,7 @@ static void addTextureEditWidget(Resource<Texture> texture, ImVec2 size, std::fu
 	displayAssetTextureSelectPopup();
 }
 
-static void addTextureEditWidget(std::shared_ptr<Material> mat, const std::string& name, Texture::TextureType ttype)
+static void addTextureEditWidget(Resource<Material> mat, const std::string& name, Texture::TextureType ttype)
 {
 	Resource<Texture> tex = Resource<Texture>::empty;
 	if (mat->hasTexture(ttype))
@@ -1885,7 +1885,7 @@ static void addTextureEditWidget(std::shared_ptr<Material> mat, const std::strin
 	ImGui::Text(name.c_str());
 }
 
-static void addSamplerEditWidget(std::shared_ptr<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype)
+static void addSamplerEditWidget(Resource<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype)
 {
 	ImGui::PushID(name.c_str());
 

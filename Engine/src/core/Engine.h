@@ -104,7 +104,7 @@ public:
     void saveProject();
     std::string getProjectDirectory() const;
 
-    std::shared_ptr<Material> getDefaultMaterial() const;
+    Resource<Material> getDefaultMaterial() const;
 
     void reloadEngineConfig();
 
@@ -189,7 +189,7 @@ protected:
 
     std::map<std::type_index, void*> m_subSystems;
 
-    std::shared_ptr<Material> m_defaultMaterial;
+    Resource<Material> m_defaultMaterial;
 
     std::atomic<bool> m_isPaused = false;
     std::atomic<bool> m_isStopped = false;

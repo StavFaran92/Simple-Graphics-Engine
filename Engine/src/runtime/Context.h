@@ -48,7 +48,7 @@ public:
 	ImguiHandler* getImguiHandler() const;
 	Input* getInput() const;
 	EventSystem* getEventSystem() const;
-	//std::shared_ptr<Material> getDefaultMaterial() const;
+	//Resource<Material> getDefaultMaterial() const;
 
 	std::shared_ptr<Scene> getActiveScene() const;
 

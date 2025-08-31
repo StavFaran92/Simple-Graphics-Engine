@@ -223,7 +223,7 @@ bool Engine::init(const InitParams& initParams)
     m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
     m_commonShaders = std::make_shared<CommonShaders>();
     m_builtInMeshes = std::make_shared<BuiltInMeshes>();
-    m_defaultMaterial = std::make_shared<Material>();
+    m_defaultMaterial = Material::create();
 
     auto foliageSystem = new FoliageSystem();
     foliageSystem->init();
@@ -492,7 +492,7 @@ std::string Engine::getProjectDirectory() const
     return m_projectDirectory;
 }
 
-std::shared_ptr<Material> Engine::getDefaultMaterial() const
+Resource<Material> Engine::getDefaultMaterial() const
 {
     return m_defaultMaterial;
 }

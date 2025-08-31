@@ -5,6 +5,6 @@ MaterialComponent::MaterialComponent()
 {
 	auto mat = Engine::get()->getDefaultMaterial()->clone();
 
-	//auto mat = std::make_shared<Material>(*Engine::get()->getDefaultMaterial().get());
+	//auto mat = Material::create(*Engine::get()->getDefaultMaterial().get());
 	materials[0] = mat;
 }

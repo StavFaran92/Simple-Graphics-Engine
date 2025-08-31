@@ -192,7 +192,7 @@ EventSystem* Context::getEventSystem() const
 	return Engine::get()->getEventSystem();
 }
 
-//std::shared_ptr<Material> Context::getDefaultMaterial() const
+//Resource<Material> Context::getDefaultMaterial() const
 //{
 //	return m_defaultMaterial;
 //}

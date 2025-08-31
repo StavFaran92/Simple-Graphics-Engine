@@ -29,7 +29,7 @@ public:
 			auto importer = Engine::get()->getSubSystem<ModelImporter>();
 			auto rock = importer.loadModelFromFile("C:/Users/Stav/Downloads/rock1-ue/rock2.obj", getContext()->getActiveScene().get());
 
-			auto rockMat = std::make_shared<Material>();
+			auto rockMat = Material::create();
 
 			auto albedoMap = Engine::get()->getSubSystem<Assets>()->::importTexture2D("C:/Users/Stav/Downloads/rock1-ue/rock1-albedo.png", false);
 			rockMat->setTexture(Texture::Type::Albedo, Resource<Texture>(albedoMap));
@@ -76,7 +76,7 @@ public:
 			auto& trans = sphere.getComponent<Transformation>();
 			trans.setLocalScale({ 100, 100, 100 });
 
-			auto sphereMat = std::make_shared<Material>();
+			auto sphereMat = Material::create();
 
 			auto albedoMap = Assets::importTexture2D("C:/Users/Stav/Downloads/Ground048_2K-JPG/Ground048_2K-JPG_Color.jpg", false);
 			sphereMat->setTexture(Texture::Type::Albedo, Resource<Texture>(albedoMap));

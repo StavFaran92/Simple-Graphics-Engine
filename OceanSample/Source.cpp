@@ -193,7 +193,7 @@ private:
 		shader->setUniformValue("waveSpeed", 1.0f);
 		shader->setUniformValue("steepness", .5f);
 
-		//std::shared_ptr<Material> mat = std::make_shared<Material>();
+		//Resource<Material> mat = Material::create();
 		//quad.addComponent<MaterialComponent>().addMaterial().materials[0]->setTexture(Texture::Type::Roughness, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
 	}
 

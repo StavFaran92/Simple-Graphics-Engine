@@ -94,6 +94,7 @@ enum AssetType : int
 	ANIMATION,
 	SHADER,
 	PREFAB,
+	MATERIAL,
 
 	TOTAL_ASSET_TYPE_COUNT
 };

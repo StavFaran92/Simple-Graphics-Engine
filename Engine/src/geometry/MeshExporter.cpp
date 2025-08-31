@@ -14,7 +14,7 @@ std::string MeshExporter::exportMesh(const std::string& name, Resource<MeshColle
 	return relativeFilepath;
 }
 
-std::string MeshExporter::exportMaterial(std::vector<std::shared_ptr<Material>> materials, const aiScene* scene)
+std::string MeshExporter::exportMaterial(std::vector<Resource<Material>> materials, const aiScene* scene)
 {
 	return "";
 }

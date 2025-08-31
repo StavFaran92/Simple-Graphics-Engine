@@ -9,7 +9,12 @@
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
 
-class EngineAPI Material
+struct MaterialImportSettings : public BaseAssetParameters
+{
+
+};
+
+class EngineAPI Material : public Asset
 {
 public:
 	Material();
@@ -36,12 +41,16 @@ public:
 
 	std::vector<Resource<Texture>> getAllTextures() const;
 
-	std::shared_ptr<Material> clone() const;
+	Resource<Material> clone() const;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_samplers);
 	}
+
+	static Resource<Material> import(const std::string& fileLocation, const MaterialImportSettings& settings = {});
+	static Resource<Material> loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings = {});
+	static Resource<Material> create();
 
 protected:
 	void setTexturesInShader(Resource<Shader>& shader);

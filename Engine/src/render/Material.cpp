@@ -6,6 +6,44 @@
 #include "core/Engine.h"
 #include "runtime/Context.h"
 #include "systems/CommonTextures.h"
+#include "memory/AssetLoader.h"
+
+#include <filesystem>
+
+template<>
+struct AssetTraits<Material>
+{
+	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	{
+		return false;
+	}
+
+	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
+	{
+		// Data extract
+		if (params.name.empty())
+		{
+			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
+		}
+		else
+		{
+			aInfo.name = params.name;
+		}
+
+		aInfo.aType = AssetType::MATERIAL;
+
+		const std::string relativeFilepath = "/" + aInfo.name + ".asset";
+		aInfo.filePath = relativeFilepath;
+		aInfo.origFilePath = fileLocation;
+	}
+
+	static Resource<Material> load(AssetInfo& aInfo)
+	{
+		return {};
+	}
+};
+
+static AssetFnRegister<AssetType::MATERIAL> assetRegister(AssetTraits<Material>::load);
 
 Material::Material()
 {
@@ -75,6 +113,21 @@ void Material::setTextureInShader(Resource<Shader>& shader, Texture::TextureType
 	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
 }
 
+Resource<Material> Material::import(const std::string& fileLocation, const MaterialImportSettings& settings)
+{
+	return AssetLoader<Material>::import(fileLocation, settings);
+}
+
+Resource<Material> Material::loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings)
+{
+	return AssetLoader<Material>::loadTransient(fileLocation, settings);
+}
+
+Resource<Material> Material::create()
+{
+	return Resource<Material>();
+}
+
 void Material::setTexturesInShader(Resource<Shader>& shader)
 {
 	// It either has diffuse or albedo
@@ -116,9 +169,9 @@ std::vector<Resource<Texture>> Material::getAllTextures() const
 	return res;
 }
 
-std::shared_ptr<Material> Material::clone() const
+Resource<Material> Material::clone() const
 {
-	auto newMaterial = std::make_shared<Material>();
+	auto newMaterial = Material::create();
 
 	for (const auto& sampler : m_samplers)
 	{
