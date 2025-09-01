@@ -46,6 +46,7 @@ class AnimationLoader;
 class Shader;
 class EventLayerStack;
 class BuiltInMeshes;
+class BuiltInMaterials;
 class Asset;
 struct EngineConfig;
 template<typename T>class Resource;
@@ -180,6 +181,7 @@ protected:
     std::shared_ptr<ProjectManager> m_projectManager;
     std::shared_ptr<CommonShaders> m_commonShaders;
     std::shared_ptr<BuiltInMeshes> m_builtInMeshes;
+    std::shared_ptr<BuiltInMaterials> m_builtInMaterials;
     std::shared_ptr<CommonTextures> m_commonTextures;
     std::shared_ptr<Assets> m_assets;
     std::shared_ptr<EngineConfig> m_engineConfig;
@@ -188,8 +190,6 @@ protected:
     InitParams m_initParams;
 
     std::map<std::type_index, void*> m_subSystems;
-
-    Resource<Material> m_defaultMaterial;
 
     std::atomic<bool> m_isPaused = false;
     std::atomic<bool> m_isStopped = false;

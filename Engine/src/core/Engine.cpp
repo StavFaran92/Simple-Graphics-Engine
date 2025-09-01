@@ -37,6 +37,7 @@
 #include "core/EventLayerStack.h"
 #include "core/EngineConfig.h"
 #include "systems/BuiltInMeshes.h"
+#include "systems/BuiltInMaterials.h"
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
@@ -223,7 +224,7 @@ bool Engine::init(const InitParams& initParams)
     m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
     m_commonShaders = std::make_shared<CommonShaders>();
     m_builtInMeshes = std::make_shared<BuiltInMeshes>();
-    m_defaultMaterial = Material::create();
+    m_builtInMaterials = std::make_shared<BuiltInMaterials>();
 
     auto foliageSystem = new FoliageSystem();
     foliageSystem->init();
@@ -494,7 +495,7 @@ std::string Engine::getProjectDirectory() const
 
 Resource<Material> Engine::getDefaultMaterial() const
 {
-    return m_defaultMaterial;
+    return m_builtInMaterials->getDefaultMaterial();
 }
 
 void Engine::reloadEngineConfig()
