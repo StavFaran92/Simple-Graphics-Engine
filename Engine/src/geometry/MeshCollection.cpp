@@ -39,7 +39,7 @@ struct AssetTraits<MeshCollection>
 		Resource<MeshCollection> generatedMesh(uuid);
 		ModelImporter::ModelInfo mInfo;
 		mInfo.mesh = generatedMesh;
-		Engine::get()->getResourceManager()->incRef(uuid);
+		//Engine::get()->getResourceManager()->incRef(uuid);
 		std::string filepath;
 		if (aInfo.isTransient)
 		{
