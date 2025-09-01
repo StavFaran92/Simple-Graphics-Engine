@@ -2815,6 +2815,10 @@ void RenderAssetViewWindow() {
 			{
 				iconID = icons.at("prefab")->getID();
 			}
+			else if (aInfo.aType == AssetType::MATERIAL)
+			{
+				iconID = icons.at("material")->getID();
+			}
 
 			// Create a small icon
 			ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
@@ -3206,6 +3210,7 @@ public:
 		icons["shader"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-100.png", settings);
 		icons["folder"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
 		icons["prefab"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png", settings);
+		icons["material"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-material-100.png", settings);
 	}
 
 	void update(float deltaTime) override
