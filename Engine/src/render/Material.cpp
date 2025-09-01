@@ -7,6 +7,14 @@
 #include "runtime/Context.h"
 #include "systems/CommonTextures.h"
 #include "memory/AssetLoader.h"
+#include "core/Factory.h"
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/types/optional.hpp>
+#include <cereal/archives/json.hpp>
+#include <iostream>
+#include <fstream>
 
 #include <filesystem>
 
@@ -40,6 +48,22 @@ struct AssetTraits<Material>
 	static Resource<Material> load(AssetInfo& aInfo)
 	{
 		return {};
+	}
+
+	static void save(AssetInfo& aInfo, const Resource<Material>& mat)
+	{
+		auto projectDir = Engine::get()->getProjectDirectory();
+		std::ofstream os(projectDir + "/" + aInfo.name + ".asset");
+		cereal::JSONOutputArchive oarchive(os);
+
+		try
+		{
+			oarchive(*mat.get());
+		}
+		catch (const cereal::Exception& e)
+		{
+			logError("Serialization Error occured: {}", e.what());
+		}
 	}
 };
 
@@ -123,9 +147,19 @@ Resource<Material> Material::loadTransient(const std::string& fileLocation, cons
 	return AssetLoader<Material>::loadTransient(fileLocation, settings);
 }
 
-Resource<Material> Material::create()
+Resource<Material> Material::create(bool isTransient) // TODO rethink
 {
-	return Resource<Material>();
+	Resource<Material> mat = Factory<Material>::create();
+
+	AssetInfo aInfo;
+	aInfo.uuid = mat.getUID();
+	aInfo.aType = AssetType::MATERIAL;
+	aInfo.name = aInfo.uuid;
+	aInfo.isTransient = isTransient;
+	
+	AssetLoader<Material>::save(aInfo, mat);
+
+	return mat;
 }
 
 void Material::setTexturesInShader(Resource<Shader>& shader)
@@ -171,7 +205,7 @@ std::vector<Resource<Texture>> Material::getAllTextures() const
 
 Resource<Material> Material::clone() const
 {
-	auto newMaterial = Material::create();
+	auto newMaterial = Material::create(false); // tODO rethink this
 
 	for (const auto& sampler : m_samplers)
 	{

@@ -107,6 +107,7 @@ static const std::map<AssetType, std::string> g_assetTypeToStr
 	{ AssetType::ANIMATION,		"animations"	},
 	{ AssetType::SHADER,		"shaders"		},
 	{ AssetType::PREFAB,		"prefabs"		},
+	{ AssetType::MATERIAL,		"materials"		},
 };
 
 static std::string getAssetTypeAsStr(AssetType aType)

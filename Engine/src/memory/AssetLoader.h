@@ -5,6 +5,9 @@
 #include "Asset.h"
 #include <filesystem>
 
+// This class is responsible for all the asset work in the File I/O realm
+// it enforces a strict one way policy on how to handle assets on disk,
+// each asset is required to implement its own specifics using the AssetTraits proxy
 template<typename T>
 class AssetLoader
 {
@@ -60,5 +63,12 @@ public:
 		aInfo.filePath = fileLocation;
 
 		return AssetTraits<T>::load(aInfo);
+	}
+
+	static void save(AssetInfo& aInfo, const Resource<T>& asset)
+	{
+		AssetTraits<T>::save(aInfo, asset);
+
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 	}
 };

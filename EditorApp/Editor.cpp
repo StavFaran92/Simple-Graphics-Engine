@@ -1877,7 +1877,7 @@ static void addTextureEditWidget(Resource<Material> mat, const std::string& name
 	}
 
 	addTextureEditWidget(tex, { 20, 20 }, [=](std::string uuid) {
-		mat->setTexture(ttype, Resource<Texture>(uuid));
+		mat.get()->setTexture(ttype, Resource<Texture>(uuid));
 	});
 
 	ImGui::SameLine();

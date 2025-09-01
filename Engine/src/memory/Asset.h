@@ -32,6 +32,7 @@ struct AssetTraits {
 	static bool copyFiles(const std::string& fileLocation, AssetInfo&);
 	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo);
 	static Resource<T> load(AssetInfo& aInfo);
+	static void save(AssetInfo& aInfo, const Resource<T>& asset);
 };
 
 class Asset

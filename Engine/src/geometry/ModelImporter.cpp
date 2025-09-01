@@ -225,7 +225,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const std::st
 	{
 		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		{
-			auto& material = Material::create();
+			auto& material = Material::create(false);
 			auto& aMaterial = scene->mMaterials[i];
 
 			// get uuid using tex name from association map

@@ -2,7 +2,7 @@
 
 BuiltInMaterials::BuiltInMaterials()
 {
-	m_defaultMaterial = Material::create();
+	m_defaultMaterial = Material::create(true);
 }
 
 Resource<Material> BuiltInMaterials::getMaterial(const std::string& material)
