@@ -27,8 +27,7 @@ bool FoliageSystem::init()
 
 	ModelImportSettings settings;
 	settings.isTransient = true;
-	auto& modelInfo = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings);
-	m_grassBlade = modelInfo.mesh;
+	m_grassBlade = MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings);;
 
 	glGenBuffers(1, &m_frustumUBO);
 

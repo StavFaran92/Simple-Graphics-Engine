@@ -13,9 +13,7 @@ Entity WaterSystem::createPool()
 	auto poolQuad = Engine::get()->getContext()->getActiveScene()->createEntity("Pool");
 
 	// TODO use grid instead
-	auto quadModel = Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx"); 
-
-	poolQuad.addComponent<MeshComponent>(quadModel.mesh);
+	poolQuad.addComponent<MeshComponent>(MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx"));
 	poolQuad.addComponent<RenderableComponent>();
 
 	auto& planeTransform = poolQuad.getComponent<Transformation>();

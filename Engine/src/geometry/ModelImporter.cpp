@@ -236,7 +236,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const std::st
 			aiString diffuseStr;
 			if (aMaterial->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &diffuseStr) == aiReturn_SUCCESS)
 			{
-				std::string name = std::filesystem::path(diffuseStr.C_Str()).filename().string();
+				std::string name = std::filesystem::path(diffuseStr.C_Str()).filename().stem().string();
 				UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(name);
 				Resource<Texture> texture = Resource<Texture>(uuid);
 				material->setTexture(Texture::TextureType::Albedo, texture);
@@ -245,7 +245,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const std::st
 			aiString normalStr;
 			if (aMaterial->GetTexture(aiTextureType::aiTextureType_NORMALS, 0, &normalStr) == aiReturn_SUCCESS)
 			{
-				std::string name = std::filesystem::path(normalStr.C_Str()).filename().string();
+				std::string name = std::filesystem::path(normalStr.C_Str()).filename().stem().string();
 				UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(name);
 				Resource<Texture> texture = Resource<Texture>(uuid);
 				material->setTexture(Texture::TextureType::Normal, texture);
