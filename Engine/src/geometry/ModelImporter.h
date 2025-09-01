@@ -70,7 +70,7 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	ModelImporter::ModelInfo import(const std::string& path, ModelImportSettings settings = {});
+	//ModelImporter::ModelInfo import(const std::string& path, ModelImportSettings settings = {});
 
 	/**
 	 * Import a model from a file.

@@ -30,6 +30,8 @@ public:
 
 	static Resource<MeshCollection> import(const std::string& fileLocation, const ModelImportSettings& settings = {});
 	static Resource<MeshCollection> loadTransient(const std::string& fileLocation, const ModelImportSettings& settings = {});
+
+	static std::map<int, Resource<Material>> getLastLoadedMaterials();
 	
 
 private:

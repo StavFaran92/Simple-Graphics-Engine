@@ -69,142 +69,142 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-ModelImporter::ModelInfo ModelImporter::import(const std::string& path, ModelImportSettings settings)
-{
-	if (!std::filesystem::exists(path))
-	{
-		logError("File doesn't exists: " + path);
-		return {};
-	}
-
-	auto fileDir = std::filesystem::path(path).parent_path().string();
-	std::string fileName;
-
-	if (settings.name.empty())
-	{
-		settings.name = std::filesystem::path(path).filename().stem().string();
-	}
-
-	// read scene from file
-	const aiScene* scene = m_importer->ReadFile(path,
-		aiProcess_Triangulate | 
-		aiProcess_GenSmoothNormals | 
-		aiProcess_FlipUVs | 
-		aiProcess_CalcTangentSpace |
-		aiProcess_ValidateDataStructure);
-
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-	{
-		logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
-		return {};
-	}
-
-	ModelImporter::ModelInfo mInfo;
-
-	std::unordered_set<std::string> cachedTextures;
-
-	// Import textures
-	if (scene->HasMaterials())
-	{
-		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		{
-			auto& aMaterial = scene->mMaterials[i];
-
-			auto& diffuse = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures);
-			if (!diffuse.isEmpty())
-			{
-				mInfo.textures.push_back(diffuse);
-			}
-
-			auto& normal = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures);
-			if (!normal.isEmpty())
-			{
-				mInfo.textures.push_back(normal);
-			}
-		}
-	}
-
-
-	AssetInfo aInfo;
-
-	if (!settings.isTransient)
-	{
-		mInfo.mesh = Factory<MeshCollection>::create();
-
-		if (scene->HasTextures())
-		{
-			aiScene* strippedScene = new aiScene(*scene);
-
-			for (unsigned int i = 0; i < strippedScene->mNumMaterials; ++i)
-			{
-				aiMaterial* mat = strippedScene->mMaterials[i];
-
-				for (int t = aiTextureType_NONE + 1; t <= aiTextureType_UNKNOWN; ++t)
-				{
-					aiTextureType texType = static_cast<aiTextureType>(t);
-
-					unsigned int texCount = mat->GetTextureCount(texType);
-					for (unsigned int index = 0; index < texCount; ++index)
-					{
-						strippedScene->mTextures[index] = nullptr;
-						strippedScene->mNumTextures = 0;
-						// Remove only the texture reference (path binding)
-						//mat->RemoveProperty(AI_MATKEY_TEXTURE(texType, index));
-					}
-				}
-			}
-
-			scene = strippedScene;
-		}
-
-		// TODO I should probably copy the file instead of export (issue with GLTF and bin)
-		std::string relativeFilePath = MeshExporter::exportMesh(settings.name, mInfo.mesh, scene);
-		aInfo.filePath = relativeFilePath;
-		aInfo.origFilePath = path;
-
-		loadModelFromFile(Engine::get()->getProjectDirectory() + relativeFilePath, mInfo);
-	}
-	else
-	{
-		assert(!settings.name.empty());
-
-		mInfo.mesh = Factory<MeshCollection>::createUsingCustomUUID(settings.name);
-
-		// Formats such as obj and GLTF cause issues with the engine meshes,
-		// a hack I use is to convert the mesh on import into a DAE file (collada format)
-		// or in the case of transient mesh convert into DAE blob and load the scene from it to avoid I/O.
-		Assimp::Exporter exporter;
-		const aiExportDataBlob* blob = exporter.ExportToBlob(scene, "collada");
-		scene = m_importer->ReadFileFromMemory(blob->data, blob->size, 0);
-		aInfo.isTransient = true;
-
-		loadModelFromAssimpScene(scene, path, mInfo);
-		exporter.FreeBlob();
-	}
-	
-	// Add asset
-	aInfo.uuid = mInfo.mesh.getUID();
-	aInfo.aType = AssetType::MESH;
-	aInfo.name = settings.name;
-
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-
-#if 0 // display AABB for models
-	for (auto& mesh : mInfo.mesh.get()->getMeshes())
-	{
-
-		auto aabb = mesh->getAABB();
-
-		auto aabbEnt = ShapeFactory::createBox(&Engine::get()->getContext()->getActiveScene()->getRegistry());
-
-		auto& aabbTransform = aabbEnt.getComponent<Transformation>();
-		aabbTransform.scale(aabb.extents.x, aabb.extents.y, aabb.extents.z);
-		aabbTransform.translate(aabb.center.x, aabb.center.y, aabb.center.z);
-	}
-#endif 
-
-	return mInfo;
-}
+//ModelImporter::ModelInfo ModelImporter::import(const std::string& path, ModelImportSettings settings)
+//{
+//	if (!std::filesystem::exists(path))
+//	{
+//		logError("File doesn't exists: " + path);
+//		return {};
+//	}
+//
+//	auto fileDir = std::filesystem::path(path).parent_path().string();
+//	std::string fileName;
+//
+//	if (settings.name.empty())
+//	{
+//		settings.name = std::filesystem::path(path).filename().stem().string();
+//	}
+//
+//	// read scene from file
+//	const aiScene* scene = m_importer->ReadFile(path,
+//		aiProcess_Triangulate | 
+//		aiProcess_GenSmoothNormals | 
+//		aiProcess_FlipUVs | 
+//		aiProcess_CalcTangentSpace |
+//		aiProcess_ValidateDataStructure);
+//
+//	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+//	{
+//		logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
+//		return {};
+//	}
+//
+//	ModelImporter::ModelInfo mInfo;
+//
+//	std::unordered_set<std::string> cachedTextures;
+//
+//	// Import textures
+//	if (scene->HasMaterials())
+//	{
+//		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+//		{
+//			auto& aMaterial = scene->mMaterials[i];
+//
+//			auto& diffuse = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures);
+//			if (!diffuse.isEmpty())
+//			{
+//				mInfo.textures.push_back(diffuse);
+//			}
+//
+//			auto& normal = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures);
+//			if (!normal.isEmpty())
+//			{
+//				mInfo.textures.push_back(normal);
+//			}
+//		}
+//	}
+//
+//
+//	AssetInfo aInfo;
+//
+//	if (!settings.isTransient)
+//	{
+//		mInfo.mesh = Factory<MeshCollection>::create();
+//
+//		if (scene->HasTextures())
+//		{
+//			aiScene* strippedScene = new aiScene(*scene);
+//
+//			for (unsigned int i = 0; i < strippedScene->mNumMaterials; ++i)
+//			{
+//				aiMaterial* mat = strippedScene->mMaterials[i];
+//
+//				for (int t = aiTextureType_NONE + 1; t <= aiTextureType_UNKNOWN; ++t)
+//				{
+//					aiTextureType texType = static_cast<aiTextureType>(t);
+//
+//					unsigned int texCount = mat->GetTextureCount(texType);
+//					for (unsigned int index = 0; index < texCount; ++index)
+//					{
+//						strippedScene->mTextures[index] = nullptr;
+//						strippedScene->mNumTextures = 0;
+//						// Remove only the texture reference (path binding)
+//						//mat->RemoveProperty(AI_MATKEY_TEXTURE(texType, index));
+//					}
+//				}
+//			}
+//
+//			scene = strippedScene;
+//		}
+//
+//		// TODO I should probably copy the file instead of export (issue with GLTF and bin)
+//		std::string relativeFilePath = MeshExporter::exportMesh(settings.name, mInfo.mesh, scene);
+//		aInfo.filePath = relativeFilePath;
+//		aInfo.origFilePath = path;
+//
+//		loadModelFromFile(Engine::get()->getProjectDirectory() + relativeFilePath, mInfo);
+//	}
+//	else
+//	{
+//		assert(!settings.name.empty());
+//
+//		mInfo.mesh = Factory<MeshCollection>::createUsingCustomUUID(settings.name);
+//
+//		// Formats such as obj and GLTF cause issues with the engine meshes,
+//		// a hack I use is to convert the mesh on import into a DAE file (collada format)
+//		// or in the case of transient mesh convert into DAE blob and load the scene from it to avoid I/O.
+//		Assimp::Exporter exporter;
+//		const aiExportDataBlob* blob = exporter.ExportToBlob(scene, "collada");
+//		scene = m_importer->ReadFileFromMemory(blob->data, blob->size, 0);
+//		aInfo.isTransient = true;
+//
+//		loadModelFromAssimpScene(scene, path, mInfo);
+//		exporter.FreeBlob();
+//	}
+//	
+//	// Add asset
+//	aInfo.uuid = mInfo.mesh.getUID();
+//	aInfo.aType = AssetType::MESH;
+//	aInfo.name = settings.name;
+//
+//	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+//
+//#if 0 // display AABB for models
+//	for (auto& mesh : mInfo.mesh.get()->getMeshes())
+//	{
+//
+//		auto aabb = mesh->getAABB();
+//
+//		auto aabbEnt = ShapeFactory::createBox(&Engine::get()->getContext()->getActiveScene()->getRegistry());
+//
+//		auto& aabbTransform = aabbEnt.getComponent<Transformation>();
+//		aabbTransform.scale(aabb.extents.x, aabb.extents.y, aabb.extents.z);
+//		aabbTransform.translate(aabb.center.x, aabb.center.y, aabb.center.z);
+//	}
+//#endif 
+//
+//	return mInfo;
+//}
 
 void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo)
 {

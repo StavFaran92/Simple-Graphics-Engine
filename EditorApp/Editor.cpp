@@ -1165,11 +1165,13 @@ void ShowModelCreatorWindow()
 	auto mesh = MeshCollection::import(modelPathBuffer.c_str());
 	entity.addComponent<MeshComponent>().mesh = mesh;
 
-	//auto& materialComponent = entity.addComponent<MaterialComponent>();
-	//for(auto& [idx, m] : modelInfo.materials)
-	//{
-	//	materialComponent.setMaterial(idx, m);
-	//}
+	auto& materials = MeshCollection::getLastLoadedMaterials();
+
+	auto& materialComponent = entity.addComponent<MaterialComponent>();
+	for(auto& [idx, m] : materials)
+	{
+		materialComponent.setMaterial(idx, m);
+	}
 
 	modelPathBuffer.clear();
 

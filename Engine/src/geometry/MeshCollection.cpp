@@ -50,10 +50,19 @@ struct AssetTraits<MeshCollection>
 			filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
 		}
 		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
+		m_lastLoadedModelInfo = mInfo;
 		return generatedMesh;
 
 		//return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 	}
+
+	static std::map<int, Resource<Material>> getLoadedMaterials()
+	{
+		return m_lastLoadedModelInfo.materials;
+	}
+
+private:
+	static inline ModelImporter::ModelInfo m_lastLoadedModelInfo;
 };
 
 static AssetFnRegister<AssetType::MESH> textureAssetRegister(AssetTraits<MeshCollection>::load);
@@ -119,6 +128,11 @@ Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation,
 Resource<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, const ModelImportSettings& settings)
 {
 	return AssetLoader<MeshCollection>::loadTransient(fileLocation, settings);
+}
+
+std::map<int, Resource<Material>> MeshCollection::getLastLoadedMaterials()
+{
+	return AssetTraits<MeshCollection>::getLoadedMaterials();
 }
 
 //Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImporter::ModelImportSettings& settings)

@@ -67,7 +67,10 @@ public:
 
 	static void save(AssetInfo& aInfo, const Resource<T>& asset)
 	{
-		AssetTraits<T>::save(aInfo, asset);
+		if (!aInfo.isTransient)
+		{
+			AssetTraits<T>::save(aInfo, asset);
+		}
 
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 	}
