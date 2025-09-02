@@ -39,17 +39,7 @@ struct AssetTraits<MeshCollection>
 		Resource<MeshCollection> generatedMesh(uuid);
 		ModelImporter::ModelInfo mInfo;
 		mInfo.mesh = generatedMesh;
-		//Engine::get()->getResourceManager()->incRef(uuid);
-		std::string filepath;
-		if (aInfo.isTransient)
-		{
-			filepath = aInfo.filePath;
-		}
-		else
-		{
-			filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-		}
-		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
+		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
 		m_lastLoadedModelInfo = mInfo;
 		return generatedMesh;
 

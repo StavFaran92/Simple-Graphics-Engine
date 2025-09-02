@@ -206,15 +206,14 @@ ModelImporter::ModelImporter()
 //	return mInfo;
 //}
 
-void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const std::string& path, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string modelName = std::filesystem::path(path).filename().string();
-	modelName = modelName.substr(0, modelName.find_first_of('.'));
+	std::string modelName = std::filesystem::path(aInfo.filePath).filename().stem().string();
 
 	// create new model session
 	ModelImporter::ModelImportSession session;
-	session.filepath = path;
-	session.fileDir = std::filesystem::path(path).parent_path().string();
+	session.filepath = aInfo.filePath;
+	session.fileDir = std::filesystem::path(aInfo.filePath).parent_path().string();
 	session.name = modelName;
 	session.mesh = modelInfo.mesh;
 
@@ -225,7 +224,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const std::st
 	{
 		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		{
-			auto& material = Material::create(false);
+			auto& material = Material::create(aInfo.isTransient);
 			auto& aMaterial = scene->mMaterials[i];
 
 			// get uuid using tex name from association map
@@ -261,18 +260,28 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const std::st
 	}
 }
 
-ModelImporter::ModelInfo ModelImporter::loadModelFromFile(const std::string & path, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromFile(AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
-	if (!std::filesystem::exists(path))
+	std::string filepath;
+	if (aInfo.isTransient)
 	{
-		logError("File doesn't exists: " + path);
-		return {};
+		filepath = aInfo.filePath;
+	}
+	else
+	{
+		filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	}
+
+	if (!std::filesystem::exists(filepath))
+	{
+		logError("File doesn't exists: " + filepath);
+		return;
 	}
 
 	const aiScene* scene = nullptr;
 
 	// If the scene was previously loaded last, we can optimize the load since it is already in memory.
-	if (path == m_lastLoadedSceneName)
+	if (filepath == m_lastLoadedSceneName)
 	{
 		scene = m_importer->GetScene();
 	}
@@ -280,20 +289,18 @@ ModelImporter::ModelInfo ModelImporter::loadModelFromFile(const std::string & pa
 	{
 
 		// read scene from file
-		scene = m_importer->ReadFile(path, aiProcess_ValidateDataStructure);
+		scene = m_importer->ReadFile(filepath, aiProcess_ValidateDataStructure);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
-			return {};
+			return;
 		}
 	}
 
-	m_lastLoadedSceneName = path;
+	m_lastLoadedSceneName = filepath;
 
-	loadModelFromAssimpScene(scene, path, modelInfo);
-
-	return modelInfo;
+	loadModelFromAssimpScene(scene, aInfo, modelInfo);
 }
 
 bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
