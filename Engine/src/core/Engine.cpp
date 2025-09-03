@@ -562,7 +562,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     settings.name = "SGE_MAIN_CAMERA";
     mainCamera.addComponent<MeshComponent>(MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings));
     mainCamera.addComponent<RenderableComponent>();
-    mainCamera.addComponent<MaterialComponent>();
+    //mainCamera.addComponent<MaterialComponent>();
 
     //for (auto& [idx, m] : modelInfo.materials)
     //{

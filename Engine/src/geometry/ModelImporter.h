@@ -31,7 +31,6 @@ namespace Assimp
 
 struct ModelImportSettings : public BaseAssetParameters
 {
-	std::string name;
 	bool isTransient = false;
 };
 
