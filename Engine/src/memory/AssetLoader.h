@@ -65,7 +65,14 @@ public:
 
 		AssetInfo aInfo;
 		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, settings, aInfo);
-		aInfo.uuid = uuid::generate_uuid_v4();
+		if (settings.customUUID.empty())
+		{
+			aInfo.uuid = uuid::generate_uuid_v4();
+		}
+		else
+		{
+			aInfo.uuid = settings.customUUID;
+		}
 		aInfo.isTransient = true;
 		aInfo.filePath = fileLocation;
 
