@@ -147,17 +147,28 @@ Resource<Material> Material::loadTransient(const std::string& fileLocation, cons
 	return AssetLoader<Material>::loadTransient(fileLocation, settings);
 }
 
-Resource<Material> Material::create(bool isTransient) // TODO rethink
+Resource<Material> Material::create(AssetInfo& aInfo)
 {
-	Resource<Material> mat = Factory<Material>::create();
+	Resource<Material> mat;
 
-	AssetInfo aInfo;
-	aInfo.uuid = mat.getUID();
 	aInfo.aType = AssetType::MATERIAL;
-	aInfo.name = aInfo.uuid;
-	aInfo.isTransient = isTransient;
+	
+	if (!aInfo.name.empty())
+	{
+		mat = Factory<Material>::createUsingCustomUUID(aInfo.name);
+	}
+	else
+	{
+		mat = Factory<Material>::create();
+		aInfo.name = mat.getUID();
+	}
+
+	aInfo.uuid = mat.getUID();
+	aInfo.isTransient = aInfo.isTransient;
 	
 	AssetLoader<Material>::save(aInfo, mat);
+
+	mat.get()->m_assetInfo = aInfo;
 
 	return mat;
 }
@@ -205,7 +216,10 @@ std::vector<Resource<Texture>> Material::getAllTextures() const
 
 Resource<Material> Material::clone() const
 {
-	auto newMaterial = Material::create(false); // tODO rethink this
+	AssetInfo clonedAssetInfo;
+	clonedAssetInfo.attributes = m_assetInfo.attributes;
+	clonedAssetInfo.isTransient = m_assetInfo.isTransient;
+	auto newMaterial = Material::create(clonedAssetInfo); // tODO rethink this
 
 	for (const auto& sampler : m_samplers)
 	{

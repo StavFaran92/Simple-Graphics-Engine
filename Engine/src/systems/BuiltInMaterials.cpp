@@ -2,7 +2,10 @@
 
 BuiltInMaterials::BuiltInMaterials()
 {
-	m_defaultMaterial = Material::create(true);
+	AssetInfo aInfo;
+	aInfo.isTransient = true;
+	aInfo.name = "SGE_MATERIAL_DEFAULT";
+	m_defaultMaterial = Material::create(aInfo);
 }
 
 Resource<Material> BuiltInMaterials::getMaterial(const std::string& material)

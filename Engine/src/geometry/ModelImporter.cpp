@@ -224,10 +224,13 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 	{
 		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		{
-			auto& material = Material::create(aInfo.isTransient);
 			auto& aMaterial = scene->mMaterials[i];
 
 			// get uuid using tex name from association map
+			AssetInfo materialAssetInfo;
+			materialAssetInfo.isTransient = aInfo.isTransient;
+			materialAssetInfo.name = aMaterial->GetName().C_Str();
+			auto& material = Material::create(materialAssetInfo);
 			material->setName(aMaterial->GetName().C_Str());
 
 			// load texture

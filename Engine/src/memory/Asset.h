@@ -55,4 +55,7 @@ public:
 	static Resource<T> load(AssetInfo& aInfo) {
 		return T::load(aInfo);
 	}
+
+protected:
+	AssetInfo m_assetInfo;
 };
