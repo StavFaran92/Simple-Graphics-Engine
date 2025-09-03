@@ -51,6 +51,15 @@ BuiltInMeshes::BuiltInMeshes()
 		addAsAsset(meshCollection);
 		m_meshes[MeshType::GRID] = meshCollection;
 	}
+
+	{
+		//Resource<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_CAMERA");
+		ModelImportSettings settings;
+		settings.customUUID = "SGE_MESH_CAMERA";
+		Resource<MeshCollection> meshCollection = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings);
+		addAsAsset(meshCollection);
+		m_meshes[MeshType::CAMERA] = meshCollection;
+	}
 }
 
 BuiltInMeshes::~BuiltInMeshes()

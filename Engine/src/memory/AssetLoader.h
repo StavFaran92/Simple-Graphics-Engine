@@ -23,7 +23,14 @@ public:
 
 		// Data extract
 		AssetInfo aInfo;
-		aInfo.uuid = uuid::generate_uuid_v4();
+		if (params.customUUID.empty())
+		{
+			aInfo.uuid = uuid::generate_uuid_v4();
+		}
+		else
+		{
+			aInfo.uuid = params.customUUID;
+		}
 		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
 
 		// Copy + Paste

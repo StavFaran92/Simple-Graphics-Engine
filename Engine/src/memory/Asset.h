@@ -8,6 +8,7 @@
 struct BaseAssetParameters
 {
 	std::string name;
+	UUID customUUID;
 
 	virtual ~BaseAssetParameters() = default;
 };

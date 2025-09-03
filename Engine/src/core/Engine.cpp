@@ -473,12 +473,6 @@ MemoryPool<Asset>& Engine::getMemoryPool() const
 void Engine::loadProject(const std::string& dirPath)
 {
     m_projectDirectory = dirPath;
-
-    // This is a shit hack I must fix,
-    // I cannot put camera in built in meshes since it also containts material and texture data I need.
-    ModelImportSettings settings;
-    settings.name = "SGE_MAIN_CAMERA";
-    MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings);
     
     m_projectManager->loadProject(getContext()->getProjectAssetRegistry()->getFilepath(), m_context);
 }
@@ -556,18 +550,8 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.getComponent<Transformation>().setLocalPosition({10,10,10});
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
-
-    ModelImportSettings settings;
-    settings.isTransient = true;
-    settings.name = "SGE_MAIN_CAMERA";
-    mainCamera.addComponent<MeshComponent>(MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings));
+    mainCamera.addComponent<MeshComponent>(Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::CAMERA));
     mainCamera.addComponent<RenderableComponent>();
-    //mainCamera.addComponent<MaterialComponent>();
-
-    //for (auto& [idx, m] : modelInfo.materials)
-    //{
-    //    materialComponent.setMaterial(idx, m);
-    //}
 
     m_context->getActiveScene()->setGameCamera(mainCamera);
 
