@@ -51,6 +51,7 @@ public:
 	static Resource<Material> import(const std::string& fileLocation, const MaterialImportSettings& settings = {});
 	static Resource<Material> loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings = {});
 	static Resource<Material> create(AssetInfo& aInfo);
+	static void save(const Resource<Material>& material);
 
 protected:
 	void setTexturesInShader(Resource<Shader>& shader);

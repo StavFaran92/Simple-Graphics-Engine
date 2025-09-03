@@ -259,6 +259,8 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 			{
 				modelInfo.materials[i] = material;
 			}
+
+			Material::save(material);
 		}
 	}
 }

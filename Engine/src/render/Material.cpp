@@ -173,6 +173,11 @@ Resource<Material> Material::create(AssetInfo& aInfo)
 	return mat;
 }
 
+void Material::save(const Resource<Material>& material)
+{
+	AssetLoader<Material>::save(material.get()->m_assetInfo, material);
+}
+
 void Material::setTexturesInShader(Resource<Shader>& shader)
 {
 	// It either has diffuse or albedo
