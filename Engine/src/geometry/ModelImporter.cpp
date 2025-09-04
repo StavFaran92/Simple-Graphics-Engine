@@ -226,41 +226,9 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
-			// get uuid using tex name from association map
-			AssetInfo materialAssetInfo;
-			materialAssetInfo.isTransient = aInfo.isTransient;
-			materialAssetInfo.name = aMaterial->GetName().C_Str();
-			auto& material = Material::create(materialAssetInfo);
-			material->setName(aMaterial->GetName().C_Str());
-
-			// load texture
-
-			aiString diffuseStr;
-			if (aMaterial->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0, &diffuseStr) == aiReturn_SUCCESS)
-			{
-				std::string name = std::filesystem::path(diffuseStr.C_Str()).filename().stem().string();
-				UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(name);
-				Resource<Texture> texture = Resource<Texture>(uuid);
-				material->setTexture(Texture::TextureType::Albedo, texture);
-			}
-
-			aiString normalStr;
-			if (aMaterial->GetTexture(aiTextureType::aiTextureType_NORMALS, 0, &normalStr) == aiReturn_SUCCESS)
-			{
-				std::string name = std::filesystem::path(normalStr.C_Str()).filename().stem().string();
-				UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(name);
-				Resource<Texture> texture = Resource<Texture>(uuid);
-				material->setTexture(Texture::TextureType::Normal, texture);
-
-
-			}
-
-			if (material->getAllTextures().size() > 0)
-			{
-				modelInfo.materials[i] = material;
-			}
-
-			Material::save(material);
+			UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(aMaterial->GetName().C_Str());
+			Resource<Material> material = Resource<Material>(uuid);
+			modelInfo.materials[i] = material;
 		}
 	}
 }
@@ -335,17 +303,26 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
+			// get uuid using tex name from association map
+			AssetInfo materialAssetInfo;
+			materialAssetInfo.isTransient = aInfo.isTransient;
+			materialAssetInfo.name = aMaterial->GetName().C_Str();
+			auto& material = Material::create(materialAssetInfo);
+			material->setName(aMaterial->GetName().C_Str());
+
 			auto& diffuse = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures);
-			//if (!diffuse.isEmpty())
-			//{
-			//	mInfo.textures.push_back(diffuse);
-			//}
+			if (!diffuse.isEmpty())
+			{
+				material->setTexture(Texture::TextureType::Albedo, diffuse);
+			}
 
 			auto& normal = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures);
-			//if (!normal.isEmpty())
-			//{
-			//	mInfo.textures.push_back(normal);
-			//}
+			if (!normal.isEmpty())
+			{
+				material->setTexture(Texture::TextureType::Normal, normal);
+			}
+
+			Material::save(material);
 		}
 	}
 
