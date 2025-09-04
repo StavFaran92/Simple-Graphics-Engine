@@ -295,7 +295,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 		return false;
 	}
 
-	std::unordered_set<std::string> cachedTextures;
+	std::unordered_map<std::string, Resource<Texture>> cachedTextures;
 
 	// Import textures
 	if (scene->HasMaterials())
@@ -525,7 +525,7 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 
 
 
-Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_set<std::string>& cachedTextures)
+Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, Resource<Texture>>& cachedTextures)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
@@ -542,12 +542,12 @@ Resource<Texture> ModelImporter::importAiMaterialTexture(aiMaterial* mat, aiText
 	if (cachedTextures.find(path) != cachedTextures.end())
 	{
 		// Already loaded
-		return Resource<Texture>::empty;
+		return cachedTextures[path];
 	}
 
 	auto texture = Texture::import(path);
 
-	cachedTextures.insert(path);
+	cachedTextures.insert({ path, texture });
 
 	return texture;
 }
