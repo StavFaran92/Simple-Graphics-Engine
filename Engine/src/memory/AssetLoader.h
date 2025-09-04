@@ -83,9 +83,10 @@ public:
 	{
 		if (!aInfo.isTransient)
 		{
+			aInfo.filePath = "/" + aInfo.name + ".asset";
 			AssetTraits<T>::save(aInfo, asset);
 		}
 
-		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+		Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
 	}
 };

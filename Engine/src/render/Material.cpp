@@ -47,13 +47,30 @@ struct AssetTraits<Material>
 
 	static Resource<Material> load(AssetInfo& aInfo)
 	{
-		return {};
+		auto projectDir = Engine::get()->getProjectDirectory();
+		std::ifstream is(projectDir + aInfo.filePath);
+		cereal::JSONInputArchive iarchive(is);
+		Material* loadedMaterial = new Material();
+
+		try
+		{
+			iarchive(*loadedMaterial);
+			Engine::get()->getMemoryPool().add(aInfo.uuid, loadedMaterial);
+			return Resource<Material>(aInfo.uuid);
+
+		}
+		catch (const cereal::Exception& e)
+		{
+			logError("Deserialization Error occured: {}", e.what());
+		}
+
+		return Resource<Material>::empty;
 	}
 
 	static void save(AssetInfo& aInfo, const Resource<Material>& mat)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ofstream os(projectDir + "/" + aInfo.name + ".asset");
+		std::ofstream os(projectDir + aInfo.filePath);
 		cereal::JSONOutputArchive oarchive(os);
 
 		try

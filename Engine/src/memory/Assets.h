@@ -39,6 +39,8 @@ public:
 
 	AssetInfo addAsset(AssetInfo& assetInfo);
 
+	AssetInfo updateAsset(AssetInfo& assetInfo);
+
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 
 	std::vector<AssetInfo> getAllAssets() const;

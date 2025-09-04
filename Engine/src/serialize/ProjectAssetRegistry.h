@@ -23,6 +23,7 @@ public:
 	void save();
 	//void addTexture(Resource<Texture> texture);
 	void addAssetRegistry(AssetInfo asset);
+	void updateAssetRegistry(AssetInfo asset);
 	void addAssociation(std::string name, UUID uuid);
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 	std::vector<AssetInfo> getAllAssets() const;

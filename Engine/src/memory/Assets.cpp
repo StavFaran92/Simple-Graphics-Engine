@@ -192,3 +192,17 @@ std::string Assets::getAlias(UUID uid) const
 	return "N/A";
 
 }
+
+AssetInfo Assets::updateAsset(AssetInfo& aInfo)
+{
+	if (!aInfo.isTransient)
+	{
+		Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
+	}
+
+	m_assets[aInfo.name] = aInfo;
+
+	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
+
+	return aInfo;
+}

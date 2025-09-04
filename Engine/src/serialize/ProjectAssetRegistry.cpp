@@ -125,6 +125,23 @@ void ProjectAssetRegistry::addAssetRegistry(AssetInfo asset)
 	sync();
 }
 
+void ProjectAssetRegistry::updateAssetRegistry(AssetInfo asset)
+{
+	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
+	for (auto& aReg : m_assetRegistry[assetTypeName])
+	{
+		std::string uuid = aReg.at("uuid").get<std::string>();
+		if (uuid == asset.uuid)
+		{
+			to_json(aReg, asset);
+			sync();
+			return;
+		}
+	}
+
+	addAssetRegistry(asset);
+}
+
 void ProjectAssetRegistry::addAssociation(std::string name, UUID uuid)
 {
 	m_assetRegistry["association"].push_back({ name, uuid });
