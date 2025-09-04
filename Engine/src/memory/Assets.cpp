@@ -155,10 +155,10 @@ void Assets::load()
 
 	std::vector<AssetInfo> assets = par->getAllAssets();
 
-	for (const auto& asset : assets)
+	for (auto& assetInfo : assets)
 	{
-		AssetFactory::loadAsset(asset);
-		m_assets[asset.name] = asset;
+		AssetFactory::loadAsset(assetInfo);
+		m_assets[assetInfo.name] = assetInfo;
 	}
 }
 

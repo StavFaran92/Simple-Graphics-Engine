@@ -226,8 +226,9 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
+			std::string matName = aMaterial->GetName().C_Str();
 			UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(aMaterial->GetName().C_Str());
-			Resource<Material> material = Resource<Material>(uuid);
+			Resource<Material> material = Resource<Material>(matName);
 			modelInfo.materials[i] = material;
 		}
 	}

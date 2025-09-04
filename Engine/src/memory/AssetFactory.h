@@ -5,9 +5,9 @@
 class AssetFactory
 {
 public:
-	using LoadFn = std::function<void(AssetInfo)>;
+	using LoadFn = std::function<Resource<Asset>(AssetInfo&)>;
 
-	static bool loadAsset(AssetInfo aInfo);
+	static bool loadAsset(AssetInfo& aInfo);
 
 	static void registerLoadFunc(AssetType aType, const LoadFn& fn);
 

@@ -87,6 +87,9 @@ public:
 			AssetTraits<T>::save(aInfo, asset);
 		}
 
+		aInfo.data = asset;
+
 		Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
+
 	}
 };

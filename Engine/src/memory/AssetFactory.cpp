@@ -2,7 +2,7 @@
 
 //std::map<AssetType, AssetFactory::LoadFn> AssetFactory::loadFunctionsRegistry;
 
-bool AssetFactory::loadAsset(AssetInfo aInfo)
+bool AssetFactory::loadAsset(AssetInfo& aInfo)
 {
 	auto iter = getLoadFunctionRegistry().find(aInfo.aType);
 	if (iter == getLoadFunctionRegistry().end())
@@ -10,7 +10,7 @@ bool AssetFactory::loadAsset(AssetInfo aInfo)
 		logError("Invalid asset type in regsitry, did you forget to register your load function?");
 		return false;
 	}
-	iter->second(aInfo);
+	aInfo.data = iter->second(aInfo);
 
 	return true;
 }
