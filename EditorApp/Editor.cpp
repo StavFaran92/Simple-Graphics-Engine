@@ -1258,6 +1258,13 @@ void displayEntityHelper(Entity& e)
 				selectedEntityRename = true;
 			}
 
+			if (ImGui::MenuItem("Create Prefab"))
+			{
+				AssetInfo aInfo;
+				aInfo.name = "test";
+				Prefab::create(state.getSelectedEntity(), aInfo);
+			}
+
 			if (e.HasComponent<CameraComponent>())
 			{
 				if (ImGui::MenuItem("Set as Primary Camera"))
@@ -2847,7 +2854,6 @@ void RenderAssetViewWindow() {
 		// Double click to open
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 		{
-
 		}
 		
 		
