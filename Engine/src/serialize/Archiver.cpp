@@ -30,12 +30,14 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	return serializedEntity;
 }
 
-void Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
+Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 {
 	auto e = scene.getRegistry().getRegistry().create(serializedEnt.entity);
 	auto entityHandler = Entity(e, &scene.getRegistry());
 
 	ComponentSerializer::deserializeComponents(serializedEnt.components, entityHandler, scene);
+
+	return entityHandler;
 
 }
 

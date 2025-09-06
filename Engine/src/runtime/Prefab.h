@@ -15,7 +15,7 @@ public:
 	static Resource<Prefab> loadTransient(const std::string& fileLocation, const PrefabImportSettings& settings);
 	static Resource<Prefab> create(const Entity& e, AssetInfo& aInfo);
 
-	Entity Instansiate();
+	void Instansiate();
 
 	template <class Archive>
 	void serialize(Archive& archive) {

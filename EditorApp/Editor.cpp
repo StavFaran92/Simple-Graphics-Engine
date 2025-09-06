@@ -1262,7 +1262,11 @@ void displayEntityHelper(Entity& e)
 			{
 				AssetInfo aInfo;
 				aInfo.name = "test";
-				Prefab::create(state.getSelectedEntity(), aInfo);
+				auto prefab = Prefab::create(state.getSelectedEntity(), aInfo);
+
+				prefab->Instansiate();
+				updateScene();
+
 			}
 
 			if (e.HasComponent<CameraComponent>())

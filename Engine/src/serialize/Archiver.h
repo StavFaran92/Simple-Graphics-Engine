@@ -121,7 +121,7 @@ public:
 
 	static SerializedEntity serializeEntity(Entity e);
 
-	static void deserializeEntity(SerializedEntity serializedEnt, Scene& scene);
+	static Entity deserializeEntity(SerializedEntity serializedEnt, Scene& scene);
 
 	static SerializedScene serializeScene(Scene* scene);
 

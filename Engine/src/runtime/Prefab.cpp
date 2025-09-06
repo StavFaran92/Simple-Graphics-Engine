@@ -11,6 +11,7 @@
 
 #include "memory/AssetLoader.h"
 #include "core/Factory.h"
+#include "component/ObjectComponent.h"
 
 template<>
 struct AssetTraits<Prefab>
@@ -118,7 +119,9 @@ Resource<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
 	return prefab;
 }
 
-Entity Prefab::Instansiate()
+void Prefab::Instansiate()
 {
-	return Entity();
+	auto& e = Archiver::deserializeEntity(m_serializedPrefab, *Engine::get()->getContext()->getActiveScene());
+	e.getComponent<ObjectComponent>().name = "test";
+	e.getComponent<ObjectComponent>().e = e;
 }
