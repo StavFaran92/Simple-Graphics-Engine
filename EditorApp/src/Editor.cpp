@@ -122,17 +122,6 @@ void AddColoredLabel(const char* label);
 static void displayTransformation(Transformation& transform, bool& isChanged);
 static void displaySelectMeshWindow();
 
-// Define a structure to represent an object in the scene hierarchy
-struct SceneObject {
-	std::string name;
-	Entity e;
-	// Add any other properties as needed
-};
-
-// Define a vector to store scene objects
-std::vector<SceneObject> sceneObjects
-{};
-
 struct EntityState
 {
 	Entity e;
@@ -771,15 +760,6 @@ static void displaySelectShaderWindow(std::string& uuid)
 	}
 }
 
-void updateScene()
-{
-	sceneObjects.clear();
-	for (auto&& [entity, obj] : Engine::get()->getContext()->getActiveScene()->getRegistry().get().view<ObjectComponent>().each())
-	{
-		sceneObjects.emplace_back(SceneObject{ obj.name, obj.e });
-	}
-}
-
 
 
 void AddColoredLabel(const char* label) 
@@ -1255,11 +1235,6 @@ void displayEntityHelper(Entity& e)
 				AssetInfo aInfo;
 				aInfo.name = assetName;
 				auto prefab = Prefab::create(state.getSelectedEntity(), aInfo);
-
-				// TODO remove - simply here for testing
-				prefab->Instansiate();
-				updateScene();
-
 			}
 
 			if (e.HasComponent<CameraComponent>())
