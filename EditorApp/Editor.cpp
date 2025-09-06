@@ -1260,8 +1260,10 @@ void displayEntityHelper(Entity& e)
 
 			if (ImGui::MenuItem("Create Prefab"))
 			{
+				std::string assetName = state.getSelectedEntity().getComponent<ObjectComponent>().name;
+
 				AssetInfo aInfo;
-				aInfo.name = "test";
+				aInfo.name = assetName;
 				auto prefab = Prefab::create(state.getSelectedEntity(), aInfo);
 
 				prefab->Instansiate();

@@ -122,6 +122,11 @@ Resource<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
 void Prefab::Instansiate()
 {
 	auto& e = Archiver::deserializeEntity(m_serializedPrefab, *Engine::get()->getContext()->getActiveScene());
-	e.getComponent<ObjectComponent>().name = "test";
+	std::string newName = e.getComponent<ObjectComponent>().name;
+	newName += "_copy";
+
+	// Todo - validate name is not taken
+
+	e.getComponent<ObjectComponent>().name = newName;
 	e.getComponent<ObjectComponent>().e = e;
 }
