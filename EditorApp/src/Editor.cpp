@@ -1143,6 +1143,12 @@ void ShowModelCreatorWindow()
 		materialComponent.setMaterial(idx, m);
 	}
 
+	AssetInfo aInfo;
+	aInfo.name = modelName;
+	Prefab::create(entity, aInfo);
+
+	entity.remove();
+
 	modelPathBuffer.clear();
 
 	updateScene();
