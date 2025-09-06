@@ -21,6 +21,9 @@
 #include <vector>
 #include <mutex>
 
+#include "Common.h"
+#include "AssetViewWindow.h"
+
 #define BEGIN_IMGUI_TABLE(name) \
 	if (ImGui::BeginTable(name, 2, ImGuiTableFlags_None)) { \
 	ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch, 0.4f); \
@@ -29,9 +32,6 @@
 #define END_IMGUI_TABLE() ImGui::EndTable(); };
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
-
-static std::unordered_map<std::string, Resource<Texture>> icons;
-
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 
 namespace fs = std::filesystem;
@@ -104,16 +104,6 @@ static ConsoleLoggerRegister clr;
 
 static std::string selectedTextureName;
 static bool showTextureDisplayWindow = false;
-
-
-
-static const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | 
-											ImGuiWindowFlags_NoCollapse | 
-											ImGuiWindowFlags_NoFocusOnAppearing | 
-											ImGuiWindowFlags_NoTitleBar | 
-											ImGuiWindowFlags_NoScrollbar | 
-											ImGuiWindowFlags_NoScrollWithMouse |
-											ImGuiWindowFlags_NoMove;
 
 Entity g_primaryCamera;
 Entity g_editorCamera;
@@ -2700,176 +2690,6 @@ void RenderInspectorWindow()
 	ImGui::End();
 }
 
-void RenderAssetViewWindow() {
-	auto assets = Engine::get()->getSubSystem<Assets>();
-
-	ImGui::Begin("Asset View", nullptr, windowFlags);
-
-	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
-
-	bool canGoBack = cwd != Engine::get()->getProjectDirectory();
-
-	if (!canGoBack)
-	{
-		// Make button look disabled
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f); // 50% transparency
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Gray color
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
-	}
-
-	// Back button
-	bool clicked = ImGui::Button("<-", ImVec2(30, 30));
-
-	// Restore style if it was pushed
-	if (!canGoBack)
-	{
-		ImGui::PopStyleColor(3);
-		ImGui::PopStyleVar();
-	}
-
-	// Only handle click if it's allowed
-	if (clicked && canGoBack)
-	{
-		cwd = cwd.parent_path();
-	}
-
-
-	ImGui::SameLine();
-
-	// Header (fixed at top)
-	ImGui::SetWindowFontScale(1.3f);
-	ImGui::Text("%s", cwd.string().c_str());
-	ImGui::SetWindowFontScale(1.0f);
-	ImGui::Separator();
-
-	// Scrollable region
-	ImGui::BeginChild("FileBrowserScrollingRegion", ImVec2(0, 0), false);
-
-	// Start grid layout
-	const float thumbnailSize = 64.0f;
-	const float padding = 16.0f;
-	const int columns = 6; // number of thumbnails per row
-
-	ImGui::Columns(columns, nullptr, false); // begin columns
-
-	for (const auto& entry : std::filesystem::directory_iterator(cwd))
-	{
-		const std::string filenameFull = entry.path().filename().string();
-
-		std::string filename = entry.path().stem().string();
-
-		if (entry.is_directory())
-		{
-			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
-
-			std::string dirName = "[Dir] " + filename;
-			// Create a small icon
-
-			unsigned int iconID = icons.at("folder")->getID();
-			ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
-			ImGui::SameLine();
-
-			// Draw filename and small info
-			ImGui::Text("%s", dirName.c_str());
-
-			ImGui::EndGroup();
-
-			ImGui::NextColumn(); // move to next grid slot
-
-			//ImGui::Separator(); // nice line between items
-		}
-
-		
-
-		// Double click to open
-		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
-		{
-			cwd /= entry.path().filename();
-			break;
-		}
-
-		
-
-	}
-
-	for (const auto& entry : std::filesystem::directory_iterator(cwd))
-	{
-		const std::string filenameFull = entry.path().filename().string();
-
-		if (filenameFull == "entities.json" || filenameFull == "ProjectAssetRegistry.json")
-			continue; // Skip unwanted files
-
-		std::string filename = entry.path().stem().string();
-		
-		if (entry.is_regular_file())
-		{
-			if (!assets->hasAsset(filename)) continue;
-
-			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
-
-			const AssetInfo& aInfo = assets->getAsset(filename);
-
-			int iconID = 0;
-			if (aInfo.aType == AssetType::MESH)
-			{
-				iconID = icons.at("mesh")->getID();
-			}
-			else if (aInfo.aType == AssetType::TEXTURE)
-			{
-				iconID = icons.at("texture")->getID();
-			}
-			else if (aInfo.aType == AssetType::ANIMATION)
-			{
-				iconID = icons.at("animation")->getID();
-			}
-			else if (aInfo.aType == AssetType::SHADER)
-			{
-				iconID = icons.at("shader")->getID();
-			}
-			else if (aInfo.aType == AssetType::PREFAB)
-			{
-				iconID = icons.at("prefab")->getID();
-			}
-			else if (aInfo.aType == AssetType::MATERIAL)
-			{
-				iconID = icons.at("material")->getID();
-			}
-
-			// Create a small icon
-			ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
-			ImGui::SameLine();
-
-			std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
-
-			// Draw filename and small info
-			ImGui::Text("%s", assetName.c_str());
-
-			auto fileSize = std::filesystem::file_size(entry);
-			ImGui::SameLine();
-			ImGui::TextDisabled("(%.1f KB)", fileSize / 1024.0f);
-
-			ImGui::EndGroup();
-
-			//ImGui::Separator(); // nice line between items
-
-			ImGui::NextColumn(); // move to next grid slot
-		}
-
-
-
-		// Double click to open
-		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
-		{
-		}
-		
-		
-	}
-	ImGui::Columns(1); // end columns
-
-	ImGui::EndChild(); // end scrollable region
-}
-
 void RenderConsoleWindow()
 {
         ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus |
@@ -3081,7 +2901,7 @@ class GUI_Helper : public GuiMenu {
 		RenderViewWindow();
 		RenderSceneHierarchyWindow();
 		RenderInspectorWindow();
-        RenderAssetViewWindow();
+        AssetViewWindow::display();
         RenderConsoleWindow();
         ShowTextureCreatorWindow();
         ShowShaderCreatorWindow();
