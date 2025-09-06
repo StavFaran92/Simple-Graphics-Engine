@@ -223,8 +223,8 @@ bool Engine::init(const InitParams& initParams)
     m_context = std::make_shared<Context>(par);
     m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
     m_commonShaders = std::make_shared<CommonShaders>();
-    m_builtInMeshes = std::make_shared<BuiltInMeshes>();
     m_builtInMaterials = std::make_shared<BuiltInMaterials>();
+    m_builtInMeshes = std::make_shared<BuiltInMeshes>();
 
     auto foliageSystem = new FoliageSystem();
     foliageSystem->init();
