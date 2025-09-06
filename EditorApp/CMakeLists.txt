@@ -1,7 +1,18 @@
 set(PROJECT_NAME EditorApp)
 
+set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
 # Add all source files in a folder and its subfolders
-file(GLOB_RECURSE SOURCES *.cpp *.h)
+# Get all source files
+file(GLOB_RECURSE SOURCES
+    ${SOURCE_ROOT}/*.cpp
+    ${SOURCE_ROOT}/*.h
+)
+
+if (SOURCES STREQUAL "")
+    message(FATAL_ERROR "No source files found in ${SOURCE_ROOT}")
+endif()
+
 
 # Add shared library target
 add_executable(${PROJECT_NAME} ${SOURCES})

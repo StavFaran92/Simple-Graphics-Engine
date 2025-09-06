@@ -1266,6 +1266,7 @@ void displayEntityHelper(Entity& e)
 				aInfo.name = assetName;
 				auto prefab = Prefab::create(state.getSelectedEntity(), aInfo);
 
+				// TODO remove - simply here for testing
 				prefab->Instansiate();
 				updateScene();
 
