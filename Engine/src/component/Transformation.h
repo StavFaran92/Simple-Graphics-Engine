@@ -104,7 +104,7 @@ public:
 	void removeParent();
 	Entity getParent() const;
 	Entity getRoot() const;
-	Entity setRoot(Entity root);
+	void setRoot(Entity root);
 
 	void update();
 	void forceUpdate();

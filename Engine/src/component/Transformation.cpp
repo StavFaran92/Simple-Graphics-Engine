@@ -103,9 +103,10 @@ Entity Transformation::getRoot() const
 	return root;
 }
 
-Entity Transformation::setRoot(Entity root)
+void Transformation::setRoot(Entity nRoot)
 {
-	return root = root;
+	root = nRoot;
+
 }
 
 void Transformation::update()

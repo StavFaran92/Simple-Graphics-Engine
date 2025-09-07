@@ -91,6 +91,19 @@ Resource<Prefab> Prefab::loadTransient(const std::string& fileLocation, const Pr
 	return AssetLoader<Prefab>::loadTransient(fileLocation, settings);
 }
 
+void Prefab::extractChildrenRecursive(const Entity& e, Resource<Prefab>& prefab)
+{
+	prefab->m_serializedPrefab.push_back(Archiver::serializeEntity(e));
+	auto& children = e.getComponent<Transformation>().getChildren();
+	if (children.size() > 0)
+	{
+		for (auto& [_, child] : children)
+		{
+			extractChildrenRecursive(child, prefab);
+		}
+	}
+}
+
 Resource<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
 {
 	Resource<Prefab> prefab;
@@ -110,7 +123,17 @@ Resource<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
 	aInfo.uuid = prefab.getUID();
 	aInfo.isTransient = aInfo.isTransient;
 
-	prefab->m_serializedPrefab = Archiver::serializeEntity(e);
+	extractChildrenRecursive(e, prefab);
+
+	//prefab->m_serializedPrefab.push_back(Archiver::serializeEntity(e));
+	//auto& children = e.getComponent<Transformation>().getChildren();
+	//if (children.size() > 0)
+	//{
+	//	for (auto& child : children)
+	//	{
+
+	//	}
+	//}
 
 	AssetLoader<Prefab>::save(aInfo, prefab);
 
@@ -121,7 +144,32 @@ Resource<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
 
 void Prefab::Instansiate()
 {
+	std::map<entity_id, Entity> entityIDRemapTable;
+
+	for (SerializedEntity& serializedEntity : m_serializedPrefab)
+	{
+		auto& e = Archiver::deserializeEntity(serializedEntity, *Engine::get()->getContext()->getActiveScene());
+		entity_id oldEntityID = e.getComponent<ObjectComponent>().e.handlerID();
+
+		entityIDRemapTable[oldEntityID] = e;
+	}
+
+	// for each entity
+		// deserealize and obtain new id
+		// add to table of old to new id
+		// change id in object comp
+		// change name in object comp
+		// change entity id in in transform
+		// change root id in transform
+		
+
+	// for each entity
+		// in transform iterate children
+			// give child new id using generated table
+
 	auto& e = Archiver::deserializeEntity(m_serializedPrefab, *Engine::get()->getContext()->getActiveScene());
+	entity_id oldEntityID = e.getComponent<ObjectComponent>().e.handlerID();
+
 	std::string newName = e.getComponent<ObjectComponent>().name;
 	newName += "_copy";
 
@@ -129,4 +177,7 @@ void Prefab::Instansiate()
 
 	e.getComponent<ObjectComponent>().name = newName;
 	e.getComponent<ObjectComponent>().e = e;
+	//Transformation transform = e.getComponent<Transformation>().setEntity();
+
+
 }

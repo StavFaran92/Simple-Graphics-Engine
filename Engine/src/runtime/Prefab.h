@@ -23,5 +23,7 @@ public:
 	}
 
 private:
-	SerializedEntity m_serializedPrefab;
+	static void extractChildrenRecursive(const Entity& e, Resource<Prefab>& prefab);
+private:
+	std::vector<SerializedEntity> m_serializedPrefab;
 };

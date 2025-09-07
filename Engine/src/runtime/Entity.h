@@ -2,6 +2,7 @@
 
 #include "core/Core.h"
 #include "core/Registry.h"
+#include "serialize/CerealHelpers.h"
 
 using entity_id = entt::id_type;
 struct NativeScriptComponent;
@@ -263,7 +264,7 @@ public:
 
     template <class Archive>
     void serialize(Archive& archive) {
-        archive(m_entity);
+        SERIALIZED_MEMBER(m_entity);
     }
 
     
