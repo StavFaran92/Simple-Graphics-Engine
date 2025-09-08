@@ -130,18 +130,23 @@ private:
 	void addChild(Entity entity);
 	void removeChild(Entity entity);
 	glm::mat4 calculateModelMatrix();
-private:
-	friend class Archiver;
 
-	glm::vec3 localTranslation;
-	glm::quat localRotation;
-	glm::vec3 localScale;
+public:
+	
+
+
 	Entity m_parent = Entity::EmptyEntity;
 	Entity entity = Entity::EmptyEntity;
 	Entity root = Entity::EmptyEntity;
 	std::unordered_map<entity_id, Entity> m_children{};
 
 private:
+	friend class Archiver;
+
+	glm::vec3 localTranslation;
+	glm::quat localRotation;
+	glm::vec3 localScale;
+
 	glm::quat m_globalRotation;
 	glm::vec3 m_globalScale;
 	glm::mat4 m_modelMatrix;

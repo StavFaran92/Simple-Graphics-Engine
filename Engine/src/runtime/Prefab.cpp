@@ -145,6 +145,7 @@ Resource<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
 void Prefab::Instansiate()
 {
 	std::map<entity_id, Entity> entityIDRemapTable;
+	std::vector<Entity> createdEntities;
 
 	for (SerializedEntity& serializedEntity : m_serializedPrefab)
 	{
@@ -152,6 +153,43 @@ void Prefab::Instansiate()
 		entity_id oldEntityID = e.getComponent<ObjectComponent>().e.handlerID();
 
 		entityIDRemapTable[oldEntityID] = e;
+
+		std::string newName = e.getComponent<ObjectComponent>().name;
+		newName += "_copy";
+
+		// Todo - validate name is not taken
+
+		e.getComponent<ObjectComponent>().name = newName;
+		e.getComponent<ObjectComponent>().e = e;
+		e.getComponent<Transformation>().entity = e;
+
+		createdEntities.push_back(e);
+	}
+
+	for (Entity& e : createdEntities)
+	{
+		auto& transform = e.getComponent<Transformation>();
+		auto& children = transform.getChildren();
+		for (int i=0; i< children.size(); i++)
+		{
+			entity_id oldID = children[i].handlerID();
+			auto it = entityIDRemapTable.find(oldID);
+			if (it == entityIDRemapTable.end()) 
+			{
+				logWarning("Could not locate oldID {} and remap table", oldID);
+				continue;
+			}
+			children[i] = it->second;
+		}
+
+		entity_id oldParentID = transform.m_parent.handlerID();
+		auto it = entityIDRemapTable.find(oldParentID);
+		if (it == entityIDRemapTable.end())
+		{
+			logWarning("Could not locate oldID {} and remap table", oldParentID);
+			continue;
+		}
+		e.getComponent<Transformation>().m_parent = it->second;
 	}
 
 	// for each entity
@@ -167,17 +205,9 @@ void Prefab::Instansiate()
 		// in transform iterate children
 			// give child new id using generated table
 
-	auto& e = Archiver::deserializeEntity(m_serializedPrefab, *Engine::get()->getContext()->getActiveScene());
-	entity_id oldEntityID = e.getComponent<ObjectComponent>().e.handlerID();
+	
 
-	std::string newName = e.getComponent<ObjectComponent>().name;
-	newName += "_copy";
-
-	// Todo - validate name is not taken
-
-	e.getComponent<ObjectComponent>().name = newName;
-	e.getComponent<ObjectComponent>().e = e;
-	//Transformation transform = e.getComponent<Transformation>().setEntity();
+	
 
 
 }
