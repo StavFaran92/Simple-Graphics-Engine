@@ -95,11 +95,16 @@ void AssetViewWindow::display()
 		}
 
 
-
+		ImGui::PopID();
 	}
+
+	static int selectedIndex = -1;   // keep track of selected group
 
 	for (const auto& entry : std::filesystem::directory_iterator(cwd))
 	{
+		ImGui::PushID(i);
+		i++;
+
 		const std::string filenameFull = entry.path().filename().string();
 
 		if (filenameFull == "entities.json" || filenameFull == "ProjectAssetRegistry.json")
@@ -110,6 +115,8 @@ void AssetViewWindow::display()
 		if (entry.is_regular_file())
 		{
 			if (!assets->hasAsset(filename)) continue;
+
+			ImVec2 p0 = ImGui::GetCursorScreenPos();
 
 			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
 
@@ -156,7 +163,62 @@ void AssetViewWindow::display()
 
 			ImGui::EndGroup();
 
-			ImGui::PopID();
+
+
+
+
+
+			
+
+			// 2) Grab the group bounds
+			ImVec2 p1 = ImGui::GetItemRectMax();
+			ImVec2 size = ImGui::GetItemRectSize();
+
+			ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(0, 0, 0, 0));
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(0, 0, 0, 0));
+			ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(0, 0, 0, 0));
+
+			// --- invisible selectable over the group ---
+			ImGui::SetCursorScreenPos(p0);
+			bool clicked = ImGui::Selectable(
+				("##tile_" + std::to_string(i)).c_str(),
+				selectedIndex == i,                          // show pressed state
+				0,
+				size
+			);
+			if (clicked) {
+				selectedIndex = i;                           // mark as selected
+			}
+
+			ImGui::PopStyleColor(3);
+
+			if (ImGui::IsItemHovered() || selectedIndex == i) {
+				ImGui::GetWindowDrawList()->AddRect(
+					p0, p1,
+					ImGui::GetColorU32(ImGuiCol_HeaderHovered), // border color
+					0.0f,                                       // rounding
+					0,                                          // flags (0 = all corners)
+					3.0f                                        // thickness
+				);
+			}
+
+			// Restore cursor to where it would have been after the group
+			ImGui::SetCursorScreenPos(p1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			if (ImGui::BeginPopupContextItem("AssetContextMenu"))
 			{
@@ -185,7 +247,7 @@ void AssetViewWindow::display()
 			ImGui::NextColumn(); // move to next grid slot
 		}
 
-
+		ImGui::PopID();
 
 		// Double click to open
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))

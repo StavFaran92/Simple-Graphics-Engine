@@ -166,6 +166,19 @@ void Prefab::Instansiate()
 		createdEntities.push_back(e);
 	}
 
+	// for each entity
+	// deserealize and obtain new id
+	// add to table of old to new id
+	// change id in object comp
+	// change name in object comp
+	// change entity id in in transform
+	// change root id in transform
+
+
+	// for each entity
+		// in transform iterate children
+			// give child new id using generated table
+
 	for (Entity& e : createdEntities)
 	{
 		auto& transform = e.getComponent<Transformation>();
@@ -183,27 +196,23 @@ void Prefab::Instansiate()
 		}
 
 		entity_id oldParentID = transform.m_parent.handlerID();
-		auto it = entityIDRemapTable.find(oldParentID);
-		if (it == entityIDRemapTable.end())
+		if (oldParentID == entt::null)
 		{
-			logWarning("Could not locate oldID {} and remap table", oldParentID);
-			continue;
+			e.getComponent<Transformation>().m_parent = Entity::EmptyEntity;
 		}
-		e.getComponent<Transformation>().m_parent = it->second;
+		else
+		{
+			auto it = entityIDRemapTable.find(oldParentID);
+			if (it == entityIDRemapTable.end())
+			{
+				logWarning("Could not locate oldID {} and remap table", oldParentID);
+				continue;
+			}
+			e.getComponent<Transformation>().m_parent = it->second;
+		}
 	}
 
-	// for each entity
-		// deserealize and obtain new id
-		// add to table of old to new id
-		// change id in object comp
-		// change name in object comp
-		// change entity id in in transform
-		// change root id in transform
-		
 
-	// for each entity
-		// in transform iterate children
-			// give child new id using generated table
 
 	
 
