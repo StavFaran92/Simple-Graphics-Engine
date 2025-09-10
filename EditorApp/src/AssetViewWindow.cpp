@@ -47,130 +47,105 @@ void AssetViewWindow::display()
 	// Scrollable region
 	ImGui::BeginChild("FileBrowserScrollingRegion", ImVec2(0, 0), false);
 
-	// Start grid layout
-	const float thumbnailSize = 64.0f;
-	const float padding = 16.0f;
 	const int columns = 6; // number of thumbnails per row
-
-	ImGui::Columns(columns, nullptr, false); // begin columns
-
-	int i = 0;
-	for (const auto& entry : std::filesystem::directory_iterator(cwd))
+	if (ImGui::BeginTable("FileBrowserGrid", columns))
 	{
-		ImGui::PushID(i);
-		i++;
+		static int selectedIndex = -1;   // keep track of selected group
 
-		const std::string filenameFull = entry.path().filename().string();
 
-		std::string filename = entry.path().stem().string();
-
-		if (entry.is_directory())
+		struct FileMetadata
 		{
-			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
+			std::string filename;
+			std::string filePath;
+			uintmax_t fileSize = 0;
+			bool isDirectory = false;
 
-			std::string dirName = "[Dir] " + filename;
-			// Create a small icon
+		};
+		std::vector<FileMetadata> fileMetadataTable;
 
-			unsigned int iconID = icons.at("folder")->getID();
-			ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
-			ImGui::SameLine();
+		for (const auto& entry : std::filesystem::directory_iterator(cwd))
+		{
+			FileMetadata fMetadata;
+			fMetadata.filename = entry.path().filename().stem().string();
 
-			// Draw filename and small info
-			ImGui::Text("%s", dirName.c_str());
+			if (fMetadata.filename == "entities" || fMetadata.filename == "ProjectAssetRegistry")
+				continue; // Skip unwanted files
 
-			ImGui::EndGroup();
-
-			ImGui::NextColumn(); // move to next grid slot
-
-			//ImGui::Separator(); // nice line between items
+			fMetadata.filePath = entry.path().string();
+			fMetadata.isDirectory = entry.is_directory();
+			fMetadata.fileSize = entry.file_size();
+			fileMetadataTable.push_back(fMetadata);
 		}
 
-
-
-		// Double click to open
-		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+		for (int i=0; i<fileMetadataTable.size(); i++)
 		{
-			cwd /= entry.path().filename();
-			break;
-		}
+			ImGui::TableNextColumn();
 
-
-		ImGui::PopID();
-	}
-
-	static int selectedIndex = -1;   // keep track of selected group
-
-	for (const auto& entry : std::filesystem::directory_iterator(cwd))
-	{
-		ImGui::PushID(i);
-		i++;
-
-		const std::string filenameFull = entry.path().filename().string();
-
-		if (filenameFull == "entities.json" || filenameFull == "ProjectAssetRegistry.json")
-			continue; // Skip unwanted files
-
-		std::string filename = entry.path().stem().string();
-
-		if (entry.is_regular_file())
-		{
-			if (!assets->hasAsset(filename)) continue;
+			const FileMetadata& fMetadata = fileMetadataTable[i];
+			ImGui::PushID(i);
 
 			ImVec2 p0 = ImGui::GetCursorScreenPos();
 
-			ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
-
-			const AssetInfo& aInfo = assets->getAsset(filename);
-
-			int iconID = 0;
-			if (aInfo.aType == AssetType::MESH)
+			if (fMetadata.isDirectory)
 			{
-				iconID = icons.at("mesh")->getID();
+				ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
+				{
+					std::string dirName = "[Dir] " + fMetadata.filename;
+
+					unsigned int iconID = icons.at("folder")->getID();
+					ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
+					ImGui::SameLine();
+
+					ImGui::Text("%s", dirName.c_str());
+				}
+				ImGui::EndGroup();
+
+				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+				{
+					cwd /= fMetadata.filename;
+					break;
+				}
 			}
-			else if (aInfo.aType == AssetType::TEXTURE)
+			else
 			{
-				iconID = icons.at("texture")->getID();
+				const std::string filename = fMetadata.filename;
+
+				if (filename == "entities" || filename == "ProjectAssetRegistry")
+					continue; // Skip unwanted files
+
+				if (!assets->hasAsset(filename)) continue;
+
+				ImGui::BeginGroup();
+				{
+
+					const AssetInfo& aInfo = assets->getAsset(filename);
+
+					int iconID = 0;
+					switch (aInfo.aType) {
+					case AssetType::MESH:     iconID = icons.at("mesh")->getID(); break;
+					case AssetType::TEXTURE:  iconID = icons.at("texture")->getID(); break;
+					case AssetType::ANIMATION:iconID = icons.at("animation")->getID(); break;
+					case AssetType::SHADER:   iconID = icons.at("shader")->getID(); break;
+					case AssetType::PREFAB:   iconID = icons.at("prefab")->getID(); break;
+					case AssetType::MATERIAL: iconID = icons.at("material")->getID(); break;
+					}
+
+					// Create a small icon
+					ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
+					ImGui::SameLine();
+
+					std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
+
+					// Draw filename and small info
+					ImGui::Text("%s", assetName.c_str());
+
+					ImGui::SameLine();
+					ImGui::TextDisabled("(%.1f KB)", fMetadata.fileSize / 1024.0f);
+
+				}
+				ImGui::EndGroup();
 			}
-			else if (aInfo.aType == AssetType::ANIMATION)
-			{
-				iconID = icons.at("animation")->getID();
-			}
-			else if (aInfo.aType == AssetType::SHADER)
-			{
-				iconID = icons.at("shader")->getID();
-			}
-			else if (aInfo.aType == AssetType::PREFAB)
-			{
-				iconID = icons.at("prefab")->getID();
-			}
-			else if (aInfo.aType == AssetType::MATERIAL)
-			{
-				iconID = icons.at("material")->getID();
-			}
 
-			// Create a small icon
-			ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
-			ImGui::SameLine();
-
-			std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
-
-			// Draw filename and small info
-			ImGui::Text("%s", assetName.c_str());
-
-			auto fileSize = std::filesystem::file_size(entry);
-			ImGui::SameLine();
-			ImGui::TextDisabled("(%.1f KB)", fileSize / 1024.0f);
-
-			ImGui::EndGroup();
-
-
-
-
-
-
-			
-
-			// 2) Grab the group bounds
 			ImVec2 p1 = ImGui::GetItemRectMax();
 			ImVec2 size = ImGui::GetItemRectSize();
 
@@ -205,29 +180,17 @@ void AssetViewWindow::display()
 			// Restore cursor to where it would have been after the group
 			ImGui::SetCursorScreenPos(p1);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 			if (ImGui::BeginPopupContextItem("AssetContextMenu"))
 			{
-				if (ImGui::Selectable("Delete")) 
-				{ 
+				if (ImGui::Selectable("Delete"))
+				{
 					logDebug("Not yet implemented");
 				}
-				if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate")) 
-				{ 
+
+				const AssetInfo& aInfo = assets->getAsset(fMetadata.filename);
+
+				if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
+				{
 					Resource<Prefab> prefab = aInfo.data.as<Prefab>();
 					if (prefab.isEmpty())
 					{
@@ -236,28 +199,16 @@ void AssetViewWindow::display()
 					}
 					prefab->Instansiate();
 					updateScene();
-				
+
 				}
 
 				ImGui::EndPopup();
 			}
 
-			//ImGui::Separator(); // nice line between items
-
-			ImGui::NextColumn(); // move to next grid slot
+			ImGui::PopID();
 		}
-
-		ImGui::PopID();
-
-		// Double click to open
-		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
-		{
-
-		}
-
-
+		
+		ImGui::EndTable();
 	}
-	ImGui::Columns(1); // end columns
-
-	ImGui::EndChild(); // end scrollable region
+	ImGui::EndChild();
 }
