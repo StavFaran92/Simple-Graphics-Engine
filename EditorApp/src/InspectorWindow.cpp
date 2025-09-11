@@ -1,5 +1,11 @@
 #include "InspectorWindow.h"
 
+#include "Tables.h"
+#include "EntityState.h"
+#include "EditorState.h"
+#include "NativeScriptsLoader.h"
+#include "Dialogs.h"
+
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
 	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -166,7 +172,7 @@ void InspectorWindow::display()
 				{
 					if (ImGui::Button("Select Mesh"))
 					{
-						showMeshSelector = true;
+						EditorState::Instance().showMeshSelector = true;
 					}
 				},
 				[&](std::string id) 
@@ -186,7 +192,7 @@ void InspectorWindow::display()
 			//}
 
 			std::string selectedMeshUID;
-			displaySelectMeshWindow(selectedMeshUID);
+			displaySelectMeshDialog(selectedMeshUID);
 
 			if (!selectedMeshUID.empty())
 			{
@@ -236,11 +242,11 @@ void InspectorWindow::display()
 			// Button to trigger some action
 			if (ImGui::Button("Select Script"))
 			{
-				showScriptSelector = true;
+				EditorState::Instance().showScriptSelector = true;
 			}
 
 			std::string selectedScript;
-			displaySelectScriptWindow(selectedScript);
+			displaySelectScriptDialog(selectedScript);
 
 			if (!selectedScript.empty())
 			{
@@ -398,7 +404,7 @@ void InspectorWindow::display()
 				if (ImGui::Button("Select")) {
 					animIndex = index;
 					animName = name;
-					showAnimationSelector = true;
+					EditorState::Instance().showAnimationSelector = true;
 				}
 
 				ImGui::SameLine();
@@ -411,12 +417,12 @@ void InspectorWindow::display()
 			}
 
 			// Show animation selector popup (externally defined)
-			if (showAnimationSelector) {
-				displaySelectAnimationWindow(selectedAnimUID);
+			if (EditorState::Instance().showAnimationSelector) {
+				displaySelectAnimationDialog(selectedAnimUID);
 				if (!selectedAnimUID.empty()) {
 					animator.addAnimation(animName, Resource<Animation>(selectedAnimUID));
 					selectedAnimUID.clear();
-					showAnimationSelector = false;
+					EditorState::Instance().showAnimationSelector = false;
 				}
 			}
 
@@ -468,11 +474,11 @@ void InspectorWindow::display()
 
 			if (ImGui::Button("Select Shader"))
 			{
-				showShaderSelector = true;
+				EditorState::Instance().showShaderSelector = true;
 			}
 
 			std::string selectedShaderUID;
-			displaySelectShaderWindow(selectedShaderUID);
+			displaySelectShaderDialog(selectedShaderUID);
 
 			if (!selectedShaderUID.empty())
 			{
@@ -598,13 +604,10 @@ void InspectorWindow::display()
 
 			if (ImGui::Button("Select Terrain"))
 			{
-				ImGui::OpenPopup("EntitySelectPopup");
-				entitySelectCB = [&foliage](Entity e) {
-					foliage.terrainRef = e;
-					};
+				logError("Not yet implemented.");
 			}
 
-			displayEntitySelectPopup();
+			displayEntitySelectDialog();
 
 			if (ImGui::Button("build"))
 			{

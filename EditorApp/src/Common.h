@@ -2,6 +2,7 @@
 
 #include "sge.h"
 #include "imgui.h"
+#include "ImGuizmo.h"
 
 #include <unordered_map>
 #include <string>
@@ -14,6 +15,36 @@ inline const ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoBringToFrontOnFoc
 											ImGuiWindowFlags_NoScrollbar |
 											ImGuiWindowFlags_NoScrollWithMouse |
 											ImGuiWindowFlags_NoMove;
+
+static const char* rigidyBodyTypesStrList[]{
+	"Static",
+	"Dynamic",
+	"Kinematic"
+};
+
+static const char* renderTechniqueStrList[]{
+	"Forward",
+	"Defererred"
+};
+
+static const char* layerMaskList[]{
+	"Layer Mask 0",
+	"Layer Mask 1",
+	"Layer Mask 2",
+	"Layer Mask 3",
+	"Layer Mask 4",
+	"Layer Mask 5",
+	"Layer Mask 6",
+	"Layer Mask 7",
+	"Layer Mask 8",
+	"Layer Mask 9",
+	"Layer Mask 10",
+	"Layer Mask 11",
+	"Layer Mask 12",
+	"Layer Mask 13",
+	"Layer Mask 14",
+	"Layer Mask 15",
+};
 
 extern std::unordered_map<std::string, Resource<Texture>> icons;
 
@@ -33,51 +64,6 @@ static void updateScene()
 		sceneObjects.emplace_back(SceneObject{ obj.name, obj.e });
 	}
 }
-
-class EntityStates
-{
-public:
-	void selectEntity(Entity e)
-	{
-		m_selectedEntity = e;
-		Engine::get()->getSubSystem<ObjectPicker>()->setSelectedObject(m_selectedEntity.handlerID());
-
-		if (e == Entity::EmptyEntity)
-		{
-			return;
-		}
-
-		std::shared_ptr<EntityState> eState = std::make_shared<EntityState>(e);
-		eState->update();
-
-		m_states[e.handlerID()] = eState;
-	}
-
-	EntityState& getCurrentEntityState()
-	{
-		auto iter = m_states.find(m_selectedEntity.handlerID());
-		if (iter == m_states.end())
-		{
-			auto eState = std::make_shared<EntityState>(m_selectedEntity);
-			eState->update();
-			m_states[m_selectedEntity.handlerID()] = eState;
-			return *eState.get();
-		}
-
-		return *iter->second.get();
-	}
-
-	Entity getSelectedEntity() const
-	{
-		return m_selectedEntity;
-	}
-
-private:
-	std::unordered_map<entity_id, std::shared_ptr<EntityState>> m_states;
-	Entity m_selectedEntity = Entity::EmptyEntity;
-};
-
-extern EntityStates state;
 
 template<typename T> 
 static void displayComponent(const std::string& componentName, std::function<void(T&)> func)
@@ -123,3 +109,4 @@ static void displayComponent(const std::string& componentName, std::function<voi
 		//ImGui::GetWindowDrawList()->AddRect(startPos, endPos, ImGui::GetColorU32(ImGuiCol_Header), 0.f, 0, 2.f);
 	}
 }
+

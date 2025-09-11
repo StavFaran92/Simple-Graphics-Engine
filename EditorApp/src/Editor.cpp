@@ -5,7 +5,6 @@
 
 #include <filesystem>
 
-#include "ImGuizmo.h"
 #include "imgui_internal.h"
 
 #include "tinyfiledialogs.h"
@@ -24,31 +23,13 @@
 #include "Common.h"
 #include "AssetViewWindow.h"
 
-#define BEGIN_IMGUI_TABLE(name) \
-	if (ImGui::BeginTable(name, 2, ImGuiTableFlags_None)) { \
-	ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch, 0.4f); \
-	ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.6f);
-
-#define END_IMGUI_TABLE() ImGui::EndTable(); };
+#include "EntityState.h"
+#include "InspectorWindow.h"
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 
 namespace fs = std::filesystem;
-
-static bool ShowLightCreatorWindow = false;
-static bool showModelInspectorWindow = false;
-static bool showPrimitiveCreatorWindow = false;
-static bool showMeshSelector = false;
-static bool showAnimationSelector = false;
-static bool selectedEntityRename = false;
-static bool showScriptSelector = false;
-static bool showShaderSelector = false;
-static bool showSamplerEditWindow = false;
-static bool showTextureCreateWindow = false;
-static bool showShaderCreateWindow = false;
-
-static bool startButtonPressed = false;
 
 struct Message
 {
@@ -120,48 +101,10 @@ static std::shared_ptr<TextureSampler> g_previousSampler;
 static void addTextureEditWidget(Resource<Material> mat, const std::string& name, Texture::Type ttype);
 void AddColoredLabel(const char* label);
 static void displayTransformation(Transformation& transform, bool& isChanged);
-static void displaySelectMeshWindow();
-
-struct EntityState
-{
-	Entity e;
-
-	Resource<Shader> shader;
-
-	std::vector<std::string> animationRenameBuffers{};
-
-	std::string renameBuffer;
-
-	EntityState(Entity e)
-		: e(e)
-	{
-	}
-
-	void update()
-	{
-		if (e.HasComponent<Animator>())
-		{
-			auto& animator = e.getComponent<Animator>();
-			auto animations = animator.getAllAnimations();
-			animationRenameBuffers.clear();
-			for (const auto& [name, anim] : animations) {
-				animationRenameBuffers.push_back(name);
-			}
-		}
-
-		if (e.HasComponent<ObjectComponent>())
-		{
-			auto& obj = e.getComponent<ObjectComponent>();
-			renameBuffer = obj.name;
-		}
-		
-
-	}
-};
 
 static void stopSimulation()
 {
-	startButtonPressed = false; // Toggle the state
+	EditorState::Instance().startButtonPressed = false; // Toggle the state
 	Engine::get()->getContext()->getActiveScene()->stopSimulation();
 
 	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_editorCamera);
@@ -172,7 +115,7 @@ static void stopSimulation()
 
 static void startsimulation()
 {
-	startButtonPressed = true; // Toggle the state
+	EditorState::Instance().startButtonPressed = true; // Toggle the state
 	Engine::get()->getContext()->getActiveScene()->startSimulation();
 
 	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
@@ -249,7 +192,7 @@ void RenderSimulationControlView()
 	ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
 
 	// Draw the button based on the current state
-	if (startButtonPressed)
+	if (EditorState::Instance().startButtonPressed)
 	{
 		if (ImGui::Button("STOP", ImVec2(70, 0)))
 		{
@@ -267,103 +210,7 @@ void RenderSimulationControlView()
 	}
 
 	ImGui::End(); // End the window
-}
-
-static void addTableRow(const std::string& rowName, std::function<void(std::string id)> func)
-{
-	ImGui::TableNextRow();
-
-	// Key: stick to left (default)
-	ImGui::TableSetColumnIndex(0);
-	ImGui::TextUnformatted(rowName.c_str());
-
-	// Value: right-align the DragFloat3
-	ImGui::TableSetColumnIndex(1);
-
-	const float fullWidth = ImGui::GetColumnWidth();
-	const float itemWidth = ImGui::CalcItemWidth(); // or CalcItemWidth(), or a fixed value
-	float cursorX = ImGui::GetCursorPosX() + fullWidth - itemWidth;
-
-	ImGui::SetCursorPosX(cursorX);
-	ImGui::SetNextItemWidth(itemWidth);
-	std::string id = "##" + rowName;
-	func(id);
-}
-
-static void addTableRowExt(const std::string& rowName, 
-	std::function<void(std::string id)> funcKey, 
-	std::function<void(std::string id)> funcValue)
-{
-	ImGui::TableNextRow();
-
-	// Key: stick to left (default)
-	ImGui::TableSetColumnIndex(0);
-	funcKey(rowName.c_str());
-
-	// Value: right-align the DragFloat3
-	ImGui::TableSetColumnIndex(1);
-
-	const float fullWidth = ImGui::GetColumnWidth();
-	const float itemWidth = ImGui::CalcItemWidth(); // or CalcItemWidth(), or a fixed value
-	float cursorX = ImGui::GetCursorPosX() + fullWidth - itemWidth;
-
-	ImGui::SetCursorPosX(cursorX);
-	ImGui::SetNextItemWidth(itemWidth);
-	std::string id = "##" + rowName;
-	funcValue(id);
-}                                            
-
-static void displayEntitySelectPopup()
-{
-	if (ImGui::BeginPopup("EntitySelectPopup")) {
-
-		
-
-		ImGui::Text("Available Entities:");
-
-		ImGui::Separator();
-
-		static Entity selectedEntity = Entity::EmptyEntity;
-
-		for (int i = 0; i < sceneObjects.size(); ++i)
-		{
-			auto& sceneObject = sceneObjects[i];
-			auto& obj = sceneObject.e.getComponent<ObjectComponent>();
-
-			bool isSelected = (selectedEntity == sceneObject.e);
-
-			if (ImGui::Selectable(obj.name.c_str(), &isSelected))
-			{
-				selectedEntity = sceneObject.e;
-			}
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK")) {
-			if (selectedEntity != Entity::EmptyEntity)
-			{
-				entitySelectCB(selectedEntity);
-
-			}
-			ImGui::CloseCurrentPopup();
-			Entity selectedEntity = Entity::EmptyEntity;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel")) {
-			ImGui::CloseCurrentPopup();
-			Entity selectedEntity = Entity::EmptyEntity;
-		}
-
-
-
-		ImGui::EndPopup();
-	}
-
-}
-
+}                                           
 
 static void displayAssetTextureSelectPopup()
 {
@@ -432,206 +279,6 @@ static void displayAssetTextureSelectPopup()
 	}
 
 }
-
-static void displaySelectMeshWindow(std::string& uuid)
-{
-	if (showMeshSelector) 
-	{
-		ImGui::Begin("Select Mesh", &showMeshSelector, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text("Available Meshes:");
-		ImGui::Separator();
-
-		static int selectedMeshIndex = -1;
-
-		auto& meshList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(AssetType::MESH); // todo fix
-
-		for (int i = 0; i < meshList.size(); i++) 
-		{
-			bool isSelected = (selectedMeshIndex == i);
-			if (isSelected)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f)); // Change background color
-			}
-			if (!isSelected)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
-			}
-
-			if (ImGui::Selectable(meshList[i].name.c_str()))
-			{
-				selectedMeshIndex = i;
-			}
-
-			ImGui::PopStyleColor();
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK")) {
-			if (selectedMeshIndex >= 0 && selectedMeshIndex < meshList.size()) 
-			{
-				uuid = meshList[selectedMeshIndex].uuid;
-				
-			}
-			showMeshSelector = false;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel")) {
-			showMeshSelector = false;
-		}
-
-		ImGui::End();
-	}
-}
-
-static void displaySelectAnimationWindow(std::string& uuid)
-{
-	if (showAnimationSelector)
-	{
-		ImGui::Begin("Select Animation", &showAnimationSelector, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text("Available Animations:");
-		ImGui::Separator();
-
-		static int selectedAnimationIndex = -1;
-
-		auto& animationList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(AssetType::ANIMATION);
-
-		for (int i = 0; i < animationList.size(); i++)
-		{
-			bool isSelected = (selectedAnimationIndex == i);
-			if (isSelected)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f)); // Change background color
-			}
-			if (!isSelected)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
-			}
-
-			if (ImGui::Selectable(animationList[i].name.c_str()))
-			{
-				selectedAnimationIndex = i;
-			}
-
-			ImGui::PopStyleColor();
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK")) {
-			if (selectedAnimationIndex >= 0 && selectedAnimationIndex < animationList.size())
-			{
-				uuid = animationList[selectedAnimationIndex].uuid;
-
-			}
-			showAnimationSelector = false;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel")) {
-			showAnimationSelector = false;
-		}
-
-		ImGui::End();
-	}
-}
-
-static void displaySelectScriptWindow(std::string& scriptName)
-{
-	if (showScriptSelector)
-	{
-		ImGui::Begin("Select Script", &showScriptSelector, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text("Available Scripts:");
-		ImGui::Separator();
-
-		static int selectedScriptIndex = -1;
-
-		std::vector<std::string> scriptNamesList;
-		NativeScriptsLoader::instance->getAllScripts(scriptNamesList);
-
-		for (int i = 0; i < scriptNamesList.size(); i++)
-		{
-			bool isSelected = (selectedScriptIndex == i);
-
-			if (ImGui::Selectable(scriptNamesList[i].c_str(), &isSelected))
-			{
-				selectedScriptIndex = i;
-			}
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK")) 
-		{
-			if (selectedScriptIndex >= 0 && selectedScriptIndex < scriptNamesList.size())
-			{
-				scriptName = scriptNamesList[selectedScriptIndex];
-
-			}
-			showScriptSelector = false;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel")) 
-		{
-			showScriptSelector = false;
-		}
-
-		ImGui::End();
-	}
-}
-
-static void displaySelectShaderWindow(std::string& uuid)
-{
-	if (showShaderSelector)
-	{
-		ImGui::Begin("Select Shader", &showShaderSelector, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text("Available Shaders:");
-		ImGui::Separator();
-
-		static int selectedShaderIndex = -1;
-
-		auto& shaderList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(AssetType::SHADER);
-
-
-		for (int i = 0; i < shaderList.size(); i++)
-		{
-			bool isSelected = (selectedShaderIndex == i);
-
-			if (ImGui::Selectable(shaderList[i].name.c_str(), &isSelected))
-			{
-				selectedShaderIndex = i;
-			}
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK"))
-		{
-			if (selectedShaderIndex >= 0 && selectedShaderIndex < shaderList.size())
-			{
-				uuid = shaderList[selectedShaderIndex].uuid;
-
-			}
-			showShaderSelector = false;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel"))
-		{
-			showShaderSelector = false;
-		}
-
-		ImGui::End();
-	}
-}
-
-
 
 void AddColoredLabel(const char* label) 
 {
@@ -708,7 +355,7 @@ enum class LightType {
 
 void LightCreatorWindow()
 {
-	if (ShowLightCreatorWindow)
+	if (EditorState::Instance().showLightCreatorWindow)
 	{
 		ImGui::SetNextWindowSize({ 400, 300 }, ImGuiCond_Appearing);
 		ImGui::Begin("Light Creator");
@@ -756,7 +403,7 @@ void LightCreatorWindow()
 				e.addComponent<PointLight>(color, ambientIntensity, diffuseIntensity, attenuation);
 			}
 
-			ShowLightCreatorWindow = false;
+			EditorState::Instance().showLightCreatorWindow = false;
 
 			updateScene();
 
@@ -765,7 +412,7 @@ void LightCreatorWindow()
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel"))
 		{
-			ShowLightCreatorWindow = false;
+			EditorState::Instance().showLightCreatorWindow = false;
 		}
 
 		ImGui::End();
@@ -829,10 +476,10 @@ void ShowTextureDisplayWindow()
 
 void ShowTextureCreatorWindow()
 {
-	if (showTextureCreateWindow)
+	if (EditorState::Instance().showTextureCreateWindow)
 	{
 		ImGui::OpenPopup("CreateEmptyTexture");
-		showTextureCreateWindow = false;
+		EditorState::Instance().showTextureCreateWindow = false;
 	}
 	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
@@ -866,10 +513,10 @@ void ShowTextureCreatorWindow()
 
 void ShowShaderCreatorWindow()
 {
-	if (showShaderCreateWindow)
+	if (EditorState::Instance().showShaderCreateWindow)
 	{
 		ImGui::OpenPopup("CreateShader");
-		showShaderCreateWindow = false;
+		EditorState::Instance().showShaderCreateWindow = false;
 	}
 	if (ImGui::BeginPopupModal("CreateShader", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
@@ -1102,7 +749,7 @@ void displayEntityHelper(Entity& e)
 			if (ImGui::MenuItem("Rename"))
 			{
 				// Focus the input text when renaming
-				selectedEntityRename = true;
+				EditorState::Instance().selectedEntityRename = true;
 			}
 
 			if (ImGui::MenuItem("Create Prefab"))
@@ -1162,7 +809,7 @@ void displayEntityHelper(Entity& e)
 
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(150.0f);
-	if (selectedEntityRename && state.getSelectedEntity() == e)
+	if (EditorState::Instance().selectedEntityRename && state.getSelectedEntity() == e)
 	{
 		ImGui::SetKeyboardFocusHere();
 		std::string& renameText = state.getCurrentEntityState().renameBuffer;
@@ -1182,7 +829,7 @@ void displayEntityHelper(Entity& e)
 		{
 			obj.name = renameText;
 			updateScene(); // Assuming this updates any necessary scene state
-			selectedEntityRename = false;
+			EditorState::Instance().selectedEntityRename = false;
 		}
 		//ImGui::InputText("##edit", &yourNameString);
 	}
@@ -1648,195 +1295,6 @@ void RenderViewWindow()
 	ImGui::End();
 }
 
-static const char* rigidyBodyTypesStrList[]{ 
-	"Static",
-	"Dynamic",
-	"Kinematic"
-};
-
-static const char* renderTechniqueStrList[]{
-	"Forward",
-	"Defererred"
-};
-
-static const char* layerMaskList[]{
-	"Layer Mask 0",
-	"Layer Mask 1",
-	"Layer Mask 2",
-	"Layer Mask 3",
-	"Layer Mask 4",
-	"Layer Mask 5",
-	"Layer Mask 6",
-	"Layer Mask 7",
-	"Layer Mask 8",
-	"Layer Mask 9",
-	"Layer Mask 10",
-	"Layer Mask 11",
-	"Layer Mask 12",
-	"Layer Mask 13",
-	"Layer Mask 14",
-	"Layer Mask 15",
-};
-
-static void displayChannelSelectWidget(int*& currentChannel)
-{
-	static const char* channelMaskOptions[] = { "None", "R", "G", "B", "A" };
-	if (ImGui::BeginCombo("##channelMask", channelMaskOptions[*currentChannel])) // Label for the combo box
-	{
-		for (int i = 0; i < IM_ARRAYSIZE(channelMaskOptions); i++)
-		{
-			bool isSelected = (*currentChannel == i);
-			if (ImGui::Selectable(channelMaskOptions[i], isSelected))
-			{
-				*currentChannel = i; // Update selected index
-			}
-
-			if (isSelected)
-				ImGui::SetItemDefaultFocus(); // Set focus to the current item
-		}
-		ImGui::EndCombo();
-	}
-}
-
-static void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(std::string uuid)> callback)
-{
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureID), size))
-	{
-		ImGui::OpenPopup("EditTexturePopup");
-		assetTextureSelectCB = callback;
-	}
-
-	displayAssetTextureSelectPopup();
-}
-
-static void addTextureEditWidget(Resource<Texture> texture, ImVec2 size, std::function<void(std::string uuid)> callback)
-{
-	int texID = 0;
-	if (!texture.isEmpty())
-	{
-		texID = texture.get()->getID();
-	}
-
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
-	{
-		ImGui::OpenPopup("EditTexturePopup");
-		assetTextureSelectCB = callback;
-	}
-
-	displayAssetTextureSelectPopup();
-}
-
-static void addTextureEditWidget(Resource<Material> mat, const std::string& name, Texture::TextureType ttype)
-{
-	Resource<Texture> tex = Resource<Texture>::empty;
-	if (mat->hasTexture(ttype))
-	{
-		tex = mat->getSampler(ttype)->texture;
-	}
-
-	addTextureEditWidget(tex, { 20, 20 }, [=](std::string uuid) {
-		mat.get()->setTexture(ttype, Resource<Texture>(uuid));
-	});
-
-	ImGui::SameLine();
-
-	ImGui::Text(name.c_str());
-}
-
-static void addSamplerEditWidget(Resource<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype)
-{
-	ImGui::PushID(name.c_str());
-
-	int texID = 0;
-	auto sampler = mat->getSampler(ttype);
-
-	if (!sampler->texture.isEmpty())
-	{
-		texID = sampler->texture.get()->getID();
-	}
-
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size)) 
-	{
-		ImGui::OpenPopup("EditSamplerPopup");
-		g_selectedSampler = sampler;
-		g_previousSampler = std::make_shared<TextureSampler>(*sampler.get());		
-	}
-
-	if (ImGui::BeginPopup("EditSamplerPopup"))
-	{
-		if (!g_selectedSampler)
-		{
-			logError("Selected sampler cannot be null.");
-			ImGui::EndPopup();
-			return;
-		}
-		auto assets = Engine::get()->getSubSystem<Assets>();
-
-		ImGui::Text("Texture");
-		addTextureEditWidget(g_selectedSampler->texture, ImVec2{150, 150}, [=](std::string uuid) {
-			g_selectedSampler->texture = Resource<Texture>(uuid);
-			});
-
-		ImGui::Spacing();
-
-		static int* currentChannelMask[4];
-		
-		currentChannelMask[0] = &g_selectedSampler->channelMaskR;
-		currentChannelMask[1] = &g_selectedSampler->channelMaskG;
-		currentChannelMask[2] = &g_selectedSampler->channelMaskB;
-		currentChannelMask[3] = &g_selectedSampler->channelMaskA;
-
-		for (int i = 0; i < g_selectedSampler->channelCount; i++)
-		{
-			ImGui::PushID(&currentChannelMask[i]);
-			displayChannelSelectWidget(currentChannelMask[i]);
-			ImGui::PopID();
-		}
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat("xoffset", &g_selectedSampler->xOffset, .1f);
-		ImGui::DragFloat("yoffset", &g_selectedSampler->yOffset, .1f);
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat("xScale", &g_selectedSampler->xScale, .1f);
-		ImGui::DragFloat("yScale", &g_selectedSampler->yScale, .1f);
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK")) 
-		{
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel")) 
-		{
-			mat->setSampler(ttype, g_previousSampler);
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::EndPopup();
-	}
-
-	ImGui::SameLine();
-	ImGui::Text(name.c_str());
-
-	ImGui::PopID();
-	
-}
-
-void rightAlignedText(const std::string& text) {
-	float textWidth = ImGui::CalcTextSize(text.c_str()).x;
-	float fullWidth = ImGui::GetColumnWidth();
-	float padding = ImGui::GetStyle().ItemSpacing.x;
-
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + fullWidth - textWidth - padding);
-	ImGui::TextUnformatted(text.c_str());
-}
-
 void RenderConsoleWindow()
 {
         ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus |
@@ -1989,11 +1447,11 @@ class GUI_Helper : public GuiMenu {
 				if (ImGui::BeginMenu("Edit")) {
 					if (ImGui::BeginMenu("Create")) {
 						if (ImGui::MenuItem("Empty Texture")) {
-							showTextureCreateWindow = true;
+							EditorState::Instance().showTextureCreateWindow = true;
 							
 						}
 						if (ImGui::MenuItem("Shader Override")) {
-							showShaderCreateWindow = true;
+							EditorState::Instance().showShaderCreateWindow = true;
 
 						}
 
@@ -2047,7 +1505,7 @@ class GUI_Helper : public GuiMenu {
 		RenderSimulationControlView();
 		RenderViewWindow();
 		RenderSceneHierarchyWindow();
-		RenderInspectorWindow();
+		InspectorWindow::display();
         AssetViewWindow::display();
         RenderConsoleWindow();
         ShowTextureCreatorWindow();
