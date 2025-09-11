@@ -303,7 +303,7 @@ void displayTextureSelectDialog()
 		if (ImGui::Button("OK")) {
 			if (selectedTextureIndex >= 0 && selectedTextureIndex < textureList.size())
 			{
-				assetTextureSelectCB(textureList[selectedTextureIndex].uuid);
+				EditorState::Instance().assetTextureSelectCB(textureList[selectedTextureIndex].uuid);
 
 			}
 			ImGui::CloseCurrentPopup();

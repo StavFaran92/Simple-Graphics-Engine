@@ -73,7 +73,7 @@ static void displayComponent(const std::string& componentName, std::function<voi
 		ImVec2 startPos = ImGui::GetCursorScreenPos();
 		ImVec2 startPosCursor = ImGui::GetCursorPos(); // Capture the initial cursor position
 
-		AddColoredLabel(componentName.c_str());
+		displayColoredLabelWidget(componentName.c_str());
 		auto& component = state.getSelectedEntity().getComponent<T>();
 
 		ImVec2 cursorPos = ImGui::GetCursorPos();

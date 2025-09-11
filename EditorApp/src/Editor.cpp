@@ -82,24 +82,11 @@ public:
 };
 
 static ConsoleLoggerRegister clr;
-
-static std::string selectedTextureName;
-static bool showTextureDisplayWindow = false;
-
 Entity g_primaryCamera;
 Entity g_editorCamera;
 
 uint32_t g_previewWindowID = 0;
 
-std::function<void(std::string uuid)> assetTextureSelectCB;
-std::function<void(Entity e)> entitySelectCB;
-Resource<Texture> selectedAssetTexture;
-
-static std::shared_ptr<TextureSampler> g_selectedSampler;
-static std::shared_ptr<TextureSampler> g_previousSampler;
-
-static void addTextureEditWidget(Resource<Material> mat, const std::string& name, Texture::Type ttype);
-void AddColoredLabel(const char* label);
 static void displayTransformation(Transformation& transform, bool& isChanged);
 
 static void stopSimulation()
@@ -211,30 +198,6 @@ void RenderSimulationControlView()
 
 	ImGui::End(); // End the window
 }                                           
-
-void AddColoredLabel(const char* label) 
-{
-	// Draw a blue background using ImGuiCol_Header color
-	ImVec2 startPos = ImGui::GetCursorScreenPos();
-	ImVec2 endPos = ImVec2(startPos.x + ImGui::GetContentRegionAvail().x, startPos.y + ImGui::GetTextLineHeightWithSpacing() + 2);
-	ImGui::GetWindowDrawList()->AddRectFilled(startPos, endPos, ImGui::GetColorU32(ImGuiCol_Header));
-
-	// Calculate the vertical offset to center the text within the rectangle
-	float offsetY = (ImGui::GetTextLineHeightWithSpacing() - ImGui::GetFrameHeight()) * 0.5f;
-
-	// Calculate padding values
-	float paddingX = 5.0f;
-	float paddingY = 2.0f;
-
-	// Adjust the text position to center it vertically and add padding
-	ImVec2 textPos = ImVec2(startPos.x + paddingX, startPos.y + offsetY + paddingY);
-
-	// Render the label text
-	ImGui::SetCursorScreenPos(textPos);
-	ImGui::TextUnformatted(label);
-
-	ImGui::Dummy(ImVec2(0.0f, 2.0f)); // Add a vertical gap
-}
 
 std::string OpenFile(const char* filter)
 {
@@ -373,37 +336,6 @@ static void addAssetLoadWidget(const std::string& name, ImGuiTextBuffer& textBuf
 	}
 	ImGui::SameLine();
 	ImGui::TextUnformatted(textBuffer.begin(), textBuffer.end());
-}
-
-void ShowTextureDisplayWindow()
-{
-	if (showTextureDisplayWindow)
-	{
-		ImGui::OpenPopup("Texture Preview");
-		showTextureDisplayWindow = false;
-	}
-	if (ImGui::BeginPopupModal("Texture Preview", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		const auto& selectedRes = DebugHelper::getInstance().getDebugTextures().at(selectedTextureName);
-		Texture* tex = selectedRes.get();
-
-		if (tex)
-		{
-			ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex->getID()));
-			ImVec2 texSize(512, 512); // Preview size (can be dynamic)
-
-			ImGui::Text("%s", selectedTextureName.c_str());
-			ImGui::Image(texID, texSize);
-		}
-
-		if (ImGui::Button("Close"))
-		{
-			ImGui::CloseCurrentPopup();
-			showTextureDisplayWindow = false;
-		}
-
-		ImGui::EndPopup();
-	}
 }
 
 void ShowTextureCreatorWindow()
@@ -1284,8 +1216,8 @@ void DisplayDebugInfoWindow()
 			ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(textureResource.get()->getID()));
 			if (ImGui::ImageButton(texID, ImVec2(100, 100)))
 			{
-				selectedTextureName = name;
-				showTextureDisplayWindow = true;
+				EditorState::Instance().selectedTextureName = name;
+				EditorState::Instance().showTextureDisplayWindow = true;
 				ImGui::OpenPopup("Texture Preview");
 			}
 		}
@@ -1442,7 +1374,7 @@ class GUI_Helper : public GuiMenu {
         RenderConsoleWindow();
         ShowTextureCreatorWindow();
         ShowShaderCreatorWindow();
-        ShowTextureDisplayWindow();
+        //ShowTextureDisplayWindow();
 
 		DisplayDebugInfoWindow();
 		

@@ -15,3 +15,7 @@ void addTextureEditWidget(Resource<Material> mat, const std::string& name, Textu
 void addSamplerEditWidget(Resource<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype);
 
 void displayChannelSelectWidget(int*& currentChannel);
+
+void displayTextureWidget();
+
+void displayColoredLabelWidget(const char* label);

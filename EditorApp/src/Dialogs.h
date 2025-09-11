@@ -14,4 +14,4 @@ void displaySelectShaderDialog(std::string& uuid);
 
 void displayEntitySelectDialog(Entity& e);
 
-void displayAssetTextureSelectDialog();
+void displayTextureSelectDialog();

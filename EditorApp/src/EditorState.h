@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <functional>
+
 class EditorState {
 public:
     // Access the singleton instance
@@ -21,6 +24,18 @@ public:
     bool showShaderCreateWindow = false;
     bool startButtonPressed = false;
     bool isMouseInSceneView = false;
+    bool showTextureDisplayWindow = false;
+
+    std::string selectedTextureName;
+
+    
+
+    std::function<void(std::string uuid)> assetTextureSelectCB;
+    std::function<void(Entity e)> entitySelectCB;
+    Resource<Texture> selectedAssetTexture;
+
+    std::shared_ptr<TextureSampler> selectedSampler;
+    std::shared_ptr<TextureSampler> previousSampler;
 
     // Delete copy/move constructors to enforce singleton
     EditorState(const EditorState&) = delete;
