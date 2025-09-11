@@ -25,6 +25,7 @@
 
 #include "EntityState.h"
 #include "InspectorWindow.h"
+#include "Dialogs.h"
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
@@ -87,8 +88,6 @@ Entity g_editorCamera;
 
 uint32_t g_previewWindowID = 0;
 
-static void displayTransformation(Transformation& transform, bool& isChanged);
-
 static void stopSimulation()
 {
 	EditorState::Instance().startButtonPressed = false; // Toggle the state
@@ -112,30 +111,6 @@ static void startsimulation()
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock(); //TODO this should be in camera event
 
 }
-
-//static void displayWindowHeader(const std::string& name)
-//{
-//	ImVec2 region = ImGui::GetContentRegionAvail();
-//	float headerHeight = 24.0f;
-//
-//	// Header style
-//	ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(50, 50, 50, 255));
-//	ImGui::BeginChild(name.c_str(), ImVec2(region.x, headerHeight), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-//
-//	// Vertical center calculation
-//	float textHeight = ImGui::GetFontSize();
-//	float textY = (headerHeight - textHeight) * 0.5f;
-//
-//	// Horizontal padding
-//	float paddingLeft = 8.0f;
-//
-//	// Set cursor position inside child window
-//	ImGui::SetCursorPos(ImVec2(paddingLeft, textY));
-//	ImGui::TextUnformatted(name.c_str());
-//
-//	ImGui::EndChild();
-//	ImGui::PopStyleColor();
-//}
 
 void focusOnEntity(Entity e)
 {
@@ -243,11 +218,6 @@ std::string SaveFile(const char* filter)
 	return std::string();
 }
 
-enum class LightType {
-	DirectionalLight = 0,
-	PointLight = 1
-};
-
 void LightCreatorWindow()
 {
 	if (EditorState::Instance().showLightCreatorWindow)
@@ -336,88 +306,6 @@ static void addAssetLoadWidget(const std::string& name, ImGuiTextBuffer& textBuf
 	}
 	ImGui::SameLine();
 	ImGui::TextUnformatted(textBuffer.begin(), textBuffer.end());
-}
-
-void ShowTextureCreatorWindow()
-{
-	if (EditorState::Instance().showTextureCreateWindow)
-	{
-		ImGui::OpenPopup("CreateEmptyTexture");
-		EditorState::Instance().showTextureCreateWindow = false;
-	}
-	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		static int width = 512;
-		static int height = 512;
-		static char textureName[256] = "NewTexture";
-
-		ImGui::InputInt("Width", &width);
-		ImGui::InputInt("Height", &height);
-		ImGui::InputText("Name", textureName, IM_ARRAYSIZE(textureName));
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK", ImVec2(120, 0)))
-		{
-			auto texture = Texture::createEmptyTexture(width, height);
-			Texture::addTexture2D(textureName, texture);
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel", ImVec2(120, 0)))
-		{
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::EndPopup();
-	}
-}
-
-void ShowShaderCreatorWindow()
-{
-	if (EditorState::Instance().showShaderCreateWindow)
-	{
-		ImGui::OpenPopup("CreateShader");
-		EditorState::Instance().showShaderCreateWindow = false;
-	}
-	if (ImGui::BeginPopupModal("CreateShader", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		static char shaderName[256] = "New Shader";
-		static char filepath[256] = "";
-		static int shaderOverrideType = 0;
-
-		// Shader Name
-		ImGui::Text("Name");
-		ImGui::InputText("##ShaderName", shaderName, IM_ARRAYSIZE(shaderName), ImGuiInputTextFlags_EnterReturnsTrue);
-
-		// Shader File Path
-		ImGui::Text("Filepath");
-		ImGui::InputText("##ShaderFilePath", filepath, IM_ARRAYSIZE(filepath), ImGuiInputTextFlags_EnterReturnsTrue);
-
-		// Override Type Drop-down
-		const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader" };
-		ImGui::Text("Override Type");
-		ImGui::Combo("##ShaderOverrideType", (int*)&shaderOverrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK", ImVec2(120, 0)))
-		{
-			auto& shader = Shader::createOverrideShader(shaderName, filepath, (ShaderOverride)shaderOverrideType);
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel", ImVec2(120, 0)))
-		{
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::EndPopup();
-	}
 }
 
 void ShowTextureImportWindow()
@@ -1372,8 +1260,8 @@ class GUI_Helper : public GuiMenu {
 		InspectorWindow::display();
         AssetViewWindow::display();
         RenderConsoleWindow();
-        ShowTextureCreatorWindow();
-        ShowShaderCreatorWindow();
+		displayTextureCreatorDialog();
+		displayShaderCreatorDialog();
         //ShowTextureDisplayWindow();
 
 		DisplayDebugInfoWindow();

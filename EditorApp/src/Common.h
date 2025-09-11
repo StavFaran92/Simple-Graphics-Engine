@@ -46,6 +46,11 @@ static const char* layerMaskList[]{
 	"Layer Mask 15",
 };
 
+enum class LightType {
+	DirectionalLight = 0,
+	PointLight = 1
+};
+
 extern std::unordered_map<std::string, Resource<Texture>> icons;
 
 struct SceneObject 

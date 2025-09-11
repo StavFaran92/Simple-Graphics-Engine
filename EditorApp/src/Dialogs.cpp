@@ -323,3 +323,85 @@ void displayTextureSelectDialog()
 	}
 
 }
+
+void displayTextureCreatorDialog()
+{
+	if (EditorState::Instance().showTextureCreateWindow)
+	{
+		ImGui::OpenPopup("CreateEmptyTexture");
+		EditorState::Instance().showTextureCreateWindow = false;
+	}
+	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		static int width = 512;
+		static int height = 512;
+		static char textureName[256] = "NewTexture";
+
+		ImGui::InputInt("Width", &width);
+		ImGui::InputInt("Height", &height);
+		ImGui::InputText("Name", textureName, IM_ARRAYSIZE(textureName));
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			auto texture = Texture::createEmptyTexture(width, height);
+			Texture::addTexture2D(textureName, texture);
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void displayShaderCreatorDialog()
+{
+	if (EditorState::Instance().showShaderCreateWindow)
+	{
+		ImGui::OpenPopup("CreateShader");
+		EditorState::Instance().showShaderCreateWindow = false;
+	}
+	if (ImGui::BeginPopupModal("CreateShader", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		static char shaderName[256] = "New Shader";
+		static char filepath[256] = "";
+		static int shaderOverrideType = 0;
+
+		// Shader Name
+		ImGui::Text("Name");
+		ImGui::InputText("##ShaderName", shaderName, IM_ARRAYSIZE(shaderName), ImGuiInputTextFlags_EnterReturnsTrue);
+
+		// Shader File Path
+		ImGui::Text("Filepath");
+		ImGui::InputText("##ShaderFilePath", filepath, IM_ARRAYSIZE(filepath), ImGuiInputTextFlags_EnterReturnsTrue);
+
+		// Override Type Drop-down
+		const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader" };
+		ImGui::Text("Override Type");
+		ImGui::Combo("##ShaderOverrideType", (int*)&shaderOverrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			auto& shader = Shader::createOverrideShader(shaderName, filepath, (ShaderOverride)shaderOverrideType);
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}

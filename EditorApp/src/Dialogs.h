@@ -15,3 +15,7 @@ void displaySelectShaderDialog(std::string& uuid);
 void displayEntitySelectDialog(Entity& e);
 
 void displayTextureSelectDialog();
+
+void displayTextureCreatorDialog();
+
+void displayShaderCreatorDialog();
