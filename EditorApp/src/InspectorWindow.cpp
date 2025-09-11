@@ -1,10 +1,13 @@
 #include "InspectorWindow.h"
 
+#include <imgui_stdlib.h>
+
 #include "Tables.h"
 #include "EntityState.h"
 #include "EditorState.h"
 #include "NativeScriptsLoader.h"
 #include "Dialogs.h"
+#include "Widgets.h"
 
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
@@ -607,7 +610,7 @@ void InspectorWindow::display()
 				logError("Not yet implemented.");
 			}
 
-			displayEntitySelectDialog();
+			//displayEntitySelectDialog();
 
 			if (ImGui::Button("build"))
 			{

@@ -3,6 +3,7 @@
 #include "EditorState.h"
 #include "imgui.h"
 #include "NativeScriptsLoader.h"
+#include "Common.h"
 
 void displaySelectMeshDialog(std::string& uuid)
 {
@@ -57,7 +58,7 @@ void displaySelectMeshDialog(std::string& uuid)
 	}
 }
 
-static void displaySelectAnimationDialog(std::string& uuid)
+void displaySelectAnimationDialog(std::string& uuid)
 {
 	if (EditorState::Instance().showAnimationSelector)
 	{
@@ -202,7 +203,7 @@ void displaySelectShaderDialog(std::string& uuid)
 	}
 }
 
-void displayEntitySelectDialog()
+void displayEntitySelectDialog(Entity& entity)
 {
 	if (ImGui::BeginPopup("EntitySelectPopup")) {
 
@@ -229,21 +230,23 @@ void displayEntitySelectDialog()
 
 		ImGui::Separator();
 
-		if (ImGui::Button("OK")) {
+		if (ImGui::Button("OK")) 
+		{
 			if (selectedEntity != Entity::EmptyEntity)
 			{
-				entitySelectCB(selectedEntity);
+				entity = selectedEntity;
 
 			}
 			ImGui::CloseCurrentPopup();
-			Entity selectedEntity = Entity::EmptyEntity;
+			selectedEntity = Entity::EmptyEntity;
 		}
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Cancel")) {
+		if (ImGui::Button("Cancel")) 
+		{
 			ImGui::CloseCurrentPopup();
-			Entity selectedEntity = Entity::EmptyEntity;
+			selectedEntity = Entity::EmptyEntity;
 		}
 
 
@@ -253,22 +256,70 @@ void displayEntitySelectDialog()
 
 }
 
-static void displayChannelSelectWidget(int*& currentChannel)
+void displayTextureSelectDialog()
 {
-	static const char* channelMaskOptions[] = { "None", "R", "G", "B", "A" };
-	if (ImGui::BeginCombo("##channelMask", channelMaskOptions[*currentChannel])) // Label for the combo box
-	{
-		for (int i = 0; i < IM_ARRAYSIZE(channelMaskOptions); i++)
+	if (ImGui::BeginPopup("EditTexturePopup")) {
+
+		auto assets = Engine::get()->getSubSystem<Assets>();
+
+		ImGui::Text("Available Textures:");
+		ImGui::Separator();
+
+		static int selectedTextureIndex = -1;
+
+		auto& textureList = assets->getAllAssetsOfType(AssetType::TEXTURE);
+
+		if (selectedTextureIndex != -1)
 		{
-			bool isSelected = (*currentChannel == i);
-			if (ImGui::Selectable(channelMaskOptions[i], isSelected))
+			Resource<Texture> displayTexture(textureList.at(selectedTextureIndex).uuid);
+			ImVec2 imageSize(150, 150);
+			ImGui::Image(reinterpret_cast<ImTextureID>(displayTexture.get()->getID()), imageSize, ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
+		}
+
+		ImGui::Separator();
+
+		for (int i = 0; i < textureList.size(); i++)
+		{
+			bool isSelected = (selectedTextureIndex == i);
+			if (isSelected)
 			{
-				*currentChannel = i; // Update selected index
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f)); // Change background color
+			}
+			if (!isSelected)
+			{
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
 			}
 
-			if (isSelected)
-				ImGui::SetItemDefaultFocus(); // Set focus to the current item
+			if (ImGui::Selectable(textureList[i].name.c_str(), false, ImGuiSelectableFlags_DontClosePopups))
+			{
+				selectedTextureIndex = i;
+			}
+
+			ImGui::PopStyleColor();
 		}
-		ImGui::EndCombo();
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK")) {
+			if (selectedTextureIndex >= 0 && selectedTextureIndex < textureList.size())
+			{
+				assetTextureSelectCB(textureList[selectedTextureIndex].uuid);
+
+			}
+			ImGui::CloseCurrentPopup();
+			selectedTextureIndex = -1;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel")) {
+			ImGui::CloseCurrentPopup();
+			selectedTextureIndex = -1;
+		}
+
+
+
+		ImGui::EndPopup();
 	}
+
 }

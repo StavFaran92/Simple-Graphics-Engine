@@ -12,4 +12,6 @@ void displaySelectScriptDialog(std::string& scriptName);
 
 void displaySelectShaderDialog(std::string& uuid);
 
-void displayEntitySelectDialog();
+void displayEntitySelectDialog(Entity& e);
+
+void displayAssetTextureSelectDialog();

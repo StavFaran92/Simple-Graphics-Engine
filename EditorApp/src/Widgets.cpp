@@ -1,5 +1,7 @@
 #include "Widgets.h"
 
+#include "Dialogs.h"
+
 void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(std::string uuid)> callback)
 {
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureID), size))
@@ -8,7 +10,7 @@ void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(std::st
 		assetTextureSelectCB = callback;
 	}
 
-	displayAssetTextureSelectPopup();
+	displayTextureSelectDialog();
 }
 
 void addTextureEditWidget(Resource<Texture> texture, ImVec2 size, std::function<void(std::string uuid)> callback)
@@ -25,7 +27,7 @@ void addTextureEditWidget(Resource<Texture> texture, ImVec2 size, std::function<
 		assetTextureSelectCB = callback;
 	}
 
-	displayAssetTextureSelectPopup();
+	displayTextureSelectDialog();
 }
 
 void addTextureEditWidget(Resource<Material> mat, const std::string& name, Texture::TextureType ttype)
