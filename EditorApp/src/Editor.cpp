@@ -1246,12 +1246,12 @@ class GUI_Helper : public GuiMenu {
 
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
 			ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-                        ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
-                        ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
-                        ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
-                        ImGui::DockBuilderDockWindow("View", dockspace_id);
-                        ImGui::DockBuilderFinish(dockspace_id);
-                }
+            ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
+            ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
+            ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
+            ImGui::DockBuilderDockWindow("View", dockspace_id);
+            ImGui::DockBuilderFinish(dockspace_id);
+		}
 
 		// Render UI
 		RenderSimulationControlView();

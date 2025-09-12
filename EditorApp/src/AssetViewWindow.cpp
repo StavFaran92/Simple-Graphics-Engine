@@ -180,6 +180,30 @@ void AssetViewWindow::display()
 			// Restore cursor to where it would have been after the group
 			ImGui::SetCursorScreenPos(p1);
 
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				
+				if (!fMetadata.isDirectory)
+				{
+					const AssetInfo& aInfo = assets->getAsset(fMetadata.filename);
+					ImGui::TextUnformatted(aInfo.name.c_str());
+					ImGui::Separator();
+					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
+					ImGui::Text("Path: %s", aInfo.filePath.c_str());
+					ImGui::Text("extension: %s", aInfo.ext.c_str());
+					ImGui::Text("UUID: %s", aInfo.uuid.c_str());
+					for (const auto& [attribName, attribVal] : aInfo.attributes)
+					{
+						ImGui::Text("%s: %s", attribName.c_str(), attribVal.c_str());
+
+					}
+					
+
+				}
+				ImGui::EndTooltip();
+			}
+
 			if (ImGui::BeginPopupContextItem("AssetContextMenu"))
 			{
 				if (ImGui::Selectable("Delete"))
