@@ -1,5 +1,13 @@
 #include "AssetViewWindow.h"
 
+void showInExplorer(const std::filesystem::path& p)
+{
+	auto absPath = std::filesystem::absolute(p);
+
+	std::string command = "explorer /select,\"" + absPath.string() + "\"";
+	system(command.c_str());
+}
+
 void AssetViewWindow::display()
 {
 	auto assets = Engine::get()->getSubSystem<Assets>();
@@ -191,8 +199,9 @@ void AssetViewWindow::display()
 					ImGui::Separator();
 					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
 					ImGui::Text("Path: %s", aInfo.filePath.c_str());
-					ImGui::Text("extension: %s", aInfo.ext.c_str());
+					ImGui::Text("Extension: %s", aInfo.ext.c_str());
 					ImGui::Text("UUID: %s", aInfo.uuid.c_str());
+					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);
 					for (const auto& [attribName, attribVal] : aInfo.attributes)
 					{
 						ImGui::Text("%s: %s", attribName.c_str(), attribVal.c_str());
@@ -206,25 +215,54 @@ void AssetViewWindow::display()
 
 			if (ImGui::BeginPopupContextItem("AssetContextMenu"))
 			{
+				if (ImGui::Selectable("Open"))
+				{
+					logDebug("Not yet implemented");
+				}
+
+				if (ImGui::Selectable("Rename"))
+				{
+					logDebug("Not yet implemented");
+				}
+
 				if (ImGui::Selectable("Delete"))
 				{
 					logDebug("Not yet implemented");
 				}
 
-				const AssetInfo& aInfo = assets->getAsset(fMetadata.filename);
-
-				if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
+				if (ImGui::Selectable("Properties"))
 				{
-					Resource<Prefab> prefab = aInfo.data.as<Prefab>();
-					if (prefab.isEmpty())
-					{
-						logWarning("Failed to cast asset to prefab asset.");
-						continue;
-					}
-					prefab->Instansiate();
-					updateScene();
-
+					logDebug("Not yet implemented");
 				}
+
+				if (ImGui::Selectable("Show in Explorer"))
+				{
+
+					showInExplorer(fMetadata.filePath);
+				}
+
+				ImGui::Separator();
+
+				if (!fMetadata.isDirectory)
+				{
+
+					const AssetInfo& aInfo = assets->getAsset(fMetadata.filename);
+
+					if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
+					{
+						Resource<Prefab> prefab = aInfo.data.as<Prefab>();
+						if (prefab.isEmpty())
+						{
+							logWarning("Failed to cast asset to prefab asset.");
+							continue;
+						}
+						prefab->Instansiate();
+						updateScene();
+
+					}
+				}
+
+				
 
 				ImGui::EndPopup();
 			}
