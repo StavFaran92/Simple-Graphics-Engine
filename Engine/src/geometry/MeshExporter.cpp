@@ -8,8 +8,8 @@ std::string MeshExporter::exportMesh(const std::string& name, Resource<MeshColle
 {
 	auto& projectDir = Engine::get()->getProjectDirectory();
 	Assimp::Exporter exporter;
-	const std::string relativeFilepath = "/" + name + ".dae";
-	const std::string savedFilePath = projectDir + relativeFilepath;
+	const std::string relativeFilepath = name + ".dae";
+	const std::string savedFilePath = projectDir + "/" + relativeFilepath;
 	exporter.Export(scene, "collada", savedFilePath);
 	return relativeFilepath;
 }

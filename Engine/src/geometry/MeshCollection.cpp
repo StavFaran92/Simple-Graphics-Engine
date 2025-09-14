@@ -26,7 +26,7 @@ struct AssetTraits<MeshCollection>
 
 		aInfo.aType = AssetType::MESH;
 
-		const std::string relativeFilepath = "/" + aInfo.name + ".dae";
+		const std::string relativeFilepath = aInfo.name + ".dae";
 		aInfo.filePath = relativeFilepath;
 		aInfo.origFilePath = fileLocation;
 	}

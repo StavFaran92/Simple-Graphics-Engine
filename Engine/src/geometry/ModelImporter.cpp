@@ -227,8 +227,8 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 			auto& aMaterial = scene->mMaterials[i];
 
 			std::string matName = aMaterial->GetName().C_Str();
-			UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(aMaterial->GetName().C_Str());
-			Resource<Material> material = Resource<Material>(matName);
+			UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(matName);
+			Resource<Material> material = Resource<Material>(uuid);
 			modelInfo.materials[i] = material;
 		}
 	}
@@ -309,6 +309,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			materialAssetInfo.isTransient = aInfo.isTransient;
 			materialAssetInfo.name = aMaterial->GetName().C_Str();
 			auto& material = Material::create(materialAssetInfo);
+			Engine::get()->getMemoryManagementSystem()->addAssociation(aMaterial->GetName().C_Str(), material.getUID());
 			material->setName(aMaterial->GetName().C_Str());
 
 			auto& diffuse = importAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures);

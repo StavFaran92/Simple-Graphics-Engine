@@ -100,7 +100,7 @@ bool Engine::init(const InitParams& initParams)
 
     m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR + "/EngineConfig.json");
 
-    m_projectDirectory = initParams.projectDir;
+    m_projectDirectory = initParams.projectDir + "/";
 
     if (!std::filesystem::exists(m_projectDirectory) || !std::filesystem::is_directory(m_projectDirectory)) 
     {

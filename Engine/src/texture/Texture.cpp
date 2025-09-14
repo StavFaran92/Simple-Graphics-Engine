@@ -31,8 +31,8 @@ struct AssetTraits<Texture>
 	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
-		const std::string savedFilePath = projectDir + relativeFilepath;
+		const std::string relativeFilepath = aInfo.name + aInfo.ext;
+		const std::string savedFilePath = projectDir + "/" + relativeFilepath;
 		return std::filesystem::copy_file(fileLocation, savedFilePath);
 	}
 
@@ -62,7 +62,7 @@ struct AssetTraits<Texture>
 
 		aInfo.ext = std::filesystem::path(fileLocation).extension().string();
 
-		const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
+		const std::string relativeFilepath = aInfo.name + aInfo.ext;
 		aInfo.filePath = relativeFilepath;
 
 		Texture::TextureAssetAttributes attributes;

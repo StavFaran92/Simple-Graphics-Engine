@@ -74,9 +74,9 @@ void AssetViewWindow::display()
 		for (const auto& entry : std::filesystem::directory_iterator(cwd))
 		{
 			FileMetadata fMetadata;
-			fMetadata.filename = entry.path().filename().stem().string();
+			fMetadata.filename = entry.path().filename().string();
 
-			if (fMetadata.filename == "entities" || fMetadata.filename == "ProjectAssetRegistry")
+			if (fMetadata.filename == "entities.json" || fMetadata.filename == "ProjectAssetRegistry.json")
 				continue; // Skip unwanted files
 
 			fMetadata.filePath = entry.path().string();
@@ -142,13 +142,10 @@ void AssetViewWindow::display()
 					ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
 					ImGui::SameLine();
 
-					std::string assetName = "[" + getAssetTypeAsStr(aInfo.aType) + "] " + aInfo.name;
+					std::string assetName = aInfo.name;
 
 					// Draw filename and small info
 					ImGui::Text("%s", assetName.c_str());
-
-					ImGui::SameLine();
-					ImGui::TextDisabled("(%.1f KB)", fMetadata.fileSize / 1024.0f);
 
 				}
 				ImGui::EndGroup();

@@ -40,7 +40,7 @@ struct AssetTraits<Material>
 
 		aInfo.aType = AssetType::MATERIAL;
 
-		const std::string relativeFilepath = "/" + aInfo.name + ".asset";
+		const std::string relativeFilepath = aInfo.name + ".asset";
 		aInfo.filePath = relativeFilepath;
 		aInfo.origFilePath = fileLocation;
 	}
@@ -48,7 +48,7 @@ struct AssetTraits<Material>
 	static Resource<Material> load(AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ifstream is(projectDir + aInfo.filePath);
+		std::ifstream is(projectDir + "/" + aInfo.filePath);
 		cereal::JSONInputArchive iarchive(is);
 		Material* loadedMaterial = new Material();
 
@@ -70,7 +70,7 @@ struct AssetTraits<Material>
 	static void save(AssetInfo& aInfo, const Resource<Material>& mat)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ofstream os(projectDir + aInfo.filePath);
+		std::ofstream os(projectDir + "/" + aInfo.filePath);
 		cereal::JSONOutputArchive oarchive(os);
 
 		try
@@ -172,7 +172,7 @@ Resource<Material> Material::create(AssetInfo& aInfo)
 	
 	if (!aInfo.name.empty())
 	{
-		mat = Factory<Material>::createUsingCustomUUID(aInfo.name);
+		mat = Factory<Material>::createUsingCustomUUID(aInfo.name + ".asset");
 	}
 	else
 	{

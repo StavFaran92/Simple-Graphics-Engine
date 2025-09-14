@@ -21,17 +21,17 @@ public:
 			return Resource<T>::empty;
 		}
 
-		// Data extract
 		AssetInfo aInfo;
+		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
+
 		if (params.customUUID.empty())
 		{
-			aInfo.uuid = uuid::generate_uuid_v4();
+			aInfo.uuid = aInfo.filePath;
 		}
 		else
 		{
 			aInfo.uuid = params.customUUID;
 		}
-		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
 
 		// Copy + Paste
 		if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
@@ -83,7 +83,8 @@ public:
 	{
 		if (!aInfo.isTransient)
 		{
-			aInfo.filePath = "/" + aInfo.name + ".asset";
+			aInfo.filePath = aInfo.name + ".asset";
+			aInfo.uuid = aInfo.filePath;
 			AssetTraits<T>::save(aInfo, asset);
 		}
 

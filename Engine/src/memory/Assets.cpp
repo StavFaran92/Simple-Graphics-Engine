@@ -119,7 +119,7 @@ AssetInfo Assets::addAsset(AssetInfo& aInfo)
 		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 	}
 
-	m_assets[aInfo.name] = aInfo;
+	m_assets[aInfo.uuid] = aInfo;
 
 	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
 
@@ -158,7 +158,7 @@ void Assets::load()
 	for (auto& assetInfo : assets)
 	{
 		AssetFactory::loadAsset(assetInfo);
-		m_assets[assetInfo.name] = assetInfo;
+		m_assets[assetInfo.uuid] = assetInfo;
 	}
 }
 
@@ -200,7 +200,7 @@ AssetInfo Assets::updateAsset(AssetInfo& aInfo)
 		Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
 	}
 
-	m_assets[aInfo.name] = aInfo;
+	m_assets[aInfo.uuid] = aInfo;
 
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 
