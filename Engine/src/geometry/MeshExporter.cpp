@@ -4,17 +4,16 @@
 #include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
 
-std::string MeshExporter::exportMesh(const std::string& name, Resource<MeshCollection> mesh, const aiScene* scene)
+void MeshExporter::exportMesh(const std::string& name, const std::string& targetDir, const aiScene* scene)
 {
+	if (!scene)
+	{
+		logError("Cannot export empty scene.");
+		return;
+	}
 	auto& projectDir = Engine::get()->getProjectDirectory();
 	Assimp::Exporter exporter;
-	const std::string relativeFilepath = name + ".dae";
-	const std::string savedFilePath = projectDir + "/" + relativeFilepath;
+	const std::string filename = name + ".dae";
+	const std::string savedFilePath = projectDir + "/" + targetDir + "/" + filename;
 	exporter.Export(scene, "collada", savedFilePath);
-	return relativeFilepath;
-}
-
-std::string MeshExporter::exportMaterial(std::vector<Resource<Material>> materials, const aiScene* scene)
-{
-	return "";
 }

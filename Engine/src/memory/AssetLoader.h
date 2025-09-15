@@ -21,17 +21,8 @@ public:
 			return Resource<T>::empty;
 		}
 
-		AssetInfo aInfo;
-		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
-
-		if (params.customUUID.empty())
-		{
-			aInfo.uuid = aInfo.filePath;
-		}
-		else
-		{
-			aInfo.uuid = params.customUUID;
-		}
+		AssetInfo aInfo = extractAssetInfoData(fileLocation, params);
+		std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
 
 		// Copy + Paste
 		if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
@@ -54,7 +45,7 @@ public:
 		return aInfo.data.as<T>();
 	}
 
-	static Resource<T> loadTransient(const std::string& fileLocation, const BaseAssetParameters& settings)
+	static Resource<T> loadTransient(const std::string& fileLocation, const BaseAssetParameters& params)
 	{
 		// Validate input
 		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -63,28 +54,25 @@ public:
 			return Resource<T>::empty;
 		}
 
-		AssetInfo aInfo;
-		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, settings, aInfo);
-		if (settings.customUUID.empty())
-		{
-			aInfo.uuid = uuid::generate_uuid_v4();
-		}
-		else
-		{
-			aInfo.uuid = settings.customUUID;
-		}
+		AssetInfo aInfo = extractAssetInfoData(fileLocation, params);
+
 		aInfo.isTransient = true;
 		aInfo.filePath = fileLocation;
 
-		return AssetTraits<T>::load(aInfo);
+		Resource<T> asset = AssetTraits<T>::load(aInfo);
+
+		if (asset.isEmpty() || !asset.get())
+		{
+			logWarning("Failed to load asset from {}", fileLocation);
+		}
+
+		return asset;
 	}
 
 	static void save(AssetInfo& aInfo, const Resource<T>& asset)
 	{
 		if (!aInfo.isTransient)
 		{
-			aInfo.filePath = aInfo.name + ".asset";
-			aInfo.uuid = aInfo.filePath;
 			AssetTraits<T>::save(aInfo, asset);
 		}
 
@@ -92,5 +80,73 @@ public:
 
 		Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
 
+	}
+
+	static Resource<T> create(AssetInfo& aInfo)
+	{
+		if (aInfo.aType == AssetType::NONE)
+		{
+			logError("Asset type cannot be NONE.");
+			return {};
+		}
+
+		if (aInfo.ext.empty())
+		{
+			logError("Asset extension cannot be empty.");
+			return {};
+		}
+
+		if (aInfo.name.empty())
+		{
+			aInfo.name = uuid::generate_uuid_v4();
+		}
+
+		if (!aInfo.assetDirectory.empty())
+		{
+			aInfo.filePath += aInfo.assetDirectory + "/";
+		}
+		aInfo.filePath += aInfo.name + aInfo.ext;
+
+		if (!aInfo.customUUID.empty())
+		{
+			aInfo.uuid = aInfo.customUUID;
+		}
+		else
+		{
+			aInfo.uuid = aInfo.filePath;
+		}
+
+		Resource<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
+
+		save(aInfo, asset);
+
+		asset.get()->m_assetInfo = aInfo;
+
+		return asset;
+	}
+
+private:
+	static AssetInfo extractAssetInfoData(const std::string& fileLocation, const BaseAssetParameters& params)
+	{
+		AssetInfo aInfo;
+		aInfo.name = params.name.empty()
+			? std::filesystem::path(fileLocation).filename().stem().string()
+			: params.name;
+
+		aInfo.origFilePath = fileLocation;
+
+		aInfo.assetDirectory = params.targetDirectory;
+
+		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
+
+		aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
+
+		aInfo.uuid = params.customUUID.empty()
+			? aInfo.filePath
+			: params.customUUID;
+
+		
+
+		return aInfo;
 	}
 };

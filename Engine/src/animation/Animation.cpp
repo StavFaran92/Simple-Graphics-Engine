@@ -15,21 +15,8 @@ struct AssetTraits<Animation>
 
 	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
 	{
-		// Data extract
-		if (params.name.empty())
-		{
-			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-		}
-		else
-		{
-			aInfo.name = params.name;
-		}
-
 		aInfo.aType = AssetType::ANIMATION;
-
-		const std::string relativeFilepath = "/" + aInfo.name + ".dae";
-		aInfo.filePath = relativeFilepath;
-		aInfo.origFilePath = fileLocation;
+		aInfo.fileName = "/" + aInfo.name + ".dae";
 	}
 
 	static Resource<Animation> load(AssetInfo& aInfo)

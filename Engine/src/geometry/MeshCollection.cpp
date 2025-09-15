@@ -14,21 +14,9 @@ struct AssetTraits<MeshCollection>
 
 	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
 	{
-		// Data extract
-		if (params.name.empty())
-		{
-			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-		}
-		else
-		{
-			aInfo.name = params.name;
-		}
-
 		aInfo.aType = AssetType::MESH;
-
-		const std::string relativeFilepath = aInfo.name + ".dae";
-		aInfo.filePath = relativeFilepath;
-		aInfo.origFilePath = fileLocation;
+		aInfo.assetDirectory = (std::filesystem::path(params.targetDirectory) / aInfo.name).generic_string();
+		aInfo.fileName = aInfo.name + ".dae";;
 	}
 
 	static Resource<MeshCollection> load(AssetInfo& aInfo)

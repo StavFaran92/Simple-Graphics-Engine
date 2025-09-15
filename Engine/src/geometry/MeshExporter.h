@@ -11,6 +11,5 @@
 class MeshExporter
 {
 public:
-	static std::string exportMesh(const std::string& name, Resource<MeshCollection> mesh, const aiScene* scene);
-	static std::string exportMaterial(std::vector<Resource<Material>> materials, const aiScene* scene);
+	static void exportMesh(const std::string& name, const std::string& targetDir, const aiScene* scene);
 };

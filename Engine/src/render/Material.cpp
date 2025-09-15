@@ -28,21 +28,8 @@ struct AssetTraits<Material>
 
 	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
 	{
-		// Data extract
-		if (params.name.empty())
-		{
-			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-		}
-		else
-		{
-			aInfo.name = params.name;
-		}
-
 		aInfo.aType = AssetType::MATERIAL;
-
-		const std::string relativeFilepath = aInfo.name + ".asset";
-		aInfo.filePath = relativeFilepath;
-		aInfo.origFilePath = fileLocation;
+		aInfo.fileName = aInfo.name + ".asset";;
 	}
 
 	static Resource<Material> load(AssetInfo& aInfo)
@@ -166,28 +153,10 @@ Resource<Material> Material::loadTransient(const std::string& fileLocation, cons
 
 Resource<Material> Material::create(AssetInfo& aInfo)
 {
-	Resource<Material> mat;
-
 	aInfo.aType = AssetType::MATERIAL;
-	
-	if (!aInfo.name.empty())
-	{
-		mat = Factory<Material>::createUsingCustomUUID(aInfo.name + ".asset");
-	}
-	else
-	{
-		mat = Factory<Material>::create();
-		aInfo.name = mat.getUID();
-	}
+	aInfo.ext = ".asset";
 
-	aInfo.uuid = mat.getUID();
-	aInfo.isTransient = aInfo.isTransient;
-	
-	AssetLoader<Material>::save(aInfo, mat);
-
-	mat.get()->m_assetInfo = aInfo;
-
-	return mat;
+	return AssetLoader<Material>::create(aInfo);
 }
 
 void Material::save(const Resource<Material>& material)

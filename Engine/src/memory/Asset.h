@@ -9,6 +9,8 @@ struct BaseAssetParameters
 {
 	std::string name;
 	UUID customUUID;
+	std::string targetDirectory;
+	bool isTransient = false;
 
 	virtual ~BaseAssetParameters() = default;
 };
@@ -57,6 +59,6 @@ public:
 		return T::load(aInfo);
 	}
 
-protected:
+public:
 	AssetInfo m_assetInfo;
 };

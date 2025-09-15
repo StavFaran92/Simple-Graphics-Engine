@@ -32,7 +32,7 @@ struct AssetTraits<Texture>
 	{
 		auto& projectDir = Engine::get()->getProjectDirectory();
 		const std::string relativeFilepath = aInfo.name + aInfo.ext;
-		const std::string savedFilePath = projectDir + "/" + relativeFilepath;
+		const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + relativeFilepath;
 		return std::filesystem::copy_file(fileLocation, savedFilePath);
 	}
 
@@ -47,23 +47,9 @@ struct AssetTraits<Texture>
 
 		auto settings = *tParams; // Just for convinience
 
-		aInfo.origFilePath = fileLocation;
 		aInfo.aType = AssetType::TEXTURE;
-
-		if (!settings.name.empty())
-		{
-			aInfo.name = settings.name;
-		}
-		else
-		{
-			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-
-		}
-
 		aInfo.ext = std::filesystem::path(fileLocation).extension().string();
-
-		const std::string relativeFilepath = aInfo.name + aInfo.ext;
-		aInfo.filePath = relativeFilepath;
+		aInfo.fileName = aInfo.name + aInfo.ext;;
 
 		Texture::TextureAssetAttributes attributes;
 		attributes.flip = settings.flip;

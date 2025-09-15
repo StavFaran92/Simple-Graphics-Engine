@@ -23,21 +23,8 @@ struct AssetTraits<Prefab>
 
 	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
 	{
-		// Data extract
-		if (params.name.empty())
-		{
-			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-		}
-		else
-		{
-			aInfo.name = params.name;
-		}
-
 		aInfo.aType = AssetType::PREFAB;
-
-		const std::string relativeFilepath = "/" + aInfo.name + ".asset";
-		aInfo.filePath = relativeFilepath;
-		aInfo.origFilePath = fileLocation;
+		aInfo.fileName = aInfo.name + ".asset";;
 	}
 
 	static Resource<Prefab> load(AssetInfo& aInfo)
@@ -106,38 +93,14 @@ void Prefab::extractChildrenRecursive(const Entity& e, Resource<Prefab>& prefab)
 
 Resource<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
 {
-	Resource<Prefab> prefab;
-
 	aInfo.aType = AssetType::PREFAB;
+	aInfo.ext = ".asset";
 
-	if (!aInfo.name.empty())
-	{
-		prefab = Factory<Prefab>::createUsingCustomUUID(aInfo.name);
-	}
-	else
-	{
-		prefab = Factory<Prefab>::create();
-		aInfo.name = prefab.getUID();
-	}
-
-	aInfo.uuid = prefab.getUID();
-	aInfo.isTransient = aInfo.isTransient;
+	Resource<Prefab> prefab = AssetLoader<Prefab>::create(aInfo);
 
 	extractChildrenRecursive(e, prefab);
 
-	//prefab->m_serializedPrefab.push_back(Archiver::serializeEntity(e));
-	//auto& children = e.getComponent<Transformation>().getChildren();
-	//if (children.size() > 0)
-	//{
-	//	for (auto& child : children)
-	//	{
-
-	//	}
-	//}
-
 	AssetLoader<Prefab>::save(aInfo, prefab);
-
-	prefab->m_assetInfo = aInfo;
 
 	return prefab;
 }

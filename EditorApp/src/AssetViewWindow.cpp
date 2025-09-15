@@ -15,6 +15,8 @@ void AssetViewWindow::display()
 	ImGui::Begin("Asset View", nullptr, windowFlags);
 
 	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
+	std::filesystem::path rel = std::filesystem::relative(cwd, Engine::get()->getProjectDirectory());
+	if (rel == ".") rel = "";
 
 	bool canGoBack = cwd != Engine::get()->getProjectDirectory();
 
@@ -98,7 +100,7 @@ void AssetViewWindow::display()
 			{
 				ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
 				{
-					std::string dirName = "[Dir] " + fMetadata.filename;
+					std::string dirName = fMetadata.filename;
 
 					unsigned int iconID = icons.at("folder")->getID();
 					ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
@@ -121,12 +123,14 @@ void AssetViewWindow::display()
 				if (filename == "entities" || filename == "ProjectAssetRegistry")
 					continue; // Skip unwanted files
 
-				if (!assets->hasAsset(filename)) continue;
+				
+				UUID uuid = (rel / filename).generic_string();
+				if (!assets->hasAsset(uuid)) continue;
 
 				ImGui::BeginGroup();
 				{
 
-					const AssetInfo& aInfo = assets->getAsset(filename);
+					const AssetInfo& aInfo = assets->getAsset(uuid);
 
 					int iconID = 0;
 					switch (aInfo.aType) {
@@ -191,7 +195,8 @@ void AssetViewWindow::display()
 				
 				if (!fMetadata.isDirectory)
 				{
-					const AssetInfo& aInfo = assets->getAsset(fMetadata.filename);
+					UUID uuid = (rel / fMetadata.filename).generic_string();
+					const AssetInfo& aInfo = assets->getAsset(uuid);
 					ImGui::TextUnformatted(aInfo.name.c_str());
 					ImGui::Separator();
 					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
@@ -242,8 +247,8 @@ void AssetViewWindow::display()
 
 				if (!fMetadata.isDirectory)
 				{
-
-					const AssetInfo& aInfo = assets->getAsset(fMetadata.filename);
+					UUID uuid = (rel / fMetadata.filename).generic_string();
+					const AssetInfo& aInfo = assets->getAsset(uuid);
 
 					if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
 					{

@@ -40,20 +40,7 @@ struct AssetTraits<Shader>
 
 		auto settings = *sParams; // Just for convinience
 
-
-		if (params.name.empty())
-		{
-			aInfo.name = std::filesystem::path(fileLocation).filename().stem().string();
-		}
-		else
-		{
-			aInfo.name = params.name;
-		}
-
-		const std::string relativeFilepath = "/" + aInfo.name + ".glsl";
-		aInfo.filePath = relativeFilepath;
-		aInfo.origFilePath = fileLocation;
-
+		aInfo.fileName = aInfo.name + ".glsl";;
 		aInfo.aType = AssetType::SHADER;
 
 		aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(sParams->shaderOverride);

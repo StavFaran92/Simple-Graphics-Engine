@@ -10,8 +10,11 @@
 struct AssetInfo
 {
 	UUID uuid;
+	UUID customUUID;
 	std::string origFilePath;
 	std::string filePath;
+	std::string fileName;
+	std::string assetDirectory;
 	std::string ext;
 	AssetType aType;
 	bool isValid = false;
