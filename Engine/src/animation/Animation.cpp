@@ -2,6 +2,7 @@
 
 #include "animation/Bone.h"
 #include "animation/AnimationLoader.h"
+#include "memory/AssetLoader.h"
 
 #include <filesystem>
 

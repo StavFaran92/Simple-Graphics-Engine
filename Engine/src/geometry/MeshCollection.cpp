@@ -1,6 +1,7 @@
 #include "geometry/MeshCollection.h"
 
 #include "geometry/ModelImporter.h"
+#include "memory/AssetLoader.h"
 
 #include <filesystem>
 

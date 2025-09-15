@@ -10,7 +10,7 @@
 #include "texture/Texture.h"
 #include "runtime/Entity.h"
 #include "render/Material.h"
-#include "memory/AssetLoader.h"
+#include "memory/Asset.h"
 
 // Forward declerations
 struct aiNode;

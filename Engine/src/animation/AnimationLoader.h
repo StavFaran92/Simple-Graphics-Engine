@@ -11,14 +11,13 @@
 #include "core/Core.h"
 #include "memory/Assets.h"
 #include "memory/Asset.h"
-#include "memory/AssetLoader.h"
-
-class Animation;
 
 struct AnimationImportSettings : public BaseAssetParameters
 {
-	
+
 };
+
+class Animation;
 
 class EngineAPI AnimationLoader
 {
