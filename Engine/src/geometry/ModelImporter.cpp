@@ -89,8 +89,17 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
-			std::string matName = aMaterial->GetName().C_Str();
-			UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(matName);
+			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
+
+			std::string materialName = aMaterial->GetName().C_Str();
+			//materialName += (i != 0) ? " " + std::to_string(i) : "";
+
+			UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(materialID);
+			if (uuid == EMPTY_UUID)
+			{
+				logWarning("Could not locate material: {}", materialID);
+				continue;
+			}
 			Resource<Material> material = Resource<Material>(uuid);
 			modelInfo.materials[i] = material;
 		}
@@ -165,16 +174,22 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		{
+			// i will use unique id as scene#index
+			// name will be used  for display
+			// add assiciation between them
 			auto& aMaterial = scene->mMaterials[i];
+			std::string materialName = std::string(aMaterial->GetName().C_Str());
+			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
+			//materialName += (i != 0) ? " " + std::to_string(i) : ""; // This is some DAE nonsense logic, I should think of a better approach
 
 			// get uuid using tex name from association map
 			AssetInfo materialAssetInfo;
 			materialAssetInfo.isTransient = aInfo.isTransient;
 			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
-			materialAssetInfo.name = aMaterial->GetName().C_Str();
+			materialAssetInfo.name = materialID;
 			auto& material = Material::create(materialAssetInfo);
-			Engine::get()->getMemoryManagementSystem()->addAssociation(aMaterial->GetName().C_Str(), material.getUID());
-			material->setName(aMaterial->GetName().C_Str());
+			Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
+			material->setName(materialName);
 
 			auto& diffuse = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures, aInfo);
 			if (!diffuse.isEmpty())
