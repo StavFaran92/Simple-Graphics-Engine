@@ -1,7 +1,6 @@
 #include "geometry/ModelImporter.h"
 
 #include <assimp/Importer.hpp>
-#include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <algorithm>
@@ -20,7 +19,6 @@
 #include "memory/Assets.h"
 #include "utils/AssimpGLMHelpers.h"
 #include "core/Factory.h"
-#include "geometry/MeshExporter.h"
 #include "geometry/ShapeFactory.h"
 
 bool findFile(const std::filesystem::path& directory, const std::string& fileName, std::filesystem::path& outputPath)
@@ -158,8 +156,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	auto fileDir = std::filesystem::path(fileLocation).parent_path().string();
 
 	// read scene from file
-	const aiScene* scene = m_importer->ReadFile(fileLocation,
-		aiProcess_ValidateDataStructure);
+	const aiScene* scene = m_importer->ReadFile(fileLocation, aiProcess_ValidateDataStructure);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -174,9 +171,6 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		{
-			// i will use unique id as scene#index
-			// name will be used  for display
-			// add assiciation between them
 			auto& aMaterial = scene->mMaterials[i];
 			std::string materialName = std::string(aMaterial->GetName().C_Str());
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
