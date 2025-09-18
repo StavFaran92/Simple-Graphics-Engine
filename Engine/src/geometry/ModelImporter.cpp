@@ -135,7 +135,11 @@ void ModelImporter::loadModelFromFile(AssetInfo& aInfo, ModelImporter::ModelInfo
 	{
 
 		// read scene from file
-		scene = m_importer->ReadFile(filepath, aiProcess_ValidateDataStructure);
+		scene = m_importer->ReadFile(filepath, aiProcess_Triangulate |
+			aiProcess_GenSmoothNormals |
+			aiProcess_FlipUVs |
+			aiProcess_CalcTangentSpace |
+			aiProcess_ValidateDataStructure);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
@@ -155,10 +159,6 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 	// read scene from file
 	const aiScene* scene = m_importer->ReadFile(fileLocation,
-		aiProcess_Triangulate |
-		aiProcess_GenSmoothNormals |
-		aiProcess_FlipUVs |
-		aiProcess_CalcTangentSpace |
 		aiProcess_ValidateDataStructure);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -180,7 +180,6 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			auto& aMaterial = scene->mMaterials[i];
 			std::string materialName = std::string(aMaterial->GetName().C_Str());
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
-			//materialName += (i != 0) ? " " + std::to_string(i) : ""; // This is some DAE nonsense logic, I should think of a better approach
 
 			// get uuid using tex name from association map
 			AssetInfo materialAssetInfo;
@@ -209,34 +208,10 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 	Resource<MeshCollection> mesh = Factory<MeshCollection>::create();
 
-	if (scene->HasTextures())
-	{
-		aiScene* strippedScene = new aiScene(*scene);
-
-		for (unsigned int i = 0; i < strippedScene->mNumMaterials; ++i)
-		{
-			aiMaterial* mat = strippedScene->mMaterials[i];
-
-			for (int t = aiTextureType_NONE + 1; t <= aiTextureType_UNKNOWN; ++t)
-			{
-				aiTextureType texType = static_cast<aiTextureType>(t);
-
-				unsigned int texCount = mat->GetTextureCount(texType);
-				for (unsigned int index = 0; index < texCount; ++index)
-				{
-					strippedScene->mTextures[index] = nullptr;
-					strippedScene->mNumTextures = 0;
-					// Remove only the texture reference (path binding)
-					//mat->RemoveProperty(AI_MATKEY_TEXTURE(texType, index));
-				}
-			}
-		}
-
-		scene = strippedScene;
-	}
-
-	// TODO I should probably copy the file instead of export (issue with GLTF and bin)
-	MeshExporter::exportMesh(aInfo.name, aInfo.assetDirectory, scene);
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	const std::string filename = std::filesystem::path(fileLocation).filename().string();
+	const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + filename;
+	std::filesystem::copy_file(fileLocation, savedFilePath);
 
 	return true;
 }
