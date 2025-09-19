@@ -188,7 +188,7 @@ void displayColoredLabelWidget(const char* label)
 {
 	// Draw a blue background using ImGuiCol_Header color
 	ImVec2 startPos = ImGui::GetCursorScreenPos();
-	ImVec2 endPos = ImVec2(startPos.x + ImGui::GetContentRegionAvail().x, startPos.y + ImGui::GetTextLineHeightWithSpacing() + 2);
+	ImVec2 endPos = ImVec2(startPos.x + ImGui::GetContentRegionAvail().x, startPos.y + ImGui::GetTextLineHeightWithSpacing());
 	ImGui::GetWindowDrawList()->AddRectFilled(startPos, endPos, ImGui::GetColorU32(ImGuiCol_Header));
 
 	// Calculate the vertical offset to center the text within the rectangle
@@ -196,7 +196,7 @@ void displayColoredLabelWidget(const char* label)
 
 	// Calculate padding values
 	float paddingX = 5.0f;
-	float paddingY = 2.0f;
+	float paddingY = 3.0f;
 
 	// Adjust the text position to center it vertically and add padding
 	ImVec2 textPos = ImVec2(startPos.x + paddingX, startPos.y + offsetY + paddingY);

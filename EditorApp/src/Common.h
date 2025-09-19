@@ -86,16 +86,25 @@ static void displayComponent(const std::string& componentName, std::function<voi
 
 		if (!std::is_same<T, Transformation>::value)
 		{
-			ImGui::SetCursorPos(ImVec2(windowSize.x - 24.0f, cursorPos.y - ImGui::GetTextLineHeightWithSpacing() - 7.0f));
+			ImGui::SetCursorPos(ImVec2(windowSize.x - 24.0f, cursorPos.y - ImGui::GetTextLineHeightWithSpacing() - 8.0f));
 			ImGui::PushID(componentName.c_str());
-			if (ImGui::Button("X")) {
+			ImVec2 size(10, 10); // size of the hitbox
+
+			auto pos = ImGui::GetCursorPos();
+			if (ImGui::InvisibleButton("##X", size))
+			{
 				state.getSelectedEntity().RemoveComponent<T>();
 				ImGui::EndGroup();
 				updateScene();
 				return;
 			}
+			ImGui::SetCursorPos(pos);
+			ImGui::Text("X"); // draw your own label or icon
+			
 			ImGui::PopID();
 		}
+
+		ImGui::Dummy(ImVec2(0, 5));
 
 		ImGui::Indent(5); // Indent by 10 pixels
 		func(component);
