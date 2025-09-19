@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "NativeScriptsLoader.h"
 #include "Common.h"
+#include "Widgets.h"
 
 void displaySelectMeshDialog(std::string& uuid)
 {
@@ -403,5 +404,99 @@ void displayShaderCreatorDialog()
 		}
 
 		ImGui::EndPopup();
+	}
+}
+
+void displayMaterialEditDialog()
+{
+	if (EditorState::Instance().showMaterialEditWindow)
+	{
+		ImGui::OpenPopup("EditMaterial");
+		EditorState::Instance().showMaterialEditWindow = false;
+	}
+	if (ImGui::BeginPopupModal("EditMaterial", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		auto& mat = EditorState::Instance().selectedMaterialForEdit;
+		ImGui::Text(mat->getName().c_str());
+
+		ImGui::Dummy(ImVec2(0, 4));
+
+		addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
+		addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
+		addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
+		addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
+		addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void displayAssetSelectDialog(AssetType aType, UUID& uuid)
+{
+	if (EditorState::Instance().showAssetSelectorWindow)
+	{
+		std::string label = "Select " + getAssetTypeAsStr(aType);
+		ImGui::Begin(label.c_str(), &EditorState::Instance().showAssetSelectorWindow, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Text("Available Animations:");
+		ImGui::Separator();
+
+		static int selectedAssetIndex = -1;
+
+		auto& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(aType);
+
+		for (int i = 0; i < assetList.size(); i++)
+		{
+			bool isSelected = (selectedAssetIndex == i);
+			if (isSelected)
+			{
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f)); // Change background color
+			}
+			if (!isSelected)
+			{
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
+			}
+
+			if (ImGui::Selectable(assetList[i].name.c_str()))
+			{
+				selectedAssetIndex = i;
+			}
+
+			ImGui::PopStyleColor();
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK")) 
+		{
+			if (selectedAssetIndex >= 0 && selectedAssetIndex < assetList.size())
+			{
+				uuid = assetList[selectedAssetIndex].uuid;
+
+			}
+			EditorState::Instance().showAssetSelectorWindow = false;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel")) 
+		{
+			EditorState::Instance().showAssetSelectorWindow = false;
+		}
+
+		ImGui::End();
 	}
 }

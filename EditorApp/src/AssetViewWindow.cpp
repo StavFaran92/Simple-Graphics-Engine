@@ -1,5 +1,8 @@
 #include "AssetViewWindow.h"
 
+#include "Dialogs.h"
+#include "EditorState.h"
+
 void showInExplorer(const std::filesystem::path& p)
 {
 	auto absPath = std::filesystem::absolute(p);
@@ -219,7 +222,23 @@ void AssetViewWindow::display()
 			{
 				if (ImGui::Selectable("Open"))
 				{
-					logDebug("Not yet implemented");
+					UUID uuid = (rel / fMetadata.filename).generic_string();
+					const AssetInfo& aInfo = assets->getAsset(uuid);
+
+					if (aInfo.aType == AssetType::MATERIAL)
+					{
+						Resource<Material> mat = aInfo.data.as<Material>();
+						if (mat.isEmpty())
+						{
+							logError("Asset cast to material failed.");
+						}
+						else
+						{
+							EditorState::Instance().selectedMaterialForEdit = mat;
+							EditorState::Instance().showMaterialEditWindow = true;
+
+						}
+					}
 				}
 
 				if (ImGui::Selectable("Rename"))

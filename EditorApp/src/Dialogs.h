@@ -19,3 +19,7 @@ void displayTextureSelectDialog();
 void displayTextureCreatorDialog();
 
 void displayShaderCreatorDialog();
+
+void displayMaterialEditDialog();
+
+void displayAssetSelectDialog(AssetType aType, UUID& uuid);

@@ -22,11 +22,17 @@ public:
     bool showSamplerEditWindow = false;
     bool showTextureCreateWindow = false;
     bool showShaderCreateWindow = false;
+    bool showMaterialEditWindow = false;
     bool startButtonPressed = false;
     bool isMouseInSceneView = false;
     bool showTextureDisplayWindow = false;
 
+    bool showAssetSelectorWindow = false;
+    AssetType assetSelectType;
+    std::function<void(UUID uuid)> assetSelectCB;
+
     std::string selectedTextureName;
+
 
     
 
@@ -36,6 +42,8 @@ public:
 
     std::shared_ptr<TextureSampler> selectedSampler;
     std::shared_ptr<TextureSampler> previousSampler;
+
+    Resource<Material> selectedMaterialForEdit;
 
     // Delete copy/move constructors to enforce singleton
     EditorState(const EditorState&) = delete;

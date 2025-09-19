@@ -19,3 +19,5 @@ void displayChannelSelectWidget(int*& currentChannel);
 void displayTextureWidget();
 
 void displayColoredLabelWidget(const char* label);
+
+void addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& uuid);

@@ -1262,7 +1262,21 @@ class GUI_Helper : public GuiMenu {
         RenderConsoleWindow();
 		displayTextureCreatorDialog();
 		displayShaderCreatorDialog();
+		displayMaterialEditDialog();
         //ShowTextureDisplayWindow();
+
+		if (EditorState::Instance().showAssetSelectorWindow) 
+		{
+			UUID uuid;
+			displayAssetSelectDialog(EditorState::Instance().assetSelectType, uuid);
+			if (!uuid.empty())
+			{
+				if (EditorState::Instance().assetSelectCB)
+				{
+					EditorState::Instance().assetSelectCB(uuid);
+				}
+			}
+		}
 
 		DisplayDebugInfoWindow();
 		

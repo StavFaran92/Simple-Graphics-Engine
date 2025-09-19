@@ -364,7 +364,6 @@ void InspectorWindow::display()
 
 			ImGui::DragFloat("playback speed", &animator.m_playbackSpeed);
 
-			static int animIndex = 0;
 			static int activeAnimationIndex = 0;
 			static std::string animName;
 			static std::string selectedAnimUID;
@@ -419,13 +418,9 @@ void InspectorWindow::display()
 						animationName = animation.getUID();
 					}
 
-					// Select animation button
-					if (ImGui::Button(animationName.c_str(), ImVec2(width, 0)))
-					{
-						animIndex = index;
-						animName = name;
-						EditorState::Instance().showAnimationSelector = true;
-					}
+					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uid) {
+						animator.addAnimation(name, Resource<Animation>(uid));
+					});
 
 					bool isSelected = (index == activeAnimationIndex);
 					if (ImGui::Checkbox("Make Active Animation", &isSelected))
@@ -443,28 +438,13 @@ void InspectorWindow::display()
 				index++;
 			}
 
-			// Show animation selector popup (externally defined)
-			if (EditorState::Instance().showAnimationSelector) {
-				displaySelectAnimationDialog(selectedAnimUID);
-				if (!selectedAnimUID.empty()) {
-					animator.addAnimation(animName, Resource<Animation>(selectedAnimUID));
-					selectedAnimUID.clear();
-					EditorState::Instance().showAnimationSelector = false;
-				}
-			}
-
-			
-
 			if (ImGui::Button("+")) {
 				int animationsCount = animations.size();
 				std::string newAnimationName = "New Animation_" + std::to_string(animationsCount);
 				animator.addAnimation(newAnimationName, Resource<Animation>::empty);
 				eState.animationRenameBuffers.push_back(newAnimationName);
 			}
-			
-
-			
-			});
+		});
 
 		displayComponent<Terrain>("Terrain", [](Terrain& terrain) {
 			addTextureEditWidget(terrain.m_heightmap, { 50, 50 }, [&](std::string uuid) {
