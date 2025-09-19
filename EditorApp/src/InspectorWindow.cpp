@@ -170,45 +170,20 @@ void InspectorWindow::display()
 				rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()).c_str());
 			});
 
-			addTableRowExt("Select Mesh", 
-				[&](std::string id) 
-				{
-					if (ImGui::Button("Select Mesh"))
-					{
-						EditorState::Instance().showMeshSelector = true;
-					}
-				},
-				[&](std::string id) 
-				{
-					rightAlignedText(Engine::get()->getSubSystem<Assets>()->getAlias(meshComponent.mesh.getUID()).c_str());
-				});
-
 			END_IMGUI_TABLE();
-			
 
-			//ImGui::Text("Number of vertices: %d", (int)meshComponent.mesh.get()->getNumOfVertices());
-
-			//Button to trigger some action
-			//if (ImGui::Button("Select Mesh")) 
-			//{
-			//	showMeshSelector = true;
-			//}
-
-			std::string selectedMeshUID;
-			displaySelectMeshDialog(selectedMeshUID);
-
-			if (!selectedMeshUID.empty())
+			std::string meshName = "None";
+			if (!meshComponent.mesh.isEmpty())
 			{
-				meshComponent.mesh = Resource<MeshCollection>(selectedMeshUID);
+				meshName = meshComponent.mesh.getUID();
 			}
 
-			//ImGui::SameLine();
-
-			// Text display field
-			//ImGui::Text(Engine::get()->getSubSystem<Assets>()->getAlias(meshComponent.mesh.getUID()).c_str());
-
-			
+			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uid) {
+				meshComponent.mesh = Resource<MeshCollection>(uid);
 			});
+			
+			
+		});
 
 		displayComponent<CameraComponent>("Camera", [](CameraComponent& cameraComponent) {
 			// TBD
