@@ -14,6 +14,7 @@ AnimationLoader::AnimationLoader()
     Engine::get()->registerSubSystem<AnimationLoader>(this);
 
     m_importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+    m_importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);
 }
 
 void readSceneNodeData(MeshNodeData& nodeData, const aiNode* scene)
@@ -113,28 +114,12 @@ Resource<Animation> AnimationLoader::load(AssetInfo& aInfo)
     return res;
 }
 
-bool AnimationLoader::copyFileToResourceFolder(const std::string& path, AssetInfo& aInfo)
+bool AnimationLoader::copyFileToResourceFolder(const std::string& fileLocation, AssetInfo& aInfo)
 {
-    // Copy
-    const aiScene* scene = m_importer.ReadFile(path, aiProcess_Triangulate);
-
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-    {
-        logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
-        return false;
-    }
-
-    assert(scene && scene->mRootNode && scene->HasAnimations());
-
-    // Paste
     auto& projectDir = Engine::get()->getProjectDirectory();
-    Assimp::Exporter exporter;
-    const std::string savedFilePath = projectDir + "/" + aInfo.filePath;
-    if (exporter.Export(scene, "collada", savedFilePath) != aiReturn_SUCCESS)
-    {
-        logError("Mesh copy failed.");
-        return false;
-    }
+    const std::string filename = std::filesystem::path(fileLocation).filename().string();
+    const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + filename;
+    std::filesystem::copy_file(fileLocation, savedFilePath);
 
     return true;
 }

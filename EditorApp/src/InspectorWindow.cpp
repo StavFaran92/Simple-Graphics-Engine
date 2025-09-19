@@ -362,8 +362,10 @@ void InspectorWindow::display()
 
 		displayComponent<Animator>("Animator", [](Animator& animator) {
 
+			ImGui::DragFloat("playback speed", &animator.m_playbackSpeed);
 
 			static int animIndex = 0;
+			static int activeAnimationIndex = 0;
 			static std::string animName;
 			static std::string selectedAnimUID;
 			//static bool showAnimationSelector = false;
@@ -371,6 +373,7 @@ void InspectorWindow::display()
 
 			EntityState& eState = state.getCurrentEntityState();
 			
+			ImGui::LabelText("", "Animations");
 
 			auto animations = animator.getAllAnimations();
 
@@ -385,33 +388,54 @@ void InspectorWindow::display()
 
 				ImGui::PushID(index);
 
-				std::string oldName = name;
+				if (ImGui::CollapsingHeader(name.c_str()))
+				{
 
-				ImGui::InputText("##Name", &eState.animationRenameBuffers[index]);
+					ImGui::Indent();
 
-				if (ImGui::IsItemDeactivatedAfterEdit()) {
-					auto newAnimationName = std::string(eState.animationRenameBuffers[index]);
-					// This runs when the user is done editing,
-					// either by pressing Enter or unfocusing the input field
-					if (newAnimationName != oldName) {
-						auto anim = animator.getAnimation(oldName);
-						animator.removeAnimation(oldName);
-						animator.addAnimation(newAnimationName, anim);
-						break;
+					std::string oldName = name;
+
+					float width = ImGui::GetContentRegionAvail().x;
+					ImGui::SetNextItemWidth(width);
+
+					ImGui::InputText("##Name", &eState.animationRenameBuffers[index]);
+
+					if (ImGui::IsItemDeactivatedAfterEdit()) 
+					{
+						auto newAnimationName = std::string(eState.animationRenameBuffers[index]);
+						// This runs when the user is done editing,
+						// either by pressing Enter or unfocusing the input field
+						if (newAnimationName != oldName) {
+							auto anim = animator.getAnimation(oldName);
+							animator.removeAnimation(oldName);
+							animator.addAnimation(newAnimationName, anim);
+							break;
+						}
 					}
+
+					std::string animationName = "None";
+					if (!animation.isEmpty())
+					{
+						animationName = animation.getUID();
+					}
+
+					// Select animation button
+					if (ImGui::Button(animationName.c_str(), ImVec2(width, 0)))
+					{
+						animIndex = index;
+						animName = name;
+						EditorState::Instance().showAnimationSelector = true;
+					}
+
+					bool isSelected = (index == activeAnimationIndex);
+					if (ImGui::Checkbox("Make Active Animation", &isSelected))
+					{
+						activeAnimationIndex = index;
+						animator.playAnimation(name);
+					}
+
+					ImGui::Unindent();
 				}
-
-				ImGui::SameLine();
-
-				// Select animation button
-				if (ImGui::Button("Select")) {
-					animIndex = index;
-					animName = name;
-					EditorState::Instance().showAnimationSelector = true;
-				}
-
-				ImGui::SameLine();
-				ImGui::TextUnformatted(animation.getUID().c_str());
 
 				ImGui::PopID();
 
@@ -429,13 +453,17 @@ void InspectorWindow::display()
 				}
 			}
 
-			if (ImGui::Button("Add Animation")) {
-				animator.addAnimation("New Animation", Resource<Animation>::empty);
-				eState.animationRenameBuffers.push_back("New Animation");
+			
+
+			if (ImGui::Button("+")) {
+				int animationsCount = animations.size();
+				std::string newAnimationName = "New Animation_" + std::to_string(animationsCount);
+				animator.addAnimation(newAnimationName, Resource<Animation>::empty);
+				eState.animationRenameBuffers.push_back(newAnimationName);
 			}
 			
 
-			ImGui::DragFloat("playback speed", &animator.m_playbackSpeed);
+			
 			});
 
 		displayComponent<Terrain>("Terrain", [](Terrain& terrain) {
