@@ -272,22 +272,20 @@ void InspectorWindow::display()
 			{
 				ImGui::PushID(&mat);
 				
-				auto& matName = mat->getName();
-				if (matName.empty())
+				std::string matName = "None";
+				if (!mat.isEmpty())
 				{
-					matName = "Material " + std::to_string(index);
+					matName = mat->getName();
+					if (matName.empty())
+					{
+						matName = "Material " + std::to_string(index);
+					}
 				}
 
-				// Start a new collapsible header for each material
-				if (ImGui::CollapsingHeader(matName.c_str()))
-				{
-					
-					addSamplerEditWidget(mat, { 20,20 }, "Albedo", Texture::TextureType::Albedo);
-					addSamplerEditWidget(mat, { 20,20 }, "Normal", Texture::TextureType::Normal);
-					addSamplerEditWidget(mat, { 20,20 }, "Metallic", Texture::TextureType::Metallic);
-					addSamplerEditWidget(mat, { 20,20 }, "Roughness", Texture::TextureType::Roughness);
-					addSamplerEditWidget(mat, { 20,20 }, "Occlusion", Texture::TextureType::AmbientOcclusion);
-				}
+				addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
+					mat = Resource<Material>(uid);
+				});
+
 				++index;
 				ImGui::PopID();
 			}
