@@ -21,6 +21,81 @@
 #include "core/Factory.h"
 #include "geometry/ShapeFactory.h"
 
+void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& mat) 
+{
+	if (!aiMat)
+	{
+		logError("Null material.");
+		return;
+	}
+
+	aiColor3D diffuseColor;
+	if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
+	{
+		mat->colorDiffuse = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+	}
+
+	ai_real rounghnessFactor;
+	if(aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, rounghnessFactor) == aiReturn_SUCCESS)
+	{
+		mat->roughnessFactor = rounghnessFactor;
+	}
+
+	ai_real metallicFactor;
+	if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallicFactor) == aiReturn_SUCCESS)
+	{
+		mat->metallicFactor = metallicFactor;
+	}
+}
+
+void PrintMaterialProperties(const aiMaterial* mat) {
+	if (!mat) {
+		std::cout << "Null material\n";
+		return;
+	}
+
+	std::cout << "Material has " << mat->mNumProperties << " properties\n";
+
+	for (unsigned int i = 0; i < mat->mNumProperties; i++) {
+		aiMaterialProperty* prop = mat->mProperties[i];
+		std::cout << "----------------------------------------\n";
+		std::cout << "Key: " << prop->mKey.C_Str()
+			<< " | Type: " << prop->mType
+			<< " | Semantic: " << prop->mSemantic
+			<< " | Index: " << prop->mIndex
+			<< " | Size: " << prop->mDataLength << "\n";
+
+		// Try to pretty-print depending on type
+		if (prop->mType == aiPTI_String) {
+			aiString str;
+			memcpy(&str, prop->mData, sizeof(aiString));
+			std::cout << "  Value (string): " << str.C_Str() << "\n";
+		}
+		else if (prop->mType == aiPTI_Float) {
+			unsigned count = prop->mDataLength / sizeof(float);
+			float* vals = (float*)prop->mData;
+			std::cout << "  Value (float[" << count << "]): ";
+			for (unsigned c = 0; c < count; c++)
+				std::cout << vals[c] << " ";
+			std::cout << "\n";
+		}
+		else if (prop->mType == aiPTI_Integer) {
+			unsigned count = prop->mDataLength / sizeof(int);
+			int* vals = (int*)prop->mData;
+			std::cout << "  Value (int[" << count << "]): ";
+			for (unsigned c = 0; c < count; c++)
+				std::cout << vals[c] << " ";
+			std::cout << "\n";
+		}
+		else if (prop->mType == aiPTI_Buffer) {
+			std::cout << "  Value: (raw buffer, " << prop->mDataLength << " bytes)\n";
+		}
+		else {
+			std::cout << "  Value: (unknown type)\n";
+		}
+	}
+}
+
 bool findFile(const std::filesystem::path& directory, const std::string& fileName, std::filesystem::path& outputPath)
 {
 	for (const auto& entry : std::filesystem::recursive_directory_iterator(directory))
@@ -86,6 +161,8 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		{
 			auto& aMaterial = scene->mMaterials[i];
+
+			//PrintMaterialProperties(aMaterial);
 
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 
@@ -195,6 +272,26 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			{
 				material->setTexture(Texture::TextureType::Normal, normal);
 			}
+
+			auto& roughness = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, fileDir, cachedTextures, aInfo);
+			if (!roughness.isEmpty())
+			{
+				material->setTexture(Texture::TextureType::Roughness, roughness);
+			}
+
+			auto& metallic = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_METALNESS, fileDir, cachedTextures, aInfo);
+			if (!metallic.isEmpty())
+			{
+				material->setTexture(Texture::TextureType::Metallic, metallic);
+			}
+
+			auto& ao = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, fileDir, cachedTextures, aInfo);
+			if (!ao.isEmpty())
+			{
+				material->setTexture(Texture::TextureType::AmbientOcclusion, ao);
+			}
+
+			extractAiMaterialProperties(aMaterial, material);
 
 			Material::save(material);
 		}

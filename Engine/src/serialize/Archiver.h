@@ -31,30 +31,6 @@ class Scene;
 class Entity;
 class Context;
 
-namespace glm
-{
-	template<class Archive>
-	void serialize(Archive& archive, glm::vec3& v) {
-			SERIALIZED_MEMBER(v.x); 
-			SERIALIZED_MEMBER(v.y); 
-			SERIALIZED_MEMBER(v.z);
-	}
-
-	template<class Archive>
-	void serialize(Archive& archive, glm::vec2& v) {
-		SERIALIZED_MEMBER(v.x); 
-		SERIALIZED_MEMBER(v.y);
-	}
-
-	template<class Archive>
-	void serialize(Archive& archive, glm::quat& q) {
-			SERIALIZED_MEMBER(q.x); 
-			SERIALIZED_MEMBER(q.y); 
-			SERIALIZED_MEMBER(q.z); 
-			SERIALIZED_MEMBER(q.w);
-	}
-};
-
 struct SerializedEntity
 {
 	entt::entity entity;

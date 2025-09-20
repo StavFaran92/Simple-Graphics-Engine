@@ -35,6 +35,10 @@ struct PBR_Material
 	sampler2D texture_metallic;
 	sampler2D texture_roughness;
 	sampler2D texture_ao;
+
+	float roughnessFactor;
+	float metallicFactor;
+	vec3 colorDiffuse;
 }; 
 
 struct PointLight 

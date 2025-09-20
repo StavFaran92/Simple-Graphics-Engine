@@ -157,8 +157,8 @@ void main()
 { 	
 	gPosition = fs_in.fragPos;
 	gNormal = normalize(fs_in.normal) * getPBRTexture(material.samplerNormal).rgb;
-	gAlbedo = getPBRTexture(material.samplerAlbedo).rgb;
-	gMRA.r = getPBRTexture(material.samplerMetallic).r;
-	gMRA.g = getPBRTexture(material.samplerRoughness).r;
+	gAlbedo = getPBRTexture(material.samplerAlbedo).rgb * material.colorDiffuse;
+	gMRA.r = getPBRTexture(material.samplerMetallic).r * material.metallicFactor;
+	gMRA.g = getPBRTexture(material.samplerRoughness).r * material.roughnessFactor;
 	gMRA.b = getPBRTexture(material.samplerAO).r;
 } 

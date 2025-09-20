@@ -46,6 +46,9 @@ public:
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_samplers);
+		SERIALIZED_MEMBER(m_name);
+		SERIALIZED_MEMBER(colorDiffuse);
+		SERIALIZED_MEMBER(roughnessFactor);
 	}
 
 	static Resource<Material> import(const std::string& fileLocation, const MaterialImportSettings& settings = {});
@@ -57,8 +60,10 @@ protected:
 	void setTexturesInShader(Resource<Shader>& shader);
 	void setTextureInShader(Resource<Shader>& shader, Texture::TextureType ttype, int slot);
 
-protected:
-	std::map<Texture::TextureType, std::shared_ptr<TextureSampler>> m_samplers;
-
+public:
 	std::string m_name;
+	std::map<Texture::TextureType, std::shared_ptr<TextureSampler>> m_samplers;
+	glm::vec3 colorDiffuse{1.0f, 1.0f, 1.0f};
+	float roughnessFactor = 1;
+	float metallicFactor = 0;
 };
