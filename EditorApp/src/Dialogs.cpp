@@ -303,9 +303,12 @@ void displayShaderCreatorDialog()
 
 void displayMaterialEditDialog()
 {
+	static Resource<Material> previousMaterial;
 	if (EditorState::Instance().showMaterialEditWindow)
 	{
 		ImGui::OpenPopup("EditMaterial");
+		
+		previousMaterial = EditorState::Instance().selectedMaterialForEdit.get()->clone(true);
 		EditorState::Instance().showMaterialEditWindow = false;
 	}
 	if (ImGui::BeginPopupModal("EditMaterial", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
@@ -325,6 +328,7 @@ void displayMaterialEditDialog()
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
+			Material::save(mat);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -332,6 +336,7 @@ void displayMaterialEditDialog()
 
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
+			mat = previousMaterial;
 			ImGui::CloseCurrentPopup();
 		}
 

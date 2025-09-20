@@ -196,7 +196,7 @@ void DeferredRenderer::render()
 
     if (graphics->material)
     {
-	graphics->material->use(graphics->shader);
+		graphics->material->use(graphics->shader);
     }
 
 	// Draw

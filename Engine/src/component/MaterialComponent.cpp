@@ -3,8 +3,8 @@
 
 MaterialComponent::MaterialComponent()
 {
-	auto mat = Engine::get()->getDefaultMaterial()->clone();
+	//auto mat = Engine::get()->getDefaultMaterial()->clone(false);
 
-	//auto mat = Material::create(*Engine::get()->getDefaultMaterial().get());
-	materials[0] = mat;
+	////auto mat = Material::create(*Engine::get()->getDefaultMaterial().get());
+	//materials[0] = mat;
 }

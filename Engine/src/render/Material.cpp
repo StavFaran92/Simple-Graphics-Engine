@@ -205,11 +205,11 @@ std::vector<Resource<Texture>> Material::getAllTextures() const
 	return res;
 }
 
-Resource<Material> Material::clone() const
+Resource<Material> Material::clone(bool isTransient) const
 {
 	AssetInfo clonedAssetInfo;
 	clonedAssetInfo.attributes = m_assetInfo.attributes;
-	clonedAssetInfo.isTransient = m_assetInfo.isTransient;
+	clonedAssetInfo.isTransient = isTransient;
 	auto newMaterial = Material::create(clonedAssetInfo); // tODO rethink this
 
 	for (const auto& sampler : m_samplers)

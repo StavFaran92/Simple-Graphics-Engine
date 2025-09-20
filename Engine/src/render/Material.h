@@ -41,7 +41,7 @@ public:
 
 	std::vector<Resource<Texture>> getAllTextures() const;
 
-	Resource<Material> clone() const;
+	Resource<Material> clone(bool isTransient) const;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
