@@ -693,6 +693,16 @@ void Scene::draw(float deltaTime)
 			Engine::get()->getPhysicsSystem()->visualizePhysicsShapeDebug(this);
 		}
 
+		if (Engine::get()->getConfig().renderConfig.renderNonOpaquePass)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Non Opaque render pass");
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			m_forwardRenderer->renderSceneNonOpaque(this);
+			glDisable(GL_BLEND);
+			glPopDebugGroup();
+		}
+
 		// Render UI
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

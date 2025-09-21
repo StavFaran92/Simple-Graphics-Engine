@@ -97,6 +97,82 @@ void Renderer::renderScene(Scene* scene)
     }
 }
 
+void Renderer::renderSceneNonOpaque(Scene* scene)
+{
+    auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+    graphics->renderView->bind();
+
+    std::map<float, Entity> transparentEntities;
+
+    auto& camera = graphics->renderView->getCamera();
+    auto& camTransform = camera.getComponent<Transformation>();
+    auto& camForward = camTransform.getForward();
+
+    for (auto&& [entity, mesh, transform, renderable, material] :
+        scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent, MaterialComponent>(entt::exclude<ShaderComponent>).each())
+    {
+        Entity entityHandler{ entity, &scene->getRegistry() };
+
+        for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
+        {
+            auto matIndex = mesh->getMaterialIndex();
+            MaterialComponent& materialComponent = entityHandler.getComponent<MaterialComponent>();
+            auto& material = materialComponent.at(matIndex);
+
+            // Only render transparent objects
+            if (!material->isTransparent)
+            {
+                continue;
+            }
+
+            float distance = glm::dot(transform.getWorldPosition(), camForward);
+
+            // object is behind the camera
+            if (distance < 0)
+            {
+                continue;
+            }
+
+            transparentEntities[distance] = entityHandler;
+        }
+    }
+
+    auto iter = transparentEntities.rbegin();
+    while (iter != transparentEntities.rend())
+    {
+        Entity& entityHandler = iter->second;
+
+        graphics->entity = &entityHandler;
+        for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
+        {
+
+            graphics->model = &entityHandler.getComponent<Transformation>().getWorldTransformation();;
+            graphics->shader = m_pbrShader;
+            graphics->mesh = mesh.get();
+
+            auto matIndex = mesh->getMaterialIndex();
+            MaterialComponent& materialComponent = entityHandler.getComponent<MaterialComponent>();
+            graphics->material = materialComponent.at(matIndex).get();
+
+            // Only render transparent objects
+            if (!graphics->material->isTransparent)
+            {
+                continue;
+            }
+
+            // draw model
+            graphics->shader->use();
+            setUniforms();
+
+            // Draw
+            draw(*graphics->mesh->getVAO());
+        }
+
+        iter++;
+    }
+}
+
 void Renderer::setUniforms()
 {
 

@@ -15,6 +15,7 @@ struct EngineConfig
 		bool renderVolumetricsPass = true;
 		bool renderWireframeGrid = true;
 		bool renderFoliagePass = true;
+		bool renderNonOpaquePass = true;
 	};
 
 	EngineConfig(const std::string& path);

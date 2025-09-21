@@ -67,4 +67,5 @@ public:
 	glm::vec3 colorDiffuse{1.0f, 1.0f, 1.0f};
 	float roughnessFactor = 1.f;
 	float metallicFactor = 1.f;
+	bool isTransparent = false;
 };

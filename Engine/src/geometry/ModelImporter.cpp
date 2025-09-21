@@ -46,6 +46,8 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& ma
 	{
 		mat->metallicFactor = metallicFactor;
 	}
+
+	mat->isTransparent = true; // TODO remove
 }
 
 void PrintMaterialProperties(const aiMaterial* mat) {
@@ -162,7 +164,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
-			//PrintMaterialProperties(aMaterial);
+			PrintMaterialProperties(aMaterial);
 
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 

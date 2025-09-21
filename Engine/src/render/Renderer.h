@@ -28,6 +28,8 @@ public:
 	// Inherited via IRenderer
 	void renderScene(Scene*) override;
 
+	void renderSceneNonOpaque(Scene*);
+
 private:
 	void setUniforms();
 protected:
