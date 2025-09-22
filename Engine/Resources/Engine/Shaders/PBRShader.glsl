@@ -289,9 +289,9 @@ float getTime()
 void main()
 {
     vec3 normal = normalize(fs_in.normal);
-    vec3 albedo = pow(getPBRTexture(material.samplerAlbedo).rgb, vec3(2.2));
-    float metallic = getPBRTexture(material.samplerMetallic).r;
-    float roughness = getPBRTexture(material.samplerRoughness).r;
+    vec3 albedo = pow(getPBRTexture(material.samplerAlbedo).rgb  * material.colorDiffuse, vec3(2.2));
+    float metallic = getPBRTexture(material.samplerMetallic).r * material.metallicFactor;
+    float roughness = getPBRTexture(material.samplerRoughness).r* material.roughnessFactor;
     float ao = getPBRTexture(material.samplerAO).r;
 
 #ifdef CUSTOM_SHADER

@@ -203,6 +203,9 @@ void Renderer::setUniforms()
 
     graphics->shader->bindUniformBlockToBindPoint("Time", 0);
     graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+    graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 5);
+    graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 6);
+    graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 7);
 }
 
 void Renderer::render()
