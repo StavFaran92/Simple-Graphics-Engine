@@ -163,6 +163,8 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
 
             // draw model
             graphics->shader->use();
+            glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(*graphics->model)));
+            graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
             setUniforms();
 
             // Draw
@@ -206,6 +208,8 @@ void Renderer::setUniforms()
     graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 5);
     graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 6);
     graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 7);
+
+    graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
 }
 
 void Renderer::render()
