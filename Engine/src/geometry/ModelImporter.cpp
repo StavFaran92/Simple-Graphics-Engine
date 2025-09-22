@@ -21,7 +21,7 @@
 #include "core/Factory.h"
 #include "geometry/ShapeFactory.h"
 
-void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& mat) 
+void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& mat)
 {
 	if (!aiMat)
 	{
@@ -36,7 +36,7 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& ma
 	}
 
 	ai_real rounghnessFactor;
-	if(aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, rounghnessFactor) == aiReturn_SUCCESS)
+	if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, rounghnessFactor) == aiReturn_SUCCESS)
 	{
 		mat->roughnessFactor = rounghnessFactor;
 	}
@@ -47,7 +47,12 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& ma
 		mat->metallicFactor = metallicFactor;
 	}
 
-	mat->isTransparent = true; // TODO remove
+	ai_real opacityFactor;
+	if (aiMat->Get(AI_MATKEY_OPACITY, opacityFactor) == aiReturn_SUCCESS)
+	{
+		mat->opacityFactor = opacityFactor;
+		mat->isOpaque = opacityFactor == 1;
+	}
 }
 
 void PrintMaterialProperties(const aiMaterial* mat) {

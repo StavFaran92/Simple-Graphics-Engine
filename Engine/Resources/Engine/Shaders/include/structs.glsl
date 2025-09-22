@@ -39,6 +39,7 @@ struct PBR_Material
 	float roughnessFactor;
 	float metallicFactor;
 	vec3 colorDiffuse;
+	float opacityFactor;
 }; 
 
 struct PointLight 

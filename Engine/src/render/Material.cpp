@@ -89,6 +89,7 @@ void Material::use(Resource<Shader>& shader)
 	shader.get()->setUniformValue("material.roughnessFactor", roughnessFactor);
 	shader.get()->setUniformValue("material.metallicFactor", metallicFactor);
 	shader.get()->setUniformValue("material.colorDiffuse", colorDiffuse);
+	shader.get()->setUniformValue("material.opacityFactor", opacityFactor);
 }
 
 void Material::release()

@@ -294,7 +294,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 				graphics->material = materialComponent->at(matIndex).get();
 
 				// Only render Opaque objects
-				if (graphics->material->isTransparent)
+				if (!graphics->material->isOpaque)
 				{
 					continue;
 				}
