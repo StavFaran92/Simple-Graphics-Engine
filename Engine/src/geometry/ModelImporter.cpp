@@ -20,6 +20,7 @@
 #include "utils/AssimpGLMHelpers.h"
 #include "core/Factory.h"
 #include "geometry/ShapeFactory.h"
+#include <GL/glew.h>
 
 void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& mat)
 {
@@ -267,31 +268,31 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
 			material->setName(materialName);
 
-			auto& diffuse = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures, aInfo);
+			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures, aInfo);
 			if (!diffuse.isEmpty())
 			{
 				material->setTexture(Texture::TextureType::Albedo, diffuse);
 			}
 
-			auto& normal = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures, aInfo);
+			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures, aInfo);
 			if (!normal.isEmpty())
 			{
 				material->setTexture(Texture::TextureType::Normal, normal);
 			}
 
-			auto& roughness = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, fileDir, cachedTextures, aInfo);
+			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, fileDir, cachedTextures, aInfo);
 			if (!roughness.isEmpty())
 			{
 				material->setTexture(Texture::TextureType::Roughness, roughness);
 			}
 
-			auto& metallic = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_METALNESS, fileDir, cachedTextures, aInfo);
+			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, fileDir, cachedTextures, aInfo);
 			if (!metallic.isEmpty())
 			{
 				material->setTexture(Texture::TextureType::Metallic, metallic);
 			}
 
-			auto& ao = copyAiMaterialTexture(aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, fileDir, cachedTextures, aInfo);
+			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, fileDir, cachedTextures, aInfo);
 			if (!ao.isEmpty())
 			{
 				material->setTexture(Texture::TextureType::AmbientOcclusion, ao);
@@ -477,7 +478,7 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 
 
 
-Resource<Texture> ModelImporter::copyAiMaterialTexture(aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, Resource<Texture>>& cachedTextures, AssetInfo& aInfo)
+Resource<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, Resource<Texture>>& cachedTextures, AssetInfo& aInfo)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
@@ -485,24 +486,87 @@ Resource<Texture> ModelImporter::copyAiMaterialTexture(aiMaterial* mat, aiTextur
 		return Resource<Texture>::empty;
 	}
 
-	std::string path = findTexture(str, dir);
-	if (path.empty())
+	Resource<Texture> texture;
+	const aiTexture* aiTexture = scene->GetEmbeddedTexture(str.C_Str());
+	if(aiTexture)
 	{
-		return Resource<Texture>::empty;
-	}
+		int width = 0;
+		int height = 0;
+		unsigned char* pixelData = nullptr;
+		if (aiTexture->mHeight == 0)
+		{
+			// Compressed image (PNG/JPG) in memory
+			size_t size = aiTexture->mWidth;
+			const unsigned char* data = reinterpret_cast<unsigned char*>(aiTexture->pcData);
 
-	if (cachedTextures.find(path) != cachedTextures.end())
+			int channels = 0;
+			pixelData = Texture::decodeCompressedFromMemory(data, size, &width, &height, &channels);
+		}
+		else {
+			// Raw ARGB8888 pixels
+			width = aiTexture->mWidth;
+			height = aiTexture->mHeight;
+			pixelData = reinterpret_cast<unsigned char*>(aiTexture->pcData);
+		}
+
+		Texture::TextureData tData;
+		tData.format = Texture::Format::RGB;
+		tData.internalFormat = Texture::InternalFormat::RGB2;
+		tData.isTransient = aInfo.isTransient;
+		tData.genMipMap = false;
+		tData.height = height;
+		tData.width = width;
+		tData.type = Texture::Type::UNSIGNED_BYTE;
+		tData.bpp = 3;
+		tData.data = (void*)pixelData;
+
+		tData.params = {
+			{GL_TEXTURE_MIN_FILTER, GL_NEAREST },
+			{GL_TEXTURE_MAG_FILTER, GL_NEAREST },
+			{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+			{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
+		};
+
+		//tData.isTransient = false; // todo remove
+		tData.textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().string();
+
+		texture = Texture::create2DTextureFromBuffer(tData);
+
+		AssetInfo aInfo;
+		aInfo.uuid = texture.getUID();
+		aInfo.aType = AssetType::TEXTURE;
+		aInfo.name = tData.textureName;
+		aInfo.isTransient = true;
+		//aInfo.filePath = savedFileLocation;
+		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+		//Texture::writeTexture2D("./" + tData.textureName, texture);
+
+	}	
+	else
 	{
-		// Already loaded
-		return cachedTextures[path];
+		std::string path = findTexture(str, dir);
+		if (path.empty())
+		{
+			return Resource<Texture>::empty;
+		}
+
+		if (cachedTextures.find(path) != cachedTextures.end())
+		{
+			// Already loaded
+			return cachedTextures[path];
+		}
+
+		Texture::TextureImportSettings tSettings;
+		tSettings.targetDirectory = aInfo.assetDirectory;
+		tSettings.isTransient = aInfo.isTransient;
+		texture = Texture::import(path, tSettings);
+
+		cachedTextures.insert({ path, texture });
 	}
+	
 
-	Texture::TextureImportSettings tSettings;
-	tSettings.targetDirectory = aInfo.assetDirectory;
-	tSettings.isTransient = aInfo.isTransient;
-	auto texture = Texture::import(path, tSettings);
-
-	cachedTextures.insert({ path, texture });
+	
 
 	return texture;
 }

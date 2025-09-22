@@ -273,6 +273,8 @@ public:
 	static Resource<Texture> import(const std::string& fileLocation, const TextureImportSettings & = {});
 	static Resource<Texture> loadTransient(const std::string& fileLocation, const TextureImportSettings& settings = {});
 
+	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);
+
 	/**  Destructor */
 	~Texture();
 private:

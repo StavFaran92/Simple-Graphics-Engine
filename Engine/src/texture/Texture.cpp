@@ -466,6 +466,11 @@ void Texture::extractTextureDataFromSettings(const TextureImportSettings& settin
 	
 }
 
+unsigned char* Texture::decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels) 
+{
+	return stbi_load_from_memory(rawBuffer, len, outWidth, outHeight, outChannels, 3);
+}
+
 Resource<Texture> Texture::importTexture3D(const std::string& fileLocation)
 {
 	// TODO fix
