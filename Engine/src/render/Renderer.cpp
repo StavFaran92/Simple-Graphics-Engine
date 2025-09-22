@@ -121,7 +121,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
             auto& material = materialComponent.at(matIndex);
 
             // Only render transparent objects
-            if (material->isOpaque)
+            if (material->isOpaque())
             {
                 continue;
             }
@@ -156,7 +156,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
             graphics->material = materialComponent.at(matIndex).get();
 
             // Only render transparent objects
-            if (graphics->material->isOpaque)
+            if (graphics->material->isOpaque())
             {
                 continue;
             }

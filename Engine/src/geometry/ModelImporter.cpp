@@ -51,7 +51,6 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& ma
 	if (aiMat->Get(AI_MATKEY_OPACITY, opacityFactor) == aiReturn_SUCCESS)
 	{
 		mat->opacityFactor = opacityFactor;
-		mat->isOpaque = opacityFactor == 1.f;
 	}
 }
 

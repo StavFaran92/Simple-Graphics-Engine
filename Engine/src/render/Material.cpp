@@ -224,3 +224,8 @@ Resource<Material> Material::clone(bool isTransient) const
 
 	return newMaterial;
 }
+
+bool Material::isOpaque() const
+{
+	return opacityFactor == 1;
+}

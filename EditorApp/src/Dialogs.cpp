@@ -318,6 +318,11 @@ void displayMaterialEditDialog()
 
 		ImGui::Dummy(ImVec2(0, 4));
 
+		ImGui::ColorEdit3("Base Color", glm::value_ptr(mat->colorDiffuse));
+		ImGui::DragFloat("Metallic", &mat->metallicFactor, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat("Roughness", &mat->roughnessFactor, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat("Opacity", &mat->opacityFactor, 0.01f, 0.0f, 1.0f);
+
 		addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
 		addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
 		addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);

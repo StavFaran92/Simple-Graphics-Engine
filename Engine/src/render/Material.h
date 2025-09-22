@@ -43,6 +43,8 @@ public:
 
 	Resource<Material> clone(bool isTransient) const;
 
+	bool isOpaque() const;
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_samplers);
@@ -50,6 +52,7 @@ public:
 		SERIALIZED_MEMBER(colorDiffuse);
 		SERIALIZED_MEMBER(roughnessFactor);
 		SERIALIZED_MEMBER(metallicFactor);
+		SERIALIZED_MEMBER(opacityFactor);
 	}
 
 	static Resource<Material> import(const std::string& fileLocation, const MaterialImportSettings& settings = {});
@@ -68,5 +71,4 @@ public:
 	float roughnessFactor = 1.f;
 	float metallicFactor = 1.f;
 	float opacityFactor = 1.f;
-	bool isOpaque = false;
 };
