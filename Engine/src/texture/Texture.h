@@ -206,22 +206,13 @@ public:
 	static Resource<Texture> createEmptyTexture(int width, int height, int internalFormat, int format, int type);
 
 	/**
-	 * Load a texture from a given file path.
-	 * 
-	 * \param fileLocation	The filepath location
-	 * \param isFlipped		Should flip the texture vertically
-	 * \return				A pointer to the loaded texture
-	 */
-	static Resource<Texture> create2DTextureFromFile(const std::string& fileLocation, bool flip = FLIP_TEXTURE);
-
-	/**
 	 * Create a texture using predefined data
 	 *
 	 * \return				A pointer to the loaded texture
 	 */
 	static Resource<Texture> create2DTextureFromBuffer(const TextureData& textureData);
 
-	static Resource<Texture> create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, void* data);
+	static Resource<Texture> create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data);
 
 	static Resource<Texture> createDummyTexture(unsigned char color[3]);
 

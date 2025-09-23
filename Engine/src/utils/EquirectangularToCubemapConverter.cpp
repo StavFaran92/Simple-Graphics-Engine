@@ -122,8 +122,7 @@ Resource<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirectangula
 			{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
 			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR },
 			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR }
-		}
-	, nullptr);
+		}, true, nullptr);
 
 	RenderBufferObject rbo{ outputWidth, outputHeight };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);

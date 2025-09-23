@@ -118,6 +118,7 @@ bool DeferredRenderer::setupSSAO()
 		{ GL_TEXTURE_MAG_FILTER,	GL_NEAREST	},
 		{ GL_TEXTURE_WRAP_S,		GL_REPEAT	},
 		{ GL_TEXTURE_WRAP_T,		GL_REPEAT   } },
+		true,
 		&ssaoNoise[0]
 		);
 

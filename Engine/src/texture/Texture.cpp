@@ -175,6 +175,14 @@ struct AssetTraits<Texture>
 	static bool isHDRImage(const std::string& filename) {
 		return stbi_is_hdr(filename.c_str());
 	}
+
+	static void save(AssetInfo& aInfo, const Resource<Texture>& texture)
+	{
+		auto projectDir = Engine::get()->getProjectDirectory();
+		std::string fileLocation = projectDir + "/" + aInfo.filePath;
+
+		Texture::writeTexture2D(fileLocation, texture);
+	}
 };
 
 static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(AssetTraits<Texture>::load);
@@ -217,27 +225,37 @@ Resource<Texture> Texture::createEmptyTexture(int width, int height, int interna
 
 Resource<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
 {
-	Resource<Texture> texture;
-	if (textureData.isTransient)
-	{
-		if (textureData.textureName.empty())
-		{
-			logError("Transient texture must have a name!");
-			return Resource<Texture>::empty;
-		}
-		texture = Factory<Texture>::createUsingCustomUUID(textureData.textureName);
-	}
-	else
-	{
-		texture = Factory<Texture>::create();
-	}
+	//Resource<Texture> texture;
+	//if (textureData.isTransient)
+	//{
+	//	if (textureData.textureName.empty())
+	//	{
+	//		logError("Transient texture must have a name!");
+	//		return Resource<Texture>::empty;
+	//	}
+	//	texture = Factory<Texture>::createUsingCustomUUID(textureData.textureName);
+	//}
+	//else
+	//{
+	//	texture = Factory<Texture>::create();
+	//}
+
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::TEXTURE;
+	aInfo.ext = ".png";
+	aInfo.isTransient = textureData.isTransient;
+	aInfo.name = textureData.textureName;
+
+	Resource<Texture> texture = AssetLoader<Texture>::create(aInfo);
 
 	texture.get()->build(textureData);
+
+	AssetLoader<Texture>::save(aInfo, texture);
 
 	return texture;
 }
 
-Resource<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, void* data)
+Resource<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data)
 {
 	TextureData textureData;
 	textureData.target = GL_TEXTURE_2D;
@@ -248,6 +266,7 @@ Resource<Texture> Texture::create2DTextureFromBuffer(int width, int height, int 
 	textureData.format = (Format)format;
 	textureData.type = (Type)type;
 	textureData.params = params;
+	textureData.isTransient = isTransient;
 	textureData.data = data;
 
 	return create2DTextureFromBuffer(textureData);
@@ -393,7 +412,7 @@ void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> 
 		texture.get()->getHeight(),
 		texture.get()->getBitDepth(),
 		texture.get()->getData().data,
-		texture.get()->getBitDepth());
+		texture.get()->getWidth() * texture.get()->getBitDepth());
 }
 
 Resource<Texture> Texture::import(const std::string& fileLocation, const TextureImportSettings& settings)
@@ -468,7 +487,8 @@ void Texture::extractTextureDataFromSettings(const TextureImportSettings& settin
 
 unsigned char* Texture::decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels) 
 {
-	return stbi_load_from_memory(rawBuffer, len, outWidth, outHeight, outChannels, 3);
+	auto buffer = stbi_load_from_memory(rawBuffer, len, outWidth, outHeight, outChannels, 3);
+	return buffer;
 }
 
 Resource<Texture> Texture::importTexture3D(const std::string& fileLocation)

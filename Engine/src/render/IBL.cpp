@@ -201,8 +201,8 @@ Resource<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 			{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
 			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR },
 			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR } 
-		}
-	, nullptr);
+		},
+		true, nullptr);
 
 	RenderBufferObject rbo{ 512, 512 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);

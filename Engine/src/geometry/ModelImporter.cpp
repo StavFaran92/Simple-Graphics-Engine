@@ -528,19 +528,25 @@ Resource<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, aiM
 		};
 
 		//tData.isTransient = false; // todo remove
-		tData.textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().string();
+		tData.textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().stem().string();
 
 		texture = Texture::create2DTextureFromBuffer(tData);
 
-		AssetInfo aInfo;
-		aInfo.uuid = texture.getUID();
-		aInfo.aType = AssetType::TEXTURE;
-		aInfo.name = tData.textureName;
-		aInfo.isTransient = true;
-		//aInfo.filePath = savedFileLocation;
-		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
-		//Texture::writeTexture2D("./" + tData.textureName, texture);
+		
+		
+
+		//auto& projectDir = Engine::get()->getProjectDirectory();
+		//const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName;
+		//Texture::writeTexture2D(savedFilePath, texture);
+
+		//AssetInfo aInfo;
+		//aInfo.uuid = texture.getUID();
+		//aInfo.aType = AssetType::TEXTURE;
+		//aInfo.name = tData.textureName;
+		//aInfo.isTransient = false;
+		//aInfo.filePath = savedFilePath;
+		//aInfo.attributes = texture->getTextureAssetAttributes().toMap();
+		//Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 	}	
 	else
