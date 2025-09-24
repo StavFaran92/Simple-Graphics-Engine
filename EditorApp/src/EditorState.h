@@ -38,12 +38,12 @@ public:
 
     std::function<void(std::string uuid)> assetTextureSelectCB;
     std::function<void(Entity e)> entitySelectCB;
-    Resource<Texture> selectedAssetTexture;
+    ResourceWrapper<Texture> selectedAssetTexture;
 
     std::shared_ptr<TextureSampler> selectedSampler;
     std::shared_ptr<TextureSampler> previousSampler;
 
-    Resource<Material> selectedMaterialForEdit;
+    ResourceWrapper<Material> selectedMaterialForEdit;
 
     // Delete copy/move constructors to enforce singleton
     EditorState(const EditorState&) = delete;

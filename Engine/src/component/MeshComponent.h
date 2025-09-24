@@ -5,7 +5,7 @@
 
 struct EngineAPI MeshComponent : public Component
 {
-	MeshComponent(const Resource<MeshCollection>& mesh) : mesh(mesh) {};
+	MeshComponent(const ResourceWrapper<MeshCollection>& mesh) : mesh(mesh) {};
 	MeshComponent() = default;
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene&)
@@ -21,7 +21,7 @@ struct EngineAPI MeshComponent : public Component
 	}
 
 	float materialSlot = 0; // todo this will be used (probably as a list) to support multi material models
-	Resource<MeshCollection> mesh = Resource<MeshCollection>::empty;
+	ResourceWrapper<MeshCollection> mesh = ResourceWrapper<MeshCollection>::empty;
 	
 };
 

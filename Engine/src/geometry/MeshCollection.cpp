@@ -21,12 +21,12 @@ struct AssetTraits<MeshCollection>
 		aInfo.fileName = aInfo.name + aInfo.ext;
 	}
 
-	static Resource<MeshCollection> load(AssetInfo& aInfo)
+	static ResourceWrapper<MeshCollection> load(AssetInfo& aInfo)
 	{
 		UUID uuid = aInfo.uuid;
 		MeshCollection* meshPtr = new MeshCollection();
 		Engine::get()->getMemoryPool().add(uuid, meshPtr);
-		Resource<MeshCollection> generatedMesh(uuid);
+		ResourceWrapper<MeshCollection> generatedMesh(uuid);
 		ModelImporter::ModelInfo mInfo;
 		mInfo.mesh = generatedMesh;
 		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
@@ -36,7 +36,7 @@ struct AssetTraits<MeshCollection>
 		//return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 	}
 
-	static std::map<int, Resource<Material>> getLoadedMaterials()
+	static std::map<int, ResourceWrapper<Material>> getLoadedMaterials()
 	{
 		return m_lastLoadedModelInfo.materials;
 	}
@@ -100,17 +100,17 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 	return m_bonesNameToIDMap.at(boneName);
 }
 
-Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImportSettings& settings)
+ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImportSettings& settings)
 {
 	return AssetLoader<MeshCollection>::import(fileLocation, settings);
 }
 
-Resource<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, const ModelImportSettings& settings)
+ResourceWrapper<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, const ModelImportSettings& settings)
 {
 	return AssetLoader<MeshCollection>::loadTransient(fileLocation, settings);
 }
 
-std::map<int, Resource<Material>> MeshCollection::getLastLoadedMaterials()
+std::map<int, ResourceWrapper<Material>> MeshCollection::getLastLoadedMaterials()
 {
 	return AssetTraits<MeshCollection>::getLoadedMaterials();
 }

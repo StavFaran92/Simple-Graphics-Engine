@@ -6,7 +6,7 @@
 #include "render/Renderer.h"
 #include "geometry/Mesh.h"
 #include "geometry/Box.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "render/Shader.h"
 #include "geometry/ShapeFactory.h"
 #include "render/Material.h"
@@ -66,7 +66,7 @@ Entity Skybox::CreateSkyboxFromEquirectangularMap(const std::string& equirectnag
     return createSkyboxHelper(cubemap, equirectnagularMap, entity, scene);
 }
 
-Entity Skybox::loadSkybox(Resource<Texture> equirectnagularMap, Entity& entity, Scene* scene)
+Entity Skybox::loadSkybox(ResourceWrapper<Texture> equirectnagularMap, Entity& entity, Scene* scene)
 {
     if (!scene)
     {
@@ -85,7 +85,7 @@ Entity Skybox::CreateSkyboxFromCubemap(const SkyboxFaces& faces, Scene* scene)
     std::vector<std::string> facesVec{ faces.right, faces.left, faces.top, faces.bottom, faces.front, faces.back };
     auto cubemap = Cubemap::createCubemapFromCubemapFiles(facesVec);
 
-    Resource<Texture> equirectangularMap = EquirectangularToCubemapConverter::fromCubemapToEquirectangular(cubemap);
+    ResourceWrapper<Texture> equirectangularMap = EquirectangularToCubemapConverter::fromCubemapToEquirectangular(cubemap);
     equirectangularMap = TextureTransformer::flipVertical(equirectangularMap);
     Cubemap::saveEquirectangularMap(equirectangularMap);
     Texture::addTexture2D(equirectangularMap);
@@ -98,7 +98,7 @@ Entity Skybox::CreateSkyboxFromCubemap(const SkyboxFaces& faces, Scene* scene)
     return loadSkybox(equirectangularMap, entity, scene);
 }
 
-Entity Skybox::createSkyboxHelper(Resource<Texture> cubemap, Resource<Texture> equirectangularMap, Entity& entity, Scene* scene)
+Entity Skybox::createSkyboxHelper(ResourceWrapper<Texture> cubemap, ResourceWrapper<Texture> equirectangularMap, Entity& entity, Scene* scene)
 {
     if (!scene)
     {

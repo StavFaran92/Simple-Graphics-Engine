@@ -7,7 +7,7 @@
 #include "core/Factory.h"
 #include "memory/Assets.h"
 
-void Sphere::createMesh(Resource<MeshCollection>& meshCollection, float radius, int sectors, int stacks)
+void Sphere::createMesh(ResourceWrapper<MeshCollection>& meshCollection, float radius, int sectors, int stacks)
 {
     //ModelImporter::ModelImportSettings settings;
     //settings.name = "SGE_SPHERE_MESH";

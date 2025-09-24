@@ -1,7 +1,7 @@
 #pragma once 
 
 #include <string>
-#include "Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "Asset.h"
 #include <filesystem>
 
@@ -12,13 +12,13 @@ template<typename T>
 class AssetLoader
 {
 public:
-	static Resource<T> import(const std::string& fileLocation, const BaseAssetParameters& params)
+	static ResourceWrapper<T> import(const std::string& fileLocation, const BaseAssetParameters& params)
 	{
 		// Validate input
 		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
 		{
 			logError("Invalid asset path specified.");
-			return Resource<T>::empty;
+			return ResourceWrapper<T>::empty;
 		}
 
 		AssetInfo aInfo = extractAssetInfoData(fileLocation, params);
@@ -28,7 +28,7 @@ public:
 		if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
 		{
 			logError("Failed to copy file from {} to resource folder", fileLocation);
-			return Resource<T>::empty;
+			return ResourceWrapper<T>::empty;
 		}
 
 		// Load
@@ -36,7 +36,7 @@ public:
 		if (aInfo.data.isEmpty())
 		{
 			logError("Failed to load file {}", fileLocation);
-			return Resource<T>::empty;
+			return ResourceWrapper<T>::empty;
 		}
 
 		// Add Asset
@@ -45,13 +45,13 @@ public:
 		return aInfo.data.as<T>();
 	}
 
-	static Resource<T> loadTransient(const std::string& fileLocation, const BaseAssetParameters& params)
+	static ResourceWrapper<T> loadTransient(const std::string& fileLocation, const BaseAssetParameters& params)
 	{
 		// Validate input
 		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
 		{
 			logError("Invalid asset path specified.");
-			return Resource<T>::empty;
+			return ResourceWrapper<T>::empty;
 		}
 
 		AssetInfo aInfo = extractAssetInfoData(fileLocation, params);
@@ -59,7 +59,7 @@ public:
 		aInfo.isTransient = true;
 		aInfo.filePath = fileLocation;
 
-		Resource<T> asset = AssetTraits<T>::load(aInfo);
+		ResourceWrapper<T> asset = AssetTraits<T>::load(aInfo);
 
 		if (asset.isEmpty() || !asset.get())
 		{
@@ -69,7 +69,7 @@ public:
 		return asset;
 	}
 
-	static void save(AssetInfo& aInfo, const Resource<T>& asset)
+	static void save(AssetInfo& aInfo, const ResourceWrapper<T>& asset)
 	{
 		if (!aInfo.isTransient)
 		{
@@ -82,7 +82,7 @@ public:
 
 	}
 
-	static Resource<T> create(AssetInfo& aInfo)
+	static ResourceWrapper<T> create(AssetInfo& aInfo)
 	{
 		if (aInfo.aType == AssetType::NONE)
 		{
@@ -116,7 +116,7 @@ public:
 			aInfo.uuid = aInfo.filePath;
 		}
 
-		Resource<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
+		ResourceWrapper<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
 
 		save(aInfo, asset);
 

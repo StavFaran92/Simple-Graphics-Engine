@@ -3,7 +3,7 @@
 
 #include "core/Core.h"
 
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
 
 class FrameBufferObject;
@@ -33,8 +33,8 @@ public:
 
 private:
 	std::shared_ptr<FrameBufferObject> m_frameBuffer;
-	Resource<Texture> m_targetTexture;
-	Resource<Shader> m_pickingShader;
+	ResourceWrapper<Texture> m_targetTexture;
+	ResourceWrapper<Shader> m_pickingShader;
 
 	int m_selectedObject = -1;
 };

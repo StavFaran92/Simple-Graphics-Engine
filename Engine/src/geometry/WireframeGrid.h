@@ -3,7 +3,7 @@
 #include "render/VertexLayout.h"
 #include "render/VertexArrayObject.h"
 #include "render/Shader.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 class WireframeGrid
 {
@@ -57,5 +57,5 @@ public:
 	}
 
 	std::shared_ptr<VertexArrayObject> vao;
-	Resource<Shader> shader;
+	ResourceWrapper<Shader> shader;
 };

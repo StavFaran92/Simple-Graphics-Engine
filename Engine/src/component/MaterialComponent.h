@@ -13,17 +13,17 @@ struct EngineAPI MaterialComponent : public Component
 	auto begin() const { return materials.begin(); }
 	auto end() const { return materials.end(); }
 
-	void addMaterial(const Resource<Material>& mat)
+	void addMaterial(const ResourceWrapper<Material>& mat)
 	{
 		materials[count++] = mat;
 	}
 
-	void setMaterial(int index, const Resource<Material>& mat)
+	void setMaterial(int index, const ResourceWrapper<Material>& mat)
 	{
 		materials[index] = mat;
 	}
 
-	Resource<Material> at(int index)
+	ResourceWrapper<Material> at(int index)
 	{
 		auto iter = materials.find(index);
 		if (iter == materials.end())
@@ -44,7 +44,7 @@ struct EngineAPI MaterialComponent : public Component
 		SERIALIZED_MEMBER(count);
 	}
 
-	std::map<int, Resource<Material>> materials;
+	std::map<int, ResourceWrapper<Material>> materials;
 	int count = 0;
 
 };

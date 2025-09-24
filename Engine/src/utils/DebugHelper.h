@@ -4,7 +4,7 @@
 
 #include "core/Engine.h"
 #include "core/Core.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 #include <glm/glm.hpp>
 
@@ -33,9 +33,9 @@ public:
 
 	void drawTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3);
 
-    void registerTextureForDebug(const std::string& name, Resource<Texture> texture);
+    void registerTextureForDebug(const std::string& name, ResourceWrapper<Texture> texture);
 
-    const std::map<std::string, Resource<Texture>>& getDebugTextures() const;
+    const std::map<std::string, ResourceWrapper<Texture>>& getDebugTextures() const;
 
 private:
     // Private constructor to prevent direct instantiation
@@ -46,8 +46,8 @@ private:
 
     std::shared_ptr<VertexArrayObject> m_vao;
     std::shared_ptr<VertexBufferObject> m_pointVBO;
-    Resource<Shader> m_pointShader;
-    Resource<Shader> m_lineShader;
+    ResourceWrapper<Shader> m_pointShader;
+    ResourceWrapper<Shader> m_lineShader;
 
-    std::map<std::string, Resource<Texture>> m_debugTextures;
+    std::map<std::string, ResourceWrapper<Texture>> m_debugTextures;
 };

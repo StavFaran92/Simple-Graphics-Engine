@@ -15,18 +15,18 @@ struct EngineAPI ShaderComponent : public Component
 
 	ShaderComponent(Shader* vertexShader, Shader* fragmentShader);
 
-	void addTexture(const std::string& name, Resource<Texture> texture)
+	void addTexture(const std::string& name, ResourceWrapper<Texture> texture)
 	{
 		customTextures[name] = texture;
 	}
 
-	void setProjectionTexture(Resource<Texture> texture);
+	void setProjectionTexture(ResourceWrapper<Texture> texture);
 
 	void update();
 
 	void parseUniforms(const std::string& sourceCode);
 
-	void setShader(Resource<Shader> shader);
+	void setShader(ResourceWrapper<Shader> shader);
 
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
@@ -51,12 +51,12 @@ struct EngineAPI ShaderComponent : public Component
 	}
 
 	// This will only be used by forward renderer, ignored by deffered
-	Resource<Shader> m_customShader;
+	ResourceWrapper<Shader> m_customShader;
 
-	std::map<std::string, Resource<Texture>> customTextures;
+	std::map<std::string, ResourceWrapper<Texture>> customTextures;
 
 	ProjectionType projection = ProjectionType::DefaultProjection;
-	Resource<Texture> projectionTexture;
+	ResourceWrapper<Texture> projectionTexture;
 	std::shared_ptr<RenderView> renderViewProjection;
 
 	std::unordered_map<std::string, Value> m_uniformProperties;

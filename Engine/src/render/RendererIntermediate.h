@@ -5,7 +5,7 @@
 #include "render/VertexArrayObject.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
 
 class EngineAPI RendererIntermediate : public IRenderer

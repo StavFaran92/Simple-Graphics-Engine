@@ -7,6 +7,6 @@
 class EngineAPI Quad 
 {
 public:
-	static void createMesh(Resource<MeshCollection>&);
+	static void createMesh(ResourceWrapper<MeshCollection>&);
 };
 

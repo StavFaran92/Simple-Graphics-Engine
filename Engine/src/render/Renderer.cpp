@@ -237,14 +237,14 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             continue;
 
         }
-        Resource<Shader> shader = shaderComponent.m_customShader;
+        ResourceWrapper<Shader> shader = shaderComponent.m_customShader;
         shader->use();
         graphics->shader = shader;
 
         if (shaderComponent.shaderOverride == ShaderOverride::PBR)
         {
             // Bind mesh
-            Resource<MeshCollection> meshCollecton;
+            ResourceWrapper<MeshCollection> meshCollecton;
 
             if (shaderComponent.projection == ShaderComponent::DefaultProjection)
             {
@@ -366,7 +366,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             }
 
             // Bind mesh
-            Resource<MeshCollection> meshCollecton;
+            ResourceWrapper<MeshCollection> meshCollecton;
 
             if (shaderComponent.projection == ShaderComponent::DefaultProjection)
             {

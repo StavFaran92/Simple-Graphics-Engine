@@ -107,7 +107,7 @@ void Scene::displayWireframeMesh(Entity e)
 	}
 }
 
-void Scene::setIBLData(Resource<Texture> irradianceMap, Resource<Texture> prefilterEnvMap)
+void Scene::setIBLData(ResourceWrapper<Texture> irradianceMap, ResourceWrapper<Texture> prefilterEnvMap)
 {
 	m_irradianceMap = irradianceMap;
 	m_prefilterEnvMap = prefilterEnvMap;
@@ -440,7 +440,7 @@ void Scene::draw(float deltaTime)
 				m_terrainShader->setUniformValue("height", terrain.getHeight());
 				m_terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
 				m_terrainShader->setTextureInShader(graphics->shadowMap, "shadowMap", 5);
-				Resource<Texture> heightmap = terrain.getHeightmap();
+				ResourceWrapper<Texture> heightmap = terrain.getHeightmap();
 
 				if (heightmap.isEmpty())
 					continue;
@@ -527,7 +527,7 @@ void Scene::draw(float deltaTime)
 			// Render Volumetrics
 			for (auto&& [entity, volume, shader] : m_registry->get().view<VolumeComponent, ShaderComponent>().each())
 			{
-				Resource<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+				ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 				renderView->swapToAdditionalTarget();
 				renderView->bind();
 				RenderCommand::clear();
@@ -643,7 +643,7 @@ void Scene::draw(float deltaTime)
 						glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Highlight Pass 3 - Merge");
 
 						// 3rd pass
-						Resource<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
+						ResourceWrapper<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
 						m_highlightRenderView->swapBackToMainTarget(); // todo optimize (i should fetch the secondary texture instead)
 						auto& edgeDetectedTexture = m_highlightRenderView->getRenderTargetTexture(); // todo fix
 						auto width = Engine::get()->getWindow()->getWidth();
@@ -903,7 +903,7 @@ void Scene::setPostProcess(bool value)
 //	return m_objectSelection->isObjectSelected(id);
 //}
 
-bool Scene::setPostProcessShader(Resource<Shader> shader)
+bool Scene::setPostProcessShader(ResourceWrapper<Shader> shader)
 {
 	if (m_postProcessProjector)
 	{

@@ -3,24 +3,22 @@
 #include <cstdint>
 #include <atomic>
 
-class Texture;
-class Mesh;
 #include "core/Engine.h"
 #include "memory/MemoryPool.h"
 #include "memory/ResourceManager.h"
 #include "serialize/CerealHelpers.h"
 
 template<typename T>
-class Resource
+class ResourceWrapper
 {
 public:
-	static Resource<T> empty;
+	static ResourceWrapper<T> empty;
 
-	Resource() : uuid(EMPTY_UUID) {};
+	ResourceWrapper() : uuid(EMPTY_UUID) {};
 
-	Resource(std::nullptr_t) : uuid(EMPTY_UUID) {};
+	ResourceWrapper(std::nullptr_t) : uuid(EMPTY_UUID) {};
 
-	Resource(UUID uid) : uuid(uid) 
+	ResourceWrapper(UUID uid) : uuid(uid) 
 	{
 		Engine::get()->getResourceManager()->incRef(uid);
 
@@ -28,7 +26,7 @@ public:
 			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	};
 
-	Resource(const Resource<T>& other) 
+	ResourceWrapper(const ResourceWrapper<T>& other) 
 	{
 		uuid = other.uuid;
 		if (other.uuid != EMPTY_UUID)
@@ -40,7 +38,7 @@ public:
 			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	};
 
-	Resource<T>& operator=(const Resource<T>& other)
+	ResourceWrapper<T>& operator=(const ResourceWrapper<T>& other)
 	{
 		if (uuid == other.uuid) 
 			return *this;
@@ -58,7 +56,7 @@ public:
 		return *this;
 	};
 
-	Resource(Resource<T>&& other)
+	ResourceWrapper(ResourceWrapper<T>&& other)
 	{
 		uuid = other.uuid;
 		other.uuid = EMPTY_UUID;
@@ -66,7 +64,7 @@ public:
 			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	};
 
-	Resource<T>& operator=(Resource<T>&& other) noexcept
+	ResourceWrapper<T>& operator=(ResourceWrapper<T>&& other) noexcept
 	{
 		clean();
 		uuid = other.uuid;
@@ -107,14 +105,14 @@ public:
 		SERIALIZED_MEMBER(uuid);
 	}
 
-	~Resource<T>() // destructor
+	~ResourceWrapper<T>() // destructor
 	{
 		if(uuid != EMPTY_UUID) clean();
 	}
 
 	// Upcast (texture -> asset)
 	template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
-	Resource(const Resource<U>& other) 
+	ResourceWrapper(const ResourceWrapper<U>& other) 
 	{
 		uuid = other.getUID();
 		if (other.getUID() != EMPTY_UUID)
@@ -128,9 +126,14 @@ public:
 
 	// Downcast (Asset -> Texture)
 	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
-	Resource<U> as() const
+	ResourceWrapper<U> as() const
 	{
-		return Resource<U>(uuid);
+		return ResourceWrapper<U>(uuid);
+	}
+
+	bool isAsset() const
+	{
+		return m_isAsset;
 	}
 
 private:
@@ -151,8 +154,9 @@ private:
 	}
 private:
 	UUID uuid = EMPTY_UUID;
-	mutable Asset* m_cache = nullptr;
+	mutable ResourceBase* m_cache = nullptr;
+	bool m_isAsset = false;
 };
 
 template<typename T>
-inline Resource<T> Resource<T>::empty;
+inline ResourceWrapper<T> ResourceWrapper<T>::empty;

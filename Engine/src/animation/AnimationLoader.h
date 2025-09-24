@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -24,7 +24,7 @@ class EngineAPI AnimationLoader
 public:
 	AnimationLoader();
 
-	Resource<Animation> load(AssetInfo& aInfo);
+	ResourceWrapper<Animation> load(AssetInfo& aInfo);
 
 	bool copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&);
 

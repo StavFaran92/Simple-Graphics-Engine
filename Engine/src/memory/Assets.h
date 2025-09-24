@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/Engine.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "core/Core.h"
 #include "core/Configurations.h"
 
@@ -21,7 +21,7 @@ struct AssetInfo
 	std::map<std::string, std::string> attributes;
 	std::string name;
 	bool isTransient = false;
-	Resource<Asset> data = Resource<Asset>::empty;
+	ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
 	//bool isClient = false
 	//timestamp
 	//size
@@ -36,7 +36,7 @@ public:
 	std::string getAlias(UUID uid) const;
 
 	template<typename T>
-	Resource<T> loadAsset(UUID uid, const std::string& path);
+	ResourceWrapper<T> loadAsset(UUID uid, const std::string& path);
 
 	AssetInfo importAsset(AssetInfo& assetInfo);
 

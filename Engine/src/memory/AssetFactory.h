@@ -5,7 +5,7 @@
 class AssetFactory
 {
 public:
-	using LoadFn = std::function<Resource<Asset>(AssetInfo&)>;
+	using LoadFn = std::function<ResourceWrapper<ResourceBase>(AssetInfo&)>;
 
 	static bool loadAsset(AssetInfo& aInfo);
 

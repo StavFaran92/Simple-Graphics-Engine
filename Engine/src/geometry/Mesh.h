@@ -4,7 +4,7 @@
 
 #include "core/Core.h"
 #include "render/Shader.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "memory/Asset.h"
 
 class VertexBufferObject;
@@ -41,7 +41,7 @@ struct MeshData;
  * it can be used to manipulate an existing Mesh data or to generate one yourself.
  * It should be used with the MeshBuilder class.
  */
-class EngineAPI Mesh : public Asset
+class EngineAPI Mesh : public ResourceBase
 {
 public:
 	// -------------------- Methods -------------------- //

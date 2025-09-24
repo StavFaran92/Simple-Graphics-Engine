@@ -5,7 +5,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "geometry/MeshCollection.h"
 
 class MeshExporter

@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "runtime/Entity.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 class FrameBufferObject;
 class RenderBufferObject;
@@ -18,11 +18,11 @@ class ScreenBufferDisplay
 public:
 	ScreenBufferDisplay(Scene* scene);
 	bool init(int windowWidth, int windowHeight);
-	void draw(Resource<Texture> textureHandler);
+	void draw(ResourceWrapper<Texture> textureHandler);
 
 private:
 	Entity m_quad;
-	Resource<Shader> m_screenShader = nullptr;
+	ResourceWrapper<Shader> m_screenShader = nullptr;
 	std::shared_ptr<IRenderer> m_renderer = nullptr;
 	Scene* m_scene = nullptr;
 };

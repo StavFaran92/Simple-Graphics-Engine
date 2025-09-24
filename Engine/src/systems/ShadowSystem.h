@@ -26,7 +26,7 @@ public:
 
 	void renderToDepthMap();
 
-	Resource<Texture> getShadowMap() const;
+	ResourceWrapper<Texture> getShadowMap() const;
 	glm::mat4 getLightSpaceMat() const;
 private:
 	bool m_isInit = false;
@@ -35,8 +35,8 @@ private:
 
 	FrameBufferObject m_fbo;
 	Scene* m_scene = nullptr;
-	Resource<Shader> m_simpleDepthShader = nullptr;
-	Resource<Texture> m_depthMapTexture = nullptr;
+	ResourceWrapper<Shader> m_simpleDepthShader = nullptr;
+	ResourceWrapper<Texture> m_depthMapTexture = nullptr;
 
 	std::shared_ptr<ScreenBufferDisplay> m_bufferDisplay;
 

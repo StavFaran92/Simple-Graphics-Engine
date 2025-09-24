@@ -7,7 +7,7 @@
 #include "runtime/Context.h"
 #include "systems/CommonTextures.h"
 
-const std::vector<Resource<Texture>>& TerrainMaterial::getAllTextures() const
+const std::vector<ResourceWrapper<Texture>>& TerrainMaterial::getAllTextures() const
 {
 	return m_textures;
 }

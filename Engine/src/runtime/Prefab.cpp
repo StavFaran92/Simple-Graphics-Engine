@@ -27,7 +27,7 @@ struct AssetTraits<Prefab>
 		aInfo.fileName = aInfo.name + ".asset";;
 	}
 
-	static Resource<Prefab> load(AssetInfo& aInfo)
+	static ResourceWrapper<Prefab> load(AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
 		std::ifstream is(projectDir + aInfo.filePath);
@@ -38,7 +38,7 @@ struct AssetTraits<Prefab>
 		{
 			iarchive(*loadedPrefab);
 			Engine::get()->getMemoryPool().add(aInfo.uuid, loadedPrefab);
-			return Resource<Prefab>(aInfo.uuid);
+			return ResourceWrapper<Prefab>(aInfo.uuid);
 
 		}
 		catch (const cereal::Exception& e)
@@ -46,10 +46,10 @@ struct AssetTraits<Prefab>
 			logError("Deserialization Error occured: {}", e.what());
 		}
 
-		return Resource<Prefab>::empty;
+		return ResourceWrapper<Prefab>::empty;
 	}
 
-	static void save(AssetInfo& aInfo, const Resource<Prefab>& prefab)
+	static void save(AssetInfo& aInfo, const ResourceWrapper<Prefab>& prefab)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
 		std::ofstream os(projectDir + aInfo.filePath);
@@ -68,17 +68,17 @@ struct AssetTraits<Prefab>
 
 static AssetFnRegister<AssetType::PREFAB> assetRegister(AssetTraits<Prefab>::load);
 
-Resource<Prefab> Prefab::import(const std::string& fileLocation, const PrefabImportSettings& settings)
+ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, const PrefabImportSettings& settings)
 {
 	return AssetLoader<Prefab>::import(fileLocation, settings);
 }
 
-Resource<Prefab> Prefab::loadTransient(const std::string& fileLocation, const PrefabImportSettings& settings)
+ResourceWrapper<Prefab> Prefab::loadTransient(const std::string& fileLocation, const PrefabImportSettings& settings)
 {
 	return AssetLoader<Prefab>::loadTransient(fileLocation, settings);
 }
 
-void Prefab::extractChildrenRecursive(const Entity& e, Resource<Prefab>& prefab)
+void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)
 {
 	prefab->m_serializedPrefab.push_back(Archiver::serializeEntity(e));
 	auto& children = e.getComponent<Transformation>().getChildren();
@@ -91,12 +91,12 @@ void Prefab::extractChildrenRecursive(const Entity& e, Resource<Prefab>& prefab)
 	}
 }
 
-Resource<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
+ResourceWrapper<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
 {
 	aInfo.aType = AssetType::PREFAB;
 	aInfo.ext = ".asset";
 
-	Resource<Prefab> prefab = AssetLoader<Prefab>::create(aInfo);
+	ResourceWrapper<Prefab> prefab = AssetLoader<Prefab>::create(aInfo);
 
 	extractChildrenRecursive(e, prefab);
 

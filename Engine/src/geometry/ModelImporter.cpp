@@ -8,7 +8,7 @@
 #include "core/Logger.h"
 #include <filesystem>
 #include "geometry/MeshBuilder.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "render/Material.h"
 #include "runtime/Entity.h"
 #include "component/Component.h"
@@ -22,7 +22,7 @@
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
 
-void extractAiMaterialProperties(const aiMaterial* aiMat, Resource<Material>& mat)
+void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Material>& mat)
 {
 	if (!aiMat)
 	{
@@ -169,7 +169,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
-			PrintMaterialProperties(aMaterial);
+			//PrintMaterialProperties(aMaterial);
 
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 
@@ -182,7 +182,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 				logWarning("Could not locate material: {}", materialID);
 				continue;
 			}
-			Resource<Material> material = Resource<Material>(uuid);
+			ResourceWrapper<Material> material = ResourceWrapper<Material>(uuid);
 			modelInfo.materials[i] = material;
 		}
 	}
@@ -248,7 +248,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 		return false;
 	}
 
-	std::unordered_map<std::string, Resource<Texture>> cachedTextures;
+	std::unordered_map<std::string, ResourceWrapper<Texture>> cachedTextures;
 
 	// Import materials and textures
 	if (scene->HasMaterials())
@@ -304,7 +304,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 		}
 	}
 
-	Resource<MeshCollection> mesh = Factory<MeshCollection>::create();
+	ResourceWrapper<MeshCollection> mesh = Factory<MeshCollection>::create();
 
 	auto& projectDir = Engine::get()->getProjectDirectory();
 	const std::string filename = std::filesystem::path(fileLocation).filename().string();
@@ -478,15 +478,15 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 
 
 
-Resource<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, Resource<Texture>>& cachedTextures, AssetInfo& aInfo)
+ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, ResourceWrapper<Texture>>& cachedTextures, AssetInfo& aInfo)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
 	{
-		return Resource<Texture>::empty;
+		return ResourceWrapper<Texture>::empty;
 	}
 
-	Resource<Texture> texture;
+	ResourceWrapper<Texture> texture;
 	const aiTexture* aiTexture = scene->GetEmbeddedTexture(str.C_Str());
 	if(aiTexture)
 	{
@@ -554,7 +554,7 @@ Resource<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, aiM
 		std::string path = findTexture(str, dir);
 		if (path.empty())
 		{
-			return Resource<Texture>::empty;
+			return ResourceWrapper<Texture>::empty;
 		}
 
 		if (cachedTextures.find(path) != cachedTextures.end())

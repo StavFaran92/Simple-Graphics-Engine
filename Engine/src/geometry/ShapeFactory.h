@@ -8,7 +8,7 @@
 class Entity;
 class SGE_Regsitry;
 class MeshCollection;
-template<typename>class Resource;
+template<typename>class ResourceWrapper;
 
 class EngineAPI ShapeFactory
 {

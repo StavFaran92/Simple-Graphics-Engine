@@ -34,28 +34,28 @@ template<typename T>
 struct AssetTraits {
 	static bool copyFiles(const std::string& fileLocation, AssetInfo&);
 	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo);
-	static Resource<T> load(AssetInfo& aInfo);
-	static void save(AssetInfo& aInfo, const Resource<T>& asset);
+	static ResourceWrapper<T> load(AssetInfo& aInfo);
+	static void save(AssetInfo& aInfo, const ResourceWrapper<T>& asset);
 };
 
-class Asset
+class ResourceBase
 {
 public:
-	Asset() = default;
-	virtual ~Asset() = default;
+	ResourceBase() = default;
+	virtual ~ResourceBase() = default;
 
-	static Resource<Asset> import(const std::string& fileLocation, const BaseAssetParameters& params);
+	static ResourceWrapper<ResourceBase> import(const std::string& fileLocation, const BaseAssetParameters& params);
 
 	//virtual Resource<Asset> load(AssetInfo aInfo) = 0;
 
 	// CRTP
 	template <typename T>
-	static Resource<T> import(const std::string& fileLocation, const BaseAssetParameters& params) {
+	static ResourceWrapper<T> import(const std::string& fileLocation, const BaseAssetParameters& params) {
 		return T::import(fileLocation, params);
 	}
 
 	template <typename T>
-	static Resource<T> load(AssetInfo& aInfo) {
+	static ResourceWrapper<T> load(AssetInfo& aInfo) {
 		return T::load(aInfo);
 	}
 

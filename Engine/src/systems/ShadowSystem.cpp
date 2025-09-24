@@ -1,7 +1,7 @@
 #include "systems/ShadowSystem.h"
 
 #include "render/FrameBufferObject.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "gl/glew.h"
 #include "core/Logger.h"
 #include "runtime/Scene.h"
@@ -186,7 +186,7 @@ void ShadowSystem::renderToDepthMap()
 	glCullFace(GL_BACK);
 }
 
-Resource<Texture> ShadowSystem::getShadowMap() const
+ResourceWrapper<Texture> ShadowSystem::getShadowMap() const
 {
 	return m_depthMapTexture;
 }

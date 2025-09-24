@@ -3,7 +3,7 @@
 #include <memory>
 #include <map>
 #include "render/Shader.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 class CommonShaders
 {
@@ -21,12 +21,12 @@ public:
 
     void close();
 
-    Resource<Shader> getShader(ShaderType sType) const;
+    ResourceWrapper<Shader> getShader(ShaderType sType) const;
 
     CommonShaders(const CommonShaders& other) = delete;
     CommonShaders& operator=(const CommonShaders& other) = delete;
 
 private:
-    std::map<ShaderType, Resource<Shader>> m_shaders;
+    std::map<ShaderType, ResourceWrapper<Shader>> m_shaders;
     
 };

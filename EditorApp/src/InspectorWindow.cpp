@@ -132,7 +132,7 @@ void InspectorWindow::display()
 			case ColliderType::MESH:
 				if (auto* mesh = dynamic_cast<CollisionMesh*>(rBody.collider.get())) {
 					ImGui::Checkbox("Convex", &mesh->isConvex);
-					// Optional: display mesh resource name, etc.
+					// Optional: display mesh ResourceWrapper name, etc.
 				}
 				break;
 			case ColliderType::CAPSULE:
@@ -179,7 +179,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uid) {
-				meshComponent.mesh = Resource<MeshCollection>(uid);
+				meshComponent.mesh = ResourceWrapper<MeshCollection>(uid);
 			});
 			
 			
@@ -258,7 +258,7 @@ void InspectorWindow::display()
 				}
 
 				addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
-					mat = Resource<Material>(uid);
+					mat = ResourceWrapper<Material>(uid);
 				});
 
 				++index;
@@ -313,7 +313,7 @@ void InspectorWindow::display()
 
 		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
 			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](std::string uuid) {
-				skybox.setSkybox(Resource<Texture>(uuid));
+				skybox.setSkybox(ResourceWrapper<Texture>(uuid));
 			});
 
 			// Compile Button
@@ -325,7 +325,7 @@ void InspectorWindow::display()
 
 		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
 			addTextureEditWidget(image.image, { 50, 50 }, [&](std::string uuid) {
-				image.image = Resource<Texture>(uuid);
+				image.image = ResourceWrapper<Texture>(uuid);
 				});
 			ImGui::DragFloat("posX", &image.position.x);
 			ImGui::DragFloat("posY", &image.position.y);
@@ -392,7 +392,7 @@ void InspectorWindow::display()
 					}
 
 					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uid) {
-						animator.addAnimation(name, Resource<Animation>(uid));
+						animator.addAnimation(name, ResourceWrapper<Animation>(uid));
 					});
 
 					bool isSelected = (index == activeAnimationIndex);
@@ -414,14 +414,14 @@ void InspectorWindow::display()
 			if (ImGui::Button("+")) {
 				int animationsCount = animations.size();
 				std::string newAnimationName = "New Animation_" + std::to_string(animationsCount);
-				animator.addAnimation(newAnimationName, Resource<Animation>::empty);
+				animator.addAnimation(newAnimationName, ResourceWrapper<Animation>::empty);
 				eState.animationRenameBuffers.push_back(newAnimationName);
 			}
 		});
 
 		displayComponent<Terrain>("Terrain", [](Terrain& terrain) {
 			addTextureEditWidget(terrain.m_heightmap, { 50, 50 }, [&](std::string uuid) {
-				terrain = Terrain::generateTerrain(terrain.m_width, terrain.m_height, terrain.m_scale, Resource<Texture>(uuid));
+				terrain = Terrain::generateTerrain(terrain.m_width, terrain.m_height, terrain.m_scale, ResourceWrapper<Texture>(uuid));
 			});
 			ImGui::DragInt("height", &terrain.m_height);
 			ImGui::DragInt("width", &terrain.m_width);
@@ -437,7 +437,7 @@ void InspectorWindow::display()
 				ImGui::PushID(i);
 				auto texture = terrain.getTexture(i);
 				addTextureEditWidget(texture, { 50, 50 }, [i, &terrain](std::string uuid) {
-					terrain.setTexture(i, Resource<Texture>(uuid));
+					terrain.setTexture(i, ResourceWrapper<Texture>(uuid));
 				});
 				ImGui::DragFloat("Height blend", &terrain.m_textureBlends[i].blend, .01f);
 				auto scale = terrain.getTextureScale(i);
@@ -466,7 +466,7 @@ void InspectorWindow::display()
 
 			if (!selectedShaderUID.empty())
 			{
-				shaderComponent.setShader(Resource<Shader>(selectedShaderUID));
+				shaderComponent.setShader(ResourceWrapper<Shader>(selectedShaderUID));
 			}
 
 			if (!shaderComponent.m_customShader.isEmpty())
@@ -493,7 +493,7 @@ void InspectorWindow::display()
 				// Projection Texture
 				ImGui::Text("Projection Texture:");
 				addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](std::string uuid) {
-					shaderComponent.setProjectionTexture(Resource<Texture>(uuid));
+					shaderComponent.setProjectionTexture(ResourceWrapper<Texture>(uuid));
 				});
 			}
 
@@ -505,7 +505,7 @@ void InspectorWindow::display()
 					ImGui::PushID(name.c_str());
 					ImGui::Text(name.c_str());
 					addTextureEditWidget(texture, { 100,100 }, [&](std::string uuid) {
-						texture = Resource<Texture>(uuid);
+						texture = ResourceWrapper<Texture>(uuid);
 						});
 					ImGui::PopID();
 				}
@@ -574,7 +574,7 @@ void InspectorWindow::display()
 		displayComponent<FoliageComponent>("Foliage Component", [](FoliageComponent& foliage) {
 			// Compile Button
 			addTextureEditWidget(foliage.m_foliageSpreadMap, { 100,100 }, [&](std::string uuid) {
-				foliage.m_foliageSpreadMap = Resource<Texture>(uuid);
+				foliage.m_foliageSpreadMap = ResourceWrapper<Texture>(uuid);
 				});
 
 			ImGui::ColorEdit3("Bottom Color", (float*)&foliage.colorA);

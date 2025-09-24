@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "geometry/MeshCollection.h"
 
 class EngineAPI BuiltInMeshes
@@ -19,7 +19,7 @@ public:
 	BuiltInMeshes();
 	~BuiltInMeshes();
 
-	Resource<MeshCollection> getMesh(MeshType type);
+	ResourceWrapper<MeshCollection> getMesh(MeshType type);
 private:
-	std::map<MeshType, Resource<MeshCollection>> m_meshes;
+	std::map<MeshType, ResourceWrapper<MeshCollection>> m_meshes;
 };

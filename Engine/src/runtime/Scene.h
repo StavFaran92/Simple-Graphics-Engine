@@ -74,7 +74,7 @@ public:
 	Scene(Context* context);
 
 	void setPostProcess(bool value);
-	bool setPostProcessShader(Resource<Shader> shader);
+	bool setPostProcessShader(ResourceWrapper<Shader> shader);
 
 	void addCoroutine(const std::function<bool(float)>& coroutine);
 	void removeCoroutine(std::function<bool(float)> coroutine);
@@ -95,7 +95,7 @@ public:
 
 	void displayWireframeMesh(Entity e);
 
-	void setIBLData(Resource<Texture> irradianceMap, Resource<Texture> prefilterEnvMap);
+	void setIBLData(ResourceWrapper<Texture> irradianceMap, ResourceWrapper<Texture> prefilterEnvMap);
 
 	//int getRenderTarget() const;
 
@@ -168,7 +168,7 @@ private:
 
 	bool m_isSimulationActive = false;
 
-	Resource<Shader> m_tempOutlineShader = nullptr;
+	ResourceWrapper<Shader> m_tempOutlineShader = nullptr;
 
 	//CameraComponent* m_activeCamera = nullptr;
 
@@ -181,14 +181,14 @@ private:
 	//std::shared_ptr<RenderBufferObject> m_renderTargetRBO;
 	//Resource<Texture> m_renderTargetTexture;
 
-	Resource<Texture> m_irradianceMap;
-	Resource<Texture> m_prefilterEnvMap;
-	Resource<Texture> m_BRDFIntegrationLUT;
-	Resource<Shader> m_skyboxShader;
-	Resource<Shader> m_UIShader;
-	Resource<Shader> m_terrainShader;
+	ResourceWrapper<Texture> m_irradianceMap;
+	ResourceWrapper<Texture> m_prefilterEnvMap;
+	ResourceWrapper<Texture> m_BRDFIntegrationLUT;
+	ResourceWrapper<Shader> m_skyboxShader;
+	ResourceWrapper<Shader> m_UIShader;
+	ResourceWrapper<Shader> m_terrainShader;
 
-	Resource<MeshCollection> m_basicBox;
+	ResourceWrapper<MeshCollection> m_basicBox;
 
 	//Entity m_primaryCamera = Entity::EmptyEntity;
 
@@ -202,12 +202,12 @@ private:
 
 	std::shared_ptr<RenderView> m_highlightRenderView;
 
-	Resource<Shader> m_highlightMaskShader;
-	Resource<Shader> m_highlightEdgeDetectionShader;
-	Resource<Shader> m_highlightMergeShader;
+	ResourceWrapper<Shader> m_highlightMaskShader;
+	ResourceWrapper<Shader> m_highlightEdgeDetectionShader;
+	ResourceWrapper<Shader> m_highlightMergeShader;
 
 	std::shared_ptr<WireframeGrid> m_wireframeGrid;
 
-	Resource<Shader> m_sampleComputeShader;
+	ResourceWrapper<Shader> m_sampleComputeShader;
 	
 };

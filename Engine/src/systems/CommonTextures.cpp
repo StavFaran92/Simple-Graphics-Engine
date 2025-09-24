@@ -16,7 +16,7 @@ void CommonTextures::close()
 	m_textures.clear();
 }
 
-Resource<Texture> CommonTextures::getTexture(TextureType texType)
+ResourceWrapper<Texture> CommonTextures::getTexture(TextureType texType)
 {
 	return m_textures[texType];
 }

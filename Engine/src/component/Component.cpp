@@ -23,7 +23,7 @@ InstanceBatch::InstanceBatch()
 	glGenBuffers(1, &m_id);
 }
 
-InstanceBatch::InstanceBatch(const std::vector<std::shared_ptr<Transformation>>& transformations, Resource<Mesh> mesh)
+InstanceBatch::InstanceBatch(const std::vector<std::shared_ptr<Transformation>>& transformations, ResourceWrapper<Mesh> mesh)
 	: mesh(mesh), transformations(transformations)
 {
 	glGenBuffers(1, &m_id);

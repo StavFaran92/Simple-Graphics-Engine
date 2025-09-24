@@ -7,7 +7,7 @@
 #include "core/Engine.h"
 #include "core/Window.h"
 #include "core/Logger.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "runtime/Scene.h"
 #include "runtime/Entity.h"
 #include "component/Component.h"
@@ -54,7 +54,7 @@ bool PostProcessProjector::init(int windowWidth, int windowHeight)
 	auto height = windowHeight;
 
 	// Create a empty texture and attach to FBO
-	m_textureHandler = Resource<Texture>(Texture::createEmptyTexture(width, height));
+	m_textureHandler = ResourceWrapper<Texture>(Texture::createEmptyTexture(width, height));
 	m_frameBuffer->attachTexture(m_textureHandler.get()->getID());
 
 	// Create RBO and attach to FBO
@@ -121,7 +121,7 @@ void PostProcessProjector::draw()
 	m_textureHandler.get()->unbind();
 }
 
-void PostProcessProjector::setPostProcessShader(Resource<Shader> shader)
+void PostProcessProjector::setPostProcessShader(ResourceWrapper<Shader> shader)
 {
 	m_screenShader = shader;
 }

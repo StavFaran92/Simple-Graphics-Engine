@@ -11,7 +11,7 @@
 #include "render/ShaderLoader.h"
 #include "core/Engine.h"
 #include "texture/Texture.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "core/Factory.h"
 #include "memory/Assets.h"
 #include "memory/AssetLoader.h"
@@ -47,14 +47,14 @@ struct AssetTraits<Shader>
 		aInfo.isTransient = sParams->isTransient;
 	}
 
-	static Resource<Shader> load(AssetInfo& aInfo)
+	static ResourceWrapper<Shader> load(AssetInfo& aInfo)
 	{
 		UUID uuid = aInfo.uuid;
 		std::string shaderOverrideStr = aInfo.attributes.at("shader_override");
 		ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
 		Shader* shaderPtr = new Shader();
 		Engine::get()->getMemoryPool().add(uuid, shaderPtr);
-		Resource<Shader> shader(uuid);
+		ResourceWrapper<Shader> shader(uuid);
 		Engine::get()->getResourceManager()->incRef(uuid);
 
 		std::string filepath;
@@ -101,7 +101,7 @@ void Shader::bindUniformBlockToBindPoint(const std::string& uniformBlockName, in
 	glUniformBlockBinding(m_id, uniformBlockIndex, bindPointIndex);
 }
 
-void Shader::setTextureInShader(Resource<Texture> texture, const std::string& uniform, int slot)
+void Shader::setTextureInShader(ResourceWrapper<Texture> texture, const std::string& uniform, int slot)
 {
 	texture.get()->setSlot(slot);
 	texture.get()->bind();
@@ -536,15 +536,15 @@ void replaceDirective(std::string& source, const std::string& directive, std::st
 	}
 }
 
-Resource<Shader> Shader::createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient)
+ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient)
 {
-	Resource<Shader> shader;
+	ResourceWrapper<Shader> shader;
 	if (isTransient)
 	{
 		if (name.empty())
 		{
 			logError("Transient shader must have a name!");
-			return Resource<Shader>::empty;
+			return ResourceWrapper<Shader>::empty;
 		}
 		shader = Factory<Shader>::createUsingCustomUUID(name);
 	}
@@ -570,12 +570,12 @@ Resource<Shader> Shader::createOverrideShader(const std::string& name, const std
 	return shader;
 }
 
-Resource<Shader> Shader::import(const std::string& fileLocation, const ShaderLoadParams& settings)
+ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, const ShaderLoadParams& settings)
 {
 	return AssetLoader<Shader>::import(fileLocation, settings);
 }
 
-Resource<Shader> Shader::loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings)
+ResourceWrapper<Shader> Shader::loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings)
 {
 	return AssetLoader<Shader>::loadTransient(fileLocation, settings);
 }

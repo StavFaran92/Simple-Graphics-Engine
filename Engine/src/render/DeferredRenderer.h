@@ -4,7 +4,7 @@
 
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
 #include "core/Window.h"
 #include "core/Configurations.h"
@@ -36,33 +36,33 @@ private:
 	
 	RenderBufferObject m_renderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
 	
-	Resource<Texture> m_positionTexture = nullptr;
-	Resource<Texture> m_normalTexture = nullptr;
-	Resource<Texture> m_albedoTexture = nullptr;
-	Resource<Texture> m_MRATexture = nullptr;
+	ResourceWrapper<Texture> m_positionTexture = nullptr;
+	ResourceWrapper<Texture> m_normalTexture = nullptr;
+	ResourceWrapper<Texture> m_albedoTexture = nullptr;
+	ResourceWrapper<Texture> m_MRATexture = nullptr;
 	
 	Scene* m_scene = nullptr;
 
 
 	Entity m_quad;
-	Resource<Shader> m_screenShader;
+	ResourceWrapper<Shader> m_screenShader;
 	
 	
-	Resource<Shader> m_gBufferShader;
-	Resource<Shader> m_lightPassShader;
+	ResourceWrapper<Shader> m_gBufferShader;
+	ResourceWrapper<Shader> m_lightPassShader;
 
 	// SSAO
 	FrameBufferObject m_ssaoFBO;
 	RenderBufferObject m_ssaoRenderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
-	Resource<Texture> m_ssaoNoiseTexture = nullptr;
-	Resource<Texture> m_ssaoColorBuffer = nullptr;
-	Resource<Shader> m_ssaoPassShader;
+	ResourceWrapper<Texture> m_ssaoNoiseTexture = nullptr;
+	ResourceWrapper<Texture> m_ssaoColorBuffer = nullptr;
+	ResourceWrapper<Shader> m_ssaoPassShader;
 	std::vector<glm::vec3> m_ssaoKernel;
 	
 	FrameBufferObject m_ssaoBlurFBO;
 	RenderBufferObject m_ssaoBlurRenderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
-	Resource<Texture> m_ssaoBlurColorBuffer = nullptr;
-	Resource<Shader> m_ssaoBlurPassShader;
+	ResourceWrapper<Texture> m_ssaoBlurColorBuffer = nullptr;
+	ResourceWrapper<Shader> m_ssaoBlurPassShader;
 
 };
 

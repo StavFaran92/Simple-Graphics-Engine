@@ -1,7 +1,7 @@
 #pragma once
 
 #include "texture/Texture.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "core/Core.h"
 
 class EngineAPI TextureSampler
@@ -9,7 +9,7 @@ class EngineAPI TextureSampler
 public:
 	TextureSampler(int channelCount = 3);
 
-	Resource<Texture> texture;
+	ResourceWrapper<Texture> texture;
 
 	enum Color {
 		None = 0,

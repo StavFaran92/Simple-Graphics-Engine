@@ -74,7 +74,7 @@ void readAnimationBones(const aiAnimation* animation, std::unordered_map<std::st
     }
 }
 
-Resource<Animation> AnimationLoader::load(AssetInfo& aInfo)
+ResourceWrapper<Animation> AnimationLoader::load(AssetInfo& aInfo)
 {
     std::string filepath;
     if (aInfo.isTransient)
@@ -91,7 +91,7 @@ Resource<Animation> AnimationLoader::load(AssetInfo& aInfo)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
-        return Resource<Animation>::empty;
+        return ResourceWrapper<Animation>::empty;
     }
 
     assert(scene && scene->mRootNode && scene->HasAnimations());
@@ -109,7 +109,7 @@ Resource<Animation> AnimationLoader::load(AssetInfo& aInfo)
     anim->build(aiAnimation->mName.C_Str(), (float)aiAnimation->mDuration, (float)aiAnimation->mTicksPerSecond, rootNode, bones);
 
     Engine::get()->getMemoryPool().add(aInfo.uuid, anim);
-    auto& res = Resource<Animation>(aInfo.uuid);
+    auto& res = ResourceWrapper<Animation>(aInfo.uuid);
 
     return res;
 }

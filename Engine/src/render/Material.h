@@ -4,7 +4,7 @@
 #include <map>
 #include "core/Core.h"
 
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "render/Shader.h"
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
@@ -14,13 +14,13 @@ struct MaterialImportSettings : public BaseAssetParameters
 
 };
 
-class EngineAPI Material : public Asset
+class EngineAPI Material : public ResourceBase
 {
 public:
 	Material();
 	~Material() = default;
 
-	virtual void use(Resource<Shader>& shader);
+	virtual void use(ResourceWrapper<Shader>& shader);
 
 	virtual void release();
 
@@ -34,14 +34,14 @@ public:
 
 	bool hasTexture(Texture::TextureType textureType) const;
 
-	void setTexture(Texture::TextureType textureType, Resource<Texture> textureHandler);
+	void setTexture(Texture::TextureType textureType, ResourceWrapper<Texture> textureHandler);
 
 	void setName(const std::string& name);
 	std::string getName() const;
 
-	std::vector<Resource<Texture>> getAllTextures() const;
+	std::vector<ResourceWrapper<Texture>> getAllTextures() const;
 
-	Resource<Material> clone(bool isTransient) const;
+	ResourceWrapper<Material> clone(bool isTransient) const;
 
 	bool isOpaque() const;
 
@@ -55,14 +55,14 @@ public:
 		SERIALIZED_MEMBER(opacityFactor);
 	}
 
-	static Resource<Material> import(const std::string& fileLocation, const MaterialImportSettings& settings = {});
-	static Resource<Material> loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings = {});
-	static Resource<Material> create(AssetInfo& aInfo);
-	static void save(const Resource<Material>& material);
+	static ResourceWrapper<Material> import(const std::string& fileLocation, const MaterialImportSettings& settings = {});
+	static ResourceWrapper<Material> loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings = {});
+	static ResourceWrapper<Material> create(AssetInfo& aInfo);
+	static void save(const ResourceWrapper<Material>& material);
 
 protected:
-	void setTexturesInShader(Resource<Shader>& shader);
-	void setTextureInShader(Resource<Shader>& shader, Texture::TextureType ttype, int slot);
+	void setTexturesInShader(ResourceWrapper<Shader>& shader);
+	void setTextureInShader(ResourceWrapper<Shader>& shader, Texture::TextureType ttype, int slot);
 
 public:
 	std::string m_name;

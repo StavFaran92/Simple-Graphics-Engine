@@ -71,7 +71,7 @@ static const unsigned int indices[] = {
     6, 7, 3
 };
 
-void Box::createMesh(Resource<MeshCollection>& meshCollection)
+void Box::createMesh(ResourceWrapper<MeshCollection>& meshCollection)
 {
     //ModelImporter::ModelImportSettings settings;
     //settings.name = "SGE_BOX_MESH";

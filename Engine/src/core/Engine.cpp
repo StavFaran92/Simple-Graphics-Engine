@@ -151,7 +151,7 @@ bool Engine::init(const InitParams& initParams)
     m_eventSystem = std::make_shared<EventSystem>();
     m_eventLayerStack = std::make_shared<EventLayerStack>();
 
-    m_memoryPool = std::make_shared<MemoryPool<Asset>>();
+    m_memoryPool = std::make_shared<MemoryPool<ResourceBase>>();
     //m_memoryPoolMeshCollection = std::make_shared<MemoryPool<MeshCollection>>();
     //m_memoryPoolAnimation = std::make_shared<MemoryPool<Animation>>();
     //m_memoryPoolShader = std::make_shared<MemoryPool<Shader>>();
@@ -465,7 +465,7 @@ const EngineConfig& Engine::getConfig() const
     return *m_engineConfig.get();
 }
 
-MemoryPool<Asset>& Engine::getMemoryPool() const
+MemoryPool<ResourceBase>& Engine::getMemoryPool() const
 {
     return *m_memoryPool.get();
 }
@@ -487,7 +487,7 @@ std::string Engine::getProjectDirectory() const
     return m_projectDirectory;
 }
 
-Resource<Material> Engine::getDefaultMaterial() const
+ResourceWrapper<Material> Engine::getDefaultMaterial() const
 {
     return m_builtInMaterials->getDefaultMaterial();
 }

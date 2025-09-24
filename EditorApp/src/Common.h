@@ -51,7 +51,7 @@ enum class LightType {
 	PointLight = 1
 };
 
-extern std::unordered_map<std::string, Resource<Texture>> icons;
+extern std::unordered_map<std::string, ResourceWrapper<Texture>> icons;
 
 struct SceneObject 
 {

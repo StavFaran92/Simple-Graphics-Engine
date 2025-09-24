@@ -13,7 +13,7 @@
 #include "core/Configurations.h"
 #include "core/CacheSystem.h"
 #include "core/Engine.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "memory/Assets.h"
 #include "core/Factory.h"
 #include "runtime/Context.h"
@@ -23,10 +23,10 @@
 
 #include "utils/EquirectangularToCubemapConverter.h"
 
-Resource<Texture> Cubemap::createCubemapFromCubemapFiles(const std::vector<std::string>& faces)
+ResourceWrapper<Texture> Cubemap::createCubemapFromCubemapFiles(const std::vector<std::string>& faces)
 {
 	Texture::TextureData cubemapData = extractCubemapDataFromCubemapFiles(faces);
-	Resource<Texture> cubemap = createCubemapFromBuffer(cubemapData);
+	ResourceWrapper<Texture> cubemap = createCubemapFromBuffer(cubemapData);
 	for (int i = 0; i < 6; i++)
 	{
 		stbi_image_free(cubemapData.facesData[i]);
@@ -105,12 +105,12 @@ Texture::TextureData Cubemap::extractCubemapDataFromEquirectangularFile(const st
 //	return cubemap;
 //}
 
-Resource<Texture> Cubemap::createCubemapFromBuffer(const Texture::TextureData& cubemapData)
+ResourceWrapper<Texture> Cubemap::createCubemapFromBuffer(const Texture::TextureData& cubemapData)
 {
 	return build(cubemapData);
 }
 
-Resource<Texture> Cubemap::createDefaultCubemap()
+ResourceWrapper<Texture> Cubemap::createDefaultCubemap()
 {
 	Texture::TextureData cubemapData;
 	static unsigned char* FULL_WHITE = new unsigned char[3]{ 255, 255, 255 }; // todo fix
@@ -136,7 +136,7 @@ Resource<Texture> Cubemap::createDefaultCubemap()
 	return createCubemapFromBuffer(cubemapData);
 }
 
-Resource<Texture> Cubemap::createEmptyCubemap(int width, int height, int internalFormat, int format, int type)
+ResourceWrapper<Texture> Cubemap::createEmptyCubemap(int width, int height, int internalFormat, int format, int type)
 {
 	Texture::TextureData cubemapData;
 	cubemapData.target = GL_TEXTURE_CUBE_MAP;
@@ -157,7 +157,7 @@ Resource<Texture> Cubemap::createEmptyCubemap(int width, int height, int interna
 	return createCubemapFromBuffer(cubemapData);
 }
 
-Resource<Texture> Cubemap::createEmptyCubemap(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool createMipMaps)
+ResourceWrapper<Texture> Cubemap::createEmptyCubemap(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool createMipMaps)
 {
 	Texture::TextureData cubemapData;
 	cubemapData.target = GL_TEXTURE_CUBE_MAP;
@@ -200,9 +200,9 @@ Texture::TextureData Cubemap::extractCubemapDataFromCubemapFiles(const std::vect
 	return cubemapData;
 }
 
-Resource<Texture> Cubemap::build(const Texture::TextureData& textureData)
+ResourceWrapper<Texture> Cubemap::build(const Texture::TextureData& textureData)
 {
-	Resource<Texture> texture = Factory<Texture>::create();
+	ResourceWrapper<Texture> texture = Factory<Texture>::create();
 
 	texture.get()->m_data = textureData;
 
@@ -229,7 +229,7 @@ Resource<Texture> Cubemap::build(const Texture::TextureData& textureData)
 	return texture;
 }
 
-void Cubemap::saveEquirectangularMap(Resource<Texture> equirectangularMap)
+void Cubemap::saveEquirectangularMap(ResourceWrapper<Texture> equirectangularMap)
 {
 	equirectangularMap.get()->bind();
 

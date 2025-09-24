@@ -23,7 +23,7 @@ enum class ShaderOverride : int
 };
 
 struct ShadersInfo;
-template<typename> class Resource;
+template<typename> class ResourceWrapper;
 class Texture;
 template<typename> class AssetTraits;
 
@@ -35,7 +35,7 @@ struct ShaderLoadParams : public BaseAssetParameters
 	bool isTransient = false;
 };
 
-class EngineAPI Shader : public Asset, std::enable_shared_from_this<Shader>
+class EngineAPI Shader : public ResourceBase, std::enable_shared_from_this<Shader>
 {
 public:
 
@@ -58,7 +58,7 @@ public:
 
 	void bindUniformBlockToBindPoint(const std::string& uniformBlockName, int bindPointIndex);
 
-	void setTextureInShader(Resource<Texture> texture, const std::string& uniform, int slot);
+	void setTextureInShader(ResourceWrapper<Texture> texture, const std::string& uniform, int slot);
 
 	bool build();
 
@@ -72,9 +72,9 @@ public:
 
 	const std::string& getSourceCode() const;
 
-	static Resource<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient = false);
-	static Resource<Shader> import(const std::string& fileLocation, const ShaderLoadParams& settings = {});
-	static Resource<Shader> loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings = {});
+	static ResourceWrapper<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient = false);
+	static ResourceWrapper<Shader> import(const std::string& fileLocation, const ShaderLoadParams& settings = {});
+	static ResourceWrapper<Shader> loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings = {});
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);
 	static std::string getShaderOverrideAsStr(ShaderOverride shaderOverride);

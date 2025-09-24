@@ -13,7 +13,7 @@
 
 #include "GL/glew.h"
 
-Entity Terrain::createTerrain(int width, int height, float scale, Resource<Texture> heightMap)
+Entity Terrain::createTerrain(int width, int height, float scale, ResourceWrapper<Texture> heightMap)
 {
 	auto terrainEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
 
@@ -50,7 +50,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, const std::
 	return generateTerrain(width, height, scale, heightMap);
 }
 
-Terrain Terrain::generateTerrain(int width, int height, float scale, Resource<Texture> heightMap)
+Terrain Terrain::generateTerrain(int width, int height, float scale, ResourceWrapper<Texture> heightMap)
 {
 	auto& meshCollection = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRID);//Grid::generateGrid(10, 10, false);
 
@@ -72,7 +72,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, Resource<Te
 	return terrain; // todo fix
 }
 
-Resource<MeshCollection> Terrain::getMesh() const
+ResourceWrapper<MeshCollection> Terrain::getMesh() const
 {
 	return m_mesh;
 }
@@ -82,7 +82,7 @@ float Terrain::getScale() const
 	return m_scale;
 }
 
-Resource<Texture> Terrain::getHeightmap() const
+ResourceWrapper<Texture> Terrain::getHeightmap() const
 {
 	return m_heightmap;
 }
@@ -97,7 +97,7 @@ int Terrain::getHeight() const
 	return m_height;
 }
 
-void Terrain::setTexture(int index, Resource<Texture> texture)
+void Terrain::setTexture(int index, ResourceWrapper<Texture> texture)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
@@ -141,12 +141,12 @@ void Terrain::setTextureBlend(int index, float val)
 	m_textureBlends[index].blend = val;
 }
 
-Resource<Texture>& Terrain::getTexture(int index)
+ResourceWrapper<Texture>& Terrain::getTexture(int index)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
 		logWarning("Invalid texture index specified: " + std::to_string(index));
-		return Resource<Texture>::empty;
+		return ResourceWrapper<Texture>::empty;
 	}
 
 	return m_textureBlends.at(index).texture;

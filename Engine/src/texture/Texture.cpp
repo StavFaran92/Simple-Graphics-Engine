@@ -7,7 +7,7 @@
 #include "core/Configurations.h"
 #include "core/CacheSystem.h"
 #include "core/Engine.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "core/Factory.h"
 #include "runtime/Context.h"
 
@@ -60,7 +60,7 @@ struct AssetTraits<Texture>
 		aInfo.attributes = attributes.toMap();
 	}
 
-	static Resource<Texture> load(AssetInfo& aInfo)
+	static ResourceWrapper<Texture> load(AssetInfo& aInfo)
 	{
 		std::string filepath;
 		if (aInfo.isTransient)
@@ -88,7 +88,7 @@ struct AssetTraits<Texture>
 
 		//texture->m_attributes = attributes;
 
-		return Resource<Texture>(aInfo.uuid);
+		return ResourceWrapper<Texture>(aInfo.uuid);
 	}
 
 	static void extractTextureDataFromAttributes(const Texture::TextureAssetAttributes& attributes, Texture::TextureData& textureData)
@@ -176,7 +176,7 @@ struct AssetTraits<Texture>
 		return stbi_is_hdr(filename.c_str());
 	}
 
-	static void save(AssetInfo& aInfo, const Resource<Texture>& texture)
+	static void save(AssetInfo& aInfo, const ResourceWrapper<Texture>& texture)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
 		std::string fileLocation = projectDir + "/" + aInfo.filePath;
@@ -199,12 +199,12 @@ Texture::Texture(const Texture& other)
 {
 }
 
-Resource<Texture> Texture::createEmptyTexture(int width, int height)
+ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height)
 {
 	return createEmptyTexture(width, height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE);
 }
 
-Resource<Texture> Texture::createEmptyTexture(int width, int height, int internalFormat, int format, int type)
+ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int internalFormat, int format, int type)
 {
 	TextureData textureData;
 	textureData.target = GL_TEXTURE_2D;
@@ -223,39 +223,17 @@ Resource<Texture> Texture::createEmptyTexture(int width, int height, int interna
 	return create2DTextureFromBuffer(textureData);
 }
 
-Resource<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
+ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
 {
-	//Resource<Texture> texture;
-	//if (textureData.isTransient)
-	//{
-	//	if (textureData.textureName.empty())
-	//	{
-	//		logError("Transient texture must have a name!");
-	//		return Resource<Texture>::empty;
-	//	}
-	//	texture = Factory<Texture>::createUsingCustomUUID(textureData.textureName);
-	//}
-	//else
-	//{
-	//	texture = Factory<Texture>::create();
-	//}
-
-	AssetInfo aInfo;
-	aInfo.aType = AssetType::TEXTURE;
-	aInfo.ext = ".png";
-	aInfo.isTransient = textureData.isTransient;
-	aInfo.name = textureData.textureName;
-
-	Resource<Texture> texture = AssetLoader<Texture>::create(aInfo);
-
+	ResourceWrapper<Texture> texture;
+	UUID uuid = textureData.textureName.empty() ? uuid::generate_uuid_v4() : textureData.textureName;
+	texture = Factory<Texture>::createUsingCustomUUID(uuid);
 	texture.get()->build(textureData);
-
-	AssetLoader<Texture>::save(aInfo, texture);
 
 	return texture;
 }
 
-Resource<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data)
+ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data)
 {
 	TextureData textureData;
 	textureData.target = GL_TEXTURE_2D;
@@ -270,25 +248,6 @@ Resource<Texture> Texture::create2DTextureFromBuffer(int width, int height, int 
 	textureData.data = data;
 
 	return create2DTextureFromBuffer(textureData);
-}
-
-Resource<Texture> Texture::createDummyTexture(unsigned char data[3])
-{
-	TextureData tData;
-	tData.target = GL_TEXTURE_2D;
-	tData.width = 1;
-	tData.height = 1;
-	tData.bpp = 3;
-	tData.data = data;
-	tData.internalFormat = InternalFormat::RGB2;
-	tData.format = Format::RGB;
-	tData.type = Type::UNSIGNED_BYTE;
-	tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-					{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-					{GL_TEXTURE_WRAP_S, GL_REPEAT},
-					{GL_TEXTURE_WRAP_T, GL_REPEAT } };
-
-	return create2DTextureFromBuffer(tData);
 }
 
 void Texture::build(const TextureData& textureData)
@@ -388,7 +347,7 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 }
 
-Resource<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
+ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
 {
 	return AssetLoader<Texture>::loadTransient(fileLocation, settings);
 }
@@ -405,7 +364,7 @@ Texture::TextureAssetAttributes Texture::getTextureAssetAttributes()
 	return m_attributes;;
 }
 
-void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> texture)
+void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Texture> texture)
 {
 	stbi_write_png(fileLocation.c_str(),
 		texture.get()->getWidth(),
@@ -415,17 +374,17 @@ void Texture::writeTexture2D(const std::string& fileLocation, Resource<Texture> 
 		texture.get()->getWidth() * texture.get()->getBitDepth());
 }
 
-Resource<Texture> Texture::import(const std::string& fileLocation, const TextureImportSettings& settings)
+ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, const TextureImportSettings& settings)
 {
 	return AssetLoader<Texture>::import(fileLocation, settings);
 }
 
-void Texture::addTexture2D(Resource<Texture> texture)
+void Texture::addTexture2D(ResourceWrapper<Texture> texture)
 {
 	addTexture2D("Texture_" + texture.getUID().substr(4), texture);
 }
 
-void Texture::addTexture2D(const std::string& name, Resource<Texture> texture)
+void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> texture)
 {
 	texture.get()->bind();
 
@@ -491,7 +450,7 @@ unsigned char* Texture::decodeCompressedFromMemory(const unsigned char* rawBuffe
 	return buffer;
 }
 
-Resource<Texture> Texture::importTexture3D(const std::string& fileLocation)
+ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocation)
 {
 	// TODO fix
 

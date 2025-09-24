@@ -37,7 +37,7 @@ protected:
 
 	Scene* m_scene = nullptr;
 
-	Resource<Shader> m_pbrShader = nullptr;
+	ResourceWrapper<Shader> m_pbrShader = nullptr;
 	Entity m_quad;
 
 

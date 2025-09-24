@@ -33,7 +33,7 @@ Entity ShapeFactory::createBoxEntity(SGE_Regsitry* registry)
 {
 	static int createdBoxCount = 0;
 	auto entity = createEntity(registry, "Box_" + std::to_string(createdBoxCount++));
-	Resource<MeshCollection> mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
+	ResourceWrapper<MeshCollection> mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
 	entity.getComponent<MeshComponent>().mesh = mesh;
 	return entity;
 }
@@ -42,7 +42,7 @@ Entity ShapeFactory::createQuad(SGE_Regsitry* registry)
 {
 	static int createdQuadCount = 0;
 	auto entity = createEntity(registry, "Quad_" + std::to_string(createdQuadCount++));
-	Resource<MeshCollection> mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
+	ResourceWrapper<MeshCollection> mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::QUAD);
 	entity.getComponent<MeshComponent>().mesh = mesh;
 	return entity;
 }
@@ -51,7 +51,7 @@ Entity ShapeFactory::createSphere(SGE_Regsitry* registry)
 {
 	static int createdSphereCount = 0;
 	auto entity = createEntity(registry, "Sphere_" + std::to_string(createdSphereCount++));
-	Resource<MeshCollection> mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
+	ResourceWrapper<MeshCollection> mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
 	entity.getComponent<MeshComponent>().mesh = mesh;
 	return entity;
 }

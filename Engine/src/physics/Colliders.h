@@ -82,7 +82,7 @@ struct CollisionMesh : public Collider
 	}
 
 	bool isConvex = false;
-	Resource<Mesh> mesh = Resource<Mesh>::empty;
+	ResourceWrapper<Mesh> mesh = ResourceWrapper<Mesh>::empty;
 };
 
 struct CollisionTerrain : Collider

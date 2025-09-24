@@ -5,7 +5,7 @@
 #include "geometry/MeshCollection.h"
 #include "runtime/Scene.h"
 
-Animator::Animator(Resource<Animation> animation)
+Animator::Animator(ResourceWrapper<Animation> animation)
 	: m_currentAnimation(animation)
 {
 
@@ -44,7 +44,7 @@ void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::v
 	}
 }
 
-void Animator::playAnimation(Resource<Animation> animation)
+void Animator::playAnimation(ResourceWrapper<Animation> animation)
 {
 	// TODO remove maybe, there is a bug here due to name not being set
 	m_currentAnimation = animation;
@@ -56,7 +56,7 @@ void Animator::setPlaybackSpeed(float playbackSpeed)
 	m_playbackSpeed = playbackSpeed;
 }
 
-void Animator::addAnimation(const std::string& name, Resource<Animation> animation)
+void Animator::addAnimation(const std::string& name, ResourceWrapper<Animation> animation)
 {
 	m_animations[name] = animation;
 }
@@ -72,7 +72,7 @@ void Animator::removeAnimation(const std::string& name)
 
 void Animator::playAnimation(const std::string& name)
 {
-	Resource<Animation>& anim = getAnimation(name);
+	ResourceWrapper<Animation>& anim = getAnimation(name);
 	if (!anim.isEmpty())
 	{
 		playAnimation(anim);
@@ -80,19 +80,19 @@ void Animator::playAnimation(const std::string& name)
 	}
 }
 
-Resource<Animation> Animator::getAnimation(const std::string& name)
+ResourceWrapper<Animation> Animator::getAnimation(const std::string& name)
 {
 	auto iter = m_animations.find(name);
 	if (iter == m_animations.end())
 	{
 		logWarning("Could not find animation: {}", name);
-		return Resource<Animation>::empty;
+		return ResourceWrapper<Animation>::empty;
 	}
 
 	return iter->second;
 }
 
-const std::map<std::string, Resource<Animation>>& Animator::getAllAnimations() const
+const std::map<std::string, ResourceWrapper<Animation>>& Animator::getAllAnimations() const
 {
 	return m_animations;
 }

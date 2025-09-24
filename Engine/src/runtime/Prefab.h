@@ -8,12 +8,12 @@
 struct PrefabImportSettings : BaseAssetParameters
 {};
 
-class EngineAPI Prefab : public Asset
+class EngineAPI Prefab : public ResourceBase
 {
 public:
-	static Resource<Prefab> import(const std::string& fileLocation, const PrefabImportSettings& settings);
-	static Resource<Prefab> loadTransient(const std::string& fileLocation, const PrefabImportSettings& settings);
-	static Resource<Prefab> create(const Entity& e, AssetInfo& aInfo);
+	static ResourceWrapper<Prefab> import(const std::string& fileLocation, const PrefabImportSettings& settings);
+	static ResourceWrapper<Prefab> loadTransient(const std::string& fileLocation, const PrefabImportSettings& settings);
+	static ResourceWrapper<Prefab> create(const Entity& e, AssetInfo& aInfo);
 
 	void Instansiate();
 
@@ -23,7 +23,7 @@ public:
 	}
 
 private:
-	static void extractChildrenRecursive(const Entity& e, Resource<Prefab>& prefab);
+	static void extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab);
 private:
 	std::vector<SerializedEntity> m_serializedPrefab;
 };

@@ -7,7 +7,7 @@
 #include "core/Engine.h"
 #include "core/Window.h"
 #include "core/Logger.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "runtime/Scene.h"
 #include "runtime/Entity.h"
 #include "component/Component.h"
@@ -38,7 +38,7 @@ bool ScreenBufferDisplay::init(int windowWidth, int windowHeight)
 	return true;
 }
 
-void ScreenBufferDisplay::draw(Resource<Texture> textureHandler)
+void ScreenBufferDisplay::draw(ResourceWrapper<Texture> textureHandler)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 

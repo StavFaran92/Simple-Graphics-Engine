@@ -745,7 +745,7 @@ void RenderSceneHierarchyWindow()
 		{ // Begin the submenu
 			if (ImGui::MenuItem("Skybox"))
 			{
-				Entity e = Skybox::createSkybox(SGE_ROOT_DIR + "Resources/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR);
+				Entity e = Skybox::createSkybox(SGE_ROOT_DIR + "ResourceWrappers/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR);
 				updateScene();
 				state.selectEntity(sceneObjects[0].e);
 			}
@@ -1093,7 +1093,7 @@ void DisplayDebugInfoWindow()
 	const auto& debugTextures = DebugHelper::getInstance().getDebugTextures();
 
 	ImGui::Text("Debug Textures:");
-	for (const auto& [name, textureResource] : debugTextures)
+	for (const auto& [name, textureResourceWrapper] : debugTextures)
 	{
 		// Show image button
 		ImGui::BeginGroup();
@@ -1101,7 +1101,7 @@ void DisplayDebugInfoWindow()
 
 		if (ImGui::CollapsingHeader(name.c_str()))
 		{
-			ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(textureResource.get()->getID()));
+			ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(textureResourceWrapper.get()->getID()));
 			if (ImGui::ImageButton(texID, ImVec2(100, 100)))
 			{
 				EditorState::Instance().selectedTextureName = name;

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "core/Core.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 #include "geometry/MeshCollection.h"
 
 class EngineAPI Box
 {
 public:
-	static void createMesh(Resource<MeshCollection>& meshCollection);
+	static void createMesh(ResourceWrapper<MeshCollection>& meshCollection);
 };
 

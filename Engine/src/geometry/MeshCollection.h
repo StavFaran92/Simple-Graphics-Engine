@@ -4,11 +4,11 @@
 
 #include "core/Core.h"
 #include "geometry/Mesh.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
-class EngineAPI MeshCollection : public Asset
+class EngineAPI MeshCollection : public ResourceBase
 {
 public:
 	void addMesh(const std::shared_ptr<Mesh>& mesh);
@@ -28,10 +28,10 @@ public:
 	//static Resource<MeshCollection> import(const std::string& fileLocation, const ModelImporter::ModelImportSettings& settings);
 	//static Resource<MeshCollection> loadInner(AssetInfo aInfo);
 
-	static Resource<MeshCollection> import(const std::string& fileLocation, const ModelImportSettings& settings = {});
-	static Resource<MeshCollection> loadTransient(const std::string& fileLocation, const ModelImportSettings& settings = {});
+	static ResourceWrapper<MeshCollection> import(const std::string& fileLocation, const ModelImportSettings& settings = {});
+	static ResourceWrapper<MeshCollection> loadTransient(const std::string& fileLocation, const ModelImportSettings& settings = {});
 
-	static std::map<int, Resource<Material>> getLastLoadedMaterials();
+	static std::map<int, ResourceWrapper<Material>> getLastLoadedMaterials();
 	
 
 private:

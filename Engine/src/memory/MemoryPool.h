@@ -27,7 +27,7 @@ public:
     }
 
 private:
-    template<class T>friend class Resource;
+    template<class T>friend class ResourceWrapper;
     T* get(UUID uid)
     {
         //static_assert(std::is_base_of<T, K>::value, "K must derive from T");

@@ -89,7 +89,7 @@ struct EngineAPI InstanceBatch : public Component
 public:
 	InstanceBatch();
 
-	InstanceBatch(const std::vector< std::shared_ptr<Transformation>>& transformations, Resource<Mesh> mesh);
+	InstanceBatch(const std::vector< std::shared_ptr<Transformation>>& transformations, ResourceWrapper<Mesh> mesh);
 	
 
 	void addTransformation(const std::shared_ptr<Transformation>& transformation);
@@ -105,7 +105,7 @@ public:
 	void build();
 
 	std::vector<std::shared_ptr<Transformation>> transformations;
-	Resource<Mesh> mesh;
+	ResourceWrapper<Mesh> mesh;
 	unsigned int m_id = 0;
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 private:
@@ -142,5 +142,5 @@ struct VolumeComponent : public Component
 	void serialize(Archive& archive) {
 	}
 
-	Resource<Shader> shader;
+	ResourceWrapper<Shader> shader;
 };

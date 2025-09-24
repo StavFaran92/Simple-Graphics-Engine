@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 class Texture;
 
@@ -22,12 +22,12 @@ public:
 	static CommonTextures* create();
 	static CommonTextures* load();
 	void close();
-	Resource<Texture> getTexture(TextureType texType);
+	ResourceWrapper<Texture> getTexture(TextureType texType);
 
 	CommonTextures(const CommonTextures&) = delete;
 	CommonTextures& operator=(const CommonTextures&) = delete;
 private:
 	CommonTextures();
 
-	std::map<TextureType, Resource<Texture>> m_textures;
+	std::map<TextureType, ResourceWrapper<Texture>> m_textures;
 };

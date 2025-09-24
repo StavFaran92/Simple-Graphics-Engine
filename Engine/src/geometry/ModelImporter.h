@@ -22,7 +22,7 @@ class Engine;
 class TextureHandler;
 class MeshCollection;
 class Scene;
-template<typename T>class Resource;
+template<typename T>class ResourceWrapper;
 
 namespace Assimp
 {
@@ -47,16 +47,16 @@ public:
 		Entity root;
 		std::unordered_map<std::string, unsigned int> boneNameToIDMap;
 		unsigned int boneCount = 0;
-		Resource<MeshCollection> mesh;
+		ResourceWrapper<MeshCollection> mesh;
 	};
 
 	
 
 	struct ModelInfo
 	{
-		Resource<MeshCollection> mesh;
-		std::map<int, Resource<Material>> materials;
-		std::vector<Resource<Texture>> textures;
+		ResourceWrapper<MeshCollection> mesh;
+		std::map<int, ResourceWrapper<Material>> materials;
+		std::vector<ResourceWrapper<Texture>> textures;
 	};
 
 	/** Constructor */
@@ -88,7 +88,7 @@ private:
 	void loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo);
 	void processNode(aiNode* node, const aiScene* scene, ModelImportSession& session);
 	void processMesh(aiMesh* mesh, const aiScene* scene, ModelImportSession& session);
-	Resource<Texture> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, Resource<Texture>>& cachedTextures, AssetInfo& aInfo);
+	ResourceWrapper<Texture> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, ResourceWrapper<Texture>>& cachedTextures, AssetInfo& aInfo);
 	static Texture::TextureType getTextureType(aiTextureType type);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;

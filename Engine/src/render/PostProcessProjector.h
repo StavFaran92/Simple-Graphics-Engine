@@ -4,7 +4,7 @@
 
 #include "IProjector.h"
 #include "runtime/Entity.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 class FrameBufferObject;
 class RenderBufferObject;
@@ -22,7 +22,7 @@ public:
 	void enableWriting() override;
 	void disableWriting() override;
 	void draw();
-	void setPostProcessShader(Resource<Shader> shader);
+	void setPostProcessShader(ResourceWrapper<Shader> shader);
 	bool isEnabled() const;
 	void setEnabled(bool enable);
 
@@ -30,9 +30,9 @@ private:
 	Entity m_quad;
 	std::shared_ptr<FrameBufferObject> m_frameBuffer = nullptr;
 	std::shared_ptr<RenderBufferObject> m_renderBuffer = nullptr;
-	Resource<Shader> m_screenShader = nullptr;
+	ResourceWrapper<Shader> m_screenShader = nullptr;
 	std::shared_ptr<IRenderer> m_renderer = nullptr;
-	Resource<Texture> m_textureHandler = nullptr;
+	ResourceWrapper<Texture> m_textureHandler = nullptr;
 	Scene* m_scene = nullptr;
 	bool m_isEnabled = false;
 };

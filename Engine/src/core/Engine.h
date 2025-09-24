@@ -47,9 +47,9 @@ class Shader;
 class EventLayerStack;
 class BuiltInMeshes;
 class BuiltInMaterials;
-class Asset;
+class ResourceBase;
 struct EngineConfig;
-template<typename T>class Resource;
+template<typename T>class ResourceWrapper;
 template<typename T>class Factory;
 template<typename T>class MemoryPool;
 
@@ -99,13 +99,13 @@ public:
     const InitParams& getInitParams() const;
     EventLayerStack* getEventLayerStack() const;
     const EngineConfig& getConfig() const;
-    MemoryPool<Asset>& getMemoryPool() const;    
+    MemoryPool<ResourceBase>& getMemoryPool() const;
     
     void loadProject(const std::string& dirPath);
     void saveProject();
     std::string getProjectDirectory() const;
 
-    Resource<Material> getDefaultMaterial() const;
+    ResourceWrapper<Material> getDefaultMaterial() const;
 
     void reloadEngineConfig();
 
@@ -185,7 +185,7 @@ protected:
     std::shared_ptr<CommonTextures> m_commonTextures;
     std::shared_ptr<Assets> m_assets;
     std::shared_ptr<EngineConfig> m_engineConfig;
-    std::shared_ptr<MemoryPool<Asset>> m_memoryPool;
+    std::shared_ptr<MemoryPool<ResourceBase>> m_memoryPool;
 
     InitParams m_initParams;
 

@@ -1,6 +1,6 @@
 #include "render/DeferredRenderer.h"
 
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "gl/glew.h"
 #include "core/Engine.h"
 #include "core/Window.h"
@@ -250,7 +250,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 	// Render all objects
 	for (auto& entityHandler : graphics->entityGroup)
 	{
-		Resource<MeshCollection> meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
+		ResourceWrapper<MeshCollection> meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
 
 		auto animator = entityHandler.tryGetComponent<Animator>();
 		if (!animator || animator->m_currentAnimation.isEmpty())

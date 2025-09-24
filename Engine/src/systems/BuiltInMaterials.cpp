@@ -8,14 +8,14 @@ BuiltInMaterials::BuiltInMaterials()
 	m_defaultMaterial = Material::create(aInfo);
 }
 
-Resource<Material> BuiltInMaterials::getMaterial(const std::string& material)
+ResourceWrapper<Material> BuiltInMaterials::getMaterial(const std::string& material)
 {
 	throw std::runtime_error("Not yet implemented!");
 
-	return Resource<Material>();
+	return ResourceWrapper<Material>();
 }
 
-Resource<Material> BuiltInMaterials::getDefaultMaterial() const
+ResourceWrapper<Material> BuiltInMaterials::getDefaultMaterial() const
 {
 	return m_defaultMaterial;
 }

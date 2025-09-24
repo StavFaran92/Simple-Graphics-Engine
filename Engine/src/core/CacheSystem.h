@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include <functional>
-template<class T>  class Resource;
+template<class T>  class ResourceWrapper;
 
 #include "memory/MemoryPool.h"
 #include "serialize/ProjectAssetRegistry.h"
@@ -27,16 +27,16 @@ public:
 	~CacheSystem() = default;
 
 	template<typename T>
-	Resource<T> createOrGetCached(const std::string& resourceName, const std::function<Resource<T>()>& creationCallback)
+	ResourceWrapper<T> createOrGetCached(const std::string& resourceName, const std::function<ResourceWrapper<T>()>& creationCallback)
 	{
 		auto it = m_associations.find(resourceName);
 		if (it != m_associations.end())
 		{
 			UUID uid = it->second;
-			return Resource<T>(uid);
+			return ResourceWrapper<T>(uid);
 		}
 
-		Resource<T>& resource = creationCallback();
+		ResourceWrapper<T>& resource = creationCallback();
 		m_associations[resourceName] = resource.getUID();
 
 		//Engine::get()->getContext()->getProjectAssetRegistry()->addAssociation(resourceName, resource.getUID());
@@ -45,16 +45,16 @@ public:
 	}
 
 	template<typename T>
-	Resource<T> get(const std::string& resourceName)
+	ResourceWrapper<T> get(const std::string& resourceName)
 	{
 		auto it = m_associations.find(resourceName);
 		if (it != m_associations.end())
 		{
 			UUID uid = it->second;
-			return Resource<T>(uid);
+			return ResourceWrapper<T>(uid);
 		}
 
-		return Resource<T>::empty;
+		return ResourceWrapper<T>::empty;
 	}
 
 	UUID getAssociation(const std::string& name) const

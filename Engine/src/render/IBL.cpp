@@ -3,7 +3,7 @@
 #include "texture/Texture.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "render/Shader.h"
 #include "geometry/ShapeFactory.h"
 
@@ -24,7 +24,7 @@
 
 #include "core/Engine.h"
 
-Resource<Texture> IBL::generateIrradianceMap(Resource<Texture> environmentMap, Scene* scene)
+ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> environmentMap, Scene* scene)
 {
 	auto irradianceShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/IrradianceShader.glsl");
 
@@ -95,7 +95,7 @@ Resource<Texture> IBL::generateIrradianceMap(Resource<Texture> environmentMap, S
 	return irradianceMap;
 }
 
-Resource<Texture> IBL::generatePrefilterEnvMap(Resource<Texture> environmentMap, Scene* scene)
+ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> environmentMap, Scene* scene)
 {
 	auto prefilterShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/IBLPrefilterShader.glsl");
 
@@ -185,7 +185,7 @@ Resource<Texture> IBL::generatePrefilterEnvMap(Resource<Texture> environmentMap,
 	return prefilterEnvMap;
 }
 
-Resource<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
+ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 {
 	auto BRDFIntegrationShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/BRDFIntegrationShader.glsl");
 

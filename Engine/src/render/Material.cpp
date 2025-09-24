@@ -32,7 +32,7 @@ struct AssetTraits<Material>
 		aInfo.fileName = aInfo.name + ".asset";;
 	}
 
-	static Resource<Material> load(AssetInfo& aInfo)
+	static ResourceWrapper<Material> load(AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
 		std::ifstream is(projectDir + "/" + aInfo.filePath);
@@ -43,7 +43,7 @@ struct AssetTraits<Material>
 		{
 			iarchive(*loadedMaterial);
 			Engine::get()->getMemoryPool().add(aInfo.uuid, loadedMaterial);
-			return Resource<Material>(aInfo.uuid);
+			return ResourceWrapper<Material>(aInfo.uuid);
 
 		}
 		catch (const cereal::Exception& e)
@@ -51,10 +51,10 @@ struct AssetTraits<Material>
 			logError("Deserialization Error occured: {}", e.what());
 		}
 
-		return Resource<Material>::empty;
+		return ResourceWrapper<Material>::empty;
 	}
 
-	static void save(AssetInfo& aInfo, const Resource<Material>& mat)
+	static void save(AssetInfo& aInfo, const ResourceWrapper<Material>& mat)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
 		std::ofstream os(projectDir + "/" + aInfo.filePath);
@@ -82,7 +82,7 @@ Material::Material()
 	m_samplers[Texture::TextureType::AmbientOcclusion] = std::make_shared<TextureSampler>(1);
 }
 
-void Material::use(Resource<Shader>& shader)
+void Material::use(ResourceWrapper<Shader>& shader)
 {
 	setTexturesInShader(shader);
 
@@ -117,7 +117,7 @@ bool Material::hasTexture(Texture::TextureType textureType) const
 	return iter != m_samplers.end() && iter->second->texture.get();
 }
 
-void Material::setTextureInShader(Resource<Shader>& shader, Texture::TextureType ttype, int slot)
+void Material::setTextureInShader(ResourceWrapper<Shader>& shader, Texture::TextureType ttype, int slot)
 {
 	auto sampler = getSampler(ttype);
 
@@ -125,7 +125,7 @@ void Material::setTextureInShader(Resource<Shader>& shader, Texture::TextureType
 	glActiveTexture(GL_TEXTURE0 + slot);
 
 	// if texture is empty use dummy texture
-	Resource<Texture>& texture = sampler->texture;
+	ResourceWrapper<Texture>& texture = sampler->texture;
 	if (sampler->texture.isEmpty())
 	{
 		texture = Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1);
@@ -146,17 +146,17 @@ void Material::setTextureInShader(Resource<Shader>& shader, Texture::TextureType
 	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
 }
 
-Resource<Material> Material::import(const std::string& fileLocation, const MaterialImportSettings& settings)
+ResourceWrapper<Material> Material::import(const std::string& fileLocation, const MaterialImportSettings& settings)
 {
 	return AssetLoader<Material>::import(fileLocation, settings);
 }
 
-Resource<Material> Material::loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings)
+ResourceWrapper<Material> Material::loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings)
 {
 	return AssetLoader<Material>::loadTransient(fileLocation, settings);
 }
 
-Resource<Material> Material::create(AssetInfo& aInfo)
+ResourceWrapper<Material> Material::create(AssetInfo& aInfo)
 {
 	aInfo.aType = AssetType::MATERIAL;
 	aInfo.ext = ".asset";
@@ -164,12 +164,12 @@ Resource<Material> Material::create(AssetInfo& aInfo)
 	return AssetLoader<Material>::create(aInfo);
 }
 
-void Material::save(const Resource<Material>& material)
+void Material::save(const ResourceWrapper<Material>& material)
 {
 	AssetLoader<Material>::save(material.get()->m_assetInfo, material);
 }
 
-void Material::setTexturesInShader(Resource<Shader>& shader)
+void Material::setTexturesInShader(ResourceWrapper<Shader>& shader)
 {
 	// It either has diffuse or albedo
 	//setTextureInShader(shader, Texture::Type::Diffuse, 0);
@@ -180,7 +180,7 @@ void Material::setTexturesInShader(Resource<Shader>& shader)
 	setTextureInShader(shader, Texture::TextureType::AmbientOcclusion, 4);
 }
 
-void Material::setTexture(Texture::TextureType textureType, Resource<Texture> textureHandler)
+void Material::setTexture(Texture::TextureType textureType, ResourceWrapper<Texture> textureHandler)
 {
 	auto iter = m_samplers.find(textureType);
 	if (iter == m_samplers.end())
@@ -200,9 +200,9 @@ std::string Material::getName() const
 	return m_name;
 }
 
-std::vector<Resource<Texture>> Material::getAllTextures() const
+std::vector<ResourceWrapper<Texture>> Material::getAllTextures() const
 {
-	auto& res = std::vector<Resource<Texture>>();
+	auto& res = std::vector<ResourceWrapper<Texture>>();
 	for (auto& [_, sampler] : m_samplers)
 	{
 		res.push_back(sampler->texture);
@@ -210,7 +210,7 @@ std::vector<Resource<Texture>> Material::getAllTextures() const
 	return res;
 }
 
-Resource<Material> Material::clone(bool isTransient) const
+ResourceWrapper<Material> Material::clone(bool isTransient) const
 {
 	AssetInfo clonedAssetInfo;
 	clonedAssetInfo.attributes = m_assetInfo.attributes;

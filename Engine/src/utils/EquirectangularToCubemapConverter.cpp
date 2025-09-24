@@ -3,7 +3,7 @@
 #include "texture/Texture.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "render/Shader.h"
 #include "geometry/ShapeFactory.h"
 
@@ -25,7 +25,7 @@
 #include "core/Engine.h"
 
 
-Resource<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(Resource<Texture> equirectangularTexture)
+ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(ResourceWrapper<Texture> equirectangularTexture)
 {
 	equirectangularTexture = TextureTransformer::flipVertical(equirectangularTexture);
 
@@ -100,7 +100,7 @@ Resource<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubema
 	return cubemap;
 }
 
-Resource<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirectangular(Resource<Texture> cubemapTexture)
+ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirectangular(ResourceWrapper<Texture> cubemapTexture)
 {
 	auto cubemapToEquirectangularShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/CubemapToEquirectangular.glsl");
 

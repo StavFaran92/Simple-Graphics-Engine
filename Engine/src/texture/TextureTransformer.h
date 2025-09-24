@@ -1,11 +1,11 @@
 #pragma once
 
-template<typename T> class Resource;
+template<typename T> class ResourceWrapper;
 class Texture;
 
 class TextureTransformer
 {
 public:
-	static Resource<Texture> flipVertical(Resource<Texture> texture);
-	static void flipVertical(Resource<Texture> srcTexture, Resource<Texture>& dstTexture);
+	static ResourceWrapper<Texture> flipVertical(ResourceWrapper<Texture> texture);
+	static void flipVertical(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture);
 };

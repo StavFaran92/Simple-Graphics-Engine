@@ -31,9 +31,9 @@ Assets::Assets()
 //}
 //
 template<typename T>
-Resource<T> Assets::loadAsset(UUID uid, const std::string& path)
+ResourceWrapper<T> Assets::loadAsset(UUID uid, const std::string& path)
 {
-	auto& res = Resource<T>(uid);
+	auto& res = ResourceWrapper<T>(uid);
 
 	// add asset to memory pool
 	Engine::get()->getMemoryPool().add(uid, res.get());

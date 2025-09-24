@@ -8,7 +8,7 @@
 #include "core/Core.h"
 #include "core/ApplicationConstants.h"
 #include "core/Configurations.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "memory/Asset.h"
 
 struct AssetInfo;
@@ -19,7 +19,7 @@ struct AssetInfo;
 //	TextureAssetRegister();
 //};
 
-class EngineAPI Texture : public Asset
+class EngineAPI Texture : public ResourceBase
 {
 public:
 	enum class TextureType
@@ -194,7 +194,7 @@ public:
 	 * \param height	The generated texture height
 	 * \return			A pointer to the generated texture
 	 */
-	static Resource<Texture> createEmptyTexture(int width, int height);
+	static ResourceWrapper<Texture> createEmptyTexture(int width, int height);
 
 	/**
 	 * Create an empty texture.
@@ -203,18 +203,15 @@ public:
 	 * \param height	The generated texture height
 	 * \return			A pointer to the generated texture
 	 */
-	static Resource<Texture> createEmptyTexture(int width, int height, int internalFormat, int format, int type);
+	static ResourceWrapper<Texture> createEmptyTexture(int width, int height, int internalFormat, int format, int type);
 
 	/**
 	 * Create a texture using predefined data
 	 *
 	 * \return				A pointer to the loaded texture
 	 */
-	static Resource<Texture> create2DTextureFromBuffer(const TextureData& textureData);
-
-	static Resource<Texture> create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data);
-
-	static Resource<Texture> createDummyTexture(unsigned char color[3]);
+	static ResourceWrapper<Texture> create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data);
+	static ResourceWrapper<Texture> create2DTextureFromBuffer(const TextureData& textureData);
 
 	//static Texture::TextureData extractTextureDataFromFile(const std::string& fileLocation);
 
@@ -255,14 +252,14 @@ public:
 	static void extractTextureDataFromSettings(const TextureImportSettings& settings, Texture::TextureData& textureData);
 	//static void extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData);
 
-	static void writeTexture2D(const std::string& fileLocation, Resource<Texture> texture);
-	static void addTexture2D(Resource<Texture> texture);
-	static void addTexture2D(const std::string& name, Resource<Texture> texture);
+	static void writeTexture2D(const std::string& fileLocation, ResourceWrapper<Texture> texture);
+	static void addTexture2D(ResourceWrapper<Texture> texture);
+	static void addTexture2D(const std::string& name, ResourceWrapper<Texture> texture);
 
-	static Resource<Texture> importTexture3D(const std::string& fileLocation);
+	static ResourceWrapper<Texture> importTexture3D(const std::string& fileLocation);
 
-	static Resource<Texture> import(const std::string& fileLocation, const TextureImportSettings & = {});
-	static Resource<Texture> loadTransient(const std::string& fileLocation, const TextureImportSettings& settings = {});
+	static ResourceWrapper<Texture> import(const std::string& fileLocation, const TextureImportSettings & = {});
+	static ResourceWrapper<Texture> loadTransient(const std::string& fileLocation, const TextureImportSettings& settings = {});
 
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);
 

@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 #include "memory/UUID.h"
 
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "texture/Texture.h"
 
 struct AssetInfo;

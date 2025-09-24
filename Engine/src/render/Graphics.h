@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
 
 class Scene;
@@ -37,7 +37,7 @@ public:
 
 	Entity* entity = nullptr;
 	Mesh* mesh = nullptr;
-	Resource<Shader> shader = nullptr;
+	ResourceWrapper<Shader> shader = nullptr;
 	Material* material = nullptr;
 
 	// MVP
@@ -45,10 +45,10 @@ public:
 	glm::mat4* view = nullptr;
 	glm::mat4* projection = nullptr;
 
-	Resource<Texture> irradianceMap = nullptr;
-	Resource<Texture> prefilterEnvMap = nullptr;
-	Resource<Texture> brdfLUT = nullptr;
-	Resource<Texture> shadowMap = nullptr;
+	ResourceWrapper<Texture> irradianceMap = nullptr;
+	ResourceWrapper<Texture> prefilterEnvMap = nullptr;
+	ResourceWrapper<Texture> brdfLUT = nullptr;
+	ResourceWrapper<Texture> shadowMap = nullptr;
 	glm::mat4 lightSpaceMatrix;
 	Frustum* frustum = nullptr;
 	std::shared_ptr<RenderView> renderView;

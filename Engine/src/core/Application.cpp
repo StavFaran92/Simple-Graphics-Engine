@@ -22,7 +22,7 @@ void Application::skybox(std::shared_ptr<Skybox> skybox)
 	//context->getActiveScene()->setSkybox(skybox);
 }
 
-void Application::postProcess(Resource<Shader> shader)
+void Application::postProcess(ResourceWrapper<Shader> shader)
 {
 	auto context = Engine::get()->getContext();
 	context->getActiveScene()->setPostProcessShader(shader);

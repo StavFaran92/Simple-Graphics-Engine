@@ -1,6 +1,6 @@
 #include "texture/TextureTransformer.h"
 
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 #include "texture/Texture.h"
 #include "render/Shader.h"
 #include "render/FrameBufferObject.h"
@@ -17,14 +17,14 @@
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 
-Resource<Texture> TextureTransformer::flipVertical(Resource<Texture> srcTexture)
+ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture)
 {
 	auto dstTexture = Texture::createEmptyTexture(srcTexture.get()->getWidth(), srcTexture.get()->getHeight(), GL_RGB, GL_RGB, GL_UNSIGNED_BYTE);
 	flipVertical(srcTexture, dstTexture);
 	return dstTexture;
 }
 
-void TextureTransformer::flipVertical(Resource<Texture> srcTexture, Resource<Texture>& dstTexture)
+void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture)
 {
 	auto shader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/TextureTransformShader.glsl");
 

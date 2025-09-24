@@ -2,7 +2,7 @@
 
 #include "runtime/Entity.h"
 #include "texture/Texture.h"
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 class FrameBufferObject;
 class RenderBufferObject;
@@ -20,7 +20,7 @@ public:
 
 	std::shared_ptr<FrameBufferObject> m_renderTargetFBO;
 	std::shared_ptr<RenderBufferObject> m_renderTargetRBO;
-	Resource<Texture> m_renderTargetTexture = Resource<Texture>::empty;
+	ResourceWrapper<Texture> m_renderTargetTexture = ResourceWrapper<Texture>::empty;
 };
 
 class RenderView
@@ -37,11 +37,11 @@ public:
 	void setCamera(const Entity& camera);
 
 	unsigned int getRenderTargetTextureID() const;
-	Resource<Texture> getRenderTargetTexture() const;
+	ResourceWrapper<Texture> getRenderTargetTexture() const;
 
     unsigned int getRenderTargetFrameBufferID() const;
 
-    void setTexture(Resource<Texture> texture);
+    void setTexture(ResourceWrapper<Texture> texture);
 
     void resize(int w, int h);
 

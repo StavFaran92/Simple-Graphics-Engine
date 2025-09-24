@@ -6,7 +6,7 @@ struct EntityState
 {
 	Entity e;
 
-	Resource<Shader> shader;
+	ResourceWrapper<Shader> shader;
 
 	std::vector<std::string> animationRenameBuffers{};
 

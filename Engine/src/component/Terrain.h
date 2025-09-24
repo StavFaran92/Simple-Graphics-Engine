@@ -13,7 +13,7 @@ static const int MAX_TEXTURE_COUNT = 4;
 
 struct TextureBlend
 {
-	Resource<Texture> texture;
+	ResourceWrapper<Texture> texture;
 	float blend = 0;
 	float scaleX = 1;
 	float scaleY = 1;
@@ -28,27 +28,27 @@ class EngineAPI Terrain : public Component
 {
 public:
 	static Terrain generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath);
-	static Terrain generateTerrain(int width, int height, float scale, Resource<Texture> heightMap);
+	static Terrain generateTerrain(int width, int height, float scale, ResourceWrapper<Texture> heightMap);
 
-	static Entity createTerrain(int width, int height, float scale, Resource<Texture> heightMap);
+	static Entity createTerrain(int width, int height, float scale, ResourceWrapper<Texture> heightMap);
 
 
 	Terrain() = default;
 
-	Resource<MeshCollection> getMesh() const;
-	Resource<Texture> getHeightmap() const;
+	ResourceWrapper<MeshCollection> getMesh() const;
+	ResourceWrapper<Texture> getHeightmap() const;
 	float getHeightAtPoint(float x, float y) const;
 
 	float getScale() const;
 	int getWidth() const;
 	int getHeight() const;
 
-	void setTexture(int index, Resource<Texture> texture);
+	void setTexture(int index, ResourceWrapper<Texture> texture);
 	void setTextureScaleX(int index, float scaleX);
 	void setTextureScaleY(int index, float scaleY);
 	void setTextureBlend(int index, float val);
 
-	Resource<Texture>& getTexture(int index);
+	ResourceWrapper<Texture>& getTexture(int index);
 	float getTextureBlend(int index) const;
 	glm::vec2 getTextureScale(int index) const;
 
@@ -62,7 +62,7 @@ public:
 	}
 
 	
-	Resource<Texture> m_heightmap;
+	ResourceWrapper<Texture> m_heightmap;
 
 	int m_width = 100;
 	int m_height = 100;
@@ -74,7 +74,7 @@ public:
 	//std::vector<float> m_blends{ };
 
 private:
-	Resource<MeshCollection> m_mesh;
+	ResourceWrapper<MeshCollection> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
 
 	

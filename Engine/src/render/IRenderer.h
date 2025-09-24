@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 #include "core/Core.h"
 #include <entt/entt.hpp>
-#include "memory/Resource.h"
+#include "memory/ResourceWrapper.h"
 
 class Shader;
 class VertexArrayObject;
