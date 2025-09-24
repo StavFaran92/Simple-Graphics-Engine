@@ -510,6 +510,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		}
 
 		Texture::TextureData tData;
+		tData.target = GL_TEXTURE_2D;
 		tData.format = Texture::Format::RGB;
 		tData.internalFormat = Texture::InternalFormat::RGB2;
 		tData.isTransient = aInfo.isTransient;
@@ -528,26 +529,35 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		};
 
 		//tData.isTransient = false; // todo remove
-		tData.textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().stem().string();
+		tData.textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().string();
 
-		texture = Texture::create2DTextureFromBuffer(tData);
+		UUID uuid = aInfo.assetDirectory + "/" + tData.textureName;
+		texture = Factory<Texture>::createUsingCustomUUID(uuid);
+		texture.get()->build(tData);
 
+		//texture = Texture::create2DTextureFromBuffer(tData);
+
+		
+		//AssetLoader<Texture>::save()
 		
 		
 
-		//auto& projectDir = Engine::get()->getProjectDirectory();
-		//const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName;
-		//Texture::writeTexture2D(savedFilePath, texture);
+		auto& projectDir = Engine::get()->getProjectDirectory();
+		const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName;
+		Texture::writeTexture2D(savedFilePath, texture);
 
-		//AssetInfo aInfo;
-		//aInfo.uuid = texture.getUID();
-		//aInfo.aType = AssetType::TEXTURE;
-		//aInfo.name = tData.textureName;
-		//aInfo.isTransient = false;
-		//aInfo.filePath = savedFilePath;
-		//aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		//Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+		AssetInfo aInfo;
+		aInfo.uuid = texture.getUID();
+		aInfo.aType = AssetType::TEXTURE;
+		aInfo.name = tData.textureName;
+		aInfo.isTransient = false;
+		aInfo.filePath = savedFilePath;
+		aInfo.assetDirectory = aInfo.assetDirectory;
+		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
+		aInfo.data = texture;
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
+		texture.get()->m_assetInfo = aInfo;
 	}	
 	else
 	{
