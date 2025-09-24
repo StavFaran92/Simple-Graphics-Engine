@@ -528,22 +528,25 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 			{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
 		};
 
-		//tData.isTransient = false; // todo remove
-		tData.textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().string();
+		tData.textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().stem().string();
+		if (tData.textureName.empty())
+		{
+			tData.textureName = uuid::generate_uuid_v4();
+		}
 
-		UUID uuid = aInfo.assetDirectory + "/" + tData.textureName;
+		UUID uuid = aInfo.assetDirectory + "/" + tData.textureName + ".png";
+
+		if (cachedTextures.find(uuid) != cachedTextures.end())
+		{
+			// Already loaded
+			return cachedTextures[uuid];
+		}
+
 		texture = Factory<Texture>::createUsingCustomUUID(uuid);
 		texture.get()->build(tData);
 
-		//texture = Texture::create2DTextureFromBuffer(tData);
-
-		
-		//AssetLoader<Texture>::save()
-		
-		
-
 		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName;
+		const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName + ".png";
 		Texture::writeTexture2D(savedFilePath, texture);
 
 		AssetInfo aInfo;
@@ -558,6 +561,8 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 		texture.get()->m_assetInfo = aInfo;
+
+		cachedTextures.insert({ uuid, texture });
 	}	
 	else
 	{
