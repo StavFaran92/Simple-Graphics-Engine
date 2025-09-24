@@ -745,7 +745,7 @@ void RenderSceneHierarchyWindow()
 		{ // Begin the submenu
 			if (ImGui::MenuItem("Skybox"))
 			{
-				Entity e = Skybox::createSkybox(SGE_ROOT_DIR + "ResourceWrappers/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR);
+				Entity e = Skybox::createSkybox(SGE_ROOT_DIR + "Resources/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR);
 				updateScene();
 				state.selectEntity(sceneObjects[0].e);
 			}
