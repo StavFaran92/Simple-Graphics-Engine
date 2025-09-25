@@ -12,7 +12,7 @@ template<typename T>
 class AssetLoader
 {
 public:
-	static ResourceWrapper<T> import(const std::string& fileLocation, const BaseAssetParameters& params)
+	static ResourceWrapper<T> import(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		// Validate input
 		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -21,7 +21,6 @@ public:
 			return ResourceWrapper<T>::empty;
 		}
 
-		AssetInfo aInfo = extractAssetInfoData(fileLocation, params);
 		std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
 
 		// Copy + Paste
@@ -45,7 +44,7 @@ public:
 		return aInfo.data.as<T>();
 	}
 
-	static ResourceWrapper<T> loadTransient(const std::string& fileLocation, const BaseAssetParameters& params)
+	static ResourceWrapper<T> loadTransient(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		// Validate input
 		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -53,8 +52,6 @@ public:
 			logError("Invalid asset path specified.");
 			return ResourceWrapper<T>::empty;
 		}
-
-		AssetInfo aInfo = extractAssetInfoData(fileLocation, params);
 
 		aInfo.isTransient = true;
 		aInfo.filePath = fileLocation;
@@ -128,27 +125,27 @@ public:
 	}
 
 private:
-	static AssetInfo extractAssetInfoData(const std::string& fileLocation, const BaseAssetParameters& params)
-	{
-		AssetInfo aInfo;
-		aInfo.name = params.name.empty()
-			? std::filesystem::path(fileLocation).filename().stem().string()
-			: params.name;
+	//static AssetInfo extractAssetInfoData(const std::string& fileLocation, const BaseAssetParameters& params)
+	//{
+	//	AssetInfo aInfo;
+	//	aInfo.name = params.name.empty()
+	//		? std::filesystem::path(fileLocation).filename().stem().string()
+	//		: params.name;
 
-		aInfo.origFilePath = fileLocation;
+	//	aInfo.origFilePath = fileLocation;
 
-		aInfo.assetDirectory = params.targetDirectory;
+	//	aInfo.assetDirectory = params.targetDirectory;
 
-		AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
+	//	AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
 
-		aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
+	//	aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
 
-		aInfo.uuid = params.customUUID.empty()
-			? aInfo.filePath
-			: params.customUUID;
+	//	aInfo.uuid = params.customUUID.empty()
+	//		? aInfo.filePath
+	//		: params.customUUID;
 
-		
+	//	
 
-		return aInfo;
-	}
+	//	return aInfo;
+	//}
 };

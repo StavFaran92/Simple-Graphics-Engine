@@ -11,6 +11,11 @@
 #include "memory/ResourceWrapper.h"
 #include "memory/Asset.h"
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+using namespace nlohmann::literals;
+
 struct AssetInfo;
 
 class EngineAPI Texture : public ResourceBase
@@ -133,7 +138,16 @@ public:
 		bool saveOnDisk = true;
 		//bool isTransient = false;
 		std::map<int, int> params;
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(TextureImportSettings,
+			genMipMap,
+			flip,
+			saveOnDisk,
+			params
+		);
 	};
+
+	
 
 	struct TextureAssetAttributes
 	{

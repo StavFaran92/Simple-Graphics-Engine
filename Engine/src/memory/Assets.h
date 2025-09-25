@@ -9,6 +9,11 @@
 
 #include <filesystem>
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+using namespace nlohmann::literals;
+
 struct AssetDescriptor
 {
 public:
@@ -22,7 +27,9 @@ public:
 	std::map<std::string, std::string> attributes;
 	std::string name;
 	bool isTransient = false;
-	ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
+	mutable ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
+
+	
 	//timestamp
 	//size
 };
@@ -34,6 +41,7 @@ struct AssetInfo : public AssetDescriptor
 	std::string fileName;
 	std::string ext;
 	UUID uuid;
+	nlohmann::json importSettings;
 
 	~AssetInfo() = default;
 
@@ -92,8 +100,6 @@ private:
 	friend class Assets;
 	friend class ResourceBase;
 	template<typename T> friend class AssetLoader;
-
-	
 };
 
 class EngineAPI Assets

@@ -21,7 +21,7 @@
 template<>
 struct AssetTraits<Material>
 {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
 	{
 		return false;
 	}
@@ -148,12 +148,19 @@ void Material::setTextureInShader(ResourceWrapper<Shader>& shader, Texture::Text
 
 ResourceWrapper<Material> Material::import(const std::string& fileLocation, const MaterialImportSettings& settings)
 {
-	return AssetLoader<Material>::import(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::MATERIAL;
+	aInfo.importSettings = settings;
+	return AssetLoader<Material>::import(fileLocation, aInfo);
 }
 
 ResourceWrapper<Material> Material::loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings)
 {
-	return AssetLoader<Material>::loadTransient(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::MATERIAL;
+	aInfo.importSettings = settings;
+	aInfo.isTransient = true;
+	return AssetLoader<Material>::loadTransient(fileLocation, aInfo);
 }
 
 ResourceWrapper<Material> Material::create(AssetDescriptor& aDesc)

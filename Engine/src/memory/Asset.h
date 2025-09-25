@@ -5,6 +5,11 @@
 #include "Assets.h"
 #include "AssetFactory.h"
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+using namespace nlohmann::literals;
+
 struct BaseAssetParameters
 {
 	std::string name;
@@ -13,6 +18,13 @@ struct BaseAssetParameters
 	bool isTransient = false;
 
 	virtual ~BaseAssetParameters() = default;
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(BaseAssetParameters,
+		name,
+		customUUID,
+		targetDirectory,
+		isTransient
+	);
 };
 
 template<AssetType T>

@@ -8,18 +8,12 @@
 template<>
 struct AssetTraits<MeshCollection>
 {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
 	{
 		return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
 	}
 
-	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-	{
-		aInfo.aType = AssetType::MESH;
-		aInfo.assetDirectory = (std::filesystem::path(params.targetDirectory) / aInfo.name).generic_string();
-	}
-
-	static ResourceWrapper<MeshCollection> load(AssetInfo& aInfo)
+	static ResourceWrapper<MeshCollection> load(const AssetInfo& aInfo)
 	{
 		UUID uuid = aInfo.uuid;
 		MeshCollection* meshPtr = new MeshCollection();
@@ -100,12 +94,20 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 
 ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImportSettings& settings)
 {
-	return AssetLoader<MeshCollection>::import(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::MESH;
+	aInfo.assetDirectory = (std::filesystem::path(settings.targetDirectory) / aInfo.name).generic_string();
+	aInfo.importSettings = settings;
+	return AssetLoader<MeshCollection>::import(fileLocation, aInfo);
 }
 
 ResourceWrapper<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, const ModelImportSettings& settings)
 {
-	return AssetLoader<MeshCollection>::loadTransient(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::MESH;
+	aInfo.assetDirectory = (std::filesystem::path(settings.targetDirectory) / aInfo.name).generic_string();
+	aInfo.importSettings = settings;
+	return AssetLoader<MeshCollection>::loadTransient(fileLocation, aInfo);
 }
 
 std::map<int, ResourceWrapper<Material>> MeshCollection::getLastLoadedMaterials()

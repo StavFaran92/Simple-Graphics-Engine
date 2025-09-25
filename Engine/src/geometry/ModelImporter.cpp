@@ -149,7 +149,7 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
 	std::string modelName = std::filesystem::path(aInfo.filePath).filename().stem().string();
 
@@ -188,7 +188,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 	}
 }
 
-void ModelImporter::loadModelFromFile(AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
 	std::string filepath;
 	if (aInfo.isTransient)
@@ -235,7 +235,7 @@ void ModelImporter::loadModelFromFile(AssetInfo& aInfo, ModelImporter::ModelInfo
 	loadModelFromAssimpScene(scene, aInfo, modelInfo);
 }
 
-bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool ModelImporter::copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
 {
 	auto fileDir = std::filesystem::path(fileLocation).parent_path().string();
 
@@ -478,7 +478,7 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 
 
 
-ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, ResourceWrapper<Texture>>& cachedTextures, AssetInfo& aInfo)
+ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, ResourceWrapper<Texture>>& cachedTextures, const AssetInfo& aInfo)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)

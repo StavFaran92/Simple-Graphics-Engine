@@ -9,7 +9,7 @@
 template<>
 struct AssetTraits<Animation>
 {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
 	{
 		return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
 	}
@@ -19,7 +19,7 @@ struct AssetTraits<Animation>
 		aInfo.aType = AssetType::ANIMATION;
 	}
 
-	static ResourceWrapper<Animation> load(AssetInfo& aInfo)
+	static ResourceWrapper<Animation> load(const AssetInfo& aInfo)
 	{
 		return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 	}
@@ -110,10 +110,17 @@ bool Animation::preprocess(const std::string& path)
 
 ResourceWrapper<Animation> Animation::import(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
-	return AssetLoader<Animation>::import(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::ANIMATION;
+	aInfo.importSettings = settings;
+	return AssetLoader<Animation>::import(fileLocation, aInfo);
 }
 
 ResourceWrapper<Animation> Animation::loadTransient(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
-	return AssetLoader<Animation>::loadTransient(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::ANIMATION;
+	aInfo.importSettings = settings;
+	aInfo.isTransient = true;
+	return AssetLoader<Animation>::loadTransient(fileLocation, aInfo);
 }

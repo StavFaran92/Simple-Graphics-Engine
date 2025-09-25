@@ -16,7 +16,7 @@
 template<>
 struct AssetTraits<Prefab>
 {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
 	{
 		return false;
 	}
@@ -70,12 +70,21 @@ static AssetFnRegister<AssetType::PREFAB> assetRegister(AssetTraits<Prefab>::loa
 
 ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, const PrefabImportSettings& settings)
 {
-	return AssetLoader<Prefab>::import(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::PREFAB;
+	aInfo.fileName = aInfo.name + ".asset";;
+	aInfo.importSettings = settings;
+	return AssetLoader<Prefab>::import(fileLocation, aInfo);
 }
 
 ResourceWrapper<Prefab> Prefab::loadTransient(const std::string& fileLocation, const PrefabImportSettings& settings)
 {
-	return AssetLoader<Prefab>::loadTransient(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::PREFAB;
+	aInfo.fileName = aInfo.name + ".asset";;
+	aInfo.importSettings = settings;
+	aInfo.isTransient = true;
+	return AssetLoader<Prefab>::loadTransient(fileLocation, aInfo);
 }
 
 void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)

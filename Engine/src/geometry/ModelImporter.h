@@ -78,17 +78,17 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	void loadModelFromFile(AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo);
+	void loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo);
 
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo);
+	bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo);
 
 private:
 	friend class Engine;
 
-	void loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo);
+	void loadModelFromAssimpScene(const aiScene* scene, const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo);
 	void processNode(aiNode* node, const aiScene* scene, ModelImportSession& session);
 	void processMesh(aiMesh* mesh, const aiScene* scene, ModelImportSession& session);
-	ResourceWrapper<Texture> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, ResourceWrapper<Texture>>& cachedTextures, AssetInfo& aInfo);
+	ResourceWrapper<Texture> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, ResourceWrapper<Texture>>& cachedTextures, const AssetInfo& aInfo);
 	static Texture::TextureType getTextureType(aiTextureType type);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;

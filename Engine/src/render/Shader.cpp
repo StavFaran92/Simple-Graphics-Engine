@@ -22,7 +22,7 @@
 template<>
 struct AssetTraits<Shader>
 {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
 	{
 		auto& projectDir = Engine::get()->getProjectDirectory();
 		const std::string relativeFilepath = "/" + aInfo.fileName;
@@ -560,7 +560,7 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 
 	AssetDescriptor aInfo;
 	aInfo.customUUID = shader.getUID();
-	//aInfo.origFilePath = filepath;
+	aInfo.origFilePath = filepath;
 	aInfo.aType = AssetType::SHADER;
 	aInfo.name = name;
 	aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
@@ -572,12 +572,23 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 
 ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, const ShaderLoadParams& settings)
 {
-	return AssetLoader<Shader>::import(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::SHADER;
+	aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(settings.shaderOverride);
+	aInfo.isTransient = settings.isTransient;
+	aInfo.importSettings = settings;
+	return AssetLoader<Shader>::import(fileLocation, aInfo);
 }
 
 ResourceWrapper<Shader> Shader::loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings)
 {
-	return AssetLoader<Shader>::loadTransient(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::SHADER;
+	aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(settings.shaderOverride);
+	aInfo.isTransient = settings.isTransient;
+	aInfo.importSettings = settings;
+	aInfo.isTransient = true;
+	return AssetLoader<Shader>::loadTransient(fileLocation, aInfo);
 }
 
 //Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)

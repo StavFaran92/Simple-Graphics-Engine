@@ -74,7 +74,7 @@ void readAnimationBones(const aiAnimation* animation, std::unordered_map<std::st
     }
 }
 
-ResourceWrapper<Animation> AnimationLoader::load(AssetInfo& aInfo)
+ResourceWrapper<Animation> AnimationLoader::load(const AssetInfo& aInfo)
 {
     std::string filepath;
     if (aInfo.isTransient)
@@ -114,7 +114,7 @@ ResourceWrapper<Animation> AnimationLoader::load(AssetInfo& aInfo)
     return res;
 }
 
-bool AnimationLoader::copyFileToResourceFolder(const std::string& fileLocation, AssetInfo& aInfo)
+bool AnimationLoader::copyFileToResourceFolder(const std::string& fileLocation, const AssetInfo& aInfo)
 {
     auto& projectDir = Engine::get()->getProjectDirectory();
     const std::string filename = std::filesystem::path(fileLocation).filename().string();

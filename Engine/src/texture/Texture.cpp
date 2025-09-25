@@ -28,7 +28,7 @@
 template<>
 struct AssetTraits<Texture>
 {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
 	{
 		auto& projectDir = Engine::get()->getProjectDirectory();
 		const std::string relativeFilepath = aInfo.name + aInfo.ext;
@@ -75,8 +75,8 @@ struct AssetTraits<Texture>
 		Texture::TextureData textureData;
 
 		// extract texture build data
-		Texture::TextureAssetAttributes attributes(aInfo.attributes);
-		extractTextureDataFromAttributes(attributes, textureData);
+		Texture::TextureImportSettings settings = aInfo.importSettings.get<Texture::TextureImportSettings>();
+		Texture::extractTextureDataFromSettings(settings, textureData);
 		extractTextureDataFromFile(filepath, textureData);
 
 		// Create texture
@@ -87,35 +87,6 @@ struct AssetTraits<Texture>
 		//texture->m_attributes = attributes;
 
 		return ResourceWrapper<Texture>(aInfo.uuid);
-	}
-
-	static void extractTextureDataFromAttributes(const Texture::TextureAssetAttributes& attributes, Texture::TextureData& textureData)
-	{
-		if (attributes.genMipMap)
-		{
-			textureData.params = {
-				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-			};
-
-			textureData.genMipMap = true;
-		}
-		else
-		{
-			textureData.params = {
-				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_R, GL_REPEAT},
-				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-			};
-
-			textureData.genMipMap = false;
-		}
-
-		textureData.flip = attributes.flip;
 	}
 
 	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
@@ -347,7 +318,12 @@ void Texture::ClearTexture()
 
 ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
 {
-	return AssetLoader<Texture>::loadTransient(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::TEXTURE;
+	aInfo.ext = std::filesystem::path(fileLocation).extension().string();
+	aInfo.fileName = aInfo.name + aInfo.ext;
+	aInfo.importSettings = settings;
+	return AssetLoader<Texture>::loadTransient(fileLocation, aInfo);
 }
 
 Texture::~Texture()
@@ -374,7 +350,21 @@ void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Te
 
 ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, const TextureImportSettings& settings)
 {
-	return AssetLoader<Texture>::import(fileLocation, settings);
+	AssetInfo aInfo;
+	aInfo.aType = AssetType::TEXTURE;
+	aInfo.ext = std::filesystem::path(fileLocation).extension().string();
+	aInfo.fileName = aInfo.name + aInfo.ext;
+
+	//Texture::TextureAssetAttributes attributes;
+	//attributes.flip = settings.flip;
+	//attributes.genMipMap = settings.genMipMap;
+	//attributes.isHDR = AssetTraits<Texture>::isHDRImage(fileLocation);
+	//attributes.params = settings.params;
+
+	//aInfo.attributes = attributes.toMap();
+	aInfo.importSettings = settings;
+
+	return AssetLoader<Texture>::import(fileLocation, aInfo);
 }
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)

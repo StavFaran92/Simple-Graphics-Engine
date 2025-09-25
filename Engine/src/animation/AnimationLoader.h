@@ -24,9 +24,9 @@ class EngineAPI AnimationLoader
 public:
 	AnimationLoader();
 
-	ResourceWrapper<Animation> load(AssetInfo& aInfo);
+	ResourceWrapper<Animation> load(const AssetInfo& aInfo);
 
-	bool copyFileToResourceFolder(const std::string& fileLocation, AssetInfo&);
+	bool copyFileToResourceFolder(const std::string& fileLocation, const AssetInfo&);
 
 
 private:
