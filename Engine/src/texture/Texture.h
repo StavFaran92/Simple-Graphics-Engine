@@ -13,12 +13,6 @@
 
 struct AssetInfo;
 
-//class TextureAssetRegister
-//{
-//public:
-//	TextureAssetRegister();
-//};
-
 class EngineAPI Texture : public ResourceBase
 {
 public:
@@ -255,17 +249,18 @@ public:
 
 	TextureAssetAttributes getTextureAssetAttributes();
 
-	//static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
 	static void extractTextureDataFromSettings(const TextureImportSettings& settings, Texture::TextureData& textureData);
-	//static void extractTextureDataFromAttributes(const TextureAssetAttributes& attributes, Texture::TextureData& textureData);
 
 	static void writeTexture2D(const std::string& fileLocation, ResourceWrapper<Texture> texture);
+
 	static void addTexture2D(ResourceWrapper<Texture> texture);
+
 	static void addTexture2D(const std::string& name, ResourceWrapper<Texture> texture);
 
 	static ResourceWrapper<Texture> importTexture3D(const std::string& fileLocation);
 
 	static ResourceWrapper<Texture> import(const std::string& fileLocation, const TextureImportSettings & = {});
+
 	static ResourceWrapper<Texture> loadTransient(const std::string& fileLocation, const TextureImportSettings& settings = {});
 
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);

@@ -244,11 +244,10 @@ void Cubemap::saveEquirectangularMap(ResourceWrapper<Texture> equirectangularMap
 	stbi_write_png(savedFilepath.c_str(), equirectangularMap.get()->getWidth(), equirectangularMap.get()->getHeight(), 3, pixels,
 		equirectangularMap.get()->getWidth() * 3);
 
-	AssetInfo aInfo;
+	AssetDescriptor aInfo;
 	aInfo.aType = AssetType::TEXTURE;
-	aInfo.isValid = true;
 	aInfo.filePath = relativeFilepath;
-	aInfo.uuid = equirectangularMap.getUID();
+	aInfo.customUUID = equirectangularMap.getUID();
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }
 

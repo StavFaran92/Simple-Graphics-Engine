@@ -25,10 +25,8 @@ public:
 
 	int getBoneID(const std::string& boneName) const;
 
-	//static Resource<MeshCollection> import(const std::string& fileLocation, const ModelImporter::ModelImportSettings& settings);
-	//static Resource<MeshCollection> loadInner(AssetInfo aInfo);
-
 	static ResourceWrapper<MeshCollection> import(const std::string& fileLocation, const ModelImportSettings& settings = {});
+
 	static ResourceWrapper<MeshCollection> loadTransient(const std::string& fileLocation, const ModelImportSettings& settings = {});
 
 	static std::map<int, ResourceWrapper<Material>> getLastLoadedMaterials();

@@ -20,15 +20,17 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
-AssetInfo Assets::importAsset(AssetInfo& aInfo)
+void Assets::importAsset(const AssetDescriptor& assetDesc)
 {
+	AssetInfo aInfo(assetDesc);
+
 	auto& path = aInfo.origFilePath;
 
 	// Validate
 	if (!std::filesystem::exists(path))
 	{
 		logError("File doesn't exists: " + path);
-		return {};
+		return;
 	}
 
 	const auto& allAssetsOfType = getAllAssetsOfType(aInfo.aType);
@@ -38,16 +40,13 @@ AssetInfo Assets::importAsset(AssetInfo& aInfo)
 		if (asset.name == aInfo.name)
 		{
 			logWarning("Asset name must be unique, abort asset import");
-			return {};
+			return;
 		}
 	}
 
 	std::string fullName = std::filesystem::path(path).filename().string();
 	std::string name = fullName.substr(0, fullName.find_first_of('.'));
 	std::string ext = std::filesystem::path(path).extension().string();
-
-	
-	
 
 	if (!aInfo.isTransient)
 	{
@@ -68,26 +67,26 @@ AssetInfo Assets::importAsset(AssetInfo& aInfo)
 	m_assets[name] = aInfo;
 
 	logInfo("Successfully imported asset: '" + path + "' into: '" + aInfo.name + "'.");
-
-	return aInfo;
 }
 
-AssetInfo Assets::addAsset(const AssetInfo& aInfo)
+void Assets::addAsset(const AssetDescriptor& assetDesc)
 {
+	AssetInfo aInfo(assetDesc);
+
 	if (aInfo.aType == AssetType::NONE)
 	{
 		logError("Invalid asset type specified!");
-		return {};
+		return;
 	}
 	if (!aInfo.isTransient && !aInfo.filePath.empty())
 	{
 		logError("Non transient asset must have a file path specified.");
-		return {};
+		return;
 	}
 	if (aInfo.uuid.empty())
 	{
 		logError("Asset must have a UUID");
-		return {};
+		return;
 	}
 
 	if (!aInfo.isTransient)
@@ -100,8 +99,6 @@ AssetInfo Assets::addAsset(const AssetInfo& aInfo)
 	m_assets[aInfo.uuid] = aInfo;
 
 	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
-
-	return aInfo;
 }
 
 std::vector<AssetInfo> Assets::getAllAssetsOfType(AssetType aType) const
@@ -176,8 +173,10 @@ std::string Assets::getAlias(UUID uid) const
 
 }
 
-AssetInfo Assets::updateAsset(const AssetInfo& aInfo)
+void Assets::updateAsset(const AssetDescriptor& assetDesc)
 {
+	AssetInfo aInfo(assetDesc);
+
 	if (!aInfo.isTransient)
 	{
 		Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
@@ -186,6 +185,5 @@ AssetInfo Assets::updateAsset(const AssetInfo& aInfo)
 	m_assets[aInfo.uuid] = aInfo;
 
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
-
-	return aInfo;
 }
+

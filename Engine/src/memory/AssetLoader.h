@@ -82,8 +82,10 @@ public:
 
 	}
 
-	static ResourceWrapper<T> create(AssetInfo& aInfo)
+	static ResourceWrapper<T> create(AssetDescriptor& aDesc)
 	{
+		AssetInfo aInfo(aDesc);
+
 		if (aInfo.aType == AssetType::NONE)
 		{
 			logError("Asset type cannot be NONE.");

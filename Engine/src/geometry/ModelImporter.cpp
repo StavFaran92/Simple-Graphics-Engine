@@ -260,7 +260,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 
 			// get uuid using tex name from association map
-			AssetInfo materialAssetInfo;
+			AssetDescriptor materialAssetInfo;
 			materialAssetInfo.isTransient = aInfo.isTransient;
 			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
 			materialAssetInfo.name = materialID;
@@ -549,8 +549,8 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName + ".png";
 		Texture::writeTexture2D(savedFilePath, texture);
 
-		AssetInfo aInfo;
-		aInfo.uuid = texture.getUID();
+		AssetDescriptor aInfo;
+		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = tData.textureName;
 		aInfo.isTransient = false;
@@ -560,7 +560,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		aInfo.data = texture;
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
-		texture.get()->m_assetInfo = aInfo;
+		//texture.get()->m_assetInfo = aInfo;
 
 		cachedTextures.insert({ uuid, texture });
 	}	

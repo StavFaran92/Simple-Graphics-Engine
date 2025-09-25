@@ -51,8 +51,8 @@ CommonTextures* CommonTextures::create()
 		//std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
 		//Texture::writeTexture2D(savedFileLocation, texture);
 
-		AssetInfo aInfo;
-		aInfo.uuid = texture.getUID();
+		AssetDescriptor aInfo;
+		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_WHITE";
 		aInfo.isTransient = true;
@@ -85,8 +85,8 @@ CommonTextures* CommonTextures::create()
 		//std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
 		//Texture::writeTexture2D(savedFileLocation, texture);
 
-		AssetInfo aInfo;
-		aInfo.uuid = texture.getUID();
+		AssetDescriptor aInfo;
+		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_BLACK";
 		aInfo.isTransient = true;

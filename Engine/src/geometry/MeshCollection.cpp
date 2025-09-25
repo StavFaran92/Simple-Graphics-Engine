@@ -17,8 +17,6 @@ struct AssetTraits<MeshCollection>
 	{
 		aInfo.aType = AssetType::MESH;
 		aInfo.assetDirectory = (std::filesystem::path(params.targetDirectory) / aInfo.name).generic_string();
-		aInfo.ext = std::filesystem::path(fileLocation).extension().string();
-		aInfo.fileName = aInfo.name + aInfo.ext;
 	}
 
 	static ResourceWrapper<MeshCollection> load(AssetInfo& aInfo)

@@ -91,8 +91,10 @@ void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& 
 	}
 }
 
-ResourceWrapper<Prefab> Prefab::create(const Entity& e, AssetInfo& aInfo)
+ResourceWrapper<Prefab> Prefab::create(const Entity& e, const AssetDescriptor& aDesc)
 {
+	AssetInfo aInfo(aDesc);
+
 	aInfo.aType = AssetType::PREFAB;
 	aInfo.ext = ".asset";
 

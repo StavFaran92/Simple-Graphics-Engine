@@ -413,7 +413,7 @@ void ShowModelCreatorWindow()
 		materialComponent.setMaterial(idx, m);
 	}
 
-	AssetInfo aInfo;
+	AssetDescriptor aInfo;
 	aInfo.name = modelName;
 	Prefab::create(entity, aInfo);
 
@@ -508,7 +508,7 @@ void displayEntityHelper(Entity& e)
 			{
 				std::string assetName = state.getSelectedEntity().getComponent<ObjectComponent>().name;
 
-				AssetInfo aInfo;
+				AssetDescriptor aInfo;
 				aInfo.name = assetName;
 				auto prefab = Prefab::create(state.getSelectedEntity(), aInfo);
 			}

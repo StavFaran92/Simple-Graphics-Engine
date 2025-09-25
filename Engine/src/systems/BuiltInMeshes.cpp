@@ -11,8 +11,8 @@
 
 void addAsAsset(const ResourceWrapper<MeshCollection>& meshCollection)
 {
-	AssetInfo aInfo;
-	aInfo.uuid = meshCollection.getUID();
+	AssetDescriptor aInfo;
+	aInfo.customUUID = meshCollection.getUID();
 	aInfo.aType = AssetType::MESH;
 	aInfo.name = meshCollection.getUID();
 	aInfo.isTransient = true;

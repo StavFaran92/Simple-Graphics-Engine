@@ -25,7 +25,7 @@ struct AssetTraits<Shader>
 	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string relativeFilepath = "/" + aInfo.name + aInfo.ext;
+		const std::string relativeFilepath = "/" + aInfo.fileName;
 		const std::string savedFilePath = projectDir + relativeFilepath;
 		return std::filesystem::copy_file(fileLocation, savedFilePath);
 	}
@@ -40,7 +40,7 @@ struct AssetTraits<Shader>
 
 		auto settings = *sParams; // Just for convinience
 
-		aInfo.fileName = aInfo.name + ".glsl";;
+		//aInfo.fileName = aInfo.name + ".glsl";;
 		aInfo.aType = AssetType::SHADER;
 
 		aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(sParams->shaderOverride);
@@ -558,9 +558,9 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	shader->m_glslFilePath = filepath;
 	shader->recompile();
 
-	AssetInfo aInfo;
-	aInfo.uuid = shader.getUID();
-	aInfo.origFilePath = filepath;
+	AssetDescriptor aInfo;
+	aInfo.customUUID = shader.getUID();
+	//aInfo.origFilePath = filepath;
 	aInfo.aType = AssetType::SHADER;
 	aInfo.name = name;
 	aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);

@@ -2,7 +2,7 @@
 
 BuiltInMaterials::BuiltInMaterials()
 {
-	AssetInfo aInfo;
+	AssetDescriptor aInfo;
 	aInfo.isTransient = true;
 	aInfo.name = "SGE_MATERIAL_DEFAULT";
 	m_defaultMaterial = Material::create(aInfo);

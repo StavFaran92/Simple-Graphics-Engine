@@ -7,25 +7,47 @@
 
 #include <unordered_set>
 
-struct AssetInfo
+struct AssetDescriptor
 {
-	UUID uuid;
+public:
+	virtual ~AssetDescriptor() = default;
+
 	UUID customUUID;
-	std::string origFilePath;
 	std::string filePath;
-	std::string fileName;
 	std::string assetDirectory;
-	std::string ext;
 	AssetType aType;
-	mutable bool isValid = false;
 	std::map<std::string, std::string> attributes;
 	std::string name;
 	bool isTransient = false;
 	ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
-	//bool isClient = false
 	//timestamp
 	//size
-	//etc..
+};
+
+struct AssetInfo : public AssetDescriptor
+{
+	bool isValid = false;
+	std::string origFilePath;
+	std::string fileName;
+	std::string ext;
+	UUID uuid;
+
+	~AssetInfo() = default;
+
+	AssetInfo() = default;
+
+
+	AssetInfo(const AssetDescriptor& assetDesc)
+		: AssetDescriptor(assetDesc)
+	{
+	}
+
+private:
+	friend class Assets;
+	friend class ResourceBase;
+	template<typename T> friend class AssetLoader;
+
+	
 };
 
 class EngineAPI Assets
@@ -35,11 +57,11 @@ public:
 
 	std::string getAlias(UUID uid) const;
 
-	AssetInfo importAsset(AssetInfo& assetInfo);
+	void importAsset(const AssetDescriptor& assetDesc);
 
-	AssetInfo addAsset(const AssetInfo& assetInfo);
+	void addAsset(const AssetDescriptor& assetDesc);
 
-	AssetInfo updateAsset(const AssetInfo& assetInfo);
+	void updateAsset(const AssetDescriptor& assetDesc);
 
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 

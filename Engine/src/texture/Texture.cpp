@@ -399,9 +399,9 @@ void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> tex
 	std::string savedFileLocation = projectDir + relativeFilepath;
 	writeTexture2D(savedFileLocation, texture);
 
-	AssetInfo aInfo;
+	AssetDescriptor aInfo;
 	aInfo.aType = AssetType::TEXTURE;
-	aInfo.uuid = texture.getUID();
+	aInfo.customUUID = texture.getUID();
 	aInfo.name = name;
 	aInfo.filePath = relativeFilepath;
 	aInfo.attributes = texture->getTextureAssetAttributes().toMap();

@@ -116,7 +116,7 @@ void ProjectAssetRegistry::save()
 	sync();
 }
 
-void ProjectAssetRegistry::addAssetRegistry(AssetInfo asset)
+void ProjectAssetRegistry::addAssetRegistry(const AssetInfo& asset)
 {
 	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
 	json j;
@@ -125,7 +125,7 @@ void ProjectAssetRegistry::addAssetRegistry(AssetInfo asset)
 	sync();
 }
 
-void ProjectAssetRegistry::updateAssetRegistry(AssetInfo asset)
+void ProjectAssetRegistry::updateAssetRegistry(const AssetInfo& asset)
 {
 	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
 	for (auto& aReg : m_assetRegistry[assetTypeName])

@@ -29,7 +29,7 @@ struct AssetTraits<Material>
 	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
 	{
 		aInfo.aType = AssetType::MATERIAL;
-		aInfo.fileName = aInfo.name + ".asset";;
+		//aInfo.fileName = aInfo.name + ".asset";;
 	}
 
 	static ResourceWrapper<Material> load(AssetInfo& aInfo)
@@ -156,12 +156,12 @@ ResourceWrapper<Material> Material::loadTransient(const std::string& fileLocatio
 	return AssetLoader<Material>::loadTransient(fileLocation, settings);
 }
 
-ResourceWrapper<Material> Material::create(AssetInfo& aInfo)
+ResourceWrapper<Material> Material::create(AssetDescriptor& aDesc)
 {
-	aInfo.aType = AssetType::MATERIAL;
-	aInfo.ext = ".asset";
+	aDesc.aType = AssetType::MATERIAL;
+	//aInfo.ext = ".asset";
 
-	return AssetLoader<Material>::create(aInfo);
+	return AssetLoader<Material>::create(aDesc);
 }
 
 void Material::save(const ResourceWrapper<Material>& material)
@@ -212,7 +212,7 @@ std::vector<ResourceWrapper<Texture>> Material::getAllTextures() const
 
 ResourceWrapper<Material> Material::clone(bool isTransient) const
 {
-	AssetInfo clonedAssetInfo;
+	AssetDescriptor clonedAssetInfo;
 	clonedAssetInfo.attributes = m_assetInfo.attributes;
 	clonedAssetInfo.isTransient = isTransient;
 	auto newMaterial = Material::create(clonedAssetInfo); // tODO rethink this
