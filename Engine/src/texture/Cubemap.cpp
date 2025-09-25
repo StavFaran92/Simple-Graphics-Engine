@@ -246,7 +246,7 @@ void Cubemap::saveEquirectangularMap(ResourceWrapper<Texture> equirectangularMap
 
 	AssetDescriptor aInfo;
 	aInfo.aType = AssetType::TEXTURE;
-	aInfo.filePath = relativeFilepath;
+	aInfo.filePathHint = relativeFilepath;
 	aInfo.customUUID = equirectangularMap.getUID();
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }

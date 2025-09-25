@@ -120,3 +120,24 @@ static std::string getAssetTypeAsStr(AssetType aType)
 	return iter->second;
 
 }
+
+static const std::map<AssetType, std::string> g_assetTypeToExt
+{
+	{ AssetType::NONE,			"N/A"			},
+	{ AssetType::TEXTURE,		".png"			},
+	{ AssetType::MESH,			".fbx"			},
+	{ AssetType::ANIMATION,		".fbx"			},
+	{ AssetType::SHADER,		".glsl"			},
+	{ AssetType::PREFAB,		".asset"		},
+	{ AssetType::MATERIAL,		".asset"		},
+};
+
+static std::string getExtensionFromType(AssetType aType)
+{
+	auto iter = g_assetTypeToExt.find(aType);
+	if (g_assetTypeToExt.find(aType) == g_assetTypeToExt.end())
+	{
+		return "N/A";
+	}
+	return iter->second;
+}

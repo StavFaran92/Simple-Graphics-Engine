@@ -7,13 +7,16 @@
 
 #include <unordered_set>
 
+#include <filesystem>
+
 struct AssetDescriptor
 {
 public:
 	virtual ~AssetDescriptor() = default;
 
 	UUID customUUID;
-	std::string filePath;
+	std::string filePathHint;
+	std::string origFilePath;
 	std::string assetDirectory;
 	AssetType aType;
 	std::map<std::string, std::string> attributes;
@@ -27,7 +30,7 @@ public:
 struct AssetInfo : public AssetDescriptor
 {
 	bool isValid = false;
-	std::string origFilePath;
+	std::string filePath;
 	std::string fileName;
 	std::string ext;
 	UUID uuid;
@@ -40,6 +43,49 @@ struct AssetInfo : public AssetDescriptor
 	AssetInfo(const AssetDescriptor& assetDesc)
 		: AssetDescriptor(assetDesc)
 	{
+		if (aType == AssetType::NONE)
+		{
+			logError("Asset type cannot be NONE.");
+			return;
+		}
+
+		if (!filePathHint.empty())
+		{
+			ext = std::filesystem::path(filePathHint).extension().string();
+		}
+
+		if (ext.empty())
+		{
+			ext = getExtensionFromType(aType);
+
+			if (ext.empty())
+			{
+				logError("Asset extension cannot be empty.");
+				return;
+			}
+		}
+
+		if (name.empty())
+		{
+			name = uuid::generate_uuid_v4();
+		}
+
+		fileName = name + ext;
+
+		if (!assetDirectory.empty())
+		{
+			filePath += assetDirectory + "/";
+		}
+		filePath += fileName;
+
+		if (!customUUID.empty())
+		{
+			uuid = customUUID;
+		}
+		else
+		{
+			uuid = filePath;
+		}
 	}
 
 private:

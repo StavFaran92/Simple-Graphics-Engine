@@ -403,7 +403,7 @@ void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> tex
 	aInfo.aType = AssetType::TEXTURE;
 	aInfo.customUUID = texture.getUID();
 	aInfo.name = name;
-	aInfo.filePath = relativeFilepath;
+	aInfo.filePathHint = relativeFilepath;
 	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }

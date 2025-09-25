@@ -554,7 +554,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = tData.textureName;
 		aInfo.isTransient = false;
-		aInfo.filePath = savedFilePath;
+		aInfo.filePathHint = savedFilePath;
 		aInfo.assetDirectory = aInfo.assetDirectory;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		aInfo.data = texture;
