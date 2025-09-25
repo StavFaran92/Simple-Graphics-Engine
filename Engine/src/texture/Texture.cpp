@@ -74,8 +74,6 @@ struct AssetTraits<Texture>
 
 		Texture::TextureData textureData;
 
-		textureData.target = GL_TEXTURE_2D;
-
 		// extract texture build data
 		Texture::TextureAssetAttributes attributes(aInfo.attributes);
 		extractTextureDataFromAttributes(attributes, textureData);
@@ -207,7 +205,7 @@ ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height)
 ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int internalFormat, int format, int type)
 {
 	TextureData textureData;
-	textureData.target = GL_TEXTURE_2D;
+	textureData.target = Texture::TextureTarget::TEXTURE_2D;
 	textureData.width = width;
 	textureData.height = height;
 	textureData.internalFormat = (InternalFormat)internalFormat;
@@ -236,7 +234,7 @@ ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(const TextureData& t
 ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data)
 {
 	TextureData textureData;
-	textureData.target = GL_TEXTURE_2D;
+	textureData.target = Texture::TextureTarget::TEXTURE_2D;
 	textureData.width = width;
 	textureData.height = height;
 	textureData.bpp = 4;

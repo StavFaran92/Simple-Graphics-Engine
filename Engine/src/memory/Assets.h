@@ -17,7 +17,7 @@ struct AssetInfo
 	std::string assetDirectory;
 	std::string ext;
 	AssetType aType;
-	bool isValid = false;
+	mutable bool isValid = false;
 	std::map<std::string, std::string> attributes;
 	std::string name;
 	bool isTransient = false;
@@ -40,7 +40,7 @@ public:
 
 	AssetInfo importAsset(AssetInfo& assetInfo);
 
-	AssetInfo addAsset(AssetInfo& assetInfo);
+	AssetInfo addAsset(const AssetInfo& assetInfo);
 
 	AssetInfo updateAsset(AssetInfo& assetInfo);
 

@@ -103,15 +103,22 @@ public:
 		TEXTURE_MIN_FILTER = 0x2801,
 	};
 
+	enum TextureTarget : int
+	{
+		TEXTURE_2D = 0x0DE1,
+		TEXTURE_3D = 0x806F,
+		TEXTURE_CUBE_MAP = 0x8513
+	};
+
 	struct TextureData
 	{
 		int width = 0;
 		int height = 0;
 		int bpp = 0;
-		InternalFormat internalFormat;
-		Format format;
-		int target = 0;
-		Type type;
+		InternalFormat internalFormat = Texture::InternalFormat::RGB2;
+		Format format = Texture::Format::RGB;
+		TextureTarget target = Texture::TextureTarget::TEXTURE_2D;
+		Type type = Texture::Type::UNSIGNED_BYTE;
 		std::map<int, int> params;
 		bool genMipMap = false;
 		void* data = nullptr;

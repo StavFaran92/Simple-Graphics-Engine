@@ -42,7 +42,7 @@ Texture::TextureData Cubemap::extractCubemapDataFromEquirectangularFile(const st
 	
 
 	Texture::TextureData cubemapData;
-	cubemapData.target = GL_TEXTURE_CUBE_MAP;
+	cubemapData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
 
 	int width, height, nrChannels;
 	cubemapData.facesData[0] = stbi_load(fileLocation.c_str(), &cubemapData.width, &cubemapData.height, &cubemapData.bpp, 0);
@@ -118,7 +118,7 @@ ResourceWrapper<Texture> Cubemap::createDefaultCubemap()
 	{
 		cubemapData.facesData[i] = FULL_WHITE;
 	}
-	cubemapData.target = GL_TEXTURE_CUBE_MAP;
+	cubemapData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
 	cubemapData.width = 1;
 	cubemapData.height = 1;
 	cubemapData.internalFormat = Texture::InternalFormat::RGB2;
@@ -139,7 +139,7 @@ ResourceWrapper<Texture> Cubemap::createDefaultCubemap()
 ResourceWrapper<Texture> Cubemap::createEmptyCubemap(int width, int height, int internalFormat, int format, int type)
 {
 	Texture::TextureData cubemapData;
-	cubemapData.target = GL_TEXTURE_CUBE_MAP;
+	cubemapData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
 	cubemapData.width = width;
 	cubemapData.height = height;
 	cubemapData.internalFormat = (Texture::InternalFormat)internalFormat;
@@ -160,7 +160,7 @@ ResourceWrapper<Texture> Cubemap::createEmptyCubemap(int width, int height, int 
 ResourceWrapper<Texture> Cubemap::createEmptyCubemap(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool createMipMaps)
 {
 	Texture::TextureData cubemapData;
-	cubemapData.target = GL_TEXTURE_CUBE_MAP;
+	cubemapData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
 	cubemapData.width = width;
 	cubemapData.height = height;
 	cubemapData.internalFormat = (Texture::InternalFormat)internalFormat;
@@ -175,7 +175,7 @@ ResourceWrapper<Texture> Cubemap::createEmptyCubemap(int width, int height, int 
 Texture::TextureData Cubemap::extractCubemapDataFromCubemapFiles(const std::vector<std::string>& files)
 {
 	Texture::TextureData cubemapData;
-	cubemapData.target = GL_TEXTURE_CUBE_MAP;
+	cubemapData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
 
 	int width, height, nrChannels;
 	for (unsigned int i = 0; i < files.size(); i++)

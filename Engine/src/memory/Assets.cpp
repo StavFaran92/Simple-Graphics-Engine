@@ -47,8 +47,6 @@ ResourceWrapper<T> Assets::loadAsset(UUID uid, const std::string& path)
 AssetInfo Assets::importAsset(AssetInfo& aInfo)
 {
 	auto& path = aInfo.origFilePath;
-	auto& uid = aInfo.uuid;
-	auto& aType = aInfo.aType;
 
 	// Validate
 	if (!std::filesystem::exists(path))
@@ -85,7 +83,7 @@ AssetInfo Assets::importAsset(AssetInfo& aInfo)
 
 		aInfo.filePath = relativeFilepath;
 
-		Engine::get()->getMemoryManagementSystem()->addAssociation(fullName, uid);
+		Engine::get()->getMemoryManagementSystem()->addAssociation(fullName, aInfo.uuid);
 		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 	}
 
@@ -98,27 +96,31 @@ AssetInfo Assets::importAsset(AssetInfo& aInfo)
 	return aInfo;
 }
 
-AssetInfo Assets::addAsset(AssetInfo& aInfo)
+AssetInfo Assets::addAsset(const AssetInfo& aInfo)
 {
-	auto& path = aInfo.origFilePath;
-	auto& uid = aInfo.uuid;
-	auto& aType = aInfo.aType;
-	auto& savedFilepath = aInfo.filePath;
-
-	assert(!savedFilepath.empty());
-	assert(!uid.empty());
-	
-
-	aInfo.filePath = savedFilepath;
-	aInfo.isValid = true;
-	aInfo.aType = aType;
+	if (aInfo.aType == AssetType::NONE)
+	{
+		logError("Invalid asset type specified!");
+		return {};
+	}
+	if (!aInfo.isTransient && !aInfo.filePath.empty())
+	{
+		logError("Non transient asset must have a file path specified.");
+		return {};
+	}
+	if (aInfo.uuid.empty())
+	{
+		logError("Asset must have a UUID");
+		return {};
+	}
 
 	if (!aInfo.isTransient)
 	{
-		Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.name, uid); //TODO maybe use some naming convention here?
+		Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.name, aInfo.uuid); //TODO maybe use some naming convention here?
 		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 	}
 
+	aInfo.isValid = true;
 	m_assets[aInfo.uuid] = aInfo;
 
 	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
@@ -128,6 +130,11 @@ AssetInfo Assets::addAsset(AssetInfo& aInfo)
 
 std::vector<AssetInfo> Assets::getAllAssetsOfType(AssetType aType) const
 {
+	if (aType == AssetType::NONE)
+	{
+		logError("Invalid asset type specified!");
+		return {};
+	}
 	std::vector<AssetInfo> result;
 	for (const auto& asset : m_assets)
 	{

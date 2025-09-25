@@ -169,7 +169,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, AssetInfo& aI
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
-			//PrintMaterialProperties(aMaterial);
+			PrintMaterialProperties(aMaterial);
 
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 
@@ -510,7 +510,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		}
 
 		Texture::TextureData tData;
-		tData.target = GL_TEXTURE_2D;
+		tData.target = Texture::TextureTarget::TEXTURE_2D;
 		tData.format = Texture::Format::RGB;
 		tData.internalFormat = Texture::InternalFormat::RGB2;
 		tData.isTransient = aInfo.isTransient;

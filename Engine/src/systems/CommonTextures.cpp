@@ -29,7 +29,7 @@ CommonTextures* CommonTextures::create()
 		static unsigned char* whiteColor = new unsigned char[3] { 255, 255, 255 }; // todo rethink this
 
 		Texture::TextureData tData;
-		tData.target = GL_TEXTURE_2D;
+		tData.target = Texture::TextureTarget::TEXTURE_2D;
 		tData.width = 1;
 		tData.height = 1;
 		tData.bpp = 3;
@@ -64,7 +64,7 @@ CommonTextures* CommonTextures::create()
 	{
 		static unsigned char* blackColor = new unsigned char[3] { 0, 0, 0};
 		Texture::TextureData tData;
-		tData.target = GL_TEXTURE_2D;
+		tData.target = Texture::TextureTarget::TEXTURE_2D;
 		tData.width = 1;
 		tData.height = 1;
 		tData.bpp = 3;
