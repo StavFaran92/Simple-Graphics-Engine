@@ -20,30 +20,6 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
-//template<typename T>
-//Assets::AssetType Assets::getAssetType()
-//{
-//	if constexpr (std::is_same_v<T, Mesh>) return AssetType::MESH;
-//	if constexpr (std::is_same_v<T, Texture>) return AssetType::TEXTURE;
-//	if constexpr (std::is_same_v<T, Animation>) return AssetType::ANIMATION;
-//	if constexpr (std::is_same_v<T, Shader>) return AssetType::SHADER;
-//	return AssetType::NONE;
-//}
-//
-template<typename T>
-ResourceWrapper<T> Assets::loadAsset(UUID uid, const std::string& path)
-{
-	auto& res = ResourceWrapper<T>(uid);
-
-	// add asset to memory pool
-	Engine::get()->getMemoryPool().add(uid, res.get());
-
-	AssetType aType = getAssetType<T>();
-	m_assets[aType].insert(uid);
-
-	return res;
-}
-
 AssetInfo Assets::importAsset(AssetInfo& aInfo)
 {
 	auto& path = aInfo.origFilePath;
@@ -156,7 +132,7 @@ std::vector<AssetInfo> Assets::getAllAssets() const
 	return result;
 }
 
-void Assets::load()
+void Assets::loadAssetsDatabase()
 {
 	auto par = Engine::get()->getContext()->getProjectAssetRegistry();
 
@@ -200,7 +176,7 @@ std::string Assets::getAlias(UUID uid) const
 
 }
 
-AssetInfo Assets::updateAsset(AssetInfo& aInfo)
+AssetInfo Assets::updateAsset(const AssetInfo& aInfo)
 {
 	if (!aInfo.isTransient)
 	{

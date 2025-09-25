@@ -23,7 +23,7 @@ namespace fs = std::filesystem;
 
 void ProjectManager::loadProject(const std::string& filePath, std::shared_ptr<Context>& context)
 {
-    Engine::get()->getSubSystem<Assets>()->load();
+    Engine::get()->getSubSystem<Assets>()->loadAssetsDatabase();
     Archiver::load();    
 }
 

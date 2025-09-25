@@ -35,26 +35,22 @@ public:
 
 	std::string getAlias(UUID uid) const;
 
-	template<typename T>
-	ResourceWrapper<T> loadAsset(UUID uid, const std::string& path);
-
 	AssetInfo importAsset(AssetInfo& assetInfo);
 
 	AssetInfo addAsset(const AssetInfo& assetInfo);
 
-	AssetInfo updateAsset(AssetInfo& assetInfo);
+	AssetInfo updateAsset(const AssetInfo& assetInfo);
 
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 
 	std::vector<AssetInfo> getAllAssets() const;
 
-	void load();
+	void loadAssetsDatabase();
 
 	AssetInfo getAsset(UUID uuid) const;
+
 	bool hasAsset(UUID uuid) const;
 
 private:
-	//std::map<AssetType, std::unordered_set<AssetInfo>> m_assets;
-
 	std::unordered_map<UUID, AssetInfo> m_assets;
 };
