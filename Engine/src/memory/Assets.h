@@ -98,6 +98,7 @@ struct AssetInfo : public AssetDescriptor
 
 		fileName = name + ext;
 
+		filePath = "";
 		if (!assetDirectory.empty())
 		{
 			filePath += assetDirectory + "/";

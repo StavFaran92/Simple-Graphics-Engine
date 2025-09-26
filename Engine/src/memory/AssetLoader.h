@@ -88,38 +88,6 @@ public:
 	{
 		AssetInfo aInfo(aDesc);
 
-		if (aInfo.aType == AssetType::NONE)
-		{
-			logError("Asset type cannot be NONE.");
-			return {};
-		}
-
-		if (aInfo.ext.empty())
-		{
-			logError("Asset extension cannot be empty.");
-			return {};
-		}
-
-		if (aInfo.name.empty())
-		{
-			aInfo.name = uuid::generate_uuid_v4();
-		}
-
-		if (!aInfo.assetDirectory.empty())
-		{
-			aInfo.filePath += aInfo.assetDirectory + "/";
-		}
-		aInfo.filePath += aInfo.name + aInfo.ext;
-
-		if (!aInfo.customUUID.empty())
-		{
-			aInfo.uuid = aInfo.customUUID;
-		}
-		else
-		{
-			aInfo.uuid = aInfo.filePath;
-		}
-
 		ResourceWrapper<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
 
 		save(aInfo, asset);
