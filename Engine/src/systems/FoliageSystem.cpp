@@ -58,13 +58,13 @@ bool FoliageSystem::init()
 	//glBindBufferBase(GL_UNIFORM_BUFFER, 4, m_randomPatchSampleUBO);
 
 	{
-		Texture::TextureImportSettings tSettings;
+		Texture::TextureAssetDescriptor tSettings;
 		tSettings.flip = true;
 		grassTexture = Texture::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
 	}
 
 	{
-		Texture::TextureImportSettings noiseSettings;
+		Texture::TextureAssetDescriptor noiseSettings;
 		noiseSettings.params[GL_TEXTURE_WRAP_S] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
@@ -73,7 +73,7 @@ bool FoliageSystem::init()
 	}
 
 	{
-		Texture::TextureImportSettings noiseSettings;
+		Texture::TextureAssetDescriptor noiseSettings;
 		noiseSettings.params[GL_TEXTURE_WRAP_S] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;

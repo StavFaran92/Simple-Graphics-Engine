@@ -130,13 +130,11 @@ public:
 		std::string textureName;
 	};
 
-	struct TextureImportSettings : public AssetDescriptor
+	struct TextureAssetDescriptor : public AssetDescriptor
 	{
-		//std::string name;
 		bool genMipMap = false;
 		bool flip = false;
 		bool saveOnDisk = true;
-		//bool isTransient = false;
 		std::map<int, int> params;
 
 		json fillParams() const override
@@ -144,7 +142,7 @@ public:
 			return *this;
 		}
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(TextureImportSettings,
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(TextureAssetDescriptor,
 			genMipMap,
 			flip,
 			saveOnDisk,
@@ -268,7 +266,7 @@ public:
 
 	TextureAssetAttributes getTextureAssetAttributes();
 
-	static void extractTextureDataFromSettings(const TextureImportSettings& settings, Texture::TextureData& textureData);
+	static void extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData);
 
 	static void writeTexture2D(const std::string& fileLocation, ResourceWrapper<Texture> texture);
 
@@ -278,9 +276,9 @@ public:
 
 	static ResourceWrapper<Texture> importTexture3D(const std::string& fileLocation);
 
-	static ResourceWrapper<Texture> import(const std::string& fileLocation, const TextureImportSettings & = {});
+	static ResourceWrapper<Texture> import(const std::string& fileLocation, const TextureAssetDescriptor & = {});
 
-	static ResourceWrapper<Texture> loadTransient(const std::string& fileLocation, const TextureImportSettings& settings = {});
+	static ResourceWrapper<Texture> loadTransient(const std::string& fileLocation, const TextureAssetDescriptor& settings = {});
 
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);
 

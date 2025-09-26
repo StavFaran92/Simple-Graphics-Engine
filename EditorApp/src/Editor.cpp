@@ -1409,7 +1409,7 @@ public:
 
 		
 
-		Texture::TextureImportSettings settings;
+		Texture::TextureAssetDescriptor settings;
 		icons["mesh"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
 		icons["texture"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
 		icons["animation"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);

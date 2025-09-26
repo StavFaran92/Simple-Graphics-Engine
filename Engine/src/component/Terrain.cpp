@@ -40,7 +40,7 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 Terrain Terrain::generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath)
 {
 	// Ensure height sampling does not wrap at borders so terrain edges use edge heights
-	Texture::TextureImportSettings settings;
+	Texture::TextureAssetDescriptor settings;
 	settings.params[GL_TEXTURE_WRAP_S] = GL_CLAMP_TO_EDGE;
 	settings.params[GL_TEXTURE_WRAP_T] = GL_CLAMP_TO_EDGE;
 	settings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;

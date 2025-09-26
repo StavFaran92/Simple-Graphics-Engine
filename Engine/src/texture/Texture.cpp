@@ -75,7 +75,7 @@ struct AssetTraits<Texture>
 		Texture::TextureData textureData;
 
 		// extract texture build data
-		Texture::TextureImportSettings settings = aInfo.importSettings.get<Texture::TextureImportSettings>();
+		Texture::TextureAssetDescriptor settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
 		Texture::extractTextureDataFromSettings(settings, textureData);
 		extractTextureDataFromFile(filepath, textureData);
 
@@ -316,12 +316,10 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 }
 
-ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
+ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureAssetDescriptor& settings/* = {}*/)
 {
 	AssetInfo aInfo(settings);
 	aInfo.aType = AssetType::TEXTURE;
-	aInfo.ext = std::filesystem::path(fileLocation).extension().string();
-	aInfo.fileName = aInfo.name + aInfo.ext;
 	return AssetLoader<Texture>::loadTransient(fileLocation, aInfo);
 }
 
@@ -347,7 +345,7 @@ void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Te
 		texture.get()->getWidth() * texture.get()->getBitDepth());
 }
 
-ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, const TextureImportSettings& settings)
+ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, const TextureAssetDescriptor& settings)
 {
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::TEXTURE;
@@ -397,7 +395,7 @@ void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> tex
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 }
 
-void Texture::extractTextureDataFromSettings(const TextureImportSettings& settings, Texture::TextureData& textureData)
+void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData)
 {
 	textureData.params = settings.params;
 
