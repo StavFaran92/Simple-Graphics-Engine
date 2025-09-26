@@ -14,11 +14,6 @@ struct AssetTraits<Animation>
 		return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
 	}
 
-	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-	{
-		aInfo.aType = AssetType::ANIMATION;
-	}
-
 	static ResourceWrapper<Animation> load(const AssetInfo& aInfo)
 	{
 		return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
@@ -111,7 +106,6 @@ bool Animation::preprocess(const std::string& path)
 ResourceWrapper<Animation> Animation::import(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
 	AssetInfo aInfo;
-	settings.fillAssetInfo(aInfo);
 	aInfo.aType = AssetType::ANIMATION;
 	return AssetLoader<Animation>::import(fileLocation, aInfo);
 }
@@ -119,7 +113,6 @@ ResourceWrapper<Animation> Animation::import(const std::string& fileLocation, co
 ResourceWrapper<Animation> Animation::loadTransient(const std::string& fileLocation, const AnimationImportSettings& settings)
 {
 	AssetInfo aInfo;
-	settings.fillAssetInfo(aInfo);
 	aInfo.aType = AssetType::ANIMATION;
 	return AssetLoader<Animation>::loadTransient(fileLocation, aInfo);
 }

@@ -30,23 +30,6 @@ struct AssetTraits<Shader>
 		return std::filesystem::copy_file(fileLocation, savedFilePath);
 	}
 
-	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-	{
-		auto sParams = dynamic_cast<const ShaderLoadParams*>(&params);
-		if (!sParams)
-		{
-			throw std::runtime_error("Params specified to Asset load are of incorrect type!");
-		}
-
-		auto settings = *sParams; // Just for convinience
-
-		//aInfo.fileName = aInfo.name + ".glsl";;
-		aInfo.aType = AssetType::SHADER;
-
-		aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(sParams->shaderOverride);
-		aInfo.isTransient = sParams->isTransient;
-	}
-
 	static ResourceWrapper<Shader> load(AssetInfo& aInfo)
 	{
 		UUID uuid = aInfo.uuid;

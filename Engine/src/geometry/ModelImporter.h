@@ -29,7 +29,7 @@ namespace Assimp
 	class Importer;
 }
 
-struct ModelImportSettings : public BaseAssetParameters
+struct ModelImportSettings : public AssetDescriptor
 {
 	
 };

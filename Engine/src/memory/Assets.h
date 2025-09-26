@@ -29,6 +29,7 @@ public:
 	bool isTransient = false;
 	mutable ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
 
+	virtual json fillParams() const { return {}; }
 	
 	//timestamp
 	//size
@@ -51,6 +52,8 @@ struct AssetInfo : public AssetDescriptor
 	AssetInfo(const AssetDescriptor& assetDesc)
 		: AssetDescriptor(assetDesc)
 	{
+		importSettings = assetDesc.fillParams();
+
 		if (aType == AssetType::NONE)
 		{
 			logError("Asset type cannot be NONE.");

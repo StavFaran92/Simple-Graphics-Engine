@@ -5,7 +5,7 @@
 #include "runtime/Entity.h"
 #include "serialize/Archiver.h"
 
-struct PrefabImportSettings : BaseAssetParameters
+struct PrefabImportSettings : public AssetDescriptor
 {};
 
 class EngineAPI Prefab : public ResourceBase

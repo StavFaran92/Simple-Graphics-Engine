@@ -21,11 +21,11 @@ struct AssetTraits<Prefab>
 		return false;
 	}
 
-	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-	{
-		aInfo.aType = AssetType::PREFAB;
-		aInfo.fileName = aInfo.name + ".asset";;
-	}
+	//static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
+	//{
+	//	aInfo.aType = AssetType::PREFAB;
+	//	aInfo.fileName = aInfo.name + ".asset";;
+	//}
 
 	static ResourceWrapper<Prefab> load(AssetInfo& aInfo)
 	{

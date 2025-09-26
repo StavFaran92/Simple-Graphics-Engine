@@ -579,7 +579,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		}
 
 		Texture::TextureImportSettings tSettings;
-		tSettings.targetDirectory = aInfo.assetDirectory;
+		tSettings.assetDirectory = aInfo.assetDirectory;
 		tSettings.isTransient = aInfo.isTransient;
 		texture = Texture::import(path, tSettings);
 

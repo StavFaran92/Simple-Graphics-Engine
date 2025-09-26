@@ -10,30 +10,30 @@
 using json = nlohmann::json;
 using namespace nlohmann::literals;
 
-struct BaseAssetParameters
-{
-	std::string name;
-	UUID customUUID;
-	std::string targetDirectory;
-	bool isTransient = false;
-
-	void fillAssetInfo(AssetInfo& aInfo) const
-	{
-		if (!name.empty())
-		{
-			aInfo.name = name;
-		}
-
-		aInfo.assetDirectory = targetDirectory;
-
-		aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
-
-		aInfo.importSettings = fillParams();
-	}
-	virtual json fillParams() const { return {}; };
-
-	virtual ~BaseAssetParameters() = default;
-};
+//struct BaseAssetParameters
+//{
+//	std::string name;
+//	UUID customUUID;
+//	std::string targetDirectory;
+//	bool isTransient = false;
+//
+//	void fillAssetInfo(AssetInfo& aInfo) const
+//	{
+//		if (!name.empty())
+//		{
+//			aInfo.name = name;
+//		}
+//
+//		aInfo.assetDirectory = targetDirectory;
+//
+//		aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
+//
+//		aInfo.importSettings = fillParams();
+//	}
+//	virtual json fillParams() const { return {}; };
+//
+//	virtual ~BaseAssetParameters() = default;
+//};
 
 template<AssetType T>
 class AssetFnRegister
@@ -53,7 +53,6 @@ AssetFnRegister<T> AssetFnRegister<T>::staticRegister;
 template<typename T>
 struct AssetTraits {
 	static bool copyFiles(const std::string& fileLocation, AssetInfo&);
-	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo);
 	static ResourceWrapper<T> load(AssetInfo& aInfo);
 	static void save(AssetInfo& aInfo, const ResourceWrapper<T>& asset);
 };
@@ -64,13 +63,13 @@ public:
 	ResourceBase() = default;
 	virtual ~ResourceBase() = default;
 
-	static ResourceWrapper<ResourceBase> import(const std::string& fileLocation, const BaseAssetParameters& params);
+	static ResourceWrapper<ResourceBase> import(const std::string& fileLocation, AssetInfo& params);
 
 	//virtual Resource<Asset> load(AssetInfo aInfo) = 0;
 
 	// CRTP
 	template <typename T>
-	static ResourceWrapper<T> import(const std::string& fileLocation, const BaseAssetParameters& params) {
+	static ResourceWrapper<T> import(const std::string& fileLocation, AssetInfo& params) {
 		return T::import(fileLocation, params);
 	}
 

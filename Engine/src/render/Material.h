@@ -9,7 +9,7 @@
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
 
-struct MaterialImportSettings : public BaseAssetParameters
+struct MaterialImportSettings : public AssetDescriptor
 {
 
 };

@@ -130,7 +130,7 @@ public:
 		std::string textureName;
 	};
 
-	struct TextureImportSettings : public BaseAssetParameters
+	struct TextureImportSettings : public AssetDescriptor
 	{
 		//std::string name;
 		bool genMipMap = false;

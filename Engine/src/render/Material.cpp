@@ -26,12 +26,6 @@ struct AssetTraits<Material>
 		return false;
 	}
 
-	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-	{
-		aInfo.aType = AssetType::MATERIAL;
-		//aInfo.fileName = aInfo.name + ".asset";;
-	}
-
 	static ResourceWrapper<Material> load(AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();

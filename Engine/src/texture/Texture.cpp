@@ -36,29 +36,29 @@ struct AssetTraits<Texture>
 		return std::filesystem::copy_file(fileLocation, savedFilePath);
 	}
 
-	static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-	{
-		// Data extract
-		auto tParams = dynamic_cast<const Texture::TextureImportSettings*>(&params);
-		if (!tParams)
-		{
-			throw std::runtime_error("Params specified to Asset load are of incorrect type!");
-		}
+	//static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
+	//{
+	//	// Data extract
+	//	auto tParams = dynamic_cast<const Texture::TextureImportSettings*>(&params);
+	//	if (!tParams)
+	//	{
+	//		throw std::runtime_error("Params specified to Asset load are of incorrect type!");
+	//	}
 
-		auto settings = *tParams; // Just for convinience
+	//	auto settings = *tParams; // Just for convinience
 
-		aInfo.aType = AssetType::TEXTURE;
-		aInfo.ext = std::filesystem::path(fileLocation).extension().string();
-		aInfo.fileName = aInfo.name + aInfo.ext;;
+	//	aInfo.aType = AssetType::TEXTURE;
+	//	aInfo.ext = std::filesystem::path(fileLocation).extension().string();
+	//	aInfo.fileName = aInfo.name + aInfo.ext;;
 
-		Texture::TextureAssetAttributes attributes;
-		attributes.flip = settings.flip;
-		attributes.genMipMap = settings.genMipMap;
-		attributes.isHDR = isHDRImage(fileLocation);
-		attributes.params = settings.params;
+	//	Texture::TextureAssetAttributes attributes;
+	//	attributes.flip = settings.flip;
+	//	attributes.genMipMap = settings.genMipMap;
+	//	attributes.isHDR = isHDRImage(fileLocation);
+	//	attributes.params = settings.params;
 
-		aInfo.attributes = attributes.toMap();
-	}
+	//	aInfo.attributes = attributes.toMap();
+	//}
 
 	static ResourceWrapper<Texture> load(AssetInfo& aInfo)
 	{
@@ -318,8 +318,7 @@ void Texture::ClearTexture()
 
 ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
 {
-	AssetInfo aInfo;
-	settings.fillAssetInfo(aInfo);
+	AssetInfo aInfo(settings);
 	aInfo.aType = AssetType::TEXTURE;
 	aInfo.ext = std::filesystem::path(fileLocation).extension().string();
 	aInfo.fileName = aInfo.name + aInfo.ext;

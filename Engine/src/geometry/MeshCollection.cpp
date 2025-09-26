@@ -94,17 +94,17 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 
 ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImportSettings& settings)
 {
-	AssetInfo aInfo;
+	AssetInfo aInfo(settings);
 	aInfo.aType = AssetType::MESH;
-	aInfo.assetDirectory = (std::filesystem::path(settings.targetDirectory) / aInfo.name).generic_string();
+	aInfo.assetDirectory = (std::filesystem::path(settings.assetDirectory) / aInfo.name).generic_string();
 	return AssetLoader<MeshCollection>::import(fileLocation, aInfo);
 }
 
 ResourceWrapper<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, const ModelImportSettings& settings)
 {
-	AssetInfo aInfo;
+	AssetInfo aInfo(settings);
 	aInfo.aType = AssetType::MESH;
-	aInfo.assetDirectory = (std::filesystem::path(settings.targetDirectory) / aInfo.name).generic_string();
+	aInfo.assetDirectory = (std::filesystem::path(settings.assetDirectory) / aInfo.name).generic_string();
 	return AssetLoader<MeshCollection>::loadTransient(fileLocation, aInfo);
 }
 
