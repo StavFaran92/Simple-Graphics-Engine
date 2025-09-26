@@ -85,8 +85,8 @@ public:
 	const std::string& getSourceCode() const;
 
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient = false);
-	static ResourceWrapper<Shader> import(const std::string& fileLocation, const ShaderAssetDescriptor& settings = {});
-	static ResourceWrapper<Shader> loadTransient(const std::string& fileLocation, const ShaderAssetDescriptor& settings = {});
+	static ResourceWrapper<Shader> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
+	static ResourceWrapper<Shader> loadTransient(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);
 	static std::string getShaderOverrideAsStr(ShaderOverride shaderOverride);

@@ -553,20 +553,17 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	return shader;
 }
 
-ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, const ShaderAssetDescriptor& settings)
+ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, ShaderAssetDescriptor desc)
 {
-	AssetInfo aInfo(settings);
-	aInfo.aType = AssetType::SHADER;
-	//aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(settings.shaderOverride);
+	desc.aType = AssetType::SHADER;
+	AssetInfo aInfo(desc);
 	return AssetLoader<Shader>::import(fileLocation, aInfo);
 }
 
-ResourceWrapper<Shader> Shader::loadTransient(const std::string& fileLocation, const ShaderAssetDescriptor& settings)
+ResourceWrapper<Shader> Shader::loadTransient(const std::string& fileLocation, ShaderAssetDescriptor desc)
 {
-	AssetInfo aInfo(settings);
-	aInfo.aType = AssetType::SHADER;
-	//aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(settings.shaderOverride);
-	return AssetLoader<Shader>::loadTransient(fileLocation, aInfo);
+	desc.aType = AssetType::SHADER;
+	return AssetLoader<Shader>::loadTransient(fileLocation, desc);
 }
 
 //Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)

@@ -103,16 +103,14 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-ResourceWrapper<Animation> Animation::import(const std::string& fileLocation, const AnimationImportSettings& settings)
+ResourceWrapper<Animation> Animation::import(const std::string& fileLocation, AnimationImportSettings desc)
 {
-	AssetInfo aInfo;
-	aInfo.aType = AssetType::ANIMATION;
-	return AssetLoader<Animation>::import(fileLocation, aInfo);
+	desc.aType = AssetType::ANIMATION;
+	return AssetLoader<Animation>::import(fileLocation, desc);
 }
 
-ResourceWrapper<Animation> Animation::loadTransient(const std::string& fileLocation, const AnimationImportSettings& settings)
+ResourceWrapper<Animation> Animation::loadTransient(const std::string& fileLocation, AnimationImportSettings desc)
 {
-	AssetInfo aInfo;
-	aInfo.aType = AssetType::ANIMATION;
-	return AssetLoader<Animation>::loadTransient(fileLocation, aInfo);
+	desc.aType = AssetType::ANIMATION;
+	return AssetLoader<Animation>::loadTransient(fileLocation, desc);
 }

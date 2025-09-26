@@ -60,13 +60,31 @@ struct AssetInfo : public AssetDescriptor
 			return;
 		}
 
-		if (!filePathHint.empty())
+		if (!origFilePath.empty())
 		{
-			ext = std::filesystem::path(filePathHint).extension().string();
+			auto& path = std::filesystem::path(origFilePath);
+
+			// Extract Name
+			if (name.empty())
+			{
+				name = path.filename().stem().string();
+			}
+			ext = path.extension().string();
+			fileName = path.filename().string();
+		}
+
+		if (name.empty())
+		{
+			name = uuid::generate_uuid_v4();
 		}
 
 		if (ext.empty())
 		{
+			if (!filePathHint.empty())
+			{
+				ext = std::filesystem::path(filePathHint).extension().string();
+			}
+
 			ext = getExtensionFromType(aType);
 
 			if (ext.empty())
@@ -76,10 +94,7 @@ struct AssetInfo : public AssetDescriptor
 			}
 		}
 
-		if (name.empty())
-		{
-			name = uuid::generate_uuid_v4();
-		}
+		
 
 		fileName = name + ext;
 

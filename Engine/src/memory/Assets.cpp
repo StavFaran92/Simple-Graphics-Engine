@@ -78,7 +78,7 @@ void Assets::addAsset(const AssetDescriptor& assetDesc)
 		logError("Invalid asset type specified!");
 		return;
 	}
-	if (!aInfo.isTransient && !aInfo.filePath.empty())
+	if (!aInfo.isTransient && aInfo.filePath.empty())
 	{
 		logError("Non transient asset must have a file path specified.");
 		return;

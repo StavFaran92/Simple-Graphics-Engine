@@ -276,9 +276,9 @@ public:
 
 	static ResourceWrapper<Texture> importTexture3D(const std::string& fileLocation);
 
-	static ResourceWrapper<Texture> import(const std::string& fileLocation, const TextureAssetDescriptor & = {});
+	static ResourceWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
 
-	static ResourceWrapper<Texture> loadTransient(const std::string& fileLocation, const TextureAssetDescriptor& settings = {});
+	static ResourceWrapper<Texture> loadTransient(const std::string& fileLocation, TextureAssetDescriptor settings = {});
 
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);
 

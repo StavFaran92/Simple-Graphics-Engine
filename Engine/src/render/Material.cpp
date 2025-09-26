@@ -140,19 +140,16 @@ void Material::setTextureInShader(ResourceWrapper<Shader>& shader, Texture::Text
 	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
 }
 
-ResourceWrapper<Material> Material::import(const std::string& fileLocation, const MaterialImportSettings& settings)
+ResourceWrapper<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
 {
-	AssetInfo aInfo;
-	aInfo.aType = AssetType::MATERIAL;
-	return AssetLoader<Material>::import(fileLocation, aInfo);
+	desc.aType = AssetType::MATERIAL;
+	return AssetLoader<Material>::import(fileLocation, desc);
 }
 
-ResourceWrapper<Material> Material::loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings)
+ResourceWrapper<Material> Material::loadTransient(const std::string& fileLocation, MaterialImportSettings desc)
 {
-	AssetInfo aInfo;
-	aInfo.aType = AssetType::MATERIAL;
-	aInfo.isTransient = true;
-	return AssetLoader<Material>::loadTransient(fileLocation, aInfo);
+	desc.aType = AssetType::MATERIAL;
+	return AssetLoader<Material>::loadTransient(fileLocation, desc);
 }
 
 ResourceWrapper<Material> Material::create(AssetDescriptor& aDesc)

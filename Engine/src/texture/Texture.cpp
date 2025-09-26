@@ -316,11 +316,10 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 }
 
-ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureAssetDescriptor& settings/* = {}*/)
+ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, TextureAssetDescriptor desc/* = {}*/)
 {
-	AssetInfo aInfo(settings);
-	aInfo.aType = AssetType::TEXTURE;
-	return AssetLoader<Texture>::loadTransient(fileLocation, aInfo);
+	desc.aType = AssetType::TEXTURE;
+	return AssetLoader<Texture>::loadTransient(fileLocation, desc);
 }
 
 Texture::~Texture()
@@ -345,23 +344,10 @@ void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Te
 		texture.get()->getWidth() * texture.get()->getBitDepth());
 }
 
-ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, const TextureAssetDescriptor& settings)
+ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
 {
-	AssetInfo aInfo;
-	aInfo.aType = AssetType::TEXTURE;
-	aInfo.ext = std::filesystem::path(fileLocation).extension().string();
-	aInfo.fileName = aInfo.name + aInfo.ext;
-
-	//Texture::TextureAssetAttributes attributes;
-	//attributes.flip = settings.flip;
-	//attributes.genMipMap = settings.genMipMap;
-	//attributes.isHDR = AssetTraits<Texture>::isHDRImage(fileLocation);
-	//attributes.params = settings.params;
-
-	//aInfo.attributes = attributes.toMap();
-	aInfo.importSettings = settings;
-
-	return AssetLoader<Texture>::import(fileLocation, aInfo);
+	desc.aType = AssetType::TEXTURE;
+	return AssetLoader<Texture>::import(fileLocation, desc);
 }
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)

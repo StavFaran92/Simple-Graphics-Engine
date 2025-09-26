@@ -55,8 +55,8 @@ public:
 		SERIALIZED_MEMBER(opacityFactor);
 	}
 
-	static ResourceWrapper<Material> import(const std::string& fileLocation, const MaterialImportSettings& settings = {});
-	static ResourceWrapper<Material> loadTransient(const std::string& fileLocation, const MaterialImportSettings& settings = {});
+	static ResourceWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
+	static ResourceWrapper<Material> loadTransient(const std::string& fileLocation, MaterialImportSettings settings = {});
 	static ResourceWrapper<Material> create(AssetDescriptor& aDesc);
 	static void save(const ResourceWrapper<Material>& material);
 
