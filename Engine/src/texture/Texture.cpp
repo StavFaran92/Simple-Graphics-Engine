@@ -75,7 +75,12 @@ struct AssetTraits<Texture>
 		Texture::TextureData textureData;
 
 		// extract texture build data
-		Texture::TextureAssetDescriptor settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
+		Texture::TextureAssetDescriptor settings{};
+
+		if (aInfo.importSettings.is_object() && !aInfo.importSettings.empty()) 
+		{
+			settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
+		}
 		Texture::extractTextureDataFromSettings(settings, textureData);
 		extractTextureDataFromFile(filepath, textureData);
 
