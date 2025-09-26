@@ -13,6 +13,10 @@
 
 #include "glm/glm.hpp"
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 enum class ShaderOverride : int
 {
 	None,
@@ -29,10 +33,18 @@ template<typename> class AssetTraits;
 
 using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned int, glm::mat3, glm::mat4>;
 
-struct ShaderLoadParams : public AssetDescriptor
+struct ShaderAssetDescriptor : public AssetDescriptor
 {
 	ShaderOverride shaderOverride;
-	bool isTransient = false;
+
+	json fillParams() const override
+	{
+		return *this;
+	}
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(ShaderAssetDescriptor,
+		shaderOverride
+	);
 };
 
 class EngineAPI Shader : public ResourceBase, std::enable_shared_from_this<Shader>
@@ -73,8 +85,8 @@ public:
 	const std::string& getSourceCode() const;
 
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient = false);
-	static ResourceWrapper<Shader> import(const std::string& fileLocation, const ShaderLoadParams& settings = {});
-	static ResourceWrapper<Shader> loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings = {});
+	static ResourceWrapper<Shader> import(const std::string& fileLocation, const ShaderAssetDescriptor& settings = {});
+	static ResourceWrapper<Shader> loadTransient(const std::string& fileLocation, const ShaderAssetDescriptor& settings = {});
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);
 	static std::string getShaderOverrideAsStr(ShaderOverride shaderOverride);

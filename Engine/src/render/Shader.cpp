@@ -33,8 +33,8 @@ struct AssetTraits<Shader>
 	static ResourceWrapper<Shader> load(AssetInfo& aInfo)
 	{
 		UUID uuid = aInfo.uuid;
-		std::string shaderOverrideStr = aInfo.attributes.at("shader_override");
-		ShaderOverride shaderOverride = Shader::getShaderOverrideFromStr(shaderOverrideStr);
+		ShaderAssetDescriptor params = aInfo.importSettings.get<ShaderAssetDescriptor>();
+		ShaderOverride shaderOverride = params.shaderOverride;
 		Shader* shaderPtr = new Shader();
 		Engine::get()->getMemoryPool().add(uuid, shaderPtr);
 		ResourceWrapper<Shader> shader(uuid);
@@ -553,21 +553,19 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	return shader;
 }
 
-ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, const ShaderLoadParams& settings)
+ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, const ShaderAssetDescriptor& settings)
 {
-	AssetInfo aInfo;
+	AssetInfo aInfo(settings);
 	aInfo.aType = AssetType::SHADER;
-	aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(settings.shaderOverride);
-	aInfo.isTransient = settings.isTransient;
+	//aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(settings.shaderOverride);
 	return AssetLoader<Shader>::import(fileLocation, aInfo);
 }
 
-ResourceWrapper<Shader> Shader::loadTransient(const std::string& fileLocation, const ShaderLoadParams& settings)
+ResourceWrapper<Shader> Shader::loadTransient(const std::string& fileLocation, const ShaderAssetDescriptor& settings)
 {
-	AssetInfo aInfo;
+	AssetInfo aInfo(settings);
 	aInfo.aType = AssetType::SHADER;
-	aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(settings.shaderOverride);
-	aInfo.isTransient = settings.isTransient;
+	//aInfo.attributes["shader_override"] = Shader::getShaderOverrideAsStr(settings.shaderOverride);
 	return AssetLoader<Shader>::loadTransient(fileLocation, aInfo);
 }
 
