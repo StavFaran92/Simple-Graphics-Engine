@@ -319,10 +319,10 @@ void Texture::ClearTexture()
 ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, const TextureImportSettings& settings/* = {}*/)
 {
 	AssetInfo aInfo;
+	settings.fillAssetInfo(aInfo);
 	aInfo.aType = AssetType::TEXTURE;
 	aInfo.ext = std::filesystem::path(fileLocation).extension().string();
 	aInfo.fileName = aInfo.name + aInfo.ext;
-	aInfo.importSettings = settings;
 	return AssetLoader<Texture>::loadTransient(fileLocation, aInfo);
 }
 

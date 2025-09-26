@@ -17,14 +17,22 @@ struct BaseAssetParameters
 	std::string targetDirectory;
 	bool isTransient = false;
 
-	virtual ~BaseAssetParameters() = default;
+	void fillAssetInfo(AssetInfo& aInfo) const
+	{
+		if (!name.empty())
+		{
+			aInfo.name = name;
+		}
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(BaseAssetParameters,
-		name,
-		customUUID,
-		targetDirectory,
-		isTransient
-	);
+		aInfo.assetDirectory = targetDirectory;
+
+		aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
+
+		aInfo.importSettings = fillParams();
+	}
+	virtual json fillParams() const { return {}; };
+
+	virtual ~BaseAssetParameters() = default;
 };
 
 template<AssetType T>

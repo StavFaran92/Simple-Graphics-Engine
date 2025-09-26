@@ -150,7 +150,6 @@ ResourceWrapper<Material> Material::import(const std::string& fileLocation, cons
 {
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::MATERIAL;
-	aInfo.importSettings = settings;
 	return AssetLoader<Material>::import(fileLocation, aInfo);
 }
 
@@ -158,7 +157,6 @@ ResourceWrapper<Material> Material::loadTransient(const std::string& fileLocatio
 {
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::MATERIAL;
-	aInfo.importSettings = settings;
 	aInfo.isTransient = true;
 	return AssetLoader<Material>::loadTransient(fileLocation, aInfo);
 }

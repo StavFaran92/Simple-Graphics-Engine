@@ -139,6 +139,11 @@ public:
 		//bool isTransient = false;
 		std::map<int, int> params;
 
+		json fillParams() const override
+		{
+			return *this;
+		}
+
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(TextureImportSettings,
 			genMipMap,
 			flip,

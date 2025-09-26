@@ -97,7 +97,6 @@ ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLo
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::MESH;
 	aInfo.assetDirectory = (std::filesystem::path(settings.targetDirectory) / aInfo.name).generic_string();
-	aInfo.importSettings = settings;
 	return AssetLoader<MeshCollection>::import(fileLocation, aInfo);
 }
 
@@ -106,7 +105,6 @@ ResourceWrapper<MeshCollection> MeshCollection::loadTransient(const std::string&
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::MESH;
 	aInfo.assetDirectory = (std::filesystem::path(settings.targetDirectory) / aInfo.name).generic_string();
-	aInfo.importSettings = settings;
 	return AssetLoader<MeshCollection>::loadTransient(fileLocation, aInfo);
 }
 

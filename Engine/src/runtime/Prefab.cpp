@@ -73,7 +73,6 @@ ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, const Pr
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::PREFAB;
 	aInfo.fileName = aInfo.name + ".asset";;
-	aInfo.importSettings = settings;
 	return AssetLoader<Prefab>::import(fileLocation, aInfo);
 }
 
@@ -82,7 +81,6 @@ ResourceWrapper<Prefab> Prefab::loadTransient(const std::string& fileLocation, c
 	AssetInfo aInfo;
 	aInfo.aType = AssetType::PREFAB;
 	aInfo.fileName = aInfo.name + ".asset";;
-	aInfo.importSettings = settings;
 	aInfo.isTransient = true;
 	return AssetLoader<Prefab>::loadTransient(fileLocation, aInfo);
 }
