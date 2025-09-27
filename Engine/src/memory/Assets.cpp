@@ -91,7 +91,7 @@ void Assets::addAsset(const AssetDescriptor& assetDesc)
 
 	if (!aInfo.isTransient)
 	{
-		Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.name, aInfo.uuid); //TODO maybe use some naming convention here?
+		Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
 		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 	}
 
@@ -187,3 +187,7 @@ void Assets::updateAsset(const AssetDescriptor& assetDesc)
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 }
 
+UUID Assets::getAssetFromPath(const std::string& path) const
+{
+	return Engine::get()->getMemoryManagementSystem()->getAssociation(path);
+}

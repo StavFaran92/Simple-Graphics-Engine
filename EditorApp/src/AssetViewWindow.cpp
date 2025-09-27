@@ -127,7 +127,8 @@ void AssetViewWindow::display()
 					continue; // Skip unwanted files
 
 				
-				UUID uuid = (rel / filename).generic_string();
+				std::string relativeFilePath = (rel / filename).generic_string();
+				UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 				if (!assets->hasAsset(uuid)) continue;
 
 				ImGui::BeginGroup();
@@ -198,7 +199,8 @@ void AssetViewWindow::display()
 				
 				if (!fMetadata.isDirectory)
 				{
-					UUID uuid = (rel / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 					ImGui::TextUnformatted(aInfo.name.c_str());
 					ImGui::Separator();
@@ -222,7 +224,8 @@ void AssetViewWindow::display()
 			{
 				if (ImGui::Selectable("Open"))
 				{
-					UUID uuid = (rel / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 
 					if (aInfo.aType == AssetType::MATERIAL)
@@ -266,7 +269,8 @@ void AssetViewWindow::display()
 
 				if (!fMetadata.isDirectory)
 				{
-					UUID uuid = (rel / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 
 					if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))

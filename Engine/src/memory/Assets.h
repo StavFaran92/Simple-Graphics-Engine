@@ -140,6 +140,8 @@ public:
 
 	void loadAssetsDatabase();
 
+	UUID getAssetFromPath(const std::string& path) const;
+
 	AssetInfo getAsset(UUID uuid) const;
 
 	bool hasAsset(UUID uuid) const;

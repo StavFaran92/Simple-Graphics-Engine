@@ -169,7 +169,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 		{
 			auto& aMaterial = scene->mMaterials[i];
 
-			PrintMaterialProperties(aMaterial);
+			//PrintMaterialProperties(aMaterial);
 
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 
