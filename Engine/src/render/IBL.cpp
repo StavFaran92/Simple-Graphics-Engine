@@ -26,7 +26,9 @@
 
 ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> environmentMap, Scene* scene)
 {
-	auto irradianceShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/IrradianceShader.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	auto irradianceShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/IrradianceShader.glsl", aDesc);
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -97,7 +99,9 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 
 ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> environmentMap, Scene* scene)
 {
-	auto prefilterShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/IBLPrefilterShader.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	auto prefilterShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/IBLPrefilterShader.glsl", aDesc);
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -187,7 +191,9 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 
 ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 {
-	auto BRDFIntegrationShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/BRDFIntegrationShader.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	auto BRDFIntegrationShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/BRDFIntegrationShader.glsl", aDesc);
 
 	// Generate FBO 
 	FrameBufferObject fbo;

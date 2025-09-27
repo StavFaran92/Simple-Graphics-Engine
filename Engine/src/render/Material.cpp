@@ -147,13 +147,6 @@ ResourceWrapper<Material> Material::import(const std::string& fileLocation, Mate
 	return AssetLoader<Material>::import(fileLocation, desc.parse());
 }
 
-ResourceWrapper<Material> Material::loadTransient(const std::string& fileLocation, MaterialImportSettings desc)
-{
-	desc.aType = AssetType::MATERIAL;
-	desc.origFilePath = fileLocation;
-	return AssetLoader<Material>::loadTransient(fileLocation, desc.parse());
-}
-
 ResourceWrapper<Material> Material::create(AssetDescriptor& aDesc)
 {
 	aDesc.aType = AssetType::MATERIAL;

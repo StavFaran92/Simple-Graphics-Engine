@@ -20,7 +20,9 @@ Entity Terrain::createTerrain(int width, int height, float scale, ResourceWrappe
 	auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
 	terrainComponent.m_textureCount = 1;
 
-	auto& grassTexture = Texture::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
+	Texture::TextureAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	auto& grassTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg", aDesc);
 	terrainComponent.setTexture(0, grassTexture);
 
 	terrainEntity.addComponent<Terrain>(terrainComponent);

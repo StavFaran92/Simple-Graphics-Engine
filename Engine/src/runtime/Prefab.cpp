@@ -75,13 +75,6 @@ ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabIm
 	return AssetLoader<Prefab>::import(fileLocation, desc.parse());
 }
 
-ResourceWrapper<Prefab> Prefab::loadTransient(const std::string& fileLocation, PrefabImportSettings desc)
-{
-	desc.aType = AssetType::PREFAB;
-	desc.origFilePath = fileLocation;
-	return AssetLoader<Prefab>::loadTransient(fileLocation, desc.parse());
-}
-
 void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)
 {
 	prefab->m_serializedPrefab.push_back(Archiver::serializeEntity(e));

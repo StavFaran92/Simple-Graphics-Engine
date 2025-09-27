@@ -321,13 +321,6 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 }
 
-ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, TextureAssetDescriptor desc/* = {}*/)
-{
-	desc.aType = AssetType::TEXTURE;
-	desc.origFilePath = fileLocation;
-	return AssetLoader<Texture>::loadTransient(fileLocation, desc.parse());
-}
-
 Texture::~Texture()
 {
 	ClearTexture();

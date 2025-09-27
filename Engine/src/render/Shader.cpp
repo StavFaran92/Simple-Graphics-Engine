@@ -560,13 +560,6 @@ ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, ShaderAs
 	return AssetLoader<Shader>::import(fileLocation, desc.parse());
 }
 
-ResourceWrapper<Shader> Shader::loadTransient(const std::string& fileLocation, ShaderAssetDescriptor desc)
-{
-	desc.aType = AssetType::SHADER;
-	desc.origFilePath = fileLocation;
-	return AssetLoader<Shader>::loadTransient(fileLocation, desc.parse());
-}
-
 //Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)
 //{
 //	shader->m_isShaderOverride = true;

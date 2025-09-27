@@ -55,7 +55,8 @@ BuiltInMeshes::BuiltInMeshes()
 	{
 		ModelImportSettings settings;
 		settings.customUUID = "SGE_MESH_CAMERA";
-		ResourceWrapper<MeshCollection> meshCollection = MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings);
+		settings.isTransient = true;
+		ResourceWrapper<MeshCollection> meshCollection = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings);
 		addAsAsset(meshCollection);
 		m_meshes[MeshType::CAMERA] = meshCollection;
 	}

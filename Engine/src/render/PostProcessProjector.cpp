@@ -75,7 +75,9 @@ bool PostProcessProjector::init(int windowWidth, int windowHeight)
 	m_quad = ScreenQuad::GenerateScreenQuad(&m_scene->getRegistry());
 	
 	// Generate screen shader
-	m_screenShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_default.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	m_screenShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_default.glsl", aDesc);
 
 	// Generate screen renderer
 	m_renderer = std::make_shared<Renderer2D>();

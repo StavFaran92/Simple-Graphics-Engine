@@ -65,7 +65,9 @@ bool PhysicsSystem::init()
 
     m_defaultMaterial = m_physics->createMaterial(0.5f, 0.5f, 0.1f);
 
-    m_debugVisualizeShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl");
+    ShaderAssetDescriptor aDesc;
+    aDesc.isTransient = true;
+    m_debugVisualizeShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl", aDesc);
 
     m_isInit = true;
 

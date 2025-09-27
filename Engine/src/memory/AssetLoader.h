@@ -21,30 +21,38 @@ public:
 			return ResourceWrapper<T>::empty;
 		}
 
-		//aDesc.origFilePath = fileLocation;
-		//AssetInfo aInfo(aDesc);
-
-		std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
-
-		// Copy + Paste
-		if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
+		if (!aInfo.isTransient)
 		{
-			logError("Failed to copy file from {} to resource folder", fileLocation);
-			return ResourceWrapper<T>::empty;
+			std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
+
+			// Copy + Paste
+			if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
+			{
+				logError("Failed to copy file from {} to resource folder", fileLocation);
+				return ResourceWrapper<T>::empty;
+			}
+		}
+		else
+		{
+			aInfo.filePath = fileLocation;
 		}
 
 		// Load
-		aInfo.data = AssetTraits<T>::load(aInfo);
-		if (aInfo.data.isEmpty())
+		ResourceWrapper<T> asset = AssetTraits<T>::load(aInfo);
+		if (asset.isEmpty() || !asset.get())
 		{
 			logError("Failed to load file {}", fileLocation);
 			return ResourceWrapper<T>::empty;
 		}
 
+		aInfo.data = asset;
+
 		// Add Asset
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
-		return aInfo.data.as<T>();
+		return asset;
+
+		
 	}
 
 	static ResourceWrapper<T> loadTransient(const std::string& fileLocation, AssetInfo& aInfo)

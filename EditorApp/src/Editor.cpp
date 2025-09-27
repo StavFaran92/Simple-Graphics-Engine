@@ -1410,13 +1410,14 @@ public:
 		
 
 		Texture::TextureAssetDescriptor settings;
-		icons["mesh"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
-		icons["texture"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
-		icons["animation"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);
-		icons["shader"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-100.png", settings);
-		icons["folder"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
-		icons["prefab"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png", settings);
-		icons["material"] = Texture::loadTransient(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-material-100.png", settings);
+		settings.isTransient = true;
+		icons["mesh"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
+		icons["texture"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
+		icons["animation"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);
+		icons["shader"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-100.png", settings);
+		icons["folder"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
+		icons["prefab"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png", settings);
+		icons["material"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-material-100.png", settings);
 	}
 
 	void update(float deltaTime) override

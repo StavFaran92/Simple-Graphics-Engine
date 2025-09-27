@@ -12,8 +12,10 @@ DebugHelper::DebugHelper()
 {
 	m_vao = std::make_shared<VertexArrayObject>();
 
-	m_pointShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/PointDebugShader.glsl");
-	m_lineShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/LineDebugShader.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	m_pointShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PointDebugShader.glsl", aDesc);
+	m_lineShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/LineDebugShader.glsl", aDesc);
 }
 
 

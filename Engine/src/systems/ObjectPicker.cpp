@@ -35,7 +35,9 @@ ObjectPicker::ObjectPicker()
 
 bool ObjectPicker::init()
 {
-	m_pickingShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	m_pickingShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl", aDesc);
 
 	m_frameBuffer = std::make_shared<FrameBufferObject>();
 

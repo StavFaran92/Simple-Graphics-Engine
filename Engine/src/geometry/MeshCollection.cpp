@@ -100,14 +100,6 @@ ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLo
 	return AssetLoader<MeshCollection>::import(fileLocation, desc.parse());
 }
 
-ResourceWrapper<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, ModelImportSettings desc)
-{
-	desc.aType = AssetType::MESH;
-	desc.assetDirectory = std::filesystem::path(fileLocation).filename().stem().generic_string();
-	desc.origFilePath = fileLocation;
-	return AssetLoader<MeshCollection>::loadTransient(fileLocation, desc.parse());
-}
-
 std::map<int, ResourceWrapper<Material>> MeshCollection::getLastLoadedMaterials()
 {
 	return AssetTraits<MeshCollection>::getLoadedMaterials();

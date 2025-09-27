@@ -22,12 +22,14 @@ FoliageSystem::FoliageSystem()
 
 bool FoliageSystem::init()
 {
-	m_foliageShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
-	m_foliageQuadShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	m_foliageShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl", aDesc);
+	m_foliageQuadShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl", aDesc);
 
 	ModelImportSettings settings;
 	settings.isTransient = true;
-	m_grassBlade = MeshCollection::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings);;
+	m_grassBlade = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings);;
 
 	glGenBuffers(1, &m_frustumUBO);
 
@@ -60,7 +62,8 @@ bool FoliageSystem::init()
 	{
 		Texture::TextureAssetDescriptor tSettings;
 		tSettings.flip = true;
-		grassTexture = Texture::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
+		tSettings.isTransient = true;
+		grassTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
 	}
 
 	{
@@ -69,7 +72,8 @@ bool FoliageSystem::init()
 		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-		windNoise = Texture::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings);
+		noiseSettings.isTransient = true;
+		windNoise = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings);
 	}
 
 	{
@@ -78,7 +82,8 @@ bool FoliageSystem::init()
 		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-		noiseTexture = Texture::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
+		noiseSettings.isTransient = true;
+		noiseTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
 	}
 
 	return true;

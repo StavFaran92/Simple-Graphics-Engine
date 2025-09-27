@@ -35,7 +35,7 @@ using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned
 
 struct ShaderAssetDescriptor : public AssetDescriptor
 {
-	ShaderOverride shaderOverride;
+	ShaderOverride shaderOverride = ShaderOverride::None;
 
 	json fillParams() const override
 	{
@@ -86,7 +86,6 @@ public:
 
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient = false);
 	static ResourceWrapper<Shader> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
-	static ResourceWrapper<Shader> loadTransient(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);
 	static std::string getShaderOverrideAsStr(ShaderOverride shaderOverride);

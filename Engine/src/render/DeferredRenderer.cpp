@@ -74,9 +74,10 @@ bool DeferredRenderer::setupGBuffer()
 
 	m_gBuffer.unbind();
 
-	m_gBufferShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
-
-	m_lightPassShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	m_gBufferShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl", aDesc);
+	m_lightPassShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl", aDesc);
 
 	return true;
 }
@@ -145,7 +146,9 @@ bool DeferredRenderer::setupSSAO()
 
 	m_ssaoFBO.unbind();
 
-	m_ssaoPassShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
+	ShaderAssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	m_ssaoPassShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl", aDesc);
 
 	// Initialize SSAO Blur
 	m_ssaoBlurFBO.bind();
@@ -164,7 +167,7 @@ bool DeferredRenderer::setupSSAO()
 
 	m_ssaoBlurFBO.unbind();
 
-	m_ssaoBlurPassShader = Shader::loadTransient(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOBlurPassShader.glsl");
+	m_ssaoBlurPassShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOBlurPassShader.glsl", aDesc);
 
 	DebugHelper::getInstance().registerTextureForDebug("SSAO Color", m_ssaoBlurColorBuffer);
 

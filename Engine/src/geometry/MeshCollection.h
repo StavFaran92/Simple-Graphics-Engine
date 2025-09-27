@@ -27,8 +27,6 @@ public:
 
 	static ResourceWrapper<MeshCollection> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
 
-	static ResourceWrapper<MeshCollection> loadTransient(const std::string& fileLocation, ModelImportSettings aDesc = {});
-
 	static std::map<int, ResourceWrapper<Material>> getLastLoadedMaterials();
 	
 

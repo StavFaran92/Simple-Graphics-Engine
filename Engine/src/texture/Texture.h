@@ -278,8 +278,6 @@ public:
 
 	static ResourceWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
 
-	static ResourceWrapper<Texture> loadTransient(const std::string& fileLocation, TextureAssetDescriptor settings = {});
-
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);
 
 	/**  Destructor */
