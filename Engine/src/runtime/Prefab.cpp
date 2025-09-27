@@ -71,13 +71,15 @@ static AssetFnRegister<AssetType::PREFAB> assetRegister(AssetTraits<Prefab>::loa
 ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabImportSettings desc)
 {
 	desc.aType = AssetType::PREFAB;
-	return AssetLoader<Prefab>::import(fileLocation, desc);
+	desc.origFilePath = fileLocation;
+	return AssetLoader<Prefab>::import(fileLocation, desc.parse());
 }
 
 ResourceWrapper<Prefab> Prefab::loadTransient(const std::string& fileLocation, PrefabImportSettings desc)
 {
 	desc.aType = AssetType::PREFAB;
-	return AssetLoader<Prefab>::loadTransient(fileLocation, desc);
+	desc.origFilePath = fileLocation;
+	return AssetLoader<Prefab>::loadTransient(fileLocation, desc.parse());
 }
 
 void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)

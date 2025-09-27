@@ -20,6 +20,11 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
+AssetInfo AssetDescriptor::parse()
+{
+	return AssetInfo(*this);
+}
+
 void Assets::importAsset(const AssetDescriptor& assetDesc)
 {
 	AssetInfo aInfo(assetDesc);

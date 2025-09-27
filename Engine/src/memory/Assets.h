@@ -14,6 +14,8 @@
 using json = nlohmann::json;
 using namespace nlohmann::literals;
 
+struct AssetInfo;
+
 struct AssetDescriptor
 {
 public:
@@ -30,6 +32,8 @@ public:
 	mutable ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
 
 	virtual json fillParams() const { return {}; }
+
+	AssetInfo parse();
 	
 	//timestamp
 	//size

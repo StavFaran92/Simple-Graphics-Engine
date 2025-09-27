@@ -324,7 +324,8 @@ void Texture::ClearTexture()
 ResourceWrapper<Texture> Texture::loadTransient(const std::string& fileLocation, TextureAssetDescriptor desc/* = {}*/)
 {
 	desc.aType = AssetType::TEXTURE;
-	return AssetLoader<Texture>::loadTransient(fileLocation, desc);
+	desc.origFilePath = fileLocation;
+	return AssetLoader<Texture>::loadTransient(fileLocation, desc.parse());
 }
 
 Texture::~Texture()
@@ -352,7 +353,8 @@ void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Te
 ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
-	return AssetLoader<Texture>::import(fileLocation, desc);
+	desc.origFilePath = fileLocation;
+	return AssetLoader<Texture>::import(fileLocation, desc.parse());
 }
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)

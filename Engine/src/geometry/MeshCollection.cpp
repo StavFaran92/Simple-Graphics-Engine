@@ -92,18 +92,20 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 	return m_bonesNameToIDMap.at(boneName);
 }
 
-ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, ModelImportSettings aDesc)
+ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, ModelImportSettings desc)
 {
-	aDesc.aType = AssetType::MESH;
-	aDesc.assetDirectory = std::filesystem::path(fileLocation).filename().stem().generic_string();
-	return AssetLoader<MeshCollection>::import(fileLocation, aDesc);
+	desc.aType = AssetType::MESH;
+	desc.assetDirectory = std::filesystem::path(fileLocation).filename().stem().generic_string();
+	desc.origFilePath = fileLocation;
+	return AssetLoader<MeshCollection>::import(fileLocation, desc.parse());
 }
 
-ResourceWrapper<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, ModelImportSettings aDesc)
+ResourceWrapper<MeshCollection> MeshCollection::loadTransient(const std::string& fileLocation, ModelImportSettings desc)
 {
-	aDesc.aType = AssetType::MESH;
-	aDesc.assetDirectory = (std::filesystem::path(aDesc.assetDirectory) / aDesc.name).generic_string();
-	return AssetLoader<MeshCollection>::loadTransient(fileLocation, aDesc);
+	desc.aType = AssetType::MESH;
+	desc.assetDirectory = std::filesystem::path(fileLocation).filename().stem().generic_string();
+	desc.origFilePath = fileLocation;
+	return AssetLoader<MeshCollection>::loadTransient(fileLocation, desc.parse());
 }
 
 std::map<int, ResourceWrapper<Material>> MeshCollection::getLastLoadedMaterials()

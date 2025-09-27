@@ -143,13 +143,15 @@ void Material::setTextureInShader(ResourceWrapper<Shader>& shader, Texture::Text
 ResourceWrapper<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
 {
 	desc.aType = AssetType::MATERIAL;
-	return AssetLoader<Material>::import(fileLocation, desc);
+	desc.origFilePath = fileLocation;
+	return AssetLoader<Material>::import(fileLocation, desc.parse());
 }
 
 ResourceWrapper<Material> Material::loadTransient(const std::string& fileLocation, MaterialImportSettings desc)
 {
 	desc.aType = AssetType::MATERIAL;
-	return AssetLoader<Material>::loadTransient(fileLocation, desc);
+	desc.origFilePath = fileLocation;
+	return AssetLoader<Material>::loadTransient(fileLocation, desc.parse());
 }
 
 ResourceWrapper<Material> Material::create(AssetDescriptor& aDesc)

@@ -12,7 +12,7 @@ template<typename T>
 class AssetLoader
 {
 public:
-	static ResourceWrapper<T> import(const std::string& fileLocation, AssetDescriptor& aDesc)
+	static ResourceWrapper<T> import(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		// Validate input
 		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -21,8 +21,8 @@ public:
 			return ResourceWrapper<T>::empty;
 		}
 
-		aDesc.origFilePath = fileLocation;
-		AssetInfo aInfo(aDesc);
+		//aDesc.origFilePath = fileLocation;
+		//AssetInfo aInfo(aDesc);
 
 		std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
 
@@ -47,7 +47,7 @@ public:
 		return aInfo.data.as<T>();
 	}
 
-	static ResourceWrapper<T> loadTransient(const std::string& fileLocation, AssetDescriptor& aDesc)
+	static ResourceWrapper<T> loadTransient(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		// Validate input
 		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -56,8 +56,8 @@ public:
 			return ResourceWrapper<T>::empty;
 		}
 
-		aDesc.origFilePath = fileLocation;
-		AssetInfo aInfo(aDesc);
+		//aDesc.origFilePath = fileLocation;
+		//AssetInfo aInfo(aDesc);
 		aInfo.isTransient = true;
 		aInfo.filePath = fileLocation;
 
