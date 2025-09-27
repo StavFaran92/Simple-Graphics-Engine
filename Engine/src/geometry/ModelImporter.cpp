@@ -534,15 +534,13 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 			tData.textureName = uuid::generate_uuid_v4();
 		}
 
-		UUID uuid = aInfo.assetDirectory + "/" + tData.textureName + ".png";
-
-		if (cachedTextures.find(uuid) != cachedTextures.end())
+		if (cachedTextures.find(tData.textureName) != cachedTextures.end())
 		{
 			// Already loaded
-			return cachedTextures[uuid];
+			return cachedTextures[tData.textureName];
 		}
 
-		texture = Factory<Texture>::createUsingCustomUUID(uuid);
+		texture = Factory<Texture>::create();
 		texture.get()->build(tData);
 
 		auto& projectDir = Engine::get()->getProjectDirectory();
@@ -550,7 +548,6 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		Texture::writeTexture2D(savedFilePath, texture);
 
 		AssetDescriptor textureAssetDesc;
-		textureAssetDesc.customUUID = texture.getUID();
 		textureAssetDesc.aType = AssetType::TEXTURE;
 		textureAssetDesc.name = tData.textureName;
 		textureAssetDesc.isTransient = false;
@@ -562,7 +559,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 
 		//texture.get()->m_assetInfo = aInfo;
 
-		cachedTextures.insert({ uuid, texture });
+		cachedTextures.insert({ tData.textureName, texture });
 	}	
 	else
 	{

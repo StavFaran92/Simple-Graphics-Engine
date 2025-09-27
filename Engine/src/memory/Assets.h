@@ -73,9 +73,18 @@ struct AssetInfo : public AssetDescriptor
 			fileName = path.filename().string();
 		}
 
+		if (!customUUID.empty())
+		{
+			uuid = customUUID;
+		}
+		else
+		{
+			uuid = uuid::generate_uuid_v4();
+		}
+
 		if (name.empty())
 		{
-			name = uuid::generate_uuid_v4();
+			name = uuid;
 		}
 
 		if (ext.empty())
@@ -104,15 +113,6 @@ struct AssetInfo : public AssetDescriptor
 			filePath += assetDirectory + "/";
 		}
 		filePath += fileName;
-
-		if (!customUUID.empty())
-		{
-			uuid = customUUID;
-		}
-		else
-		{
-			uuid = filePath;
-		}
 	}
 
 private:
