@@ -1,11 +1,15 @@
 #include "systems/BuiltInMaterials.h"
 
+#include "core/Factory.h"
+
 BuiltInMaterials::BuiltInMaterials()
 {
-	AssetDescriptor aInfo;
-	aInfo.isTransient = true;
-	aInfo.name = "SGE_MATERIAL_DEFAULT";
-	m_defaultMaterial = Material::create(aInfo);
+	AssetDescriptor aDesc;
+	aDesc.isTransient = true;
+	aDesc.name = "SGE_MATERIAL_DEFAULT";
+	aDesc.aType = AssetType::MATERIAL;
+	m_defaultMaterial = Factory<Material>::createUsingCustomUUID(aDesc.name);
+	Engine::get()->getSubSystem<Assets>()->addAsset(aDesc.parse());
 }
 
 ResourceWrapper<Material> BuiltInMaterials::getMaterial(const std::string& material)

@@ -48,7 +48,7 @@ struct AssetTraits<Material>
 		return ResourceWrapper<Material>::empty;
 	}
 
-	static void save(AssetInfo& aInfo, const ResourceWrapper<Material>& mat)
+	static void save(const ResourceWrapper<Material>& mat, AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
 		std::ofstream os(projectDir + "/" + aInfo.filePath);
@@ -147,17 +147,14 @@ ResourceWrapper<Material> Material::import(const std::string& fileLocation, Mate
 	return AssetLoader<Material>::import(fileLocation, desc.parse());
 }
 
-ResourceWrapper<Material> Material::create(AssetDescriptor& aDesc)
+ResourceWrapper<Material> Material::create()
 {
-	aDesc.aType = AssetType::MATERIAL;
-	//aInfo.ext = ".asset";
-
-	return AssetLoader<Material>::create(aDesc);
+	return Factory<Material>::create();
 }
 
-void Material::save(const ResourceWrapper<Material>& material)
+void Material::save(const ResourceWrapper<Material>& material, AssetInfo aInfo)
 {
-	AssetLoader<Material>::save(material.get()->m_assetInfo, material);
+	AssetLoader<Material>::save(material, aInfo);
 }
 
 void Material::setTexturesInShader(ResourceWrapper<Shader>& shader)
@@ -203,10 +200,10 @@ std::vector<ResourceWrapper<Texture>> Material::getAllTextures() const
 
 ResourceWrapper<Material> Material::clone(bool isTransient) const
 {
-	AssetDescriptor clonedAssetInfo;
-	clonedAssetInfo.attributes = m_assetInfo.attributes;
-	clonedAssetInfo.isTransient = isTransient;
-	auto newMaterial = Material::create(clonedAssetInfo); // tODO rethink this
+	//AssetDescriptor clonedAssetInfo;
+	//clonedAssetInfo.attributes = m_assetInfo.attributes;
+	//clonedAssetInfo.isTransient = isTransient;
+	auto newMaterial = Material::create(); // tODO rethink this
 
 	for (const auto& sampler : m_samplers)
 	{

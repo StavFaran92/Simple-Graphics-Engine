@@ -144,7 +144,7 @@ void ProjectAssetRegistry::updateAssetRegistry(const AssetInfo& asset)
 
 void ProjectAssetRegistry::addAssociation(std::string name, UUID uuid)
 {
-	m_assetRegistry["association"].push_back({ name, uuid });
+	m_assetRegistry["association"][name] = uuid;
 	sync();
 }
 

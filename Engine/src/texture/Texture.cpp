@@ -150,7 +150,7 @@ struct AssetTraits<Texture>
 		return stbi_is_hdr(filename.c_str());
 	}
 
-	static void save(AssetInfo& aInfo, const ResourceWrapper<Texture>& texture)
+	static void save(const ResourceWrapper<Texture>& texture, AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
 		std::string fileLocation = projectDir + "/" + aInfo.filePath;
@@ -378,7 +378,7 @@ void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> tex
 	aInfo.name = name;
 	aInfo.filePathHint = relativeFilepath;
 	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
 }
 
 void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData)

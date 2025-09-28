@@ -12,7 +12,8 @@ class EngineAPI Prefab : public ResourceBase
 {
 public:
 	static ResourceWrapper<Prefab> import(const std::string& fileLocation, PrefabImportSettings desc);
-	static ResourceWrapper<Prefab> create(const Entity& e, const AssetDescriptor& aDesc);
+	static ResourceWrapper<Prefab> create(const Entity& e);
+	static void save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo);
 
 	void Instansiate();
 

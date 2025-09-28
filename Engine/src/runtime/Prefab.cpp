@@ -49,7 +49,7 @@ struct AssetTraits<Prefab>
 		return ResourceWrapper<Prefab>::empty;
 	}
 
-	static void save(AssetInfo& aInfo, const ResourceWrapper<Prefab>& prefab)
+	static void save(const ResourceWrapper<Prefab>& prefab, AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
 		std::ofstream os(projectDir + aInfo.filePath);
@@ -75,6 +75,11 @@ ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabIm
 	return AssetLoader<Prefab>::import(fileLocation, desc.parse());
 }
 
+void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo)
+{
+	AssetLoader<Prefab>::save(prefab, aInfo);
+}
+
 void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)
 {
 	prefab->m_serializedPrefab.push_back(Archiver::serializeEntity(e));
@@ -88,18 +93,18 @@ void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& 
 	}
 }
 
-ResourceWrapper<Prefab> Prefab::create(const Entity& e, const AssetDescriptor& aDesc)
+ResourceWrapper<Prefab> Prefab::create(const Entity& e)
 {
-	AssetInfo aInfo(aDesc);
+	//AssetInfo aInfo(aDesc);
 
-	aInfo.aType = AssetType::PREFAB;
-	aInfo.ext = ".asset";
+	//aInfo.aType = AssetType::PREFAB;
+	//aInfo.ext = ".asset";
 
-	ResourceWrapper<Prefab> prefab = AssetLoader<Prefab>::create(aInfo);
+	ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
 
 	extractChildrenRecursive(e, prefab);
 
-	AssetLoader<Prefab>::save(aInfo, prefab);
+	//AssetLoader<Prefab>::save(prefab, aInfo.parse());
 
 	return prefab;
 }

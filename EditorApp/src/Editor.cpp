@@ -413,9 +413,13 @@ void ShowModelCreatorWindow()
 		materialComponent.setMaterial(idx, m);
 	}
 
+	
+	ResourceWrapper<Prefab> prefab = Prefab::create(entity);
+
 	AssetDescriptor aInfo;
 	aInfo.name = modelName;
-	Prefab::create(entity, aInfo);
+	aInfo.aType = AssetType::PREFAB;
+	Prefab::save(prefab, aInfo);
 
 	entity.remove();
 
@@ -508,9 +512,13 @@ void displayEntityHelper(Entity& e)
 			{
 				std::string assetName = state.getSelectedEntity().getComponent<ObjectComponent>().name;
 
+				auto prefab = Prefab::create(state.getSelectedEntity());
+
 				AssetDescriptor aInfo;
 				aInfo.name = assetName;
-				auto prefab = Prefab::create(state.getSelectedEntity(), aInfo);
+				aInfo.aType = AssetType::PREFAB;
+				Prefab::save(prefab, aInfo.parse());
+
 			}
 
 			if (e.HasComponent<CameraComponent>())

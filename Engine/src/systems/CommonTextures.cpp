@@ -58,7 +58,7 @@ CommonTextures* CommonTextures::create()
 		aInfo.isTransient = true;
 		//aInfo.filePath = savedFileLocation;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
 	}
 
 	{
@@ -92,7 +92,7 @@ CommonTextures* CommonTextures::create()
 		aInfo.isTransient = true;
 		//aInfo.filePath = savedFileLocation;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
 	}
 
 	//Engine::get()->getSubSystem<Assets>()->importTexture2D("SGE_CUBEMAP_WHITE", [&]() {

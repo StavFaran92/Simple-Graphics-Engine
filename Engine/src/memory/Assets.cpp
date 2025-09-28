@@ -25,10 +25,8 @@ AssetInfo AssetDescriptor::parse()
 	return AssetInfo(*this);
 }
 
-void Assets::importAsset(const AssetDescriptor& assetDesc)
+void Assets::importAsset(AssetInfo& aInfo)
 {
-	AssetInfo aInfo(assetDesc);
-
 	auto& path = aInfo.origFilePath;
 
 	// Validate
@@ -74,10 +72,8 @@ void Assets::importAsset(const AssetDescriptor& assetDesc)
 	logInfo("Successfully imported asset: '" + path + "' into: '" + aInfo.name + "'.");
 }
 
-void Assets::addAsset(const AssetDescriptor& assetDesc)
+void Assets::addAsset(AssetInfo& aInfo)
 {
-	AssetInfo aInfo(assetDesc);
-
 	if (aInfo.aType == AssetType::NONE)
 	{
 		logError("Invalid asset type specified!");
@@ -178,12 +174,11 @@ std::string Assets::getAlias(UUID uid) const
 
 }
 
-void Assets::updateAsset(const AssetDescriptor& assetDesc)
+void Assets::updateAsset(AssetInfo& aInfo)
 {
-	AssetInfo aInfo(assetDesc);
-
 	if (!aInfo.isTransient)
 	{
+		Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
 		Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
 	}
 

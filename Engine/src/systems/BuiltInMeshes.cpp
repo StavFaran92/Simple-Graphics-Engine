@@ -16,7 +16,7 @@ void addAsAsset(const ResourceWrapper<MeshCollection>& meshCollection)
 	aInfo.aType = AssetType::MESH;
 	aInfo.name = meshCollection.getUID();
 	aInfo.isTransient = true;
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
 }
 
 BuiltInMeshes::BuiltInMeshes()

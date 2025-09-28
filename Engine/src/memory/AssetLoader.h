@@ -55,35 +55,11 @@ public:
 		
 	}
 
-	static ResourceWrapper<T> loadTransient(const std::string& fileLocation, AssetInfo& aInfo)
-	{
-		// Validate input
-		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
-		{
-			logError("Invalid asset path specified.");
-			return ResourceWrapper<T>::empty;
-		}
-
-		//aDesc.origFilePath = fileLocation;
-		//AssetInfo aInfo(aDesc);
-		aInfo.isTransient = true;
-		aInfo.filePath = fileLocation;
-
-		ResourceWrapper<T> asset = AssetTraits<T>::load(aInfo);
-
-		if (asset.isEmpty() || !asset.get())
-		{
-			logWarning("Failed to load asset from {}", fileLocation);
-		}
-
-		return asset;
-	}
-
-	static void save(AssetInfo& aInfo, const ResourceWrapper<T>& asset)
+	static void save(const ResourceWrapper<T>& asset, AssetInfo& aInfo)
 	{
 		if (!aInfo.isTransient)
 		{
-			AssetTraits<T>::save(aInfo, asset);
+			AssetTraits<T>::save(asset, aInfo);
 		}
 
 		aInfo.data = asset;
@@ -92,13 +68,11 @@ public:
 
 	}
 
-	static ResourceWrapper<T> create(AssetDescriptor& aDesc)
+	static ResourceWrapper<T> create(AssetInfo& aInfo)
 	{
-		AssetInfo aInfo(aDesc);
-
 		ResourceWrapper<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
 
-		save(aInfo, asset);
+		save(asset, aInfo);
 
 		asset.get()->m_assetInfo = aInfo;
 

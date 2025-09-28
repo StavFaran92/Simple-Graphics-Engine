@@ -16,7 +16,7 @@ using namespace nlohmann::literals;
 
 struct AssetInfo;
 
-struct AssetDescriptor
+struct EngineAPI AssetDescriptor
 {
 public:
 	virtual ~AssetDescriptor() = default;
@@ -132,11 +132,11 @@ public:
 
 	std::string getAlias(UUID uid) const;
 
-	void importAsset(const AssetDescriptor& assetDesc);
+	void importAsset(AssetInfo& aInfo);
 
-	void addAsset(const AssetDescriptor& assetDesc);
+	void addAsset(AssetInfo& aInfo);
 
-	void updateAsset(const AssetDescriptor& assetDesc);
+	void updateAsset(AssetInfo& aInfo);
 
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 
