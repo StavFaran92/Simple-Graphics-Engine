@@ -189,15 +189,22 @@ std::unordered_map<std::string, UUID> ProjectAssetRegistry::getAssociations() co
 {
 	std::unordered_map<std::string, UUID> associations;
 
-	// Check if the "association" key exists and is an array
-	if (m_assetRegistry.contains("association") && m_assetRegistry["association"].is_array()) {
-		for (const auto& item : m_assetRegistry["association"]) {
-			// Ensure each item is an array with exactly two elements
-			if (item.is_array() && item.size() == 2 && item[0].is_string() && item[1].is_string()) {
-				std::string key = item[0];
-				UUID value = item[1];
+	if (m_assetRegistry.contains("association")) 
+	{
+		const auto& assoc = m_assetRegistry["association"];
+
+		if (assoc.is_object())
+		{
+			for (auto it = assoc.begin(); it != assoc.end(); ++it)
+			{
+				const std::string key = it.key();
+				const UUID value = it.value().get<std::string>();
 				associations[key] = value;
 			}
+		}
+		else
+		{
+			logWarning("Expected 'association' to be an object, but got different type.");
 		}
 	}
 	return associations;

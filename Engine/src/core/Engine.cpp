@@ -205,7 +205,7 @@ bool Engine::init(const InitParams& initParams)
         return false;
     }
 
-    m_memoryManagementSystem = std::make_shared<CacheSystem>();
+    
 
     m_randomSystem = std::make_shared<RandomNumberGenerator>();
 
@@ -219,6 +219,8 @@ bool Engine::init(const InitParams& initParams)
     {   
         par = ProjectAssetRegistry::create(initParams.projectDir);
     }
+
+    m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
 
     m_context = std::make_shared<Context>(par);
     m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
