@@ -8,7 +8,7 @@
 template<>
 struct AssetTraits<MeshCollection>
 {
-	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
+	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	{
 		return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
 	}

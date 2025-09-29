@@ -20,7 +20,8 @@ void to_json(nlohmann::json& j, const AssetInfo& asset)
 		{"filePath", asset.filePath},
 		{"type", asset.aType}, // Assuming AssetType supports JSON conversion
 		{"isValid", asset.isValid},
-		{"attributes", asset.importSettings},
+		{"attributes", asset.attributes},
+		{"importSettings", asset.importSettings},
 		{"name", asset.name},
 		{"isTransient", asset.isTransient},
 	};
@@ -34,7 +35,8 @@ void from_json(const nlohmann::json& j, AssetInfo& asset)
 	j.at("filePath").get_to(asset.filePath);
 	j.at("type").get_to(asset.aType); // Assuming AssetType supports JSON conversion
 	j.at("isValid").get_to(asset.isValid);
-	j.at("attributes").get_to(asset.importSettings);
+	j.at("attributes").get_to(asset.attributes);
+	j.at("importSettings").get_to(asset.importSettings);
 	j.at("name").get_to(asset.name);
 	j.at("isTransient").get_to(asset.isTransient);
 }

@@ -51,56 +51,33 @@ public:
 		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 		return asset;
-
-		
 	}
 
-	static void save(const ResourceWrapper<T>& asset, AssetInfo& aInfo)
+	static void updateAsset(const ResourceWrapper<T>& asset, const AssetUpdateDescriptor& uDesc)
 	{
+		AssetInfo aInfo = Engine::get()->getSubSystem<Assets>()->getAsset(asset.getUID());
+		aInfo.update(uDesc);
+
 		if (!aInfo.isTransient)
 		{
 			AssetTraits<T>::save(asset, aInfo);
 		}
 
-		aInfo.data = asset;
-
 		Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
-
 	}
 
-	static ResourceWrapper<T> create(AssetInfo& aInfo)
+	static ResourceWrapper<T> createAsset(AssetInfo& aInfo)
 	{
 		ResourceWrapper<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
 
-		save(asset, aInfo);
+		if (!aInfo.isTransient)
+		{
+			AssetTraits<T>::save(asset, aInfo);
+		}
 
 		asset.get()->m_assetInfo = aInfo;
+		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
 		return asset;
 	}
-
-private:
-	//static AssetInfo extractAssetInfoData(const std::string& fileLocation, const BaseAssetParameters& params)
-	//{
-	//	AssetInfo aInfo;
-	//	aInfo.name = params.name.empty()
-	//		? std::filesystem::path(fileLocation).filename().stem().string()
-	//		: params.name;
-
-	//	aInfo.origFilePath = fileLocation;
-
-	//	aInfo.assetDirectory = params.targetDirectory;
-
-	//	AssetTraits<T>::convertAssetLoadParamsToAssetInfo(fileLocation, params, aInfo);
-
-	//	aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
-
-	//	aInfo.uuid = params.customUUID.empty()
-	//		? aInfo.filePath
-	//		: params.customUUID;
-
-	//	
-
-	//	return aInfo;
-	//}
 };

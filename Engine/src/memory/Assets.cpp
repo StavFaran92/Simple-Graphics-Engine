@@ -25,6 +25,33 @@ AssetInfo AssetDescriptor::parse()
 	return AssetInfo(*this);
 }
 
+void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
+{
+	if (!uDesc.assetDirectory.empty())
+	{
+		assetDirectory = uDesc.assetDirectory;
+	}
+
+	if (!uDesc.name.empty())
+	{
+		name = uDesc.name;
+	}
+
+	for (const auto& attrib : uDesc.attributes)
+	{
+		attributes[attrib.first] = attrib.second;
+	}
+
+	fileName = name + ext;
+
+	filePath = "";
+	if (!assetDirectory.empty())
+	{
+		filePath += assetDirectory + "/";
+	}
+	filePath += fileName;
+}
+
 void Assets::importAsset(AssetInfo& aInfo)
 {
 	auto& path = aInfo.origFilePath;
@@ -191,3 +218,4 @@ UUID Assets::getAssetFromPath(const std::string& path) const
 {
 	return Engine::get()->getMemoryManagementSystem()->getAssociation(path);
 }
+

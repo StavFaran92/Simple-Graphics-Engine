@@ -80,7 +80,7 @@ public:
 	 */
 	void loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo);
 
-	bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo);
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo);
 
 private:
 	friend class Engine;

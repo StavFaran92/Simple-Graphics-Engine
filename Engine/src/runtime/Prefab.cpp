@@ -49,10 +49,10 @@ struct AssetTraits<Prefab>
 		return ResourceWrapper<Prefab>::empty;
 	}
 
-	static void save(const ResourceWrapper<Prefab>& prefab, AssetInfo& aInfo)
+	static void save(const ResourceWrapper<Prefab>& prefab, const std::string& path)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ofstream os(projectDir + aInfo.filePath);
+		std::ofstream os(projectDir + "/" + path);
 		cereal::JSONOutputArchive oarchive(os);
 
 		try

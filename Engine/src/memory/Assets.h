@@ -39,6 +39,13 @@ public:
 	//size
 };
 
+struct EngineAPI AssetUpdateDescriptor
+{
+	std::string assetDirectory;
+	std::map<std::string, std::string> attributes;
+	std::string name;
+};
+
 struct AssetInfo : public AssetDescriptor
 {
 	bool isValid = false;
@@ -119,6 +126,8 @@ struct AssetInfo : public AssetDescriptor
 		filePath += fileName;
 	}
 
+	void update(const AssetUpdateDescriptor& uDesc);
+
 private:
 	friend class Assets;
 	friend class ResourceBase;
@@ -136,7 +145,27 @@ public:
 
 	void addAsset(AssetInfo& aInfo);
 
-	void updateAsset(AssetInfo& aInfo);
+	template<typename T>
+	void updateAsset(AssetInfo& aInfo)
+	{
+		AssetInfo aInfo = getAsset(asset.getUID());
+		aInfo.update(uDesc);
+
+		if (!aInfo.isTransient)
+		{
+			AssetTraits<T>::save(asset, aInfo);
+		}
+
+		if (!aInfo.isTransient)
+		{
+			Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
+			Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
+		}
+
+		m_assets[aInfo.uuid] = aInfo;
+
+		logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
+	}
 
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 

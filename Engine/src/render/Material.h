@@ -57,7 +57,7 @@ public:
 
 	static ResourceWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
 	static ResourceWrapper<Material> create();
-	static void save(const ResourceWrapper<Material>& material, AssetInfo aInfo);
+	static void updateAsset(const ResourceWrapper<Material>& material, AssetUpdateDescriptor desc);
 
 protected:
 	void setTexturesInShader(ResourceWrapper<Shader>& shader);

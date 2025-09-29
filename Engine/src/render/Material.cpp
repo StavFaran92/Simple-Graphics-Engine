@@ -48,10 +48,10 @@ struct AssetTraits<Material>
 		return ResourceWrapper<Material>::empty;
 	}
 
-	static void save(const ResourceWrapper<Material>& mat, AssetInfo& aInfo)
+	static void save(const ResourceWrapper<Material>& mat, const std::string& path)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ofstream os(projectDir + "/" + aInfo.filePath);
+		std::ofstream os(projectDir + "/" + path);
 		cereal::JSONOutputArchive oarchive(os);
 
 		try
@@ -152,9 +152,9 @@ ResourceWrapper<Material> Material::create()
 	return Factory<Material>::create();
 }
 
-void Material::save(const ResourceWrapper<Material>& material, AssetInfo aInfo)
+void Material::updateAsset(const ResourceWrapper<Material>& material, AssetUpdateDescriptor desc)
 {
-	AssetLoader<Material>::save(material, aInfo);
+	AssetLoader<Material>::updateAsset(material, desc);
 }
 
 void Material::setTexturesInShader(ResourceWrapper<Shader>& shader)

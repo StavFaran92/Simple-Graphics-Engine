@@ -172,16 +172,14 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 			//PrintMaterialProperties(aMaterial);
 
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
-
-			std::string materialName = aMaterial->GetName().C_Str();
-			//materialName += (i != 0) ? " " + std::to_string(i) : "";
-
-			UUID uuid = Engine::get()->getMemoryManagementSystem()->getAssociation(materialID);
-			if (uuid == EMPTY_UUID)
+			auto iter = aInfo.attributes.find(materialID);
+			if (iter == aInfo.attributes.end())
 			{
 				logWarning("Could not locate material: {}", materialID);
 				continue;
 			}
+
+			UUID uuid = iter->second;
 			ResourceWrapper<Material> material = ResourceWrapper<Material>(uuid);
 			modelInfo.materials[i] = material;
 		}
@@ -235,7 +233,7 @@ void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::Mod
 	loadModelFromAssimpScene(scene, aInfo, modelInfo);
 }
 
-bool ModelImporter::copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
+bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
 	auto fileDir = std::filesystem::path(fileLocation).parent_path().string();
 
@@ -261,7 +259,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, const AssetInfo& 
 
 			// get uuid using tex name from association map
 			auto& material = Factory<Material>::create();
-			Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
+			aInfo.attributes[materialID] = material.getUID();
+			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
 			material->setName(materialName);
 
 			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures, aInfo);
@@ -299,7 +298,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, const AssetInfo& 
 			AssetDescriptor materialAssetInfo;
 			materialAssetInfo.isTransient = aInfo.isTransient;
 			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
-			materialAssetInfo.name = materialID;
+			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
 			Material::save(material, materialAssetInfo);
 		}
