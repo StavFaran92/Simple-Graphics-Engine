@@ -48,7 +48,7 @@ struct EngineAPI AssetUpdateDescriptor
 	std::string name;
 };
 
-struct AssetInfo : public AssetDescriptor
+struct EngineAPI AssetInfo : public AssetDescriptor
 {
 	bool isValid = false;
 	std::string filePath;
@@ -162,7 +162,7 @@ public:
 	bool hasAsset(UUID uuid) const;
 
 	template<typename T>
-	void updateAsset(const ResourceWrapper<T>& asset, const AssetUpdateDescriptor& uDesc)
+	void updateAsset(const ResourceWrapper<T>& asset, const AssetUpdateDescriptor& uDesc = {})
 	{
 		AssetInfo aInfo = getAsset(asset.getUID());
 		aInfo.update(uDesc);
