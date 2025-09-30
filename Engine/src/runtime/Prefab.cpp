@@ -72,12 +72,12 @@ ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabIm
 {
 	desc.aType = AssetType::PREFAB;
 	desc.origFilePath = fileLocation;
-	return AssetLoader<Prefab>::import(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset<Prefab>(fileLocation, desc.parse());
 }
 
 void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo)
 {
-	AssetLoader<Prefab>::save(prefab, aInfo);
+	//Engine::get()->getSubSystem<Assets>()->updateAsset<Prefab>(prefab, aInfo); // todo fix
 }
 
 void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)

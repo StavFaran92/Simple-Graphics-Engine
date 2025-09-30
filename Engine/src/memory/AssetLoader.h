@@ -12,72 +12,72 @@ template<typename T>
 class AssetLoader
 {
 public:
-	static ResourceWrapper<T> import(const std::string& fileLocation, AssetInfo& aInfo)
-	{
-		// Validate input
-		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
-		{
-			logError("Invalid asset path specified.");
-			return ResourceWrapper<T>::empty;
-		}
+	//static ResourceWrapper<T> import(const std::string& fileLocation, AssetInfo& aInfo)
+	//{
+	//	// Validate input
+	//	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+	//	{
+	//		logError("Invalid asset path specified.");
+	//		return ResourceWrapper<T>::empty;
+	//	}
 
-		if (!aInfo.isTransient)
-		{
-			std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
+	//	if (!aInfo.isTransient)
+	//	{
+	//		std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
 
-			// Copy + Paste
-			if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
-			{
-				logError("Failed to copy file from {} to resource folder", fileLocation);
-				return ResourceWrapper<T>::empty;
-			}
-		}
-		else
-		{
-			aInfo.filePath = fileLocation;
-		}
+	//		// Copy + Paste
+	//		if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
+	//		{
+	//			logError("Failed to copy file from {} to resource folder", fileLocation);
+	//			return ResourceWrapper<T>::empty;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		aInfo.filePath = fileLocation;
+	//	}
 
-		// Load
-		ResourceWrapper<T> asset = AssetTraits<T>::load(aInfo);
-		if (asset.isEmpty() || !asset.get())
-		{
-			logError("Failed to load file {}", fileLocation);
-			return ResourceWrapper<T>::empty;
-		}
+	//	// Load
+	//	ResourceWrapper<T> asset = AssetTraits<T>::load(aInfo);
+	//	if (asset.isEmpty() || !asset.get())
+	//	{
+	//		logError("Failed to load file {}", fileLocation);
+	//		return ResourceWrapper<T>::empty;
+	//	}
 
-		aInfo.data = asset;
+	//	aInfo.data = asset;
 
-		// Add Asset
-		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+	//	// Add Asset
+	//	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
-		return asset;
-	}
+	//	return asset;
+	//}
 
-	static void updateAsset(const ResourceWrapper<T>& asset, const AssetUpdateDescriptor& uDesc)
-	{
-		AssetInfo aInfo = Engine::get()->getSubSystem<Assets>()->getAsset(asset.getUID());
-		aInfo.update(uDesc);
+	//static void updateAsset(const ResourceWrapper<T>& asset, const AssetUpdateDescriptor& uDesc)
+	//{
+	//	AssetInfo aInfo = Engine::get()->getSubSystem<Assets>()->getAsset(asset.getUID());
+	//	aInfo.update(uDesc);
 
-		if (!aInfo.isTransient)
-		{
-			AssetTraits<T>::save(asset, aInfo);
-		}
+	//	if (!aInfo.isTransient)
+	//	{
+	//		AssetTraits<T>::save(asset, aInfo);
+	//	}
 
-		Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
-	}
+	//	Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
+	//}
 
-	static ResourceWrapper<T> createAsset(AssetInfo& aInfo)
-	{
-		ResourceWrapper<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
+	//static ResourceWrapper<T> createAsset(AssetInfo& aInfo)
+	//{
+	//	ResourceWrapper<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
 
-		if (!aInfo.isTransient)
-		{
-			AssetTraits<T>::save(asset, aInfo);
-		}
+	//	if (!aInfo.isTransient)
+	//	{
+	//		AssetTraits<T>::save(asset, aInfo);
+	//	}
 
-		asset.get()->m_assetInfo = aInfo;
-		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+	//	asset.get()->m_assetInfo = aInfo;
+	//	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 
-		return asset;
-	}
+	//	return asset;
+	//}
 };

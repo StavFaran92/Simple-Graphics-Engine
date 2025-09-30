@@ -10,6 +10,8 @@
 #include <filesystem>
 
 #include <nlohmann/json.hpp>
+//#include "core/CacheSystem.h"
+//#include "serialize/ProjectAssetRegistry.h"
 
 using json = nlohmann::json;
 using namespace nlohmann::literals;
@@ -141,31 +143,11 @@ public:
 
 	std::string getAlias(UUID uid) const;
 
-	void importAsset(AssetInfo& aInfo);
+	//void importAsset(AssetInfo& aInfo);
 
 	void addAsset(AssetInfo& aInfo);
 
-	template<typename T>
-	void updateAsset(AssetInfo& aInfo)
-	{
-		AssetInfo aInfo = getAsset(asset.getUID());
-		aInfo.update(uDesc);
-
-		if (!aInfo.isTransient)
-		{
-			AssetTraits<T>::save(asset, aInfo);
-		}
-
-		if (!aInfo.isTransient)
-		{
-			Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
-			Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
-		}
-
-		m_assets[aInfo.uuid] = aInfo;
-
-		logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
-	}
+	//void updateAsset(const ResourceWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc);
 
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 
@@ -178,6 +160,82 @@ public:
 	AssetInfo getAsset(UUID uuid) const;
 
 	bool hasAsset(UUID uuid) const;
+
+	template<typename T>
+	void updateAsset(const ResourceWrapper<T>& asset, const AssetUpdateDescriptor& uDesc)
+	{
+		AssetInfo aInfo = getAsset(asset.getUID());
+		aInfo.update(uDesc);
+
+		if (!aInfo.isTransient)
+		{
+			AssetTraits<T>::save(asset, aInfo.filePath);
+			//Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
+			//Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
+		}
+
+		m_assets[aInfo.uuid] = aInfo;
+
+		logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
+	}
+
+	template<typename T>
+	ResourceWrapper<T> importAsset(const std::string& fileLocation, AssetInfo& aInfo)
+	{
+		// Validate input
+		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+		{
+			logError("Invalid asset path specified.");
+			return ResourceWrapper<T>::empty;
+		}
+
+		if (!aInfo.isTransient)
+		{
+			std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
+
+			// Copy + Paste
+			if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
+			{
+				logError("Failed to copy file from {} to resource folder", fileLocation);
+				return ResourceWrapper<T>::empty;
+			}
+		}
+		else
+		{
+			aInfo.filePath = fileLocation;
+		}
+
+		// Load
+		ResourceWrapper<T> asset = AssetTraits<T>::load(aInfo);
+		if (asset.isEmpty() || !asset.get())
+		{
+			logError("Failed to load file {}", fileLocation);
+			return ResourceWrapper<T>::empty;
+		}
+
+		aInfo.data = asset;
+
+		// Add Asset
+		addAsset(aInfo);
+
+		return asset;
+	}
+
+	template<typename T>
+	ResourceWrapper<T> createAsset(AssetInfo& aInfo)
+	{
+		ResourceWrapper<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
+
+		if (!aInfo.isTransient)
+		{
+			AssetTraits<T>::save(asset, aInfo.filePath);
+		}
+
+		asset.get()->m_assetInfo = aInfo;
+		addAsset(aInfo);
+
+		return asset;
+	}
 
 private:
 	std::unordered_map<UUID, AssetInfo> m_assets;

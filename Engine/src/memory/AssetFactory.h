@@ -6,10 +6,12 @@ class AssetFactory
 {
 public:
 	using LoadFn = std::function<ResourceWrapper<ResourceBase>(AssetInfo&)>;
+	//using SaveFn = std::function<void(ResourceWrapper<ResourceBase>, const std::string&)>;
 
 	static bool loadAsset(AssetInfo& aInfo);
 
 	static void registerLoadFunc(AssetType aType, const LoadFn& fn);
+
 
 private:
 

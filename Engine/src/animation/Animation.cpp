@@ -107,5 +107,5 @@ ResourceWrapper<Animation> Animation::import(const std::string& fileLocation, An
 {
 	desc.aType = AssetType::ANIMATION;
 	desc.origFilePath = fileLocation;
-	return AssetLoader<Animation>::import(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset<Animation>(fileLocation, desc.parse());
 }

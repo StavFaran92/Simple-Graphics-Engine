@@ -347,7 +347,7 @@ ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, Textur
 {
 	desc.aType = AssetType::TEXTURE;
 	desc.origFilePath = fileLocation;
-	return AssetLoader<Texture>::import(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset<Texture>(fileLocation, desc.parse());
 }
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)

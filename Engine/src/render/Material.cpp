@@ -144,7 +144,7 @@ ResourceWrapper<Material> Material::import(const std::string& fileLocation, Mate
 {
 	desc.aType = AssetType::MATERIAL;
 	desc.origFilePath = fileLocation;
-	return AssetLoader<Material>::import(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset<Material>(fileLocation, desc.parse());
 }
 
 ResourceWrapper<Material> Material::create()
@@ -154,7 +154,7 @@ ResourceWrapper<Material> Material::create()
 
 void Material::updateAsset(const ResourceWrapper<Material>& material, AssetUpdateDescriptor desc)
 {
-	AssetLoader<Material>::updateAsset(material, desc);
+	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
 }
 
 void Material::setTexturesInShader(ResourceWrapper<Shader>& shader)
