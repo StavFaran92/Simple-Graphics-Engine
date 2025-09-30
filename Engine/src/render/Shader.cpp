@@ -57,6 +57,14 @@ struct AssetTraits<Shader>
 
 		return shader;
 	}
+
+	static void save(const ResourceWrapper<Shader>& shader, const AssetInfo& aInfo)
+	{
+		auto& projectDir = Engine::get()->getProjectDirectory();
+		const std::string relativeFilepath = "/" + aInfo.filePath;
+		const std::string savedFilePath = projectDir + relativeFilepath;
+		std::filesystem::copy_file(aInfo.origFilePath, savedFilePath);
+	}
 };
 
 uint32_t Shader::s_activeShader = 0;
@@ -542,13 +550,12 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	shader->recompile();
 
 	AssetDescriptor aInfo;
-	aInfo.customUUID = shader.getUID();
 	aInfo.origFilePath = filepath;
 	aInfo.aType = AssetType::SHADER;
 	aInfo.name = name;
 	aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
 	aInfo.isTransient = isTransient;
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse()); // todo fix
+	Engine::get()->getSubSystem<Assets>()->createAsset(shader, aInfo.parse());
 
 	return shader;
 }

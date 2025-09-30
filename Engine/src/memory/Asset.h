@@ -54,7 +54,7 @@ template<typename T>
 struct AssetTraits {
 	static bool copyFiles(const std::string& fileLocation, AssetInfo&);
 	static ResourceWrapper<T> load(AssetInfo& aInfo);
-	static void save(const ResourceWrapper<T>& asset, const std::string& path);
+	static void save(const ResourceWrapper<T>& asset, const AssetInfo& aInfo);
 };
 
 class ResourceBase

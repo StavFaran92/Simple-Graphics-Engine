@@ -150,10 +150,10 @@ struct AssetTraits<Texture>
 		return stbi_is_hdr(filename.c_str());
 	}
 
-	static void save(const ResourceWrapper<Texture>& texture, const std::string& path)
+	static void save(const ResourceWrapper<Texture>& texture, const AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
-		std::string fileLocation = projectDir + "/" + path;
+		std::string fileLocation = projectDir + "/" + aInfo.filePath;
 
 		Texture::writeTexture2D(fileLocation, texture);
 	}

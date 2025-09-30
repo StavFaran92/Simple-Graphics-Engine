@@ -169,9 +169,8 @@ public:
 
 		if (!aInfo.isTransient)
 		{
-			AssetTraits<T>::save(asset, aInfo.filePath);
-			//Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
-			//Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
+			AssetTraits<T>::save(asset, aInfo);
+			updateRegistry(aInfo);
 		}
 
 		m_assets[aInfo.uuid] = aInfo;
@@ -222,13 +221,11 @@ public:
 	}
 
 	template<typename T>
-	ResourceWrapper<T> createAsset(AssetInfo& aInfo)
+	ResourceWrapper<T> createAsset(const ResourceWrapper<T>& asset, AssetInfo& aInfo)
 	{
-		ResourceWrapper<T> asset = Factory<T>::createUsingCustomUUID(aInfo.uuid);
-
 		if (!aInfo.isTransient)
 		{
-			AssetTraits<T>::save(asset, aInfo.filePath);
+			AssetTraits<T>::save(asset, aInfo);
 		}
 
 		asset.get()->m_assetInfo = aInfo;
@@ -237,6 +234,8 @@ public:
 		return asset;
 	}
 
+private:
+	void updateRegistry(const AssetInfo& aInfo);
 private:
 	std::unordered_map<UUID, AssetInfo> m_assets;
 };

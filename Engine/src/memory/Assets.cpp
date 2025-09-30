@@ -119,8 +119,7 @@ void Assets::addAsset(AssetInfo& aInfo)
 
 	if (!aInfo.isTransient)
 	{
-		Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
-		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
+		updateRegistry(aInfo);
 	}
 
 	aInfo.isValid = true;
@@ -188,6 +187,12 @@ bool Assets::hasAsset(UUID uuid) const
 		return true;
 	}
 	return false;
+}
+
+void Assets::updateRegistry(const AssetInfo& aInfo)
+{
+	Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
+	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 }
 
 std::string Assets::getAlias(UUID uid) const

@@ -48,10 +48,10 @@ struct AssetTraits<Material>
 		return ResourceWrapper<Material>::empty;
 	}
 
-	static void save(const ResourceWrapper<Material>& mat, const std::string& path)
+	static void save(const ResourceWrapper<Material>& mat, const AssetInfo& aInfo)
 	{
 		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ofstream os(projectDir + "/" + path);
+		std::ofstream os(projectDir + "/" + aInfo.filePath);
 		cereal::JSONOutputArchive oarchive(os);
 
 		try

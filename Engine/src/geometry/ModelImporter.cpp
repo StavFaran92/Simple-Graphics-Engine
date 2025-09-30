@@ -300,7 +300,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
-			Engine::get()->getSubSystem<Assets>()->createAsset<Material>(materialAssetInfo.parse());
+			Engine::get()->getSubSystem<Assets>()->createAsset<Material>(material, materialAssetInfo.parse());
 		}
 	}
 
