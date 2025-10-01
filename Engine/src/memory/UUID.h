@@ -14,6 +14,7 @@ namespace uuid {
 
     inline UUID generate_uuid_v4()
     {
+#ifdef OPTION_A
         std::stringstream ss;
         int i;
         ss << std::hex;
@@ -38,5 +39,9 @@ namespace uuid {
             ss << dis(gen);
         };
         return ss.str();
+#else
+        static int counter = 0;
+        return std::to_string(counter++);
+#endif
     }
 }

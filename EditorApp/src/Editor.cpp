@@ -419,7 +419,7 @@ void ShowModelCreatorWindow()
 	AssetDescriptor aInfo;
 	aInfo.name = modelName;
 	aInfo.aType = AssetType::PREFAB;
-	Prefab::save(prefab, aInfo);
+	Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo.parse());
 
 	entity.remove();
 

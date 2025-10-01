@@ -183,7 +183,7 @@ void Assets::loadAssetsDatabase()
 
 	for (auto& assetInfo : assets)
 	{
-		AssetFactory::loadAsset(assetInfo);
+		assetInfo.data = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
 }
@@ -290,12 +290,15 @@ ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocatio
 
 ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& asset, AssetInfo& aInfo)
 {
+	aInfo.uuid = asset.getUID();
+
 	if (!aInfo.isTransient)
 	{
 		AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
 	}
 
 	asset.get()->m_assetInfo = aInfo;
+	aInfo.data = asset;
 	addAsset(aInfo);
 
 	return asset;

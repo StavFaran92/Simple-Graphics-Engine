@@ -230,7 +230,7 @@ void AssetViewWindow::display()
 
 					if (aInfo.aType == AssetType::MATERIAL)
 					{
-						ResourceWrapper<Material> mat = aInfo.data.as<Material>();
+						ResourceWrapper<Material> mat = ResourceWrapper<Material>(uuid);
 						if (mat.isEmpty())
 						{
 							logError("Asset cast to material failed.");
