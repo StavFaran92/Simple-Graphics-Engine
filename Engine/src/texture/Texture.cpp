@@ -35,9 +35,9 @@ namespace {
 
 bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	auto& projectDir = Engine::get()->getProjectDirectory();
+	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::string relativeFilepath = aInfo.name + aInfo.ext;
-	const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + relativeFilepath;
+	const std::filesystem::path savedFilePath = projectDir / aInfo.assetDirectory / relativeFilepath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath);
 }
 

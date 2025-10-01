@@ -242,7 +242,7 @@ ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocatio
 
 		// Copy + Paste
 		//if (!asset.get()->getAssetManager().copyFiles(fileLocation, aInfo))
-		if(AssetFactory::getManager(aInfo.aType)->copyFiles(fileLocation, aInfo))
+		if(!AssetFactory::getManager(aInfo.aType)->copyFiles(fileLocation, aInfo))
 		{
 			logError("Failed to copy file from {} to resource folder", fileLocation);
 			return ResourceWrapper<ResourceBase>::empty;
