@@ -8,10 +8,18 @@
 #include "render/Shader.h"
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
+#include "memory/Asset.h"
 
 struct MaterialImportSettings : public AssetDescriptor
 {
 
+};
+
+struct MaterialAssetManager : public AssetManager
+{
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
+	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
+	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
 };
 
 class EngineAPI Material : public ResourceBase
@@ -70,4 +78,5 @@ public:
 	float roughnessFactor = 1.f;
 	float metallicFactor = 1.f;
 	float opacityFactor = 1.f;
+
 };

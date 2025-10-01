@@ -6,21 +6,28 @@
 
 #include <filesystem>
 
-template<>
-struct AssetTraits<Animation>
+namespace {
+	struct AnimationManagerRegistration {
+		AnimationManagerRegistration() {
+			AssetFactory::registerManager(AssetType::ANIMATION, std::make_shared<AnimationAssetManager>());
+		}
+	} _animationManagerRegistration;
+}
+
+bool AnimationAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
-	{
-		return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
-	}
+	return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
+}
 
-	static ResourceWrapper<Animation> load(const AssetInfo& aInfo)
-	{
-		return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
-	}
-};
+ResourceWrapper<ResourceBase> AnimationAssetManager::load(AssetInfo& aInfo)
+{
+	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
+}
 
-static AssetFnRegister<AssetType::ANIMATION> assetRegister(AssetTraits<Animation>::load);
+void AnimationAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+{
+	throw new std::runtime_error("Not yet implemented!");
+}
 
 Animation::Animation()
 {
@@ -107,5 +114,7 @@ ResourceWrapper<Animation> Animation::import(const std::string& fileLocation, An
 {
 	desc.aType = AssetType::ANIMATION;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset<Animation>(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Animation>();
 }
+
+

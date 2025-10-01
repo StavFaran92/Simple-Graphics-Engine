@@ -25,143 +25,63 @@
 
 #include "memory/AssetLoader.h"
 
-template<>
-struct AssetTraits<Texture>
+namespace {
+	struct TextureManagerRegistration {
+		TextureManagerRegistration() {
+			AssetFactory::registerManager(AssetType::TEXTURE, std::make_shared<TextureAssetManager>());
+		}
+	} _textureManagerRegistration;
+}
+
+bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	const std::string relativeFilepath = aInfo.name + aInfo.ext;
+	const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + relativeFilepath;
+	return std::filesystem::copy_file(fileLocation, savedFilePath);
+}
+
+ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
+{
+	std::string filepath;
+	if (aInfo.isTransient)
 	{
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string relativeFilepath = aInfo.name + aInfo.ext;
-		const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + relativeFilepath;
-		return std::filesystem::copy_file(fileLocation, savedFilePath);
+		filepath = aInfo.filePath;
 	}
-
-	//static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-	//{
-	//	// Data extract
-	//	auto tParams = dynamic_cast<const Texture::TextureImportSettings*>(&params);
-	//	if (!tParams)
-	//	{
-	//		throw std::runtime_error("Params specified to Asset load are of incorrect type!");
-	//	}
-
-	//	auto settings = *tParams; // Just for convinience
-
-	//	aInfo.aType = AssetType::TEXTURE;
-	//	aInfo.ext = std::filesystem::path(fileLocation).extension().string();
-	//	aInfo.fileName = aInfo.name + aInfo.ext;;
-
-	//	Texture::TextureAssetAttributes attributes;
-	//	attributes.flip = settings.flip;
-	//	attributes.genMipMap = settings.genMipMap;
-	//	attributes.isHDR = isHDRImage(fileLocation);
-	//	attributes.params = settings.params;
-
-	//	aInfo.attributes = attributes.toMap();
-	//}
-
-	static ResourceWrapper<Texture> load(AssetInfo& aInfo)
+	else
 	{
-		std::string filepath;
-		if (aInfo.isTransient)
-		{
-			filepath = aInfo.filePath;
-		}
-		else
-		{
-			filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-		}
-
-		Texture::TextureData textureData;
-
-		// extract texture build data
-		Texture::TextureAssetDescriptor settings{};
-
-		if (aInfo.importSettings.is_object() && !aInfo.importSettings.empty()) 
-		{
-			settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
-		}
-		Texture::extractTextureDataFromSettings(settings, textureData);
-		extractTextureDataFromFile(filepath, textureData);
-
-		// Create texture
-		Texture* texture = new Texture();
-		texture->build(textureData);
-		Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
-
-		//texture->m_attributes = attributes;
-
-		return ResourceWrapper<Texture>(aInfo.uuid);
+		filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
 	}
 
-	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
+	Texture::TextureData textureData;
+
+	// extract texture build data
+	Texture::TextureAssetDescriptor settings{};
+
+	if (aInfo.importSettings.is_object() && !aInfo.importSettings.empty())
 	{
-		// Determine if the image is HDR
-		if (isHDRImage(fileLocation))
-		{
-			textureData.isHDR = true;
-		}
-
-		stbi_set_flip_vertically_on_load(textureData.flip);
-
-		if (textureData.isHDR)
-		{
-			textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
-		}
-		else
-		{
-			textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
-		}
-
-		// load validation
-		if (!textureData.data)
-		{
-			logError("Failed to find: {}", fileLocation.c_str());
-		}
-
-		// Determine format based on bits per pixel (bpp)
-		if (textureData.bpp == 1)
-		{
-			textureData.format = (Texture::Format)GL_RED;
-			textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
-		}
-		else if (textureData.bpp == 3)
-		{
-			textureData.format = (Texture::Format)GL_RGB;
-			textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
-		}
-		else if (textureData.bpp == 4)
-		{
-			textureData.format = (Texture::Format)GL_RGBA;
-			textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
-		}
-		else {
-			throw std::runtime_error("Unsupported texture format!");
-		}
-
-		std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
-		textureData.textureName = textureName;
-
-		textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
+		settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
 	}
+	Texture::extractTextureDataFromSettings(settings, textureData);
+	Texture::extractTextureDataFromFile(filepath, textureData);
 
-	// Function to determine if the file is HDR based on its extension
-	static bool isHDRImage(const std::string& filename) {
-		return stbi_is_hdr(filename.c_str());
-	}
+	// Create texture
+	Texture* texture = new Texture();
+	texture->build(textureData);
+	Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
 
-	static void save(const ResourceWrapper<Texture>& texture, const AssetInfo& aInfo)
-	{
-		auto projectDir = Engine::get()->getProjectDirectory();
-		std::string fileLocation = projectDir + "/" + aInfo.filePath;
+	//texture->m_attributes = attributes;
 
-		Texture::writeTexture2D(fileLocation, texture);
-	}
-};
+	return ResourceWrapper<Texture>(aInfo.uuid);
+}
 
-static AssetFnRegister<AssetType::TEXTURE> textureAssetRegister(AssetTraits<Texture>::load);
+void TextureAssetManager::save(const ResourceWrapper<ResourceBase>& texture, const AssetInfo& aInfo)
+{
+	auto projectDir = Engine::get()->getProjectDirectory();
+	std::string fileLocation = projectDir + "/" + aInfo.filePath;
 
-
+	Texture::writeTexture2D(fileLocation, texture.as<Texture>());
+}
 
 Texture::Texture()
 	:m_id(0), m_slot(0)
@@ -347,7 +267,7 @@ ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, Textur
 {
 	desc.aType = AssetType::TEXTURE;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset<Texture>(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Texture>();
 }
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)
@@ -487,6 +407,62 @@ ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocatio
 
 	//return texture;
 	return {};
+}
+
+void Texture::extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
+{
+	// Determine if the image is HDR
+	if (isHDRImage(fileLocation))
+	{
+		textureData.isHDR = true;
+	}
+
+	stbi_set_flip_vertically_on_load(textureData.flip);
+
+	if (textureData.isHDR)
+	{
+		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+	}
+	else
+	{
+		textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+	}
+
+	// load validation
+	if (!textureData.data)
+	{
+		logError("Failed to find: {}", fileLocation.c_str());
+	}
+
+	// Determine format based on bits per pixel (bpp)
+	if (textureData.bpp == 1)
+	{
+		textureData.format = (Texture::Format)GL_RED;
+		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
+	}
+	else if (textureData.bpp == 3)
+	{
+		textureData.format = (Texture::Format)GL_RGB;
+		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
+	}
+	else if (textureData.bpp == 4)
+	{
+		textureData.format = (Texture::Format)GL_RGBA;
+		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
+	}
+	else {
+		throw std::runtime_error("Unsupported texture format!");
+	}
+
+	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
+	textureData.textureName = textureName;
+
+	textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
+}
+
+// Function to determine if the file is HDR based on its extension
+bool Texture::isHDRImage(const std::string& filename) {
+	return stbi_is_hdr(filename.c_str());
 }
 
 //adi is your love of your life

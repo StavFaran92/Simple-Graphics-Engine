@@ -22,6 +22,13 @@ struct MeshNodeData
 	std::vector<MeshNodeData> children;
 };
 
+struct AnimationAssetManager : public AssetManager
+{
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
+	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
+	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+};
+
 class EngineAPI Animation : public ResourceBase
 {
 public:

@@ -8,6 +8,17 @@
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
+struct MeshCollectionAssetManager : public AssetManager
+{
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
+	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
+	std::map<int, ResourceWrapper<Material>> getLoadedMaterials();
+	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+
+private:
+	ModelImporter::ModelInfo m_lastLoadedModelInfo;
+};
+
 class EngineAPI MeshCollection : public ResourceBase
 {
 public:

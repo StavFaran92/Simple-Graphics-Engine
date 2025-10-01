@@ -8,6 +8,13 @@
 struct PrefabImportSettings : public AssetDescriptor
 {};
 
+struct PrefabAssetManager : public AssetManager
+{
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
+	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
+	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+};
+
 class EngineAPI Prefab : public ResourceBase
 {
 public:

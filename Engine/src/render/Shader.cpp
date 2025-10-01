@@ -19,53 +19,57 @@
 
 #include <filesystem>
 
-template<>
-struct AssetTraits<Shader>
+namespace {
+	struct ShaderManagerRegistration {
+		ShaderManagerRegistration() {
+			AssetFactory::registerManager(AssetType::SHADER, std::make_shared<ShaderAssetManager>());
+		}
+	} _shaderManagerRegistration;
+}
+
+bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	const std::string relativeFilepath = "/" + aInfo.fileName;
+	const std::string savedFilePath = projectDir + relativeFilepath;
+	return std::filesystem::copy_file(fileLocation, savedFilePath);
+}
+
+ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
+{
+	UUID uuid = aInfo.uuid;
+	ShaderAssetDescriptor params = aInfo.importSettings.get<ShaderAssetDescriptor>();
+	ShaderOverride shaderOverride = params.shaderOverride;
+	Shader* shaderPtr = new Shader();
+	Engine::get()->getMemoryPool().add(uuid, shaderPtr);
+	ResourceWrapper<Shader> shader(uuid);
+	Engine::get()->getResourceManager()->incRef(uuid);
+
+	std::string filepath;
+	if (aInfo.isTransient)
 	{
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string relativeFilepath = "/" + aInfo.fileName;
-		const std::string savedFilePath = projectDir + relativeFilepath;
-		return std::filesystem::copy_file(fileLocation, savedFilePath);
+		filepath = aInfo.filePath;
+	}
+	else
+	{
+		filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
 	}
 
-	static ResourceWrapper<Shader> load(AssetInfo& aInfo)
-	{
-		UUID uuid = aInfo.uuid;
-		ShaderAssetDescriptor params = aInfo.importSettings.get<ShaderAssetDescriptor>();
-		ShaderOverride shaderOverride = params.shaderOverride;
-		Shader* shaderPtr = new Shader();
-		Engine::get()->getMemoryPool().add(uuid, shaderPtr);
-		ResourceWrapper<Shader> shader(uuid);
-		Engine::get()->getResourceManager()->incRef(uuid);
+	shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
+	shader->shaderOverride = shaderOverride;
+	shader->m_glslFilePath = filepath;
+	shader->recompile();
 
-		std::string filepath;
-		if (aInfo.isTransient)
-		{
-			filepath = aInfo.filePath;
-		}
-		else
-		{
-			filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-		}
+	return shader;
+}
 
-		shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
-		shader->shaderOverride = shaderOverride;
-		shader->m_glslFilePath = filepath;
-		shader->recompile();
-
-		return shader;
-	}
-
-	static void save(const ResourceWrapper<Shader>& shader, const AssetInfo& aInfo)
-	{
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string relativeFilepath = "/" + aInfo.filePath;
-		const std::string savedFilePath = projectDir + relativeFilepath;
-		std::filesystem::copy_file(aInfo.origFilePath, savedFilePath);
-	}
-};
+void ShaderAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+{
+	auto& projectDir = Engine::get()->getProjectDirectory();
+	const std::string relativeFilepath = "/" + aInfo.filePath;
+	const std::string savedFilePath = projectDir + relativeFilepath;
+	std::filesystem::copy_file(aInfo.origFilePath, savedFilePath);
+}
 
 uint32_t Shader::s_activeShader = 0;
 
@@ -564,7 +568,7 @@ ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, ShaderAs
 {
 	desc.aType = AssetType::SHADER;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset<Shader>(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Shader>();
 }
 
 //Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)
@@ -672,3 +676,4 @@ Shader::~Shader() {
 	// TODO fix, this is currently a gpu memory leak
 	//clear();
 }
+

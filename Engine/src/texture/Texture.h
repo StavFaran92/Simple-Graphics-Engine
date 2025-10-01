@@ -18,6 +18,13 @@ using namespace nlohmann::literals;
 
 struct AssetInfo;
 
+struct TextureAssetManager : public AssetManager
+{
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
+	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
+	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+};
+
 class EngineAPI Texture : public ResourceBase
 {
 public:
@@ -279,6 +286,10 @@ public:
 	static ResourceWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
 
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);
+
+	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
+
+	static bool isHDRImage(const std::string& filename);
 
 	/**  Destructor */
 	~Texture();

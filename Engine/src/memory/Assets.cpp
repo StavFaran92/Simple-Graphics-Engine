@@ -211,3 +211,73 @@ UUID Assets::getAssetFromPath(const std::string& path) const
 	return Engine::get()->getMemoryManagementSystem()->getAssociation(path);
 }
 
+void Assets::updateAsset(const ResourceWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc)
+{
+	AssetInfo aInfo = getAsset(asset.getUID());
+	aInfo.update(uDesc);
+
+	if (!aInfo.isTransient)
+	{
+		AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
+		updateRegistry(aInfo);
+	}
+
+	m_assets[aInfo.uuid] = aInfo;
+
+	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
+}
+
+ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetInfo& aInfo)
+{
+	// Validate input
+	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+	{
+		logError("Invalid asset path specified.");
+		return ResourceWrapper<ResourceBase>::empty;
+	}
+
+	if (!aInfo.isTransient)
+	{
+		std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
+
+		// Copy + Paste
+		//if (!asset.get()->getAssetManager().copyFiles(fileLocation, aInfo))
+		if(AssetFactory::getManager(aInfo.aType)->copyFiles(fileLocation, aInfo))
+		{
+			logError("Failed to copy file from {} to resource folder", fileLocation);
+			return ResourceWrapper<ResourceBase>::empty;
+		}
+	}
+	else
+	{
+		aInfo.filePath = fileLocation;
+	}
+
+	// Load
+	ResourceWrapper<ResourceBase> asset = AssetFactory::getManager(aInfo.aType)->load(aInfo);
+	if (asset.isEmpty() || !asset.get())
+	{
+		logError("Failed to load file {}", fileLocation);
+		return ResourceWrapper<ResourceBase>::empty;
+	}
+
+	aInfo.data = asset;
+
+	// Add Asset
+	addAsset(aInfo);
+
+	return asset;
+}
+
+ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& asset, AssetInfo& aInfo)
+{
+	if (!aInfo.isTransient)
+	{
+		AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
+	}
+
+	asset.get()->m_assetInfo = aInfo;
+	addAsset(aInfo);
+
+	return asset;
+}

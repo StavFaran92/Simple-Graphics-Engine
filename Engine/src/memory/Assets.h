@@ -143,11 +143,7 @@ public:
 
 	std::string getAlias(UUID uid) const;
 
-	//void importAsset(AssetInfo& aInfo);
-
 	void addAsset(AssetInfo& aInfo);
-
-	//void updateAsset(const ResourceWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc);
 
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 
@@ -161,78 +157,11 @@ public:
 
 	bool hasAsset(UUID uuid) const;
 
-	template<typename T>
-	void updateAsset(const ResourceWrapper<T>& asset, const AssetUpdateDescriptor& uDesc = {})
-	{
-		AssetInfo aInfo = getAsset(asset.getUID());
-		aInfo.update(uDesc);
+	void updateAsset(const ResourceWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc = {});
 
-		if (!aInfo.isTransient)
-		{
-			AssetTraits<T>::save(asset, aInfo);
-			updateRegistry(aInfo);
-		}
+	ResourceWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetInfo& aInfo);
 
-		m_assets[aInfo.uuid] = aInfo;
-
-		logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
-	}
-
-	template<typename T>
-	ResourceWrapper<T> importAsset(const std::string& fileLocation, AssetInfo& aInfo)
-	{
-		// Validate input
-		if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
-		{
-			logError("Invalid asset path specified.");
-			return ResourceWrapper<T>::empty;
-		}
-
-		if (!aInfo.isTransient)
-		{
-			std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
-
-			// Copy + Paste
-			if (!AssetTraits<T>::copyFiles(fileLocation, aInfo))
-			{
-				logError("Failed to copy file from {} to resource folder", fileLocation);
-				return ResourceWrapper<T>::empty;
-			}
-		}
-		else
-		{
-			aInfo.filePath = fileLocation;
-		}
-
-		// Load
-		ResourceWrapper<T> asset = AssetTraits<T>::load(aInfo);
-		if (asset.isEmpty() || !asset.get())
-		{
-			logError("Failed to load file {}", fileLocation);
-			return ResourceWrapper<T>::empty;
-		}
-
-		aInfo.data = asset;
-
-		// Add Asset
-		addAsset(aInfo);
-
-		return asset;
-	}
-
-	template<typename T>
-	ResourceWrapper<T> createAsset(const ResourceWrapper<T>& asset, AssetInfo& aInfo)
-	{
-		if (!aInfo.isTransient)
-		{
-			AssetTraits<T>::save(asset, aInfo);
-		}
-
-		asset.get()->m_assetInfo = aInfo;
-		addAsset(aInfo);
-
-		return asset;
-	}
+	ResourceWrapper<ResourceBase> createAsset(const ResourceWrapper<ResourceBase>& asset, AssetInfo& aInfo);
 
 private:
 	void updateRegistry(const AssetInfo& aInfo);

@@ -13,66 +13,62 @@
 #include "core/Factory.h"
 #include "component/ObjectComponent.h"
 
-template<>
-struct AssetTraits<Prefab>
+namespace {
+	struct PrefabManagerRegistration {
+		PrefabManagerRegistration() {
+			AssetFactory::registerManager(AssetType::PREFAB, std::make_shared<PrefabAssetManager>());
+		}
+	} _PrefabManagerRegistration;
+}
+
+bool PrefabAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
+	return false;
+}
+
+ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
+{
+	auto projectDir = Engine::get()->getProjectDirectory();
+	std::ifstream is(projectDir + aInfo.filePath);
+	cereal::JSONInputArchive iarchive(is);
+	Prefab* loadedPrefab = new Prefab();
+
+	try
 	{
-		return false;
+		iarchive(*loadedPrefab);
+		Engine::get()->getMemoryPool().add(aInfo.uuid, loadedPrefab);
+		return ResourceWrapper<Prefab>(aInfo.uuid);
+
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	//static void convertAssetLoadParamsToAssetInfo(const std::string& fileLocation, const BaseAssetParameters& params, AssetInfo& aInfo)
-	//{
-	//	aInfo.aType = AssetType::PREFAB;
-	//	aInfo.fileName = aInfo.name + ".asset";;
-	//}
+	return ResourceWrapper<Prefab>::empty;
+}
 
-	static ResourceWrapper<Prefab> load(AssetInfo& aInfo)
+void PrefabAssetManager::save(const ResourceWrapper<ResourceBase>& prefab, const AssetInfo& aInfo)
+{
+	auto projectDir = Engine::get()->getProjectDirectory();
+	std::ofstream os(projectDir + "/" + aInfo.filePath);
+	cereal::JSONOutputArchive oarchive(os);
+
+	try
 	{
-		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ifstream is(projectDir + aInfo.filePath);
-		cereal::JSONInputArchive iarchive(is);
-		Prefab* loadedPrefab = new Prefab();
-
-		try
-		{
-			iarchive(*loadedPrefab);
-			Engine::get()->getMemoryPool().add(aInfo.uuid, loadedPrefab);
-			return ResourceWrapper<Prefab>(aInfo.uuid);
-
-		}
-		catch (const cereal::Exception& e)
-		{
-			logError("Deserialization Error occured: {}", e.what());
-		}
-
-		return ResourceWrapper<Prefab>::empty;
+		oarchive(*prefab.as<Prefab>().get());
 	}
-
-	static void save(const ResourceWrapper<Prefab>& prefab, const AssetInfo& aInfo)
+	catch (const cereal::Exception& e)
 	{
-		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ofstream os(projectDir + "/" + aInfo.filePath);
-		cereal::JSONOutputArchive oarchive(os);
-
-		try
-		{
-			oarchive(*prefab.get());
-		}
-		catch (const cereal::Exception& e)
-		{
-			logError("Serialization Error occured: {}", e.what());
-		}
+		logError("Serialization Error occured: {}", e.what());
 	}
-};
-
-static AssetFnRegister<AssetType::PREFAB> assetRegister(AssetTraits<Prefab>::load);
+}
 
 ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabImportSettings desc)
 {
 	desc.aType = AssetType::PREFAB;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset<Prefab>(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Prefab>();
 }
 
 void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo)
@@ -187,3 +183,5 @@ void Prefab::Instansiate()
 
 
 }
+
+

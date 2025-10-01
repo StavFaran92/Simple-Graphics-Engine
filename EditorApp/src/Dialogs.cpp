@@ -333,7 +333,8 @@ void displayMaterialEditDialog()
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			Material::updateAsset(mat, {});
+			//Material::updateAsset(mat, {});
+			Engine::get()->getSubSystem<Assets>()->updateAsset(mat);
 			ImGui::CloseCurrentPopup();
 		}
 

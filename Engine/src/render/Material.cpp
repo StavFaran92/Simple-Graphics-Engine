@@ -18,54 +18,58 @@
 
 #include <filesystem>
 
-template<>
-struct AssetTraits<Material>
+namespace {
+	struct MaterialManagerRegistration {
+		MaterialManagerRegistration() {
+			AssetFactory::registerManager(AssetType::MATERIAL, std::make_shared<MaterialAssetManager>());
+		}
+	} _materialManagerRegistration;
+}
+
+bool MaterialAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	static bool copyFiles(const std::string& fileLocation, const AssetInfo& aInfo)
+	return false;
+}
+
+ResourceWrapper<ResourceBase> MaterialAssetManager::load(AssetInfo& aInfo)
+{
+	auto projectDir = Engine::get()->getProjectDirectory();
+	std::ifstream is(projectDir + "/" + aInfo.filePath);
+	cereal::JSONInputArchive iarchive(is);
+	Material* loadedMaterial = new Material();
+
+	try
 	{
-		return false;
+		iarchive(*loadedMaterial);
+		Engine::get()->getMemoryPool().add(aInfo.uuid, loadedMaterial);
+		return ResourceWrapper<ResourceBase>(aInfo.uuid);
+
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	static ResourceWrapper<Material> load(AssetInfo& aInfo)
+	return ResourceWrapper<ResourceBase>::empty;
+}
+
+void MaterialAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+{
+	auto projectDir = Engine::get()->getProjectDirectory();
+	std::ofstream os(projectDir + "/" + aInfo.filePath);
+	cereal::JSONOutputArchive oarchive(os);
+
+	try
 	{
-		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ifstream is(projectDir + "/" + aInfo.filePath);
-		cereal::JSONInputArchive iarchive(is);
-		Material* loadedMaterial = new Material();
-
-		try
-		{
-			iarchive(*loadedMaterial);
-			Engine::get()->getMemoryPool().add(aInfo.uuid, loadedMaterial);
-			return ResourceWrapper<Material>(aInfo.uuid);
-
-		}
-		catch (const cereal::Exception& e)
-		{
-			logError("Deserialization Error occured: {}", e.what());
-		}
-
-		return ResourceWrapper<Material>::empty;
+		oarchive(*mat.as<Material>().get());
 	}
-
-	static void save(const ResourceWrapper<Material>& mat, const AssetInfo& aInfo)
+	catch (const cereal::Exception& e)
 	{
-		auto projectDir = Engine::get()->getProjectDirectory();
-		std::ofstream os(projectDir + "/" + aInfo.filePath);
-		cereal::JSONOutputArchive oarchive(os);
-
-		try
-		{
-			oarchive(*mat.get());
-		}
-		catch (const cereal::Exception& e)
-		{
-			logError("Serialization Error occured: {}", e.what());
-		}
+		logError("Serialization Error occured: {}", e.what());
 	}
-};
+}
 
-static AssetFnRegister<AssetType::MATERIAL> assetRegister(AssetTraits<Material>::load);
+//static AssetFnRegister<AssetType::MATERIAL> assetRegister(AssetTraits<Material>::load);
 
 Material::Material()
 {
@@ -144,7 +148,7 @@ ResourceWrapper<Material> Material::import(const std::string& fileLocation, Mate
 {
 	desc.aType = AssetType::MATERIAL;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset<Material>(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Material>();
 }
 
 ResourceWrapper<Material> Material::create()

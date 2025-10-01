@@ -50,11 +50,11 @@ public:
 template<AssetType T>
 AssetFnRegister<T> AssetFnRegister<T>::staticRegister;
 
-template<typename T>
-struct AssetTraits {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo&);
-	static ResourceWrapper<T> load(AssetInfo& aInfo);
-	static void save(const ResourceWrapper<T>& asset, const AssetInfo& aInfo);
+class AssetManager {
+public:
+	virtual bool copyFiles(const std::string& fileLocation, AssetInfo&) = 0;
+	virtual ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) = 0;
+	virtual void save(const ResourceWrapper<ResourceBase>& asset, const AssetInfo& aInfo) {};
 };
 
 class ResourceBase

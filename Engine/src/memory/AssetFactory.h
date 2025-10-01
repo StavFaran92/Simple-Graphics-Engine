@@ -2,11 +2,19 @@
 
 #include "Assets.h"
 
+class AssetManager;
+
 class AssetFactory
 {
 public:
 	using LoadFn = std::function<ResourceWrapper<ResourceBase>(AssetInfo&)>;
 	//using SaveFn = std::function<void(ResourceWrapper<ResourceBase>, const std::string&)>;
+
+	// Register a manager instance for a specific asset type.
+	static void registerManager(AssetType aType, std::shared_ptr<AssetManager> manager);
+
+	// Retrieve the manager (non-owning pointer).
+	static AssetManager* getManager(AssetType aType);
 
 	static bool loadAsset(AssetInfo& aInfo);
 
@@ -22,5 +30,5 @@ private:
 	}
 
 private:
-	
+	static std::map<AssetType, std::shared_ptr<AssetManager>>& getManagerRegistry();
 };

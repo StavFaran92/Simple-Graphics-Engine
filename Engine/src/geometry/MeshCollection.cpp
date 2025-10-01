@@ -5,39 +5,41 @@
 
 #include <filesystem>
 
-template<>
-struct AssetTraits<MeshCollection>
+namespace {
+	struct MeshManagerRegistration {
+		MeshManagerRegistration() {
+			AssetFactory::registerManager(AssetType::MESH, std::make_shared<MeshCollectionAssetManager>());
+		}
+	} _meshManagerRegistration;
+}
+
+bool MeshCollectionAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	static bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
-	{
-		return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
-	}
+	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
+}
 
-	static ResourceWrapper<MeshCollection> load(const AssetInfo& aInfo)
-	{
-		UUID uuid = aInfo.uuid;
-		MeshCollection* meshPtr = new MeshCollection();
-		Engine::get()->getMemoryPool().add(uuid, meshPtr);
-		ResourceWrapper<MeshCollection> generatedMesh(uuid);
-		ModelImporter::ModelInfo mInfo;
-		mInfo.mesh = generatedMesh;
-		Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
-		m_lastLoadedModelInfo = mInfo;
-		return generatedMesh;
+ResourceWrapper<ResourceBase> MeshCollectionAssetManager::load(AssetInfo& aInfo)
+{
+	UUID uuid = aInfo.uuid;
+	MeshCollection* meshPtr = new MeshCollection();
+	Engine::get()->getMemoryPool().add(uuid, meshPtr);
+	ResourceWrapper<MeshCollection> generatedMesh(uuid);
+	ModelImporter::ModelInfo mInfo;
+	mInfo.mesh = generatedMesh;
+	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
+	m_lastLoadedModelInfo = mInfo;
+	return generatedMesh;
+}
 
-		//return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
-	}
+std::map<int, ResourceWrapper<Material>> MeshCollectionAssetManager::getLoadedMaterials()
+{
+	return m_lastLoadedModelInfo.materials;
+}
 
-	static std::map<int, ResourceWrapper<Material>> getLoadedMaterials()
-	{
-		return m_lastLoadedModelInfo.materials;
-	}
-
-private:
-	static inline ModelImporter::ModelInfo m_lastLoadedModelInfo;
-};
-
-static AssetFnRegister<AssetType::MESH> textureAssetRegister(AssetTraits<MeshCollection>::load);
+void MeshCollectionAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+{
+	throw new std::runtime_error("Not yet implemented!");
+}
 
 void MeshCollection::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
@@ -97,29 +99,12 @@ ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLo
 	desc.aType = AssetType::MESH;
 	desc.assetDirectory = std::filesystem::path(fileLocation).filename().stem().generic_string();
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset<MeshCollection>(fileLocation, desc.parse());
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<MeshCollection>();
 }
 
 std::map<int, ResourceWrapper<Material>> MeshCollection::getLastLoadedMaterials()
 {
-	return AssetTraits<MeshCollection>::getLoadedMaterials();
+	return dynamic_cast<MeshCollectionAssetManager*>(AssetFactory::getManager(AssetType::MESH))->getLoadedMaterials(); // todo fix
 }
 
-//Resource<MeshCollection> MeshCollection::import(const std::string& fileLocation, const ModelImporter::ModelImportSettings& settings)
-//{
-//	return Resource<MeshCollection>();
-//}
 
-//Resource<MeshCollection> MeshCollection::loadInner(AssetInfo aInfo)
-//{
-//	UUID uuid = aInfo.uuid;
-//	MeshCollection* meshPtr = new MeshCollection();
-//	Engine::get()->getMemoryPool().add(uuid, meshPtr);
-//	Resource<MeshCollection> generatedMesh(uuid);
-//	ModelImporter::ModelInfo mInfo;
-//	mInfo.mesh = generatedMesh;
-//	Engine::get()->getResourceManager()->incRef(uuid);
-//	const std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-//	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(filepath, mInfo);
-//	return generatedMesh;
-//}

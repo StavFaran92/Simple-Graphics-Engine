@@ -47,6 +47,13 @@ struct ShaderAssetDescriptor : public AssetDescriptor
 	);
 };
 
+struct ShaderAssetManager : public AssetManager
+{
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
+	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
+	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+};
+
 class EngineAPI Shader : public ResourceBase, std::enable_shared_from_this<Shader>
 {
 public:
@@ -127,7 +134,7 @@ private:
 	void setMat4(const std::string& name, const glm::mat4& v);
 
 	friend class CustomShaderBuilder;
-	friend class AssetTraits<Shader>;
+	friend class ShaderAssetManager;
 
 protected:
 	unsigned int m_id;
