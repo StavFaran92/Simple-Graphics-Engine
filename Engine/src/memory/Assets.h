@@ -61,72 +61,7 @@ struct EngineAPI AssetInfo : public AssetDescriptor
 
 	AssetInfo() = default;
 
-
-	AssetInfo(const AssetDescriptor& assetDesc)
-		: AssetDescriptor(assetDesc)
-	{
-		importSettings = assetDesc.fillParams();
-
-		if (aType == AssetType::NONE)
-		{
-			logError("Asset type cannot be NONE.");
-			return;
-		}
-
-		if (!origFilePath.empty())
-		{
-			auto& path = std::filesystem::path(origFilePath);
-
-			// Extract Name
-			if (name.empty())
-			{
-				name = path.filename().stem().string();
-			}
-			ext = path.extension().string();
-			fileName = path.filename().string();
-		}
-
-		if (!customUUID.empty())
-		{
-			uuid = customUUID;
-		}
-		else
-		{
-			uuid = uuid::generate_uuid_v4();
-		}
-
-		if (name.empty())
-		{
-			name = uuid;
-		}
-
-		if (ext.empty())
-		{
-			if (!filePathHint.empty())
-			{
-				ext = std::filesystem::path(filePathHint).extension().string();
-			}
-
-			ext = getExtensionFromType(aType);
-
-			if (ext.empty())
-			{
-				logError("Asset extension cannot be empty.");
-				return;
-			}
-		}
-
-		
-
-		fileName = name + ext;
-
-		filePath = "";
-		if (!assetDirectory.empty())
-		{
-			filePath += assetDirectory + "/";
-		}
-		filePath += fileName;
-	}
+	AssetInfo(const AssetDescriptor& assetDesc);
 
 	void update(const AssetUpdateDescriptor& uDesc);
 

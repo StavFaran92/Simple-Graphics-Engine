@@ -25,6 +25,72 @@ AssetInfo AssetDescriptor::parse()
 	return AssetInfo(*this);
 }
 
+AssetInfo::AssetInfo(const AssetDescriptor& assetDesc)
+	: AssetDescriptor(assetDesc)
+{
+	importSettings = assetDesc.fillParams();
+
+	if (aType == AssetType::NONE)
+	{
+		logError("Asset type cannot be NONE.");
+		return;
+	}
+
+	if (!origFilePath.empty())
+	{
+		auto& path = std::filesystem::path(origFilePath);
+
+		// Extract Name
+		if (name.empty())
+		{
+			name = path.filename().stem().string();
+		}
+		ext = path.extension().string();
+		fileName = path.filename().string();
+	}
+
+	if (!customUUID.empty())
+	{
+		uuid = customUUID;
+	}
+	else
+	{
+		uuid = uuid::generate_uuid_v4();
+	}
+
+	if (name.empty())
+	{
+		name = uuid;
+	}
+
+	if (ext.empty())
+	{
+		if (!filePathHint.empty())
+		{
+			ext = std::filesystem::path(filePathHint).extension().string();
+		}
+
+		ext = getExtensionFromType(aType);
+
+		if (ext.empty())
+		{
+			logError("Asset extension cannot be empty.");
+			return;
+		}
+	}
+
+
+
+	fileName = name + ext;
+
+	filePath = "";
+	if (!assetDirectory.empty())
+	{
+		filePath += assetDirectory + "/";
+	}
+	filePath += fileName;
+}
+
 void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
 {
 	if (!uDesc.assetDirectory.empty())
@@ -51,53 +117,6 @@ void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
 	}
 	filePath += fileName;
 }
-
-//void Assets::importAsset(AssetInfo& aInfo)
-//{
-//	auto& path = aInfo.origFilePath;
-//
-//	// Validate
-//	if (!std::filesystem::exists(path))
-//	{
-//		logError("File doesn't exists: " + path);
-//		return;
-//	}
-//
-//	const auto& allAssetsOfType = getAllAssetsOfType(aInfo.aType);
-//	for (const auto& asset : allAssetsOfType)
-//	{
-//		// Should add override option in settings
-//		if (asset.name == aInfo.name)
-//		{
-//			logWarning("Asset name must be unique, abort asset import");
-//			return;
-//		}
-//	}
-//
-//	std::string fullName = std::filesystem::path(path).filename().string();
-//	std::string name = fullName.substr(0, fullName.find_first_of('.'));
-//	std::string ext = std::filesystem::path(path).extension().string();
-//
-//	if (!aInfo.isTransient)
-//	{
-//		// Save asset in resource folder
-//		auto& projectDir = Engine::get()->getProjectDirectory();
-//		const std::string relativeFilepath = "/" + fullName;
-//		const std::string savedFilePath = projectDir + relativeFilepath;
-//		std::filesystem::copy_file(path, savedFilePath);
-//
-//		aInfo.filePath = relativeFilepath;
-//
-//		Engine::get()->getMemoryManagementSystem()->addAssociation(fullName, aInfo.uuid);
-//		Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
-//	}
-//
-//	aInfo.isValid = true;
-//
-//	m_assets[name] = aInfo;
-//
-//	logInfo("Successfully imported asset: '" + path + "' into: '" + aInfo.name + "'.");
-//}
 
 void Assets::addAsset(AssetInfo& aInfo)
 {
