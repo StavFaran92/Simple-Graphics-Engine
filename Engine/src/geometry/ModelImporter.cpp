@@ -545,19 +545,19 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		texture = Factory<Texture>::create();
 		texture.get()->build(tData);
 
-		auto& projectDir = Engine::get()->getProjectDirectory();
-		const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName + ".png";
-		Texture::writeTexture2D(savedFilePath, texture);
+		//auto& projectDir = Engine::get()->getProjectDirectory();
+		//const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName + ".png";
+		//Texture::writeTexture2D(savedFilePath, texture);
 
 		AssetDescriptor textureAssetDesc;
 		textureAssetDesc.aType = AssetType::TEXTURE;
 		textureAssetDesc.name = tData.textureName;
 		textureAssetDesc.isTransient = false;
-		textureAssetDesc.filePathHint = savedFilePath;
+		//textureAssetDesc.filePathHint = savedFilePath;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.attributes = texture->getTextureAssetAttributes().toMap();
 		textureAssetDesc.data = texture;
-		Engine::get()->getSubSystem<Assets>()->addAsset(textureAssetDesc.parse());
+		Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc.parse());
 
 		//texture.get()->m_assetInfo = aInfo;
 

@@ -14,7 +14,7 @@ namespace uuid {
 
     inline UUID generate_uuid_v4()
     {
-#ifdef OPTION_A
+#ifdef UUID_OPTION_A
         std::stringstream ss;
         int i;
         ss << std::hex;
