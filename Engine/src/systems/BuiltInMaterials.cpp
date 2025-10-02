@@ -4,12 +4,12 @@
 
 BuiltInMaterials::BuiltInMaterials()
 {
-	AssetDescriptor aDesc;
+	AssetCreateDescriptor aDesc;
 	aDesc.isTransient = true;
 	aDesc.name = "SGE_MATERIAL_DEFAULT";
 	aDesc.aType = AssetType::MATERIAL;
 	m_defaultMaterial = Factory<Material>::createUsingCustomUUID(aDesc.name);
-	Engine::get()->getSubSystem<Assets>()->addAsset(aDesc.parse());
+	Engine::get()->getSubSystem<Assets>()->createAsset(m_defaultMaterial, aDesc);
 }
 
 ResourceWrapper<Material> BuiltInMaterials::getMaterial(const std::string& material)

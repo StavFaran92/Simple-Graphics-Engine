@@ -267,7 +267,7 @@ ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, Textur
 {
 	desc.aType = AssetType::TEXTURE;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Texture>();
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Texture>();
 }
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)
@@ -287,18 +287,12 @@ void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> tex
 	texture->m_data.data = pixels;
 	texture->m_data.bpp = 3;
 
-	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string relativeFilepath = "/" + name + ".png";
-	std::string savedFileLocation = projectDir + relativeFilepath;
-	writeTexture2D(savedFileLocation, texture);
-
-	AssetDescriptor aInfo;
+	AssetCreateDescriptor aInfo;
 	aInfo.aType = AssetType::TEXTURE;
 	aInfo.customUUID = texture.getUID();
 	aInfo.name = name;
-	aInfo.filePathHint = relativeFilepath;
 	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
+	Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 }
 
 void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData)

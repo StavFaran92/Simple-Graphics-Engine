@@ -47,18 +47,13 @@ CommonTextures* CommonTextures::create()
 		auto texture = Texture::create2DTextureFromBuffer(tData);
 		instance->m_textures[TextureType::WHITE_1X1] = texture;
 
-		//auto& projectDir = Engine::get()->getProjectDirectory();
-		//std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
-		//Texture::writeTexture2D(savedFileLocation, texture);
-
-		AssetDescriptor aInfo;
+		AssetCreateDescriptor aInfo;
 		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_WHITE";
 		aInfo.isTransient = true;
-		//aInfo.filePath = savedFileLocation;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
+		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 	}
 
 	{
@@ -81,25 +76,14 @@ CommonTextures* CommonTextures::create()
 		auto texture = Texture::create2DTextureFromBuffer(tData);
 		instance->m_textures[TextureType::BLACK_1X1] = texture;
 
-		//auto& projectDir = Engine::get()->getProjectDirectory();
-		//std::string savedFileLocation = projectDir + "/" + texture.getUID() + ".png";
-		//Texture::writeTexture2D(savedFileLocation, texture);
-
-		AssetDescriptor aInfo;
+		AssetCreateDescriptor aInfo;
 		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_BLACK";
 		aInfo.isTransient = true;
-		//aInfo.filePath = savedFileLocation;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
+		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 	}
-
-	//Engine::get()->getSubSystem<Assets>()->importTexture2D("SGE_CUBEMAP_WHITE", [&]() {
-	//	auto cubemap = Cubemap::createDefaultCubemap();
-	//	instance->m_textures[TextureType::CUBEMAP_WHITE_1X1] = cubemap;
-	//	return cubemap;
-	//	});
 
 	return instance;
 }

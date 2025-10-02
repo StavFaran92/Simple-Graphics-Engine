@@ -137,7 +137,7 @@ public:
 		std::string textureName;
 	};
 
-	struct TextureAssetDescriptor : public AssetDescriptor
+	struct TextureAssetDescriptor : public AssetCreateDescriptor
 	{
 		bool genMipMap = false;
 		bool flip = false;

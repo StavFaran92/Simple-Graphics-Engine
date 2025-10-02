@@ -5,7 +5,7 @@
 #include "runtime/Entity.h"
 #include "serialize/Archiver.h"
 
-struct PrefabImportSettings : public AssetDescriptor
+struct PrefabImportSettings : public AssetCreateDescriptor
 {};
 
 struct PrefabAssetManager : public AssetManager

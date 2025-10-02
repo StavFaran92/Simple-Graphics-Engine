@@ -99,7 +99,7 @@ ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLo
 	desc.aType = AssetType::MESH;
 	desc.assetDirectory = std::filesystem::path(fileLocation).filename().stem().generic_string();
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<MeshCollection>();
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MeshCollection>();
 }
 
 std::map<int, ResourceWrapper<Material>> MeshCollection::getLastLoadedMaterials()

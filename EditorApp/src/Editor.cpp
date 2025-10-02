@@ -416,10 +416,10 @@ void ShowModelCreatorWindow()
 	
 	ResourceWrapper<Prefab> prefab = Prefab::create(entity);
 
-	AssetDescriptor aInfo;
+	AssetCreateDescriptor aInfo;
 	aInfo.name = modelName;
 	aInfo.aType = AssetType::PREFAB;
-	Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo.parse());
+	Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
 
 	entity.remove();
 
@@ -514,10 +514,10 @@ void displayEntityHelper(Entity& e)
 
 				auto prefab = Prefab::create(state.getSelectedEntity());
 
-				AssetDescriptor aInfo;
+				AssetCreateDescriptor aInfo;
 				aInfo.name = assetName;
 				aInfo.aType = AssetType::PREFAB;
-				Prefab::save(prefab, aInfo.parse());
+				Prefab::save(prefab, aInfo);
 
 			}
 

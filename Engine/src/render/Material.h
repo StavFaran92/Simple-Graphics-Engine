@@ -10,7 +10,7 @@
 #include "texture/TextureSampler.h"
 #include "memory/Asset.h"
 
-struct MaterialImportSettings : public AssetDescriptor
+struct MaterialImportSettings : public AssetCreateDescriptor
 {
 
 };

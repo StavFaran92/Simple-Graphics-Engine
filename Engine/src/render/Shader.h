@@ -33,7 +33,7 @@ template<typename> class AssetTraits;
 
 using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned int, glm::mat3, glm::mat4>;
 
-struct ShaderAssetDescriptor : public AssetDescriptor
+struct ShaderAssetDescriptor : public AssetCreateDescriptor
 {
 	ShaderOverride shaderOverride = ShaderOverride::None;
 

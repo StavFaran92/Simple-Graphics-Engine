@@ -209,10 +209,15 @@ void AssetViewWindow::display()
 					ImGui::Text("Extension: %s", aInfo.ext.c_str());
 					ImGui::Text("UUID: %s", aInfo.uuid.c_str());
 					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);
-					for (const auto& [attribName, attribVal] : aInfo.attributes)
-					{
-						ImGui::Text("%s: %s", attribName.c_str(), attribVal.c_str());
 
+					if (aInfo.attributes.size() > 0)
+					{
+						ImGui::LabelText("##Attributes:", "Attributes:");
+						for (const auto& [attribName, attribVal] : aInfo.attributes)
+						{
+							ImGui::Text("%s: %s", attribName.c_str(), attribVal.c_str());
+
+						}
 					}
 					
 

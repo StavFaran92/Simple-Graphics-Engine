@@ -238,17 +238,13 @@ void Cubemap::saveEquirectangularMap(ResourceWrapper<Texture> equirectangularMap
 
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
-	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string relativeFilepath = "/" + equirectangularMap.getUID() + ".png";
-	std::string savedFilepath = projectDir + relativeFilepath;
-	stbi_write_png(savedFilepath.c_str(), equirectangularMap.get()->getWidth(), equirectangularMap.get()->getHeight(), 3, pixels,
-		equirectangularMap.get()->getWidth() * 3);
+	equirectangularMap->m_data.data = pixels;
+	equirectangularMap->m_data.bpp = 3;
 
-	AssetDescriptor aInfo;
+	AssetCreateDescriptor aInfo;
 	aInfo.aType = AssetType::TEXTURE;
-	aInfo.filePathHint = relativeFilepath;
 	aInfo.customUUID = equirectangularMap.getUID();
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
+	Engine::get()->getSubSystem<Assets>()->createAsset(equirectangularMap, aInfo);
 }
 
 // adi loves you

@@ -11,12 +11,12 @@
 
 void addAsAsset(const ResourceWrapper<MeshCollection>& meshCollection)
 {
-	AssetDescriptor aInfo;
+	AssetCreateDescriptor aInfo;
 	aInfo.customUUID = meshCollection.getUID();
 	aInfo.aType = AssetType::MESH;
 	aInfo.name = meshCollection.getUID();
 	aInfo.isTransient = true;
-	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo.parse());
+	Engine::get()->getSubSystem<Assets>()->createAsset(meshCollection, aInfo);
 }
 
 BuiltInMeshes::BuiltInMeshes()

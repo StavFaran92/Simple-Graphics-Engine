@@ -20,15 +20,16 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
-AssetInfo AssetDescriptor::parse()
-{
-	return AssetInfo(*this);
-}
-
-AssetInfo::AssetInfo(const AssetDescriptor& assetDesc)
-	: AssetDescriptor(assetDesc)
+AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 {
 	importSettings = assetDesc.fillParams();
+
+	name = assetDesc.name;
+	aType = assetDesc.aType;
+	origFilePath = assetDesc.origFilePath;
+	assetDirectory = assetDesc.assetDirectory;
+	attributes = assetDesc.attributes;
+	isTransient = assetDesc.isTransient;
 
 	if (aType == AssetType::NONE)
 	{
@@ -49,9 +50,9 @@ AssetInfo::AssetInfo(const AssetDescriptor& assetDesc)
 		fileName = path.filename().string();
 	}
 
-	if (!customUUID.empty())
+	if (!assetDesc.customUUID.empty())
 	{
-		uuid = customUUID;
+		uuid = assetDesc.customUUID;
 	}
 	else
 	{
@@ -65,11 +66,6 @@ AssetInfo::AssetInfo(const AssetDescriptor& assetDesc)
 
 	if (ext.empty())
 	{
-		if (!filePathHint.empty())
-		{
-			ext = std::filesystem::path(filePathHint).extension().string();
-		}
-
 		ext = getExtensionFromType(aType);
 
 		if (ext.empty())
@@ -78,8 +74,6 @@ AssetInfo::AssetInfo(const AssetDescriptor& assetDesc)
 			return;
 		}
 	}
-
-
 
 	fileName = name + ext;
 
@@ -246,8 +240,10 @@ void Assets::updateAsset(const ResourceWrapper<ResourceBase>& asset, const Asset
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 }
 
-ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetInfo& aInfo)
+ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
 {
+	AssetInfo aInfo(desc);
+
 	// Validate input
 	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
 	{
@@ -288,9 +284,11 @@ ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocatio
 	return asset;
 }
 
-ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& asset, AssetInfo& aInfo)
+ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc)
 {
-	aInfo.uuid = asset.getUID();
+	desc.customUUID = asset.getUID();
+
+	AssetInfo aInfo(desc);
 
 	if (!aInfo.isTransient)
 	{

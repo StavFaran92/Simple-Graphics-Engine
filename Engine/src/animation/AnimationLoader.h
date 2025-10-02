@@ -12,7 +12,7 @@
 #include "memory/Assets.h"
 #include "memory/Asset.h"
 
-struct AnimationImportSettings : public AssetDescriptor
+struct AnimationImportSettings : public AssetCreateDescriptor
 {
 
 };

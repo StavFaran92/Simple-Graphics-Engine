@@ -295,14 +295,12 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 			extractAiMaterialProperties(aMaterial, material);
 
-			AssetDescriptor materialAssetInfo;
+			AssetCreateDescriptor materialAssetInfo;
 			materialAssetInfo.isTransient = aInfo.isTransient;
 			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
-			Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo.parse());
-			//AssetLoader<Material>::createAsset(material, materialAssetInfo.parse());
-			//Material::updateAsset(material, {});
+			Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo);
 		}
 	}
 
@@ -480,7 +478,13 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 
 
 
-ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, ResourceWrapper<Texture>>& cachedTextures, const AssetInfo& aInfo)
+ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, 
+	aiMaterial* mat, 
+	aiTextureType type, 
+	const std::string& dir, 
+	std::unordered_map<std::string, 
+	ResourceWrapper<Texture>>& cachedTextures, 
+	const AssetInfo& aInfo)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
@@ -492,6 +496,14 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 	const aiTexture* aiTexture = scene->GetEmbeddedTexture(str.C_Str());
 	if(aiTexture)
 	{
+		std::string textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().stem().string();
+
+		if (cachedTextures.find(textureName) != cachedTextures.end())
+		{
+			// Already loaded
+			return cachedTextures[textureName];
+		}
+
 		int width = 0;
 		int height = 0;
 		unsigned char* pixelData = nullptr;
@@ -517,6 +529,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		tData.internalFormat = Texture::InternalFormat::RGB2;
 		tData.isTransient = aInfo.isTransient;
 		tData.genMipMap = false;
+		tData.textureName = textureName;
 		tData.height = height;
 		tData.width = width;
 		tData.type = Texture::Type::UNSIGNED_BYTE;
@@ -530,36 +543,16 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 			{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
 		};
 
-		tData.textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().stem().string();
-		if (tData.textureName.empty())
-		{
-			tData.textureName = uuid::generate_uuid_v4();
-		}
-
-		if (cachedTextures.find(tData.textureName) != cachedTextures.end())
-		{
-			// Already loaded
-			return cachedTextures[tData.textureName];
-		}
-
 		texture = Factory<Texture>::create();
 		texture.get()->build(tData);
 
-		//auto& projectDir = Engine::get()->getProjectDirectory();
-		//const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + tData.textureName + ".png";
-		//Texture::writeTexture2D(savedFilePath, texture);
-
-		AssetDescriptor textureAssetDesc;
+		AssetCreateDescriptor textureAssetDesc;
 		textureAssetDesc.aType = AssetType::TEXTURE;
 		textureAssetDesc.name = tData.textureName;
-		textureAssetDesc.isTransient = false;
-		//textureAssetDesc.filePathHint = savedFilePath;
+		textureAssetDesc.isTransient = aInfo.isTransient;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.attributes = texture->getTextureAssetAttributes().toMap();
-		textureAssetDesc.data = texture;
-		Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc.parse());
-
-		//texture.get()->m_assetInfo = aInfo;
+		Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc);
 
 		cachedTextures.insert({ tData.textureName, texture });
 	}	
@@ -584,9 +577,6 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 
 		cachedTextures.insert({ path, texture });
 	}
-	
-
-	
 
 	return texture;
 }

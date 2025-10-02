@@ -553,13 +553,13 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	shader->m_glslFilePath = filepath;
 	shader->recompile();
 
-	AssetDescriptor aInfo;
+	AssetCreateDescriptor aInfo;
 	aInfo.origFilePath = filepath;
 	aInfo.aType = AssetType::SHADER;
 	aInfo.name = name;
 	aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
 	aInfo.isTransient = isTransient;
-	Engine::get()->getSubSystem<Assets>()->createAsset(shader, aInfo.parse());
+	Engine::get()->getSubSystem<Assets>()->createAsset(shader, aInfo);
 
 	return shader;
 }
@@ -568,7 +568,7 @@ ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, ShaderAs
 {
 	desc.aType = AssetType::SHADER;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Shader>();
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Shader>();
 }
 
 //Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)

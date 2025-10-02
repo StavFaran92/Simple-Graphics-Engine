@@ -68,7 +68,7 @@ ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabIm
 {
 	desc.aType = AssetType::PREFAB;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Prefab>();
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Prefab>();
 }
 
 void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo)

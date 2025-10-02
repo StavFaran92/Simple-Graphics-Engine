@@ -148,7 +148,7 @@ ResourceWrapper<Material> Material::import(const std::string& fileLocation, Mate
 {
 	desc.aType = AssetType::MATERIAL;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc.parse()).as<Material>();
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Material>();
 }
 
 ResourceWrapper<Material> Material::create()
