@@ -323,7 +323,7 @@ void ModelImporter::processNode(const aiScene* scene, aiNode* node)
 	{
 		std::shared_ptr<Mesh> mesh = processMesh(scene, scene->mMeshes[node->mMeshes[i]]);
 
-		aiMatrix4x4 transform;
+		aiMatrix4x4 transform = node->mTransformation;
 		aiNode* parent = node->mParent;
 		while (parent)
 		{
