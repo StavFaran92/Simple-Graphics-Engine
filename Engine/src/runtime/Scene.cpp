@@ -100,8 +100,7 @@ void Scene::displayWireframeMesh(Entity e)
 		graphics->entity = &e;
 		graphics->shader = m_tempOutlineShader;
 		graphics->mesh = mesh.get();
-		auto tempModel = e.getComponent<Transformation>().getWorldTransformation();
-		graphics->model = &tempModel;
+		graphics->model = e.getComponent<Transformation>().getWorldTransformation();
 
 		m_deferredRenderer->render();
 	}
@@ -331,8 +330,8 @@ void Scene::draw(float deltaTime)
 		graphics->scene = this;
 		graphics->context = m_context;
 		graphics->renderer = m_forwardRenderer.get();
-		graphics->view = &glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
-		graphics->projection = &m_defaultPerspectiveProjection;
+		graphics->view = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
+		graphics->projection = m_defaultPerspectiveProjection;
 		graphics->cameraPos = primaryCameraTransform.getWorldPosition();
 		graphics->irradianceMap = m_irradianceMap;
 		graphics->prefilterEnvMap = m_prefilterEnvMap;
@@ -434,8 +433,8 @@ void Scene::draw(float deltaTime)
 			for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
 			{
 				m_terrainShader->use();
-				m_terrainShader->setUniformValue("view", *graphics->view);
-				m_terrainShader->setUniformValue("projection", *graphics->projection);
+				m_terrainShader->setUniformValue("view", graphics->view);
+				m_terrainShader->setUniformValue("projection", graphics->projection);
 				m_terrainShader->setUniformValue("scale", terrain.getScale());
 				m_terrainShader->setUniformValue("model", transform.getWorldTransformation());
 				m_terrainShader->setUniformValue("width", terrain.getWidth());
@@ -489,8 +488,8 @@ void Scene::draw(float deltaTime)
 			m_skyboxShader->use();
 			renderView->bind();
 
-			m_skyboxShader->setViewMatrix(*graphics->view);
-			m_skyboxShader->setProjectionMatrix(*graphics->projection);
+			m_skyboxShader->setViewMatrix(graphics->view);
+			m_skyboxShader->setProjectionMatrix(graphics->projection);
 
 			for (auto&& [entity, skybox, transform] :
 				m_registry->get().view<SkyboxComponent, Transformation>().each())
@@ -498,7 +497,7 @@ void Scene::draw(float deltaTime)
 				Entity entityhandler{ entity, m_registry.get() };
 				graphics->entity = &entityhandler;
 				graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
-				graphics->model = &transform.getWorldTransformation();
+				graphics->model = transform.getWorldTransformation();
 
 				if (skybox.cubemap.isEmpty()) continue;
 
@@ -543,8 +542,8 @@ void Scene::draw(float deltaTime)
 				shader.m_customShader->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
 
 				shader.m_customShader->setModelMatrix(glm::mat4(1.0));
-				shader.m_customShader->setViewMatrix(*graphics->view);
-				shader.m_customShader->setProjectionMatrix(*graphics->projection);
+				shader.m_customShader->setViewMatrix(graphics->view);
+				shader.m_customShader->setProjectionMatrix(graphics->projection);
 
 				auto viewport = renderView->getViewport();
 				shader.m_customShader->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
@@ -611,8 +610,8 @@ void Scene::draw(float deltaTime)
 						RenderCommand::clear();
 						m_highlightMaskShader->use();
 						m_highlightMaskShader->setModelMatrix(e.getComponent<Transformation>().getWorldTransformation());
-						m_highlightMaskShader->setViewMatrix(*graphics->view);
-						m_highlightMaskShader->setProjectionMatrix(*graphics->projection);
+						m_highlightMaskShader->setViewMatrix(graphics->view);
+						m_highlightMaskShader->setProjectionMatrix(graphics->projection);
 
 						for (auto& m : mesh->mesh->getMeshes())
 							RenderCommand::draw(m->getVAO());
@@ -678,8 +677,8 @@ void Scene::draw(float deltaTime)
 
 			m_wireframeGrid->shader->use();
 			m_wireframeGrid->shader->setModelMatrix(glm::mat4(1.0));
-			m_wireframeGrid->shader->setViewMatrix(*graphics->view);
-			m_wireframeGrid->shader->setProjectionMatrix(*graphics->projection);
+			m_wireframeGrid->shader->setViewMatrix(graphics->view);
+			m_wireframeGrid->shader->setProjectionMatrix(graphics->projection);
 			m_wireframeGrid->shader->setUniformValue("color", glm::vec3(0.6, 0.6, 0.6));
 
 			m_wireframeGrid->vao->Bind();

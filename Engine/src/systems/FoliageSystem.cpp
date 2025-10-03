@@ -172,8 +172,8 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 
 	auto& foliageShader = m_foliageShader;
 	foliageShader->use();
-	foliageShader->setUniformValue("view", *graphics->view);
-	foliageShader->setUniformValue("projection", *graphics->projection);
+	foliageShader->setUniformValue("view", graphics->view);
+	foliageShader->setUniformValue("projection", graphics->projection);
 	foliageShader->setUniformValue("colorA", foliage.colorA);
 	foliageShader->setUniformValue("colorB", foliage.colorB);
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);

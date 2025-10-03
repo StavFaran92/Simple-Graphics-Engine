@@ -274,6 +274,16 @@ int Mesh::getMaterialIndex() const
 	return materialIndex;
 }
 
+void Mesh::setRestTransform(glm::mat4 transform)
+{
+	m_restTransform = transform;
+}
+
+glm::mat4 Mesh::getRestTransform() const
+{
+	return m_restTransform;
+}
+
 Mesh::~Mesh()
 {
 	//logDebug( __FUNCTION__ );

@@ -363,8 +363,8 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
 
         m_debugVisualizeShader->use();
 
-        m_debugVisualizeShader->setViewMatrix(*graphics->view);
-        m_debugVisualizeShader->setProjectionMatrix(*graphics->projection);
+        m_debugVisualizeShader->setViewMatrix(graphics->view);
+        m_debugVisualizeShader->setProjectionMatrix(graphics->projection);
         m_debugVisualizeShader->setUniformValue("color", glm::vec3(0, 1, 0));
 
         glDisable(GL_DEPTH_TEST);

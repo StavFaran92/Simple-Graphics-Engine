@@ -160,8 +160,10 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 	session.name = modelName;
 	session.mesh = modelInfo.mesh;
 
+	m_currentSession = session;
+
 	// extract mesh from root node
-	processNode(scene->mRootNode, scene, session);
+	processNode(scene, scene->mRootNode);
 
 	if (scene->HasMaterials())
 	{
@@ -314,18 +316,29 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	return true;
 }
 
-void ModelImporter::processNode(aiNode* node, const aiScene* scene, ModelImporter::ModelImportSession& session)
+void ModelImporter::processNode(const aiScene* scene, aiNode* node)
 {
 	// process all the node's meshes (if any)
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
-		processMesh(scene->mMeshes[node->mMeshes[i]], scene, session);
+		std::shared_ptr<Mesh> mesh = processMesh(scene, scene->mMeshes[node->mMeshes[i]]);
+
+		aiMatrix4x4 transform;
+		aiNode* parent = node->mParent;
+		while (parent)
+		{
+			transform = parent->mTransformation * transform;
+			parent = parent->mParent;
+		}
+
+		mesh->setRestTransform(AssimpGLMHelpers::convertMat4ToGLMFormat(transform));
+		m_currentSession.mesh->addMesh(mesh);
 	}
 
 	// then do the same for each of its children
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		processNode(node->mChildren[i], scene, session);
+		processNode(scene, node->mChildren[i]);
 	}
 }
 
@@ -335,7 +348,7 @@ struct BoneWeight
 	float weight = 0.f;
 };
 
-void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporter::ModelImportSession& session)
+std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh)
 {
 	MeshBuilder builder;
 
@@ -347,32 +360,32 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 	std::vector<glm::vec2> texcoords;
 	std::vector<unsigned int> indices;
 
-	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+	for (unsigned int i = 0; i < aiMesh->mNumVertices; i++)
 	{
 		// process vertex positions, normals and texture coordinates
-		if (mesh->HasPositions())
+		if (aiMesh->HasPositions())
 		{
 			glm::vec3 pos;
-			pos.x = mesh->mVertices[i].x;
-			pos.y = mesh->mVertices[i].y;
-			pos.z = mesh->mVertices[i].z;
+			pos.x = aiMesh->mVertices[i].x;
+			pos.y = aiMesh->mVertices[i].y;
+			pos.z = aiMesh->mVertices[i].z;
 			positions.emplace_back(pos);
 		}
 
-		if (mesh->HasNormals())
+		if (aiMesh->HasNormals())
 		{
 			glm::vec3 normal;
-			normal.x = mesh->mNormals[i].x;
-			normal.y = mesh->mNormals[i].y;
-			normal.z = mesh->mNormals[i].z;
+			normal.x = aiMesh->mNormals[i].x;
+			normal.y = aiMesh->mNormals[i].y;
+			normal.z = aiMesh->mNormals[i].z;
 			normals.emplace_back(normal);
 		}
 
-		if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+		if (aiMesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
 		{
 			glm::vec2 vec;
-			vec.x = mesh->mTextureCoords[0][i].x;
-			vec.y = mesh->mTextureCoords[0][i].y;
+			vec.x = aiMesh->mTextureCoords[0][i].x;
+			vec.y = aiMesh->mTextureCoords[0][i].y;
 			texcoords.emplace_back(vec);
 		}
 		else
@@ -380,22 +393,22 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 			texcoords.emplace_back(glm::vec2(0.0f, 0.0f));
 		}
 
-		if (mesh->HasTangentsAndBitangents())
+		if (aiMesh->HasTangentsAndBitangents())
 		{
-			tangents.emplace_back(glm::vec3{ mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z });
+			tangents.emplace_back(glm::vec3{ aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z });
 		}
 	}
 	// process indices
-	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+	for (unsigned int i = 0; i < aiMesh->mNumFaces; i++)
 	{
-		aiFace face = mesh->mFaces[i];
+		aiFace face = aiMesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
 	}
 
 	
 	
-	if (mesh->HasBones())
+	if (aiMesh->HasBones())
 	{
 		std::vector<glm::ivec3> bonesIDs;
 		std::vector<glm::vec3> bonesWeights;
@@ -407,13 +420,13 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 		std::map<int, std::map<float, BoneWeight>> vertexToBoneMap;
 
 		// Extract Bone to ID map 
-		auto& boneNameToIDMap = session.boneNameToIDMap;
-		auto& boneCount = session.boneCount;
+		auto& boneNameToIDMap = m_currentSession.boneNameToIDMap;
+		auto& boneCount = m_currentSession.boneCount;
 
 		// Iterate all bones in Assimp model
-		for (int i = 0; i < mesh->mNumBones; i++)
+		for (int i = 0; i < aiMesh->mNumBones; i++)
 		{
-			auto bone = mesh->mBones[i];
+			auto bone = aiMesh->mBones[i];
 			auto boneName = bone->mName.C_Str();
 
 			// a new bone is found, increment bone ID and add bone offset to offsets array
@@ -459,10 +472,10 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 		builder.addBoneIDs(bonesIDs)
 			.addBoneWeights(bonesWeights);
 
-		session.mesh.get()->addBonesInfo(bonesOffsets, boneNameToIDMap);
+		m_currentSession.mesh->addBonesInfo(bonesOffsets, boneNameToIDMap);
 	}
 
-	builder.setMaterialIndex(mesh->mMaterialIndex);
+	builder.setMaterialIndex(aiMesh->mMaterialIndex);
 
 	builder.addPositions(positions)
 		.addNormals(normals)
@@ -473,7 +486,7 @@ void ModelImporter::processMesh(aiMesh* mesh, const aiScene* scene, ModelImporte
 	// build mesh
 	builder.build(*generatedMesh.get());
 
-	session.mesh.get()->addMesh(generatedMesh);
+	return generatedMesh;
 }
 
 

@@ -31,8 +31,8 @@ void DebugHelper::drawPoint(const glm::vec3& pos, const glm::vec3& color/* = { 1
 	m_pointShader->use();
 	m_pointShader->setUniformValue("color", color);
 	m_pointShader->setModelMatrix(model);
-	m_pointShader->setViewMatrix(*graphics->view);
-	m_pointShader->setProjectionMatrix(*graphics->projection);
+	m_pointShader->setViewMatrix(graphics->view);
+	m_pointShader->setProjectionMatrix(graphics->projection);
 
 	m_vao->Bind();
 
@@ -51,8 +51,8 @@ void DebugHelper::drawLine(const glm::vec3& p1, const glm::vec3& p2, const glm::
 	m_lineShader->setUniformValue("color", color);
 	m_lineShader->setUniformValue("p1", p1);
 	m_lineShader->setUniformValue("p2", p2);
-	m_lineShader->setViewMatrix(*graphics->view);
-	m_lineShader->setProjectionMatrix(*graphics->projection);
+	m_lineShader->setViewMatrix(graphics->view);
+	m_lineShader->setProjectionMatrix(graphics->projection);
 
 	m_vao->Bind();
 

@@ -75,7 +75,10 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		}
 	}
 
-	fileName = name + ext;
+	if (fileName.empty())
+	{
+		fileName = name + ext;
+	}
 
 	filePath = "";
 	if (!assetDirectory.empty())

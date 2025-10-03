@@ -41,9 +41,9 @@ public:
 	Material* material = nullptr;
 
 	// MVP
-	glm::mat4* model = nullptr;
-	glm::mat4* view = nullptr;
-	glm::mat4* projection = nullptr;
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
 
 	ResourceWrapper<Texture> irradianceMap = nullptr;
 	ResourceWrapper<Texture> prefilterEnvMap = nullptr;

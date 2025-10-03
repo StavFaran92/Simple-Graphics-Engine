@@ -94,6 +94,10 @@ public:
 
 	int getMaterialIndex() const;
 
+	void setRestTransform(glm::mat4 transform);
+
+	glm::mat4 getRestTransform() const;
+
 	/**
 	 * Build the mesh using the specified vertices data.
 	 * This call will initialize all the OpenGL related Buffer data
@@ -125,6 +129,7 @@ private:
 	size_t m_indexCount = 0;
 	VertexLayout m_layout;
 	bool m_useColors = false;
+	glm::mat4 m_restTransform;
 
 	AABB m_aabb;
 	int materialIndex{};

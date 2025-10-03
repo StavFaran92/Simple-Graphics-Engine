@@ -76,8 +76,7 @@ void Renderer::renderScene(Scene* scene)
             for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
             {
 
-                auto tempModel = entityHandler.getComponent<Transformation>().getWorldTransformation();
-                graphics->model = &tempModel;
+                graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation();;
                 graphics->shader = m_pbrShader;
                 graphics->mesh = mesh.get();
 
@@ -149,7 +148,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
         for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
         {
 
-            graphics->model = &entityHandler.getComponent<Transformation>().getWorldTransformation();;
+            graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation();;
             graphics->shader = m_pbrShader;
             graphics->mesh = mesh.get();
 
@@ -165,7 +164,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
 
             // draw model
             graphics->shader->use();
-            glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(*graphics->model)));
+            glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
             graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
             setUniforms();
 
@@ -182,28 +181,10 @@ void Renderer::setUniforms()
 
     auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-    // Model
-    if (graphics->model)
-    {
-        graphics->shader->setModelMatrix(*graphics->model);
-    }
-
-    // View
-    if (graphics->view)
-    {
-        graphics->shader->setViewMatrix(*graphics->view);
-    }
-
-    // Projection
-    if (graphics->projection)
-    {
-        graphics->shader->setProjectionMatrix(*graphics->projection);
-    }
-
-    if (graphics->material)
-    {
-        graphics->material->use(graphics->shader);
-    }
+    graphics->shader->setModelMatrix(graphics->model);
+    graphics->shader->setViewMatrix(graphics->view);
+    graphics->shader->setProjectionMatrix(graphics->projection);
+    graphics->material->use(graphics->shader);
 
     graphics->shader->bindUniformBlockToBindPoint("Time", 0);
     graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
@@ -291,7 +272,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             {
                 graphics->mesh = mesh.get();
                 auto& transform = graphics->entity->getComponent<Transformation>();
-                graphics->model = &transform.getWorldTransformation();
+                graphics->model = transform.getWorldTransformation();
 
                 // TODO get this to work
                 AABB& aabb = mesh.get()->getAABB();
@@ -341,7 +322,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 if (shaderComponent.projection == ShaderComponent::ProjectionType::DefaultProjection)
                 {
                     graphics->renderView->bind();
-                    glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(*graphics->model)));
+                    glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
                     graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
                     setUniforms();
                     RenderCommand::draw(mesh->getVAO());
@@ -383,7 +364,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             {
                 graphics->mesh = mesh.get();
                 auto& transform = graphics->entity->getComponent<Transformation>();
-                graphics->model = &transform.getWorldTransformation();
+                graphics->model = transform.getWorldTransformation();
 
                 // TODO get this to work
                 AABB& aabb = mesh.get()->getAABB();

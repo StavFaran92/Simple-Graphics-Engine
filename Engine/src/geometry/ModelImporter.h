@@ -86,13 +86,13 @@ private:
 	friend class Engine;
 
 	void loadModelFromAssimpScene(const aiScene* scene, const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo);
-	void processNode(aiNode* node, const aiScene* scene, ModelImportSession& session);
-	void processMesh(aiMesh* mesh, const aiScene* scene, ModelImportSession& session);
+	void processNode(const aiScene* aiScene, aiNode* aiNode);
+	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh);
 	ResourceWrapper<Texture> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, ResourceWrapper<Texture>>& cachedTextures, const AssetInfo& aInfo);
 	static Texture::TextureType getTextureType(aiTextureType type);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;
-	std::map<uint32_t, ModelImportSession> m_sessions;
+	ModelImportSession m_currentSession;
 	std::shared_ptr<Assimp::Importer> m_importer = nullptr;
 
 	std::string m_lastLoadedSceneName;

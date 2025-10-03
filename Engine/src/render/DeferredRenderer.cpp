@@ -192,9 +192,9 @@ void DeferredRenderer::render()
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-    graphics->shader->setModelMatrix(*graphics->model);
-    graphics->shader->setViewMatrix(*graphics->view);
-    graphics->shader->setProjectionMatrix(*graphics->projection);
+    graphics->shader->setModelMatrix(graphics->model);
+    graphics->shader->setViewMatrix(graphics->view);
+    graphics->shader->setProjectionMatrix(graphics->projection);
 	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
 	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
 
@@ -277,7 +277,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 			graphics->entity = &entityHandler;
 			graphics->mesh = mesh.get();
 			auto& transform = entityHandler.getComponent<Transformation>();
-			graphics->model = &transform.getWorldTransformation();
+			glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
+			graphics->model = modelTransform;
 
 			// TODO get this to work
 			AABB& aabb = mesh.get()->getAABB();
