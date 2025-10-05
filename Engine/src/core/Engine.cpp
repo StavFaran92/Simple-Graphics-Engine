@@ -43,6 +43,7 @@
 #include "component/MeshComponent.h"
 #include "component/MaterialComponent.h"
 #include "component/RenderableComponent.h"
+#include "scripts/ScriptSystem.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"
@@ -237,6 +238,9 @@ bool Engine::init(const InitParams& initParams)
         logError("Object picker failed to init!");
         return false;
     }
+
+    auto scriptSystem = new ScriptSystem();
+    scriptSystem->init();
 
     if (initParams.loadExistingProject)
     {

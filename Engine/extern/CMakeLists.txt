@@ -20,6 +20,8 @@ target_include_directories(Engine PUBLIC
 	physx/PhysX/include
 	physx/PxShared/include
 	FileWatch
+	sol2/include
+	lua/include
 )
 
 target_link_directories(Engine PUBLIC 
@@ -29,6 +31,7 @@ target_link_directories(Engine PUBLIC
 	spdlog/lib
 	nativefiledialog/lib
 	physx/PhysX/bin/win.x86_64.vc142.mt/checked
+	lua
 )
 
 target_link_libraries(Engine PUBLIC 
@@ -50,6 +53,7 @@ target_link_libraries(Engine PUBLIC
 	nfd
 	ImGuizmo
 	tinyfiledialogs
+	lua54
 )
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR})
@@ -69,6 +73,10 @@ file(COPY "${ASSIMP_BIN_DIR}/" DESTINATION ${OUTPUT_DIR}/bin/RelWithDebInfo)
 set(GLEW_BIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glew/bin")
 file(COPY "${GLEW_BIN_DIR}/" DESTINATION ${OUTPUT_DIR}/bin/Release)
 file(COPY "${GLEW_BIN_DIR}/" DESTINATION ${OUTPUT_DIR}/bin/RelWithDebInfo)
+
+set(LUA_BIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lua")
+file(COPY "${LUA_BIN_DIR}/lua54.dll" DESTINATION ${OUTPUT_DIR}/bin/Release)
+file(COPY "${LUA_BIN_DIR}/lua54.dll" DESTINATION ${OUTPUT_DIR}/bin/RelWithDebInfo)
 
 
 
