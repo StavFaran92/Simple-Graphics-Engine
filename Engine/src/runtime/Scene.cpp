@@ -66,6 +66,7 @@
 #include "component/SkyboxComponent.h"
 #include "component/NativeScriptComponent.h"
 #include "component/ImageComponent.h"
+#include "scripts/ScriptSystem.h"
 
 struct PlaneGPU {
 	glm::vec3 normal;
@@ -291,6 +292,20 @@ void Scene::update(float deltaTime)
 			catch (const std::exception& e)
 			{
 				logError("Native Script Error occured: {}" , e.what());
+			}
+		}
+
+		// Run all scripts updates
+		auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
+		for (auto&& [entity, script] : m_registry->get().view<ScriptComponent>().each())
+		{
+			try
+			{
+				scriptSystem->callUpdate(script, deltaTime);
+			}
+			catch (const std::exception& e)
+			{
+				logError("Script Error occured: {}", e.what());
 			}
 		}
 
@@ -974,6 +989,20 @@ void Scene::startSimulation()
 		//nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
 	}
 
+	// Run all scripts create
+	auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
+	for (auto&& [entity, script] : m_registry->get().view<ScriptComponent>().each())
+	{
+		try
+		{
+			scriptSystem->callCreate(script);
+		}
+		catch (const std::exception& e)
+		{
+			logError("Script Error occured: {}", e.what());
+		}
+	}
+
 	gameEventLayer->setEnabled(true);
 
 	m_isSimulationActive = true;
@@ -999,6 +1028,20 @@ void Scene::stopSimulation()
 			logError("Native Script Error occured: ", e.what());
 		}
 		//gameEventLayer->unsubscribe(nsc.script); // TODO fix, ican simply remove the layer instead of all the scripts from the layer
+	}
+
+	// Run all scripts destroy
+	auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
+	for (auto&& [entity, script] : m_registry->get().view<ScriptComponent>().each())
+	{
+		try
+		{
+			scriptSystem->callDestroy(script);
+		}
+		catch (const std::exception& e)
+		{
+			logError("Script Error occured: {}", e.what());
+		}
 	}
 
 	getRegistry().getRegistry().clear();

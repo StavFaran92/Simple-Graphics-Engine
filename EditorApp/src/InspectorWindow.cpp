@@ -599,6 +599,10 @@ void InspectorWindow::display()
 			}
 			});
 
+		displayComponent<ScriptComponent>("Lua Script Component", [](ScriptComponent& script) {
+			ImGui::Text(script.filepath.c_str());
+			});
+
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
 			});
 
@@ -661,7 +665,7 @@ void InspectorWindow::display()
 				state.getSelectedEntity().addComponent<CameraComponent>();
 			}
 
-			if (ImGui::MenuItem("Script"))
+			if (ImGui::MenuItem("C++ Script"))
 			{
 				state.getSelectedEntity().addComponent<NativeScriptComponent>();
 			}
@@ -706,6 +710,12 @@ void InspectorWindow::display()
 			if (ImGui::MenuItem("Foliage"))
 			{
 				auto& foliage = state.getSelectedEntity().addComponent<FoliageComponent>();
+			}
+
+			if (ImGui::MenuItem("Lua Script"))
+			{
+				auto& script = state.getSelectedEntity().addComponent<ScriptComponent>();
+				script.loadScript("C:/Users/Stav/Documents/simple_lua_script.lua");
 			}
 
 			//Todo REMOVE
