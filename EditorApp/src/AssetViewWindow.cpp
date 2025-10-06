@@ -3,6 +3,26 @@
 #include "Dialogs.h"
 #include "EditorState.h"
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
+void openInVSCode(const std::string& path)
+{
+#ifndef _WIN32
+	if (fork() == 0) { // child process
+		execlp("code", "code", path.c_str(), (char*)nullptr);
+		_exit(0); // exit child if exec fails
+	}
+#else
+	// fallback for Windows
+	std::thread([path]() {
+		std::string command = "code \"" + path + "\"";
+		std::system(command.c_str());
+		}).detach();
+#endif
+}
+
 void showInExplorer(const std::filesystem::path& p)
 {
 	auto absPath = std::filesystem::absolute(p);
@@ -247,6 +267,11 @@ void AssetViewWindow::display()
 							EditorState::Instance().showMaterialEditWindow = true;
 
 						}
+					}
+
+					else if (aInfo.aType == AssetType::LUA_SCRIPT)
+					{
+						openInVSCode(Engine::get()->getProjectDirectory() + "/" + aInfo.filePath);
 					}
 				}
 
