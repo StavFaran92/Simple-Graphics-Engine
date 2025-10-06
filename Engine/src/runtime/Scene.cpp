@@ -995,6 +995,7 @@ void Scene::startSimulation()
 	{
 		try
 		{
+			scriptSystem->loadScript(script);
 			scriptSystem->callCreate(script);
 		}
 		catch (const std::exception& e)

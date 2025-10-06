@@ -714,8 +714,7 @@ void InspectorWindow::display()
 
 			if (ImGui::MenuItem("Lua Script"))
 			{
-				auto& script = state.getSelectedEntity().addComponent<ScriptComponent>();
-				script.loadScript("C:/Users/Stav/Documents/simple_lua_script.lua");
+				auto& script = state.getSelectedEntity().addComponent<ScriptComponent>("C:/Users/Stav/Documents/simple_lua_script.lua");
 			}
 
 			//Todo REMOVE

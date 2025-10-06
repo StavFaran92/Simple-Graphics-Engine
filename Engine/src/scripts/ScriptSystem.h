@@ -12,7 +12,7 @@ public:
 
     void init();
 
-    void loadScript(const std::string& path, ScriptComponent& scriptComponent);
+    void loadScript(ScriptComponent& scriptComponent);
 
     void callCreate(ScriptComponent& script);
     void callUpdate(ScriptComponent& script, float dt);

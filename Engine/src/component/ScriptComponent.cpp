@@ -2,9 +2,18 @@
 
 #include "scripts/ScriptSystem.h"
 
-void ScriptComponent::loadScript(const std::string& path)
+ScriptComponent::ScriptComponent(const std::string& path)
+	: filepath(path)
 {
-	Engine::get()->getSubSystem<ScriptSystem>()->loadScript(path, *this);
+
+}
+
+void ScriptComponent::loadScript()
+{
+	if (filepath.empty())
+		return;
+
+	Engine::get()->getSubSystem<ScriptSystem>()->loadScript(*this);
 }
 
 bool ScriptComponent::isValid() const

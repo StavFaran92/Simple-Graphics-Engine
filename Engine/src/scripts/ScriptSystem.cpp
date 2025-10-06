@@ -43,10 +43,13 @@ void ScriptSystem::init()
     impl_->init();
 }
 
-void ScriptSystem::loadScript(const std::string& path, ScriptComponent& scriptComponent)
+void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
 {
+    if (scriptComponent.filepath.empty())
+        return;
+
     try {
-        impl_->lua.script_file(path);
+        impl_->lua.script_file(scriptComponent.filepath);
         sol::table script = impl_->lua["Script"];
         if (script.valid())
         {
@@ -55,7 +58,6 @@ void ScriptSystem::loadScript(const std::string& path, ScriptComponent& scriptCo
                 scriptComponent.handlerID = impl_->count();
             }
             impl_->scripts[scriptComponent.handlerID] = script;
-            scriptComponent.filepath = path;
         }
         else
         {
