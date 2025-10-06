@@ -600,7 +600,15 @@ void InspectorWindow::display()
 			});
 
 		displayComponent<ScriptComponent>("Lua Script Component", [](ScriptComponent& script) {
-			ImGui::Text(script.filepath.c_str());
+			std::string scriptName = "None";
+			if (!script.getScript().isEmpty())
+			{
+				scriptName = script.getScript().getUID();
+			}
+
+			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uid) {
+				script.script = ResourceWrapper<LuaScript>(uid);
+				});
 			});
 
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
@@ -714,7 +722,7 @@ void InspectorWindow::display()
 
 			if (ImGui::MenuItem("Lua Script"))
 			{
-				auto& script = state.getSelectedEntity().addComponent<ScriptComponent>("C:/Users/Stav/Documents/simple_lua_script.lua");
+				auto& script = state.getSelectedEntity().addComponent<ScriptComponent>();
 			}
 
 			//Todo REMOVE

@@ -95,6 +95,7 @@ enum AssetType : int
 	SHADER,
 	PREFAB,
 	MATERIAL,
+	LUA_SCRIPT,
 
 	TOTAL_ASSET_TYPE_COUNT
 };
@@ -108,6 +109,7 @@ static const std::map<AssetType, std::string> g_assetTypeToStr
 	{ AssetType::SHADER,		"shaders"		},
 	{ AssetType::PREFAB,		"prefabs"		},
 	{ AssetType::MATERIAL,		"materials"		},
+	{ AssetType::LUA_SCRIPT,	"lua script"	},
 };
 
 static std::string getAssetTypeAsStr(AssetType aType)

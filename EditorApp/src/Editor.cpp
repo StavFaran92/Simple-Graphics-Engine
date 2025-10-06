@@ -308,6 +308,37 @@ static void addAssetLoadWidget(const std::string& name, ImGuiTextBuffer& textBuf
 	ImGui::TextUnformatted(textBuffer.begin(), textBuffer.end());
 }
 
+void ShowLuaScriptImportWindow()
+{
+	static ImGuiTextBuffer pathBuffer;
+
+	const char* filepath = tinyfd_openFileDialog(
+		"Select an asset to load",
+		"",
+		1,
+		Constants::g_luaScriptSupportedFormats,
+		"",
+		0);
+
+	if (filepath)
+	{
+		pathBuffer.clear();
+		pathBuffer.append(filepath);
+	}
+
+	std::filesystem::path path(pathBuffer.c_str());
+
+	if (!std::filesystem::exists(path))
+	{
+		logWarning("Path not found: " + path.string());
+		return;
+	}
+
+	LuaScript::import(pathBuffer.c_str());
+
+	pathBuffer.clear();
+}
+
 void ShowTextureImportWindow()
 {
 	static ImGuiTextBuffer texturePathBuffer;
@@ -1176,6 +1207,10 @@ class GUI_Helper : public GuiMenu {
 							// Action for importing animation
 							ShowAnimationImportWindow();
 						}
+						if (ImGui::MenuItem("Lua Script")) {
+							// Action for importing animation
+							ShowLuaScriptImportWindow();
+						}
 						ImGui::EndMenu();
 					}
 					if (ImGui::MenuItem("Build", "")) {
@@ -1422,10 +1457,11 @@ public:
 		icons["mesh"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
 		icons["texture"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
 		icons["animation"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);
-		icons["shader"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-100.png", settings);
+		icons["shader"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-pixel-100.png", settings);
 		icons["folder"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
 		icons["prefab"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png", settings);
 		icons["material"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-material-100.png", settings);
+		icons["lua_script"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-file-100.png", settings);
 	}
 
 	void update(float deltaTime) override

@@ -239,6 +239,7 @@ void Assets::updateAsset(const ResourceWrapper<ResourceBase>& asset, const Asset
 	}
 
 	m_assets[aInfo.uuid] = aInfo;
+	asset.get()->m_assetInfo = aInfo;
 
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 }
@@ -283,6 +284,7 @@ ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocatio
 
 	// Add Asset
 	addAsset(aInfo);
+	asset.get()->m_assetInfo = aInfo;
 
 	return asset;
 }

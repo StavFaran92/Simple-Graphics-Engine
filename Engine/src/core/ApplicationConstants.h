@@ -33,6 +33,10 @@ namespace Constants {
 		"*.fbx",
 	};
 
+	static const char* g_luaScriptSupportedFormats[] = {
+		"*.lua",
+	};
+
 	
 
 

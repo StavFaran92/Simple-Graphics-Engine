@@ -45,11 +45,13 @@ void ScriptSystem::init()
 
 void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
 {
-    if (scriptComponent.filepath.empty())
+    if (!scriptComponent.isValid())
         return;
 
     try {
-        impl_->lua.script_file(scriptComponent.filepath);
+        const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
+        std::string filepath = (projectDir / scriptComponent.getScript()->m_assetInfo.filePath).string();
+        impl_->lua.script_file(filepath);
         sol::table script = impl_->lua["Script"];
         if (script.valid())
         {
@@ -57,12 +59,13 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
         }
         else
         {
-            logWarning("Warning: No 'Script' table found in {}", scriptComponent.filepath);
+            logWarning("Warning: No 'Script' table found in {}", filepath);
         }
 
     
     }
-    catch (const sol::error& e) {
+    catch (const sol::error& e) 
+    {
         logError("Error loading script: {}" ,e.what());
     }
 }

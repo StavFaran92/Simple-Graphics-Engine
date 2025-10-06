@@ -144,6 +144,7 @@ void AssetViewWindow::display()
 					case AssetType::SHADER:   iconID = icons.at("shader")->getID(); break;
 					case AssetType::PREFAB:   iconID = icons.at("prefab")->getID(); break;
 					case AssetType::MATERIAL: iconID = icons.at("material")->getID(); break;
+					case AssetType::LUA_SCRIPT: iconID = icons.at("lua_script")->getID(); break;
 					}
 
 					// Create a small icon

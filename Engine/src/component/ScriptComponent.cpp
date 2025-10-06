@@ -2,15 +2,15 @@
 
 #include "scripts/ScriptSystem.h"
 
-ScriptComponent::ScriptComponent(const std::string& path)
-	: filepath(path)
+ScriptComponent::ScriptComponent(const ResourceWrapper<LuaScript>& script)
+	: script(script)
 {
 
 }
 
 void ScriptComponent::loadScript()
 {
-	if (filepath.empty())
+	if (!isValid())
 		return;
 
 	Engine::get()->getSubSystem<ScriptSystem>()->loadScript(*this);
@@ -18,5 +18,10 @@ void ScriptComponent::loadScript()
 
 bool ScriptComponent::isValid() const
 {
-	return !filepath.empty();
+	return !script.isEmpty();
+}
+
+ResourceWrapper<LuaScript>& ScriptComponent::getScript()
+{
+	return script;
 }
