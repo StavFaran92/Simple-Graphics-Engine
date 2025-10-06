@@ -297,16 +297,13 @@ void Scene::update(float deltaTime)
 
 		// Run all scripts updates
 		auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
-		for (auto&& [entity, script] : m_registry->get().view<ScriptComponent>().each())
+		try
 		{
-			try
-			{
-				scriptSystem->callUpdate(script, deltaTime);
-			}
-			catch (const std::exception& e)
-			{
-				logError("Script Error occured: {}", e.what());
-			}
+			scriptSystem->callUpdate(deltaTime);
+		}
+		catch (const std::exception& e)
+		{
+			logError("Script Error occured: {}", e.what());
 		}
 
 		// Physics
@@ -993,15 +990,16 @@ void Scene::startSimulation()
 	auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
 	for (auto&& [entity, script] : m_registry->get().view<ScriptComponent>().each())
 	{
-		try
-		{
-			scriptSystem->loadScript(script);
-			scriptSystem->callCreate(script);
-		}
-		catch (const std::exception& e)
-		{
-			logError("Script Error occured: {}", e.what());
-		}
+		scriptSystem->loadScript(script);
+	}
+
+	try
+	{
+		scriptSystem->callCreate();
+	}
+	catch (const std::exception& e)
+	{
+		logError("Script Error occured: {}", e.what());
 	}
 
 	gameEventLayer->setEnabled(true);
@@ -1033,16 +1031,13 @@ void Scene::stopSimulation()
 
 	// Run all scripts destroy
 	auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
-	for (auto&& [entity, script] : m_registry->get().view<ScriptComponent>().each())
+	try
 	{
-		try
-		{
-			scriptSystem->callDestroy(script);
-		}
-		catch (const std::exception& e)
-		{
-			logError("Script Error occured: {}", e.what());
-		}
+		scriptSystem->callDestroy();
+	}
+	catch (const std::exception& e)
+	{
+		logError("Script Error occured: {}", e.what());
 	}
 
 	getRegistry().getRegistry().clear();

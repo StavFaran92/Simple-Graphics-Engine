@@ -14,7 +14,7 @@ class ScriptSystem::Impl
 {
 public:
     sol::state lua;
-    std::unordered_map<int, sol::table> scripts;
+    std::vector<sol::table> scripts;
 
     void init()
     {
@@ -53,11 +53,7 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
         sol::table script = impl_->lua["Script"];
         if (script.valid())
         {
-            if (scriptComponent.handlerID == -1)
-            {
-                scriptComponent.handlerID = impl_->count();
-            }
-            impl_->scripts[scriptComponent.handlerID] = script;
+            impl_->scripts.push_back(script);
         }
         else
         {
@@ -71,36 +67,35 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
     }
 }
 
-void ScriptSystem::callCreate(ScriptComponent& scriptComponent)
+void ScriptSystem::callCreate()
 {
-    if (scriptComponent.isValid())
+    for (auto& script : impl_->scripts)
     {
-        sol::table& script = impl_->scripts[scriptComponent.handlerID];
         sol::function fn = script["create"];
         if (fn.valid())
             fn(script);
     }
 }
 
-void ScriptSystem::callUpdate(ScriptComponent& scriptComponent, float dt)
+void ScriptSystem::callUpdate(float dt)
 {
-    if (scriptComponent.isValid())
+    for (auto& script : impl_->scripts)
     {
-        sol::table& script = impl_->scripts[scriptComponent.handlerID];
         sol::function fn = script["update"];
         if (fn.valid())
             fn(script, dt);
     }
 }
 
-void ScriptSystem::callDestroy(ScriptComponent& scriptComponent)
+void ScriptSystem::callDestroy()
 {
-    if (scriptComponent.isValid())
+    for (auto& script : impl_->scripts)
     {
-        sol::table& script = impl_->scripts[scriptComponent.handlerID];
         sol::function fn = script["destroy"];
         if (fn.valid())
             fn(script);
     }
+
+    impl_->scripts.clear();
 
 }

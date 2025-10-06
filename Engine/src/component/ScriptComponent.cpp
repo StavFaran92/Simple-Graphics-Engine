@@ -18,5 +18,5 @@ void ScriptComponent::loadScript()
 
 bool ScriptComponent::isValid() const
 {
-	return handlerID != -1;
+	return !filepath.empty();
 }

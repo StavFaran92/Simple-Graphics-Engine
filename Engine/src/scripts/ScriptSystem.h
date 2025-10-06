@@ -14,9 +14,9 @@ public:
 
     void loadScript(ScriptComponent& scriptComponent);
 
-    void callCreate(ScriptComponent& script);
-    void callUpdate(ScriptComponent& script, float dt);
-    void callDestroy(ScriptComponent& script);
+    void callCreate();
+    void callUpdate(float dt);
+    void callDestroy();
 
 private:
     class Impl;                 

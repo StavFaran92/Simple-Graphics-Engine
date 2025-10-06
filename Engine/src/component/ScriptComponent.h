@@ -31,8 +31,8 @@ public:
 
 
 private:
-	friend class ScriptSystem;
-	int handlerID = -1;
+	//friend class ScriptSystem;
+	//int handlerID = -1;
 	//Entity entity;
 };
 
