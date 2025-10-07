@@ -10,6 +10,10 @@
 //    sol::table script
 //};
 
+void LogDebug(const std::string& msg) {
+    logDebug(msg);
+}
+
 class ScriptSystem::Impl
 {
 public:
@@ -19,15 +23,9 @@ public:
     void init()
     {
         lua.open_libraries(sol::lib::base);
+
+        lua.set_function("log", LogDebug);
     }
-
-    int counter = 0;
-
-    int count()
-    {
-        return counter++;
-    }
-
 };
 
 ScriptSystem::ScriptSystem()

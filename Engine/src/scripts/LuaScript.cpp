@@ -66,7 +66,7 @@ ResourceWrapper<LuaScript> LuaScript::create()
 	std::filesystem::create_directories(temp.parent_path());
 
 	std::string baseLuaScriptFilepath = SGE_ROOT_DIR + "Resources/Engine/Scripts/base_lua_file.lua";
-	std::filesystem::copy_file(baseLuaScriptFilepath, temp);
+	std::filesystem::copy_file(baseLuaScriptFilepath, temp, std::filesystem::copy_options::overwrite_existing);
 	script->filepath = temp.generic_string();
 
 	return script;
