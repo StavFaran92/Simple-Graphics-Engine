@@ -301,6 +301,43 @@ void displayShaderCreatorDialog()
 	}
 }
 
+void displayLuaScriptCreatorDialog()
+{
+	if (EditorState::Instance().showLuaScriptCreateWindow)
+	{
+		ImGui::OpenPopup("CreateLuaScript");
+		EditorState::Instance().showLuaScriptCreateWindow = false;
+	}
+	if (ImGui::BeginPopupModal("CreateLuaScript", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		static char luaScriptName[256] = "NewLuaScript";
+
+		ImGui::InputText("Name", luaScriptName, IM_ARRAYSIZE(luaScriptName));
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			ResourceWrapper<LuaScript> script = LuaScript::create();
+
+			AssetCreateDescriptor desc;
+			desc.aType = AssetType::LUA_SCRIPT;
+			desc.name = luaScriptName;
+			Engine::get()->getSubSystem<Assets>()->createAsset(script, desc);
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
 void displayMaterialEditDialog()
 {
 	static ResourceWrapper<Material> previousMaterial;

@@ -24,6 +24,7 @@ ResourceWrapper<ResourceBase> LuaScriptAssetManager::load(AssetInfo& aInfo)
 	//auto projectDir = Engine::get()->getProjectDirectory();
 	//std::ifstream is(projectDir + "/" + aInfo.filePath);
 	LuaScript* loadedScript = new LuaScript();
+	loadedScript->filepath = aInfo.filePath;
 
 	try
 	{
@@ -41,7 +42,11 @@ ResourceWrapper<ResourceBase> LuaScriptAssetManager::load(AssetInfo& aInfo)
 
 void LuaScriptAssetManager::save(const ResourceWrapper<ResourceBase>& script, const AssetInfo& aInfo)
 {
-	throw std::runtime_error("Not yet implemented!");
+	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
+	const std::string relativeFilepath = aInfo.name + aInfo.ext;
+	const std::filesystem::path savedFilePath = projectDir / aInfo.assetDirectory / relativeFilepath;
+	std::filesystem::copy_file(script.as<LuaScript>()->filepath, savedFilePath);
+	script.as<LuaScript>()->filepath = savedFilePath.generic_string();
 }
 
 ResourceWrapper<LuaScript> LuaScript::import(const std::string& fileLocation, LuaScriptImportSettings desc)
@@ -53,7 +58,18 @@ ResourceWrapper<LuaScript> LuaScript::import(const std::string& fileLocation, Lu
 
 ResourceWrapper<LuaScript> LuaScript::create()
 {
-	return Factory<LuaScript>::create();
+	ResourceWrapper<LuaScript> script = Factory<LuaScript>::create();
+
+	static int counter = 0;
+	std::string name = "temp_script_" + std::to_string(counter++) + ".lua";
+	auto temp = std::filesystem::temp_directory_path() / "SGE" / name;
+	std::filesystem::create_directories(temp.parent_path());
+
+	std::string baseLuaScriptFilepath = SGE_ROOT_DIR + "Resources/Engine/Scripts/base_lua_file.lua";
+	std::filesystem::copy_file(baseLuaScriptFilepath, temp);
+	script->filepath = temp.generic_string();
+
+	return script;
 }
 
 void LuaScript::updateAsset(const ResourceWrapper<LuaScript>& script, AssetUpdateDescriptor desc)

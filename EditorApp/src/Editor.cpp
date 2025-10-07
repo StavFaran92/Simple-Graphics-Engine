@@ -1250,8 +1250,8 @@ class GUI_Helper : public GuiMenu {
 
 						}
 
-						if (ImGui::MenuItem("Prefab")) {
-							Prefab::import("", {});
+						if (ImGui::MenuItem("Lua Script")) {
+							EditorState::Instance().showLuaScriptCreateWindow = true;
 
 						}
 						ImGui::EndMenu();
@@ -1304,6 +1304,7 @@ class GUI_Helper : public GuiMenu {
         AssetViewWindow::display();
         RenderConsoleWindow();
 		displayTextureCreatorDialog();
+		displayLuaScriptCreatorDialog();
 		displayShaderCreatorDialog();
 		displayMaterialEditDialog();
         //ShowTextureDisplayWindow();

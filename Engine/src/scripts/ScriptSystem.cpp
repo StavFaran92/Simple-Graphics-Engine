@@ -50,7 +50,7 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
 
     try {
         const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-        std::string filepath = (projectDir / scriptComponent.getScript()->m_assetInfo.filePath).string();
+        std::string filepath = (projectDir / scriptComponent.getScript()->filepath).string();
         impl_->lua.script_file(filepath);
         sol::table script = impl_->lua["Script"];
         if (script.valid())

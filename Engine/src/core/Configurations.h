@@ -5,6 +5,8 @@
 #include <string>
 #include <typeinfo>
 
+#include "core/Core.h"
+
 constexpr bool FLIP_TEXTURE = true;
 constexpr bool DEBUG_MODE_ENABLED = false;
 constexpr bool DEBUG_DISPLAY_NORMALS = false;
@@ -100,17 +102,8 @@ enum AssetType : int
 	TOTAL_ASSET_TYPE_COUNT
 };
 
-static const std::map<AssetType, std::string> g_assetTypeToStr
-{
-	{ AssetType::NONE,			"N/A"			},
-	{ AssetType::TEXTURE,		"textures"		},
-	{ AssetType::MESH,			"meshes"		},
-	{ AssetType::ANIMATION,		"animations"	},
-	{ AssetType::SHADER,		"shaders"		},
-	{ AssetType::PREFAB,		"prefabs"		},
-	{ AssetType::MATERIAL,		"materials"		},
-	{ AssetType::LUA_SCRIPT,	"lua script"	},
-};
+extern EngineAPI const std::map<AssetType, std::string> g_assetTypeToStr;
+
 
 static std::string getAssetTypeAsStr(AssetType aType)
 {
@@ -123,16 +116,7 @@ static std::string getAssetTypeAsStr(AssetType aType)
 
 }
 
-static const std::map<AssetType, std::string> g_assetTypeToExt
-{
-	{ AssetType::NONE,			"N/A"			},
-	{ AssetType::TEXTURE,		".png"			},
-	{ AssetType::MESH,			".fbx"			},
-	{ AssetType::ANIMATION,		".fbx"			},
-	{ AssetType::SHADER,		".glsl"			},
-	{ AssetType::PREFAB,		".asset"		},
-	{ AssetType::MATERIAL,		".asset"		},
-};
+extern EngineAPI const std::map<AssetType, std::string> g_assetTypeToExt;
 
 static std::string getExtensionFromType(AssetType aType)
 {

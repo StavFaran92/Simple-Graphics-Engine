@@ -7,8 +7,6 @@
 
 #include <string>
 
-class ScriptSystem;
-
 class EngineAPI ScriptComponent : public Component
 {
 public:
@@ -35,10 +33,6 @@ public:
 
 
 private:
-	
-	//friend class ScriptSystem;
-	//int handlerID = -1;
-	//Entity entity;
 };
 
 REGISTER_COMPONENT(ScriptComponent)

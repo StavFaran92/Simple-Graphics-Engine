@@ -31,3 +31,26 @@ size_t getAttributeLocationInShader(LayoutAttribute attribute)
 	return attribData.location;
 }
 
+const std::map<AssetType, std::string> g_assetTypeToStr
+{
+	{ AssetType::NONE,			"N/A" },
+	{ AssetType::TEXTURE,		"textures" },
+	{ AssetType::MESH,			"meshes" },
+	{ AssetType::ANIMATION,		"animations" },
+	{ AssetType::SHADER,		"shaders" },
+	{ AssetType::PREFAB,		"prefabs" },
+	{ AssetType::MATERIAL,		"materials" },
+	{ AssetType::LUA_SCRIPT,	"lua script" },
+};
+
+const std::map<AssetType, std::string> g_assetTypeToExt
+{
+	{ AssetType::NONE,			"N/A" },
+	{ AssetType::TEXTURE,		".png" },
+	{ AssetType::MESH,			".fbx" },
+	{ AssetType::ANIMATION,		".fbx" },
+	{ AssetType::SHADER,		".glsl" },
+	{ AssetType::PREFAB,		".asset" },
+	{ AssetType::MATERIAL,		".asset" },
+	{ AssetType::LUA_SCRIPT,	".lua" },
+};

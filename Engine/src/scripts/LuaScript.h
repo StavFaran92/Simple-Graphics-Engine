@@ -21,4 +21,6 @@ public:
 	static ResourceWrapper<LuaScript> import(const std::string& fileLocation, LuaScriptImportSettings settings = {});
 	static ResourceWrapper<LuaScript> create();
 	static void updateAsset(const ResourceWrapper<LuaScript>& script, AssetUpdateDescriptor desc);
+
+	std::string filepath;
 };
