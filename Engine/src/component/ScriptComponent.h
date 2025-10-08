@@ -1,5 +1,6 @@
 #pragma once
 
+#include "memory/ResourceWrapper.h"
 #include "component/Component.h"
 #include "core/Core.h"
 #include "component/ComponentSerializer.h"
@@ -25,10 +26,8 @@ public:
 		SERIALIZED_MEMBER(entity);
 	}
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene&)
-	{
-		attachSimple<ScriptComponent>(c, entityHandler);
-	}
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
+
 
 	ResourceWrapper<LuaScript> script;
 	Entity entity;

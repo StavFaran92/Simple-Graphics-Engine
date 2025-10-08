@@ -18,7 +18,9 @@ void BindAllToLua(sol::state& lua) {
 
     lua.new_usertype<Entity>("Entity",
         // Constructors
-        sol::constructors<Entity(), Entity(entt::entity, SGE_Regsitry*)>(),
+        sol::no_constructor,  // you control lifetime
+
+        //sol::constructors<Entity(), Entity(entt::entity, SGE_Regsitry*)>(),
 
         // Parent/child hierarchy
         "setRoot", &Entity::setRoot,

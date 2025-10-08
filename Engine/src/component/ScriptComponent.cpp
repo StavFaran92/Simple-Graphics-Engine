@@ -1,6 +1,7 @@
 #include "component/ScriptComponent.h"
 
 #include "scripts/ScriptSystem.h"
+#include "runtime/Scene.h"
 
 ScriptComponent::ScriptComponent(const ResourceWrapper<LuaScript>& script)
 	: script(script)
@@ -24,4 +25,13 @@ bool ScriptComponent::isValid() const
 ResourceWrapper<LuaScript>& ScriptComponent::getScript()
 {
 	return script;
+}
+
+void ScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+{
+	if (auto tc = std::dynamic_pointer_cast<ScriptComponent>(c))
+	{
+		auto& script = entityHandler.addComponent<ScriptComponent>(*tc);
+		script.entity.setRegistry(&scene.getRegistry());
+	}
 }

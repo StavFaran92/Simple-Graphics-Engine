@@ -6,6 +6,7 @@
 #include <sol/sol.hpp> // or #include "sol.hpp", whichever suits your needs
 
 #include "scripts/LuaBindings.h"
+#include "runtime/Entity.h"
 
 struct LuaState
 {
@@ -25,7 +26,10 @@ public:
 
     void init()
     {
-        lua.open_libraries(sol::lib::base);
+        lua.open_libraries(
+            sol::lib::base, 
+            sol::lib::math, 
+            sol::lib::package);
 
         BindAllToLua(lua);
     }
@@ -77,7 +81,7 @@ void ScriptSystem::callCreate()
     {
         sol::function fn = script.script["create"];
         if (fn.valid())
-            fn(script.entity);
+            fn(script.script, script.entity);
     }
 }
 
@@ -87,7 +91,9 @@ void ScriptSystem::callUpdate(float dt)
     {
         sol::function fn = script.script["update"];
         if (fn.valid())
-            fn(script.entity, dt);
+        {
+            fn(script.script, script.entity, dt);
+        }
     }
 }
 
@@ -97,7 +103,7 @@ void ScriptSystem::callDestroy()
     {
         sol::function fn = script.script["destroy"];
         if (fn.valid())
-            fn(script.entity);
+            fn(script.script, script.entity);
     }
 
     impl_->scripts.clear();
