@@ -14,7 +14,7 @@ class Entity;
 class Mesh;
 
 
-class EngineAPI Renderer : public RendererIntermediate
+class Renderer : public RendererIntermediate
 {
 public:
 	// Constructor

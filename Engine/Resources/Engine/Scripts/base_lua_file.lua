@@ -1,10 +1,10 @@
 Script = {}
 
-function Script:create()
+function Script:create(entity)
 end
 
-function Script:update(dt)
+function Script:update(entity, dt)
 end
 
-function Script:destroy()
+function Script:destroy(entity)
 end

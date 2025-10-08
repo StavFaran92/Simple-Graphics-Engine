@@ -23,7 +23,7 @@ class Material;
 class TextureHandler;
 class Frustum;
 
-class EngineAPI IRenderer {
+class IRenderer {
 public:
 	//struct DrawQueueRenderParams
 	//{

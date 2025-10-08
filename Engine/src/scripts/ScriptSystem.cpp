@@ -5,10 +5,13 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include <sol/sol.hpp> // or #include "sol.hpp", whichever suits your needs
 
-//struct LuaState
-//{
-//    sol::table script
-//};
+#include "scripts/LuaBindings.h"
+
+struct LuaState
+{
+    Entity entity;
+    sol::table script;
+};
 
 void LogDebug(const std::string& msg) {
     logDebug(msg);
@@ -18,13 +21,13 @@ class ScriptSystem::Impl
 {
 public:
     sol::state lua;
-    std::vector<sol::table> scripts;
+    std::vector<LuaState> scripts;
 
     void init()
     {
         lua.open_libraries(sol::lib::base);
 
-        lua.set_function("log", LogDebug);
+        BindAllToLua(lua);
     }
 };
 
@@ -53,7 +56,7 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
         sol::table script = impl_->lua["Script"];
         if (script.valid())
         {
-            impl_->scripts.push_back(script);
+            impl_->scripts.push_back({ scriptComponent.entity, script });
         }
         else
         {
@@ -72,9 +75,9 @@ void ScriptSystem::callCreate()
 {
     for (auto& script : impl_->scripts)
     {
-        sol::function fn = script["create"];
+        sol::function fn = script.script["create"];
         if (fn.valid())
-            fn(script);
+            fn(script.entity);
     }
 }
 
@@ -82,9 +85,9 @@ void ScriptSystem::callUpdate(float dt)
 {
     for (auto& script : impl_->scripts)
     {
-        sol::function fn = script["update"];
+        sol::function fn = script.script["update"];
         if (fn.valid())
-            fn(script, dt);
+            fn(script.entity, dt);
     }
 }
 
@@ -92,9 +95,9 @@ void ScriptSystem::callDestroy()
 {
     for (auto& script : impl_->scripts)
     {
-        sol::function fn = script["destroy"];
+        sol::function fn = script.script["destroy"];
         if (fn.valid())
-            fn(script);
+            fn(script.entity);
     }
 
     impl_->scripts.clear();

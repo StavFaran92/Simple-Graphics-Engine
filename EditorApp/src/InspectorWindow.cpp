@@ -723,6 +723,7 @@ void InspectorWindow::display()
 			if (ImGui::MenuItem("Lua Script"))
 			{
 				auto& script = state.getSelectedEntity().addComponent<ScriptComponent>();
+				script.entity = state.getSelectedEntity();
 			}
 
 			//Todo REMOVE

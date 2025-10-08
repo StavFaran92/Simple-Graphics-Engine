@@ -22,6 +22,7 @@ public:
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(script);
+		SERIALIZED_MEMBER(entity);
 	}
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene&)
@@ -30,6 +31,7 @@ public:
 	}
 
 	ResourceWrapper<LuaScript> script;
+	Entity entity;
 
 
 private:

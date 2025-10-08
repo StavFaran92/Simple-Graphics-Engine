@@ -8,7 +8,7 @@
 #include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
 
-class EngineAPI RendererIntermediate : public IRenderer
+class RendererIntermediate : public IRenderer
 {
 public:
 	void clear() const override;
