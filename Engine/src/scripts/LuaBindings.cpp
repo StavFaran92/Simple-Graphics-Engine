@@ -14,13 +14,39 @@
 #include "scripts/LuaScript.h"
 #include "texture/Texture.h"
 
+using ComponentGetter = std::function<sol::object(Entity&, sol::state_view)>;
+
+std::unordered_map<std::string, ComponentGetter> componentGetters{
+            { "Transform", [](Entity& e, sol::state_view lua) { return sol::make_object(lua, e.getComponent<Transformation>()); } },
+            // add more here
+};
+
 void BindAllToLua(sol::state& lua) {
+
+    lua.new_usertype<glm::vec2>("vec2",
+        "x", &glm::vec3::x,
+        "y", &glm::vec3::y
+    );
+
+    lua.new_usertype<glm::vec3>("vec3",
+        "x", &glm::vec3::x,
+        "y", &glm::vec3::y,
+        "z", &glm::vec3::z
+    );
 
     lua.new_usertype<Entity>("Entity",
         // Constructors
         sol::no_constructor,  // you control lifetime
 
-        //sol::constructors<Entity(), Entity(entt::entity, SGE_Regsitry*)>(),
+
+        
+
+        "getComponent", [](Entity& e, const std::string& name, sol::this_state s) {
+            auto it = componentGetters.find(name);
+            if (it != componentGetters.end())
+                return it->second(e, s);
+            return sol::make_object(s, sol::nil);
+        },
 
         // Parent/child hierarchy
         "setRoot", &Entity::setRoot,
