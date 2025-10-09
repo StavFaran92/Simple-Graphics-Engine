@@ -81,7 +81,14 @@ void ScriptSystem::callCreate()
     {
         sol::function fn = script.script["create"];
         if (fn.valid())
-            fn(script.script, script.entity);
+        {
+            sol::protected_function_result result = fn(script.script, script.entity);
+            if (!result.valid()) {
+                sol::error err = result;
+                logError("Lua Error: {}", err.what());
+            }
+        }
+            
     }
 }
 

@@ -17,18 +17,21 @@
 using ComponentGetter = std::function<sol::object(Entity&, sol::state_view)>;
 
 std::unordered_map<std::string, ComponentGetter> componentGetters{
-            { "Transform", [](Entity& e, sol::state_view lua) { return sol::make_object(lua, e.getComponent<Transformation>()); } },
-            // add more here
+    { "Transform", [](Entity& e, sol::state_view lua) { return sol::make_object(lua, e.getComponent<Transformation>()); } },
 };
 
 void BindAllToLua(sol::state& lua) {
 
     lua.new_usertype<glm::vec2>("vec2",
-        "x", &glm::vec3::x,
-        "y", &glm::vec3::y
+        "x", &glm::vec2::x,
+        "y", &glm::vec2::y
     );
 
     lua.new_usertype<glm::vec3>("vec3",
+        sol::constructors<
+        glm::vec3(),                    // default: vec3()
+        glm::vec3(float, float, float)  // parameterized: vec3(x, y, z)
+        >(),
         "x", &glm::vec3::x,
         "y", &glm::vec3::y,
         "z", &glm::vec3::z
@@ -38,15 +41,14 @@ void BindAllToLua(sol::state& lua) {
         // Constructors
         sol::no_constructor,  // you control lifetime
 
-
-        
-
         "getComponent", [](Entity& e, const std::string& name, sol::this_state s) {
             auto it = componentGetters.find(name);
             if (it != componentGetters.end())
                 return it->second(e, s);
             return sol::make_object(s, sol::nil);
         },
+
+        "getTransform", [](Entity& self) -> Transformation& { return self.getComponent<Transformation>(); },
 
         // Parent/child hierarchy
         "setRoot", &Entity::setRoot,
