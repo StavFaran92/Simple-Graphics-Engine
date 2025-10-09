@@ -14,10 +14,10 @@
 #include "scripts/LuaScript.h"
 #include "texture/Texture.h"
 
-using ComponentGetter = std::function<sol::object(Entity&, sol::state_view)>;
+using ComponentGetter = std::function<sol::object(Entity&, sol::this_state)>;
 
 std::unordered_map<std::string, ComponentGetter> componentGetters{
-    { "Transform", [](Entity& e, sol::state_view lua) { return sol::make_object(lua, e.getComponent<Transformation>()); } },
+    { "Transform", [](Entity& e, sol::this_state lua) -> sol::object { return sol::object(lua, sol::in_place, std::ref(e.getComponent<Transformation>())); } },
 };
 
 void BindAllToLua(sol::state& lua) {
@@ -41,14 +41,12 @@ void BindAllToLua(sol::state& lua) {
         // Constructors
         sol::no_constructor,  // you control lifetime
 
-        "getComponent", [](Entity& e, const std::string& name, sol::this_state s) {
+        "getComponent", [](Entity& e, const std::string& name, sol::this_state s) -> sol::object {
             auto it = componentGetters.find(name);
             if (it != componentGetters.end())
                 return it->second(e, s);
             return sol::make_object(s, sol::nil);
         },
-
-        "getTransform", [](Entity& self) -> Transformation& { return self.getComponent<Transformation>(); },
 
         // Parent/child hierarchy
         "setRoot", &Entity::setRoot,
