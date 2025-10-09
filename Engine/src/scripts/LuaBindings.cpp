@@ -20,6 +20,19 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
     { "Transform", [](Entity& e, sol::this_state lua) -> sol::object { return sol::object(lua, sol::in_place, std::ref(e.getComponent<Transformation>())); } },
 };
 
+sol::object getComponentHelper(Entity & e, sol::stack_object key, sol::this_state lua)
+{
+    auto maybe_string_key = key.as<sol::optional<std::string>>();
+    if (maybe_string_key) {
+        const std::string& k = *maybe_string_key;
+
+        auto it = componentGetters.find(k);
+        if (it != componentGetters.end())
+            return it->second(e, lua);
+        return sol::make_object(lua, sol::nil);
+    }
+}
+
 void BindAllToLua(sol::state& lua) {
 
     lua.new_usertype<glm::vec2>("vec2",
@@ -41,12 +54,8 @@ void BindAllToLua(sol::state& lua) {
         // Constructors
         sol::no_constructor,  // you control lifetime
 
-        "getComponent", [](Entity& e, const std::string& name, sol::this_state s) -> sol::object {
-            auto it = componentGetters.find(name);
-            if (it != componentGetters.end())
-                return it->second(e, s);
-            return sol::make_object(s, sol::nil);
-        },
+        sol::meta_function::index,
+        &getComponentHelper,
 
         // Parent/child hierarchy
         "setRoot", &Entity::setRoot,
