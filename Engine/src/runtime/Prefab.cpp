@@ -105,7 +105,7 @@ ResourceWrapper<Prefab> Prefab::create(const Entity& e)
 	return prefab;
 }
 
-void Prefab::Instansiate()
+Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 {
 	std::map<entity_id, Entity> entityIDRemapTable;
 	std::vector<Entity> createdEntities;
@@ -175,13 +175,11 @@ void Prefab::Instansiate()
 		}
 	}
 
-
-
+	// First entity is the root.
+	Entity& root = createdEntities.front();
+	root.getComponent<Transformation>().setLocalPosition(position);
 	
-
-	
-
-
+	return root;
 }
 
 

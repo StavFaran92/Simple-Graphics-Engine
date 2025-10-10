@@ -11,13 +11,70 @@
 #include "lights/PointLight.h"
 #include "render/Material.h"
 #include "runtime/Prefab.h"
+#include "runtime/Scene.h"
 #include "scripts/LuaScript.h"
 #include "texture/Texture.h"
+#include "component/CameraComponent.h"
+#include "component/SkyboxComponent.h"
+#include "component/ShaderComponent.h"
+#include "component/PlayerControllerComponent.h"
+#include "component/PhysicsComponent.h"
+#include "component/ObjectComponent.h"
+#include "component/RenderableComponent.h"
+#include "component/MaterialComponent.h"
+#include "component/ImageComponent.h"
 
 using ComponentGetter = std::function<sol::object(Entity&, sol::this_state)>;
 
 std::unordered_map<std::string, ComponentGetter> componentGetters{
-    { "Transform", [](Entity& e, sol::this_state lua) -> sol::object { return sol::object(lua, sol::in_place, std::ref(e.getComponent<Transformation>())); } },
+    { "Transform", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<Transformation>()));
+    } },
+
+    {
+        "Camera", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<CameraComponent>()));
+    } },
+
+    { "Terrain", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<Terrain>()));
+    } },
+
+    { "Foliage", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<FoliageComponent>()));
+    } },
+
+    { "Skybox", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<SkyboxComponent>()));
+    } },
+
+    { "Shader", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<ShaderComponent>()));
+    } },
+
+    { "PlayerController", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<PlayerController>()));
+    } },
+
+    { "Physics", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<PhysicsComponent>()));
+    } },
+
+    { "Object", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<ObjectComponent>()));
+    } },
+
+    { "Renderable", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<RenderableComponent>()));
+    } },
+
+    { "Material", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<MaterialComponent>()));
+    } },
+
+    { "Image", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<ImageComponent>()));
+    } }
 };
 
 sol::object getComponentHelper(Entity & e, sol::stack_object key, sol::this_state lua)
@@ -33,61 +90,8 @@ sol::object getComponentHelper(Entity & e, sol::stack_object key, sol::this_stat
     }
 }
 
-void BindAllToLua(sol::state& lua) {
-
-    lua.new_usertype<glm::vec2>("vec2",
-        "x", &glm::vec2::x,
-        "y", &glm::vec2::y
-    );
-
-    lua.new_usertype<glm::vec3>("vec3",
-        sol::constructors<
-        glm::vec3(),                    // default: vec3()
-        glm::vec3(float, float, float)  // parameterized: vec3(x, y, z)
-        >(),
-        "x", &glm::vec3::x,
-        "y", &glm::vec3::y,
-        "z", &glm::vec3::z
-    );
-
-    lua.new_usertype<Entity>("Entity",
-        // Constructors
-        sol::no_constructor,  // you control lifetime
-
-        sol::meta_function::index,
-        &getComponentHelper,
-
-        // Parent/child hierarchy
-        "setRoot", &Entity::setRoot,
-        "setParent", &Entity::setParent,
-        "removeParent", &Entity::removeParent,
-        "getParent", &Entity::getParent,
-        //"addChildren", &Entity::addChildren,
-        //"removeChildren", &Entity::removeChildren,
-        "getChildren", &Entity::getChildren,
-        "getChildByName", &Entity::getChildByName,
-        "getRoot", &Entity::getRoot,
-
-        // Entity validity & comparison
-        "valid", &Entity::valid,
-        "equals", [](Entity& self, Entity& other) { return self == other; },
-        "notEquals", [](Entity& self, Entity& other) { return self != other; },
-
-        // Handlers
-        "handler", &Entity::handler,
-        "handlerID", &Entity::handlerID,
-
-        // Remove function
-        "remove", &Entity::remove
-    );
-
-
-    lua.new_usertype<Animation>("Animation",
-        "getDuration", &Animation::getDuration,
-        "getTicksPerSecond", &Animation::getTicksPerSecond,
-        "import", &Animation::import
-    );
-
+void bindComponents(sol::state& lua)
+{
     lua.new_usertype<Animator>("Animator",
         "playAnimation", sol::overload(
             [](Animator& self, const std::string& name) { self.playAnimation(name); },
@@ -163,7 +167,6 @@ void BindAllToLua(sol::state& lua) {
         "getParent", &Transformation::getParent,
         "getRoot", &Transformation::getRoot,
         "setRoot", &Transformation::setRoot,
-        "update", &Transformation::update,
         "forceUpdate", &Transformation::forceUpdate,
         "worldToLocal", &Transformation::worldToLocal,
         "getChildren", &Transformation::getChildren
@@ -179,20 +182,7 @@ void BindAllToLua(sol::state& lua) {
         "getRestTransform", &Mesh::getRestTransform
     );
 
-    lua.new_usertype<MeshCollection>("MeshCollection",
-        "addMesh", &MeshCollection::addMesh,
-        "getPrimaryMesh", &MeshCollection::getPrimaryMesh,
-        "getMeshes", &MeshCollection::getMeshes,
-        "getNumOfVertices", &MeshCollection::getNumOfVertices,
-        "addBonesInfo", &MeshCollection::addBonesInfo,
-        "getBoneOffsets", &MeshCollection::getBoneOffsets,
-        "getBoneID", &MeshCollection::getBoneID,
-        "import", &MeshCollection::import,
-        "getLastLoadedMaterials", &MeshCollection::getLastLoadedMaterials
-    );
-
     lua.new_usertype<DirectionalLight>("DirectionalLight",
-        "useLight", &DirectionalLight::useLight,
         "SetAmbientIntensity", &DirectionalLight::SetAmbientIntensity,
         "SetDiffuseIntensity", &DirectionalLight::SetDiffuseIntensity,
         "SetColor", &DirectionalLight::SetColor,
@@ -208,6 +198,27 @@ void BindAllToLua(sol::state& lua) {
         "getAttenuation", &PointLight::getAttenuation
     );
 
+    lua.new_usertype<MaterialComponent>("MaterialComponent",
+        "addMaterial", &MaterialComponent::addMaterial,
+        "setMaterial", &MaterialComponent::setMaterial,
+        "at", &MaterialComponent::at
+    );
+
+    lua.new_usertype<PlayerController>("PlayerController",
+        "move", &PlayerController::move
+    );
+}
+
+void bindAssets(sol::state& lua)
+{
+    lua.new_usertype<Animation>("Animation",
+        "getDuration", &Animation::getDuration,
+        "getTicksPerSecond", &Animation::getTicksPerSecond,
+        "import", &Animation::import
+    );
+
+
+
     lua.new_usertype<Material>("Material",
         "getSampler", &Material::getSampler,
         "setSampler", &Material::setSampler,
@@ -221,6 +232,8 @@ void BindAllToLua(sol::state& lua) {
         "create", &Material::create,
         "updateAsset", &Material::updateAsset
     );
+
+
 
     lua.new_usertype<Shader>("Shader",
         "getShaderOverride", &Shader::getShaderOverride,
@@ -272,5 +285,91 @@ void BindAllToLua(sol::state& lua) {
         "import", &Texture::import,
         "isHDRImage", &Texture::isHDRImage
     );
+
+    lua.new_usertype<MeshCollection>("MeshCollection",
+        "addMesh", &MeshCollection::addMesh,
+        "getPrimaryMesh", &MeshCollection::getPrimaryMesh,
+        "getMeshes", &MeshCollection::getMeshes,
+        "getNumOfVertices", &MeshCollection::getNumOfVertices,
+        "addBonesInfo", &MeshCollection::addBonesInfo,
+        "getBoneOffsets", &MeshCollection::getBoneOffsets,
+        "getBoneID", &MeshCollection::getBoneID,
+        "import", &MeshCollection::import,
+        "getLastLoadedMaterials", &MeshCollection::getLastLoadedMaterials
+    );
+}
+
+void bindAll(sol::state& lua) 
+{
+    bindAssets(lua);
+    bindComponents(lua);
+
+    lua.new_usertype<glm::vec2>("vec2",
+        "x", &glm::vec2::x,
+        "y", &glm::vec2::y
+    );
+
+    lua.new_usertype<glm::vec3>("vec3",
+        sol::constructors<
+        glm::vec3(),                    // default: vec3()
+        glm::vec3(float, float, float)  // parameterized: vec3(x, y, z)
+        >(),
+        "x", &glm::vec3::x,
+        "y", &glm::vec3::y,
+        "z", &glm::vec3::z
+    );
+
+    lua.new_usertype<Entity>("Entity",
+        sol::no_constructor,
+
+        sol::meta_function::index,
+        &getComponentHelper,
+
+        "setRoot", &Entity::setRoot,
+        "setParent", &Entity::setParent,
+        "removeParent", &Entity::removeParent,
+        "getParent", &Entity::getParent,
+        "getChildren", &Entity::getChildren,
+        "getChildByName", &Entity::getChildByName,
+        "getRoot", &Entity::getRoot,
+
+        "valid", &Entity::valid,
+        "equals", [](Entity& self, Entity& other) { return self == other; },
+        "notEquals", [](Entity& self, Entity& other) { return self != other; },
+
+        "handler", &Entity::handler,
+        "handlerID", &Entity::handlerID,
+
+        // Remove function
+        "remove", &Entity::remove
+    );
+
+    lua.new_usertype<Scene>("Scene",
+        "createEntity", sol::overload(
+            [](Scene& self) { return self.createEntity(); },
+            [](Scene& self, const std::string& name) { return self.createEntity(name); }
+        ),
+        "removeEntity", &Scene::removeEntity,
+        "getEntityByName", &Scene::getEntityByName
+    );
+
+    lua.new_usertype<Assets>("Assets",
+        // Constructor
+        sol::constructors<Assets()>(),
+
+        // Methods
+        "getAlias", &Assets::getAlias,
+        "getAllAssetsOfType", &Assets::getAllAssetsOfType,
+        "getAllAssets", &Assets::getAllAssets,
+        "getAssetFromPath", &Assets::getAssetFromPath,
+        "getAsset", &Assets::getAsset,
+        "hasAsset", &Assets::hasAsset,
+        "updateAsset", &Assets::updateAsset,
+        "importAsset", &Assets::importAsset,
+        "createAsset", &Assets::createAsset
+    );
+
+    lua.set_function("getActiveScene", []() { return Engine::get()->getContext()->getActiveScene(); });
+    lua.set_function("assets", []() { return std::ref(*Engine::get()->getSubSystem<Assets>()); });
 
 }

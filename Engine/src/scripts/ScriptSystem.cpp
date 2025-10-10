@@ -31,7 +31,7 @@ public:
             sol::lib::math, 
             sol::lib::package);
 
-        BindAllToLua(lua);
+        bindAll(lua);
     }
 };
 

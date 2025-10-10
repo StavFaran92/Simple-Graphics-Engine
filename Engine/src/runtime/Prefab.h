@@ -22,7 +22,7 @@ public:
 	static ResourceWrapper<Prefab> create(const Entity& e);
 	static void save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo);
 
-	void Instansiate();
+	Entity Instansiate(glm::vec3 position = glm::vec3{ 0.0f });
 
 	template <class Archive>
 	void serialize(Archive& archive) {
