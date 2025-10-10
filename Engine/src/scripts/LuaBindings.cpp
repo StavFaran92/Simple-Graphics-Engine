@@ -88,6 +88,7 @@ sol::object getComponentHelper(Entity & e, sol::stack_object key, sol::this_stat
             return it->second(e, lua);
         return sol::make_object(lua, sol::nil);
     }
+    return sol::make_object(lua, sol::nil);
 }
 
 void bindComponents(sol::state& lua)

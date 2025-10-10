@@ -56,7 +56,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	}
 	else
 	{
-		uuid = uuid::generate_uuid_v4();
+		uuid = UUID::generate_uuid_v4();
 	}
 
 	if (name.empty())

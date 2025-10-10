@@ -97,6 +97,8 @@ std::shared_ptr<ProjectAssetRegistry> ProjectAssetRegistry::parse(const std::str
 		return nullptr;
 	}
 
+	UUID::setCounter(resourceFile["counter"]);
+
 	par->m_assetRegistry = resourceFile;
 
 	return par;
@@ -133,7 +135,7 @@ void ProjectAssetRegistry::updateAssetRegistry(const AssetInfo& asset)
 	for (auto& aReg : m_assetRegistry[assetTypeName])
 	{
 		std::string uuid = aReg.at("uuid").get<std::string>();
-		if (uuid == asset.uuid)
+		if (uuid == asset.uuid.str())
 		{
 			to_json(aReg, asset);
 			sync();
@@ -221,6 +223,8 @@ void ProjectAssetRegistry::sync()
 		logError("Failed to open asset registry file: " + m_filename);
 		return;
 	}
+
+	m_assetRegistry["counter"] = UUID::getCounter();
 
 	// Write JSON data to file
 	outputFile << std::setw(4) << m_assetRegistry << std::endl;

@@ -120,7 +120,7 @@ ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int 
 ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
 {
 	ResourceWrapper<Texture> texture;
-	UUID uuid = textureData.textureName.empty() ? uuid::generate_uuid_v4() : textureData.textureName;
+	UUID uuid = textureData.textureName.empty() ? UUID::generate_uuid_v4() : textureData.textureName;
 	texture = Factory<Texture>::createUsingCustomUUID(uuid);
 	texture.get()->build(textureData);
 
@@ -272,7 +272,7 @@ ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, Textur
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)
 {
-	addTexture2D("Texture_" + texture.getUID().substr(4), texture);
+	addTexture2D("Texture_" + texture.getUID().str().substr(4), texture);
 }
 
 void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> texture)

@@ -14,7 +14,7 @@ public:
     static ResourceWrapper<T> create(Args&&... args)
     {
         T* asset = new T(args...);
-        auto uid = uuid::generate_uuid_v4();
+        auto uid = UUID::generate_uuid_v4();
         Engine::get()->getMemoryPool().add(uid, asset);
         //Engine::get()->getResourceManager()->incRef(uid);
         ResourceWrapper<T> res(uid);

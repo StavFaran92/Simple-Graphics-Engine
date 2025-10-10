@@ -35,7 +35,7 @@ private:
         auto iter = m_memory.find(uid);
         if (iter == m_memory.end())
         {
-            logError("Could not locate resource: " + uid);
+            logError("Could not locate resource: {}", uid);
             return nullptr;
         }
         return iter->second;
