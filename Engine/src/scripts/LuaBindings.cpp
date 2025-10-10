@@ -243,11 +243,25 @@ void bindAssets(sol::state& lua)
         "import", &Shader::import
     );
 
-    lua.new_usertype<Prefab>("Prefab",
-        "import", &Prefab::import,
-        "create", &Prefab::create,
-        "save", &Prefab::save,
-        "Instansiate", &Prefab::Instansiate
+    lua.new_usertype<ResourceWrapper<Prefab>>("Prefab",
+        sol::constructors<
+        ResourceWrapper<Prefab>(UUID)
+        >(),
+        // Instance methods
+        "save", [](ResourceWrapper<Prefab>& self) {
+            self->save(self, {});
+        },
+        "instansiate", [](ResourceWrapper<Prefab>& self, glm::vec3 position) {
+            self->Instansiate(position);
+        },
+
+        // Static methods wrapped as lambdas inside new_usertype
+        "create", [](const Entity& e) {
+            return Prefab::create(e); // returns ResourceWrapper<Prefab>
+        },
+        "import", [](const std::string& path) {
+            return Prefab::import(path, {}); // returns ResourceWrapper<Prefab>
+        }
     );
 
     lua.new_usertype<LuaScript>("LuaScript",

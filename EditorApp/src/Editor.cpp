@@ -548,7 +548,7 @@ void displayEntityHelper(Entity& e)
 				AssetCreateDescriptor aInfo;
 				aInfo.name = assetName;
 				aInfo.aType = AssetType::PREFAB;
-				Prefab::save(prefab, aInfo);
+				Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
 
 			}
 
