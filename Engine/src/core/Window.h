@@ -14,12 +14,12 @@ public:
 
 	Window();
 
-        int init();
+    int init();
 
-        inline int getWidth() { return m_width; }
-        inline int getHeight() { return m_height; }
+    inline int getWidth() { return m_width; }
+    inline int getHeight() { return m_height; }
 
-        void resize(int width, int height);
+    void resize(int width, int height);
 
 	void close();
 

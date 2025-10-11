@@ -24,6 +24,10 @@
 #include "component/MaterialComponent.h"
 #include "component/ImageComponent.h"
 
+#include "core/Window.h"
+#include "ui/Mouse.h"
+#include "ui/Input.h"
+
 using ComponentGetter = std::function<sol::object(Entity&, sol::this_state)>;
 
 std::unordered_map<std::string, ComponentGetter> componentGetters{
@@ -377,7 +381,7 @@ void bindAll(sol::state& lua)
 
     lua.new_usertype<Assets>("Assets",
         // Constructor
-        sol::constructors<Assets()>(),
+        sol::no_constructor,
 
         // Methods
         "getAlias", &Assets::getAlias,
@@ -390,6 +394,30 @@ void bindAll(sol::state& lua)
         "importAsset", &Assets::importAsset,
         "createAsset", &Assets::createAsset
     );
+
+    lua.new_usertype<Window>("Window",
+        sol::no_constructor,
+
+        // Methods
+        "width", &Window::getWidth,
+        "height", &Window::getHeight
+    );
+
+    lua.new_enum("MouseButton",
+        "LeftMousebutton", Mouse::MouseButton::LeftMousebutton,
+        "RightMousebutton", Mouse::MouseButton::RightMousebutton,
+        "MiddleMousebutton", Mouse::MouseButton::MiddleMousebutton
+    );
+
+    lua.new_usertype<Mouse>("Mouse",
+        sol::no_constructor,
+        "get", []() { return std::ref(*Engine::get()->getInput()->getMouse()); },
+
+        // Methods
+        "getButtonPressed", &Mouse::getButtonPressed
+    );
+
+    
 
     lua.set_function("getActiveScene", []() { return Engine::get()->getContext()->getActiveScene(); });
     lua.set_function("assets", []() { return std::ref(*Engine::get()->getSubSystem<Assets>()); });
