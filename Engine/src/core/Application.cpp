@@ -41,7 +41,7 @@ bool Application::mouse_middleButtonPressed()
 	return Engine::get()->getInput()->getMouse()->getButtonPressed(Mouse::MouseButton::MiddleMousebutton);
 }
 
-int Application::keyboard_getKeyState(SDL_Scancode code)
+int Application::keyboard_getKeyState(Keyboard::Key code)
 {
 	return Engine::get()->getInput()->getKeyboard()->getKeyState(code);
 }

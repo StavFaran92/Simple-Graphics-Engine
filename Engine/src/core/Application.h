@@ -2,7 +2,7 @@
 #include <memory>
 
 #include "core/Core.h"
-#include "SDL2/SDL_scancode.h"
+#include "ui/Keyboard.h"
 
 class Model;
 class Shader;
@@ -32,7 +32,7 @@ protected:
 	Context* getContext() const;
 
 	// Input
-	int keyboard_getKeyState(SDL_Scancode code);
+	int keyboard_getKeyState(Keyboard::Key code);
 	bool mouse_leftButtonPressed();
 	bool mouse_rightButtonPressed();
 	bool mouse_middleButtonPressed();

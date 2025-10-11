@@ -8,7 +8,7 @@ Keyboard::Keyboard()
 	m_keyboardState = SDL_GetKeyboardState(&m_length);
 }
 
-int Keyboard::getKeyState(SDL_Scancode code) const
+int Keyboard::getKeyState(Key code) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -19,7 +19,7 @@ int Keyboard::getKeyState(SDL_Scancode code) const
 	return m_keyboardState[code];
 }
 
-void Keyboard::onKeyPressed(EventHandler handler, SDL_Scancode code, std::function<void(SDL_Event e)> callback) const
+void Keyboard::onKeyPressed(EventHandler handler, Key code, KeyCallback callback) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -31,12 +31,16 @@ void Keyboard::onKeyPressed(EventHandler handler, SDL_Scancode code, std::functi
 	{
 		if (e.key.keysym.scancode == code)
 		{
-			callback(e);
+			KeyEvent kEvent;
+			kEvent.keysym = static_cast<Key>(code);
+			kEvent.repeat = e.key.repeat != 0;
+			kEvent.state = KeyState::Pressed;
+			callback(kEvent);
 		}
 	});
 }
 
-void Keyboard::onKeyReleased(EventHandler handler, SDL_Scancode code, std::function<void(SDL_Event e)> callback) const
+void Keyboard::onKeyReleased(EventHandler handler, Key code, KeyCallback callback) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -47,7 +51,11 @@ void Keyboard::onKeyReleased(EventHandler handler, SDL_Scancode code, std::funct
 	{
 		if (e.key.keysym.scancode == code)
 		{
-			callback(e);
+			KeyEvent kEvent;
+			kEvent.keysym = static_cast<Key>(code);
+			kEvent.repeat = e.key.repeat != 0;
+			kEvent.state = KeyState::Released;
+			callback(kEvent);
 		}
 	});
 

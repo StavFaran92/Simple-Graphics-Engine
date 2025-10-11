@@ -81,11 +81,11 @@ public:
 
 		auto& camComponent = m_camera.getComponent<CameraComponent>();
 
-		if (Engine::get()->getInput()->getKeyboard()->getKeyState(SDL_SCANCODE_W))
+		if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_W))
 		{
 			m_movementH = glm::vec3(camComponent.front.x, 0, camComponent.front.z) * velocity;
 		}
-		else if (Engine::get()->getInput()->getKeyboard()->getKeyState(SDL_SCANCODE_S))
+		else if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_S))
 		{
 			m_movementH = -glm::vec3(camComponent.front.x, 0, camComponent.front.z) * velocity;
 		}
@@ -94,11 +94,11 @@ public:
 			m_movementH = glm::vec3(0);
 		}
 
-		if (Engine::get()->getInput()->getKeyboard()->getKeyState(SDL_SCANCODE_A))
+		if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_A))
 		{
 			m_movementV = -glm::vec3(camComponent.right.x, 0, camComponent.right.z) * velocity;
 		}
-		else if (Engine::get()->getInput()->getKeyboard()->getKeyState(SDL_SCANCODE_D))
+		else if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_D))
 		{
 			m_movementV = glm::vec3(camComponent.right.x, 0, camComponent.right.z) * velocity;
 		}
