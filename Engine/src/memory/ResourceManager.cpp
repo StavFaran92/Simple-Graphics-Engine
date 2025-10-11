@@ -22,18 +22,10 @@ int ResourceManager::getRefCount(UUID uuid) const
 
 int ResourceManager::incRef(UUID uuid)
 {
-    if (uuid == "255")
-    {
-        std::cout << "\n";
-    }
     return ++m_resourceRefCount[uuid];
 }
 
 int ResourceManager::decRef(UUID uuid)
 {
-    if (uuid == "255")
-    {
-        std::cout << "\n";
-    }
     return --m_resourceRefCount[uuid];
 }
