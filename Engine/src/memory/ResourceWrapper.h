@@ -101,8 +101,18 @@ public:
 	}
 
 	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(uuid);
+	void save(Archive& archive) const {
+		archive(CEREAL_NVP(uuid));
+	}
+
+	template <class Archive>
+	void load(Archive& archive) {
+		archive(CEREAL_NVP(uuid));
+
+		Engine::get()->getResourceManager()->incRef(uuid);
+
+		if (!isEmpty())
+			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	}
 
 	~ResourceWrapper<T>() // destructor
