@@ -195,6 +195,7 @@ bool Engine::init(const InitParams& initParams)
     auto animationLoader = new AnimationLoader();
     auto graphics = new Graphics();
     auto system = new System();
+    auto gameKeyboard = new GameKeyboard();
     
     m_assets = std::make_shared<Assets>();
 

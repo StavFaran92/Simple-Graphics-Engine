@@ -26,6 +26,10 @@ public:
 		bool rmb = false;
 		bool mmb = false;
 	};
+	struct MouseEvent
+	{
+
+	};
 
 	const MouseState& getMouseState();
 	void getMousePosition(int& x, int& y);

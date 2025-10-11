@@ -417,6 +417,14 @@ void bindAll(sol::state& lua)
         "getButtonPressed", &Mouse::getButtonPressed
     );
 
+    lua.new_usertype<GameKeyboard>("Keyboard",
+        sol::no_constructor,
+        "get", []() { return std::ref(*Engine::get()->getSubSystem<GameKeyboard>()); },
+
+        // Methods
+        "getKeyState", &GameKeyboard::getKeyState
+    );
+
     
 
     lua.set_function("getActiveScene", []() { return Engine::get()->getContext()->getActiveScene(); });

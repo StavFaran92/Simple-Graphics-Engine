@@ -182,3 +182,12 @@ private:
 	const uint8_t* m_keyboardState = nullptr;
 	int m_length = 0;
 };
+
+class EngineAPI GameKeyboard : public Keyboard
+{
+public:
+	GameKeyboard();
+
+private:
+	EventHandler gameHandler;
+};

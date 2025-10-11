@@ -3,6 +3,8 @@
 #include "core/EventSystem.h"
 #include "core/Logger.h"
 
+#include "SDL2/SDL.h"
+
 Keyboard::Keyboard() 
 {
 	m_keyboardState = SDL_GetKeyboardState(&m_length);
@@ -59,4 +61,11 @@ void Keyboard::onKeyReleased(EventHandler handler, Key code, KeyCallback callbac
 		}
 	});
 
+}
+
+GameKeyboard::GameKeyboard() : Keyboard()
+{
+	gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
+
+	Engine::get()->registerSubSystem<GameKeyboard>(this);
 }
