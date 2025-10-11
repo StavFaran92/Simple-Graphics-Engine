@@ -40,6 +40,9 @@ endforeach()
 # Add library
 add_library(Engine SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 
+
+target_precompile_headers(${PROJECT_NAME} PUBLIC src/core/pch.h)
+
 target_include_directories(${PROJECT_NAME} PRIVATE src/)
 target_include_directories(${PROJECT_NAME} PRIVATE include/)
 

@@ -1,6 +1,5 @@
 #include "core/Logger.h"
 #include <spdlog/sinks/base_sink.h>
-#include <mutex>
 
 std::shared_ptr<spdlog::logger> Logger::s_logger;
 std::function<void(spdlog::level::level_enum, const std::string&)> Logger::s_callback;
