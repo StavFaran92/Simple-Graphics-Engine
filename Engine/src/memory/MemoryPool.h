@@ -14,6 +14,8 @@ public:
     void add(UUID uid, T* resource)
     {
         m_memory[uid] = resource;
+
+        logDebug("Added Resource {} to Memory", uid);
     }
 
     std::vector<std::string> getAll() const
@@ -35,7 +37,7 @@ private:
         auto iter = m_memory.find(uid);
         if (iter == m_memory.end())
         {
-            logError("Could not locate resource: {}", uid);
+            logError("Could not locate resource: {} in memory", uid);
             return nullptr;
         }
         return iter->second;
@@ -47,6 +49,8 @@ private:
         if (iter == m_memory.end()) return;
         delete iter->second;
         m_memory.erase(uid);
+
+        logDebug("Erased Resource {} from memory", uid);
     }
     std::unordered_map<UUID, T*> m_memory;
     
