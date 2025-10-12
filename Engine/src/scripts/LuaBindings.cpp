@@ -215,6 +215,13 @@ void bindComponents(sol::state& lua)
     lua.new_usertype<PlayerController>("PlayerController",
         "move", &PlayerController::move
     );
+
+    lua.new_usertype<CameraComponent>("CameraComponent",
+        "front", &CameraComponent::front,
+        "right", &CameraComponent::right,
+        "center", &CameraComponent::center,
+        "up", &CameraComponent::up
+    );
 }
 
 void bindAssets(sol::state& lua)
@@ -508,7 +515,7 @@ void bindAll(sol::state& lua)
 
     
 
-    lua.set_function("getActiveScene", []() { return Engine::get()->getContext()->getActiveScene(); });
+    lua.set_function("getActiveScene", []() { return  std::ref(*Engine::get()->getContext()->getActiveScene()); });
     lua.set_function("assets", []() { return std::ref(*Engine::get()->getSubSystem<Assets>()); });
 
 }
