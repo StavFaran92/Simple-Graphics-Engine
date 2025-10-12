@@ -145,9 +145,7 @@ void Scene::init(Context* context)
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
 
-	gameEventLayer = std::make_shared<GameLayer>();
-	gameEventLayer->setEnabled(false);
-	Engine::get()->getEventSystem()->pushLayer(gameEventLayer);
+	gameEventLayer = Engine::get()->getEventSystem()->getLayer("GameLayer");
 
 	m_deferredRenderer = std::make_shared<DeferredRenderer>(this);
 	m_deferredRenderer->init();

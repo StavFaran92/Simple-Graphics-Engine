@@ -25,11 +25,13 @@ public:
 	void pushLayer(std::shared_ptr<EventLayer> layer);
 	void popLayer();
 
+	std::shared_ptr<EventLayer> getLayer(const std::string& layerName);
+	std::shared_ptr<EventLayer> getLayer(EventHandler handler);
+
 private:
 	friend class Engine;
 
-	std::shared_ptr<EventLayer> getLayer(const std::string& layerName);
-	std::shared_ptr<EventLayer> getLayer(EventHandler handler);
+	
 	
 private:
 	inline static uint64_t s_currentSubscriber = 0;

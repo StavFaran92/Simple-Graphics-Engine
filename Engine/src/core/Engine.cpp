@@ -44,6 +44,7 @@
 #include "component/MaterialComponent.h"
 #include "component/RenderableComponent.h"
 #include "scripts/ScriptSystem.h"
+#include "core/GameLayer.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"
@@ -151,6 +152,10 @@ bool Engine::init(const InitParams& initParams)
 
     m_eventSystem = std::make_shared<EventSystem>();
     m_eventLayerStack = std::make_shared<EventLayerStack>();
+
+    std::shared_ptr<GameLayer> gameEventLayer = std::make_shared<GameLayer>();
+    gameEventLayer->setEnabled(false);
+    m_eventSystem->pushLayer(gameEventLayer);
 
     m_memoryPool = std::make_shared<MemoryPool<ResourceBase>>();
     //m_memoryPoolMeshCollection = std::make_shared<MemoryPool<MeshCollection>>();

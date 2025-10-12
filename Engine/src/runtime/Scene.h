@@ -48,7 +48,7 @@ class TextureHandler;
 class SGE_Regsitry;
 class Entity;
 class RenderView;
-class GameLayer;
+class EventLayer;
 class WireframeGrid;
 namespace physx {
 	class PxScene;
@@ -198,7 +198,7 @@ private:
 
 	std::map<std::string, std::shared_ptr<RenderView>> m_renderViews;
 
-	std::shared_ptr<GameLayer> gameEventLayer;
+	std::shared_ptr<EventLayer> gameEventLayer;
 
 	std::shared_ptr<RenderView> m_highlightRenderView;
 

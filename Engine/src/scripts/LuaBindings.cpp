@@ -423,13 +423,25 @@ void bindAll(sol::state& lua)
 
     loadKeyCodes(lua);
 
+    lua.new_enum("KeyState",
+        "Invalid", Keyboard::KeyState::Invalid,
+        "Pressed", Keyboard::KeyState::Pressed,
+        "Released", Keyboard::KeyState::Released
+    );
+
+    lua.new_usertype<Keyboard::KeyEvent>("KeyEvent",
+        "state", &Keyboard::KeyEvent::state,
+        "repeat", &Keyboard::KeyEvent::repeat,
+        "code", &Keyboard::KeyEvent::keysym
+    );
+
     lua.new_usertype<GameKeyboard>("Keyboard",
         sol::no_constructor,
         "get", []() { return std::ref(*Engine::get()->getSubSystem<GameKeyboard>()); },
 
         // Methods
         "getKeyState", &GameKeyboard::getKeyState,
-        "onKeyPressed", & GameKeyboard::onKeyPressed
+        "onKeyPressed", &GameKeyboard::onKeyPressed
     );
 
     
