@@ -146,9 +146,31 @@ void ProjectAssetRegistry::updateAssetRegistry(const AssetInfo& asset)
 	addAssetRegistry(asset);
 }
 
+void ProjectAssetRegistry::removeAssetRegistry(const AssetInfo& asset)
+{
+	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
+	for (int i=0; i< m_assetRegistry[assetTypeName].size(); i++)
+	{
+		auto aReg = m_assetRegistry[assetTypeName][i];
+		std::string uuid = aReg.at("uuid").get<std::string>();
+		if (uuid == asset.uuid.str())
+		{
+			m_assetRegistry[assetTypeName].erase(i);
+			sync();
+			return;
+		}
+	}
+}
+
 void ProjectAssetRegistry::addAssociation(std::string name, UUID uuid)
 {
 	m_assetRegistry["association"][name] = uuid;
+	sync();
+}
+
+void ProjectAssetRegistry::removeAssociation(std::string name)
+{
+	m_assetRegistry["association"].erase(name);
 	sync();
 }
 

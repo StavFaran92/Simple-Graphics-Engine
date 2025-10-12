@@ -282,7 +282,12 @@ void AssetViewWindow::display()
 
 				if (ImGui::Selectable("Delete"))
 				{
-					logDebug("Not yet implemented");
+					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
+					auto asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
+					std::string path = asset.filePath;
+					Engine::get()->getSubSystem<Assets>()->deleteAsset(asset);
+					std::filesystem::remove(Engine::get()->getProjectDirectory() + "/" + path);
 				}
 
 				if (ImGui::Selectable("Properties"))

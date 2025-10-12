@@ -306,3 +306,10 @@ ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<Resource
 
 	return asset;
 }
+
+void Assets::deleteAsset(const AssetInfo& aInfo)
+{
+	Engine::get()->getMemoryManagementSystem()->removeAssociation(aInfo.filePath);
+	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
+	m_assets.erase(aInfo.uuid);
+}

@@ -24,7 +24,9 @@ public:
 	//void addTexture(Resource<Texture> texture);
 	void addAssetRegistry(const AssetInfo& asset);
 	void updateAssetRegistry(const AssetInfo& asset);
+	void removeAssetRegistry(const AssetInfo& asset);
 	void addAssociation(std::string name, UUID uuid);
+	void removeAssociation(std::string name);
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 	std::vector<AssetInfo> getAllAssets() const;
 	std::unordered_map<std::string, UUID> getAssociations() const;

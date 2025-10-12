@@ -82,6 +82,8 @@ public:
 
 	bool hasAsset(UUID uuid) const;
 
+	void deleteAsset(const AssetInfo& aInfo);
+
 	void updateAsset(const ResourceWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc = {});
 
 	ResourceWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);

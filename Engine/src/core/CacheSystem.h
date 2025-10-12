@@ -87,6 +87,13 @@ public:
 
 	}
 
+	void removeAssociation(const std::string& name)
+	{
+		m_associations.erase(name);
+		Engine::get()->getContext()->getProjectAssetRegistry()->removeAssociation(name);
+
+	}
+
 	void clear();
 private:
 	std::unordered_map<std::string, UUID> m_associations;
