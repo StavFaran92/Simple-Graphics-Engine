@@ -1432,9 +1432,9 @@ public:
 
 		g_editorCamera = editorCamera;
 
-		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, Keyboard::Key::SCANCODE_ESCAPE, [](Keyboard::KeyEvent e) { stopSimulation(); });
+		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](Keyboard::KeyEvent e) { stopSimulation(); });
 		
-		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiHandler, Keyboard::Key::SCANCODE_X, [](Keyboard::KeyEvent e) {
+		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiHandler, KeyCode::SCANCODE_X, [](Keyboard::KeyEvent e) {
 			debugTerrainFlag = true;
 			});
 

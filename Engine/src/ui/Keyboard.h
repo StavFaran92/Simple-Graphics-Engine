@@ -22,14 +22,14 @@ public:
 	{
 		KeyState state = KeyState::Invalid;
 		bool repeat = false;
-		Key keysym = SCANCODE_UNKNOWN;
+		KeyCode keysym = SCANCODE_UNKNOWN;
 	};
 	using KeyCallback = std::function<void(KeyEvent s)>;
 
 	Keyboard();
-	int getKeyState(Key code) const;
-	void onKeyPressed(EventHandler handler, Key code, KeyCallback callback) const;
-	void onKeyReleased(EventHandler handler, Key code, KeyCallback callback) const;
+	int getKeyState(KeyCode code) const;
+	void onKeyPressed(EventHandler handler, KeyCode code, KeyCallback callback) const;
+	void onKeyReleased(EventHandler handler, KeyCode code, KeyCallback callback) const;
 
 private:
 	const uint8_t* m_keyboardState = nullptr;
@@ -40,6 +40,7 @@ class EngineAPI GameKeyboard : public Keyboard
 {
 public:
 	GameKeyboard();
+	void onKeyPressed(KeyCode code, KeyCallback callback) const;
 
 private:
 	EventHandler gameHandler;

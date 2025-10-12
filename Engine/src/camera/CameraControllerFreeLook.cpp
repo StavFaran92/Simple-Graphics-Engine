@@ -21,11 +21,11 @@ void CameraControllerFreeLook::onCreate(Entity& e)
 
 void CameraControllerFreeLook::onUpdate(float deltaTime)
 {
-	if(Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_W))
+	if(Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_W))
 	{
 		m_velocityF = m_cameraComponent->front * velocity * deltaTime;
 	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_S))
+	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_S))
 	{
 		m_velocityF = -m_cameraComponent->front * velocity * deltaTime;
 	}
@@ -34,11 +34,11 @@ void CameraControllerFreeLook::onUpdate(float deltaTime)
 		m_velocityF = glm::vec3{ 0 };
 	}
 
-	if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_D))
+	if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_D))
 	{
 		m_velocityR = m_cameraComponent->right * velocity * deltaTime;
 	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_A))
+	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_A))
 	{
 		m_velocityR = -m_cameraComponent->right * velocity * deltaTime;
 	}
@@ -47,11 +47,11 @@ void CameraControllerFreeLook::onUpdate(float deltaTime)
 		m_velocityR = glm::vec3{ 0 };
 	}
 
-	if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_E))
+	if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_E))
 	{
 		m_velocityU = glm::vec3{0,1,0} *velocity * deltaTime;
 	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(Keyboard::Key::SCANCODE_Q))
+	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_Q))
 	{
 		m_velocityU = glm::vec3{ 0,-1,0 }  * velocity * deltaTime;
 	}

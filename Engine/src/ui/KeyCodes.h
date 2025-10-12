@@ -1,6 +1,6 @@
 #pragma once
 
-enum Key : int
+enum KeyCode : int
 {
 	SCANCODE_UNKNOWN = 0,
 	SCANCODE_A = 4,

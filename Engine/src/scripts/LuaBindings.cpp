@@ -28,6 +28,8 @@
 #include "ui/Mouse.h"
 #include "ui/Input.h"
 
+#include "ui/KeyCodes_Lua.gen.h"
+
 using ComponentGetter = std::function<sol::object(Entity&, sol::this_state)>;
 
 std::unordered_map<std::string, ComponentGetter> componentGetters{
@@ -414,15 +416,20 @@ void bindAll(sol::state& lua)
         "get", []() { return std::ref(*Engine::get()->getInput()->getMouse()); },
 
         // Methods
-        "getButtonPressed", &Mouse::getButtonPressed
+        "getButtonPressed", &Mouse::getButtonPressed,
+        "lock", []() {Engine::get()->getWindow()->lockMouse(); },
+        "unlock", []() {Engine::get()->getWindow()->unlockMouse(); }
     );
+
+    loadKeyCodes(lua);
 
     lua.new_usertype<GameKeyboard>("Keyboard",
         sol::no_constructor,
         "get", []() { return std::ref(*Engine::get()->getSubSystem<GameKeyboard>()); },
 
         // Methods
-        "getKeyState", &GameKeyboard::getKeyState
+        "getKeyState", &GameKeyboard::getKeyState,
+        "onKeyPressed", & GameKeyboard::onKeyPressed
     );
 
     

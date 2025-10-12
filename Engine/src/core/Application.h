@@ -32,7 +32,7 @@ protected:
 	Context* getContext() const;
 
 	// Input
-	int keyboard_getKeyState(Keyboard::Key code);
+	int keyboard_getKeyState(KeyCode code);
 	bool mouse_leftButtonPressed();
 	bool mouse_rightButtonPressed();
 	bool mouse_middleButtonPressed();

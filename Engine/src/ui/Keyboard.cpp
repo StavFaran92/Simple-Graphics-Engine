@@ -10,7 +10,7 @@ Keyboard::Keyboard()
 	m_keyboardState = SDL_GetKeyboardState(&m_length);
 }
 
-int Keyboard::getKeyState(Key code) const
+int Keyboard::getKeyState(KeyCode code) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -21,7 +21,7 @@ int Keyboard::getKeyState(Key code) const
 	return m_keyboardState[code];
 }
 
-void Keyboard::onKeyPressed(EventHandler handler, Key code, KeyCallback callback) const
+void Keyboard::onKeyPressed(EventHandler handler, KeyCode code, KeyCallback callback) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -34,7 +34,7 @@ void Keyboard::onKeyPressed(EventHandler handler, Key code, KeyCallback callback
 		if (e.key.keysym.scancode == code)
 		{
 			KeyEvent kEvent;
-			kEvent.keysym = static_cast<Key>(code);
+			kEvent.keysym = static_cast<KeyCode>(code);
 			kEvent.repeat = e.key.repeat != 0;
 			kEvent.state = KeyState::Pressed;
 			callback(kEvent);
@@ -42,7 +42,7 @@ void Keyboard::onKeyPressed(EventHandler handler, Key code, KeyCallback callback
 	});
 }
 
-void Keyboard::onKeyReleased(EventHandler handler, Key code, KeyCallback callback) const
+void Keyboard::onKeyReleased(EventHandler handler, KeyCode code, KeyCallback callback) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -54,7 +54,7 @@ void Keyboard::onKeyReleased(EventHandler handler, Key code, KeyCallback callbac
 		if (e.key.keysym.scancode == code)
 		{
 			KeyEvent kEvent;
-			kEvent.keysym = static_cast<Key>(code);
+			kEvent.keysym = static_cast<KeyCode>(code);
 			kEvent.repeat = e.key.repeat != 0;
 			kEvent.state = KeyState::Released;
 			callback(kEvent);
@@ -68,4 +68,9 @@ GameKeyboard::GameKeyboard() : Keyboard()
 	gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
 
 	Engine::get()->registerSubSystem<GameKeyboard>(this);
+}
+
+void GameKeyboard::onKeyPressed(KeyCode code, KeyCallback callback) const
+{
+	return onKeyPressed(code, callback);
 }
