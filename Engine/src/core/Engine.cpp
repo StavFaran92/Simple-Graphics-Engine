@@ -201,6 +201,7 @@ bool Engine::init(const InitParams& initParams)
     auto graphics = new Graphics();
     auto system = new System();
     auto gameKeyboard = new GameKeyboard();
+    auto gameMouse = new GameMouse();
     
     m_assets = std::make_shared<Assets>();
 

@@ -30,15 +30,15 @@ void Application::postProcess(ResourceWrapper<Shader> shader)
 
 bool Application::mouse_leftButtonPressed()
 {
-	return Engine::get()->getInput()->getMouse()->getButtonPressed(Mouse::MouseButton::LeftMousebutton);
+	return Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT);
 }
 bool Application::mouse_rightButtonPressed()
 {
-	return Engine::get()->getInput()->getMouse()->getButtonPressed(Mouse::MouseButton::RightMousebutton);
+	return Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_RIGHT);
 }
 bool Application::mouse_middleButtonPressed()
 {
-	return Engine::get()->getInput()->getMouse()->getButtonPressed(Mouse::MouseButton::MiddleMousebutton);
+	return Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_MIDDLE);
 }
 
 int Application::keyboard_getKeyState(KeyCode code)

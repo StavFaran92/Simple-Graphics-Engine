@@ -327,10 +327,76 @@ void bindAssets(sol::state& lua)
     );
 }
 
+void bindUI(sol::state& lua)
+{
+    // Mouse
+    lua.new_enum("MouseButton",
+        "MOUSE_BUTTON_LEFT", MouseButton::MOUSE_BUTTON_LEFT,
+        "MOUSE_BUTTON_RIGHT", MouseButton::MOUSE_BUTTON_RIGHT,
+        "MOUSE_BUTTON_MIDDLE", MouseButton::MOUSE_BUTTON_MIDDLE
+    );
+
+    lua.new_enum("MouseEventType",
+        "Invalid", Mouse::MouseEventType::Invalid,
+        "Motion", Mouse::MouseEventType::Motion,
+        "ButtonPressed", Mouse::MouseEventType::ButtonPressed,
+        "ButtonReleased", Mouse::MouseEventType::ButtonReleased
+    );
+
+    lua.new_usertype<Mouse::MouseEvent>("MouseEvent",
+        "type", &Mouse::MouseEvent::type,
+        "x", &Mouse::MouseEvent::x,
+        "y", &Mouse::MouseEvent::y,
+        "xrel", &Mouse::MouseEvent::xrel,
+        "yrel", &Mouse::MouseEvent::yrel,
+        "clicks", &Mouse::MouseEvent::clicks,
+        "button", &Mouse::MouseEvent::button
+    );
+
+    lua.new_usertype<GameMouse>("Mouse",
+        sol::no_constructor,
+        "get", []() { return std::ref(*Engine::get()->getSubSystem<GameMouse>()); },
+
+        // Methods
+        "getButtonPressed", & GameMouse::getButtonPressed,
+        "onMousePressed", &GameMouse::onMousePressed,
+        "onMouseReleased", &GameMouse::onMouseReleased,
+        "onMouseMotion", &GameMouse::onMouseMotion,
+        "lock", []() {Engine::get()->getWindow()->lockMouse(); },
+        "unlock", []() {Engine::get()->getWindow()->unlockMouse(); }
+    );
+
+    // Keyboard
+    loadKeyCodes(lua);
+
+    lua.new_enum("KeyState",
+        "Invalid", Keyboard::KeyState::Invalid,
+        "Pressed", Keyboard::KeyState::Pressed,
+        "Released", Keyboard::KeyState::Released
+    );
+
+    lua.new_usertype<Keyboard::KeyEvent>("KeyEvent",
+        "state", &Keyboard::KeyEvent::state,
+        "repeat", &Keyboard::KeyEvent::repeat,
+        "code", &Keyboard::KeyEvent::keysym
+    );
+
+    lua.new_usertype<GameKeyboard>("Keyboard",
+        sol::no_constructor,
+        "get", []() { return std::ref(*Engine::get()->getSubSystem<GameKeyboard>()); },
+
+        // Methods
+        "getKeyState", &GameKeyboard::getKeyState,
+        "onKeyPressed", &GameKeyboard::onKeyPressed,
+        "onKeyReleased", &GameKeyboard::onKeyReleased
+    );
+}
+
 void bindAll(sol::state& lua) 
 {
     bindAssets(lua);
     bindComponents(lua);
+    bindUI(lua);
 
     lua.new_usertype<glm::vec2>("vec2",
         "x", &glm::vec2::x,
@@ -405,45 +471,7 @@ void bindAll(sol::state& lua)
         "height", &Window::getHeight
     );
 
-    lua.new_enum("MouseButton",
-        "LeftMousebutton", Mouse::MouseButton::LeftMousebutton,
-        "RightMousebutton", Mouse::MouseButton::RightMousebutton,
-        "MiddleMousebutton", Mouse::MouseButton::MiddleMousebutton
-    );
 
-    lua.new_usertype<Mouse>("Mouse",
-        sol::no_constructor,
-        "get", []() { return std::ref(*Engine::get()->getInput()->getMouse()); },
-
-        // Methods
-        "getButtonPressed", &Mouse::getButtonPressed,
-        "lock", []() {Engine::get()->getWindow()->lockMouse(); },
-        "unlock", []() {Engine::get()->getWindow()->unlockMouse(); }
-    );
-
-    loadKeyCodes(lua);
-
-    lua.new_enum("KeyState",
-        "Invalid", Keyboard::KeyState::Invalid,
-        "Pressed", Keyboard::KeyState::Pressed,
-        "Released", Keyboard::KeyState::Released
-    );
-
-    lua.new_usertype<Keyboard::KeyEvent>("KeyEvent",
-        "state", &Keyboard::KeyEvent::state,
-        "repeat", &Keyboard::KeyEvent::repeat,
-        "code", &Keyboard::KeyEvent::keysym
-    );
-
-    lua.new_usertype<GameKeyboard>("Keyboard",
-        sol::no_constructor,
-        "get", []() { return std::ref(*Engine::get()->getSubSystem<GameKeyboard>()); },
-
-        // Methods
-        "getKeyState", &GameKeyboard::getKeyState,
-        "onKeyPressed", &GameKeyboard::onKeyPressed,
-        "onKeyReleased", &GameKeyboard::onKeyReleased
-    );
 
     
 

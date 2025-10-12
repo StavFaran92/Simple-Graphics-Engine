@@ -2,10 +2,10 @@
 
 #include "core/Engine.h"
 #include "core/EventSystem.h"
+#include "SDL2/SDL.h"
 
 Mouse::Mouse()
 {
-	//m_eventHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer"); // TODO fix
 }
 
 const Mouse::MouseState& Mouse::getMouseState()
@@ -34,7 +34,55 @@ void Mouse::getMousePosition(int& x, int& y)
 	y = state.y;
 }
 
-bool Mouse::getButtonPressed(MouseButton button) 
+void Mouse::onMousePressed(EventHandler handler, MouseButton code, MouseCallback callback) const
+{
+	auto eventSystem = Engine::get()->getEventSystem();
+
+	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONDOWN, [=](SDL_Event e)
+	{
+		MouseEvent mEvent;
+		mEvent.type = Mouse::MouseEventType::ButtonPressed;
+		mEvent.button = static_cast<MouseButton>(e.button.button);
+		mEvent.clicks = e.button.clicks;
+		mEvent.x = e.button.x;
+		mEvent.y = e.button.y;
+		callback(mEvent);
+	});
+}
+
+void Mouse::onMouseReleased(EventHandler handler, MouseButton code, MouseCallback callback) const
+{
+	auto eventSystem = Engine::get()->getEventSystem();
+
+	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
+	{
+		MouseEvent mEvent;
+		mEvent.type = Mouse::MouseEventType::ButtonReleased;
+		mEvent.button = static_cast<MouseButton>(e.button.button);
+		mEvent.clicks = e.button.clicks;
+		mEvent.x = e.button.x;
+		mEvent.y = e.button.y;
+		callback(mEvent);
+	});
+}
+
+void Mouse::onMouseMotion(EventHandler handler, MouseButton code, MouseCallback callback) const
+{
+	auto eventSystem = Engine::get()->getEventSystem();
+
+	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEMOTION, [=](SDL_Event e)
+	{
+		MouseEvent mEvent;
+		mEvent.type = Mouse::MouseEventType::Motion;
+		mEvent.x = e.motion.x;
+		mEvent.y = e.motion.y;
+		mEvent.xrel = e.motion.xrel;
+		mEvent.yrel = e.motion.yrel;
+		callback(mEvent);
+	});
+}
+
+bool Mouse::getButtonPressed(MouseButton button)
 {
 	bool result = false;
 
@@ -42,69 +90,40 @@ bool Mouse::getButtonPressed(MouseButton button)
 
 	switch (button)
 	{
-	case MouseButton::LeftMousebutton:
+	case MouseButton::MOUSE_BUTTON_LEFT:
 		result = state.lmb;
 		break;
-	case MouseButton::RightMousebutton:
+	case MouseButton::MOUSE_BUTTON_RIGHT:
 		result = state.rmb;
 		break;
-	case MouseButton::MiddleMousebutton:
+	case MouseButton::MOUSE_BUTTON_MIDDLE:
 		result = state.mmb;
 		break;
 	default:
 		break;
 	}
-	
-	return result;
-}
-void Mouse::onMousePressed(EventHandler handler, MouseButton code, std::function<void(SDL_Event e)> callback) const
-{
-	auto eventSystem = Engine::get()->getEventSystem();
-
-	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONDOWN, [=](SDL_Event e)
-	{
-		if (e.button.button == mouseButtonToSDLCode(code))
-		{
-			callback(e);
-		}
-	});
-}
-
-void Mouse::onMouseReleased(EventHandler handler, MouseButton code, std::function<void(SDL_Event e)> callback) const
-{
-	auto eventSystem = Engine::get()->getEventSystem();
-
-	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
-	{
-		if (e.button.button == mouseButtonToSDLCode(code))
-		{
-			callback(e);
-		}
-	});
-}
-//
-//void Mouse::onEvent(SDL_Event e)
-//{
-//}
-
-int Mouse::mouseButtonToSDLCode(MouseButton button) const
-{
-	int result = -1;
-
-	switch (button)
-	{
-	case MouseButton::LeftMousebutton:
-		result = SDL_BUTTON_LEFT;
-		break;
-	case MouseButton::RightMousebutton:
-		result = SDL_BUTTON_RIGHT;
-		break;
-	case MouseButton::MiddleMousebutton:
-		result = SDL_BUTTON_MIDDLE;
-		break;
-	default:
-		break;
-	}
 
 	return result;
+}
+
+GameMouse::GameMouse()
+{
+	gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
+
+	Engine::get()->registerSubSystem<GameMouse>(this);
+}
+
+void GameMouse::onMousePressed(MouseButton code, MouseCallback callback) const
+{
+	return Mouse::onMousePressed(gameHandler, code, callback);
+}
+
+void GameMouse::onMouseReleased(MouseButton code, MouseCallback callback) const
+{
+	return Mouse::onMouseReleased(gameHandler, code, callback);
+}
+
+void GameMouse::onMouseMotion(MouseButton code, MouseCallback callback) const
+{
+	return Mouse::onMouseMotion(gameHandler, code, callback);
 }
