@@ -23,6 +23,7 @@
 #include "component/RenderableComponent.h"
 #include "component/MaterialComponent.h"
 #include "component/ImageComponent.h"
+#include "physics/Physics.h"
 
 #include "core/Window.h"
 #include "ui/Mouse.h"
@@ -390,6 +391,38 @@ void bindUI(sol::state& lua)
         "onKeyPressed", &GameKeyboard::onKeyPressed,
         "onKeyReleased", &GameKeyboard::onKeyReleased
     );
+
+    lua.new_usertype<Physics::HitResult>("HitResult",
+        // Members
+        "position", &Physics::HitResult::position,
+        "normal", &Physics::HitResult::normal,
+        "distance", &Physics::HitResult::distance,
+        "entity", &Physics::HitResult::e
+    );
+
+    lua.new_enum("LayerMask",
+        "LAYER_0", Physics::LayerMask::LAYER_0,
+        "LAYER_1", Physics::LayerMask::LAYER_1,
+        "LAYER_2", Physics::LayerMask::LAYER_2,
+        "LAYER_3", Physics::LayerMask::LAYER_3,
+        "LAYER_4", Physics::LayerMask::LAYER_4,
+        "LAYER_5", Physics::LayerMask::LAYER_5,
+        "LAYER_6", Physics::LayerMask::LAYER_6,
+        "LAYER_7", Physics::LayerMask::LAYER_7,
+        "LAYER_8", Physics::LayerMask::LAYER_8,
+        "LAYER_9", Physics::LayerMask::LAYER_9,
+        "LAYER_10", Physics::LayerMask::LAYER_10,
+        "LAYER_11", Physics::LayerMask::LAYER_11,
+        "LAYER_12", Physics::LayerMask::LAYER_12,
+        "LAYER_13", Physics::LayerMask::LAYER_13,
+        "LAYER_14", Physics::LayerMask::LAYER_14,
+        "LAYER_15", Physics::LayerMask::LAYER_15,
+        "LAYER_16", Physics::LayerMask::LAYER_16,
+        "LAYER_17", Physics::LayerMask::LAYER_17
+    );
+
+
+    lua.set_function("raycast", Physics::raycast);
 }
 
 void bindAll(sol::state& lua) 
