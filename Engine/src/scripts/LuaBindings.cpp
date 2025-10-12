@@ -441,7 +441,8 @@ void bindAll(sol::state& lua)
 
         // Methods
         "getKeyState", &GameKeyboard::getKeyState,
-        "onKeyPressed", &GameKeyboard::onKeyPressed
+        "onKeyPressed", &GameKeyboard::onKeyPressed,
+        "onKeyReleased", &GameKeyboard::onKeyReleased
     );
 
     

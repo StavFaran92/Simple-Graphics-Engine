@@ -41,6 +41,7 @@ class EngineAPI GameKeyboard : public Keyboard
 public:
 	GameKeyboard();
 	void onKeyPressed(KeyCode code, KeyCallback callback) const;
+	void onKeyReleased(KeyCode code, KeyCallback callback) const;
 
 private:
 	EventHandler gameHandler;

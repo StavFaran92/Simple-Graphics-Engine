@@ -74,3 +74,8 @@ void GameKeyboard::onKeyPressed(KeyCode code, KeyCallback callback) const
 {
 	return Keyboard::onKeyPressed(gameHandler, code, callback);
 }
+
+void GameKeyboard::onKeyReleased(KeyCode code, KeyCallback callback) const
+{
+	return Keyboard::onKeyReleased(gameHandler, code, callback);
+}
