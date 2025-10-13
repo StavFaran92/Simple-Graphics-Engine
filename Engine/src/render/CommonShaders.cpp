@@ -5,7 +5,7 @@
 CommonShaders::CommonShaders()
 {
 	ShaderAssetDescriptor aDesc;
-	aDesc.isTransient = true;
+	aDesc.isEngineOwned = true;
 	m_shaders[ShaderType::REFLECTION_SHADER] = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/ReflectionShader.glsl", aDesc);
 	m_shaders[ShaderType::REFRACTION_SHADER] = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/ReflectionShader.glsl", aDesc);
 	m_shaders[ShaderType::PICKING_SHADER] = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl", aDesc);

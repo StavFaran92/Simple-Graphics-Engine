@@ -20,6 +20,28 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
+void AssetInfo::establishFilepath()
+{
+	filePath = "";
+	if (isEngineOwned)
+	{
+		filePath += "Engine/";
+	}
+	else
+	{
+		filePath += "Content/";
+	}
+
+	if (!assetDirectory.empty())
+	{
+		filePath += assetDirectory + "/";
+	}
+
+	std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + filePath);
+
+	filePath += fileName;
+}
+
 AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 {
 	importSettings = assetDesc.fillParams();
@@ -29,7 +51,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	origFilePath = assetDesc.origFilePath;
 	assetDirectory = assetDesc.assetDirectory;
 	attributes = assetDesc.attributes;
-	isTransient = assetDesc.isTransient;
+	isEngineOwned = assetDesc.isEngineOwned;
 
 	if (aType == AssetType::NONE)
 	{
@@ -80,12 +102,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		fileName = name + ext;
 	}
 
-	filePath = "";
-	if (!assetDirectory.empty())
-	{
-		filePath += assetDirectory + "/";
-	}
-	filePath += fileName;
+	establishFilepath();
 }
 
 void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
@@ -107,12 +124,7 @@ void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
 
 	fileName = name + ext;
 
-	filePath = "";
-	if (!assetDirectory.empty())
-	{
-		filePath += assetDirectory + "/";
-	}
-	filePath += fileName;
+	establishFilepath();
 }
 
 void Assets::addAsset(AssetInfo& aInfo)
@@ -122,7 +134,7 @@ void Assets::addAsset(AssetInfo& aInfo)
 		logError("Invalid asset type specified!");
 		return;
 	}
-	if (!aInfo.isTransient && aInfo.filePath.empty())
+	if (aInfo.filePath.empty())
 	{
 		logError("Non transient asset must have a file path specified.");
 		return;
@@ -133,10 +145,7 @@ void Assets::addAsset(AssetInfo& aInfo)
 		return;
 	}
 
-	if (!aInfo.isTransient)
-	{
-		updateRegistry(aInfo);
-	}
+	updateRegistry(aInfo);
 
 	aInfo.isValid = true;
 	m_assets[aInfo.uuid] = aInfo;
@@ -232,11 +241,8 @@ void Assets::updateAsset(const ResourceWrapper<ResourceBase>& asset, const Asset
 	AssetInfo aInfo = getAsset(asset.getUID());
 	aInfo.update(uDesc);
 
-	if (!aInfo.isTransient)
-	{
-		AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
-		updateRegistry(aInfo);
-	}
+	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo); // todo check for non engine generated 
+	updateRegistry(aInfo);
 
 	m_assets[aInfo.uuid] = aInfo;
 	asset.get()->m_assetInfo = aInfo;
@@ -255,21 +261,11 @@ ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocatio
 		return ResourceWrapper<ResourceBase>::empty;
 	}
 
-	if (!aInfo.isTransient)
+	// Copy + Paste
+	if (!AssetFactory::getManager(aInfo.aType)->copyFiles(fileLocation, aInfo))
 	{
-		std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + aInfo.assetDirectory);
-
-		// Copy + Paste
-		//if (!asset.get()->getAssetManager().copyFiles(fileLocation, aInfo))
-		if(!AssetFactory::getManager(aInfo.aType)->copyFiles(fileLocation, aInfo))
-		{
-			logError("Failed to copy file from {} to resource folder", fileLocation);
-			return ResourceWrapper<ResourceBase>::empty;
-		}
-	}
-	else
-	{
-		aInfo.filePath = fileLocation;
+		logError("Failed to copy file from {} to resource folder", fileLocation);
+		return ResourceWrapper<ResourceBase>::empty;
 	}
 
 	// Load
@@ -295,10 +291,7 @@ ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<Resource
 
 	AssetInfo aInfo(desc);
 
-	if (!aInfo.isTransient)
-	{
-		AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
-	}
+	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
 
 	asset.get()->m_assetInfo = aInfo;
 	aInfo.data = asset;

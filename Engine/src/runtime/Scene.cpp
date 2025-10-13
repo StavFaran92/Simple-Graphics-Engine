@@ -195,7 +195,7 @@ void Scene::init(Context* context)
 	m_quadUI.RemoveComponent<ObjectComponent>();
 
 	ShaderAssetDescriptor aDesc;
-	aDesc.isTransient = true;
+	aDesc.isEngineOwned = true;
 	m_UIShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/UIShader.glsl", aDesc);
 	m_terrainShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/TerrainShader.glsl", aDesc); // todo consider move to context (or even Engine)
 	m_tempOutlineShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl", aDesc);

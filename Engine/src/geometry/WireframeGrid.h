@@ -54,7 +54,7 @@ public:
 		vao->build();
 
 		ShaderAssetDescriptor aDesc;
-		aDesc.isTransient = true;
+		aDesc.isEngineOwned = true;
 		shader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl", aDesc);
 	}
 

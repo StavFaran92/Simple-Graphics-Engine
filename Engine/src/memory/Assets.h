@@ -22,7 +22,7 @@ public:
 	AssetType aType = AssetType::NONE;
 	std::map<std::string, std::string> attributes;
 	std::string name;
-	bool isTransient = false;
+	bool isEngineOwned = false;
 
 	virtual nlohmann::json fillParams() const { return {}; }
 	
@@ -49,7 +49,7 @@ struct EngineAPI AssetInfo
 	AssetType aType = AssetType::NONE;
 	std::map<std::string, std::string> attributes;
 	std::string name;
-	bool isTransient = false;
+	bool isEngineOwned = false;
 	nlohmann::json importSettings;
 	ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
 
@@ -59,6 +59,7 @@ struct EngineAPI AssetInfo
 
 	AssetInfo(const AssetCreateDescriptor& assetDesc);
 	void update(const AssetUpdateDescriptor& desc);
+	void establishFilepath();
 };
 
 class EngineAPI Assets

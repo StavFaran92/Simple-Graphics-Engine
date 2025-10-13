@@ -51,7 +51,7 @@ CommonTextures* CommonTextures::create()
 		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_WHITE";
-		aInfo.isTransient = true;
+		aInfo.isEngineOwned = true;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 	}
@@ -80,7 +80,7 @@ CommonTextures* CommonTextures::create()
 		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = "SGE_TEXTURE_BLACK";
-		aInfo.isTransient = true;
+		aInfo.isEngineOwned = true;
 		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 	}

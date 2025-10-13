@@ -446,8 +446,20 @@ void bindAll(sol::state& lua)
     lua.new_usertype<glm::vec3>("vec3",
         sol::constructors<
         glm::vec3(),                    // default: vec3()
+        glm::vec3(float),  // parameterized: vec3(x, y, z)
         glm::vec3(float, float, float)  // parameterized: vec3(x, y, z)
         >(),
+        // Arithmetic operators
+        sol::meta_function::addition, sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator+),
+        sol::meta_function::subtraction, sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator-),
+        sol::meta_function::multiplication, sol::overload(
+            sol::resolve<glm::vec3(const glm::vec3&, float)>(glm::operator*),
+            sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator*)
+        ),
+        sol::meta_function::division, sol::resolve<glm::vec3(const glm::vec3&, float)>(glm::operator/),
+        sol::meta_function::to_string, [](const glm::vec3& v) {
+            return "vec3(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")";
+        },
         "x", &glm::vec3::x,
         "y", &glm::vec3::y,
         "z", &glm::vec3::z

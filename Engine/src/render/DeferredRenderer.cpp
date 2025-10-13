@@ -75,7 +75,7 @@ bool DeferredRenderer::setupGBuffer()
 	m_gBuffer.unbind();
 
 	ShaderAssetDescriptor aDesc;
-	aDesc.isTransient = true;
+	aDesc.isEngineOwned = true;
 	m_gBufferShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl", aDesc);
 	m_lightPassShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl", aDesc);
 
@@ -147,7 +147,7 @@ bool DeferredRenderer::setupSSAO()
 	m_ssaoFBO.unbind();
 
 	ShaderAssetDescriptor aDesc;
-	aDesc.isTransient = true;
+	aDesc.isEngineOwned = true;
 	m_ssaoPassShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl", aDesc);
 
 	// Initialize SSAO Blur

@@ -45,15 +45,7 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 	ResourceWrapper<Shader> shader(uuid);
 	Engine::get()->getResourceManager()->incRef(uuid);
 
-	std::string filepath;
-	if (aInfo.isTransient)
-	{
-		filepath = aInfo.filePath;
-	}
-	else
-	{
-		filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	}
+	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
 
 	shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
 	shader->shaderOverride = shaderOverride;
@@ -558,7 +550,7 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	aInfo.aType = AssetType::SHADER;
 	aInfo.name = name;
 	aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
-	aInfo.isTransient = isTransient;
+	aInfo.isEngineOwned = isEngineOwned;
 	Engine::get()->getSubSystem<Assets>()->createAsset(shader, aInfo);
 
 	return shader;

@@ -190,15 +190,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 
 void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string filepath;
-	if (aInfo.isTransient)
-	{
-		filepath = aInfo.filePath;
-	}
-	else
-	{
-		filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	}
+	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
 
 	if (!std::filesystem::exists(filepath))
 	{
@@ -298,7 +290,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			extractAiMaterialProperties(aMaterial, material);
 
 			AssetCreateDescriptor materialAssetInfo;
-			materialAssetInfo.isTransient = aInfo.isTransient;
+			materialAssetInfo.isEngineOwned = aInfo.isEngineOwned;
 			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
@@ -540,7 +532,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		tData.target = Texture::TextureTarget::TEXTURE_2D;
 		tData.format = Texture::Format::RGB;
 		tData.internalFormat = Texture::InternalFormat::RGB2;
-		tData.isTransient = aInfo.isTransient;
+		tData.isTransient = aInfo.isEngineOwned;
 		tData.genMipMap = false;
 		tData.textureName = textureName;
 		tData.height = height;
@@ -562,7 +554,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		AssetCreateDescriptor textureAssetDesc;
 		textureAssetDesc.aType = AssetType::TEXTURE;
 		textureAssetDesc.name = tData.textureName;
-		textureAssetDesc.isTransient = aInfo.isTransient;
+		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.attributes = texture->getTextureAssetAttributes().toMap();
 		Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc);
@@ -585,7 +577,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 
 		Texture::TextureAssetDescriptor tSettings;
 		tSettings.assetDirectory = aInfo.assetDirectory;
-		tSettings.isTransient = aInfo.isTransient;
+		tSettings.isEngineOwned = aInfo.isEngineOwned;
 		texture = Texture::import(path, tSettings);
 
 		cachedTextures.insert({ path, texture });

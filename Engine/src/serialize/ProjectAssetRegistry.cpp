@@ -23,7 +23,7 @@ void to_json(nlohmann::json& j, const AssetInfo& asset)
 		{"attributes", asset.attributes},
 		{"importSettings", asset.importSettings},
 		{"name", asset.name},
-		{"isTransient", asset.isTransient},
+		{"isEngineOwned", asset.isEngineOwned},
 	};
 }
 
@@ -38,7 +38,7 @@ void from_json(const nlohmann::json& j, AssetInfo& asset)
 	j.at("attributes").get_to(asset.attributes);
 	j.at("importSettings").get_to(asset.importSettings);
 	j.at("name").get_to(asset.name);
-	j.at("isTransient").get_to(asset.isTransient);
+	j.at("isEngineOwned").get_to(asset.isEngineOwned);
 }
 
 ProjectAssetRegistry::ProjectAssetRegistry(const std::string& filename)

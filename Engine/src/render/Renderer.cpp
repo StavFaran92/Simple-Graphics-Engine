@@ -43,7 +43,7 @@ Renderer::Renderer(Scene* scene)
 bool Renderer::init()
 {
     ShaderAssetDescriptor aDesc;
-    aDesc.isTransient = true;
+    aDesc.isEngineOwned = true;
 	m_pbrShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl", aDesc);
 
     m_quad = ScreenQuad::GenerateScreenQuad(&Engine::get()->getContext()->getRegistry());

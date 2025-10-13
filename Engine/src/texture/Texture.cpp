@@ -43,15 +43,7 @@ bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& 
 
 ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
 {
-	std::string filepath;
-	if (aInfo.isTransient)
-	{
-		filepath = aInfo.filePath;
-	}
-	else
-	{
-		filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
-	}
+	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
 
 	Texture::TextureData textureData;
 

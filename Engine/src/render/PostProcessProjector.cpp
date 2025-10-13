@@ -76,7 +76,7 @@ bool PostProcessProjector::init(int windowWidth, int windowHeight)
 	
 	// Generate screen shader
 	ShaderAssetDescriptor aDesc;
-	aDesc.isTransient = true;
+	aDesc.isEngineOwned = true;
 	m_screenShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_default.glsl", aDesc);
 
 	// Generate screen renderer

@@ -15,7 +15,7 @@ void addAsAsset(const ResourceWrapper<MeshCollection>& meshCollection)
 	aInfo.customUUID = meshCollection.getUID();
 	aInfo.aType = AssetType::MESH;
 	aInfo.name = meshCollection.getUID();
-	aInfo.isTransient = true;
+	aInfo.isEngineOwned = true;
 	Engine::get()->getSubSystem<Assets>()->createAsset(meshCollection, aInfo);
 }
 
@@ -55,7 +55,7 @@ BuiltInMeshes::BuiltInMeshes()
 	{
 		ModelImportSettings settings;
 		settings.customUUID = "SGE_MESH_CAMERA";
-		settings.isTransient = true;
+		settings.isEngineOwned = true;
 		ResourceWrapper<MeshCollection> meshCollection = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings);
 		addAsAsset(meshCollection);
 		m_meshes[MeshType::CAMERA] = meshCollection;
