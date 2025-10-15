@@ -17,7 +17,7 @@ void to_json(nlohmann::json& j, const AssetInfo& asset)
 	j = nlohmann::json{
 		{"uuid", asset.uuid}, // Assuming UUID has a valid to_json
 		{"origFilePath", asset.origFilePath},
-		{"filePath", asset.filePath},
+		{"relativefilePath", asset.relativefilePath},
 		{"type", asset.aType}, // Assuming AssetType supports JSON conversion
 		{"isValid", asset.isValid},
 		{"attributes", asset.attributes},
@@ -32,13 +32,15 @@ void from_json(const nlohmann::json& j, AssetInfo& asset)
 {
 	j.at("uuid").get_to(asset.uuid); // Assuming UUID has a valid from_json
 	j.at("origFilePath").get_to(asset.origFilePath);
-	j.at("filePath").get_to(asset.filePath);
+	j.at("relativefilePath").get_to(asset.relativefilePath);
 	j.at("type").get_to(asset.aType); // Assuming AssetType supports JSON conversion
 	j.at("isValid").get_to(asset.isValid);
 	j.at("attributes").get_to(asset.attributes);
 	j.at("importSettings").get_to(asset.importSettings);
 	j.at("name").get_to(asset.name);
 	j.at("isEngineOwned").get_to(asset.isEngineOwned);
+
+	asset.establishFilepath();
 }
 
 ProjectAssetRegistry::ProjectAssetRegistry(const std::string& filename)

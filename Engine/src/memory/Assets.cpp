@@ -22,24 +22,32 @@ Assets::Assets()
 
 void AssetInfo::establishFilepath()
 {
-	filePath = "";
+	relativefilePath = "";
 	if (isEngineOwned)
 	{
-		filePath += "Engine/";
+		relativefilePath += "Engine/";
 	}
 	else
 	{
-		filePath += "Content/";
+		relativefilePath += "Content/";
 	}
 
 	if (!assetDirectory.empty())
 	{
-		filePath += assetDirectory + "/";
+		relativefilePath += assetDirectory + "/";
 	}
 
-	std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/" + filePath);
+	relativefilePath += "/" + fileName;
 
-	filePath += fileName;
+	if (!isTransient)
+	{
+		fullFilePath = Engine::get()->getProjectDirectory() + "/" + relativefilePath;
+		std::filesystem::create_directories(std::filesystem::path(fullFilePath).parent_path());
+	}
+	else
+	{
+		fullFilePath = origFilePath;
+	}
 }
 
 AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
@@ -52,6 +60,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	assetDirectory = assetDesc.assetDirectory;
 	attributes = assetDesc.attributes;
 	isEngineOwned = assetDesc.isEngineOwned;
+	isTransient = assetDesc.isTransient;
 
 	if (aType == AssetType::NONE)
 	{
@@ -70,6 +79,11 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		}
 		ext = path.extension().string();
 		fileName = path.filename().string();
+	}
+	else if(isTransient)
+	{
+		logError("Cannot create a transient resource without original file path specified.");
+		return;
 	}
 
 	if (!assetDesc.customUUID.empty())
@@ -134,7 +148,7 @@ void Assets::addAsset(AssetInfo& aInfo)
 		logError("Invalid asset type specified!");
 		return;
 	}
-	if (aInfo.filePath.empty())
+	if (aInfo.relativefilePath.empty())
 	{
 		logError("Non transient asset must have a file path specified.");
 		return;
@@ -216,7 +230,7 @@ bool Assets::hasAsset(UUID uuid) const
 
 void Assets::updateRegistry(const AssetInfo& aInfo)
 {
-	Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.filePath, aInfo.uuid); //TODO maybe use some naming convention here?
+	Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.relativefilePath, aInfo.uuid); //TODO maybe use some naming convention here?
 	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 }
 
@@ -252,6 +266,7 @@ void Assets::updateAsset(const ResourceWrapper<ResourceBase>& asset, const Asset
 
 ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
 {
+	desc.origFilePath = fileLocation;
 	AssetInfo aInfo(desc);
 
 	// Validate input
@@ -300,9 +315,35 @@ ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<Resource
 	return asset;
 }
 
+// TODO maybe remove this to a resource loader? doesnt really belong here...
+ResourceWrapper<ResourceBase> Assets::loadResource(const std::string& fileLocation, AssetCreateDescriptor& desc)
+{
+	desc.origFilePath = fileLocation;
+	desc.isTransient = true;
+
+	AssetInfo aInfo(desc);
+
+	// Validate input
+	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+	{
+		logError("Invalid asset path specified.");
+		return ResourceWrapper<ResourceBase>::empty;
+	}
+
+	// Load
+	ResourceWrapper<ResourceBase> resource = AssetFactory::getManager(aInfo.aType)->load(aInfo);
+	if (resource.isEmpty() || !resource.get())
+	{
+		logError("Failed to load file {}", fileLocation);
+		return ResourceWrapper<ResourceBase>::empty;
+	}
+
+	return resource;
+}
+
 void Assets::deleteAsset(const AssetInfo& aInfo)
 {
-	Engine::get()->getMemoryManagementSystem()->removeAssociation(aInfo.filePath);
+	Engine::get()->getMemoryManagementSystem()->removeAssociation(aInfo.relativefilePath);
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
 	m_assets.erase(aInfo.uuid);
 }

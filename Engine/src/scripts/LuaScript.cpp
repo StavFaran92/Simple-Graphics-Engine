@@ -14,7 +14,7 @@ namespace {
 bool LuaScriptAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-	const std::filesystem::path savedFilePath = projectDir / aInfo.filePath;
+	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath);
 }
 
@@ -23,7 +23,7 @@ ResourceWrapper<ResourceBase> LuaScriptAssetManager::load(AssetInfo& aInfo)
 	//auto projectDir = Engine::get()->getProjectDirectory();
 	//std::ifstream is(projectDir + "/" + aInfo.filePath);
 	LuaScript* loadedScript = new LuaScript();
-	loadedScript->filepath = aInfo.filePath;
+	loadedScript->filepath = aInfo.relativefilePath;
 
 	try
 	{
@@ -42,7 +42,7 @@ ResourceWrapper<ResourceBase> LuaScriptAssetManager::load(AssetInfo& aInfo)
 void LuaScriptAssetManager::save(const ResourceWrapper<ResourceBase>& script, const AssetInfo& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-	const std::filesystem::path savedFilePath = projectDir / aInfo.filePath;
+	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
 	std::filesystem::copy_file(script.as<LuaScript>()->filepath, savedFilePath);
 	script.as<LuaScript>()->filepath = savedFilePath.generic_string();
 }

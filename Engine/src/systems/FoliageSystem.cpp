@@ -22,10 +22,8 @@ FoliageSystem::FoliageSystem()
 
 bool FoliageSystem::init()
 {
-	ShaderAssetDescriptor aDesc;
-	aDesc.isEngineOwned = true;
-	m_foliageShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl", aDesc);
-	m_foliageQuadShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl", aDesc);
+	m_foliageShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
+	m_foliageQuadShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl");
 
 	ModelImportSettings settings;
 	settings.isEngineOwned = true;

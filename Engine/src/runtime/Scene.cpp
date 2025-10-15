@@ -194,11 +194,9 @@ void Scene::init(Context* context)
 	m_quadUI.RemoveComponent<RenderableComponent>();
 	m_quadUI.RemoveComponent<ObjectComponent>();
 
-	ShaderAssetDescriptor aDesc;
-	aDesc.isEngineOwned = true;
-	m_UIShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/UIShader.glsl", aDesc);
-	m_terrainShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/TerrainShader.glsl", aDesc); // todo consider move to context (or even Engine)
-	m_tempOutlineShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl", aDesc);
+	m_UIShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/UIShader.glsl");
+	m_terrainShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/TerrainShader.glsl"); // todo consider move to context (or even Engine)
+	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl");
 
 	m_uboTime = std::make_shared<UniformBufferObject>(sizeof(float));
 	m_uboTime->attachToBindPoint(0);
@@ -212,7 +210,7 @@ void Scene::init(Context* context)
 	// Create BRDF look up texture
 	m_BRDFIntegrationLUT = IBL::generateBRDFIntegrationLUT(this);
 
-	m_skyboxShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/SkyboxShader.glsl", aDesc);
+	m_skyboxShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SkyboxShader.glsl");
 
 	m_basicBox = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
 
@@ -222,7 +220,7 @@ void Scene::init(Context* context)
 
 	m_highlightRenderView = std::make_shared<RenderView>(Viewport{ 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight() }, Entity::EmptyEntity);
 
-	m_highlightMaskShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl", aDesc);
+	m_highlightMaskShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl");
 	m_highlightEdgeDetectionShader = Shader::createOverrideShader("HighlightEdgeDetectionShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
 	m_highlightMergeShader = Shader::createOverrideShader("HighlightMergeShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
 

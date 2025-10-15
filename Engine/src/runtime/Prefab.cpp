@@ -29,7 +29,7 @@ bool PrefabAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& a
 ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ifstream is(projectDir + aInfo.filePath);
+	std::ifstream is(projectDir + aInfo.relativefilePath);
 	cereal::JSONInputArchive iarchive(is);
 	Prefab* loadedPrefab = new Prefab();
 
@@ -51,7 +51,7 @@ ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
 void PrefabAssetManager::save(const ResourceWrapper<ResourceBase>& prefab, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ofstream os(projectDir + "/" + aInfo.filePath);
+	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
 	cereal::JSONOutputArchive oarchive(os);
 
 	try

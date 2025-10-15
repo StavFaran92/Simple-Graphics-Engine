@@ -36,13 +36,13 @@ namespace {
 bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-	const std::filesystem::path savedFilePath = projectDir / aInfo.filePath;
+	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath);
 }
 
 ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
 {
-	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.relativefilePath;
 
 	Texture::TextureData textureData;
 
@@ -69,7 +69,7 @@ ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
 void TextureAssetManager::save(const ResourceWrapper<ResourceBase>& texture, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
-	std::string fileLocation = projectDir + "/" + aInfo.filePath;
+	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
 
 	Texture::writeTexture2D(fileLocation, texture.as<Texture>());
 }

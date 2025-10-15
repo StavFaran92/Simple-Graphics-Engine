@@ -93,6 +93,7 @@ public:
 
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
 	static ResourceWrapper<Shader> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
+	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);
 	static std::string getShaderOverrideAsStr(ShaderOverride shaderOverride);

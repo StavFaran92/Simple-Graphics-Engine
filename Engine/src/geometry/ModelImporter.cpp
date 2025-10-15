@@ -151,12 +151,12 @@ ModelImporter::ModelImporter()
 
 void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string modelName = std::filesystem::path(aInfo.filePath).filename().stem().string();
+	std::string modelName = std::filesystem::path(aInfo.relativefilePath).filename().stem().string();
 
 	// create new model session
 	ModelImporter::ModelImportSession session;
-	session.filepath = aInfo.filePath;
-	session.fileDir = std::filesystem::path(aInfo.filePath).parent_path().string();
+	session.filepath = aInfo.relativefilePath;
+	session.fileDir = std::filesystem::path(aInfo.relativefilePath).parent_path().string();
 	session.name = modelName;
 	session.mesh = modelInfo.mesh;
 
@@ -190,7 +190,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 
 void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.relativefilePath;
 
 	if (!std::filesystem::exists(filepath))
 	{
@@ -302,7 +302,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 	auto& projectDir = Engine::get()->getProjectDirectory();
 	const std::string filename = std::filesystem::path(fileLocation).filename().string();
-	const std::string savedFilePath = projectDir + "/" + aInfo.filePath;
+	const std::string savedFilePath = projectDir + "/" + aInfo.relativefilePath;
 	std::filesystem::copy_file(fileLocation, savedFilePath);
 
 	return true;

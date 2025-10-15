@@ -30,7 +30,7 @@ namespace {
 bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
 	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string savedFilePath = projectDir + aInfo.filePath;
+	const std::string savedFilePath = projectDir + aInfo.relativefilePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
@@ -44,7 +44,7 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 	ResourceWrapper<Shader> shader(uuid);
 	Engine::get()->getResourceManager()->incRef(uuid);
 
-	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.filePath;
+	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.relativefilePath;
 
 	shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
 	shader->shaderOverride = shaderOverride;
@@ -57,7 +57,7 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 void ShaderAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
 {
 	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string relativeFilepath = "/" + aInfo.filePath;
+	const std::string relativeFilepath = "/" + aInfo.relativefilePath;
 	const std::string savedFilePath = projectDir + relativeFilepath;
 	std::filesystem::copy_file(aInfo.origFilePath, savedFilePath);
 }
@@ -531,13 +531,13 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	shader->m_glslFilePath = filepath;
 	shader->recompile();
 
-	AssetCreateDescriptor aInfo;
-	aInfo.origFilePath = filepath;
-	aInfo.aType = AssetType::SHADER;
-	aInfo.name = name;
-	aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
-	aInfo.isEngineOwned = isEngineOwned;
-	Engine::get()->getSubSystem<Assets>()->createAsset(shader, aInfo);
+	//AssetCreateDescriptor aInfo;
+	//aInfo.origFilePath = filepath;
+	//aInfo.aType = AssetType::SHADER;
+	//aInfo.name = name;
+	//aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
+	//aInfo.isEngineOwned = isEngineOwned;
+	//Engine::get()->getSubSystem<Assets>()->createAsset(shader, aInfo);
 
 	return shader;
 }
@@ -545,8 +545,13 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, ShaderAssetDescriptor desc)
 {
 	desc.aType = AssetType::SHADER;
-	desc.origFilePath = fileLocation;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Shader>();
+}
+
+ResourceWrapper<Shader> Shader::load(const std::string& fileLocation, ShaderAssetDescriptor desc)
+{
+	desc.aType = AssetType::SHADER;
+	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Shader>();
 }
 
 //Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)

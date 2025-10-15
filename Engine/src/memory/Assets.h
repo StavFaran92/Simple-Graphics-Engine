@@ -23,6 +23,7 @@ public:
 	std::map<std::string, std::string> attributes;
 	std::string name;
 	bool isEngineOwned = false;
+	bool isTransient = false;
 
 	virtual nlohmann::json fillParams() const { return {}; }
 	
@@ -40,7 +41,8 @@ struct EngineAPI AssetUpdateDescriptor
 struct EngineAPI AssetInfo
 {
 	bool isValid = false;
-	std::string filePath;
+	std::string relativefilePath;
+	std::string fullFilePath;
 	std::string fileName;
 	std::string ext;
 	UUID uuid;
@@ -50,6 +52,7 @@ struct EngineAPI AssetInfo
 	std::map<std::string, std::string> attributes;
 	std::string name;
 	bool isEngineOwned = false;
+	bool isTransient = false;
 	nlohmann::json importSettings;
 	ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
 
@@ -90,6 +93,8 @@ public:
 	ResourceWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
 	ResourceWrapper<ResourceBase> createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc);
+
+	ResourceWrapper<ResourceBase> loadResource(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
 private:
 	void updateRegistry(const AssetInfo& aInfo);

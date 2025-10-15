@@ -6,13 +6,9 @@
 
 ResourceWrapper<Shader> PostProcess::inversion()
 { 
-	ShaderAssetDescriptor aDesc;
-	aDesc.isEngineOwned = true;
-	return Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_inversion.glsl", aDesc);
+	return Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_inversion.glsl");
 }
 ResourceWrapper<Shader> PostProcess::grayscale()
 {
-	ShaderAssetDescriptor aDesc;
-	aDesc.isEngineOwned = true;
-	return Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_grayscale.glsl", aDesc);
+	return Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcess/PostProcessShader_grayscale.glsl");
 }

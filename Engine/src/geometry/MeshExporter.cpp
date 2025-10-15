@@ -24,7 +24,7 @@ void MeshExporter::exportMesh(const std::string& name, const std::string& target
 void MeshExporter::exportMesh(const AssetInfo& aInfo, const ResourceWrapper<MeshCollection>& meshCollection)
 {
     auto& projectDir = Engine::get()->getProjectDirectory();
-    const std::string savedFilePath = projectDir + "/" + aInfo.filePath;
+    const std::string savedFilePath = projectDir + "/" + aInfo.relativefilePath;
 
     std::ofstream out(savedFilePath);
     if (!out.is_open()) 

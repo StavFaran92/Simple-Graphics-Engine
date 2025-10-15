@@ -42,9 +42,7 @@ Renderer::Renderer(Scene* scene)
 
 bool Renderer::init()
 {
-    ShaderAssetDescriptor aDesc;
-    aDesc.isEngineOwned = true;
-	m_pbrShader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl", aDesc);
+	m_pbrShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
 
     m_quad = ScreenQuad::GenerateScreenQuad(&Engine::get()->getContext()->getRegistry());
     m_quad.RemoveComponent<RenderableComponent>();

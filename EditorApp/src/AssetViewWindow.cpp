@@ -226,7 +226,7 @@ void AssetViewWindow::display()
 					ImGui::TextUnformatted(aInfo.name.c_str());
 					ImGui::Separator();
 					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
-					ImGui::Text("Path: %s", aInfo.filePath.c_str());
+					ImGui::Text("Path: %s", aInfo.relativefilePath.c_str());
 					ImGui::Text("Extension: %s", aInfo.ext.c_str());
 					ImGui::Text("UUID: %s", aInfo.uuid.str().c_str());
 					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);
@@ -271,7 +271,7 @@ void AssetViewWindow::display()
 
 					else if (aInfo.aType == AssetType::LUA_SCRIPT)
 					{
-						openInVSCode(Engine::get()->getProjectDirectory() + "/" + aInfo.filePath);
+						openInVSCode(Engine::get()->getProjectDirectory() + "/" + aInfo.relativefilePath);
 					}
 				}
 
@@ -285,7 +285,7 @@ void AssetViewWindow::display()
 					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					auto asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
-					std::string path = asset.filePath;
+					std::string path = asset.relativefilePath;
 					Engine::get()->getSubSystem<Assets>()->deleteAsset(asset);
 					std::filesystem::remove(Engine::get()->getProjectDirectory() + "/" + path);
 				}
