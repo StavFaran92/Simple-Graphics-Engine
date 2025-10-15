@@ -27,8 +27,9 @@ void MeshExporter::exportMesh(const AssetInfo& aInfo, const ResourceWrapper<Mesh
     const std::string savedFilePath = projectDir + "/" + aInfo.filePath;
 
     std::ofstream out(savedFilePath);
-    if (!out.is_open()) {
-        std::cerr << "Failed to open file for writing: " << savedFilePath << "\n";
+    if (!out.is_open()) 
+    {
+        logError("Failed to open file for writing: {}", savedFilePath);
         return;
     }
 
