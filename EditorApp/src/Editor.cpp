@@ -1449,20 +1449,14 @@ public:
 		auto gui = new GUI_Helper();
 		Engine::get()->getImguiHandler()->addGUI(gui);
 
-		
-
-		
-
-		Texture::TextureAssetDescriptor settings;
-		settings.isEngineOwned = true;
-		icons["mesh"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
-		icons["texture"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
-		icons["animation"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);
-		icons["shader"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-pixel-100.png", settings);
-		icons["folder"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png", settings);
-		icons["prefab"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png", settings);
-		icons["material"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-material-100.png", settings);
-		icons["lua_script"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-file-100.png", settings);
+		icons["mesh"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png");
+		icons["texture"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png");
+		icons["animation"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png");
+		icons["shader"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-pixel-100.png");
+		icons["folder"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-folder-100.png");
+		icons["prefab"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png");
+		icons["material"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-material-100.png");
+		icons["lua_script"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-file-100.png");
 	}
 
 	void update(float deltaTime) override

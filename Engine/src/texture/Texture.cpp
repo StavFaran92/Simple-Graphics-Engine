@@ -42,7 +42,7 @@ bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& 
 
 ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
 {
-	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.relativefilePath;
+	std::string filepath = aInfo.fullFilePath;
 
 	Texture::TextureData textureData;
 
@@ -257,8 +257,13 @@ void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Te
 ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
-	desc.origFilePath = fileLocation;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Texture>();
+}
+
+ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureAssetDescriptor desc)
+{
+	desc.aType = AssetType::TEXTURE;
+	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Texture>();
 }
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)
