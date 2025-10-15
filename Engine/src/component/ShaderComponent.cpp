@@ -1,7 +1,8 @@
 #include <regex>
 
 #include "component/ShaderComponent.h"
-#include "systems/CommonTextures.h"
+
+#include "memory/BuiltInAssets.h"
 
 ShaderComponent::ShaderComponent()
 {
@@ -56,7 +57,7 @@ void ShaderComponent::parseUniforms(const std::string& sourceCode)
 			uniformProperties[name] = glm::mat4(1.0f);
 		}
 		else if (type == "sampler2D") {
-			customTextures[name] = Engine::get()->getCommonTextures()->getTexture("SGE_TEXTURE_WHITE");
+			customTextures[name] = BuiltInAssets::get<Texture>(SGE_TEXTURE_WHITE);
 		}
 
 		searchStart = match.suffix().first;

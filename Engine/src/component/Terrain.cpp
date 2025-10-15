@@ -5,11 +5,13 @@
 #include "geometry/MeshBuilder.h"
 #include "core/Factory.h"
 #include "core/Logger.h"
-#include "systems/CommonTextures.h"
+
 #include "geometry/Grid.h"
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
-#include "systems/BuiltInMeshes.h"
+
+#include "memory/BuiltInAssets.h"
+
 
 #include "GL/glew.h"
 
@@ -52,7 +54,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, const std::
 
 Terrain Terrain::generateTerrain(int width, int height, float scale, ResourceWrapper<Texture> heightMap)
 {
-	auto& meshCollection = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::GRID);//Grid::generateGrid(10, 10, false);
+	auto& meshCollection = BuiltInAssets::get<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
 
 	Terrain terrain;
 	terrain.m_heightmap = heightMap;
@@ -64,7 +66,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, ResourceWra
 	for (int i = 0; i < MAX_TEXTURE_COUNT; i++)
 	{
 		TextureBlend blend;
-		blend.texture = Engine::get()->getCommonTextures()->getTexture("SGE_TEXTURE_WHITE");
+		blend.texture = BuiltInAssets::get<Texture>(SGE_TEXTURE_WHITE);
 		blend.blend = i * .2f + .2f;
 		terrain.m_textureBlends.push_back(blend);
 	}

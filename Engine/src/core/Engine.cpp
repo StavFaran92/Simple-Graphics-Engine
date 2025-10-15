@@ -27,7 +27,7 @@
 #include "render/Material.h"
 #include "lights/DirectionalLight.h"
 #include "render/CommonShaders.h"
-#include "systems/CommonTextures.h"
+#include "systems/BuiltInAssetsLoader.h"
 #include "systems/ObjectPicker.h"
 #include "animation/AnimationLoader.h"
 #include "memory/Assets.h"
@@ -36,8 +36,7 @@
 #include "render/RenderCommand.h"
 #include "core/EventLayerStack.h"
 #include "core/EngineConfig.h"
-#include "systems/BuiltInMeshes.h"
-#include "systems/BuiltInMaterials.h"
+
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
@@ -162,14 +161,8 @@ bool Engine::init(const InitParams& initParams)
     m_eventSystem->pushLayer(gameEventLayer);
 
     m_memoryPool = std::make_shared<MemoryPool<ResourceBase>>();
-    //m_memoryPoolMeshCollection = std::make_shared<MemoryPool<MeshCollection>>();
-    //m_memoryPoolAnimation = std::make_shared<MemoryPool<Animation>>();
-    //m_memoryPoolShader = std::make_shared<MemoryPool<Shader>>();
-
 
     m_projectManager = std::make_shared<ProjectManager>();
-
-    
 
     m_window = std::make_shared<Window>();
     if (!m_window->init())
@@ -188,10 +181,6 @@ bool Engine::init(const InitParams& initParams)
     ShaderLoader::LoadParams lParams;
     lParams.extendShader = true;
     m_shaderLoader = std::make_shared<ShaderLoader>(shaderParser, lParams);
-
-    //auto secondScene = std::make_shared<Scene>();
-    //secondScene->setPostProcess(true);
-    //m_context->addScene(secondScene);
 
     m_imguiHandler = std::make_shared<ImguiHandler>();
     if (!m_imguiHandler->init(m_window->GetWindow(), m_window->GetContext()))
@@ -221,19 +210,16 @@ bool Engine::init(const InitParams& initParams)
     if (initParams.loadExistingProject)
     {
         par = ProjectAssetRegistry::parse(m_projectDirectory);
+        m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
+        m_context = std::make_shared<Context>(par);
     }
     else
     {   
         par = ProjectAssetRegistry::create(initParams.projectDir);
+        m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
+        m_context = std::make_shared<Context>(par);
+        BuiltInAssetsLoader::loadAssets();
     }
-
-    m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
-
-    m_context = std::make_shared<Context>(par);
-    m_commonTextures = std::shared_ptr<CommonTextures>(CommonTextures::create());
-    m_commonShaders = std::make_shared<CommonShaders>();
-    m_builtInMaterials = std::make_shared<BuiltInMaterials>();
-    m_builtInMeshes = std::make_shared<BuiltInMeshes>();
 
     m_physicsSystem = std::make_shared<PhysicsSystem>();
     if (!m_physicsSystem->init())
@@ -454,21 +440,6 @@ ResourceManager* Engine::getResourceManager() const
     return m_resourceManager.get();
 }
 
-CommonShaders* Engine::getCommonShaders() const
-{
-    return m_commonShaders.get();
-}
-
-CommonTextures* Engine::getCommonTextures() const
-{
-    return m_commonTextures.get();
-}
-
-BuiltInMeshes* Engine::getBuiltInMeshes() const
-{
-    return m_builtInMeshes.get();
-}
-
 const InitParams& Engine::getInitParams() const
 {
     return m_initParams;
@@ -508,7 +479,7 @@ std::string Engine::getProjectDirectory() const
 
 ResourceWrapper<Material> Engine::getDefaultMaterial() const
 {
-    return m_builtInMaterials->getDefaultMaterial();
+    return Engine::get()->getSubSystem<Assets>()->getAsset("SGE_MATERIAL_DEFAULT").data.as<Material>();
 }
 
 void Engine::reloadEngineConfig()
@@ -569,7 +540,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.getComponent<Transformation>().setLocalPosition({10,10,10});
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
-    mainCamera.addComponent<MeshComponent>(Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::CAMERA));
+    mainCamera.addComponent<MeshComponent>(Engine::get()->getSubSystem<Assets>()->getAsset("SGE_MESH_CAMERA").data.as<MeshCollection>());
     mainCamera.addComponent<RenderableComponent>();
 
     m_context->getActiveScene()->setGameCamera(mainCamera);

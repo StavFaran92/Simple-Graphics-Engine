@@ -36,7 +36,7 @@
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
 #include "utils/EquirectangularToCubemapConverter.h"
-#include "systems/CommonTextures.h"
+
 #include "render/RenderCommand.h"
 #include "glm/ext.hpp"
 #include "render/IBL.h"
@@ -56,7 +56,7 @@
 #include "core/EventSystem.h"
 #include "core/EngineConfig.h"
 #include "geometry/WireframeGrid.h"
-#include "systems/BuiltInMeshes.h"
+
 #include "component/FoliageComponent.h"
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
@@ -67,6 +67,8 @@
 #include "component/NativeScriptComponent.h"
 #include "component/ImageComponent.h"
 #include "scripts/ScriptSystem.h"
+#include "memory/BuiltInAssets.h"
+
 
 struct PlaneGPU {
 	glm::vec3 normal;
@@ -212,7 +214,7 @@ void Scene::init(Context* context)
 
 	m_skyboxShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SkyboxShader.glsl");
 
-	m_basicBox = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::BOX);
+	m_basicBox = BuiltInAssets::get<MeshCollection>(SGE_MESH_BOX);
 
 	addRenderView("Game View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 

@@ -4,7 +4,7 @@
 #include "runtime/Context.h"
 #include "render/Material.h"
 #include "component/Transformation.h"
-#include "systems/CommonTextures.h"
+
 #include "utils/EquirectangularToCubemapConverter.h"
 #include "runtime/Scene.h"
 #include "render/IBL.h"

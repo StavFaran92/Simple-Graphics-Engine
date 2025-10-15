@@ -93,9 +93,6 @@ public:
     RandomNumberGenerator* getRandomSystem() const;
     ShaderLoader* getShaderLoader() const;
     ResourceManager* getResourceManager() const;
-    CommonShaders* getCommonShaders() const;
-    CommonTextures* getCommonTextures() const;
-    BuiltInMeshes* getBuiltInMeshes() const;
     const InitParams& getInitParams() const;
     EventLayerStack* getEventLayerStack() const;
     const EngineConfig& getConfig() const;
@@ -179,10 +176,6 @@ protected:
     std::shared_ptr<ShaderLoader> m_shaderLoader;
     std::shared_ptr<ResourceManager> m_resourceManager;
     std::shared_ptr<ProjectManager> m_projectManager;
-    std::shared_ptr<CommonShaders> m_commonShaders;
-    std::shared_ptr<BuiltInMeshes> m_builtInMeshes;
-    std::shared_ptr<BuiltInMaterials> m_builtInMaterials;
-    std::shared_ptr<CommonTextures> m_commonTextures;
     std::shared_ptr<Assets> m_assets;
     std::shared_ptr<EngineConfig> m_engineConfig;
     std::shared_ptr<MemoryPool<ResourceBase>> m_memoryPool;

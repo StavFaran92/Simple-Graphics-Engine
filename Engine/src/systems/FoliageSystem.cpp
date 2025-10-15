@@ -10,7 +10,7 @@
 #include "render/RenderCommand.h"
 #include <GL/glew.h>
 #include "core/Random.h"
-#include "systems/BuiltInMeshes.h"
+
 #include "systems/TimeManager.h"
 #include "component/Terrain.h"
 #include <glm/ext.hpp>

@@ -1,8 +1,10 @@
 #include "texture/TextureSampler.h"
-#include "systems/CommonTextures.h"
+
+
+#include "memory/BuiltInAssets.h"
 
 TextureSampler::TextureSampler(int channelCount)
-	: texture( Engine::get()->getCommonTextures()->getTexture("SGE_TEXTURE_WHITE")),
+	: texture( BuiltInAssets::get<Texture>(SGE_TEXTURE_WHITE)),
 	channelCount(channelCount)
 {
 }

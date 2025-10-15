@@ -6,7 +6,7 @@
 #include "render/ShaderLoader.h"
 
 #include "utils/Utils.h"
-#include "systems/CommonTextures.h"
+
 #include "core/Factory.h"
 
 #include "memory/Assets.h"

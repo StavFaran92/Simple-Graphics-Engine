@@ -5,7 +5,7 @@
 
 #include "core/Engine.h"
 #include "runtime/Context.h"
-#include "systems/CommonTextures.h"
+
 #include "memory/AssetLoader.h"
 #include "core/Factory.h"
 #include <cereal/types/polymorphic.hpp>
@@ -15,6 +15,7 @@
 #include <cereal/archives/json.hpp>
 #include <iostream>
 #include <fstream>
+#include "memory/BuiltInAssets.h"
 
 #include <filesystem>
 
@@ -126,7 +127,7 @@ void Material::setTextureInShader(ResourceWrapper<Shader>& shader, Texture::Text
 	ResourceWrapper<Texture>& texture = sampler->texture;
 	if (sampler->texture.isEmpty())
 	{
-		texture = Engine::get()->getCommonTextures()->getTexture("SGE_TEXTURE_WHITE");
+		texture = BuiltInAssets::get<Texture>(SGE_TEXTURE_WHITE);
 	}
 
 	// Binds iterated texture to target GL_TEXTURE_2D on texture unit i

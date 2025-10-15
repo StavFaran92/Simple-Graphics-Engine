@@ -44,7 +44,7 @@
 #include "component/Component.h"
 #include "core/Random.h"
 #include "systems/TimeManager.h"
-#include "systems/CommonTextures.h"
+
 #include "memory/ResourceManager.h"
 #include "systems/ObjectPicker.h"
 #include "physics/Physics.h"
@@ -71,3 +71,4 @@
 #include "component/ScriptComponent.h"
 #include "component/ImageComponent.h"
 #include "runtime/Prefab.h"
+#include "memory/BuiltInAssets.h"

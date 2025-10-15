@@ -1,11 +1,13 @@
 #include "serialize/Archiver.h"
 
 #include "runtime/Scene.h"
-#include "systems/BuiltInMeshes.h"
+
 #include "component/ComponentSerializer.h"
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
 #include "component/RenderableComponent.h"
+#include "memory/BuiltInAssets.h"
+
 
 Archiver* Archiver::instance = new Archiver();
 
@@ -81,7 +83,7 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 		gameCameraEntity.getComponent<Transformation>().setLocalPosition({ 10,10,10 });
 		gameCameraEntity.getComponent<CameraComponent>().center = { 0,0,0 };
 		gameCameraEntity.getComponent<CameraComponent>().up = { 0,1,0 };
-		gameCameraEntity.addComponent<MeshComponent>().mesh = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::CAMERA);
+		gameCameraEntity.addComponent<MeshComponent>().mesh = BuiltInAssets::get<MeshCollection>(SGE_MESH_CAMERA);
 		gameCameraEntity.addComponent<RenderableComponent>();
 	}
 	scene.setGameCamera(gameCameraEntity);
