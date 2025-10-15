@@ -36,8 +36,7 @@ namespace {
 bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-	const std::string relativeFilepath = aInfo.name + aInfo.ext;
-	const std::filesystem::path savedFilePath = projectDir / aInfo.assetDirectory / relativeFilepath;
+	const std::filesystem::path savedFilePath = projectDir / aInfo.filePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath);
 }
 
@@ -119,7 +118,7 @@ ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(const TextureData& t
 	return texture;
 }
 
-ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data)
+ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data)
 {
 	TextureData textureData;
 	textureData.target = Texture::TextureTarget::TEXTURE_2D;
@@ -130,7 +129,7 @@ ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(int width, int heigh
 	textureData.format = (Format)format;
 	textureData.type = (Type)type;
 	textureData.params = params;
-	textureData.isTransient = isTransient;
+	textureData.isEngineOwned = isEngineOwned;
 	textureData.data = data;
 
 	return create2DTextureFromBuffer(textureData);

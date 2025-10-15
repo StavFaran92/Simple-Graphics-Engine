@@ -136,6 +136,10 @@ bool Engine::init(const InitParams& initParams)
             }
         }
 
+        std::filesystem::create_directories(Engine::get()->getProjectDirectory());
+        std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/Engine");
+        std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/Content");
+
     }
 
     glEnable(GL_DEPTH_TEST);
@@ -206,12 +210,7 @@ bool Engine::init(const InitParams& initParams)
     m_assets = std::make_shared<Assets>();
 
     m_timeManager = std::make_shared<TimeManager>();
-    m_physicsSystem = std::make_shared<PhysicsSystem>();
-    if (!m_physicsSystem->init())
-    {
-        logError("Physics System init failed!");
-        return false;
-    }
+    
 
     
 
@@ -235,6 +234,13 @@ bool Engine::init(const InitParams& initParams)
     m_commonShaders = std::make_shared<CommonShaders>();
     m_builtInMaterials = std::make_shared<BuiltInMaterials>();
     m_builtInMeshes = std::make_shared<BuiltInMeshes>();
+
+    m_physicsSystem = std::make_shared<PhysicsSystem>();
+    if (!m_physicsSystem->init())
+    {
+        logError("Physics System init failed!");
+        return false;
+    }
 
     auto foliageSystem = new FoliageSystem();
     foliageSystem->init();

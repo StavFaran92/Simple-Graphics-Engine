@@ -49,7 +49,7 @@ public:
 
 	std::vector<ResourceWrapper<Texture>> getAllTextures() const;
 
-	ResourceWrapper<Material> clone(bool isTransient) const;
+	ResourceWrapper<Material> clone(bool isEngineOwned) const;
 
 	bool isOpaque() const;
 

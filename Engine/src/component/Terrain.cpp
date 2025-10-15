@@ -20,9 +20,7 @@ Entity Terrain::createTerrain(int width, int height, float scale, ResourceWrappe
 	auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
 	terrainComponent.m_textureCount = 1;
 
-	Texture::TextureAssetDescriptor aDesc;
-	aDesc.isTransient = true;
-	auto& grassTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg", aDesc);
+	auto& grassTexture = Engine::get()->getSubSystem<Assets>()->getAsset("SGE_TEXTURE_GRASS").data.as<Texture>();
 	terrainComponent.setTexture(0, grassTexture);
 
 	terrainEntity.addComponent<Terrain>(terrainComponent);
@@ -66,7 +64,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, ResourceWra
 	for (int i = 0; i < MAX_TEXTURE_COUNT; i++)
 	{
 		TextureBlend blend;
-		blend.texture = Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1);
+		blend.texture = Engine::get()->getCommonTextures()->getTexture("SGE_TEXTURE_WHITE");
 		blend.blend = i * .2f + .2f;
 		terrain.m_textureBlends.push_back(blend);
 	}

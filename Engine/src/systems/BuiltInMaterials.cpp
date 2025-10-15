@@ -5,7 +5,7 @@
 BuiltInMaterials::BuiltInMaterials()
 {
 	AssetCreateDescriptor aDesc;
-	aDesc.isTransient = true;
+	aDesc.isEngineOwned = true;
 	aDesc.name = "SGE_MATERIAL_DEFAULT";
 	aDesc.aType = AssetType::MATERIAL;
 	m_defaultMaterial = Factory<Material>::createUsingCustomUUID(aDesc.name);

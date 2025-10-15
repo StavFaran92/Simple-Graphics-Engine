@@ -2,7 +2,7 @@
 #include "systems/CommonTextures.h"
 
 TextureSampler::TextureSampler(int channelCount)
-	: texture( Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1)), 
+	: texture( Engine::get()->getCommonTextures()->getTexture("SGE_TEXTURE_WHITE")),
 	channelCount(channelCount)
 {
 }

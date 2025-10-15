@@ -14,7 +14,7 @@ Entity WaterSystem::createPool()
 
 	// TODO use grid instead
 	ModelImportSettings aDesc;
-	aDesc.isTransient = true;
+	aDesc.isEngineOwned = true;
 	poolQuad.addComponent<MeshComponent>(MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx", aDesc));
 	poolQuad.addComponent<RenderableComponent>();
 

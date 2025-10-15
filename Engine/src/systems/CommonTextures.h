@@ -8,26 +8,16 @@ class Texture;
 class EngineAPI CommonTextures
 {
 public:
-	enum class TextureType
-	{
-		BLACK_1X1,
-		WHITE_1X1,
-		CUBEMAP_WHITE_1X1
-	};
-
-
-
-	
-
 	static CommonTextures* create();
 	static CommonTextures* load();
 	void close();
-	ResourceWrapper<Texture> getTexture(TextureType texType);
+	ResourceWrapper<Texture> getTexture(const std::string& name);
 
 	CommonTextures(const CommonTextures&) = delete;
 	CommonTextures& operator=(const CommonTextures&) = delete;
 private:
 	CommonTextures();
+	void acquireTexture(const std::string& name, const std::string& path);
 
-	std::map<TextureType, ResourceWrapper<Texture>> m_textures;
+	std::map<std::string, ResourceWrapper<Texture>> m_textures;
 };

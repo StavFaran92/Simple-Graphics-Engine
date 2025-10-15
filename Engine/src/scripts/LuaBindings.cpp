@@ -302,8 +302,8 @@ void bindAssets(sol::state& lua)
             }
         ),
         "create2DTextureFromBuffer", sol::overload(
-            [](int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isTransient, void* data) {
-                return Texture::create2DTextureFromBuffer(width, height, internalFormat, format, type, params, isTransient, data);
+            [](int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data) {
+                return Texture::create2DTextureFromBuffer(width, height, internalFormat, format, type, params, isEngineOwned, data);
             },
             [](const Texture::TextureData& textureData) {
                 return Texture::create2DTextureFromBuffer(textureData);

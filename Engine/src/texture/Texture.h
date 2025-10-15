@@ -133,7 +133,7 @@ public:
 
 		void* facesData[6]{ nullptr }; //only apply to Cubemap
 
-		bool isTransient = false;
+		bool isEngineOwned = false;
 		std::string textureName;
 	};
 

@@ -30,9 +30,8 @@ namespace {
 bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
 	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string relativeFilepath = "/" + aInfo.fileName;
-	const std::string savedFilePath = projectDir + relativeFilepath;
-	return std::filesystem::copy_file(fileLocation, savedFilePath);
+	const std::string savedFilePath = projectDir + aInfo.filePath;
+	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
 ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
@@ -49,7 +48,7 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 
 	shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
 	shader->shaderOverride = shaderOverride;
-	shader->m_glslFilePath = filepath;
+	shader->m_glslFilePath = aInfo.origFilePath; // TODO fix, this should be path but causes issues with shader inclusion
 	shader->recompile();
 
 	return shader;
@@ -523,22 +522,9 @@ void replaceDirective(std::string& source, const std::string& directive, std::st
 	}
 }
 
-ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isTransient)
+ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned)
 {
-	ResourceWrapper<Shader> shader;
-	if (isTransient)
-	{
-		if (name.empty())
-		{
-			logError("Transient shader must have a name!");
-			return ResourceWrapper<Shader>::empty;
-		}
-		shader = Factory<Shader>::createUsingCustomUUID(name);
-	}
-	else
-	{
-		shader = Factory<Shader>::create();
-	}
+	ResourceWrapper<Shader> shader = Factory<Shader>::create();
 
 	shader->m_isShaderOverride = true;
 	shader->shaderOverride = shaderOverride;

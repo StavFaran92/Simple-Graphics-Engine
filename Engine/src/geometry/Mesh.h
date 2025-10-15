@@ -34,7 +34,6 @@ struct MeshData
 // Forward declerations
 class MeshBuilder;
 class Model;
-struct MeshData;
 
 /**
  * The mesh class is used to represent the Egnine's basic mesh object,
@@ -69,11 +68,10 @@ public:
 	 */
 	const std::vector<glm::vec3>& getNormals() const;
 
-	/**
-	 * Clear the Mesh entirely.
-	 *
-	 */
-	void clearMesh();
+	const MeshData& getMeshData() const
+	{
+		return m_meshData;
+	}
 
 	/**
 	 * Sets the mesh's vertexLayout
@@ -118,8 +116,7 @@ private:
 	void calculateNormals();
 private:
 	// -------------------- Attributes -------------------- //
-	std::vector<glm::vec3> m_positions;
-	std::vector<glm::vec3> m_normals;
+	MeshData m_meshData;
 
 	// render data
 	std::shared_ptr<ElementBufferObject> m_ibo = nullptr;

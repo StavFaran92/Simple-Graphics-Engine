@@ -302,7 +302,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 	auto& projectDir = Engine::get()->getProjectDirectory();
 	const std::string filename = std::filesystem::path(fileLocation).filename().string();
-	const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + filename;
+	const std::string savedFilePath = projectDir + "/" + aInfo.filePath;
 	std::filesystem::copy_file(fileLocation, savedFilePath);
 
 	return true;
@@ -532,7 +532,7 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		tData.target = Texture::TextureTarget::TEXTURE_2D;
 		tData.format = Texture::Format::RGB;
 		tData.internalFormat = Texture::InternalFormat::RGB2;
-		tData.isTransient = aInfo.isEngineOwned;
+		tData.isEngineOwned = aInfo.isEngineOwned;
 		tData.genMipMap = false;
 		tData.textureName = textureName;
 		tData.height = height;

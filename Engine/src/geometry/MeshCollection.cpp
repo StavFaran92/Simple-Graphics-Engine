@@ -3,6 +3,8 @@
 #include "geometry/ModelImporter.h"
 #include "memory/AssetLoader.h"
 
+#include "geometry/MeshExporter.h"
+
 #include <filesystem>
 
 namespace {
@@ -36,9 +38,9 @@ std::map<int, ResourceWrapper<Material>> MeshCollectionAssetManager::getLoadedMa
 	return m_lastLoadedModelInfo.materials;
 }
 
-void MeshCollectionAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+void MeshCollectionAssetManager::save(const ResourceWrapper<ResourceBase>& mesh, const AssetInfo& aInfo)
 {
-	throw new std::runtime_error("Not yet implemented!");
+	MeshExporter::exportMesh(aInfo, mesh.as<MeshCollection>());
 }
 
 void MeshCollection::addMesh(const std::shared_ptr<Mesh>& mesh)

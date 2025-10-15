@@ -12,17 +12,17 @@ Mesh::Mesh()
 
 const std::vector<glm::vec3>& Mesh::getPositions() const
 {
-	return m_positions;
+	return m_meshData.m_positions;
 }
 
 const std::vector<glm::vec3>& Mesh::getNormals() const
 {
-	return m_normals;
+	return m_meshData.m_normals;
 }
 
 size_t Mesh::getNumOfVertices() const
 {
-	return m_positions.size();
+	return getPositions().size();
 }
 
 bool Mesh::build(MeshData& mData)
@@ -176,9 +176,9 @@ bool Mesh::build(MeshData& mData)
 
 	delete[] vertices;
 
-	m_positions = mData.m_positions;
+	m_meshData = mData;
 	m_vao->attachBuffer(vbo, m_ibo.get());
-	m_vao->setVertexCount(m_positions.size());
+	m_vao->setVertexCount(mData.m_positions.size());
 	m_vao->build();
 
 
@@ -186,7 +186,7 @@ bool Mesh::build(MeshData& mData)
 	glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
 
 	// TODO this can be optimized using assimp premade aabb structure
-	for (auto&& pos : m_positions)
+	for (auto&& pos : mData.m_positions)
 	{
 		minAABB.x = std::min(minAABB.x, pos.x);
 		minAABB.y = std::min(minAABB.y, pos.y);
@@ -240,15 +240,6 @@ void Mesh::calculateNormals()
 	//}
 }
 
-void Mesh::clearMesh()
-{
-	m_positions.clear();
-	m_normals.clear();
-	m_vao = nullptr;
-	m_ibo = nullptr;
-	m_vbo = nullptr;
-}
-
 void Mesh::setVertexLayout(VertexLayout layout)
 {
 	m_layout = layout;
@@ -287,5 +278,4 @@ glm::mat4 Mesh::getRestTransform() const
 Mesh::~Mesh()
 {
 	//logDebug( __FUNCTION__ );
-	clearMesh();
 }

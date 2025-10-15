@@ -791,7 +791,7 @@ void RenderSceneHierarchyWindow()
 
 			if (ImGui::MenuItem("Terrain"))
 			{
-				Entity e = Terrain::createTerrain(100, 100, 1, Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::BLACK_1X1));
+				Entity e = Terrain::createTerrain(100, 100, 1, Engine::get()->getCommonTextures()->getTexture("SGE_TEXTURE_BLACK"));
 				updateScene();
 				state.selectEntity(sceneObjects[0].e);
 			}
@@ -1454,7 +1454,7 @@ public:
 		
 
 		Texture::TextureAssetDescriptor settings;
-		settings.isTransient = true;
+		settings.isEngineOwned = true;
 		icons["mesh"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png", settings);
 		icons["texture"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png", settings);
 		icons["animation"] = Texture::import(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png", settings);

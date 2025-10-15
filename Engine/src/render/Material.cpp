@@ -126,7 +126,7 @@ void Material::setTextureInShader(ResourceWrapper<Shader>& shader, Texture::Text
 	ResourceWrapper<Texture>& texture = sampler->texture;
 	if (sampler->texture.isEmpty())
 	{
-		texture = Engine::get()->getCommonTextures()->getTexture(CommonTextures::TextureType::WHITE_1X1);
+		texture = Engine::get()->getCommonTextures()->getTexture("SGE_TEXTURE_WHITE");
 	}
 
 	// Binds iterated texture to target GL_TEXTURE_2D on texture unit i
