@@ -26,9 +26,7 @@ ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Textur
 
 void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture)
 {
-	ShaderAssetDescriptor aDesc;
-	aDesc.isEngineOwned = true;
-	auto shader = Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/TextureTransformShader.glsl", aDesc);
+	auto shader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/TextureTransformShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;

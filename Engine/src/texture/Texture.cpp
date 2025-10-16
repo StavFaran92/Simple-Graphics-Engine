@@ -37,7 +37,7 @@ bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& 
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
-	return std::filesystem::copy_file(fileLocation, savedFilePath);
+	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
 ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)

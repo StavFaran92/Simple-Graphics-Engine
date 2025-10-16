@@ -199,9 +199,6 @@ bool Engine::init(const InitParams& initParams)
     m_assets = std::make_shared<Assets>();
 
     m_timeManager = std::make_shared<TimeManager>();
-    
-
-    
 
     m_randomSystem = std::make_shared<RandomNumberGenerator>();
 
@@ -228,6 +225,18 @@ bool Engine::init(const InitParams& initParams)
         return false;
     }
 
+    if (initParams.loadExistingProject)
+    {
+        loadProject(m_projectDirectory);
+    }
+    else
+    {
+        createStartupScene(m_context, initParams);
+        saveProject();
+    }
+
+    
+
     auto foliageSystem = new FoliageSystem();
     foliageSystem->init();
 
@@ -240,16 +249,6 @@ bool Engine::init(const InitParams& initParams)
 
     auto scriptSystem = new ScriptSystem();
     scriptSystem->init();
-
-    if (initParams.loadExistingProject)
-    {
-        loadProject(m_projectDirectory);
-    }
-    else
-    {
-        createStartupScene(m_context, initParams);
-        saveProject();
-    }
 
     if (initParams.startSimulationOnStartup)
     {

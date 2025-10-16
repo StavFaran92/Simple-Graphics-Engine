@@ -302,8 +302,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 	auto& projectDir = Engine::get()->getProjectDirectory();
 	const std::string filename = std::filesystem::path(fileLocation).filename().string();
-	const std::string savedFilePath = projectDir + "/" + aInfo.relativefilePath;
-	std::filesystem::copy_file(fileLocation, savedFilePath);
+	const std::string savedFilePath =  aInfo.fullFilePath;
+	std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 
 	return true;
 }

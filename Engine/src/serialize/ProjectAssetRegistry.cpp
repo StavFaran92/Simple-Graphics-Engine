@@ -24,6 +24,7 @@ void to_json(nlohmann::json& j, const AssetInfo& asset)
 		{"importSettings", asset.importSettings},
 		{"name", asset.name},
 		{"isEngineOwned", asset.isEngineOwned},
+		{"filename", asset.fileName},
 	};
 }
 
@@ -39,6 +40,7 @@ void from_json(const nlohmann::json& j, AssetInfo& asset)
 	j.at("importSettings").get_to(asset.importSettings);
 	j.at("name").get_to(asset.name);
 	j.at("isEngineOwned").get_to(asset.isEngineOwned);
+	j.at("filename").get_to(asset.fileName);
 
 	asset.establishFilepath();
 }

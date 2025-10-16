@@ -34,8 +34,7 @@ bool MaterialAssetManager::copyFiles(const std::string& fileLocation, AssetInfo&
 
 ResourceWrapper<ResourceBase> MaterialAssetManager::load(AssetInfo& aInfo)
 {
-	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ifstream is(projectDir + "/" + aInfo.relativefilePath);
+	std::ifstream is(aInfo.fullFilePath);
 	cereal::JSONInputArchive iarchive(is);
 	Material* loadedMaterial = new Material();
 
@@ -57,7 +56,7 @@ ResourceWrapper<ResourceBase> MaterialAssetManager::load(AssetInfo& aInfo)
 void MaterialAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
+	std::ofstream os(aInfo.fullFilePath);
 	cereal::JSONOutputArchive oarchive(os);
 
 	try

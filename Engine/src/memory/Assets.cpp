@@ -22,23 +22,6 @@ Assets::Assets()
 
 void AssetInfo::establishFilepath()
 {
-	relativefilePath = "";
-	if (isEngineOwned)
-	{
-		relativefilePath += "Engine/";
-	}
-	else
-	{
-		relativefilePath += "Content/";
-	}
-
-	if (!assetDirectory.empty())
-	{
-		relativefilePath += assetDirectory + "/";
-	}
-
-	relativefilePath += "/" + fileName;
-
 	if (!isTransient)
 	{
 		fullFilePath = Engine::get()->getProjectDirectory() + "/" + relativefilePath;
@@ -116,6 +99,25 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		fileName = name + ext;
 	}
 
+	relativefilePath = "";
+	if (isEngineOwned)
+	{
+		relativefilePath += "Engine/";
+	}
+	else
+	{
+		relativefilePath += "Content/";
+	}
+
+	if (!assetDirectory.empty())
+	{
+		relativefilePath += assetDirectory + "/";
+	}
+
+	relativefilePath += "/" + fileName;
+
+	relativefilePath = std::filesystem::path(relativefilePath).lexically_normal().generic_string();
+
 	establishFilepath();
 }
 
@@ -137,6 +139,25 @@ void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
 	}
 
 	fileName = name + ext;
+
+	relativefilePath = "";
+	if (isEngineOwned)
+	{
+		relativefilePath += "Engine/";
+	}
+	else
+	{
+		relativefilePath += "Content/";
+	}
+
+	if (!assetDirectory.empty())
+	{
+		relativefilePath += assetDirectory + "/";
+	}
+
+	relativefilePath += "/" + fileName;
+
+	relativefilePath = std::filesystem::path(relativefilePath).lexically_normal().generic_string();
 
 	establishFilepath();
 }
