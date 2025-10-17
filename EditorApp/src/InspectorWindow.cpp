@@ -312,7 +312,7 @@ void InspectorWindow::display()
 			});
 
 		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
-			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](std::string uuid) {
+			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](UUID uuid) {
 				skybox.setSkybox(ResourceWrapper<Texture>(uuid));
 			});
 
@@ -324,7 +324,7 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
-			addTextureEditWidget(image.image, { 50, 50 }, [&](std::string uuid) {
+			addTextureEditWidget(image.image, { 50, 50 }, [&](UUID uuid) {
 				image.image = ResourceWrapper<Texture>(uuid);
 				});
 			ImGui::DragFloat("posX", &image.position.x);
@@ -420,7 +420,7 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<Terrain>("Terrain", [](Terrain& terrain) {
-			addTextureEditWidget(terrain.m_heightmap, { 50, 50 }, [&](std::string uuid) {
+			addTextureEditWidget(terrain.m_heightmap, { 50, 50 }, [&](UUID uuid) {
 				terrain = Terrain::generateTerrain(terrain.m_width, terrain.m_height, terrain.m_scale, ResourceWrapper<Texture>(uuid));
 			});
 			ImGui::DragInt("height", &terrain.m_height);
@@ -436,7 +436,7 @@ void InspectorWindow::display()
 			{
 				ImGui::PushID(i);
 				auto texture = terrain.getTexture(i);
-				addTextureEditWidget(texture, { 50, 50 }, [i, &terrain](std::string uuid) {
+				addTextureEditWidget(texture, { 50, 50 }, [i, &terrain](UUID uuid) {
 					terrain.setTexture(i, ResourceWrapper<Texture>(uuid));
 				});
 				ImGui::DragFloat("Height blend", &terrain.m_textureBlends[i].blend, .01f);
@@ -461,7 +461,7 @@ void InspectorWindow::display()
 				EditorState::Instance().showShaderSelector = true;
 			}
 
-			std::string selectedShaderUID;
+			UUID selectedShaderUID;
 			displaySelectShaderDialog(selectedShaderUID);
 
 			if (!selectedShaderUID.empty())
@@ -492,7 +492,7 @@ void InspectorWindow::display()
 			{
 				// Projection Texture
 				ImGui::Text("Projection Texture:");
-				addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](std::string uuid) {
+				addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](UUID uuid) {
 					shaderComponent.setProjectionTexture(ResourceWrapper<Texture>(uuid));
 				});
 			}
@@ -504,7 +504,7 @@ void InspectorWindow::display()
 				{
 					ImGui::PushID(name.c_str());
 					ImGui::Text(name.c_str());
-					addTextureEditWidget(texture, { 100,100 }, [&](std::string uuid) {
+					addTextureEditWidget(texture, { 100,100 }, [&](UUID uuid) {
 						texture = ResourceWrapper<Texture>(uuid);
 						});
 					ImGui::PopID();
@@ -573,7 +573,7 @@ void InspectorWindow::display()
 
 		displayComponent<FoliageComponent>("Foliage Component", [](FoliageComponent& foliage) {
 			// Compile Button
-			addTextureEditWidget(foliage.m_foliageSpreadMap, { 100,100 }, [&](std::string uuid) {
+			addTextureEditWidget(foliage.m_foliageSpreadMap, { 100,100 }, [&](UUID uuid) {
 				foliage.m_foliageSpreadMap = ResourceWrapper<Texture>(uuid);
 				});
 
@@ -691,7 +691,7 @@ void InspectorWindow::display()
 
 			if (ImGui::MenuItem("Image"))
 			{
-				auto& img = state.getSelectedEntity().addComponent<ImageComponent>(BuiltInAssets::get<Texture>(SGE_TEXTURE_WHITE));
+				auto& img = state.getSelectedEntity().addComponent<ImageComponent>(BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE));
 				img.size = { 50, 50 };
 			}
 

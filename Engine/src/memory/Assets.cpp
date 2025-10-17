@@ -69,14 +69,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		return;
 	}
 
-	if (!assetDesc.customUUID.empty())
-	{
-		uuid = assetDesc.customUUID;
-	}
-	else
-	{
-		uuid = UUID::generate_uuid_v4();
-	}
+	uuid = UUID::generate_uuid_v4();
 
 	if (name.empty())
 	{
@@ -251,7 +244,11 @@ bool Assets::hasAsset(UUID uuid) const
 
 void Assets::updateRegistry(const AssetInfo& aInfo)
 {
-	Engine::get()->getMemoryManagementSystem()->addAssociation(aInfo.relativefilePath, aInfo.uuid); //TODO maybe use some naming convention here?
+	if (!aInfo.name.empty())
+	{
+		Engine::get()->getMemoryManagementSystem()->addNameReference(aInfo.name, aInfo.uuid);
+	}
+	Engine::get()->getMemoryManagementSystem()->addPathReference(aInfo.relativefilePath, aInfo.uuid); //TODO maybe use some naming convention here?
 	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
 }
 
@@ -268,7 +265,12 @@ std::string Assets::getAlias(UUID uid) const
 
 UUID Assets::getAssetFromPath(const std::string& path) const
 {
-	return Engine::get()->getMemoryManagementSystem()->getAssociation(path);
+	return Engine::get()->getMemoryManagementSystem()->getUUIDFromPath(path);
+}
+
+UUID Assets::getAssetFromName(const std::string& name) const
+{
+	return Engine::get()->getMemoryManagementSystem()->getUUIDFromName(name);
 }
 
 void Assets::updateAsset(const ResourceWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc)
@@ -323,8 +325,6 @@ ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocatio
 
 ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc)
 {
-	desc.customUUID = asset.getUID();
-
 	AssetInfo aInfo(desc);
 
 	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
@@ -364,7 +364,7 @@ ResourceWrapper<ResourceBase> Assets::loadResource(const std::string& fileLocati
 
 void Assets::deleteAsset(const AssetInfo& aInfo)
 {
-	Engine::get()->getMemoryManagementSystem()->removeAssociation(aInfo.relativefilePath);
+	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.relativefilePath);
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
 	m_assets.erase(aInfo.uuid);
 }

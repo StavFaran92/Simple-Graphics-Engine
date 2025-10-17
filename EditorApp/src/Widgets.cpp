@@ -3,7 +3,7 @@
 #include "Dialogs.h"
 #include "EditorState.h"
 
-void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(std::string uuid)> callback)
+void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureID), size))
 	{
@@ -14,7 +14,7 @@ void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(std::st
 	displayTextureSelectDialog();
 }
 
-void addTextureEditWidget(ResourceWrapper<Texture> texture, ImVec2 size, std::function<void(std::string uuid)> callback)
+void addTextureEditWidget(ResourceWrapper<Texture> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
 	int texID = 0;
 	if (!texture.isEmpty())
@@ -39,7 +39,7 @@ void addTextureEditWidget(ResourceWrapper<Material> mat, const std::string& name
 		tex = mat->getSampler(ttype)->texture;
 	}
 
-	addTextureEditWidget(tex, { 20, 20 }, [=](std::string uuid) {
+	addTextureEditWidget(tex, { 20, 20 }, [=](UUID uuid) {
 		mat.get()->setTexture(ttype, ResourceWrapper<Texture>(uuid));
 		});
 
@@ -78,7 +78,7 @@ void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std:
 		auto assets = Engine::get()->getSubSystem<Assets>();
 
 		ImGui::Text("Texture");
-		addTextureEditWidget(EditorState::Instance().selectedSampler->texture, ImVec2{ 150, 150 }, [=](std::string uuid) {
+		addTextureEditWidget(EditorState::Instance().selectedSampler->texture, ImVec2{ 150, 150 }, [=](UUID uuid) {
 			EditorState::Instance().selectedSampler->texture = ResourceWrapper<Texture>(uuid);
 			});
 

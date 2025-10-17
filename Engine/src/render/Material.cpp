@@ -73,11 +73,7 @@ void MaterialAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const 
 
 Material::Material()
 {
-	m_samplers[Texture::TextureType::Albedo] = std::make_shared<TextureSampler>(3);
-	m_samplers[Texture::TextureType::Normal] = std::make_shared<TextureSampler>(3);
-	m_samplers[Texture::TextureType::Metallic] = std::make_shared<TextureSampler>(1);
-	m_samplers[Texture::TextureType::Roughness] = std::make_shared<TextureSampler>(1);
-	m_samplers[Texture::TextureType::AmbientOcclusion] = std::make_shared<TextureSampler>(1);
+
 }
 
 void Material::use(ResourceWrapper<Shader>& shader)
@@ -126,7 +122,7 @@ void Material::setTextureInShader(ResourceWrapper<Shader>& shader, Texture::Text
 	ResourceWrapper<Texture>& texture = sampler->texture;
 	if (sampler->texture.isEmpty())
 	{
-		texture = BuiltInAssets::get<Texture>(SGE_TEXTURE_WHITE);
+		texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
 	}
 
 	// Binds iterated texture to target GL_TEXTURE_2D on texture unit i
@@ -153,7 +149,16 @@ ResourceWrapper<Material> Material::import(const std::string& fileLocation, Mate
 
 ResourceWrapper<Material> Material::create()
 {
-	return Factory<Material>::create();
+
+	auto mat = Factory<Material>::create();
+
+	mat->m_samplers[Texture::TextureType::Albedo] = std::make_shared<TextureSampler>(3);
+	mat->m_samplers[Texture::TextureType::Normal] = std::make_shared<TextureSampler>(3);
+	mat->m_samplers[Texture::TextureType::Metallic] = std::make_shared<TextureSampler>(1);
+	mat->m_samplers[Texture::TextureType::Roughness] = std::make_shared<TextureSampler>(1);
+	mat->m_samplers[Texture::TextureType::AmbientOcclusion] = std::make_shared<TextureSampler>(1);
+
+	return mat;
 }
 
 void Material::updateAsset(const ResourceWrapper<Material>& material, AssetUpdateDescriptor desc)

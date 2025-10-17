@@ -91,7 +91,7 @@ Entity Skybox::CreateSkyboxFromCubemap(const SkyboxFaces& faces, Scene* scene)
     Texture::addTexture2D(equirectangularMap);
 
     static int skyboxCount = 0; // TODO fix - will not work with load
-    Engine::get()->getMemoryManagementSystem()->addAssociation("SKYBOX_" + std::to_string(skyboxCount++), equirectangularMap.getUID());
+    Engine::get()->getMemoryManagementSystem()->addPathReference("SKYBOX_" + std::to_string(skyboxCount++), equirectangularMap.getUID());
 
     auto entity = scene->createEntity();
 

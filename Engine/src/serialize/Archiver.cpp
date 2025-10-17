@@ -83,7 +83,7 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 		gameCameraEntity.getComponent<Transformation>().setLocalPosition({ 10,10,10 });
 		gameCameraEntity.getComponent<CameraComponent>().center = { 0,0,0 };
 		gameCameraEntity.getComponent<CameraComponent>().up = { 0,1,0 };
-		gameCameraEntity.addComponent<MeshComponent>().mesh = BuiltInAssets::get<MeshCollection>(SGE_MESH_CAMERA);
+		gameCameraEntity.addComponent<MeshComponent>().mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_CAMERA);
 		gameCameraEntity.addComponent<RenderableComponent>();
 	}
 	scene.setGameCamera(gameCameraEntity);

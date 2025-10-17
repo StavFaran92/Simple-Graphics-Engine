@@ -35,7 +35,7 @@ Entity ShapeFactory::createBoxEntity(SGE_Regsitry* registry)
 {
 	static int createdBoxCount = 0;
 	auto entity = createEntity(registry, "Box_" + std::to_string(createdBoxCount++));
-	ResourceWrapper<MeshCollection> mesh = BuiltInAssets::get<MeshCollection>(SGE_MESH_BOX);
+	ResourceWrapper<MeshCollection> mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
 	entity.getComponent<MeshComponent>().mesh = mesh;
 	return entity;
 }
@@ -44,7 +44,7 @@ Entity ShapeFactory::createQuad(SGE_Regsitry* registry)
 {
 	static int createdQuadCount = 0;
 	auto entity = createEntity(registry, "Quad_" + std::to_string(createdQuadCount++));
-	ResourceWrapper<MeshCollection> mesh = BuiltInAssets::get<MeshCollection>(SGE_MESH_QUAD);
+	ResourceWrapper<MeshCollection> mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_QUAD);
 	entity.getComponent<MeshComponent>().mesh = mesh;
 	return entity;
 }
@@ -53,7 +53,7 @@ Entity ShapeFactory::createSphere(SGE_Regsitry* registry)
 {
 	static int createdSphereCount = 0;
 	auto entity = createEntity(registry, "Sphere_" + std::to_string(createdSphereCount++));
-	ResourceWrapper<MeshCollection> mesh = BuiltInAssets::get<MeshCollection>(SGE_MESH_SPHERE);
+	ResourceWrapper<MeshCollection> mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_SPHERE);
 	entity.getComponent<MeshComponent>().mesh = mesh;
 	return entity;
 }

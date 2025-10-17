@@ -397,7 +397,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     PxVec3 extents = geometry.box().halfExtents * 2.;
                     model = glm::scale(model, glm::vec3(extents.x, extents.y, extents.z));
                     m_debugVisualizeShader->setModelMatrix(model);
-                    auto& mesh = BuiltInAssets::get<MeshCollection>(SGE_MESH_BOX);
+                    auto& mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
                     auto vao = mesh->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
                 }
@@ -407,7 +407,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     float radius2 = geometry.sphere().radius * 2.;
                     model = glm::scale(model, glm::vec3(radius2));
                     m_debugVisualizeShader->setModelMatrix(model);
-                    auto& mesh = BuiltInAssets::get<MeshCollection>(SGE_MESH_SPHERE);
+                    auto& mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_SPHERE);
                     auto vao = mesh->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
                 }

@@ -1,5 +1,7 @@
 #include "memory/UUID.h"
 
+uuid_type UUID::counter = 1;
+
 UUID UUID::generate_uuid_v4() 
 {
 #ifdef UUID_OPTION_A
@@ -24,26 +26,26 @@ UUID UUID::generate_uuid_v4()
 
     return UUID(ss.str());
 #else
-    return UUID(std::to_string(UUID::getAndIncrement()));
+    return UUID(UUID::getAndIncrement());
 #endif
 }
 
-// Constructor from std::string
-UUID::UUID(const std::string& str) : m_value(str) {}
+UUID::UUID(uuid_type uuid):
+    m_value(uuid)
+{
+}
 
-UUID::UUID(const char* str) : m_value(str) {}
-
-void UUID::setCounter(size_t count) 
+void UUID::setCounter(uuid_type count)
 {
     counter = count;
 }
 
-size_t UUID::getCounter()
+uuid_type UUID::getCounter()
 {
     return counter;
 }
 
-size_t UUID::getAndIncrement()
+uuid_type UUID::getAndIncrement()
 {
     return counter++;
 }
@@ -52,11 +54,16 @@ size_t UUID::getAndIncrement()
 
 // Implicit conversion to std::string
 UUID::operator std::string() const {
+    return str();
+}
+
+UUID::operator uuid_type() const
+{
     return m_value;
 }
 
-const std::string& UUID::str() const {
-    return m_value;
+std::string UUID::str() const {
+    return std::to_string(m_value);
 }
 
 // Comparison operators
@@ -74,5 +81,10 @@ bool UUID::operator<(const UUID& other) const {
 
 bool UUID::empty() const
 {
-    return m_value.empty();
+    return m_value == 0;
+}
+
+uint64_t UUID::value() const
+{
+    return m_value;
 }

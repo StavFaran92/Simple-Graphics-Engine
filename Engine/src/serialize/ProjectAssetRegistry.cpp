@@ -166,17 +166,17 @@ void ProjectAssetRegistry::removeAssetRegistry(const AssetInfo& asset)
 	}
 }
 
-void ProjectAssetRegistry::addAssociation(std::string name, UUID uuid)
-{
-	m_assetRegistry["association"][name] = uuid;
-	sync();
-}
-
-void ProjectAssetRegistry::removeAssociation(std::string name)
-{
-	m_assetRegistry["association"].erase(name);
-	sync();
-}
+//void ProjectAssetRegistry::addAssociation(std::string name, UUID uuid)
+//{
+//	m_assetRegistry["association"][name] = uuid;
+//	sync();
+//}
+//
+//void ProjectAssetRegistry::removeAssociation(std::string name)
+//{
+//	m_assetRegistry["association"].erase(name);
+//	sync();
+//}
 
 std::vector<AssetInfo> ProjectAssetRegistry::getAllAssetsOfType(AssetType aType) const
 {
@@ -215,21 +215,21 @@ std::vector<AssetInfo> ProjectAssetRegistry::getAllAssets() const
 	return result;
 }
 
-std::unordered_map<std::string, UUID> ProjectAssetRegistry::getAssociations() const
+std::unordered_map<std::string, UUID> ProjectAssetRegistry::getPaths() const
 {
-	std::unordered_map<std::string, UUID> associations;
+	std::unordered_map<std::string, UUID> paths;
 
-	if (m_assetRegistry.contains("association")) 
+	if (m_assetRegistry.contains("pathsToUUIDRefs"))
 	{
-		const auto& assoc = m_assetRegistry["association"];
+		const auto& assoc = m_assetRegistry["pathsToUUIDRefs"];
 
 		if (assoc.is_object())
 		{
 			for (auto it = assoc.begin(); it != assoc.end(); ++it)
 			{
 				const std::string key = it.key();
-				const UUID value = it.value().get<std::string>();
-				associations[key] = value;
+				const UUID uuid(it.value().get<uint64_t>());
+				paths[key] = uuid;
 			}
 		}
 		else
@@ -237,7 +237,44 @@ std::unordered_map<std::string, UUID> ProjectAssetRegistry::getAssociations() co
 			logWarning("Expected 'association' to be an object, but got different type.");
 		}
 	}
-	return associations;
+	return paths;
+}
+
+std::unordered_map<std::string, UUID> ProjectAssetRegistry::getNames() const
+{
+	std::unordered_map<std::string, UUID> names;
+
+	if (m_assetRegistry.contains("namesToUUIDRefs"))
+	{
+		const auto& assoc = m_assetRegistry["namesToUUIDRefs"];
+
+		if (assoc.is_object())
+		{
+			for (auto it = assoc.begin(); it != assoc.end(); ++it)
+			{
+				const std::string key = it.key();
+				const UUID uuid(it.value().get<uint64_t>());
+				names[key] = uuid;
+			}
+		}
+		else
+		{
+			logWarning("Expected 'association' to be an object, but got different type.");
+		}
+	}
+	return names;
+}
+
+void ProjectAssetRegistry::syncPaths(const std::unordered_map<std::string, UUID>& pathsReferences)
+{
+	m_assetRegistry["pathsToUUIDRefs"] = pathsReferences;
+	sync();
+}
+
+void ProjectAssetRegistry::syncNames(const std::unordered_map<std::string, UUID>& namesReferences)
+{
+	m_assetRegistry["namesToUUIDRefs"] = namesReferences;
+	sync();
 }
 
 void ProjectAssetRegistry::sync()

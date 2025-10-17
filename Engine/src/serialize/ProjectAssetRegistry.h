@@ -25,11 +25,18 @@ public:
 	void addAssetRegistry(const AssetInfo& asset);
 	void updateAssetRegistry(const AssetInfo& asset);
 	void removeAssetRegistry(const AssetInfo& asset);
-	void addAssociation(std::string name, UUID uuid);
-	void removeAssociation(std::string name);
+
+	//void addAssociation(std::string name, UUID uuid);
+	//void removeAssociation(std::string name);
+	//std::unordered_map<std::string, UUID> getAssociations() const;
+	std::unordered_map<std::string, UUID> getPaths() const;
+	std::unordered_map<std::string, UUID> getNames() const;
+
+	void syncPaths(const std::unordered_map<std::string, UUID>& pathsReferences);
+	void syncNames(const std::unordered_map<std::string, UUID>& namesReferences);
+
 	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
 	std::vector<AssetInfo> getAllAssets() const;
-	std::unordered_map<std::string, UUID> getAssociations() const;
 
 
 private:

@@ -22,16 +22,14 @@ void acquireTexture(const std::string& name, const std::string& path)
 	Texture::TextureAssetDescriptor aDesc;
 	aDesc.isEngineOwned = true;
 	aDesc.name = name;
-	aDesc.customUUID = name;
 	Texture::import(path, aDesc);
 }
 
-void addAsAsset(const ResourceWrapper<MeshCollection>& meshCollection)
+void addAsAsset(const std::string& name, const ResourceWrapper<MeshCollection>& meshCollection)
 {
 	AssetCreateDescriptor aInfo;
-	aInfo.customUUID = meshCollection.getUID();
 	aInfo.aType = AssetType::MESH;
-	aInfo.name = meshCollection.getUID();
+	aInfo.name = name;
 	aInfo.isEngineOwned = true;
 	Engine::get()->getSubSystem<Assets>()->createAsset(meshCollection, aInfo);
 }
@@ -60,7 +58,6 @@ void BuiltInAssetsLoader::loadTextures()
 		auto texture = Texture::create2DTextureFromBuffer(tData);
 
 		AssetCreateDescriptor aInfo;
-		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = tData.textureName;
 		aInfo.isEngineOwned = true;
@@ -88,7 +85,6 @@ void BuiltInAssetsLoader::loadTextures()
 		auto texture = Texture::create2DTextureFromBuffer(tData);
 
 		AssetCreateDescriptor aInfo;
-		aInfo.customUUID = texture.getUID();
 		aInfo.aType = AssetType::TEXTURE;
 		aInfo.name = tData.textureName;
 		aInfo.isEngineOwned = true;
@@ -106,7 +102,7 @@ void BuiltInAssetsLoader::loadMaterials()
 		aDesc.isEngineOwned = true;
 		aDesc.name = "SGE_MATERIAL_DEFAULT";
 		aDesc.aType = AssetType::MATERIAL;
-		ResourceWrapper<Material> material = Factory<Material>::createUsingCustomUUID(aDesc.name);
+		ResourceWrapper<Material> material = Material::create();
 		Engine::get()->getSubSystem<Assets>()->createAsset(material, aDesc);
 	}
 }
@@ -115,37 +111,34 @@ void BuiltInAssetsLoader::loadMeshes()
 {
 	{
 		// Create box
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_BOX");
+		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
 		Box::createMesh(meshCollection);
-		addAsAsset(meshCollection);
+		addAsAsset("SGE_MESH_BOX", meshCollection);
 	}
 
 	{
 		// Create Quad
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_QUAD");
+		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
 		Quad::createMesh(meshCollection);
-		addAsAsset(meshCollection);
+		addAsAsset("SGE_MESH_QUAD", meshCollection);
 	}
 
 	{
 		// Create sphere
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_SPHERE");
+		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
 		Sphere::createMesh(meshCollection, 1, 36, 36);
-		addAsAsset(meshCollection);
+		addAsAsset("SGE_MESH_SPHERE", meshCollection);
 	}
 
 	{
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::createUsingCustomUUID("SGE_MESH_GRID");
+		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
 		Grid::generateGrid(meshCollection, 10, 10);
-		addAsAsset(meshCollection);
+		addAsAsset("SGE_MESH_GRID", meshCollection);
 	}
 
 	{
-		ModelImportSettings settings;
-		settings.customUUID = "SGE_MESH_CAMERA";
-		settings.isEngineOwned = true;
-		ResourceWrapper<MeshCollection> meshCollection = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", settings);
-		addAsAsset(meshCollection);
+		ResourceWrapper<MeshCollection> meshCollection = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae");
+		addAsAsset("SGE_MESH_CAMERA", meshCollection);
 	}
 }
 

@@ -181,7 +181,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 				continue;
 			}
 
-			UUID uuid = iter->second;
+			UUID uuid = std::stoi(iter->second); // todo ptotect
 			ResourceWrapper<Material> material = ResourceWrapper<Material>(uuid);
 			modelInfo.materials[i] = material;
 		}

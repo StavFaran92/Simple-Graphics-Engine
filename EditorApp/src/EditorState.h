@@ -37,7 +37,7 @@ public:
 
     
 
-    std::function<void(std::string uuid)> assetTextureSelectCB;
+    std::function<void(UUID uuid)> assetTextureSelectCB;
     std::function<void(Entity e)> entitySelectCB;
     ResourceWrapper<Texture> selectedAssetTexture;
 

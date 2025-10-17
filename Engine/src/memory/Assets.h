@@ -16,7 +16,6 @@ struct EngineAPI AssetCreateDescriptor
 public:
 	virtual ~AssetCreateDescriptor() = default;
 
-	UUID customUUID;
 	std::string origFilePath;
 	std::string assetDirectory;
 	AssetType aType = AssetType::NONE;
@@ -45,7 +44,7 @@ struct EngineAPI AssetInfo
 	std::string fullFilePath;
 	std::string fileName;
 	std::string ext;
-	UUID uuid;
+	UUID uuid = EMPTY_UUID;
 	std::string origFilePath;
 	std::string assetDirectory;
 	AssetType aType = AssetType::NONE;
@@ -81,6 +80,8 @@ public:
 	void loadAssetsDatabase();
 
 	UUID getAssetFromPath(const std::string& path) const;
+
+	UUID getAssetFromName(const std::string& name) const;
 
 	AssetInfo getAsset(UUID uuid) const;
 

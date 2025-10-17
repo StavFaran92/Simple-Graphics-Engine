@@ -52,7 +52,7 @@ void displaySelectScriptDialog(std::string& scriptName)
 	}
 }
 
-void displaySelectShaderDialog(std::string& uuid)
+void displaySelectShaderDialog(UUID& uuid)
 {
 	if (EditorState::Instance().showShaderSelector)
 	{

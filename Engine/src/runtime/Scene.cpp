@@ -214,7 +214,7 @@ void Scene::init(Context* context)
 
 	m_skyboxShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SkyboxShader.glsl");
 
-	m_basicBox = BuiltInAssets::get<MeshCollection>(SGE_MESH_BOX);
+	m_basicBox = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
 
 	addRenderView("Game View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 

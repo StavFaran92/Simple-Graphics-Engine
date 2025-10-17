@@ -28,6 +28,7 @@
 #include "lights/DirectionalLight.h"
 #include "render/CommonShaders.h"
 #include "systems/BuiltInAssetsLoader.h"
+#include "memory/BuiltInAssets.h"
 #include "systems/ObjectPicker.h"
 #include "animation/AnimationLoader.h"
 #include "memory/Assets.h"
@@ -207,13 +208,13 @@ bool Engine::init(const InitParams& initParams)
     if (initParams.loadExistingProject)
     {
         par = ProjectAssetRegistry::parse(m_projectDirectory);
-        m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
+        m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
         m_context = std::make_shared<Context>(par);
     }
     else
     {   
         par = ProjectAssetRegistry::create(initParams.projectDir);
-        m_memoryManagementSystem = std::make_shared<CacheSystem>(par->getAssociations());
+        m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
         m_context = std::make_shared<Context>(par);
         BuiltInAssetsLoader::loadAssets();
     }
@@ -478,7 +479,7 @@ std::string Engine::getProjectDirectory() const
 
 ResourceWrapper<Material> Engine::getDefaultMaterial() const
 {
-    return Engine::get()->getSubSystem<Assets>()->getAsset("SGE_MATERIAL_DEFAULT").data.as<Material>();
+    return BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT);
 }
 
 void Engine::reloadEngineConfig()
@@ -539,7 +540,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.getComponent<Transformation>().setLocalPosition({10,10,10});
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
-    mainCamera.addComponent<MeshComponent>(Engine::get()->getSubSystem<Assets>()->getAsset("SGE_MESH_CAMERA").data.as<MeshCollection>());
+    mainCamera.addComponent<MeshComponent>(BuiltInAssets::getByName<MeshCollection>(SGE_MESH_CAMERA));
     mainCamera.addComponent<RenderableComponent>();
 
     m_context->getActiveScene()->setGameCamera(mainCamera);

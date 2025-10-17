@@ -1,11 +1,13 @@
 #include "core/CacheSystem.h"
 
-CacheSystem::CacheSystem(const std::unordered_map<std::string, UUID>& associations)
-	: m_associations(associations)
+CacheSystem::CacheSystem(std::shared_ptr<ProjectAssetRegistry> par)
 {
+	m_pathToUUID = par->getPaths();
+	m_nameToUUID = par->getNames();
 }
 
 void CacheSystem::clear()
 {
-	m_associations.clear();
+	m_pathToUUID.clear();
+	m_nameToUUID.clear();
 }

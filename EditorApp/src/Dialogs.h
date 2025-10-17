@@ -6,7 +6,7 @@
 
 void displaySelectScriptDialog(std::string& scriptName);
 
-void displaySelectShaderDialog(std::string& uuid);
+void displaySelectShaderDialog(UUID& uuid);
 
 void displayEntitySelectDialog(Entity& e);
 

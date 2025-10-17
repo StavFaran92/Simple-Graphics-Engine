@@ -6,9 +6,9 @@
 
 #include <functional>
 
-void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(std::string uuid)> callback);
+void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(UUID uuid)> callback);
 
-void addTextureEditWidget(ResourceWrapper<Texture> texture, ImVec2 size, std::function<void(std::string uuid)> callback);
+void addTextureEditWidget(ResourceWrapper<Texture> texture, ImVec2 size, std::function<void(UUID uuid)> callback);
 
 void addTextureEditWidget(ResourceWrapper<Material> mat, const std::string& name, Texture::TextureType ttype);
 

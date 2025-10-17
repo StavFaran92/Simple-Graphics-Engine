@@ -260,13 +260,9 @@ void bindAssets(sol::state& lua)
 
     lua.new_usertype<ResourceWrapper<Prefab>>("Prefab",
         sol::factories(
-            [](const std::string& str) {
-                // your custom UUID creation from string
-                return ResourceWrapper<Prefab>(UUID(str));
-            },
             [](int value) {
                 // your custom UUID creation from int
-                return ResourceWrapper<Prefab>(UUID(std::to_string(value)));
+                return ResourceWrapper<Prefab>(UUID(value));
             }
         ),
         // Instance methods

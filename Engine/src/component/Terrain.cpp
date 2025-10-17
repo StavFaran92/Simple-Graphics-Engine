@@ -22,7 +22,7 @@ Entity Terrain::createTerrain(int width, int height, float scale, ResourceWrappe
 	auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
 	terrainComponent.m_textureCount = 1;
 
-	auto& grassTexture = Engine::get()->getSubSystem<Assets>()->getAsset("SGE_TEXTURE_GRASS").data.as<Texture>();
+	auto& grassTexture = BuiltInAssets::getByName<Texture>("SGE_TEXTURE_GRASS");
 	terrainComponent.setTexture(0, grassTexture);
 
 	terrainEntity.addComponent<Terrain>(terrainComponent);
@@ -54,7 +54,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, const std::
 
 Terrain Terrain::generateTerrain(int width, int height, float scale, ResourceWrapper<Texture> heightMap)
 {
-	auto& meshCollection = BuiltInAssets::get<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
+	auto& meshCollection = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
 
 	Terrain terrain;
 	terrain.m_heightmap = heightMap;
@@ -66,7 +66,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, ResourceWra
 	for (int i = 0; i < MAX_TEXTURE_COUNT; i++)
 	{
 		TextureBlend blend;
-		blend.texture = BuiltInAssets::get<Texture>(SGE_TEXTURE_WHITE);
+		blend.texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
 		blend.blend = i * .2f + .2f;
 		terrain.m_textureBlends.push_back(blend);
 	}

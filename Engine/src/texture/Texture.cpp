@@ -111,8 +111,8 @@ ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int 
 ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
 {
 	ResourceWrapper<Texture> texture;
-	UUID uuid = textureData.textureName.empty() ? UUID::generate_uuid_v4() : textureData.textureName;
-	texture = Factory<Texture>::createUsingCustomUUID(uuid);
+	//UUID uuid = textureData.textureName.empty() ? UUID::generate_uuid_v4() : textureData.textureName;
+	texture = Factory<Texture>::create();
 	texture.get()->build(textureData);
 
 	return texture;
@@ -285,7 +285,6 @@ void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> tex
 
 	AssetCreateDescriptor aInfo;
 	aInfo.aType = AssetType::TEXTURE;
-	aInfo.customUUID = texture.getUID();
 	aInfo.name = name;
 	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 	Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
