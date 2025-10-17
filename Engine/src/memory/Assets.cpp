@@ -326,7 +326,7 @@ ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocatio
 ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc)
 {
 	AssetInfo aInfo(desc);
-	aInfo.uuid = asset.getUID(); // dirty Hack
+	aInfo.uuid = asset.getUID(); // dirty Hack, used since assetInfo will generate a uuid upon create, not desired behaviour for create
 
 	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
 
