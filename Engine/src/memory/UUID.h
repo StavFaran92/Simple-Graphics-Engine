@@ -10,7 +10,7 @@
 typedef uint64_t uuid_type;
 
 class EngineAPI UUID {
-    uuid_type m_value;
+    uuid_type m_value = 0 ;
 
 public:
     UUID() = default;

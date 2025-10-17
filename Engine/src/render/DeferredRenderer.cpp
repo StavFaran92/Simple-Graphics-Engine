@@ -249,6 +249,9 @@ void DeferredRenderer::renderScene(Scene* scene)
 	// Render all objects
 	for (auto& entityHandler : graphics->entityGroup)
 	{
+		std::string name = entityHandler.getComponent<ObjectComponent>().name;
+		logTrace("About to render {}", name);
+
 		ResourceWrapper<MeshCollection> meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
 
 		auto animator = entityHandler.tryGetComponent<Animator>();

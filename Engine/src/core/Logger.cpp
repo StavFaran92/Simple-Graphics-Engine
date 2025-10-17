@@ -44,7 +44,7 @@ void Logger::init(const std::string& filePath)
     sinks.push_back(std::make_shared<CallbackSink_mt>());
 
     s_logger = std::make_shared<spdlog::logger>("Engine", sinks.begin(), sinks.end());
-    s_logger->set_level(spdlog::level::trace);
+    s_logger->set_level(spdlog::level::debug);
     spdlog::register_logger(s_logger);
 }
 

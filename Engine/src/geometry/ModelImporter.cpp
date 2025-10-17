@@ -252,7 +252,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 
 			// get uuid using tex name from association map
-			auto& material = Factory<Material>::create();
+			auto& material = Material::create();
 			aInfo.attributes[materialID] = material.getUID();
 			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
 			material->setName(materialName);
