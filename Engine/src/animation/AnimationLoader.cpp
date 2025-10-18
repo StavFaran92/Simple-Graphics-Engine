@@ -108,9 +108,7 @@ ResourceWrapper<Animation> AnimationLoader::load(const AssetInfo& aInfo)
 
 bool AnimationLoader::copyFileToResourceFolder(const std::string& fileLocation, const AssetInfo& aInfo)
 {
-    auto& projectDir = Engine::get()->getProjectDirectory();
-    const std::string filename = std::filesystem::path(fileLocation).filename().string();
-    const std::string savedFilePath = projectDir + "/" + aInfo.assetDirectory + "/" + filename;
+    const std::string savedFilePath = aInfo.fullFilePath;
     std::filesystem::copy_file(fileLocation, savedFilePath);
 
     return true;
