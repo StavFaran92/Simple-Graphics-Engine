@@ -27,11 +27,11 @@ public:
 public:
     static Entity createSkybox(const std::string& textureFilepath, TexType texType);
 
-    static Entity CreateSkyboxFromEquirectangularMap(const std::string& equirectnagularMap, Scene* scene = nullptr);
+    //static Entity CreateSkyboxFromEquirectangularMap(const std::string& equirectnagularMap, Scene* scene = nullptr);
 
-    static Entity CreateSkyboxFromCubemap(const SkyboxFaces& faces, Scene* scene = nullptr);
+    //static Entity CreateSkyboxFromCubemap(const SkyboxFaces& faces, Scene* scene = nullptr);
 
-    static Entity loadSkybox(AssetWrapper<Texture> texture, Entity& entity, Scene* scene = nullptr);
+    //static Entity loadSkybox(AssetWrapper<Texture> texture, Entity& entity, Scene* scene = nullptr);
 
 private:
     static Entity createSkyboxHelper(AssetWrapper<Texture> cubemap, AssetWrapper<Texture> equirectangularMap, Entity& entity, Scene* scene);

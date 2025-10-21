@@ -25,7 +25,7 @@ Entity WaterSystem::createPool()
 	auto& shader = Shader::createOverrideShader("WaterShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
 
 	auto& shaderComponent = poolQuad.addComponent<ShaderComponent>();
-	shaderComponent.setShader(shader);
+	//shaderComponent.setShader(shader); // TODO fix
 
 	auto waterNormal = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/water_new_height.png");
 	shaderComponent.addTexture("waterNormalSampler", waterNormal);
