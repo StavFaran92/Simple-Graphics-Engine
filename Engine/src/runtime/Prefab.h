@@ -12,13 +12,13 @@ struct PrefabAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
 	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
 };
 
 class EngineAPI Prefab : public ResourceBase
 {
 public:
-	static ResourceWrapper<Prefab> import(const std::string& fileLocation, PrefabImportSettings desc);
+	static AssetWrapper<Prefab> import(const std::string& fileLocation, PrefabImportSettings desc);
 	static ResourceWrapper<Prefab> create(const Entity& e);
 	static void save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo);
 

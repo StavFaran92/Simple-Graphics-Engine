@@ -66,12 +66,12 @@ ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
 	return ResourceWrapper<Texture>(aInfo.uuid);
 }
 
-void TextureAssetManager::save(const ResourceWrapper<ResourceBase>& texture, const AssetInfo& aInfo)
+void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
 
-	Texture::writeTexture2D(fileLocation, texture.as<Texture>());
+	Texture::writeTexture2D(fileLocation, texture.as<Texture>().resource());
 }
 
 Texture::Texture()
@@ -254,7 +254,7 @@ void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Te
 		texture.get()->getWidth() * texture.get()->getBitDepth());
 }
 
-ResourceWrapper<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
+AssetWrapper<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Texture>();

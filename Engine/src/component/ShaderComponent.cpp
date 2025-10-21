@@ -9,10 +9,10 @@ ShaderComponent::ShaderComponent()
 	renderViewProjection = std::make_shared<RenderView>(Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
 };
 
-void ShaderComponent::setProjectionTexture(ResourceWrapper<Texture> texture)
+void ShaderComponent::setProjectionTexture(AssetWrapper<Texture> texture)
 {
 	renderViewProjection->bind();
-	renderViewProjection->setTexture(texture);
+	renderViewProjection->setTexture(texture.resource());
 	projectionTexture = texture;
 
 }
@@ -64,13 +64,13 @@ void ShaderComponent::parseUniforms(const std::string& sourceCode)
 	}
 }
 
-void ShaderComponent::setShader(ResourceWrapper<Shader> shader)
+void ShaderComponent::setShader(AssetWrapper<Shader> shader)
 {
 	m_customShader = shader;
 
-	shaderOverride = shader->getShaderOverride();
+	shaderOverride = shader.resource()->getShaderOverride();
 
-	const std::string& sourceCode = shader->getSourceCode();
+	const std::string& sourceCode = shader.resource()->getSourceCode();
 
 	parseUniforms(sourceCode);
 
@@ -82,7 +82,7 @@ void ShaderComponent::update()
 	auto oldUniforms = m_uniformProperties;
 	auto oldTextures = customTextures;
 
-	parseUniforms(m_customShader->getSourceCode());
+	parseUniforms(m_customShader.resource()->getSourceCode());
 
 
 	auto& newTextures = customTextures;
@@ -107,10 +107,10 @@ void ShaderComponent::update()
 
 	for (const auto& [name, value] : m_uniformProperties)
 	{
-		m_customShader.get()->setUniformValue(name, value);
+		m_customShader.resource()->setUniformValue(name, value);
 	}
 
-	if (!projectionTexture.isEmpty())
+	if (!projectionTexture.resource().isEmpty())
 	{
 		setProjectionTexture(projectionTexture);
 	}

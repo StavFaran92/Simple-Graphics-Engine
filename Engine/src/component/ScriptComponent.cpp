@@ -3,7 +3,7 @@
 #include "scripts/ScriptSystem.h"
 #include "runtime/Scene.h"
 
-ScriptComponent::ScriptComponent(const ResourceWrapper<LuaScript>& script)
+ScriptComponent::ScriptComponent(const AssetWrapper<LuaScript>& script)
 	: script(script)
 {
 
@@ -22,7 +22,7 @@ bool ScriptComponent::isValid() const
 	return !script.isEmpty();
 }
 
-ResourceWrapper<LuaScript>& ScriptComponent::getScript()
+AssetWrapper<LuaScript>& ScriptComponent::getScript()
 {
 	return script;
 }

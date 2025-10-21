@@ -85,6 +85,28 @@ public:
 		return static_cast<T*>(Engine::get()->getMemoryPool().get(uuid));
 	}
 
+	// TODO reenforce
+
+	//const T* operator->() const
+	//{
+	//	return get();
+	//}
+
+	//T* operator->()
+	//{
+	//	return get();
+	//}
+
+	//const T* get() const
+	//{
+	//	return static_cast<T*>(Engine::get()->getMemoryPool().get(uuid));
+	//}
+
+	//const T* get() const
+	//{
+	//	return static_cast<T*>(Engine::get()->getMemoryPool().get(uuid));
+	//}
+
 	inline UUID getUID() const 
 	{ 
 		return uuid; 
@@ -98,21 +120,6 @@ public:
 	bool isEmpty() const
 	{
 		return uuid == EMPTY_UUID;
-	}
-
-	template <class Archive>
-	void save(Archive& archive) const {
-		archive(CEREAL_NVP(uuid));
-	}
-
-	template <class Archive>
-	void load(Archive& archive) {
-		archive(CEREAL_NVP(uuid));
-
-		Engine::get()->getResourceManager()->incRef(uuid);
-
-		if (!isEmpty())
-			m_cache = Engine::get()->getMemoryPool().get(uuid);
 	}
 
 	~ResourceWrapper<T>() // destructor
@@ -162,7 +169,7 @@ private:
 			uuid = EMPTY_UUID;
 		}
 	}
-private:
+protected:
 	UUID uuid = EMPTY_UUID;
 	mutable ResourceBase* m_cache = nullptr;
 	bool m_isAsset = false;

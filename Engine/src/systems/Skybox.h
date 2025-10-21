@@ -2,7 +2,7 @@
 
 #include "core/Core.h"
 #include "runtime/Entity.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/AssetWrapper.h"
 
 class TextureHandler;
 class Scene;
@@ -31,10 +31,10 @@ public:
 
     static Entity CreateSkyboxFromCubemap(const SkyboxFaces& faces, Scene* scene = nullptr);
 
-    static Entity loadSkybox(ResourceWrapper<Texture> texture, Entity& entity, Scene* scene = nullptr);
+    static Entity loadSkybox(AssetWrapper<Texture> texture, Entity& entity, Scene* scene = nullptr);
 
 private:
-    static Entity createSkyboxHelper(ResourceWrapper<Texture> cubemap, ResourceWrapper<Texture> equirectangularMap, Entity& entity, Scene* scene);
+    static Entity createSkyboxHelper(AssetWrapper<Texture> cubemap, AssetWrapper<Texture> equirectangularMap, Entity& entity, Scene* scene);
 
     
 private:

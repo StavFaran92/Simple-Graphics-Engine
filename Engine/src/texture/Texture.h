@@ -22,7 +22,7 @@ struct TextureAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
 	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
 };
 
 class EngineAPI Texture : public ResourceBase
@@ -283,7 +283,7 @@ public:
 
 	static ResourceWrapper<Texture> importTexture3D(const std::string& fileLocation);
 
-	static ResourceWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
+	static AssetWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
 	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureAssetDescriptor = {});
 
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);

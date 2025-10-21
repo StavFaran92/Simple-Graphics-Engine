@@ -252,7 +252,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 		std::string name = entityHandler.getComponent<ObjectComponent>().name;
 		logTrace("About to render {}", name);
 
-		ResourceWrapper<MeshCollection> meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
+		ResourceWrapper<MeshCollection> meshCollecton = entityHandler.getComponent<MeshComponent>().mesh.resource();
 
 		auto animator = entityHandler.tryGetComponent<Animator>();
 		if (!animator || animator->m_currentAnimation.isEmpty())

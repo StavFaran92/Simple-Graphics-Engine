@@ -15,7 +15,7 @@
 
 #include "GL/glew.h"
 
-Entity Terrain::createTerrain(int width, int height, float scale, ResourceWrapper<Texture> heightMap)
+Entity Terrain::createTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap)
 {
 	auto terrainEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
 
@@ -52,7 +52,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, const std::
 	return generateTerrain(width, height, scale, heightMap);
 }
 
-Terrain Terrain::generateTerrain(int width, int height, float scale, ResourceWrapper<Texture> heightMap)
+Terrain Terrain::generateTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap)
 {
 	auto& meshCollection = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
 
@@ -74,7 +74,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, ResourceWra
 	return terrain; // todo fix
 }
 
-ResourceWrapper<MeshCollection> Terrain::getMesh() const
+AssetWrapper<MeshCollection> Terrain::getMesh() const
 {
 	return m_mesh;
 }
@@ -84,7 +84,7 @@ float Terrain::getScale() const
 	return m_scale;
 }
 
-ResourceWrapper<Texture> Terrain::getHeightmap() const
+AssetWrapper<Texture> Terrain::getHeightmap() const
 {
 	return m_heightmap;
 }
@@ -99,7 +99,7 @@ int Terrain::getHeight() const
 	return m_height;
 }
 
-void Terrain::setTexture(int index, ResourceWrapper<Texture> texture)
+void Terrain::setTexture(int index, AssetWrapper<Texture> texture)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
@@ -143,12 +143,12 @@ void Terrain::setTextureBlend(int index, float val)
 	m_textureBlends[index].blend = val;
 }
 
-ResourceWrapper<Texture>& Terrain::getTexture(int index)
+AssetWrapper<Texture>& Terrain::getTexture(int index)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
 		logWarning("Invalid texture index specified: " + std::to_string(index));
-		return ResourceWrapper<Texture>::empty;
+		return AssetWrapper<Texture>::empty;
 	}
 
 	return m_textureBlends.at(index).texture;
@@ -235,8 +235,8 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	}
 
 	// Convert from world space to heightmap space
-	float normalizedX = x / m_width * m_heightmap.get()->getWidth();
-	float normalizedY = y / m_height * m_heightmap.get()->getHeight();
+	float normalizedX = x / m_width * m_heightmap.resource().get()->getWidth();
+	float normalizedY = y / m_height * m_heightmap.resource().get()->getHeight();
 
 	normalizedX -= .5;
 	normalizedY -= .5;
@@ -245,8 +245,8 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	float flippedY = normalizedY;// m_heightmap.get()->getHeight() - 1 - normalizedY;
 
 	// Access heightmap data
-	unsigned char* pixels = static_cast<unsigned char*>(m_heightmap.get()->getData().data);
-	int stride = m_heightmap.get()->getWidth();
+	unsigned char* pixels = static_cast<unsigned char*>(m_heightmap.resource().get()->getData().data);
+	int stride = m_heightmap.resource().get()->getWidth();
 
 	// Compute floor values
 	int floorX = static_cast<int>(floor(normalizedX));
@@ -272,9 +272,9 @@ float Terrain::getHeightAtPoint(float x, float y) const
 		pixels,
 		floorX, floorY,
 		stride,
-		m_heightmap.get()->getBitDepth(),
-		m_heightmap.get()->getWidth(),
-		m_heightmap.get()->getHeight()
+		m_heightmap.resource().get()->getBitDepth(),
+		m_heightmap.resource().get()->getWidth(),
+		m_heightmap.resource().get()->getHeight()
 	);
 
 	float lerpX = 0.0f;

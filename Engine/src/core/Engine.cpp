@@ -479,7 +479,7 @@ std::string Engine::getProjectDirectory() const
 
 ResourceWrapper<Material> Engine::getDefaultMaterial() const
 {
-    return BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT);
+    return BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT).resource();
 }
 
 void Engine::reloadEngineConfig()

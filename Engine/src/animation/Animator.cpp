@@ -5,7 +5,7 @@
 #include "geometry/MeshCollection.h"
 #include "runtime/Scene.h"
 
-Animator::Animator(ResourceWrapper<Animation> animation)
+Animator::Animator(AssetWrapper<Animation> animation)
 	: m_currentAnimation(animation)
 {
 
@@ -14,21 +14,21 @@ Animator::Animator(ResourceWrapper<Animation> animation)
 void Animator::update(float dt)
 {
 	
-	if (!m_currentAnimation.isEmpty())
+	if (!m_currentAnimation.resource().isEmpty())
 	{
 		// Increment Animation time
-		m_currentTime += m_currentAnimation.get()->getTicksPerSecond() * m_playbackSpeed * dt;
-		m_currentTime = fmod(m_currentTime, m_currentAnimation.get()->getDuration());
+		m_currentTime += m_currentAnimation.resource().get()->getTicksPerSecond() * m_playbackSpeed * dt;
+		m_currentTime = fmod(m_currentTime, m_currentAnimation.resource().get()->getDuration());
 	}
 }
 
 void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
 {
-	if (m_currentAnimation.isEmpty()) 
+	if (m_currentAnimation.resource().isEmpty())
 		return;
 
 	std::unordered_map<std::string, glm::mat4> m_intermediateBoneMatrices;
-	m_currentAnimation.get()->calculateFinalBoneMatrices(m_currentTime, m_intermediateBoneMatrices);
+	m_currentAnimation.resource().get()->calculateFinalBoneMatrices(m_currentTime, m_intermediateBoneMatrices);
 	
 	meshSpaceToBoneSpaceBindPoseMat = meshCollection->getBoneOffsets();
 
@@ -44,7 +44,7 @@ void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::v
 	}
 }
 
-void Animator::playAnimation(ResourceWrapper<Animation> animation)
+void Animator::playAnimation(AssetWrapper<Animation> animation)
 {
 	// TODO remove maybe, there is a bug here due to name not being set
 	m_currentAnimation = animation;
@@ -56,7 +56,7 @@ void Animator::setPlaybackSpeed(float playbackSpeed)
 	m_playbackSpeed = playbackSpeed;
 }
 
-void Animator::addAnimation(const std::string& name, ResourceWrapper<Animation> animation)
+void Animator::addAnimation(const std::string& name, AssetWrapper<Animation> animation)
 {
 	m_animations[name] = animation;
 }
@@ -72,27 +72,27 @@ void Animator::removeAnimation(const std::string& name)
 
 void Animator::playAnimation(const std::string& name)
 {
-	ResourceWrapper<Animation>& anim = getAnimation(name);
-	if (!anim.isEmpty())
+	AssetWrapper<Animation>& anim = getAnimation(name);
+	if (!anim.resource().isEmpty())
 	{
 		playAnimation(anim);
 		m_currentAnimationName = name;
 	}
 }
 
-ResourceWrapper<Animation> Animator::getAnimation(const std::string& name)
+AssetWrapper<Animation> Animator::getAnimation(const std::string& name)
 {
 	auto iter = m_animations.find(name);
 	if (iter == m_animations.end())
 	{
 		logWarning("Could not find animation: {}", name);
-		return ResourceWrapper<Animation>::empty;
+		return AssetWrapper<Animation>::empty;
 	}
 
 	return iter->second;
 }
 
-const std::map<std::string, ResourceWrapper<Animation>>& Animator::getAllAnimations() const
+const std::map<std::string, AssetWrapper<Animation>>& Animator::getAllAnimations() const
 {
 	return m_animations;
 }

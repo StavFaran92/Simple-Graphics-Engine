@@ -2,6 +2,7 @@
 
 #include "core/Engine.h"
 #include "memory/ResourceWrapper.h"
+#include "memory/AssetWrapper.h"
 #include "core/Core.h"
 #include "core/Configurations.h"
 
@@ -53,7 +54,7 @@ struct EngineAPI AssetInfo
 	bool isEngineOwned = false;
 	bool isTransient = false;
 	nlohmann::json importSettings;
-	ResourceWrapper<ResourceBase> data = ResourceWrapper<ResourceBase>::empty;
+	AssetWrapper<ResourceBase> data = AssetWrapper<ResourceBase>::empty;
 
 	~AssetInfo() = default;
 
@@ -89,11 +90,11 @@ public:
 
 	void deleteAsset(const AssetInfo& aInfo);
 
-	void updateAsset(const ResourceWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc = {});
+	void updateAsset(const AssetWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc = {});
 
-	ResourceWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
+	AssetWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
-	ResourceWrapper<ResourceBase> createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc);
+	AssetWrapper<ResourceBase> createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc);
 
 	ResourceWrapper<ResourceBase> loadResource(const std::string& fileLocation, AssetCreateDescriptor& desc);
 

@@ -24,7 +24,7 @@ ResourceWrapper<ResourceBase> AnimationAssetManager::load(AssetInfo& aInfo)
 	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 }
 
-void AnimationAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+void AnimationAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
 {
 	throw new std::runtime_error("Not yet implemented!");
 }
@@ -110,7 +110,7 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-ResourceWrapper<Animation> Animation::import(const std::string& fileLocation, AnimationImportSettings desc)
+AssetWrapper<Animation> Animation::import(const std::string& fileLocation, AnimationImportSettings desc)
 {
 	desc.aType = AssetType::ANIMATION;
 	desc.origFilePath = fileLocation;

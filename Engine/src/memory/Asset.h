@@ -4,6 +4,7 @@
 
 #include "Assets.h"
 #include "AssetFactory.h"
+#include "memory/AssetWrapper.h"
 
 #include <nlohmann/json.hpp>
 
@@ -54,7 +55,7 @@ class AssetManager {
 public:
 	virtual bool copyFiles(const std::string& fileLocation, AssetInfo&) = 0;
 	virtual ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) = 0;
-	virtual void save(const ResourceWrapper<ResourceBase>& asset, const AssetInfo& aInfo) {};
+	virtual void save(const AssetWrapper<ResourceBase>& asset, const AssetInfo& aInfo) {};
 };
 
 class ResourceBase

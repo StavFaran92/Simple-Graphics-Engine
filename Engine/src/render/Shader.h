@@ -51,7 +51,7 @@ struct ShaderAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
 	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
 };
 
 class EngineAPI Shader : public ResourceBase, std::enable_shared_from_this<Shader>
@@ -91,8 +91,8 @@ public:
 
 	const std::string& getSourceCode() const;
 
+	static AssetWrapper<Shader> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
-	static ResourceWrapper<Shader> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);

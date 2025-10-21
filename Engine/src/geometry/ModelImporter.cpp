@@ -240,7 +240,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 		return false;
 	}
 
-	std::unordered_map<std::string, ResourceWrapper<Texture>> cachedTextures;
+	std::unordered_map<std::string, AssetWrapper<Texture>> cachedTextures;
 
 	// Import materials and textures
 	if (scene->HasMaterials())
@@ -483,21 +483,22 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 
 
 
-ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene, 
+AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 	aiMaterial* mat, 
 	aiTextureType type, 
 	const std::string& dir, 
 	std::unordered_map<std::string, 
-	ResourceWrapper<Texture>>& cachedTextures, 
+	AssetWrapper<Texture>>& cachedTextures,
 	const AssetInfo& aInfo)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
 	{
-		return ResourceWrapper<Texture>::empty;
+		return AssetWrapper<Texture>::empty;
 	}
 
 	ResourceWrapper<Texture> texture;
+	AssetWrapper<Texture> AssetTexture;
 	const aiTexture* aiTexture = scene->GetEmbeddedTexture(str.C_Str());
 	if(aiTexture)
 	{
@@ -557,16 +558,16 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc);
+		AssetTexture = Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc).as<Texture>();
 
-		cachedTextures.insert({ tData.textureName, texture });
+		cachedTextures.insert({ tData.textureName, AssetTexture });
 	}	
 	else
 	{
 		std::string path = findTexture(str, dir);
 		if (path.empty())
 		{
-			return ResourceWrapper<Texture>::empty;
+			return AssetWrapper<Texture>::empty;
 		}
 
 		if (cachedTextures.find(path) != cachedTextures.end())
@@ -578,12 +579,12 @@ ResourceWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* sce
 		Texture::TextureAssetDescriptor tSettings;
 		tSettings.assetDirectory = aInfo.assetDirectory;
 		tSettings.isEngineOwned = aInfo.isEngineOwned;
-		texture = Texture::import(path, tSettings);
+		AssetTexture = Texture::import(path, tSettings);
 
-		cachedTextures.insert({ path, texture });
+		cachedTextures.insert({ path, AssetTexture });
 	}
 
-	return texture;
+	return AssetTexture;
 }
 
 Texture::TextureType ModelImporter::getTextureType(aiTextureType type)

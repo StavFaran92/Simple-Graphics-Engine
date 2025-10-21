@@ -7,7 +7,7 @@ struct EngineAPI SkyboxComponent : public Component
 {
 	SkyboxComponent() = default;
 
-	SkyboxComponent(ResourceWrapper<Texture> skyboxImage);
+	SkyboxComponent(AssetWrapper<Texture> skyboxImage);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -15,12 +15,12 @@ struct EngineAPI SkyboxComponent : public Component
 
 	}
 
-	void setSkybox(ResourceWrapper<Texture> image);
+	void setSkybox(AssetWrapper<Texture> image);
 
 	void build();
 
 
-	ResourceWrapper<Texture> originalImage;
+	AssetWrapper<Texture> originalImage;
 	ResourceWrapper<Texture> cubemap;
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 };

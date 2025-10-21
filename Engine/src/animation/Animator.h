@@ -12,17 +12,17 @@ class EngineAPI Animator : public Component
 {
 public:
 	Animator() = default;
-	Animator(ResourceWrapper<Animation> animation);
+	Animator(AssetWrapper<Animation> animation);
 	void update(float dt);
 	void getFinalBoneMatrices(const MeshCollection* meshCollection, std::vector<glm::mat4>& outFinalBoneMatrices) const;
-	void playAnimation(ResourceWrapper<Animation> animation);
+	void playAnimation(AssetWrapper<Animation> animation);
 	void setPlaybackSpeed(float playbackSpeed);
 
-	void addAnimation(const std::string& name, ResourceWrapper<Animation> animation);
+	void addAnimation(const std::string& name, AssetWrapper<Animation> animation);
 	void removeAnimation(const std::string& name);
 	void playAnimation(const std::string& name);
-	ResourceWrapper<Animation> getAnimation(const std::string& name);
-	const std::map<std::string, ResourceWrapper<Animation>>& getAllAnimations() const;
+	AssetWrapper<Animation> getAnimation(const std::string& name);
+	const std::map<std::string, AssetWrapper<Animation>>& getAllAnimations() const;
 	std::string getCurrentAnimationName() const;
 
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
@@ -33,13 +33,13 @@ public:
 	}
 
 	std::string m_currentAnimationName;
-	ResourceWrapper<Animation> m_currentAnimation;
+	AssetWrapper<Animation> m_currentAnimation;
 	float m_currentTime = 0.f;
 	std::unordered_map<std::string, glm::mat4> m_finalBoneMatrices;
 	float m_playbackSpeed = 1.f;
 
 private:
-	std::map<std::string, ResourceWrapper<Animation>> m_animations;
+	std::map<std::string, AssetWrapper<Animation>> m_animations;
 
 };
 

@@ -14,12 +14,12 @@ void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entity
 	}
 }
 
-SkyboxComponent::SkyboxComponent(ResourceWrapper<Texture> skyboxImage)
+SkyboxComponent::SkyboxComponent(AssetWrapper<Texture> skyboxImage)
 {
 	setSkybox(skyboxImage);
 }
 
-void SkyboxComponent::setSkybox(ResourceWrapper<Texture> image)
+void SkyboxComponent::setSkybox(AssetWrapper<Texture> image)
 {
 	originalImage = image;
 }
@@ -29,7 +29,7 @@ void SkyboxComponent::build()
 
 	// TODO check if orig image is cube and support cubemap load
 
-	cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(originalImage);
+	cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(originalImage.resource());
 
 	auto scene = Engine::get()->getContext()->getActiveScene().get();
 	auto irradianceMap = IBL::generateIrradianceMap(cubemap, scene);

@@ -19,7 +19,7 @@ struct MaterialAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
 	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
 };
 
 class EngineAPI Material : public ResourceBase
@@ -42,12 +42,12 @@ public:
 
 	bool hasTexture(Texture::TextureType textureType) const;
 
-	void setTexture(Texture::TextureType textureType, ResourceWrapper<Texture> textureHandler);
+	void setTexture(Texture::TextureType textureType, AssetWrapper<Texture> textureHandler);
 
 	void setName(const std::string& name);
 	std::string getName() const;
 
-	std::vector<ResourceWrapper<Texture>> getAllTextures() const;
+	std::vector<AssetWrapper<Texture>> getAllTextures() const;
 
 	ResourceWrapper<Material> clone(bool isEngineOwned) const;
 
@@ -63,9 +63,9 @@ public:
 		SERIALIZED_MEMBER(opacityFactor);
 	}
 
-	static ResourceWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
+	static AssetWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
 	static ResourceWrapper<Material> create();
-	static void updateAsset(const ResourceWrapper<Material>& material, AssetUpdateDescriptor desc);
+	static void updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc);
 
 protected:
 	void setTexturesInShader(ResourceWrapper<Shader>& shader);

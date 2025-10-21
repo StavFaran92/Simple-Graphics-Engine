@@ -13,12 +13,12 @@ struct EngineAPI MaterialComponent : public Component
 	auto begin() const { return materials.begin(); }
 	auto end() const { return materials.end(); }
 
-	void addMaterial(const ResourceWrapper<Material>& mat)
+	void addMaterial(const AssetWrapper<Material>& mat)
 	{
 		materials[count++] = mat;
 	}
 
-	void setMaterial(int index, const ResourceWrapper<Material>& mat)
+	void setMaterial(int index, const AssetWrapper<Material>& mat)
 	{
 		materials[index] = mat;
 	}
@@ -30,7 +30,7 @@ struct EngineAPI MaterialComponent : public Component
 		{
 			return Engine::get()->getDefaultMaterial();
 		}
-		return iter->second;
+		return iter->second.resource();
 	}
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene&)
@@ -44,7 +44,7 @@ struct EngineAPI MaterialComponent : public Component
 		SERIALIZED_MEMBER(count);
 	}
 
-	std::map<int, ResourceWrapper<Material>> materials;
+	std::map<int, AssetWrapper<Material>> materials;
 	int count = 0;
 
 };

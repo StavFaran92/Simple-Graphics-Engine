@@ -12,11 +12,11 @@ class EngineAPI ScriptComponent : public Component
 {
 public:
 	ScriptComponent() = default;
-	ScriptComponent(const ResourceWrapper<LuaScript>& script);
+	ScriptComponent(const AssetWrapper<LuaScript>& script);
 	void loadScript();
 
 	bool isValid() const;
-	ResourceWrapper<LuaScript>& getScript();
+	AssetWrapper<LuaScript>& getScript();
 
 	//std::string filepath;
 
@@ -29,7 +29,7 @@ public:
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
 
 
-	ResourceWrapper<LuaScript> script;
+	AssetWrapper<LuaScript> script;
 	Entity entity;
 
 

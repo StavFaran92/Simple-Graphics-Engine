@@ -11,10 +11,12 @@
 
 void FoliageComponent::build()
 {
+	auto foliageSpreadMap = m_foliageSpreadMap.resource();
+
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
 	pixelPerPatch = width / m_patchCount.x;
 
-	glm::vec2 ratio = glm::vec2(m_foliageSpreadMap->getWidth() / width, m_foliageSpreadMap->getHeight() / height);
+	glm::vec2 ratio = glm::vec2(foliageSpreadMap->getWidth() / width, foliageSpreadMap->getHeight() / height);
 
 	m_patches.clear();
 	m_patches.reserve(m_patchCount.x * m_patchCount.y);
@@ -38,8 +40,8 @@ void FoliageComponent::build()
 		terrain = terrainRef.tryGetComponent<Terrain>();
 	}
 
-	m_foliageSpreadMap->bind();
-	std::vector<GLubyte> pixels(m_foliageSpreadMap->getWidth() * m_foliageSpreadMap->getHeight());
+	foliageSpreadMap->bind();
+	std::vector<GLubyte> pixels(foliageSpreadMap->getWidth() * foliageSpreadMap->getHeight());
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
 	glPixelStorei(GL_PACK_ALIGNMENT, 4);
@@ -59,10 +61,10 @@ void FoliageComponent::build()
 				float xRelativeToImageOffset = xOffset * ratio.x;
 				float yRelativeToImageOffset = yOffset * ratio.y;
 
-				int xModOffset = (int)xRelativeToImageOffset % m_foliageSpreadMap->getHeight();
-				int yModOffset = (int)yRelativeToImageOffset % m_foliageSpreadMap->getWidth();
+				int xModOffset = (int)xRelativeToImageOffset % foliageSpreadMap->getHeight();
+				int yModOffset = (int)yRelativeToImageOffset % foliageSpreadMap->getWidth();
 
-				int xIndexOffset = xModOffset * m_foliageSpreadMap->getWidth();
+				int xIndexOffset = xModOffset * foliageSpreadMap->getWidth();
 				int yIndexOffset = yModOffset;
 
 				int index = (xIndexOffset + yIndexOffset) % pixels.size();

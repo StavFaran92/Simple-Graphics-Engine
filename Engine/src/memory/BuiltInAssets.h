@@ -20,7 +20,7 @@ class BuiltInAssets
 {
 public:
 	template<typename T>
-	static ResourceWrapper<T> get(const UUID& uuid)
+	static AssetWrapper<T> get(const UUID& uuid)
 	{
 		if (!Engine::get()->getSubSystem<Assets>()->hasAsset(uuid))
 		{
@@ -31,14 +31,14 @@ public:
 	}
 
 	template<typename T>
-	static ResourceWrapper<T> getByName(const std::string& name)
+	static AssetWrapper<T> getByName(const std::string& name)
 	{
 		UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromName(name);
 		return get<T>(uuid);
 	}
 
 	template<typename T>
-	static ResourceWrapper<T> getByPath(const std::string& path)
+	static AssetWrapper<T> getByPath(const std::string& path)
 	{
 		UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(path);
 		return get<T>(uuid);

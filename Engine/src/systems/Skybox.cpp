@@ -59,14 +59,14 @@ Entity Skybox::CreateSkyboxFromEquirectangularMap(const std::string& equirectnag
 
     //texture = TextureTransformer::flipVertical(texture);
 
-    auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(equirectnagularMap);
+    auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(equirectnagularMap.resource());
 
     auto entity = scene->createEntity();
 
     return createSkyboxHelper(cubemap, equirectnagularMap, entity, scene);
 }
 
-Entity Skybox::loadSkybox(ResourceWrapper<Texture> equirectnagularMap, Entity& entity, Scene* scene)
+Entity Skybox::loadSkybox(AssetWrapper<Texture> equirectnagularMap, Entity& entity, Scene* scene)
 {
     if (!scene)
     {
@@ -75,7 +75,7 @@ Entity Skybox::loadSkybox(ResourceWrapper<Texture> equirectnagularMap, Entity& e
 
     //equirectnagularMap = TextureTransformer::flipVertical(equirectnagularMap);
 
-    auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(equirectnagularMap);
+    auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(equirectnagularMap.resource());
 
     return createSkyboxHelper(cubemap, equirectnagularMap, entity, scene);
 }
@@ -98,7 +98,7 @@ Entity Skybox::CreateSkyboxFromCubemap(const SkyboxFaces& faces, Scene* scene)
     return loadSkybox(equirectangularMap, entity, scene);
 }
 
-Entity Skybox::createSkyboxHelper(ResourceWrapper<Texture> cubemap, ResourceWrapper<Texture> equirectangularMap, Entity& entity, Scene* scene)
+Entity Skybox::createSkyboxHelper(AssetWrapper<Texture> cubemap, AssetWrapper<Texture> equirectangularMap, Entity& entity, Scene* scene)
 {
     if (!scene)
     {
@@ -106,10 +106,10 @@ Entity Skybox::createSkyboxHelper(ResourceWrapper<Texture> cubemap, ResourceWrap
     }
 
     // Create irradiance map using created cubemap
-    auto irradianceMap = IBL::generateIrradianceMap(cubemap, scene);
+    auto irradianceMap = IBL::generateIrradianceMap(cubemap.resource(), scene);
 
     // Create prefilter env map using created cubemap
-    auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemap, scene);
+    auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemap.resource(), scene);
 
     scene->setIBLData(irradianceMap, prefilterEnvMap);
 

@@ -217,7 +217,8 @@ void Assets::loadAssetsDatabase()
 
 	for (auto& assetInfo : assets)
 	{
-		assetInfo.data = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
+		//assetInfo.data = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
+		AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
 }
@@ -273,7 +274,7 @@ UUID Assets::getAssetFromName(const std::string& name) const
 	return Engine::get()->getMemoryManagementSystem()->getUUIDFromName(name);
 }
 
-void Assets::updateAsset(const ResourceWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc)
+void Assets::updateAsset(const AssetWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc)
 {
 	AssetInfo aInfo = getAsset(asset.getUID());
 	aInfo.update(uDesc);
@@ -282,12 +283,12 @@ void Assets::updateAsset(const ResourceWrapper<ResourceBase>& asset, const Asset
 	updateRegistry(aInfo);
 
 	m_assets[aInfo.uuid] = aInfo;
-	asset.get()->m_assetInfo = aInfo;
+	asset.resource().get()->m_assetInfo = aInfo;
 
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 }
 
-ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
+AssetWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
 {
 	desc.origFilePath = fileLocation;
 	AssetInfo aInfo(desc);
@@ -296,45 +297,48 @@ ResourceWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocatio
 	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
 	{
 		logError("Invalid asset path specified.");
-		return ResourceWrapper<ResourceBase>::empty;
+		return AssetWrapper<ResourceBase>::empty;
 	}
 
 	// Copy + Paste
 	if (!AssetFactory::getManager(aInfo.aType)->copyFiles(fileLocation, aInfo))
 	{
 		logError("Failed to copy file from {} to resource folder", fileLocation);
-		return ResourceWrapper<ResourceBase>::empty;
+		return AssetWrapper<ResourceBase>::empty;
 	}
 
 	// Load
-	ResourceWrapper<ResourceBase> asset = AssetFactory::getManager(aInfo.aType)->load(aInfo);
-	if (asset.isEmpty() || !asset.get())
+	ResourceWrapper<ResourceBase> resource = AssetFactory::getManager(aInfo.aType)->load(aInfo);
+	if (resource.isEmpty() || !resource.get())
 	{
 		logError("Failed to load file {}", fileLocation);
-		return ResourceWrapper<ResourceBase>::empty;
+		return AssetWrapper<ResourceBase>::empty;
 	}
-
-	aInfo.data = asset;
 
 	// Add Asset
 	addAsset(aInfo);
-	asset.get()->m_assetInfo = aInfo;
+
+	AssetWrapper<ResourceBase> asset = AssetWrapper<ResourceBase>::promoteToAsset(resource);
+	asset.resource().get()->m_assetInfo = aInfo;
+	aInfo.data = asset;
 
 	return asset;
 }
 
-ResourceWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc)
+AssetWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& resource, AssetCreateDescriptor& desc)
 {
 	AssetInfo aInfo(desc);
-	aInfo.uuid = asset.getUID(); // dirty Hack, used since assetInfo will generate a uuid upon create, not desired behaviour for create
+	aInfo.uuid = resource.getUID(); // dirty Hack, used since assetInfo will generate a uuid upon create, not desired behaviour for create
+
+	AssetWrapper<ResourceBase> asset = AssetWrapper<ResourceBase>::promoteToAsset(resource);
 
 	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
 
-	asset.get()->m_assetInfo = aInfo;
+	asset.resource().get()->m_assetInfo = aInfo;
 	aInfo.data = asset;
 	addAsset(aInfo);
 
-	return asset;
+	return aInfo.data;
 }
 
 // TODO maybe remove this to a resource loader? doesnt really belong here...

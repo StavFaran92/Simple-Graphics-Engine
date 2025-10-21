@@ -27,7 +27,7 @@ bool FoliageSystem::init()
 
 	ModelImportSettings settings;
 	settings.isEngineOwned = true;
-	m_grassBlade = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings);;
+	m_grassBlade = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings).resource();
 
 	glGenBuffers(1, &m_frustumUBO);
 
@@ -61,7 +61,7 @@ bool FoliageSystem::init()
 		Texture::TextureAssetDescriptor tSettings;
 		tSettings.flip = true;
 		tSettings.isEngineOwned = true;
-		grassTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
+		grassTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings).resource();
 	}
 
 	{
@@ -71,7 +71,7 @@ bool FoliageSystem::init()
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
 		noiseSettings.isEngineOwned = true;
-		windNoise = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings);
+		windNoise = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings).resource();
 	}
 
 	{
@@ -81,7 +81,7 @@ bool FoliageSystem::init()
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
 		noiseSettings.isEngineOwned = true;
-		noiseTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
+		noiseTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings).resource();
 	}
 
 	return true;
@@ -175,7 +175,7 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	foliageShader->setUniformValue("colorA", foliage.colorA);
 	foliageShader->setUniformValue("colorB", foliage.colorB);
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
-	foliageShader->setTextureInShader(foliage.m_foliageSpreadMap, "densityMap", 1);
+	foliageShader->setTextureInShader(foliage.m_foliageSpreadMap.resource(), "densityMap", 1);
 	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);
 	foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 

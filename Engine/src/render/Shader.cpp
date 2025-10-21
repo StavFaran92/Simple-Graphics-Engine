@@ -54,7 +54,7 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 	return shader;
 }
 
-void ShaderAssetManager::save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+void ShaderAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
 {
 	auto& projectDir = Engine::get()->getProjectDirectory();
 	const std::string relativeFilepath = "/" + aInfo.relativefilePath;
@@ -542,7 +542,7 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	return shader;
 }
 
-ResourceWrapper<Shader> Shader::import(const std::string& fileLocation, ShaderAssetDescriptor desc)
+AssetWrapper<Shader> Shader::import(const std::string& fileLocation, ShaderAssetDescriptor desc)
 {
 	desc.aType = AssetType::SHADER;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Shader>();

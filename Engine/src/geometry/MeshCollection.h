@@ -13,7 +13,7 @@ struct MeshCollectionAssetManager : public AssetManager
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
 	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
 	std::map<int, ResourceWrapper<Material>> getLoadedMaterials();
-	void save(const ResourceWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
 
 private:
 	ModelImporter::ModelInfo m_lastLoadedModelInfo;
@@ -36,7 +36,7 @@ public:
 
 	int getBoneID(const std::string& boneName) const;
 
-	static ResourceWrapper<MeshCollection> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
+	static AssetWrapper<MeshCollection> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
 
 	static std::map<int, ResourceWrapper<Material>> getLastLoadedMaterials();
 	

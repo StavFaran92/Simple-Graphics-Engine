@@ -218,7 +218,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             continue;
 
         }
-        ResourceWrapper<Shader> shader = shaderComponent.m_customShader;
+        ResourceWrapper<Shader> shader = shaderComponent.m_customShader.resource();
         shader->use();
         graphics->shader = shader;
 
@@ -229,11 +229,11 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
             if (shaderComponent.projection == ShaderComponent::DefaultProjection)
             {
-                meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
+                meshCollecton = entityHandler.getComponent<MeshComponent>().mesh.resource();
             }
             else if (shaderComponent.projection == ShaderComponent::Texture2D)
             {
-                meshCollecton = m_quad.getComponent<MeshComponent>().mesh;
+                meshCollecton = m_quad.getComponent<MeshComponent>().mesh.resource();
             }
 
             // fill bone animation data
@@ -351,11 +351,11 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
             if (shaderComponent.projection == ShaderComponent::DefaultProjection)
             {
-                meshCollecton = entityHandler.getComponent<MeshComponent>().mesh;
+                meshCollecton = entityHandler.getComponent<MeshComponent>().mesh.resource();
             }
             else if (shaderComponent.projection == ShaderComponent::Texture2D)
             {
-                meshCollecton = m_quad.getComponent<MeshComponent>().mesh;
+                meshCollecton = m_quad.getComponent<MeshComponent>().mesh.resource();
             }
 
             for (auto mesh : meshCollecton.get()->getMeshes())

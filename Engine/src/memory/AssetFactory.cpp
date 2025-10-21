@@ -2,8 +2,6 @@
 
 #include "memory/Asset.h"
 
-//std::map<AssetType, AssetFactory::LoadFn> AssetFactory::loadFunctionsRegistry;
-
 std::map<AssetType, std::shared_ptr<AssetManager>>& AssetFactory::getManagerRegistry()
 {
     static std::map<AssetType, std::shared_ptr<AssetManager>> registry;

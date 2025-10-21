@@ -12,15 +12,15 @@ struct LuaScriptAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
 	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const ResourceWrapper<ResourceBase>& script, const AssetInfo& aInfo) override;
+	void save(const AssetWrapper<ResourceBase>& script, const AssetInfo& aInfo) override;
 };
 
 class EngineAPI LuaScript : public ResourceBase
 {
 public:
-	static ResourceWrapper<LuaScript> import(const std::string& fileLocation, LuaScriptImportSettings settings = {});
+	static AssetWrapper<LuaScript> import(const std::string& fileLocation, LuaScriptImportSettings settings = {});
 	static ResourceWrapper<LuaScript> create();
-	static void updateAsset(const ResourceWrapper<LuaScript>& script, AssetUpdateDescriptor desc);
+	static void updateAsset(const AssetWrapper<LuaScript>& script, AssetUpdateDescriptor desc);
 
 	std::string filepath;
 };

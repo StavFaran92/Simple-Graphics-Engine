@@ -48,7 +48,7 @@ ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
 	return ResourceWrapper<Prefab>::empty;
 }
 
-void PrefabAssetManager::save(const ResourceWrapper<ResourceBase>& prefab, const AssetInfo& aInfo)
+void PrefabAssetManager::save(const AssetWrapper<ResourceBase>& prefab, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
@@ -56,7 +56,7 @@ void PrefabAssetManager::save(const ResourceWrapper<ResourceBase>& prefab, const
 
 	try
 	{
-		oarchive(*prefab.as<Prefab>().get());
+		oarchive(*prefab.as<Prefab>().resource().get());
 	}
 	catch (const cereal::Exception& e)
 	{
@@ -64,7 +64,7 @@ void PrefabAssetManager::save(const ResourceWrapper<ResourceBase>& prefab, const
 	}
 }
 
-ResourceWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabImportSettings desc)
+AssetWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabImportSettings desc)
 {
 	desc.aType = AssetType::PREFAB;
 	desc.origFilePath = fileLocation;

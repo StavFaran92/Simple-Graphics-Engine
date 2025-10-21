@@ -38,9 +38,9 @@ std::map<int, ResourceWrapper<Material>> MeshCollectionAssetManager::getLoadedMa
 	return m_lastLoadedModelInfo.materials;
 }
 
-void MeshCollectionAssetManager::save(const ResourceWrapper<ResourceBase>& mesh, const AssetInfo& aInfo)
+void MeshCollectionAssetManager::save(const AssetWrapper<ResourceBase>& mesh, const AssetInfo& aInfo)
 {
-	MeshExporter::exportMesh(aInfo, mesh.as<MeshCollection>());
+	MeshExporter::exportMesh(aInfo, mesh.as<MeshCollection>().resource());
 }
 
 void MeshCollection::addMesh(const std::shared_ptr<Mesh>& mesh)
@@ -96,7 +96,7 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 	return m_bonesNameToIDMap.at(boneName);
 }
 
-ResourceWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, ModelImportSettings desc)
+AssetWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, ModelImportSettings desc)
 {
 	desc.aType = AssetType::MESH;
 	desc.assetDirectory = std::filesystem::path(fileLocation).filename().stem().generic_string();
