@@ -33,9 +33,10 @@ ResourceWrapper<ResourceBase> MeshCollectionAssetManager::load(AssetInfo& aInfo)
 	return generatedMesh;
 }
 
-std::map<int, ResourceWrapper<Material>> MeshCollectionAssetManager::getLoadedMaterials()
+std::map<int, AssetWrapper<Material>> MeshCollectionAssetManager::getLoadedMaterials()
 {
-	return m_lastLoadedModelInfo.materials;
+	//return m_lastLoadedModelInfo.materials;
+	return Engine::get()->getSubSystem<ModelImporter>()->getLastImportedMaterial().materials;
 }
 
 void MeshCollectionAssetManager::save(const AssetWrapper<ResourceBase>& mesh, const AssetInfo& aInfo)
@@ -104,7 +105,7 @@ AssetWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocat
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MeshCollection>();
 }
 
-std::map<int, ResourceWrapper<Material>> MeshCollection::getLastLoadedMaterials()
+std::map<int, AssetWrapper<Material>> MeshCollection::getLastLoadedMaterials()
 {
 	return dynamic_cast<MeshCollectionAssetManager*>(AssetFactory::getManager(AssetType::MESH))->getLoadedMaterials(); // todo fix
 }

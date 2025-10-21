@@ -6,7 +6,7 @@
 class AssetInfo;
 
 template<typename T>
-class EngineAPI AssetWrapper
+class AssetWrapper
 { 
 public:
 	static AssetWrapper<T> empty;

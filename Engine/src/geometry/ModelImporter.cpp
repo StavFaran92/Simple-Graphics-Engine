@@ -154,7 +154,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 	std::string modelName = std::filesystem::path(aInfo.relativefilePath).filename().stem().string();
 
 	// create new model session
-	ModelImporter::ModelImportSession session;
+	ModelImporter::ModelLoadSession session;
 	session.filepath = aInfo.relativefilePath;
 	session.fileDir = std::filesystem::path(aInfo.relativefilePath).parent_path().string();
 	session.name = modelName;
@@ -240,6 +240,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 		return false;
 	}
 
+	m_lastImportedMaterials = LastImportedMaterials();
+
 	std::unordered_map<std::string, AssetWrapper<Texture>> cachedTextures;
 
 	// Import materials and textures
@@ -294,7 +296,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
-			Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo);
+			AssetWrapper<Material> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo).as<Material>();
+			m_lastImportedMaterials.materials[i] = materialAsset;
 		}
 	}
 
@@ -306,6 +309,11 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 
 	return true;
+}
+
+const ModelImporter::LastImportedMaterials& ModelImporter::getLastImportedMaterial() const
+{
+	return m_lastImportedMaterials;
 }
 
 void ModelImporter::processNode(const aiScene* scene, aiNode* node)

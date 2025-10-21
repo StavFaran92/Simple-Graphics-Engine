@@ -214,7 +214,7 @@ void Scene::init(Context* context)
 
 	m_skyboxShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SkyboxShader.glsl");
 
-	m_basicBox = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
+	m_basicBox = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX).resource();
 
 	addRenderView("Game View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 
@@ -465,7 +465,7 @@ void Scene::draw(float deltaTime)
 
 				for (int i = 0; i < textureCount; i++)
 				{
-					auto texture = terrain.getTexture(i);
+					auto texture = terrain.getTexture(i).resource();
 					texture.get()->setSlot(i + 1);
 					texture.get()->bind();
 					m_terrainShader->setUniformValue("texture_" + std::to_string(i), i + 1);
@@ -546,20 +546,20 @@ void Scene::draw(float deltaTime)
 				// TODO assert post process shader
 
 				// bind shader
-				shader.m_customShader->use();
+				shader.m_customShader.resource()->use();
 
 				// read texture from graphics FBO
-				shader.m_customShader->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
+				shader.m_customShader.resource()->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
 
-				shader.m_customShader->setModelMatrix(glm::mat4(1.0));
-				shader.m_customShader->setViewMatrix(graphics->view);
-				shader.m_customShader->setProjectionMatrix(graphics->projection);
+				shader.m_customShader.resource()->setModelMatrix(glm::mat4(1.0));
+				shader.m_customShader.resource()->setViewMatrix(graphics->view);
+				shader.m_customShader.resource()->setProjectionMatrix(graphics->projection);
 
 				auto viewport = renderView->getViewport();
-				shader.m_customShader->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
+				shader.m_customShader.resource()->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
 
-				shader.m_customShader->setUniformValue("cameraPos", graphics->cameraPos);
-				shader.m_customShader->setUniformValue("cameraLookAt", primaryCamera.front);
+				shader.m_customShader.resource()->setUniformValue("cameraPos", graphics->cameraPos);
+				shader.m_customShader.resource()->setUniformValue("cameraLookAt", primaryCamera.front);
 
 				// bind mesh
 				auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();
@@ -623,7 +623,7 @@ void Scene::draw(float deltaTime)
 						m_highlightMaskShader->setViewMatrix(graphics->view);
 						m_highlightMaskShader->setProjectionMatrix(graphics->projection);
 
-						for (auto& m : mesh->mesh->getMeshes())
+						for (auto& m : mesh->mesh.resource()->getMeshes())
 							RenderCommand::draw(m->getVAO());
 
 						glPopDebugGroup();

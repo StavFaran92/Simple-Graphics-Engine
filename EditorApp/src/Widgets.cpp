@@ -14,7 +14,7 @@ void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(UUID uu
 	displayTextureSelectDialog();
 }
 
-void addTextureEditWidget(ResourceWrapper<Texture> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
+void addTextureEditWidget(AssetWrapper<Texture> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
 	int texID = 0;
 	if (!texture.isEmpty())
@@ -31,16 +31,16 @@ void addTextureEditWidget(ResourceWrapper<Texture> texture, ImVec2 size, std::fu
 	displayTextureSelectDialog();
 }
 
-void addTextureEditWidget(ResourceWrapper<Material> mat, const std::string& name, Texture::TextureType ttype)
+void addTextureEditWidget(AssetWrapper<Material> mat, const std::string& name, Texture::TextureType ttype)
 {
-	ResourceWrapper<Texture> tex = ResourceWrapper<Texture>::empty;
-	if (mat->hasTexture(ttype))
+	AssetWrapper<Texture> tex = AssetWrapper<Texture>::empty;
+	if (mat.resource()->hasTexture(ttype))
 	{
-		tex = mat->getSampler(ttype)->texture;
+		tex = mat.resource()->getSampler(ttype)->texture;
 	}
 
 	addTextureEditWidget(tex, { 20, 20 }, [=](UUID uuid) {
-		mat.get()->setTexture(ttype, ResourceWrapper<Texture>(uuid));
+		mat.get()->setTexture(ttype, AssetWrapper<Texture>(uuid));
 		});
 
 	ImGui::SameLine();
@@ -48,12 +48,12 @@ void addTextureEditWidget(ResourceWrapper<Material> mat, const std::string& name
 	ImGui::Text(name.c_str());
 }
 
-void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype)
+void addSamplerEditWidget(AssetWrapper<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype)
 {
 	ImGui::PushID(name.c_str());
 
 	int texID = 0;
-	auto sampler = mat->getSampler(ttype);
+	auto sampler = mat.resource()->getSampler(ttype);
 
 	if (!sampler->texture.isEmpty())
 	{
@@ -79,7 +79,7 @@ void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std:
 
 		ImGui::Text("Texture");
 		addTextureEditWidget(EditorState::Instance().selectedSampler->texture, ImVec2{ 150, 150 }, [=](UUID uuid) {
-			EditorState::Instance().selectedSampler->texture = ResourceWrapper<Texture>(uuid);
+			EditorState::Instance().selectedSampler->texture = AssetWrapper<Texture>(uuid);
 			});
 
 		ImGui::Spacing();
@@ -119,7 +119,7 @@ void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std:
 
 		if (ImGui::Button("Cancel"))
 		{
-			mat->setSampler(ttype, EditorState::Instance().previousSampler);
+			mat.resource()->setSampler(ttype, EditorState::Instance().previousSampler);
 			ImGui::CloseCurrentPopup();
 		}
 

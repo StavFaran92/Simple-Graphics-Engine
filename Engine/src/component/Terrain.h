@@ -35,8 +35,8 @@ public:
 
 	Terrain() = default;
 
-	AssetWrapper<MeshCollection> getMesh() const;
-	AssetWrapper<Texture> getHeightmap() const;
+	ResourceWrapper<MeshCollection> getMesh() const;
+	ResourceWrapper<Texture> getHeightmap() const;
 	float getHeightAtPoint(float x, float y) const;
 
 	float getScale() const;

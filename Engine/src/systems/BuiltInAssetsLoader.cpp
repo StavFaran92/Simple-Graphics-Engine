@@ -137,8 +137,11 @@ void BuiltInAssetsLoader::loadMeshes()
 	}
 
 	{
-		ResourceWrapper<MeshCollection> meshCollection = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae");
-		addAsAsset("SGE_MESH_CAMERA", meshCollection);
+		ModelImportSettings aInfo;
+		aInfo.aType = AssetType::MESH;
+		aInfo.name = "SGE_MESH_CAMERA";
+		aInfo.isEngineOwned = true;
+		MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", aInfo);
 	}
 }
 

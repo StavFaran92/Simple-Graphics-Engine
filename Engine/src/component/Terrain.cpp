@@ -74,9 +74,9 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, AssetWrappe
 	return terrain; // todo fix
 }
 
-AssetWrapper<MeshCollection> Terrain::getMesh() const
+ResourceWrapper<MeshCollection> Terrain::getMesh() const
 {
-	return m_mesh;
+	return m_mesh.resource();
 }
 
 float Terrain::getScale() const
@@ -84,9 +84,9 @@ float Terrain::getScale() const
 	return m_scale;
 }
 
-AssetWrapper<Texture> Terrain::getHeightmap() const
+ResourceWrapper<Texture> Terrain::getHeightmap() const
 {
-	return m_heightmap;
+	return m_heightmap.resource();
 }
 
 int Terrain::getWidth() const

@@ -37,7 +37,7 @@ struct ModelImportSettings : public AssetCreateDescriptor
 class EngineAPI ModelImporter
 {
 public:
-	struct ModelImportSession
+	struct ModelLoadSession
 	{
 		std::string filepath;
 		std::string fileDir;
@@ -48,6 +48,11 @@ public:
 		std::unordered_map<std::string, unsigned int> boneNameToIDMap;
 		unsigned int boneCount = 0;
 		ResourceWrapper<MeshCollection> mesh;
+	};
+
+	struct LastImportedMaterials
+	{
+		std::map<int, AssetWrapper<Material>> materials;
 	};
 
 	
@@ -82,6 +87,8 @@ public:
 
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo);
 
+	const LastImportedMaterials& getLastImportedMaterial() const;
+
 private:
 	friend class Engine;
 
@@ -92,8 +99,9 @@ private:
 	static Texture::TextureType getTextureType(aiTextureType type);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;
-	ModelImportSession m_currentSession;
+	ModelLoadSession m_currentSession;
 	std::shared_ptr<Assimp::Importer> m_importer = nullptr;
 
 	std::string m_lastLoadedSceneName;
+	LastImportedMaterials m_lastImportedMaterials;
 };

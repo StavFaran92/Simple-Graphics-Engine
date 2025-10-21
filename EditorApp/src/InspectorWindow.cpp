@@ -179,7 +179,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uid) {
-				meshComponent.mesh = ResourceWrapper<MeshCollection>(uid);
+				meshComponent.mesh = AssetWrapper<MeshCollection>(uid);
 			});
 			
 			
@@ -250,7 +250,7 @@ void InspectorWindow::display()
 				std::string matName = "None";
 				if (!mat.isEmpty())
 				{
-					matName = mat->getName();
+					matName = mat.resource()->getName();
 					if (matName.empty())
 					{
 						matName = "Material " + std::to_string(index);
@@ -258,7 +258,7 @@ void InspectorWindow::display()
 				}
 
 				addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
-					mat = ResourceWrapper<Material>(uid);
+					mat = AssetWrapper<Material>(uid);
 				});
 
 				++index;
@@ -313,7 +313,7 @@ void InspectorWindow::display()
 
 		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
 			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](UUID uuid) {
-				skybox.setSkybox(ResourceWrapper<Texture>(uuid));
+				skybox.setSkybox(AssetWrapper<Texture>(uuid));
 			});
 
 			// Compile Button
@@ -325,7 +325,7 @@ void InspectorWindow::display()
 
 		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
 			addTextureEditWidget(image.image, { 50, 50 }, [&](UUID uuid) {
-				image.image = ResourceWrapper<Texture>(uuid);
+				image.image = AssetWrapper<Texture>(uuid);
 				});
 			ImGui::DragFloat("posX", &image.position.x);
 			ImGui::DragFloat("posY", &image.position.y);
@@ -392,7 +392,7 @@ void InspectorWindow::display()
 					}
 
 					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uid) {
-						animator.addAnimation(name, ResourceWrapper<Animation>(uid));
+						animator.addAnimation(name, AssetWrapper<Animation>(uid));
 					});
 
 					bool isSelected = (index == activeAnimationIndex);
@@ -414,14 +414,14 @@ void InspectorWindow::display()
 			if (ImGui::Button("+")) {
 				int animationsCount = animations.size();
 				std::string newAnimationName = "New Animation_" + std::to_string(animationsCount);
-				animator.addAnimation(newAnimationName, ResourceWrapper<Animation>::empty);
+				animator.addAnimation(newAnimationName, AssetWrapper<Animation>::empty);
 				eState.animationRenameBuffers.push_back(newAnimationName);
 			}
 		});
 
 		displayComponent<Terrain>("Terrain", [](Terrain& terrain) {
 			addTextureEditWidget(terrain.m_heightmap, { 50, 50 }, [&](UUID uuid) {
-				terrain = Terrain::generateTerrain(terrain.m_width, terrain.m_height, terrain.m_scale, ResourceWrapper<Texture>(uuid));
+				terrain = Terrain::generateTerrain(terrain.m_width, terrain.m_height, terrain.m_scale, AssetWrapper<Texture>(uuid));
 			});
 			ImGui::DragInt("height", &terrain.m_height);
 			ImGui::DragInt("width", &terrain.m_width);
@@ -437,7 +437,7 @@ void InspectorWindow::display()
 				ImGui::PushID(i);
 				auto texture = terrain.getTexture(i);
 				addTextureEditWidget(texture, { 50, 50 }, [i, &terrain](UUID uuid) {
-					terrain.setTexture(i, ResourceWrapper<Texture>(uuid));
+					terrain.setTexture(i, AssetWrapper<Texture>(uuid));
 				});
 				ImGui::DragFloat("Height blend", &terrain.m_textureBlends[i].blend, .01f);
 				auto scale = terrain.getTextureScale(i);
@@ -466,7 +466,7 @@ void InspectorWindow::display()
 
 			if (!selectedShaderUID.empty())
 			{
-				shaderComponent.setShader(ResourceWrapper<Shader>(selectedShaderUID));
+				shaderComponent.setShader(AssetWrapper<Shader>(selectedShaderUID));
 			}
 
 			if (!shaderComponent.m_customShader.isEmpty())
@@ -478,7 +478,7 @@ void InspectorWindow::display()
 			// Compile Button
 			if (ImGui::Button("recompile"))
 			{
-				shaderComponent.m_customShader->recompile();
+				shaderComponent.m_customShader.resource()->recompile();
 				shaderComponent.update();
 			}
 
@@ -493,7 +493,7 @@ void InspectorWindow::display()
 				// Projection Texture
 				ImGui::Text("Projection Texture:");
 				addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](UUID uuid) {
-					shaderComponent.setProjectionTexture(ResourceWrapper<Texture>(uuid));
+					shaderComponent.setProjectionTexture(AssetWrapper<Texture>(uuid));
 				});
 			}
 
@@ -505,7 +505,7 @@ void InspectorWindow::display()
 					ImGui::PushID(name.c_str());
 					ImGui::Text(name.c_str());
 					addTextureEditWidget(texture, { 100,100 }, [&](UUID uuid) {
-						texture = ResourceWrapper<Texture>(uuid);
+						texture = AssetWrapper<Texture>(uuid);
 						});
 					ImGui::PopID();
 				}
@@ -563,7 +563,7 @@ void InspectorWindow::display()
 					// If the value changed, update the shader
 					if (updated)
 					{
-						shaderComponent.m_customShader->setUniformValue(name, value);
+						shaderComponent.m_customShader.resource()->setUniformValue(name, value);
 					}
 
 					ImGui::PopID();
@@ -574,7 +574,7 @@ void InspectorWindow::display()
 		displayComponent<FoliageComponent>("Foliage Component", [](FoliageComponent& foliage) {
 			// Compile Button
 			addTextureEditWidget(foliage.m_foliageSpreadMap, { 100,100 }, [&](UUID uuid) {
-				foliage.m_foliageSpreadMap = ResourceWrapper<Texture>(uuid);
+				foliage.m_foliageSpreadMap = AssetWrapper<Texture>(uuid);
 				});
 
 			ImGui::ColorEdit3("Bottom Color", (float*)&foliage.colorA);
@@ -607,7 +607,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uid) {
-				script.script = ResourceWrapper<LuaScript>(uid);
+				script.script = AssetWrapper<LuaScript>(uid);
 				});
 			});
 

@@ -256,7 +256,7 @@ void AssetViewWindow::display()
 
 					if (aInfo.aType == AssetType::MATERIAL)
 					{
-						ResourceWrapper<Material> mat = ResourceWrapper<Material>(uuid);
+						AssetWrapper<Material> mat = AssetWrapper<Material>(uuid);
 						if (mat.isEmpty())
 						{
 							logError("Asset cast to material failed.");
@@ -311,13 +311,13 @@ void AssetViewWindow::display()
 
 					if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
 					{
-						ResourceWrapper<Prefab> prefab = aInfo.data.as<Prefab>();
+						AssetWrapper<Prefab> prefab = aInfo.data.as<Prefab>();
 						if (prefab.isEmpty())
 						{
 							logWarning("Failed to cast asset to prefab asset.");
 							continue;
 						}
-						prefab->Instansiate();
+						prefab.resource()->Instansiate();
 						updateScene();
 
 					}

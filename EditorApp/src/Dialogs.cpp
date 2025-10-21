@@ -351,14 +351,14 @@ void displayMaterialEditDialog()
 	if (ImGui::BeginPopupModal("EditMaterial", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		auto& mat = EditorState::Instance().selectedMaterialForEdit;
-		ImGui::Text(mat->getName().c_str());
+		ImGui::Text(mat.resource()->getName().c_str());
 
 		ImGui::Dummy(ImVec2(0, 4));
 
-		ImGui::ColorEdit3("Base Color", glm::value_ptr(mat->colorDiffuse));
-		ImGui::DragFloat("Metallic", &mat->metallicFactor, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("Roughness", &mat->roughnessFactor, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("Opacity", &mat->opacityFactor, 0.01f, 0.0f, 1.0f);
+		ImGui::ColorEdit3("Base Color", glm::value_ptr(mat.resource()->colorDiffuse));
+		ImGui::DragFloat("Metallic", &mat.resource()->metallicFactor, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat("Roughness", &mat.resource()->roughnessFactor, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat("Opacity", &mat.resource()->opacityFactor, 0.01f, 0.0f, 1.0f);
 
 		addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
 		addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
@@ -379,7 +379,7 @@ void displayMaterialEditDialog()
 
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
-			mat = previousMaterial;
+			mat.resource() = previousMaterial;
 			ImGui::CloseCurrentPopup();
 		}
 
