@@ -27,7 +27,7 @@ public:
 			logWarning("Could not find asset {}", uuid.str());
 			return {};
 		}
-		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid).data.as<T>();
+		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid).data().as<T>();
 	}
 
 	template<typename T>

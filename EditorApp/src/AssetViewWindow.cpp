@@ -311,7 +311,7 @@ void AssetViewWindow::display()
 
 					if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
 					{
-						AssetWrapper<Prefab> prefab = aInfo.data.as<Prefab>();
+						AssetWrapper<Prefab> prefab = aInfo.data().as<Prefab>();
 						if (prefab.isEmpty())
 						{
 							logWarning("Failed to cast asset to prefab asset.");

@@ -277,5 +277,5 @@ glm::mat4 Mesh::getRestTransform() const
 
 Mesh::~Mesh()
 {
-	//logDebug( __FUNCTION__ );
+	logDebug( __FUNCTION__ );
 }

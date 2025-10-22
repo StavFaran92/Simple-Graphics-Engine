@@ -2,8 +2,7 @@
 
 #include "memory/ResourceWrapper.h"
 #include "core/Core.h"
-
-class AssetInfo;
+#include "memory/AssetInfo.h"
 
 template<typename T>
 class AssetWrapper
@@ -51,7 +50,7 @@ public:
 
 	const AssetInfo& info() const
 	{
-		//return m_assetInfo; TODO fix
+		return Engine::get()->getSubSystem<Assets>()->getAsset(m_resource.getUID()); 
 	}
 
 	inline T* get() const

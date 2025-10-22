@@ -2,7 +2,7 @@
 
 #include "core/Engine.h"
 #include "memory/ResourceWrapper.h"
-#include "memory/AssetWrapper.h"
+#include "memory/AssetInfo.h"
 #include "core/Core.h"
 #include "core/Configurations.h"
 
@@ -36,33 +36,6 @@ struct EngineAPI AssetUpdateDescriptor
 	std::string assetDirectory;
 	std::map<std::string, std::string> attributes;
 	std::string name;
-};
-
-struct EngineAPI AssetInfo
-{
-	bool isValid = false;
-	std::string relativefilePath;
-	std::string fullFilePath;
-	std::string fileName;
-	std::string ext;
-	UUID uuid = EMPTY_UUID;
-	std::string origFilePath;
-	std::string assetDirectory;
-	AssetType aType = AssetType::NONE;
-	std::map<std::string, std::string> attributes;
-	std::string name;
-	bool isEngineOwned = false;
-	bool isTransient = false;
-	nlohmann::json importSettings;
-	AssetWrapper<ResourceBase> data = AssetWrapper<ResourceBase>::empty;
-
-	~AssetInfo() = default;
-
-	AssetInfo() = default;
-
-	AssetInfo(const AssetCreateDescriptor& assetDesc);
-	void update(const AssetUpdateDescriptor& desc);
-	void establishFilepath();
 };
 
 class EngineAPI Assets

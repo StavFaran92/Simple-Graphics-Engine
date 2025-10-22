@@ -33,7 +33,6 @@ bool AssetFactory::loadAsset(AssetInfo& aInfo)
 		logError("Invalid asset type in regsitry, did you forget to register your load function?");
 		return false;
 	}
-	aInfo.data = iter->second(aInfo);
 
 	return true;
 }
