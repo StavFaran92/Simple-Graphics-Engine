@@ -5,6 +5,7 @@
 #include "memory/UUID.h"
 #include "core/Configurations.h"
 #include "memory/ResourceBase.h"
+#include "memory/ResourceWrapper.h"
 
 struct AssetCreateDescriptor;
 struct AssetUpdateDescriptor;
@@ -29,7 +30,7 @@ struct EngineAPI AssetInfo
 	bool isEngineOwned = false;
 	bool isTransient = false;
 	nlohmann::json importSettings;
-	//AssetWrapper<ResourceBase> data = AssetWrapper<ResourceBase>::empty;
+	ResourceWrapper<ResourceBase> resource = ResourceWrapper<ResourceBase>::empty;
 
 	~AssetInfo() = default;
 

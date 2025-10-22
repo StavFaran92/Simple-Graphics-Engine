@@ -179,10 +179,12 @@ AssetWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, 
 		return AssetWrapper<ResourceBase>::empty;
 	}
 
+	aInfo.resource = resource;
+
 	// Add Asset
 	addAsset(aInfo);
 
-	AssetWrapper<ResourceBase> asset = AssetWrapper<ResourceBase>::promoteToAsset(resource);
+	AssetWrapper<ResourceBase> asset(aInfo.uuid);
 
 	return asset;
 }
@@ -190,13 +192,13 @@ AssetWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, 
 AssetWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& resource, AssetCreateDescriptor& desc)
 {
 	AssetInfo aInfo(desc);
-	aInfo.uuid = resource.getUID(); // dirty Hack, used since assetInfo will generate a uuid upon create, not desired behaviour for create
+	//aInfo.uuid = resource.getUID(); // dirty Hack, used since assetInfo will generate a uuid upon create, not desired behaviour for create
 
-	AssetWrapper<ResourceBase> asset = AssetWrapper<ResourceBase>::promoteToAsset(resource);
+	AssetWrapper<ResourceBase> asset(aInfo.uuid);
+	aInfo.resource = resource;
+	addAsset(aInfo);
 
 	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
-
-	addAsset(aInfo);
 
 	return asset;
 }

@@ -398,7 +398,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     model = glm::scale(model, glm::vec3(extents.x, extents.y, extents.z));
                     m_debugVisualizeShader->setModelMatrix(model);
                     auto& mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
-                    auto vao = mesh->getPrimaryMesh()->getVAO();
+                    auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
                 }
 
@@ -408,7 +408,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     model = glm::scale(model, glm::vec3(radius2));
                     m_debugVisualizeShader->setModelMatrix(model);
                     auto& mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_SPHERE);
-                    auto vao = mesh->getPrimaryMesh()->getVAO();
+                    auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
                 }
             }

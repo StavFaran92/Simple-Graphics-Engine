@@ -12,78 +12,67 @@ public:
 
 	AssetWrapper() = default;
 
-	AssetWrapper(UUID uid) : m_resource(uid)
+	AssetWrapper(UUID uuid) : uuid(uuid)
 	{};
 
 	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
 	AssetWrapper<U> as() const
 	{
-		return AssetWrapper<U>(m_resource.getUID());
+		return AssetWrapper<U>(uuid);
 	}
 
 	// Upcast (texture -> asset)
 	template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
 	AssetWrapper(const AssetWrapper<U>& other)
 	{
-		m_resource = ResourceWrapper<T>(other.resource().getUID());
+		uuid = other.getUID();
 	}
 
-	const ResourceWrapper<T>& resource() const
+	const ResourceWrapper<T> resource() const
 	{
-		return m_resource;
+		return info().resource.as<T>();
 	}
 
-	ResourceWrapper<T>& resource()
+	ResourceWrapper<T> resource()
 	{
-		return m_resource;
+		return info().resource.as<T>();
 	}
 
 	UUID getUID() const
 	{
-		return m_resource.getUID();
+		return uuid;
 	}
 
 	bool isEmpty() const
 	{
-		return m_resource.isEmpty();
+		return resource().isEmpty();
 	}
 
-	const AssetInfo& info() const
+	AssetInfo info() const
 	{
-		return Engine::get()->getSubSystem<Assets>()->getAsset(m_resource.getUID()); 
+		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 	}
 
 	inline T* get() const
 	{
-		return m_resource.get();
+		return resource().get();
 	}
 
 	template <class Archive>
-	void save(Archive& archive) const {
-		archive(CEREAL_NVP(m_resource.getUID()));
-	}
-
-	template <class Archive>
-	void load(Archive& archive) {
-		UUID uuid;
-		archive(CEREAL_NVP(uuid));
-
-		m_resource = ResourceWrapper<T>(uuid);
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(uuid);
 	}
 
 private:
-	//AssetInfo m_assetInfo;
-
+	UUID uuid = EMPTY_UUID;
 private:
 	template<typename T>friend class Factory;
 	friend class Assets;
 
-	static AssetWrapper<T> promoteToAsset(const ResourceWrapper<T>& resource)
-	{
-		return AssetWrapper<T>(resource.getUID());
-	}
-
-	ResourceWrapper<T> m_resource = ResourceWrapper<T>::empty;
+	//static AssetWrapper<T> promoteToAsset(const ResourceWrapper<T>& resource)
+	//{
+	//	return AssetWrapper<T>(resource.getUID());
+	//}
 };
 
 template<typename T>
