@@ -13,7 +13,9 @@ public:
 	AssetWrapper() = default;
 
 	AssetWrapper(UUID uuid) : uuid(uuid)
-	{};
+	{
+		m_resource = resource();
+	};
 
 	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
 	AssetWrapper<U> as() const
@@ -26,6 +28,7 @@ public:
 	AssetWrapper(const AssetWrapper<U>& other)
 	{
 		uuid = other.getUID();
+		m_resource = resource();
 	}
 
 	const ResourceWrapper<T> resource() const
@@ -65,6 +68,9 @@ public:
 
 private:
 	UUID uuid = EMPTY_UUID;
+
+	// Used mainly for debug
+	ResourceWrapper<T> m_resource = ResourceWrapper<T>::empty;
 private:
 	template<typename T>friend class Factory;
 	friend class Assets;

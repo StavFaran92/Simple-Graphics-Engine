@@ -182,8 +182,8 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 			}
 
 			UUID uuid = std::stoi(iter->second); // todo ptotect
-			ResourceWrapper<Material> material = ResourceWrapper<Material>(uuid);
-			modelInfo.materials[i] = material;
+			AssetWrapper<Material> material = AssetWrapper<Material>(uuid);
+			modelInfo.materials[i] = material.resource();
 		}
 	}
 }
@@ -255,7 +255,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 			// get uuid using tex name from association map
 			auto& material = Material::create();
-			aInfo.attributes[materialID] = material.getUID();
+			
 			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
 			material->setName(materialName);
 
@@ -298,6 +298,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			materialAssetInfo.aType = AssetType::MATERIAL;
 			AssetWrapper<Material> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo).as<Material>();
 			m_lastImportedMaterials.materials[i] = materialAsset;
+			aInfo.attributes[materialID] = materialAsset.getUID();
 		}
 	}
 
