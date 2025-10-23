@@ -173,17 +173,45 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 
 			//PrintMaterialProperties(aMaterial);
 
-			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
-			auto iter = aInfo.attributes.find(materialID);
-			if (iter == aInfo.attributes.end())
+			for (const auto& [key, value] : aInfo.attributes)
 			{
-				logWarning("Could not locate material: {}", materialID);
-				continue;
-			}
+				// Look for _MAT_ in the attribute key
+				const std::string tag = "_MAT_";
+				size_t pos = key.find(tag);
+				if (pos == std::string::npos)
+					continue; // not a material attribute
 
-			UUID uuid = std::stoi(iter->second); // todo ptotect
-			AssetWrapper<Material> material = AssetWrapper<Material>(uuid);
-			modelInfo.materials[i] = material.resource();
+				// Extract index: key format is NAME_MAT_X
+				// so we read everything after "_MAT_"
+				size_t indexPos = pos + tag.length();
+				std::string indexStr = key.substr(indexPos);
+
+				// Convert to integer safely
+				int matIndex = -1;
+				try {
+					matIndex = std::stoi(indexStr);
+				}
+				catch (...) {
+					logError("Invalid material index for attribute '{}'", key);
+					continue;
+				}
+
+				// Convert attribute value to UUID
+				UUID uuid;
+				try {
+					uuid = UUID(std::stoull(value));
+				}
+				catch (...) {
+					logError("Invalid UUID for material '{}'", key);
+					continue;
+				}
+
+				// Load material asset
+				AssetWrapper<Material> material(uuid);
+				modelInfo.materials[matIndex] = material.resource();
+
+				logDebug("Assigned material index {} -> UUID {}", matIndex, uuid);
+			}
 		}
 	}
 }
