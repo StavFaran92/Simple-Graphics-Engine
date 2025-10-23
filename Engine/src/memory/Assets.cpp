@@ -82,8 +82,7 @@ void Assets::loadAssetsDatabase()
 
 	for (auto& assetInfo : assets)
 	{
-		//assetInfo.data = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
-		AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
+		assetInfo.resource = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
 }
