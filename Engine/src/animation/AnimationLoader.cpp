@@ -97,13 +97,15 @@ ResourceWrapper<Animation> AnimationLoader::load(const AssetInfo& aInfo)
     std::unordered_map<std::string, std::shared_ptr<Bone>> bones;
     readAnimationBones(aiAnimation, bones);
 
-    Animation* anim = new Animation();
+    ResourceWrapper<Animation> anim = Factory<Animation>::create();
+
+    //Animation* anim = new Animation();
     anim->build(aiAnimation->mName.C_Str(), (float)aiAnimation->mDuration, (float)aiAnimation->mTicksPerSecond, rootNode, bones);
 
-    Engine::get()->getMemoryPool().add(aInfo.uuid, anim);
-    auto& res = ResourceWrapper<Animation>(aInfo.uuid);
+    //Engine::get()->getMemoryPool().add(aInfo.uuid, anim);
+    //auto& res = ResourceWrapper<Animation>(aInfo.uuid);
 
-    return res;
+    return anim;
 }
 
 bool AnimationLoader::copyFileToResourceFolder(const std::string& fileLocation, const AssetInfo& aInfo)

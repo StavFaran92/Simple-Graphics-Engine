@@ -31,13 +31,13 @@ ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ifstream is(projectDir + aInfo.relativefilePath);
 	cereal::JSONInputArchive iarchive(is);
-	Prefab* loadedPrefab = new Prefab();
+
+	ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
 
 	try
 	{
-		iarchive(*loadedPrefab);
-		Engine::get()->getMemoryPool().add(aInfo.uuid, loadedPrefab);
-		return ResourceWrapper<Prefab>(aInfo.uuid);
+		iarchive(*prefab.get());
+		return prefab;
 
 	}
 	catch (const cereal::Exception& e)

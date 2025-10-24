@@ -56,14 +56,11 @@ ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
 	Texture::extractTextureDataFromSettings(settings, textureData);
 	Texture::extractTextureDataFromFile(filepath, textureData);
 
-	// Create texture
-	Texture* texture = new Texture();
+	// Create texture resource
+	ResourceWrapper<Texture> texture = Factory<Texture>::create();
 	texture->build(textureData);
-	Engine::get()->getMemoryPool().add(aInfo.uuid, texture);
 
-	//texture->m_attributes = attributes;
-
-	return ResourceWrapper<Texture>(aInfo.uuid);
+	return texture;
 }
 
 void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const AssetInfo& aInfo)
@@ -268,7 +265,7 @@ ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureA
 
 void Texture::addTexture2D(ResourceWrapper<Texture> texture)
 {
-	addTexture2D("Texture_" + texture.getUID().str().substr(4), texture);
+	addTexture2D("Texture_" + std::to_string(texture.getUID()).substr(4), texture);
 }
 
 void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> texture)

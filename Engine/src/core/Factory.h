@@ -3,6 +3,7 @@
 #include "memory/UUID.h"
 #include "memory/ResourceManager.h"
 #include "memory/MemoryManager.h"
+#include "memory/ResourceBase.h"
 
 template<typename T> class ResourceWrapper;
 
@@ -14,22 +15,12 @@ public:
     static ResourceWrapper<T> create(Args&&... args)
     {
         T* asset = new T(args...);
-        auto uid = UUID::generate_uuid_v4();
-        Engine::get()->getMemoryPool().add(uid, asset);
-        //Engine::get()->getResourceManager()->incRef(uid);
-        ResourceWrapper<T> res(uid);
+        ResourceID id = ResourceBase::getNewResourceID();
+        Engine::get()->getMemoryPool().add(id, asset);
+        ResourceWrapper<T> res = ResourceBase::createNewResource<T>(id);
         return res;
     }
 
-    template<typename... Args>
-    static ResourceWrapper<T> createUsingCustomUUID(UUID uid, Args&&... args)
-    {
-        T* asset = new T(args...);
-        Engine::get()->getMemoryPool().add(uid, asset);
-        //Engine::get()->getResourceManager()->incRef(uid);
-        ResourceWrapper<T> res(uid);
-        return res;
-    }
 };
 
 

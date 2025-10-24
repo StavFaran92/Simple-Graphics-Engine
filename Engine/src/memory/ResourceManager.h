@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "memory/UUID.h"
+#include "core/Configurations.h"
 
 class EngineAPI ResourceManager
 {
@@ -11,15 +11,15 @@ public:
 	std::string getRootDir() const;
 	void setRootDir(const std::string& rootDir);
 
-    int getRefCount(UUID uuid) const;
+    int getRefCount(ResourceID uuid) const;
 
 
-    int incRef(UUID uuid);
+    int incRef(ResourceID uuid);
 
-    int decRef(UUID uuid);
+    int decRef(ResourceID uuid);
 
 private:
 	std::string m_rootResourceDir;
 
-    std::unordered_map<UUID, int> m_resourceRefCount;
+    std::unordered_map<ResourceID, int> m_resourceRefCount;
 };

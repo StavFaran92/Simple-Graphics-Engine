@@ -4,6 +4,7 @@
 #include "memory/AssetLoader.h"
 
 #include "geometry/MeshExporter.h"
+#include "core/Factory.h"
 
 #include <filesystem>
 
@@ -22,15 +23,12 @@ bool MeshCollectionAssetManager::copyFiles(const std::string& fileLocation, Asse
 
 ResourceWrapper<ResourceBase> MeshCollectionAssetManager::load(AssetInfo& aInfo)
 {
-	UUID uuid = aInfo.uuid;
-	MeshCollection* meshPtr = new MeshCollection();
-	Engine::get()->getMemoryPool().add(uuid, meshPtr);
-	ResourceWrapper<MeshCollection> generatedMesh(uuid);
+	ResourceWrapper<MeshCollection> mesh = Factory<MeshCollection>::create();
 	ModelImporter::ModelInfo mInfo;
-	mInfo.mesh = generatedMesh;
+	mInfo.mesh = mesh;
 	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
 	m_lastLoadedModelInfo = mInfo;
-	return generatedMesh;
+	return mesh;
 }
 
 std::map<int, AssetWrapper<Material>> MeshCollectionAssetManager::getLoadedMaterials()

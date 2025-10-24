@@ -20,15 +20,12 @@ bool LuaScriptAssetManager::copyFiles(const std::string& fileLocation, AssetInfo
 
 ResourceWrapper<ResourceBase> LuaScriptAssetManager::load(AssetInfo& aInfo)
 {
-	//auto projectDir = Engine::get()->getProjectDirectory();
-	//std::ifstream is(projectDir + "/" + aInfo.filePath);
-	LuaScript* loadedScript = new LuaScript();
-	loadedScript->filepath = aInfo.relativefilePath;
+	ResourceWrapper<LuaScript> luaScript = Factory<LuaScript>::create();
+	luaScript->filepath = aInfo.relativefilePath;
 
 	try
 	{
-		Engine::get()->getMemoryPool().add(aInfo.uuid, loadedScript);
-		return ResourceWrapper<ResourceBase>(aInfo.uuid);
+		return luaScript;
 
 	}
 	catch (const cereal::Exception& e)

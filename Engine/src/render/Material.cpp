@@ -36,13 +36,12 @@ ResourceWrapper<ResourceBase> MaterialAssetManager::load(AssetInfo& aInfo)
 {
 	std::ifstream is(aInfo.fullFilePath);
 	cereal::JSONInputArchive iarchive(is);
-	Material* loadedMaterial = new Material();
+	ResourceWrapper<Material> material = Factory<Material>::create();
 
 	try
 	{
-		iarchive(*loadedMaterial);
-		Engine::get()->getMemoryPool().add(aInfo.uuid, loadedMaterial);
-		return ResourceWrapper<ResourceBase>(aInfo.uuid);
+		iarchive(*material.get());
+		return material;
 
 	}
 	catch (const cereal::Exception& e)

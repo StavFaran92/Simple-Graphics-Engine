@@ -36,16 +36,12 @@ bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& a
 
 ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 {
-	UUID uuid = aInfo.uuid;
 	ShaderAssetDescriptor params = aInfo.importSettings.get<ShaderAssetDescriptor>();
 	ShaderOverride shaderOverride = params.shaderOverride;
-	Shader* shaderPtr = new Shader();
-	Engine::get()->getMemoryPool().add(uuid, shaderPtr);
-	ResourceWrapper<Shader> shader(uuid);
-	Engine::get()->getResourceManager()->incRef(uuid);
 
 	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.relativefilePath;
 
+	ResourceWrapper<Shader> shader = Factory<Shader>::create();
 	shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
 	shader->shaderOverride = shaderOverride;
 	shader->m_glslFilePath = aInfo.origFilePath; // TODO fix, this should be path but causes issues with shader inclusion
