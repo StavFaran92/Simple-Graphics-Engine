@@ -27,7 +27,7 @@ bool FoliageSystem::init()
 
 	ModelImportSettings settings;
 	settings.isEngineOwned = true;
-	m_grassBlade = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings).resource();
+	m_grassBlade = MeshCollection::load(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings);
 
 	glGenBuffers(1, &m_frustumUBO);
 
@@ -60,8 +60,7 @@ bool FoliageSystem::init()
 	{
 		Texture::TextureAssetDescriptor tSettings;
 		tSettings.flip = true;
-		tSettings.isEngineOwned = true;
-		grassTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings).resource();
+		grassTexture = Texture::load(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
 	}
 
 	{
@@ -70,8 +69,7 @@ bool FoliageSystem::init()
 		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-		noiseSettings.isEngineOwned = true;
-		windNoise = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings).resource();
+		windNoise = Texture::load(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings);
 	}
 
 	{
@@ -80,8 +78,7 @@ bool FoliageSystem::init()
 		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
 		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-		noiseSettings.isEngineOwned = true;
-		noiseTexture = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings).resource();
+		noiseTexture = Texture::load(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
 	}
 
 	return true;

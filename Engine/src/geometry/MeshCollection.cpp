@@ -103,6 +103,13 @@ AssetWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocat
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MeshCollection>();
 }
 
+ResourceWrapper<MeshCollection> MeshCollection::load(const std::string& fileLocation, ModelImportSettings aDesc)
+{
+	aDesc.aType = AssetType::MESH;
+	aDesc.origFilePath = fileLocation;
+	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, aDesc).as<MeshCollection>();
+}
+
 std::map<int, AssetWrapper<Material>> MeshCollection::getLastLoadedMaterials()
 {
 	return dynamic_cast<MeshCollectionAssetManager*>(AssetFactory::getManager(AssetType::MESH))->getLoadedMaterials(); // todo fix

@@ -166,7 +166,7 @@ void displayTextureSelectDialog()
 
 		if (selectedTextureIndex != -1)
 		{
-			ResourceWrapper<Texture> displayTexture(textureList.at(selectedTextureIndex).uuid);
+			ResourceWrapper<Texture> displayTexture = textureList.at(selectedTextureIndex).resource.as<Texture>();
 			ImVec2 imageSize(150, 150);
 			ImGui::Image(reinterpret_cast<ImTextureID>(displayTexture.get()->getID()), imageSize, ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
 		}

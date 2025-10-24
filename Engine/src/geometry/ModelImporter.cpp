@@ -218,7 +218,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 
 void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.relativefilePath;
+	std::string filepath = aInfo.fullFilePath;
 
 	if (!std::filesystem::exists(filepath))
 	{

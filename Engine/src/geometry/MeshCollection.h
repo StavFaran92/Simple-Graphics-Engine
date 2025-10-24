@@ -37,6 +37,7 @@ public:
 	int getBoneID(const std::string& boneName) const;
 
 	static AssetWrapper<MeshCollection> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
+	static ResourceWrapper<MeshCollection> load(const std::string& fileLocation, ModelImportSettings aDesc = {});
 
 	static std::map<int, AssetWrapper<Material>> getLastLoadedMaterials();
 	

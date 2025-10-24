@@ -29,7 +29,7 @@ public:
 
 	ResourceWrapper(std::nullptr_t) : id(emptyID) {};
 
-	ResourceWrapper(ResourceID id) : id(id) 
+	explicit ResourceWrapper(ResourceID id) : id(id)
 	{
 		init();
 	};
