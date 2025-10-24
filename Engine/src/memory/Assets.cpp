@@ -178,9 +178,9 @@ AssetWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, 
 		return AssetWrapper<ResourceBase>::empty;
 	}
 
-	aInfo.resource = resource;
 
 	// Add Asset
+	aInfo.resource = resource;
 	addAsset(aInfo);
 
 	AssetWrapper<ResourceBase> asset(aInfo.uuid);
@@ -190,13 +190,15 @@ AssetWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, 
 
 AssetWrapper<ResourceBase> Assets::createAsset(const ResourceWrapper<ResourceBase>& resource, AssetCreateDescriptor& desc)
 {
+	// Add asset info
 	AssetInfo aInfo(desc);
-	//aInfo.uuid = resource.getUID(); // dirty Hack, used since assetInfo will generate a uuid upon create, not desired behaviour for create
-
-	AssetWrapper<ResourceBase> asset(aInfo.uuid);
 	aInfo.resource = resource;
 	addAsset(aInfo);
 
+	// Create asset
+	AssetWrapper<ResourceBase> asset(aInfo.uuid);
+
+	// Save asset
 	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
 
 	return asset;

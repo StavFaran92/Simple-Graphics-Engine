@@ -26,6 +26,10 @@ Entity WaterSystem::createPool()
 
 	AssetCreateDescriptor desc;
 	desc.aType = AssetType::SHADER;
+	desc.origFilePath = SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl";
+	desc.name = "WaterShader";
+	desc.attributes["shader_override"] = Shader::getShaderOverrideAsStr(ShaderOverride::PBR);
+	desc.isEngineOwned = true;
 	auto& shaderAsset = Engine::get()->getSubSystem<Assets>()->createAsset(shader, desc).as<Shader>();
 
 	auto& shaderComponent = poolQuad.addComponent<ShaderComponent>();

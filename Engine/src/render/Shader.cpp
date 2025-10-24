@@ -29,15 +29,22 @@ namespace {
 
 bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string savedFilePath = projectDir + aInfo.relativefilePath;
-	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
+	return std::filesystem::copy_file(fileLocation, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
 ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 {
-	ShaderAssetDescriptor params = aInfo.importSettings.get<ShaderAssetDescriptor>();
-	ShaderOverride shaderOverride = params.shaderOverride;
+	ShaderOverride shaderOverride = ShaderOverride::None;
+	if (!aInfo.importSettings.is_null())
+	{
+		ShaderAssetDescriptor params = aInfo.importSettings.get<ShaderAssetDescriptor>();
+		shaderOverride = params.shaderOverride;
+	}
+	else if (aInfo.attributes.find("shader_override") != aInfo.attributes.end())
+	{
+		shaderOverride = Shader::getShaderOverrideFromStr(aInfo.attributes.at("shader_override"));
+	}
+	
 
 	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.relativefilePath;
 
@@ -52,10 +59,7 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 
 void ShaderAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
 {
-	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string relativeFilepath = "/" + aInfo.relativefilePath;
-	const std::string savedFilePath = projectDir + relativeFilepath;
-	std::filesystem::copy_file(aInfo.origFilePath, savedFilePath);
+	std::filesystem::copy_file(aInfo.origFilePath, aInfo.fullFilePath);
 }
 
 uint32_t Shader::s_activeShader = 0;
