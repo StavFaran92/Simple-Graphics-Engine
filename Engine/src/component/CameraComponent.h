@@ -16,6 +16,11 @@ struct EngineAPI CameraComponent : public Component
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(center);
 		SERIALIZED_MEMBER(up);
+		SERIALIZED_MEMBER(fovy);
+		SERIALIZED_MEMBER(aspect);
+		SERIALIZED_MEMBER(znear);
+		SERIALIZED_MEMBER(zfar);
+		SERIALIZED_MEMBER(type);
 	}
 
 	static CameraComponent createPerspectiveCamera(float fovy, float aspect, float znear, float zfar)
