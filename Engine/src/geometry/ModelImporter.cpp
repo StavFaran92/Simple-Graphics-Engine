@@ -541,11 +541,15 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 	{
 		std::string textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().stem().string();
 
-		if (cachedTextures.find(textureName) != cachedTextures.end())
+		if (!textureName.empty())
 		{
-			// Already loaded
-			return cachedTextures[textureName];
+			if (cachedTextures.find(textureName) != cachedTextures.end())
+			{
+				// Already loaded
+				return cachedTextures[textureName];
+			}
 		}
+
 
 		int width = 0;
 		int height = 0;
@@ -597,7 +601,10 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 		textureAssetDesc.attributes = texture->getTextureAssetAttributes().toMap();
 		AssetTexture = Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc).as<Texture>();
 
-		cachedTextures.insert({ tData.textureName, AssetTexture });
+		if (!textureName.empty())
+		{
+			cachedTextures.insert({ tData.textureName, AssetTexture });
+		}
 	}	
 	else
 	{
