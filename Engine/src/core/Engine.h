@@ -48,6 +48,7 @@ class EventLayerStack;
 class BuiltInMeshes;
 class BuiltInMaterials;
 class ResourceBase;
+class SubSystem;
 struct EngineConfig;
 template<typename T>class ResourceWrapper;
 template<typename T>class Factory;
@@ -111,18 +112,20 @@ public:
     void stop();
 
     // Template function to register a subsystem
-    template<typename T> void registerSubSystem(const T* subSystem)
+    template<typename T> 
+    void registerSubSystem(const T* subSystem)
     {
-        m_subSystems[typeid(T*)] = (void*)subSystem;
+        m_subSystems[typeid(T*)] = (SubSystem*)subSystem;
     }
 
     // Template function to get a registered subsystem
-    template<typename T> T* getSubSystem() const
+    template<typename T> 
+    T* getSubSystem() const
     {
         auto it = m_subSystems.find(typeid(T*));
         if (it != m_subSystems.end())
         {
-            return reinterpret_cast<T*>(it->second);
+            return dynamic_cast<T*>(it->second);
         }
         else
         {
@@ -176,13 +179,12 @@ protected:
     std::shared_ptr<ShaderLoader> m_shaderLoader;
     std::shared_ptr<ResourceManager> m_resourceManager;
     std::shared_ptr<ProjectManager> m_projectManager;
-    std::shared_ptr<Assets> m_assets;
     std::shared_ptr<EngineConfig> m_engineConfig;
     std::shared_ptr<MemoryPool<ResourceBase>> m_memoryPool;
 
     InitParams m_initParams;
 
-    std::map<std::type_index, void*> m_subSystems;
+    std::map<std::type_index, SubSystem*> m_subSystems;
 
     std::atomic<bool> m_isPaused = false;
     std::atomic<bool> m_isStopped = false;

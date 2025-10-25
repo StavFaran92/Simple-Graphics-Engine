@@ -3,8 +3,9 @@
 #include "memory/ResourceWrapper.h"
 #include "geometry/MeshCollection.h"
 #include "component/FoliageComponent.h"
+#include "systems/SubSystem.h"
 
-class FoliageSystem
+class FoliageSystem : public SubSystem
 {
 public:
 	FoliageSystem();

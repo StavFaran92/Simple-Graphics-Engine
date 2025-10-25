@@ -3,8 +3,9 @@
 #include <string>
 
 #include "component/ScriptComponent.h"
+#include "systems/SubSystem.h"
 
-class ScriptSystem
+class ScriptSystem : public SubSystem
 {
 public:
     ScriptSystem();

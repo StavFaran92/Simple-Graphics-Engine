@@ -5,6 +5,7 @@
 
 #include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
+#include "systems/SubSystem.h"
 
 class FrameBufferObject;
 class RenderBufferObject;
@@ -12,7 +13,7 @@ class TextureHandler;
 class Context;
 class Shader;
 
-class EngineAPI ObjectPicker
+class EngineAPI ObjectPicker : public SubSystem
 {
 public:
 	struct PixelInfo {

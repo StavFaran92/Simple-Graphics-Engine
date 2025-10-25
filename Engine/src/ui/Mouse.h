@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "core/EventLayer.h"
+#include "systems/SubSystem.h"
 
 enum MouseButton : int
 {
@@ -64,7 +65,7 @@ private:
 	MouseState m_state;
 };
 
-class EngineAPI GameMouse : public Mouse
+class EngineAPI GameMouse : public Mouse, SubSystem
 {
 public:
 	GameMouse();

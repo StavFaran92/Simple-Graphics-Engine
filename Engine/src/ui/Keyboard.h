@@ -6,6 +6,7 @@
 
 #include "core/EventLayer.h"
 #include "ui/KeyCodes.h"
+#include "systems/SubSystem.h"
 
 class EngineAPI Keyboard
 {
@@ -36,7 +37,7 @@ private:
 	int m_length = 0;
 };
 
-class EngineAPI GameKeyboard : public Keyboard
+class EngineAPI GameKeyboard : public Keyboard, SubSystem
 {
 public:
 	GameKeyboard();

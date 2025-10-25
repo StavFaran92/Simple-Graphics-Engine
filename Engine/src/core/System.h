@@ -2,7 +2,9 @@
 
 #include "core/Core.h"
 
-class EngineAPI System
+#include "systems/SubSystem.h"
+
+class EngineAPI System : public SubSystem
 {
 public:
 	System();

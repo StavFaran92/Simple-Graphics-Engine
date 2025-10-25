@@ -4,6 +4,7 @@
 #include <vector>
 #include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
+#include "systems/SubSystem.h"
 
 class Scene;
 class Context;
@@ -22,7 +23,7 @@ enum class RenderMode
 	WIREFRAME = 1
 };
 
-class Graphics
+class Graphics : public SubSystem
 {
 public:
 	Graphics();

@@ -11,6 +11,7 @@
 #include "runtime/Entity.h"
 #include "render/Material.h"
 #include "memory/Asset.h"
+#include "systems/SubSystem.h"
 
 // Forward declerations
 struct aiNode;
@@ -34,7 +35,7 @@ struct ModelImportSettings : public AssetCreateDescriptor
 	
 };
 
-class EngineAPI ModelImporter
+class EngineAPI ModelImporter : public SubSystem
 {
 public:
 	struct ModelLoadSession

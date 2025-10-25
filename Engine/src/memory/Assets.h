@@ -5,6 +5,7 @@
 #include "memory/AssetInfo.h"
 #include "core/Core.h"
 #include "core/Configurations.h"
+#include "systems/SubSystem.h"
 
 #include <unordered_set>
 
@@ -38,7 +39,7 @@ struct EngineAPI AssetUpdateDescriptor
 	std::string name;
 };
 
-class EngineAPI Assets
+class EngineAPI Assets : public SubSystem
 {
 public:
 	Assets();

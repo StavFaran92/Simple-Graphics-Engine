@@ -196,8 +196,7 @@ bool Engine::init(const InitParams& initParams)
     auto system = new System();
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
-    
-    m_assets = std::make_shared<Assets>();
+    auto assets = new Assets();
 
     m_timeManager = std::make_shared<TimeManager>();
 

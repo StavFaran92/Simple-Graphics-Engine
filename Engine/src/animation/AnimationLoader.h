@@ -12,6 +12,8 @@
 #include "memory/Assets.h"
 #include "memory/Asset.h"
 
+#include "systems/SubSystem.h"
+
 struct AnimationImportSettings : public AssetCreateDescriptor
 {
 
@@ -19,7 +21,7 @@ struct AnimationImportSettings : public AssetCreateDescriptor
 
 class Animation;
 
-class EngineAPI AnimationLoader
+class EngineAPI AnimationLoader : public SubSystem
 {
 public:
 	AnimationLoader();
