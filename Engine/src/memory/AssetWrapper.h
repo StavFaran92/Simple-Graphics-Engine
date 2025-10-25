@@ -51,7 +51,7 @@ public:
 		return resource().isEmpty();
 	}
 
-	AssetInfo info() const
+	const AssetInfo& info() const
 	{
 		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 	}

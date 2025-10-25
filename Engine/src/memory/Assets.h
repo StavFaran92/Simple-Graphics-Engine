@@ -58,7 +58,7 @@ public:
 
 	UUID getAssetFromName(const std::string& name) const;
 
-	AssetInfo getAsset(UUID uuid) const;
+	const AssetInfo& getAsset(UUID uuid) const;
 
 	bool hasAsset(UUID uuid) const;
 

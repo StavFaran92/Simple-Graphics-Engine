@@ -87,7 +87,7 @@ void Assets::loadAssetsDatabase()
 	}
 }
 
-AssetInfo Assets::getAsset(UUID uuid) const
+const AssetInfo& Assets::getAsset(UUID uuid) const
 {
 	auto iter = m_assets.find(uuid);
 	if (iter != m_assets.end())
