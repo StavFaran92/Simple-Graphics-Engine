@@ -29,6 +29,8 @@ struct EngineAPI FoliageComponent : public Component
 
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
+	static Entity createGrassField();
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 	    SERIALIZED_MEMBER(m_foliageSpreadMap);

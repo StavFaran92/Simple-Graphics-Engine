@@ -128,3 +128,10 @@ void FoliageComponent::attachToEntity(std::shared_ptr<Component> c, Entity entit
 		foliage.build();
 	}
 }
+
+Entity FoliageComponent::createGrassField()
+{
+	auto grassField = Engine::get()->getContext()->getActiveScene()->createEntity("Grass Field");
+	grassField.addComponent<FoliageComponent>();
+	return grassField;
+}

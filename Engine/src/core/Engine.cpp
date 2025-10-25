@@ -226,6 +226,13 @@ bool Engine::init(const InitParams& initParams)
         return false;
     }
 
+    auto foliageSystem = new FoliageSystem();
+    if(!foliageSystem->init())
+    {
+        logError("Foliage System init failed!");
+        return false;
+    }
+
     if (initParams.loadExistingProject)
     {
         loadProject(m_projectDirectory);
@@ -238,8 +245,7 @@ bool Engine::init(const InitParams& initParams)
 
     
 
-    auto foliageSystem = new FoliageSystem();
-    foliageSystem->init();
+    
 
     auto objectPicker = new ObjectPicker();
     if (!objectPicker->init())

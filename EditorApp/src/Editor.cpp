@@ -803,6 +803,13 @@ void RenderSceneHierarchyWindow()
 				state.selectEntity(sceneObjects[0].e);
 			}
 
+			if (ImGui::MenuItem("Grass Field"))
+			{
+				Entity e = FoliageComponent::createGrassField();
+				updateScene();
+				state.selectEntity(sceneObjects[0].e);
+			}
+
 			ImGui::EndMenu(); // End the submenu
 		}
 

@@ -636,33 +636,6 @@ void InspectorWindow::display()
 				state.getSelectedEntity().addComponent<PlayerController>();
 			}
 
-			//if (ImGui::MenuItem("Collision Box"))
-			//{
-			//	selectedEntity.addComponent<CollisionBoxComponent>();
-			//}
-
-			//if (ImGui::MenuItem("Collision Sphere"))
-			//{
-			//	selectedEntity.addComponent<CollisionSphereComponent>();
-			//}
-
-			//if (ImGui::MenuItem("Collision Mesh"))
-			//{
-			//	throw std::runtime_error("Not implemented");
-			//	// TODO fix
-			//	//auto meshComponent = selectedEntity.tryGetComponent<MeshComponent>();
-			//	//if (meshComponent)
-			//	//{
-			//	//	auto& meshCollisions = selectedEntity.addComponent<CollisionMeshComponent>();
-			//	//	meshCollisions.mesh = meshComponent->mesh;
-			//	//}
-			//}
-
-			//if (ImGui::MenuItem("Collision Terrain"))
-			//{
-			//	selectedEntity.addComponent<CollisionTerrainComponent>();
-			//}
-
 			if (ImGui::MenuItem("Mesh"))
 			{
 				state.getSelectedEntity().addComponent<MeshComponent>();
