@@ -37,7 +37,9 @@ private:
 	RenderBufferObject m_renderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
 	
 	ResourceWrapper<Texture> m_positionTexture = nullptr;
+	ResourceWrapper<Texture> m_positionTextureVS = nullptr;
 	ResourceWrapper<Texture> m_normalTexture = nullptr;
+	ResourceWrapper<Texture> m_normalTextureVS = nullptr;
 	ResourceWrapper<Texture> m_albedoTexture = nullptr;
 	ResourceWrapper<Texture> m_MRATexture = nullptr;
 	

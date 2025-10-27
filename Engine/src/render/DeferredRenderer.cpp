@@ -60,8 +60,16 @@ bool DeferredRenderer::setupGBuffer()
 	m_MRATexture = Texture::createEmptyTexture(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_gBuffer.attachTexture(m_MRATexture.get()->getID(), GL_COLOR_ATTACHMENT3);
 
-	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(4, attachments);
+	// Generate Texture for Position ViewSpace data
+	m_positionTextureVS = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_gBuffer.attachTexture(m_positionTextureVS.get()->getID(), GL_COLOR_ATTACHMENT4);
+
+	// Generate Texture for Normal ViewSpace data
+	m_normalTextureVS = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
+
+	unsigned int attachments[6] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
+	glDrawBuffers(6, attachments);
 
 	// Create RBO and attach to FBO
 	m_gBuffer.attachRenderBuffer(m_renderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
@@ -336,8 +344,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// SSAO
-	m_ssaoPassShader->setTextureInShader(m_positionTexture, "gPosition", 0);
-	m_ssaoPassShader->setTextureInShader(m_normalTexture, "gNormal", 1);
+	m_ssaoPassShader->setTextureInShader(m_positionTextureVS, "gPositionVS", 0);
+	m_ssaoPassShader->setTextureInShader(m_normalTextureVS, "gNormalVS", 1);
 	m_ssaoPassShader->setTextureInShader(m_ssaoNoiseTexture, "gSSAONoise", 2);
 
 	// TODO remove

@@ -28,6 +28,8 @@ out VS_OUT {
     vec3 fragPos;
 	vec3 normal;
     vec2 texCoord;
+    vec3 fragPosVS;
+	vec3 normalVS;
 } vs_out;
 
 // ----- Uniforms ----- //
@@ -90,6 +92,8 @@ void main()
 	vs_out.texCoord = tex;
 	vs_out.normal =  aNorm;
 	vs_out.fragPos = (aModel * totalPosition).xyz;
+	vs_out.fragPosVS = (view * vec4(vs_out.fragPos,1.0)).xyz;
+	vs_out.normalVS = (view * vec4(vs_out.normal,1.0)).xyz;
 
 	gl_Position = projection * view * aModel * totalPosition;
 }
@@ -111,6 +115,8 @@ in VS_OUT {
     vec3 fragPos;
 	vec3 normal;
     vec2 texCoord;
+    vec3 fragPosVS;
+	vec3 normalVS;
 } fs_in;
 
 // ----- Out ----- //
@@ -119,6 +125,9 @@ layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec3 gAlbedo;
 layout (location = 3) out vec3 gMRA;
+layout (location = 4) out vec3 gPositionVS;
+layout (location = 5) out vec3 gNormalVS;
+
 
 // ----- Uniforms ----- //
 uniform PBR_Material material; 
@@ -161,4 +170,8 @@ void main()
 	gMRA.r = getPBRTexture(material.samplerMetallic).r * material.metallicFactor;
 	gMRA.g = getPBRTexture(material.samplerRoughness).r * material.roughnessFactor;
 	gMRA.b = getPBRTexture(material.samplerAO).r;
+	gPositionVS = fs_in.fragPosVS;
+	gNormalVS = normalize(fs_in.normalVS);
+	// gNormalVS = normalize((view * vec4(gNormal, 1.0)).xyz);
+	// gPositionVS = (view * vec4(fs_in.fragPos, 1.0)).xyz;
 } 
