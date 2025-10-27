@@ -88,7 +88,7 @@ bool DeferredRenderer::setupSSAO()
 
 	for (int i = 0; i < 64; i++)
 	{
-		glm::vec3 sample(rand->rand() * 2, rand->rand() * 2, rand->rand());
+		glm::vec3 sample(rand->rand() * 2.0	- 1.0, rand->rand() * 2.0 - 1.0, rand->rand());
 		sample = glm::normalize(sample);
 		sample *= rand->rand();
 		float scale = (float)i / 64;
@@ -103,14 +103,14 @@ bool DeferredRenderer::setupSSAO()
 	for (int i = 0; i < 16; i++)
 	{
 		ssaoNoise.push_back({
-				rand->rand() * 2 - 1,
-				rand->rand() * 2 - 1,
+				rand->rand() * 2.0 - 1.0,
+				rand->rand() * 2.0 - 1.0,
 				0.f
 			});
 	}
 
 	m_ssaoNoiseTexture = Texture::create2DTextureFromBuffer(4, 4,
-		GL_RGBA16F,
+		GL_RGBA32F,
 		GL_RGB,
 		GL_FLOAT, {
 		{ GL_TEXTURE_MIN_FILTER,	GL_NEAREST	},
@@ -326,14 +326,14 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	//glDisable(GL_DEPTH_TEST);
 	
-#if 0
+#if 1
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "SSAO pass");
 
 	glDisable(GL_DEPTH_TEST);
 
 	m_ssaoFBO.bind();
 	m_ssaoPassShader->use();
-	RenderCommand::clear();
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	// SSAO
 	m_ssaoPassShader->setTextureInShader(m_positionTexture, "gPosition", 0);
@@ -352,11 +352,12 @@ void DeferredRenderer::renderScene(Scene* scene)
 		m_ssaoPassShader->setUniformValue("ssaoKernel[" + std::to_string(i) + "]", m_ssaoKernel[i]);
 	}
 
-	m_ssaoPassShader->setUniformValue("projection", *graphics->projection);
+	m_ssaoPassShader->setUniformValue("view", graphics->view);
+	m_ssaoPassShader->setUniformValue("projection", graphics->projection);
 
 	{
 		// render to quad
-		auto vao = m_quad.getComponent<MeshComponent>().mesh->getPrimaryMesh()->getVAO();
+		auto vao = m_quad.getComponent<MeshComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 		RenderCommand::draw(vao);
 	}
 
@@ -370,7 +371,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	{
 		// render to quad
-		auto vao = m_quad.getComponent<MeshComponent>().mesh->getPrimaryMesh()->getVAO();
+		auto vao = m_quad.getComponent<MeshComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 		RenderCommand::draw(vao);
 	}
 
@@ -390,7 +391,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 	m_lightPassShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 5);
 	m_lightPassShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
 	m_lightPassShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
-	//m_lightPassShader->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
+	m_lightPassShader->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
 
 	graphics->renderView->bind();
 

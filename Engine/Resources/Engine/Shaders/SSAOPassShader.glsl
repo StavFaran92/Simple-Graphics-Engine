@@ -57,6 +57,9 @@ void main()
     vec3 normal = texture(gNormal, TexCoords).rgb;
     vec3 ssaoNoise = texture(gSSAONoise, TexCoords * noiseScale).rgb;
 
+    fragPos = vec3(view*vec4(fragPos, 1.0));
+    normal = normalize(vec3(view*vec4(normal, 1.0)));
+
     // generate TBN
     vec3 tangent = normalize(ssaoNoise - normal * dot(ssaoNoise, normal));
     vec3 bitangent = cross(normal, tangent);
@@ -79,6 +82,9 @@ void main()
 
         // Check if sample is inside geometry, if so add to occlusion factor
         float sampleDepth = texture(gPosition, offset.xy).z;
+
+        vec3 offsetPos = texture(gPosition, offset.xy).xyz;
+        sampleDepth = vec3(view*vec4(offsetPos, 1.0)).z;
 
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
         occlusionFactor += (sampleDepth >= samplePos.z + 0.025 ? 1.0 : 0.0) * rangeCheck;  
