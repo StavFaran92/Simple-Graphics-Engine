@@ -93,7 +93,7 @@ void main()
 	vs_out.normal =  aNorm;
 	vs_out.fragPos = (aModel * totalPosition).xyz;
 	vs_out.fragPosVS = (view * vec4(vs_out.fragPos,1.0)).xyz;
-	vs_out.normalVS = (view * vec4(vs_out.normal,1.0)).xyz;
+	vs_out.normalVS = (view * vec4(vs_out.normal,0.0)).xyz;
 
 	gl_Position = projection * view * aModel * totalPosition;
 }
@@ -172,6 +172,4 @@ void main()
 	gMRA.b = getPBRTexture(material.samplerAO).r;
 	gPositionVS = fs_in.fragPosVS;
 	gNormalVS = normalize(fs_in.normalVS);
-	// gNormalVS = normalize((view * vec4(gNormal, 1.0)).xyz);
-	// gPositionVS = (view * vec4(fs_in.fragPos, 1.0)).xyz;
 } 

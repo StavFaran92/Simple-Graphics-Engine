@@ -27,6 +27,7 @@ public:
     bool isMouseInSceneView = false;
     bool showTextureDisplayWindow = false;
     bool showLuaScriptCreateWindow = false;
+    bool showSettingsWindow = false;
 
     bool showAssetSelectorWindow = false;
     AssetType assetSelectType;

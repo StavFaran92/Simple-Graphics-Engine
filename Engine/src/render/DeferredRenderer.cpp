@@ -412,6 +412,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 	m_lightPassShader->setUniformValue("cameraPos", graphics->cameraPos);
 	m_lightPassShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
 
+	m_lightPassShader->setUniformValue("useSSAO", graphics->useSSAO);
+
 	{
 		// render to quad
 		auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();

@@ -338,6 +338,32 @@ void displayLuaScriptCreatorDialog()
 	}
 }
 
+void displayProjectSettingsDialog()
+{
+	if (EditorState::Instance().showSettingsWindow)
+	{
+		ImGui::OpenPopup("DisplayProjectSettingsDialog");
+		EditorState::Instance().showSettingsWindow = false;
+	}
+
+	// Set constraints BEFORE BeginPopupModal
+	ImGui::SetNextWindowSizeConstraints(ImVec2(400, 250), ImVec2(FLT_MAX, FLT_MAX));
+
+	if (ImGui::BeginPopupModal("DisplayProjectSettingsDialog", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+		ImGui::Checkbox("SSAO", &graphics->useSSAO);
+
+		if (ImGui::Button("OK"))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
 void displayMaterialEditDialog()
 {
 	static ResourceWrapper<Material> previousMaterial;

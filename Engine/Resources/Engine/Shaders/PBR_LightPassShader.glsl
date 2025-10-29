@@ -51,6 +51,8 @@ uniform sampler2D gShadowMap;
 uniform vec3 cameraPos;
 uniform sampler2D gSSAOColorBuffer;
 
+uniform bool useSSAO;
+
 // ----- Forward Declerations ----- //
 
 // ----- Methods ----- //
@@ -294,10 +296,16 @@ void main()
 	// ambient diffuse irradiance
 	vec3 irradiance = texture(gIrradianceMap, N).rgb;
 	vec3 diffuse = irradiance * albedo;
-	vec3 ambient = (kd * diffuse + specular) *ssao * ao * vec3(1.f);
+
+	if(useSSAO)
+	{
+		diffuse *= ssao;
+	}
+
+	vec3 ambient = (kd * diffuse + specular) * ao  * vec3(1.f);
 
 	// combine results
-	vec3 color = (L0 + ambient);
+	vec3 color = L0 + ambient;
 
 	// HDR
 	color = color / (color + vec3(1.0));

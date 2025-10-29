@@ -44,6 +44,7 @@
 #include "component/Component.h"
 #include "core/Random.h"
 #include "systems/TimeManager.h"
+#include "render/Graphics.h"
 
 #include "memory/ResourceManager.h"
 #include "systems/ObjectPicker.h"

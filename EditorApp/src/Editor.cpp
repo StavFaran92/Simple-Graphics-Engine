@@ -1265,6 +1265,13 @@ class GUI_Helper : public GuiMenu {
 					}
 					ImGui::EndMenu();
 				}
+				if (ImGui::BeginMenu("Project")) {
+					if (ImGui::MenuItem("Settings")) {
+						EditorState::Instance().showSettingsWindow = true;
+
+					}
+					ImGui::EndMenu();
+				}
 				if (ImGui::BeginMenu("Help")) {
 					// Help menu items
 					ImGui::EndMenu();
@@ -1314,6 +1321,7 @@ class GUI_Helper : public GuiMenu {
 		displayLuaScriptCreatorDialog();
 		displayShaderCreatorDialog();
 		displayMaterialEditDialog();
+		displayProjectSettingsDialog();
         //ShowTextureDisplayWindow();
 
 		if (EditorState::Instance().showAssetSelectorWindow) 

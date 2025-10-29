@@ -55,4 +55,6 @@ public:
 	std::shared_ptr<RenderView> renderView;
 
 	RenderMode renderMode = RenderMode::SHADED;
+
+	bool useSSAO = true;
 };
