@@ -105,7 +105,7 @@ void Scene::displayWireframeMesh(Entity e)
 		graphics->mesh = mesh.get();
 		graphics->model = e.getComponent<Transformation>().getWorldTransformation();
 
-		m_deferredRenderer->render();
+		Engine::get()->getDeferredRenderer().render();
 	}
 }
 
@@ -148,12 +148,6 @@ void Scene::init(Context* context)
 	auto height = Engine::get()->getWindow()->getHeight();
 
 	gameEventLayer = Engine::get()->getEventSystem()->getLayer("GameLayer");
-
-	m_deferredRenderer = std::make_shared<DeferredRenderer>(this);
-	m_deferredRenderer->init();
-
-	m_forwardRenderer = std::make_shared<Renderer>(this);
-	m_forwardRenderer->init();
 
 	//m_skyboxRenderer = std::make_shared<SkyboxRenderer>(*m_renderer.get());
 	//m_gpuInstancingRenderer = std::make_shared<GpuInstancingRenderer>();
@@ -339,7 +333,7 @@ void Scene::draw(float deltaTime)
 
 		graphics->scene = this;
 		graphics->context = m_context;
-		graphics->renderer = m_forwardRenderer.get();
+		//graphics->renderer = m_forwardRenderer.get();
 		graphics->view = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
 		graphics->projection = m_defaultPerspectiveProjection;
 		graphics->cameraPos = primaryCameraTransform.getWorldPosition();
@@ -395,8 +389,8 @@ void Scene::draw(float deltaTime)
 		if (Engine::get()->getConfig().renderConfig.renderDeferredPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Deferred Renderer pass");
-			m_deferredRenderer->renderScene(this);
-			unsigned int srcID = m_deferredRenderer->getGBuffer().getID();
+			Engine::get()->getDeferredRenderer().renderScene(this);
+			unsigned int srcID = Engine::get()->getDeferredRenderer().getGBuffer().getID();
 			unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
 			RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
 			glPopDebugGroup();
@@ -405,14 +399,14 @@ void Scene::draw(float deltaTime)
 		if (Engine::get()->getConfig().renderConfig.renderForwardPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Forward Renderer pass");
-			m_forwardRenderer->renderScene(this);
+			Engine::get()->getForwardRenderer().renderScene(this);
 			glPopDebugGroup();
 		}
 
 		if (Engine::get()->getConfig().renderConfig.renderCustomShadersPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Custom shader render pass");
-			m_forwardRenderer->renderSceneUsingCustomShader(this);
+			Engine::get()->getForwardRenderer().renderSceneUsingCustomShader(this);
 			glPopDebugGroup();
 		}
 
@@ -709,7 +703,7 @@ void Scene::draw(float deltaTime)
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Non Opaque render pass");
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			m_forwardRenderer->renderSceneNonOpaque(this);
+			Engine::get()->getForwardRenderer().renderSceneNonOpaque(this);
 			glDisable(GL_BLEND);
 			glPopDebugGroup();
 		}
@@ -856,10 +850,7 @@ void Scene::onWindowResize(int w, int h)
 		m_highlightRenderView->resize(w, h);
 	}
 
-	if (m_deferredRenderer)
-	{
-		m_deferredRenderer->resize(w, h);
-	}
+	Engine::get()->getDeferredRenderer().resize(w, h);
 
     m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)w / h, 0.1f, 1000.0f);
     m_defaultUIProjection = glm::ortho(0.0f, (float)w, (float)h, 0.0f, -1.0f, 1.0f);
@@ -886,11 +877,6 @@ void Scene::clear()
 Scene::Scene(Context* context)
 {
 	init(context);
-}
-
-std::shared_ptr<IRenderer> Scene::getRenderer() const
-{
-	return m_deferredRenderer;
 }
 
 void Scene::close()

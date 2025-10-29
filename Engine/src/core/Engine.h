@@ -49,6 +49,8 @@ class BuiltInMeshes;
 class BuiltInMaterials;
 class ResourceBase;
 class SubSystem;
+class DeferredRenderer;
+class Renderer;
 struct EngineConfig;
 template<typename T>class ResourceWrapper;
 template<typename T>class Factory;
@@ -82,7 +84,6 @@ public:
     std::string getRootDir();
 
     Window* getWindow() const;
-    IRenderer* getRenderer() const;
     Context* getContext() const;
     ImguiHandler* getImguiHandler() const;
     Input* getInput() const;
@@ -98,6 +99,8 @@ public:
     EventLayerStack* getEventLayerStack() const;
     const EngineConfig& getConfig() const;
     MemoryPool<ResourceBase>& getMemoryPool() const;
+    DeferredRenderer& getDeferredRenderer() const;
+    Renderer& getForwardRenderer() const;
     
     void loadProject(const std::string& dirPath);
     void saveProject();
@@ -181,6 +184,8 @@ protected:
     std::shared_ptr<ProjectManager> m_projectManager;
     std::shared_ptr<EngineConfig> m_engineConfig;
     std::shared_ptr<MemoryPool<ResourceBase>> m_memoryPool;
+    std::shared_ptr<DeferredRenderer> m_deferredRenderer;
+    std::shared_ptr<Renderer> m_forwardRenderer;
 
     InitParams m_initParams;
 

@@ -296,13 +296,12 @@ void main()
 	// ambient diffuse irradiance
 	vec3 irradiance = texture(gIrradianceMap, N).rgb;
 	vec3 diffuse = irradiance * albedo;
+	vec3 ambient = (kd * diffuse + specular) * ao  * vec3(1.f);
 
 	if(useSSAO)
 	{
-		diffuse *= ssao;
+		ambient *= pow(ssao, 3);
 	}
-
-	vec3 ambient = (kd * diffuse + specular) * ao  * vec3(1.f);
 
 	// combine results
 	vec3 color = L0 + ambient;

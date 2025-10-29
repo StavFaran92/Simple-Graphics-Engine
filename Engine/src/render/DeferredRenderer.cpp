@@ -26,15 +26,11 @@
 #include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
+#include "memory/BuiltInAssets.h"
 
 static float lerp(float a, float b, float t)
 {
 	return a + t * (b - a);
-}
-
-DeferredRenderer::DeferredRenderer(Scene* scene) 
-	: m_scene(scene)
-{
 }
 
 bool DeferredRenderer::setupGBuffer()
@@ -68,7 +64,13 @@ bool DeferredRenderer::setupGBuffer()
 	m_normalTextureVS = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
 
-	unsigned int attachments[6] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
+	unsigned int attachments[6] = { 
+		GL_COLOR_ATTACHMENT0, 
+		GL_COLOR_ATTACHMENT1, 
+		GL_COLOR_ATTACHMENT2, 
+		GL_COLOR_ATTACHMENT3, 
+		GL_COLOR_ATTACHMENT4, 
+		GL_COLOR_ATTACHMENT5 };
 	glDrawBuffers(6, attachments);
 
 	// Create RBO and attach to FBO
@@ -185,9 +187,8 @@ bool DeferredRenderer::init()
 	setupSSAO();
 
 	// Generate screen quad
-	m_quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
-	m_quad.RemoveComponent<RenderableComponent>();
-	m_quad.RemoveComponent<ObjectComponent>();
+	UUID quadUUID = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD);
+	m_quad = Engine::get()->getSubSystem<Assets>()->getAsset(quadUUID).resource.as<MeshCollection>();
 
 	return true;
 }
@@ -365,7 +366,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	{
 		// render to quad
-		auto vao = m_quad.getComponent<MeshComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+		auto vao = m_quad->getPrimaryMesh()->getVAO();
 		RenderCommand::draw(vao);
 	}
 
@@ -379,7 +380,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	{
 		// render to quad
-		auto vao = m_quad.getComponent<MeshComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+		auto vao = m_quad->getPrimaryMesh()->getVAO();
 		RenderCommand::draw(vao);
 	}
 
@@ -416,8 +417,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	{
 		// render to quad
-		auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
-		RenderCommand::draw(mesh->getVAO());
+		auto vao = m_quad->getPrimaryMesh()->getVAO();
+		RenderCommand::draw(vao);
 	}
 
 	glPopDebugGroup();
@@ -469,4 +470,10 @@ void DeferredRenderer::resize(int w, int h)
 	m_ssaoBlurFBO.attachTexture(m_ssaoBlurColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
 	m_ssaoBlurFBO.attachRenderBuffer(m_ssaoBlurRenderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
 	m_ssaoBlurFBO.unbind();
+}
+
+void DeferredRenderer::reloadShaders()
+{
+	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
+	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
 }

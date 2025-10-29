@@ -23,11 +23,13 @@ enum class RenderMode
 	WIREFRAME = 1
 };
 
-class Graphics : public SubSystem
+class EngineAPI Graphics : public SubSystem
 {
 public:
 	Graphics();
 	
+public:
+	void reloadDefferedRendererShaders();
 public:
 	Scene* scene = nullptr;
 	Context* context = nullptr;

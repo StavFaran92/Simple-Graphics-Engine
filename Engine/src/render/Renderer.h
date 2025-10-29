@@ -18,8 +18,6 @@ class Renderer : public RendererIntermediate
 {
 public:
 	// Constructor
-	Renderer(Scene* scene);
-
 	bool init() override;
 
 	void renderSceneUsingCustomShader(Scene* scene);
@@ -34,8 +32,6 @@ private:
 	void setUniforms();
 protected:
 	bool m_wireFrameMode = false;
-
-	Scene* m_scene = nullptr;
 
 	ResourceWrapper<Shader> m_pbrShader = nullptr;
 	Entity m_quad;

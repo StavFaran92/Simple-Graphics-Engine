@@ -172,11 +172,6 @@ Window* Context::getWindow() const
 	return Engine::get()->getWindow();
 }
 
-IRenderer* Context::getRenderer() const
-{
-	return Engine::get()->getRenderer();
-}
-
 ImguiHandler* Context::getImguiHandler() const
 {
 	return Engine::get()->getImguiHandler();

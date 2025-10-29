@@ -347,7 +347,7 @@ void displayProjectSettingsDialog()
 	}
 
 	// Set constraints BEFORE BeginPopupModal
-	ImGui::SetNextWindowSizeConstraints(ImVec2(400, 250), ImVec2(FLT_MAX, FLT_MAX));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(300, 250), ImVec2(FLT_MAX, FLT_MAX));
 
 	if (ImGui::BeginPopupModal("DisplayProjectSettingsDialog", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{

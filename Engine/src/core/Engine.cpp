@@ -37,6 +37,8 @@
 #include "render/RenderCommand.h"
 #include "core/EventLayerStack.h"
 #include "core/EngineConfig.h"
+#include "render/DeferredRenderer.h"
+#include "render/Renderer.h"
 
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
@@ -198,9 +200,13 @@ bool Engine::init(const InitParams& initParams)
     auto gameMouse = new GameMouse();
     auto assets = new Assets();
 
+    
+
     m_timeManager = std::make_shared<TimeManager>();
 
     m_randomSystem = std::make_shared<RandomNumberGenerator>();
+
+    
 
     // Create or Load project asset registry
     std::shared_ptr<ProjectAssetRegistry> par;
@@ -217,6 +223,8 @@ bool Engine::init(const InitParams& initParams)
         m_context = std::make_shared<Context>(par);
         BuiltInAssetsLoader::loadAssets();
     }
+
+    
 
     m_physicsSystem = std::make_shared<PhysicsSystem>();
     if (!m_physicsSystem->init())
@@ -243,7 +251,11 @@ bool Engine::init(const InitParams& initParams)
     }
 
     
+    m_deferredRenderer = std::make_shared<DeferredRenderer>();
+    m_deferredRenderer->init();
 
+    m_forwardRenderer = std::make_shared<Renderer>();
+    m_forwardRenderer->init();
     
 
     auto objectPicker = new ObjectPicker();
@@ -284,11 +296,6 @@ std::string Engine::getRootDir()
 void Engine::SetWindow(std::shared_ptr<Window> window)
 {
     m_window = window;
-}
-
-IRenderer* Engine::getRenderer() const
-{
-    return m_context->getActiveScene()->getRenderer().get();
 }
 
 void Engine::SetContext(std::shared_ptr<Context> context)
@@ -463,6 +470,16 @@ const EngineConfig& Engine::getConfig() const
 MemoryPool<ResourceBase>& Engine::getMemoryPool() const
 {
     return *m_memoryPool.get();
+}
+
+DeferredRenderer& Engine::getDeferredRenderer() const
+{
+    return *m_deferredRenderer.get();
+}
+
+Renderer& Engine::getForwardRenderer() const
+{
+    return *m_forwardRenderer.get();
 }
 
 void Engine::loadProject(const std::string& dirPath)

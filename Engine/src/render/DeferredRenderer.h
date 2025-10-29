@@ -15,7 +15,6 @@ class RenderBufferObject;
 class DeferredRenderer : public RendererIntermediate
 {
 public:
-	DeferredRenderer(Scene* scene);
 	// Inherited via IRenderer
 	bool init() override;
 	void render() override;
@@ -24,6 +23,7 @@ public:
 	void setUniforms(Shader* shader);
 
 	void resize(int w, int h);
+	void reloadShaders();
 
 	const FrameBufferObject& getGBuffer() const;
 
@@ -43,12 +43,8 @@ private:
 	ResourceWrapper<Texture> m_albedoTexture = nullptr;
 	ResourceWrapper<Texture> m_MRATexture = nullptr;
 	
-	Scene* m_scene = nullptr;
-
-
-	Entity m_quad;
+	ResourceWrapper<MeshCollection> m_quad;
 	ResourceWrapper<Shader> m_screenShader;
-	
 	
 	ResourceWrapper<Shader> m_gBufferShader;
 	ResourceWrapper<Shader> m_lightPassShader;

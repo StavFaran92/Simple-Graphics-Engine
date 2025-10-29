@@ -34,12 +34,6 @@
 #include "component/ObjectComponent.h"
 #include "component/ShaderComponent.h"
 
-
-Renderer::Renderer(Scene* scene)
-    : m_scene(scene)
-{
-}
-
 bool Renderer::init()
 {
 	m_pbrShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");

@@ -44,7 +44,6 @@ public:
 	bool RemoveShader(ResourceWrapper<Shader> shader);
 
 	Window* getWindow() const;
-	IRenderer* getRenderer() const;
 	ImguiHandler* getImguiHandler() const;
 	Input* getInput() const;
 	EventSystem* getEventSystem() const;
