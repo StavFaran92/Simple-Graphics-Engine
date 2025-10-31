@@ -182,6 +182,12 @@ void Texture::setData(int xoffset, int yoffset, int width, int height, const voi
 	glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 }
 
+void Texture::generateMipMaps()
+{
+	bind();
+	glGenerateMipmap(m_data.target);
+}
+
 std::string Texture::textureTypeToString(TextureType type)
 {
 	switch (type)

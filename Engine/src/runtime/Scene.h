@@ -145,12 +145,6 @@ private:
 	uint32_t m_id = 0;
 	Context* m_context = nullptr;
 
-	// Renderers
-	//std::shared_ptr<DeferredRenderer> m_deferredRenderer = nullptr;
-	
-	//std::shared_ptr<GpuInstancingRenderer> m_gpuInstancingRenderer = nullptr;
-	//std::shared_ptr<SkyboxRenderer> m_skyboxRenderer = nullptr;
-
 	// Scene Services
 	std::shared_ptr<ObjectSelection> m_objectSelection = nullptr;
 	std::shared_ptr<PostProcessProjector> m_postProcessProjector = nullptr;

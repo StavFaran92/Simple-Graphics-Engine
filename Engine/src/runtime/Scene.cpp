@@ -333,7 +333,6 @@ void Scene::draw(float deltaTime)
 
 		graphics->scene = this;
 		graphics->context = m_context;
-		//graphics->renderer = m_forwardRenderer.get();
 		graphics->view = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
 		graphics->projection = m_defaultPerspectiveProjection;
 		graphics->cameraPos = primaryCameraTransform.getWorldPosition();

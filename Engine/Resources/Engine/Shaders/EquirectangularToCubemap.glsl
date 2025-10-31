@@ -50,7 +50,7 @@ void main()
     vec2 uv = SampleSphericalMap(normalize(localPos));
     vec3 color = texture(equirectangularMap, uv).rgb;
     // Apply gamma correction to the color
-    color = pow(color, vec3(1.0 / 2.2));
+    // color = pow(color, vec3(1.0 / 2.2));
 
     FragColor = vec4(color, 1.0);
 }

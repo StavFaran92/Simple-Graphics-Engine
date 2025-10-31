@@ -248,6 +248,8 @@ public:
 
 	void setData(int xoffset, int yoffset, int width, int height, const void* data);
 
+	void generateMipMaps();
+
 	/**
 	 * Converts a texture type to a string.
 	 * 

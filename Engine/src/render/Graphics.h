@@ -33,7 +33,6 @@ public:
 public:
 	Scene* scene = nullptr;
 	Context* context = nullptr;
-	IRenderer* renderer = nullptr;
 	glm::vec3 cameraPos;
 
 	std::vector<Entity> entityGroup;
