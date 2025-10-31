@@ -24,13 +24,11 @@ void SkyboxComponent::setSkybox(AssetWrapper<Texture> image)
 	originalImage = image;
 }
 
-#include "debug/RenderDocDebugHelper.h"
-
 void SkyboxComponent::build()
 {
 	// TODO check if orig image is cube and support cubemap load
 
-	RenderDocDebugHelper::startFrameCapture();
+	//RenderDocDebugHelper::startFrameCapture();
 
 	cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(originalImage.resource()); 
     cubemap->generateMipMaps();
@@ -41,6 +39,6 @@ void SkyboxComponent::build()
 
 	scene->setIBLData(irradianceMap, prefilterEnvMap);
 
-	RenderDocDebugHelper::stopFrameCapture();
+	//RenderDocDebugHelper::stopFrameCapture();
 
 }
