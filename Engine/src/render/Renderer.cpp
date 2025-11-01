@@ -272,7 +272,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
                 if (!aabb.isOnFrustum(*graphics->frustum))
                 {
-                    //continue; todo fix
+                    continue; //todo fix
                 }
 
                 auto matIndex = mesh->getMaterialIndex();
@@ -364,7 +364,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
                 if (!aabb.isOnFrustum(*graphics->frustum))
                 {
-                    //continue; todo fix
+                    continue; //todo fix
                 }
 
                 // if texture projection is enabled bind to custom FBO

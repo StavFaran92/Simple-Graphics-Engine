@@ -294,7 +294,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 			if (!aabb.isOnFrustum(*graphics->frustum))
 			{
-				//continue; todo fix
+				continue; //todo fix
 			}
 
 			graphics->material = Engine::get()->getDefaultMaterial().get();
