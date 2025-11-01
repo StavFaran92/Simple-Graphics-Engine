@@ -257,10 +257,45 @@ void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::Mod
 
 bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 {
-	auto fileDir = std::filesystem::path(fileLocation).parent_path().string();
+	std::string finalFilePath = fileLocation;
+
+	// If GLTF2, search for corresponding .GLB file
+	std::filesystem::path path(fileLocation);
+	if (path.extension().generic_string() == ".gltf")
+	{
+		// Switch to GLB file if found
+		auto parentPath = path.parent_path();
+		auto filenameStem = path.stem(); // filename without extension
+
+		// Construct potential .glb path
+		std::filesystem::path glbPath = parentPath / (filenameStem.string() + ".glb");
+
+		if (std::filesystem::exists(glbPath))
+		{
+			finalFilePath = glbPath.generic_string();
+		}
+
+		// Check for a .bin file with the same name
+		std::filesystem::path binPath = parentPath / (filenameStem.string() + ".bin");
+		if (std::filesystem::exists(binPath))
+		{
+			
+
+			std::filesystem::path targetParentPath = std::filesystem::path(aInfo.fullFilePath).parent_path();
+			std::filesystem::path targetBinFilePath = targetParentPath / (filenameStem.string() + ".bin");
+			std::filesystem::copy_file(binPath, targetBinFilePath, std::filesystem::copy_options::overwrite_existing);
+
+			logInfo("Found external .bin file: {}, copy into {}", binPath.generic_string(), targetBinFilePath.generic_string());
+			// Use it as the buffer source
+		}
+	}
+
+	std::filesystem::copy_file(finalFilePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
+
+	auto fileDir = std::filesystem::path(finalFilePath).parent_path().string();
 
 	// read scene from file
-	const aiScene* scene = m_importer->ReadFile(fileLocation, aiProcess_ValidateDataStructure);
+	const aiScene* scene = m_importer->ReadFile(finalFilePath, aiProcess_ValidateDataStructure);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -331,11 +366,6 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 	}
 
 	ResourceWrapper<MeshCollection> mesh = Factory<MeshCollection>::create();
-
-	auto& projectDir = Engine::get()->getProjectDirectory();
-	const std::string filename = std::filesystem::path(fileLocation).filename().string();
-	const std::string savedFilePath =  aInfo.fullFilePath;
-	std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 
 	return true;
 }
