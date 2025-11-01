@@ -449,8 +449,20 @@ void DeferredRenderer::resize(int w, int h)
 	m_MRATexture = Texture::createEmptyTexture(w, h, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	m_gBuffer.attachTexture(m_MRATexture.get()->getID(), GL_COLOR_ATTACHMENT3);
 
-	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(4, attachments);
+	m_positionTextureVS = Texture::createEmptyTexture(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_gBuffer.attachTexture(m_positionTextureVS.get()->getID(), GL_COLOR_ATTACHMENT4);
+
+	m_normalTextureVS = Texture::createEmptyTexture(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
+
+	unsigned int attachments[6] = {
+		GL_COLOR_ATTACHMENT0,
+		GL_COLOR_ATTACHMENT1,
+		GL_COLOR_ATTACHMENT2,
+		GL_COLOR_ATTACHMENT3,
+		GL_COLOR_ATTACHMENT4,
+		GL_COLOR_ATTACHMENT5 };
+	glDrawBuffers(6, attachments);
 
 	m_gBuffer.attachRenderBuffer(m_renderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
 	m_gBuffer.unbind();
