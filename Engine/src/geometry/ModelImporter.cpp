@@ -338,12 +338,14 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			if (!roughness.isEmpty())
 			{
 				material->setTexture(Texture::TextureType::Roughness, roughness);
+				material->getSampler(Texture::TextureType::Roughness)->channelMaskR = TextureSampler::Color::G;
 			}
 
 			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, fileDir, cachedTextures, aInfo);
 			if (!metallic.isEmpty())
 			{
 				material->setTexture(Texture::TextureType::Metallic, metallic);
+				material->getSampler(Texture::TextureType::Metallic)->channelMaskR = TextureSampler::Color::B;
 			}
 
 			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, fileDir, cachedTextures, aInfo);
