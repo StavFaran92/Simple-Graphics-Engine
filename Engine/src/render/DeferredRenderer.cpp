@@ -285,17 +285,19 @@ void DeferredRenderer::renderScene(Scene* scene)
 			graphics->entity = &entityHandler;
 			graphics->mesh = mesh.get();
 			auto& transform = entityHandler.getComponent<Transformation>();
-			glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
+			glm::mat4 modelTransform = transform.getWorldTransformation() *mesh->getRestTransform();
 			graphics->model = modelTransform;
 
 			// TODO get this to work
 			AABB& aabb = mesh.get()->getAABB();
-			aabb.adjustToTransform(transform);
+			aabb.transform(modelTransform);
 
 			if (!aabb.isOnFrustum(*graphics->frustum))
 			{
 				continue; //todo fix
 			}
+
+			//DebugHelper::getInstance().drawAABB(aabb);
 
 			graphics->material = Engine::get()->getDefaultMaterial().get();
 

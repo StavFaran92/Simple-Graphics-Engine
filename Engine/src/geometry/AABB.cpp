@@ -32,10 +32,10 @@ bool AABB::isOnFrustum(const Frustum& frustum) const
 		isForwardOfPlane(frustum.m_down);
 }
 
-void AABB::adjustToTransform(const Transformation& transform)
+void AABB::transform(const glm::mat4& transform)
 {
-	glm::vec4 calcCenter = transform.getWorldTransformation() * glm::vec4(center, 1.0f);
-	glm::vec4 calcExtent = transform.getWorldTransformation() * glm::vec4(center + extents, 1.0f);
+	glm::vec4 calcCenter = transform * glm::vec4(center, 1.0f);
+	glm::vec4 calcExtent = transform * glm::vec4(center + extents, 1.0f);
 	calcExtent -= calcCenter;
 	center = { calcCenter.x, calcCenter.y, calcCenter.z };
 	extents = { calcExtent.x, calcExtent.y, calcExtent.z };

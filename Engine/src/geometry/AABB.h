@@ -14,7 +14,7 @@ struct AABB : public Volume
 
 	virtual bool isOnFrustum(const Frustum& frustum) const;
 
-	void adjustToTransform(const Transformation& transform);
+	void transform(const glm::mat4& transform);
 
 	bool isForwardOfPlane(Plane p) const;
 	

@@ -264,11 +264,11 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             {
                 graphics->mesh = mesh.get();
                 auto& transform = graphics->entity->getComponent<Transformation>();
-                graphics->model = transform.getWorldTransformation();
+                graphics->model = transform.getWorldTransformation() * mesh->getRestTransform();
 
                 // TODO get this to work
                 AABB& aabb = mesh.get()->getAABB();
-                aabb.adjustToTransform(transform);
+                aabb.transform(graphics->model);
 
                 if (!aabb.isOnFrustum(*graphics->frustum))
                 {
@@ -356,11 +356,11 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             {
                 graphics->mesh = mesh.get();
                 auto& transform = graphics->entity->getComponent<Transformation>();
-                graphics->model = transform.getWorldTransformation();
+                graphics->model = transform.getWorldTransformation() * mesh->getRestTransform();
 
                 // TODO get this to work
                 AABB& aabb = mesh.get()->getAABB();
-                aabb.adjustToTransform(transform);
+                aabb.transform(graphics->model);
 
                 if (!aabb.isOnFrustum(*graphics->frustum))
                 {

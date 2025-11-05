@@ -11,6 +11,7 @@
 class VertexArrayObject;
 class VertexBufferObject;
 class Shader;
+struct AABB;
 
 class EngineAPI DebugHelper
 {
@@ -27,11 +28,13 @@ public:
         return instance;
     }
 
-    void drawPoint(const glm::vec3& pos, const glm::vec3& color = {1.f,0.f,0.f}, float size = 10.f);
+    void drawPoint(const glm::vec3& pos, const glm::vec3& color = {1.f,1.f,1.f}, float size = 10.f);
 
-	void drawLine(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& color = { 1,0,0 });
+	void drawLine(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& color = { 1,1,1 }, float thickness = 1);
 
 	void drawTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3);
+
+	void drawAABB(const AABB& aabb, const glm::vec3& color = { 1,1,1 }, float thickness = 1);
 
     void registerTextureForDebug(const std::string& name, ResourceWrapper<Texture> texture);
 

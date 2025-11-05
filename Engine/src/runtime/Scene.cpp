@@ -612,12 +612,15 @@ void Scene::draw(float deltaTime)
 						m_highlightRenderView->bind();
 						RenderCommand::clear();
 						m_highlightMaskShader->use();
-						m_highlightMaskShader->setModelMatrix(e.getComponent<Transformation>().getWorldTransformation());
+						
 						m_highlightMaskShader->setViewMatrix(graphics->view);
 						m_highlightMaskShader->setProjectionMatrix(graphics->projection);
 
 						for (auto& m : mesh->mesh.resource()->getMeshes())
+						{
+							m_highlightMaskShader->setModelMatrix(e.getComponent<Transformation>().getWorldTransformation() * m->getRestTransform());
 							RenderCommand::draw(m->getVAO());
+						}
 
 						glPopDebugGroup();
 					}
@@ -738,7 +741,56 @@ void Scene::draw(float deltaTime)
 		glDisable(GL_BLEND);
 
 		glPopDebugGroup();
+
+		
+#if 0 // TODO make use of this quite usefull camera frustum debug code
+		auto gameCameraTransform = getRenderView("Game View")->getCamera().getComponent<Transformation>();
+		auto gameCameraComponent = getRenderView("Game View")->getCamera().getComponent<CameraComponent>();
+		auto gameCameraView = glm::lookAt(gameCameraTransform.getWorldPosition(), gameCameraTransform.getWorldPosition() + gameCameraComponent.front, gameCameraComponent.up);
+
+		glm::mat4 view = gameCameraView;
+		glm::mat4 projection = graphics->projection;
+		glm::mat4 invViewProj = glm::inverse(projection * view);
+
+		// NDC cube corners
+		static glm::vec3 ndcCorners[8] = {
+			{-1, -1, -1}, {1, -1, -1},
+			{-1,  1, -1}, {1,  1, -1},
+			{-1, -1,  1}, {1, -1,  1},
+			{-1,  1,  1}, {1,  1,  1}
+		};
+
+		// Transform to world space
+		static glm::vec3 worldCorners[8];
+		for (int i = 0; i < 8; ++i) {
+			glm::vec4 p = invViewProj * glm::vec4(ndcCorners[i], 1.0f);
+			worldCorners[i] = glm::vec3(p) / p.w;
+		}
+
+
+		auto& debug = DebugHelper::getInstance();
+
+		// Near plane
+		debug.drawLine(worldCorners[0], worldCorners[1]);
+		debug.drawLine(worldCorners[1], worldCorners[3]);
+		debug.drawLine(worldCorners[3], worldCorners[2]);
+		debug.drawLine(worldCorners[2], worldCorners[0]);
+
+		// Far plane
+		debug.drawLine(worldCorners[4], worldCorners[5]);
+		debug.drawLine(worldCorners[5], worldCorners[7]);
+		debug.drawLine(worldCorners[7], worldCorners[6]);
+		debug.drawLine(worldCorners[6], worldCorners[4]);
+
+		// Connect near to far
+		for (int i = 0; i < 4; ++i) {
+			debug.drawLine(worldCorners[i], worldCorners[i + 4]);
+		}
+
+#endif
 	}
+
+
 
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
