@@ -68,8 +68,8 @@ void DebugHelper::drawTriangle(const glm::vec3& p1, const glm::vec3& p2, const g
 
 void DebugHelper::drawAABB(const AABB& aabb, const glm::vec3& color, float thickness)
 {
-	glm::vec3 c = aabb.center;
-	glm::vec3 e = aabb.extents;
+	glm::vec3 c = aabb.center();
+	glm::vec3 e = aabb.extents();
 
 	// Compute 8 corners from center and extents
 	glm::vec3 corners[8] = {

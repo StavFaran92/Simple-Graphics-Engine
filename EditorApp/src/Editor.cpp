@@ -129,7 +129,7 @@ void focusOnEntity(Entity e)
 		auto& targetAABB = targetMesh->mesh.get()->getPrimaryMesh()->getAABB();
 
 		// set destination to location + forward
-		targetLocation = targetTransform.getWorldPosition() - front * 5.f + targetAABB.extents * .5f;
+		targetLocation = targetTransform.getWorldPosition() - front * 5.f + targetAABB.extents() * .5f;
 
 // create fake frustum
 Frustum fakeFrustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
