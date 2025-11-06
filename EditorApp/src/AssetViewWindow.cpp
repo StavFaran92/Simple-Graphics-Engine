@@ -110,10 +110,10 @@ void AssetViewWindow::display()
 			fileMetadataTable.push_back(fMetadata);
 		}
 
+		ImGui::TableNextColumn();
+
 		for (int i=0; i<fileMetadataTable.size(); i++)
 		{
-			ImGui::TableNextColumn();
-
 			const FileMetadata& fMetadata = fileMetadataTable[i];
 			ImGui::PushID(i);
 
@@ -327,7 +327,7 @@ void AssetViewWindow::display()
 
 				ImGui::EndPopup();
 			}
-
+			ImGui::TableNextColumn();
 			ImGui::PopID();
 		}
 		

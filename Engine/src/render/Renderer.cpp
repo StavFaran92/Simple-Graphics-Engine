@@ -68,9 +68,17 @@ void Renderer::renderScene(Scene* scene)
             for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
             {
 
-                graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation();;
+                graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation() * mesh->getRestTransform();
                 graphics->shader = m_pbrShader;
                 graphics->mesh = mesh.get();
+
+                AABB& aabb = mesh.get()->getAABB();
+                aabb.transform(graphics->model);
+
+                if (!aabb.isOnFrustum(*graphics->frustum))
+                {
+                    continue;
+                }
 
                 Material* mat = graphics->entity->tryGetComponentInParent<Material>();
 
@@ -140,9 +148,17 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
         for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
         {
 
-            graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation();;
+            graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation() * mesh->getRestTransform();;
             graphics->shader = m_pbrShader;
             graphics->mesh = mesh.get();
+
+            AABB& aabb = mesh.get()->getAABB();
+            aabb.transform(graphics->model);
+
+            if (!aabb.isOnFrustum(*graphics->frustum))
+            {
+                continue;
+            }
 
             auto matIndex = mesh->getMaterialIndex();
             MaterialComponent& materialComponent = entityHandler.getComponent<MaterialComponent>();
@@ -272,7 +288,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
                 if (!aabb.isOnFrustum(*graphics->frustum))
                 {
-                    continue; //todo fix
+                    continue; 
                 }
 
                 auto matIndex = mesh->getMaterialIndex();
@@ -364,7 +380,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
                 if (!aabb.isOnFrustum(*graphics->frustum))
                 {
-                    continue; //todo fix
+                    continue; 
                 }
 
                 // if texture projection is enabled bind to custom FBO
