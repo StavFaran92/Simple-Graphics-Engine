@@ -13,8 +13,13 @@ RenderTarget::RenderTarget(Viewport viewport)
 
 	m_renderTargetFBO->bind();
 
-	// Generate Texture for Position data
-	m_renderTargetTexture = Texture::createEmptyTexture(viewport.w, viewport.h);
+	m_renderTargetTexture = Texture::createEmptyTexture(viewport.w, viewport.h, Texture::InternalFormat::RGBA8, Texture::Format::RGB, Texture::Type::UNSIGNED_BYTE, 
+		{ 
+			{GL_TEXTURE_MIN_FILTER, GL_LINEAR },
+			{GL_TEXTURE_MAG_FILTER, GL_LINEAR },
+			{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+			{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE} 
+		});
 	m_renderTargetFBO->attachTexture(m_renderTargetTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };

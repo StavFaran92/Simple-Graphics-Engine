@@ -229,6 +229,7 @@ public:
 	 * \return			A pointer to the generated texture
 	 */
 	static ResourceWrapper<Texture> createEmptyTexture(int width, int height, int internalFormat, int format, int type);
+	static ResourceWrapper<Texture> createEmptyTexture(int width, int height, int internalFormat, int format, int type, std::map<int, int> params);
 
 	/**
 	 * Create a texture using predefined data

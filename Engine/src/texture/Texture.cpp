@@ -96,11 +96,25 @@ ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int 
 	textureData.format = (Format)format;
 	textureData.type = (Type)type;
 	textureData.params = {
-		{GL_TEXTURE_MIN_FILTER, GL_NEAREST },
-		{GL_TEXTURE_MAG_FILTER, GL_NEAREST },
+		{GL_TEXTURE_MIN_FILTER, GL_LINEAR },
+		{GL_TEXTURE_MAG_FILTER, GL_LINEAR },
 		{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
 		{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
 	};
+
+	return create2DTextureFromBuffer(textureData);
+}
+
+ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int internalFormat, int format, int type, std::map<int, int> params)
+{
+	TextureData textureData;
+	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	textureData.width = width;
+	textureData.height = height;
+	textureData.internalFormat = (InternalFormat)internalFormat;
+	textureData.format = (Format)format;
+	textureData.type = (Type)type;
+	textureData.params = params;
 
 	return create2DTextureFromBuffer(textureData);
 }
