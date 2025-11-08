@@ -621,6 +621,16 @@ void InspectorWindow::display()
 			addAssetSelectWidget(shaderName, AssetType::SHADER, [&postProcessComponent](UUID uid) {
 				postProcessComponent.shader = AssetWrapper<Shader>(uid);
 				});
+
+			if (!postProcessComponent.shader.isEmpty())
+			{
+				// Compile Button
+				if (ImGui::Button("recompile"))
+				{
+					postProcessComponent.shader.resource()->recompile();
+				}
+			}
+
 			});
 
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {

@@ -823,6 +823,8 @@ void Scene::draw(float deltaTime)
 
 				auto viewport = renderView->getViewport();
 				shader->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
+				glm::vec2 texelSize = glm::vec2(1.0 / viewport.w, 1.0 / viewport.h);
+				shader->setUniformValue("texelSize", texelSize);
 
 				//shader->setUniformValue("cameraPos", graphics->cameraPos);
 				//shader->setUniformValue("cameraLookAt", primaryCamera.front);

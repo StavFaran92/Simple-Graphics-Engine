@@ -531,14 +531,6 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, co
 	shader->m_glslFilePath = filepath;
 	shader->recompile();
 
-	//AssetCreateDescriptor aInfo;
-	//aInfo.origFilePath = filepath;
-	//aInfo.aType = AssetType::SHADER;
-	//aInfo.name = name;
-	//aInfo.attributes["shader_override"] = getShaderOverrideAsStr(shaderOverride);
-	//aInfo.isEngineOwned = isEngineOwned;
-	//Engine::get()->getSubSystem<Assets>()->createAsset(shader, aInfo);
-
 	return shader;
 }
 

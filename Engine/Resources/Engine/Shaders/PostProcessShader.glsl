@@ -44,6 +44,7 @@ uniform vec3 cameraPos;
 uniform vec3 cameraLookAt;
 
 uniform vec2 screenSize;
+uniform vec2 texelSize;
 
 uniform sampler2D MainTexture;
 
