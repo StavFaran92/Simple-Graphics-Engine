@@ -13,6 +13,11 @@ public:
 	{
 		attachSimple<PostProcessComponent>(c, entityHandler);
 	}
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(shader);
+	}
 };
 
 REGISTER_COMPONENT(PostProcessComponent)

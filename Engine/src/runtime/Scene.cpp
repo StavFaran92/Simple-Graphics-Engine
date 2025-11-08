@@ -741,7 +741,7 @@ void Scene::draw(float deltaTime)
 
 		glDisable(GL_BLEND);
 
-		glPopDebugGroup();
+		
 
 		
 #if 0 // TODO make use of this quite usefull camera frustum debug code
@@ -844,6 +844,8 @@ void Scene::draw(float deltaTime)
 
 			glPopDebugGroup();
 		}
+
+		glPopDebugGroup();
 	}
 
 
