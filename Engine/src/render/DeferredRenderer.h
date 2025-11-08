@@ -28,13 +28,13 @@ public:
 	const FrameBufferObject& getGBuffer() const;
 
 private:
-	bool setupGBuffer();
-	bool setupSSAO();
+	bool setupGBuffer(int width, int height);
+	bool setupSSAO(int width, int height);
 
 private:
 	FrameBufferObject m_gBuffer;
 	
-	RenderBufferObject m_renderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
+	RenderBufferObject m_renderBuffer;
 	
 	ResourceWrapper<Texture> m_positionTexture = nullptr;
 	ResourceWrapper<Texture> m_positionTextureVS = nullptr;
@@ -51,7 +51,7 @@ private:
 
 	// SSAO
 	FrameBufferObject m_ssaoFBO;
-	RenderBufferObject m_ssaoRenderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
+	RenderBufferObject m_ssaoRenderBuffer;
 	ResourceWrapper<Texture> m_ssaoNoiseTexture = nullptr;
 	ResourceWrapper<Texture> m_ssaoColorBuffer = nullptr;
 	ResourceWrapper<Shader> m_ssaoPassShader;

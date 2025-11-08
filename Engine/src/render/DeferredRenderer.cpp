@@ -33,12 +33,9 @@ static float lerp(float a, float b, float t)
 	return a + t * (b - a);
 }
 
-bool DeferredRenderer::setupGBuffer()
+bool DeferredRenderer::setupGBuffer(int width, int height)
 {
 	m_gBuffer.bind();
-
-	auto width = Engine::get()->getWindow()->getWidth();
-	auto height = Engine::get()->getWindow()->getHeight();
 
 	// Generate Texture for Position data
 	m_positionTexture = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
@@ -74,6 +71,7 @@ bool DeferredRenderer::setupGBuffer()
 	glDrawBuffers(6, attachments);
 
 	// Create RBO and attach to FBO
+	m_renderBuffer = RenderBufferObject(width, height);
 	m_gBuffer.attachRenderBuffer(m_renderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
 
 	if (!m_gBuffer.isComplete())
@@ -84,14 +82,14 @@ bool DeferredRenderer::setupGBuffer()
 
 	m_gBuffer.unbind();
 
-	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
-	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
-
 	return true;
 }
 
-bool DeferredRenderer::setupSSAO()
+bool DeferredRenderer::setupSSAO(int width, int height)
 {
+	int ssaoBufferWidth = width * .5f;
+	int ssaoBufferHeight = height * .5f;
+
 	// Generate SSAO kernel
 	m_ssaoKernel.reserve(64);
 	auto rand = Engine::get()->getRandomSystem();
@@ -131,19 +129,17 @@ bool DeferredRenderer::setupSSAO()
 		&ssaoNoise[0]
 		);
 
-	auto width = Engine::get()->getWindow()->getWidth();
-	auto height = Engine::get()->getWindow()->getHeight();
-
 	// Initialize SSAO FBO
 	m_ssaoFBO.bind();
 
-	m_ssaoColorBuffer = Texture::createEmptyTexture(width, height, GL_RED, GL_RED, GL_FLOAT);
+	m_ssaoColorBuffer = Texture::createEmptyTexture(ssaoBufferWidth, ssaoBufferHeight, GL_RED, GL_RED, GL_FLOAT);
 	m_ssaoFBO.attachTexture(m_ssaoColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, attachments);
 
 	// Create RBO and attach to FBO
+	m_ssaoRenderBuffer = RenderBufferObject(ssaoBufferWidth, ssaoBufferHeight);
 	m_ssaoFBO.attachRenderBuffer(m_ssaoRenderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
 
 	if (!m_ssaoFBO.isComplete())
@@ -159,10 +155,11 @@ bool DeferredRenderer::setupSSAO()
 	// Initialize SSAO Blur
 	m_ssaoBlurFBO.bind();
 
-	m_ssaoBlurColorBuffer = Texture::createEmptyTexture(width, height, GL_RED, GL_RED, GL_FLOAT);
+	m_ssaoBlurColorBuffer = Texture::createEmptyTexture(ssaoBufferWidth, ssaoBufferHeight, GL_RED, GL_RED, GL_FLOAT);
 	m_ssaoBlurFBO.attachTexture(m_ssaoBlurColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	// Create RBO and attach to FBO
+	m_ssaoBlurRenderBuffer = RenderBufferObject(ssaoBufferWidth, ssaoBufferHeight);
 	m_ssaoBlurFBO.attachRenderBuffer(m_ssaoBlurRenderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
 
 	if (!m_ssaoBlurFBO.isComplete())
@@ -182,9 +179,15 @@ bool DeferredRenderer::setupSSAO()
 
 bool DeferredRenderer::init()
 {
-	setupGBuffer();
+	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
+	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
 
-	setupSSAO();
+	auto width = Engine::get()->getWindow()->getWidth();
+	auto height = Engine::get()->getWindow()->getHeight();
+
+	setupGBuffer(width, height);
+
+	setupSSAO(width, height);
 
 	// Generate screen quad
 	UUID quadUUID = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD);
@@ -356,8 +359,11 @@ void DeferredRenderer::renderScene(Scene* scene)
 		auto width = Engine::get()->getWindow()->getWidth();
 		auto height = Engine::get()->getWindow()->getHeight();
 
-		m_ssaoPassShader->setUniformValue("screenWidth", width);
-		m_ssaoPassShader->setUniformValue("screenHeight", height);
+		// We set the viewport to half the screen size to improve the SSAO performance
+		RenderCommand::setViewport(0, 0, width / 2.f, height / 2.f);
+
+		m_ssaoPassShader->setUniformValue("screenWidth", width / 2.f);
+		m_ssaoPassShader->setUniformValue("screenHeight", height / 2.f);
 
 		for (unsigned int i = 0; i < 64; ++i)
 		{
@@ -388,6 +394,9 @@ void DeferredRenderer::renderScene(Scene* scene)
 		}
 
 		glEnable(GL_DEPTH_TEST);
+
+		// We set the viewport back to original size
+		RenderCommand::setViewport(0, 0, width, height);
 
 		glPopDebugGroup();
 	}
@@ -435,59 +444,13 @@ const FrameBufferObject& DeferredRenderer::getGBuffer() const
 
 void DeferredRenderer::resize(int w, int h)
 {
-	m_renderBuffer = RenderBufferObject(w, h);
-
-	m_gBuffer.bind();
-
-	m_positionTexture = Texture::createEmptyTexture(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-	m_gBuffer.attachTexture(m_positionTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
-
-	m_normalTexture = Texture::createEmptyTexture(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-	m_gBuffer.attachTexture(m_normalTexture.get()->getID(), GL_COLOR_ATTACHMENT1);
-
-	m_albedoTexture = Texture::createEmptyTexture(w, h, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-	m_gBuffer.attachTexture(m_albedoTexture.get()->getID(), GL_COLOR_ATTACHMENT2);
-
-	m_MRATexture = Texture::createEmptyTexture(w, h, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-	m_gBuffer.attachTexture(m_MRATexture.get()->getID(), GL_COLOR_ATTACHMENT3);
-
-	m_positionTextureVS = Texture::createEmptyTexture(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-	m_gBuffer.attachTexture(m_positionTextureVS.get()->getID(), GL_COLOR_ATTACHMENT4);
-
-	m_normalTextureVS = Texture::createEmptyTexture(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
-
-	unsigned int attachments[6] = {
-		GL_COLOR_ATTACHMENT0,
-		GL_COLOR_ATTACHMENT1,
-		GL_COLOR_ATTACHMENT2,
-		GL_COLOR_ATTACHMENT3,
-		GL_COLOR_ATTACHMENT4,
-		GL_COLOR_ATTACHMENT5 };
-	glDrawBuffers(6, attachments);
-
-	m_gBuffer.attachRenderBuffer(m_renderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
-	m_gBuffer.unbind();
-
-	m_ssaoRenderBuffer = RenderBufferObject(w, h);
-	m_ssaoFBO.bind();
-	m_ssaoColorBuffer = Texture::createEmptyTexture(w, h, GL_RED, GL_RED, GL_FLOAT);
-	m_ssaoFBO.attachTexture(m_ssaoColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
-	unsigned int ssaoAttachments[1] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, ssaoAttachments);
-	m_ssaoFBO.attachRenderBuffer(m_ssaoRenderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
-	m_ssaoFBO.unbind();
-
-	m_ssaoBlurRenderBuffer = RenderBufferObject(w, h);
-	m_ssaoBlurFBO.bind();
-	m_ssaoBlurColorBuffer = Texture::createEmptyTexture(w, h, GL_RED, GL_RED, GL_FLOAT);
-	m_ssaoBlurFBO.attachTexture(m_ssaoBlurColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
-	m_ssaoBlurFBO.attachRenderBuffer(m_ssaoBlurRenderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
-	m_ssaoBlurFBO.unbind();
+	setupGBuffer(w, h);
+	setupSSAO(w, h);
 }
 
 void DeferredRenderer::reloadShaders()
 {
 	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
 	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
 }
