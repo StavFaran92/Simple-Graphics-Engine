@@ -16,6 +16,7 @@ struct EngineConfig
 		bool renderWireframeGrid = true;
 		bool renderFoliagePass = true;
 		bool renderNonOpaquePass = true;
+		bool renderPostProcess = true;
 	};
 
 	EngineConfig(const std::string& path);

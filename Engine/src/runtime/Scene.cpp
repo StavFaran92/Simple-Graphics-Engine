@@ -66,6 +66,7 @@
 #include "component/SkyboxComponent.h"
 #include "component/NativeScriptComponent.h"
 #include "component/ImageComponent.h"
+#include "component/PostProcessComponent.h"
 #include "scripts/ScriptSystem.h"
 #include "memory/BuiltInAssets.h"
 
@@ -788,6 +789,59 @@ void Scene::draw(float deltaTime)
 		}
 
 #endif
+
+		if (Engine::get()->getConfig().renderConfig.renderPostProcess)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Post Process render pass");
+
+			// Render Post Process Effects
+			for (auto&& [entity, postProcess] : m_registry->get().view<PostProcessComponent>().each())
+			{
+				ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+				renderView->swapToAdditionalTarget();
+				renderView->bind();
+				RenderCommand::clear();
+				glDisable(GL_DEPTH_TEST);
+				// TODO assert post process shader
+
+				// bind shader
+				auto shader = postProcess.shader.resource();
+
+				if (shader.isEmpty())
+				{
+					continue;
+				}
+
+				shader->use();
+
+				// read texture from graphics FBO
+				shader->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
+
+				//shader->setModelMatrix(glm::mat4(1.0));
+				//shader->setViewMatrix(graphics->view);
+				//shader->setProjectionMatrix(graphics->projection);
+
+				auto viewport = renderView->getViewport();
+				shader->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
+
+				//shader->setUniformValue("cameraPos", graphics->cameraPos);
+				//shader->setUniformValue("cameraLookAt", primaryCamera.front);
+
+				// bind mesh
+				auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); 
+
+				// in frag shader i need access to mesh extentes & main texture -> set uniforms
+
+				// draw
+				RenderCommand::draw(vao);
+
+				renderView->swapBackToMainTarget();
+				renderView->bind();
+				glEnable(GL_DEPTH_TEST);
+			}
+
+			glPopDebugGroup();
+		}
 	}
 
 

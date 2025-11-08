@@ -71,5 +71,6 @@
 #include "component/PlayerControllerComponent.h"
 #include "component/ScriptComponent.h"
 #include "component/ImageComponent.h"
+#include "component/PostProcessComponent.h"
 #include "runtime/Prefab.h"
 #include "memory/BuiltInAssets.h"

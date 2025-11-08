@@ -59,7 +59,7 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 
 void ShaderAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
 {
-	std::filesystem::copy_file(aInfo.origFilePath, aInfo.fullFilePath);
+	std::filesystem::copy_file(aInfo.origFilePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
 uint32_t Shader::s_activeShader = 0;

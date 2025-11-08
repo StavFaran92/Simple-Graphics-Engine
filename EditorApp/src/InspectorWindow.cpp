@@ -611,6 +611,18 @@ void InspectorWindow::display()
 				});
 			});
 
+		displayComponent<PostProcessComponent>("Post Process Component", [](PostProcessComponent& postProcessComponent) {
+			std::string shaderName = "None";
+			if (!postProcessComponent.shader.isEmpty())
+			{
+				shaderName = postProcessComponent.shader.getUID();
+			}
+
+			addAssetSelectWidget(shaderName, AssetType::SHADER, [&postProcessComponent](UUID uid) {
+				postProcessComponent.shader = AssetWrapper<Shader>(uid);
+				});
+			});
+
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
 			});
 
@@ -697,6 +709,11 @@ void InspectorWindow::display()
 			{
 				auto& script = state.getSelectedEntity().addComponent<ScriptComponent>();
 				script.entity = state.getSelectedEntity();
+			}
+
+			if (ImGui::MenuItem("Post Process Effect"))
+			{
+				state.getSelectedEntity().addComponent<PostProcessComponent>();
 			}
 
 			//Todo REMOVE

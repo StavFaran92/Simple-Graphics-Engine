@@ -278,7 +278,7 @@ void displayShaderCreatorDialog()
 		ImGui::InputText("##ShaderFilePath", filepath, IM_ARRAYSIZE(filepath), ImGuiInputTextFlags_EnterReturnsTrue);
 
 		// Override Type Drop-down
-		const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader" };
+		const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader", "Volume Shader", "Post Process Effect Shader"};
 		ImGui::Text("Override Type");
 		ImGui::Combo("##ShaderOverrideType", (int*)&shaderOverrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
 
@@ -286,7 +286,13 @@ void displayShaderCreatorDialog()
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			auto& shader = Shader::createOverrideShader(shaderName, filepath, (ShaderOverride)shaderOverrideType);
+			auto& shader = Shader::createOverrideShader(shaderName, filepath, (ShaderOverride)(shaderOverrideType + 1)); // todo fix
+
+			AssetCreateDescriptor desc;
+			desc.name = shaderName;
+			desc.origFilePath = filepath;
+			desc.aType = AssetType::SHADER;
+			Engine::get()->getSubSystem<Assets>()->createAsset(shader, desc);
 			ImGui::CloseCurrentPopup();
 		}
 
