@@ -337,60 +337,60 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	//glDisable(GL_DEPTH_TEST);
 	
-#if 1
-	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "SSAO pass");
-
-	glDisable(GL_DEPTH_TEST);
-
-	m_ssaoFBO.bind();
-	m_ssaoPassShader->use();
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	// SSAO
-	m_ssaoPassShader->setTextureInShader(m_positionTextureVS, "gPositionVS", 0);
-	m_ssaoPassShader->setTextureInShader(m_normalTextureVS, "gNormalVS", 1);
-	m_ssaoPassShader->setTextureInShader(m_ssaoNoiseTexture, "gSSAONoise", 2);
-
-	// TODO remove
-	auto width = Engine::get()->getWindow()->getWidth();
-	auto height = Engine::get()->getWindow()->getHeight();
-
-	m_ssaoPassShader->setUniformValue("screenWidth", width);
-	m_ssaoPassShader->setUniformValue("screenHeight", height);
-
-	for (unsigned int i = 0; i < 64; ++i)
+	if (graphics->useSSAO)
 	{
-		m_ssaoPassShader->setUniformValue("ssaoKernel[" + std::to_string(i) + "]", m_ssaoKernel[i]);
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "SSAO pass");
+
+		glDisable(GL_DEPTH_TEST);
+
+		m_ssaoFBO.bind();
+		m_ssaoPassShader->use();
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		// SSAO
+		m_ssaoPassShader->setTextureInShader(m_positionTextureVS, "gPositionVS", 0);
+		m_ssaoPassShader->setTextureInShader(m_normalTextureVS, "gNormalVS", 1);
+		m_ssaoPassShader->setTextureInShader(m_ssaoNoiseTexture, "gSSAONoise", 2);
+
+		// TODO remove
+		auto width = Engine::get()->getWindow()->getWidth();
+		auto height = Engine::get()->getWindow()->getHeight();
+
+		m_ssaoPassShader->setUniformValue("screenWidth", width);
+		m_ssaoPassShader->setUniformValue("screenHeight", height);
+
+		for (unsigned int i = 0; i < 64; ++i)
+		{
+			m_ssaoPassShader->setUniformValue("ssaoKernel[" + std::to_string(i) + "]", m_ssaoKernel[i]);
+		}
+
+		m_ssaoPassShader->setUniformValue("view", graphics->view);
+		m_ssaoPassShader->setUniformValue("projection", graphics->projection);
+
+		{
+			// render to quad
+			auto vao = m_quad->getPrimaryMesh()->getVAO();
+			RenderCommand::draw(vao);
+		}
+
+		//glClear(GL_COLOR_BUFFER_BIT);
+
+		m_ssaoBlurFBO.bind();
+		m_ssaoBlurPassShader->use();
+
+		m_ssaoBlurPassShader->setTextureInShader(m_ssaoColorBuffer, "gSSAOColorBuffer", 0);
+
+
+		{
+			// render to quad
+			auto vao = m_quad->getPrimaryMesh()->getVAO();
+			RenderCommand::draw(vao);
+		}
+
+		glEnable(GL_DEPTH_TEST);
+
+		glPopDebugGroup();
 	}
-
-	m_ssaoPassShader->setUniformValue("view", graphics->view);
-	m_ssaoPassShader->setUniformValue("projection", graphics->projection);
-
-	{
-		// render to quad
-		auto vao = m_quad->getPrimaryMesh()->getVAO();
-		RenderCommand::draw(vao);
-	}
-
-	//glClear(GL_COLOR_BUFFER_BIT);
-	
-	m_ssaoBlurFBO.bind();
-	m_ssaoBlurPassShader->use();
-
-	m_ssaoBlurPassShader->setTextureInShader(m_ssaoColorBuffer, "gSSAOColorBuffer", 0);
-
-
-	{
-		// render to quad
-		auto vao = m_quad->getPrimaryMesh()->getVAO();
-		RenderCommand::draw(vao);
-	}
-
-	glEnable(GL_DEPTH_TEST);
-
-	glPopDebugGroup();
-
-#endif
 
 	// bind textures
 	// Todo solve slots issue

@@ -147,8 +147,8 @@ bool Engine::init(const InitParams& initParams)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_3D);
 
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    //glEnable(GL_DEBUG_OUTPUT);
+    //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glEnable(GL_CULL_FACE);

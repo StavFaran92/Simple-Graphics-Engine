@@ -8,8 +8,14 @@
 #include "core/Engine.h"
 
 void APIENTRY MyDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
-	GLsizei length, const GLchar* message, const void* userParam) {
-	logError("OpenGL Debug: {]", std::string(message));
+	GLsizei length, const GLchar* message, const void* userParam) 
+{
+	if (type == GL_DEBUG_TYPE_ERROR ||
+		type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR ||
+		type == GL_DEBUG_TYPE_PERFORMANCE)
+	{
+		logError("OpenGL Debug: {}", std::string(message));
+	}
 }
 
 Window::Window()
@@ -98,10 +104,18 @@ int Window::init()
 
 	//glEnable(GL_DEBUG_OUTPUT);
 	//glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	//glDebugMessageCallback(MyDebugCallback, nullptr);
+	glDebugMessageCallback(MyDebugCallback, nullptr);
+
+	// Disable all notification messages (e.g., push/pop group)
+	glDebugMessageControl(
+		GL_DONT_CARE,           // source
+		GL_DONT_CARE,           // type
+		GL_DEBUG_SEVERITY_NOTIFICATION, // severity
+		0, nullptr,
+		GL_FALSE);              // turn off
 
 	//Use Vsync
-	if (SDL_GL_SetSwapInterval(1) != 0)
+	if (SDL_GL_SetSwapInterval(0) != 0)
 	{
 		logError("Warning: Unable to set VSync! SDL Error: {}", SDL_GetError());
 		return false;

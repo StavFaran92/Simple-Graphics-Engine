@@ -210,7 +210,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 				AssetWrapper<Material> material(uuid);
 				modelInfo.materials[matIndex] = material.resource();
 
-				logDebug("Assigned material index {} -> UUID {}", matIndex, uuid);
+				logTrace("Assigned material index {} -> UUID {}", matIndex, uuid);
 			}
 		}
 	}

@@ -37,6 +37,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	NativeScripts
 )
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC SGE_DEBUG)
-
 
