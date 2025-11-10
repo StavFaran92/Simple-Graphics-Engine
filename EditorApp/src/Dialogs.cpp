@@ -292,6 +292,7 @@ void displayShaderCreatorDialog()
 			desc.name = shaderName;
 			desc.origFilePath = filepath;
 			desc.aType = AssetType::SHADER;
+			desc.attributes["shader_override"] = Shader::getShaderOverrideAsStr((ShaderOverride)(shaderOverrideType + 1));
 			Engine::get()->getSubSystem<Assets>()->createAsset(shader, desc);
 			ImGui::CloseCurrentPopup();
 		}

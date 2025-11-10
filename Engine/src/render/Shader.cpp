@@ -19,6 +19,15 @@
 
 #include <filesystem>
 
+const std::map<ShaderOverride, std::string> shaderOverrideToString
+{
+	{ ShaderOverride::None,			"N/A" },
+	{ ShaderOverride::PBR,		"PBR" },
+	{ ShaderOverride::Pixel,		"Pixel" },
+	{ ShaderOverride::Volume,		"Volume" },
+	{ ShaderOverride::PostProcess,		"PostProcess" },
+};
+
 namespace {
 	struct ShaderManagerRegistration {
 		ShaderManagerRegistration() {
@@ -558,21 +567,24 @@ ResourceWrapper<Shader> Shader::load(const std::string& fileLocation, ShaderAsse
 
 ShaderOverride Shader::getShaderOverrideFromStr(const std::string& shaderOverride)
 {
-	if (shaderOverride == "PBR") return ShaderOverride::PBR;
-	if (shaderOverride == "Pixel") return ShaderOverride::Pixel;
+	for (const auto& [key, value] : shaderOverrideToString)
+	{
+		if (value == shaderOverride)
+			return key;
+	}
+
+	logWarning("Invalid shader override string: {}", shaderOverride);
+
 	return ShaderOverride::None;
 }
 
 std::string Shader::getShaderOverrideAsStr(ShaderOverride shaderOverride)
 {
-	switch (shaderOverride)
-	{
-	case ShaderOverride::PBR:
-		return "PBR";
-	case ShaderOverride::Pixel:
-		return "Pixel";
-	}
-	return "None";
+	auto it = shaderOverrideToString.find(shaderOverride);
+	if (it != shaderOverrideToString.end())
+		return it->second;
+
+	return shaderOverrideToString.at(ShaderOverride::None);
 }
 
 void embeddOverrideShaderInUberShader(ShadersInfo& shaderOverrideInfo, ShaderOverride shaderOverride)

@@ -26,6 +26,8 @@ enum class ShaderOverride : int
 	PostProcess
 };
 
+extern const std::map<ShaderOverride, std::string> shaderOverrideToString;
+
 struct ShadersInfo;
 template<typename> class ResourceWrapper;
 class Texture;
