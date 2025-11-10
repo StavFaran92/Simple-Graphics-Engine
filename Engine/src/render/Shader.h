@@ -26,7 +26,7 @@ enum class ShaderOverride : int
 	PostProcess
 };
 
-extern const std::map<ShaderOverride, std::string> shaderOverrideToString;
+extern EngineAPI const std::map<ShaderOverride, std::string> shaderOverrideToString;
 
 struct ShadersInfo;
 template<typename> class ResourceWrapper;
@@ -58,6 +58,8 @@ struct ShaderAssetManager : public AssetManager
 
 class EngineAPI Shader : public ResourceBase, std::enable_shared_from_this<Shader>
 {
+public:
+	inline static const std::string ATTRIB_SHADER_OVERRIDE = "shader_override";
 public:
 
 	void use();

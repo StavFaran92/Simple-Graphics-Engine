@@ -267,7 +267,7 @@ void displayShaderCreatorDialog()
 	{
 		static char shaderName[256] = "New Shader";
 		static char filepath[256] = "";
-		static int shaderOverrideType = 0;
+		static ShaderOverride shaderOverrideType = ShaderOverride::None;
 
 		// Shader Name
 		ImGui::Text("Name");
@@ -278,21 +278,40 @@ void displayShaderCreatorDialog()
 		ImGui::InputText("##ShaderFilePath", filepath, IM_ARRAYSIZE(filepath), ImGuiInputTextFlags_EnterReturnsTrue);
 
 		// Override Type Drop-down
-		const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader", "Volume Shader", "Post Process Effect Shader"};
+		int currentIndex = 0;
+		int index = 0;
+		std::vector<const char*> comboItems;
+
+		for (const auto& [key, value] : shaderOverrideToString)
+		{
+			if (key == shaderOverrideType)
+				currentIndex = index;
+
+			comboItems.push_back(value.c_str());
+			++index;
+		}
+
+		//const char* overrideTypes[] = { "PBR Basic Shader", "Pixel Shader", "Volume Shader", "Post Process Effect Shader"};
 		ImGui::Text("Override Type");
-		ImGui::Combo("##ShaderOverrideType", (int*)&shaderOverrideType, overrideTypes, IM_ARRAYSIZE(overrideTypes));
+		if(ImGui::Combo("##ShaderOverrideType", &currentIndex, comboItems.data(), static_cast<int>(comboItems.size())))
+		{
+			// Update the enum based on the selected index
+			auto it = shaderOverrideToString.begin();
+			std::advance(it, currentIndex);
+			shaderOverrideType = it->first;
+		}
 
 		ImGui::Separator();
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			auto& shader = Shader::createOverrideShader(shaderName, filepath, (ShaderOverride)(shaderOverrideType + 1)); // todo fix
+			auto& shader = Shader::createOverrideShader(shaderName, filepath, shaderOverrideType); // todo fix
 
 			AssetCreateDescriptor desc;
 			desc.name = shaderName;
 			desc.origFilePath = filepath;
 			desc.aType = AssetType::SHADER;
-			desc.attributes["shader_override"] = Shader::getShaderOverrideAsStr((ShaderOverride)(shaderOverrideType + 1));
+			desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(shaderOverrideType);
 			Engine::get()->getSubSystem<Assets>()->createAsset(shader, desc);
 			ImGui::CloseCurrentPopup();
 		}

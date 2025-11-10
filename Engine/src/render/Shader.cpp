@@ -19,7 +19,7 @@
 
 #include <filesystem>
 
-const std::map<ShaderOverride, std::string> shaderOverrideToString
+const  std::map<ShaderOverride, std::string> shaderOverrideToString
 {
 	{ ShaderOverride::None,			"N/A" },
 	{ ShaderOverride::PBR,		"PBR" },
@@ -49,9 +49,9 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 		ShaderAssetDescriptor params = aInfo.importSettings.get<ShaderAssetDescriptor>();
 		shaderOverride = params.shaderOverride;
 	}
-	else if (aInfo.attributes.find("shader_override") != aInfo.attributes.end())
+	else if (aInfo.attributes.find(Shader::ATTRIB_SHADER_OVERRIDE) != aInfo.attributes.end())
 	{
-		shaderOverride = Shader::getShaderOverrideFromStr(aInfo.attributes.at("shader_override"));
+		shaderOverride = Shader::getShaderOverrideFromStr(aInfo.attributes.at(Shader::ATTRIB_SHADER_OVERRIDE));
 	}
 	
 
