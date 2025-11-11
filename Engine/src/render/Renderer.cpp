@@ -120,6 +120,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
         }
     }
 
+    graphics->shader = m_pbrShader;
     auto iter = transparentEntities.rbegin();
     while (iter != transparentEntities.rend())
     {
