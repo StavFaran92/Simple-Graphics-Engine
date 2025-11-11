@@ -149,9 +149,19 @@ void ShadowSystem::renderToDepthMap()
 		for (auto& mesh : mesh.mesh.get()->getMeshes())
 		{
 			graphics->mesh = mesh.get();
-			m_simpleDepthShader->setUniformValue("model", transform.getWorldTransformation());
 
-			
+			glm::mat4 model = transform.getWorldTransformation() * mesh->getRestTransform();
+
+			m_simpleDepthShader->setUniformValue("model", model);
+
+			// TODO use a more sophisticated solution here
+			//AABB& aabb = mesh.get()->getAABB();
+			//aabb.transform(model);
+
+			//if (!aabb.isOnFrustum(*graphics->frustum))
+			//{
+			//	continue;
+			//}
 
 			// draw model
 			auto vao = mesh->getVAO();

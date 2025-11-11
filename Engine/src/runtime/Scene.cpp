@@ -342,6 +342,17 @@ void Scene::draw(float deltaTime)
 		graphics->brdfLUT = m_BRDFIntegrationLUT;
 		graphics->renderView = renderView;
 
+		Frustum frustum(primaryCameraTransform.getWorldPosition(),
+			primaryCamera.front,
+			primaryCamera.up,
+			primaryCamera.right,
+			primaryCamera.aspect,
+			primaryCamera.fovy,
+			primaryCamera.znear,
+			primaryCamera.zfar);
+
+		graphics->frustum = &frustum;
+
 		if(Engine::get()->getConfig().renderConfig.renderShadowMap)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Shadow Map");
@@ -369,17 +380,6 @@ void Scene::draw(float deltaTime)
 		m_uboTime->bind();
 		m_uboTime->setData(0, sizeof(float), &elapsed);
 		m_uboTime->unbind();
-
-		Frustum frustum(primaryCameraTransform.getWorldPosition(),
-			primaryCamera.front,
-			primaryCamera.up,
-			primaryCamera.right,
-			primaryCamera.aspect,
-			primaryCamera.fovy,
-			primaryCamera.znear,
-			primaryCamera.zfar);
-
-		graphics->frustum = &frustum;
 
 		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 

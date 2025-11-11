@@ -291,7 +291,6 @@ void DeferredRenderer::renderScene(Scene* scene)
 			glm::mat4 modelTransform = transform.getWorldTransformation() *mesh->getRestTransform();
 			graphics->model = modelTransform;
 
-			// TODO get this to work
 			AABB& aabb = mesh.get()->getAABB();
 			aabb.transform(modelTransform);
 

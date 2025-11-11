@@ -15,7 +15,7 @@ void RenderCommand::clear()
 
 void RenderCommand::draw(const VertexArrayObject* vao)
 {
-	Engine::get()->getSubSystem<System>()->addTriangleCount(vao->GetIndexCount() / 3);
+	Engine::get()->getSubSystem<System>()->addTriangleCount(vao->GetIndexCount() / 3); // todo remove
 
 	vao->Bind();
 
