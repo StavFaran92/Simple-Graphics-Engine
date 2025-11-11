@@ -21,6 +21,7 @@
 #include "component/MeshComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
+#include "memory/BuiltInAssets.h"
 
 #include "core/Engine.h"
 
@@ -79,10 +80,8 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 	equirectangularTexture.get()->bind();
 	
 
-	auto box = ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getRegistry());
-	box.RemoveComponent<RenderableComponent>();
-	box.RemoveComponent<ObjectComponent>();
-	auto vao = box.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto box = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
+	auto vao = box.get()->getPrimaryMesh()->getVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -150,11 +149,8 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	cubemapTexture.get()->setSlot(0);
 	cubemapTexture.get()->bind();
 
-
-	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
-	quad.RemoveComponent<RenderableComponent>();
-	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto quad = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_QUAD);
+	auto vao = quad.get()->getPrimaryMesh()->getVAO();
 
 	// render to quad
 	// attach cubemap face to fbo
