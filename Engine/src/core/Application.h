@@ -26,7 +26,6 @@ protected:
 	/** API */
 	Box* createBoxEntity();
 	Quad* createQuad();
-	void postProcess(ResourceWrapper<Shader>);
 	void skybox(std::shared_ptr<Skybox> skybox);
 
 	Context* getContext() const;

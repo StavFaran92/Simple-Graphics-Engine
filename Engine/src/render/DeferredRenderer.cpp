@@ -9,7 +9,6 @@
 #include "component/Transformation.h"
 #include "render/ScreenQuad.h"
 #include "runtime/Scene.h"
-#include "render/Renderer2D.h"
 #include "render/Material.h"
 #include "core/Random.h"
 #include "render/RenderCommand.h"
@@ -206,13 +205,10 @@ void DeferredRenderer::render()
 	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
 	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
 
-    if (graphics->material)
-    {
-		graphics->material->use(graphics->shader);
-    }
+	graphics->material->use(graphics->shader);
 
 	// Draw
-	auto instanceBatch = graphics->entity->tryGetComponent<InstanceBatch>();
+	auto instanceBatch = graphics->entity.tryGetComponent<InstanceBatch>();
 	if (!instanceBatch)
 	{
 		graphics->shader->setUniformValue("isGpuInstanced", false);
@@ -241,7 +237,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 	}
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, getGBuffer().getID());
-	clear();
+	RenderCommand::clear();
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -285,36 +281,15 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 		for (auto mesh : meshCollecton.get()->getMeshes())
 		{
-			graphics->entity = &entityHandler;
-			graphics->mesh = mesh.get();
-			auto& transform = entityHandler.getComponent<Transformation>();
-			glm::mat4 modelTransform = transform.getWorldTransformation() *mesh->getRestTransform();
-			graphics->model = modelTransform;
-
-			AABB& aabb = mesh.get()->getAABB();
-			aabb.transform(modelTransform);
-
-			if (!aabb.isOnFrustum(*graphics->frustum))
+			if (!prepareMeshForRender(mesh.get(), entityHandler))
 			{
-				continue; 
+				continue;
 			}
 
-			//DebugHelper::getInstance().drawAABB(aabb);
-
-			graphics->material = Engine::get()->getDefaultMaterial().get();
-
-			auto matIndex = mesh->getMaterialIndex();
-			auto materialComponent = graphics->entity->tryGetComponent<MaterialComponent>();
-			if (materialComponent)
+			// Only render Opaque objects
+			if (!graphics->material->isOpaque())
 			{
-
-				graphics->material = materialComponent->at(matIndex).get();
-
-				// Only render Opaque objects
-				if (!graphics->material->isOpaque())
-				{
-					continue;
-				}
+				continue;
 			}
 
 			// draw model

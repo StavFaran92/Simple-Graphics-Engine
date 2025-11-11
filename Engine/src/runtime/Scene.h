@@ -73,9 +73,6 @@ public:
 	// -------------------- Methods -------------------- //
 	Scene(Context* context);
 
-	void setPostProcess(bool value);
-	bool setPostProcessShader(ResourceWrapper<Shader> shader);
-
 	void addCoroutine(const std::function<bool(float)>& coroutine);
 	void removeCoroutine(std::function<bool(float)> coroutine);
 

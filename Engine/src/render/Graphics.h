@@ -37,10 +37,10 @@ public:
 
 	std::vector<Entity> entityGroup;
 
-	Entity* entity = nullptr;
+	Entity entity = Entity::EmptyEntity;
 	Mesh* mesh = nullptr;
 	ResourceWrapper<Shader> shader = nullptr;
-	Material* material = nullptr;
+	ResourceWrapper<Material> material = nullptr;
 
 	// MVP
 	glm::mat4 model;

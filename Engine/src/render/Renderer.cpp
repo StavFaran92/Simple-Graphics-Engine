@@ -6,7 +6,6 @@
 #include "render/VertexArrayObject.h"
 #include "render/Shader.h"
 #include "camera/ICamera.h"
-#include "render/SkyboxRenderer.h"
 #include "core/Logger.h"
 #include "geometry/Mesh.h"
 #include "runtime/Entity.h"
@@ -14,13 +13,9 @@
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
 #include "systems/TimeManager.h"
-#include "runtime/Entity.h"
 #include "systems/Skybox.h"
 #include "component/Transformation.h"
 #include "render/Material.h"
-#include "render/Shader.h"
-#include "component/Component.h"
-#include "component/Transformation.h"
 #include "render/CommonShaders.h"
 #include "geometry/MeshCollection.h"
 #include "render/Graphics.h"
@@ -33,14 +28,13 @@
 #include "component/RenderableComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/ShaderComponent.h"
+#include "memory/BuiltInAssets.h"
 
 bool Renderer::init()
 {
 	m_pbrShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
 
-    m_quad = ScreenQuad::GenerateScreenQuad(&Engine::get()->getContext()->getRegistry());
-    m_quad.RemoveComponent<RenderableComponent>();
-    m_quad.RemoveComponent<ObjectComponent>();
+    m_quad = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_QUAD).resource();
 
     return true;
 }
@@ -64,35 +58,22 @@ void Renderer::renderScene(Scene* scene)
         {
             Entity entityHandler{ entity, &scene->getRegistry() };
 
-            graphics->entity = &entityHandler;
+            graphics->entity = entityHandler;
+            graphics->shader->use();
             for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
             {
 
-                graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation() * mesh->getRestTransform();
-                graphics->shader = m_pbrShader;
-                graphics->mesh = mesh.get();
-
-                AABB& aabb = mesh.get()->getAABB();
-                aabb.transform(graphics->model);
-
-                if (!aabb.isOnFrustum(*graphics->frustum))
+                if (!prepareMeshForRender(mesh.get(), entityHandler))
                 {
                     continue;
                 }
 
-                Material* mat = graphics->entity->tryGetComponentInParent<Material>();
-
-                if (mat)
-                {
-                    graphics->material = mat;
-                }
-
                 // draw model
-                graphics->shader->use();
+                
                 setUniforms();
 
                 // Draw
-                draw(*graphics->mesh->getVAO());
+                RenderCommand::draw(mesh->getVAO());
             }
         }
     }
@@ -144,40 +125,23 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
     {
         Entity& entityHandler = iter->second;
 
-        graphics->entity = &entityHandler;
+        graphics->entity = entityHandler;
+        graphics->shader->use();
         for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
         {
 
-            graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation() * mesh->getRestTransform();;
-            graphics->shader = m_pbrShader;
-            graphics->mesh = mesh.get();
-
-            AABB& aabb = mesh.get()->getAABB();
-            aabb.transform(graphics->model);
-
-            if (!aabb.isOnFrustum(*graphics->frustum))
-            {
-                continue;
-            }
-
-            auto matIndex = mesh->getMaterialIndex();
-            MaterialComponent& materialComponent = entityHandler.getComponent<MaterialComponent>();
-            graphics->material = materialComponent.at(matIndex).get();
-
-            // Only render transparent objects
-            if (graphics->material->isOpaque())
+            if (!prepareMeshForRender(mesh.get(), entityHandler))
             {
                 continue;
             }
 
             // draw model
-            graphics->shader->use();
             glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
             graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
             setUniforms();
 
             // Draw
-            draw(*graphics->mesh->getVAO());
+            RenderCommand::draw(graphics->mesh->getVAO());
         }
 
         iter++;
@@ -203,10 +167,6 @@ void Renderer::setUniforms()
     graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
 }
 
-void Renderer::render()
-{
-}
-
 void Renderer::renderSceneUsingCustomShader(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
@@ -219,10 +179,10 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
         if (entityHandler.HasComponent<VolumeComponent>()) continue; // todo fix
 
-        graphics->entity = &entityHandler;
+        graphics->entity = entityHandler;
 
         // bind shader
-        auto& shaderComponent = graphics->entity->getComponent<ShaderComponent>();
+        auto& shaderComponent = graphics->entity.getComponent<ShaderComponent>();
         if (!shaderComponent.isValid)
         {
             continue;
@@ -243,7 +203,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             }
             else if (shaderComponent.projection == ShaderComponent::Texture2D)
             {
-                meshCollecton = m_quad.getComponent<MeshComponent>().mesh.resource();
+                meshCollecton = m_quad;
             }
 
             // fill bone animation data
@@ -278,32 +238,9 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
             for (auto mesh : meshCollecton.get()->getMeshes())
             {
-                graphics->mesh = mesh.get();
-                auto& transform = graphics->entity->getComponent<Transformation>();
-                graphics->model = transform.getWorldTransformation() * mesh->getRestTransform();
-
-                // TODO get this to work
-                AABB& aabb = mesh.get()->getAABB();
-                aabb.transform(graphics->model);
-
-                if (!aabb.isOnFrustum(*graphics->frustum))
+                if (!prepareMeshForRender(mesh.get(), entityHandler))
                 {
-                    continue; 
-                }
-
-                auto matIndex = mesh->getMaterialIndex();
-                auto materialComponent = graphics->entity->tryGetComponent<MaterialComponent>();
-                if (!materialComponent)
-                {
-                    graphics->material = Engine::get()->getDefaultMaterial().get();
-                }
-                else
-                {
-                    graphics->material = materialComponent->at(matIndex).get();
-                    if (!graphics->material)
-                    {
-                        graphics->material = Engine::get()->getDefaultMaterial().get();
-                    }
+                    continue;
                 }
 
                 {
@@ -322,7 +259,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 {
                     graphics->renderView = shaderComponent.renderViewProjection;
                     graphics->renderView->bind();
-                    auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
+                    auto& mesh = m_quad.get()->getPrimaryMesh();
                     RenderCommand::draw(mesh->getVAO());
                 }
 
@@ -365,13 +302,13 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             }
             else if (shaderComponent.projection == ShaderComponent::Texture2D)
             {
-                meshCollecton = m_quad.getComponent<MeshComponent>().mesh.resource();
+                meshCollecton = m_quad;
             }
 
             for (auto mesh : meshCollecton.get()->getMeshes())
             {
                 graphics->mesh = mesh.get();
-                auto& transform = graphics->entity->getComponent<Transformation>();
+                auto& transform = graphics->entity.getComponent<Transformation>();
                 graphics->model = transform.getWorldTransformation() * mesh->getRestTransform();
 
                 // TODO get this to work
@@ -395,7 +332,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
                 {
                     // render to quad
-                    auto& mesh = m_quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh();
+                    auto& mesh = m_quad.get()->getPrimaryMesh();
                     RenderCommand::draw(mesh->getVAO());
                 }
 

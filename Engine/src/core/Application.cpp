@@ -22,12 +22,6 @@ void Application::skybox(std::shared_ptr<Skybox> skybox)
 	//context->getActiveScene()->setSkybox(skybox);
 }
 
-void Application::postProcess(ResourceWrapper<Shader> shader)
-{
-	auto context = Engine::get()->getContext();
-	context->getActiveScene()->setPostProcessShader(shader);
-}
-
 bool Application::mouse_leftButtonPressed()
 {
 	return Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT);

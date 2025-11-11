@@ -12,7 +12,6 @@
 #include "lights/DirectionalLight.h"
 #include "component/Transformation.h"
 #include "render/Shader.h"
-#include "render/ScreenBufferDisplay.h"
 #include "runtime/Context.h"
 #include "texture/Texture.h"
 #include "animation/Animator.h"
@@ -124,7 +123,7 @@ void ShadowSystem::renderToDepthMap()
 		
 
 		Entity entityhandler{ entity, &m_scene->getRegistry()};
-		graphics->entity = &entityhandler;
+		graphics->entity = entityhandler;
 
 		auto meshCollection = mesh.mesh;
 

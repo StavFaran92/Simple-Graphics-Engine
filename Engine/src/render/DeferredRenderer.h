@@ -1,6 +1,6 @@
 #pragma once
 
-#include "render/RendererIntermediate.h"
+#include "render/IRenderer.h"
 
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
@@ -9,16 +9,15 @@
 #include "core/Window.h"
 #include "core/Configurations.h"
 
-class FrameBufferObject;
-class RenderBufferObject;
+class Scene;
 
-class DeferredRenderer : public RendererIntermediate
+class DeferredRenderer : public IRenderer
 {
 public:
 	// Inherited via IRenderer
-	bool init() override;
-	void render() override;
-	void renderScene(Scene* scene) override;
+	bool init();
+	void render();
+	void renderScene(Scene* scene);
 	void renderSceneUsingCustomShader(Scene* scene);
 	void setUniforms(Shader* shader);
 
@@ -58,7 +57,7 @@ private:
 	std::vector<glm::vec3> m_ssaoKernel;
 	
 	FrameBufferObject m_ssaoBlurFBO;
-	RenderBufferObject m_ssaoBlurRenderBuffer{ Engine::get()->getWindow()->getWidth(),Engine::get()->getWindow()->getHeight() };
+	RenderBufferObject m_ssaoBlurRenderBuffer;
 	ResourceWrapper<Texture> m_ssaoBlurColorBuffer = nullptr;
 	ResourceWrapper<Shader> m_ssaoBlurPassShader;
 

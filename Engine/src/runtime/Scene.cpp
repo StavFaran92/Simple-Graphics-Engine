@@ -5,12 +5,8 @@
 #include "lights/PointLight.h"
 #include "core/Engine.h"
 #include "camera/ICamera.h"
-#include "render/SkyboxRenderer.h"
-#include "render/PostProcessProjector.h"
 #include "core/CoroutineSystem.h"
 #include "core/Logger.h"
-#include "render/PhongShader.h"
-#include "render/PickingShader.h"
 #include "runtime/Context.h"
 #include "core/Window.h"
 #include "systems/ObjectPicker.h"
@@ -21,17 +17,16 @@
 #include "geometry/Mesh.h"
 #include "component/RenderableComponent.h"
 #include "component/Component.h"
-#include "render/Shader.h"
 #include "render/Material.h"
 #include "component/ScriptableEntity.h"
 #include "physics/PhysicsSystem.h"
 #include "geometry/Box.h"
 #include "systems/ShadowSystem.h"
 #include "lights/LightSystem.h"
-#include "core/Engine.h"
 #include "systems/TimeManager.h"
 #include "render/UniformBufferObject.h"
 #include "render/DeferredRenderer.h"
+#include "render/Renderer.h"
 #include "core/Random.h"
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
@@ -101,7 +96,7 @@ void Scene::displayWireframeMesh(Entity e)
 
 	for (auto& mesh : e.tryGetComponent<MeshComponent>()->mesh.get()->getMeshes())
 	{
-		graphics->entity = &e;
+		graphics->entity = e;
 		graphics->shader = m_tempOutlineShader;
 		graphics->mesh = mesh.get();
 		graphics->model = e.getComponent<Transformation>().getWorldTransformation();
@@ -149,22 +144,6 @@ void Scene::init(Context* context)
 	auto height = Engine::get()->getWindow()->getHeight();
 
 	gameEventLayer = Engine::get()->getEventSystem()->getLayer("GameLayer");
-
-	//m_skyboxRenderer = std::make_shared<SkyboxRenderer>(*m_renderer.get());
-	//m_gpuInstancingRenderer = std::make_shared<GpuInstancingRenderer>();
-	//m_objectSelection = std::make_shared<ObjectSelection>(m_context, this);
-	//m_objectPicker = std::make_shared<ObjectPicker>();
-	//if (!m_objectPicker->init())
-	//{
-	//	logError("Object picker failed to init!");
-	//}
-
-	m_postProcessProjector = std::make_shared<PostProcessProjector>(this);
-	if (!m_postProcessProjector->init(width, height))
-	{
-		logError("Post process projector failed to init!");
-	}
-	m_postProcessProjector->setEnabled(false);
 
 	m_coroutineManager = std::make_shared<CoroutineSystem>();
 
@@ -499,7 +478,7 @@ void Scene::draw(float deltaTime)
 				m_registry->get().view<SkyboxComponent, Transformation>().each())
 			{
 				Entity entityhandler{ entity, m_registry.get() };
-				graphics->entity = &entityhandler;
+				graphics->entity = entityhandler;
 				graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
 				graphics->model = transform.getWorldTransformation();
 
@@ -721,7 +700,7 @@ void Scene::draw(float deltaTime)
 		for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
 		{
 			Entity entityhandler{ entity, m_registry.get() };
-			graphics->entity = &entityhandler;
+			graphics->entity = entityhandler;
 			image.image.get()->bind();
 			image.image.get()->setSlot(0);
 
@@ -970,11 +949,6 @@ void Scene::onWindowResize(int w, int h)
 	{
 		view.get<CameraComponent>(entity).aspect = (float)w / h;
 	}
-
-	if (m_postProcessProjector)
-	{
-		m_postProcessProjector->init(w, h);
-	}
 }
 
 
@@ -993,11 +967,6 @@ void Scene::close()
 	clear();
 }
 
-void Scene::setPostProcess(bool value)
-{
-	m_postProcessProjector->setEnabled(value);
-}
-
 //bool Scene::isSelected(uint32_t id) const
 //{
 //	if (!m_isObjectSelectionEnabled)
@@ -1008,16 +977,6 @@ void Scene::setPostProcess(bool value)
 //
 //	return m_objectSelection->isObjectSelected(id);
 //}
-
-bool Scene::setPostProcessShader(ResourceWrapper<Shader> shader)
-{
-	if (m_postProcessProjector)
-	{
-		m_postProcessProjector->setPostProcessShader(shader);
-		return true;
-	}
-	return false;
-}
 
 void Scene::addCoroutine(const std::function<bool(float)>& coroutine)
 {

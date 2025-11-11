@@ -2,11 +2,7 @@
 
 #include "lights/DirectionalLight.h"
 #include "lights/PointLight.h"
-#include "systems/Skybox.h"
-#include "render/SkyboxRenderer.h"
 #include "camera/ICamera.h"
-#include "render/PhongShader.h"
-#include "render/PickingShader.h"
 #include "render/Shader.h"
 
 #include "runtime/Scene.h"

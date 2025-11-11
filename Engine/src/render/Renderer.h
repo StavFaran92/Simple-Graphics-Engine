@@ -1,7 +1,8 @@
 #pragma once
-#include "render/RendererIntermediate.h"
+#include "render/IRenderer.h"
 
 #include "core/Core.h"
+#include "memory/ResourceWrapper.h"
 
 // forward declerations
 class ICamera;
@@ -10,21 +11,21 @@ class Model;
 class Mesh;
 class Transformation;
 class Shader;
-class Entity;
 class Mesh;
+class Scene;
 
 
-class Renderer : public RendererIntermediate
+class Renderer : public IRenderer
 {
 public:
 	// Constructor
-	bool init() override;
+	bool init();
 
 	void renderSceneUsingCustomShader(Scene* scene);
 
 	void enableWireframeMode(bool enable);
-	// Inherited via IRenderer
-	void renderScene(Scene*) override;
+
+	void renderScene(Scene*);
 
 	void renderSceneNonOpaque(Scene*);
 
@@ -34,10 +35,5 @@ protected:
 	bool m_wireFrameMode = false;
 
 	ResourceWrapper<Shader> m_pbrShader = nullptr;
-	Entity m_quad;
-
-
-	// Inherited via RendererIntermediate
-	void render() override;
-
+	ResourceWrapper<MeshCollection> m_quad = nullptr;
 };

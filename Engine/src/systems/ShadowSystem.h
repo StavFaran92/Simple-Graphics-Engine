@@ -5,11 +5,12 @@
 #include "render/FrameBufferObject.h"
 #include "render/IRenderer.h"
 #include "runtime/Entity.h"
+#include "memory/ResourceWrapper.h"
 
 class Shader;
 class Scene;
-class ScreenBufferDisplay;
 class TextureHandler;
+class Context;
 
 class EngineAPI ShadowSystem
 {
@@ -37,8 +38,6 @@ private:
 	Scene* m_scene = nullptr;
 	ResourceWrapper<Shader> m_simpleDepthShader = nullptr;
 	ResourceWrapper<Texture> m_depthMapTexture = nullptr;
-
-	std::shared_ptr<ScreenBufferDisplay> m_bufferDisplay;
 
 	Context* m_context = nullptr;
 
