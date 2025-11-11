@@ -126,7 +126,7 @@ private:
 	size_t m_indexCount = 0;
 	VertexLayout m_layout;
 	bool m_useColors = false;
-	glm::mat4 m_restTransform;
+	glm::mat4 m_restTransform{ 1.0f };
 
 	AABB m_aabb;
 	int materialIndex{};
