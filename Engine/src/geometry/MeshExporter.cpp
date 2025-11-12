@@ -101,7 +101,12 @@ void MeshExporter::exportMesh(const AssetInfo& aInfo, const ResourceWrapper<Mesh
                 const unsigned int i1 = vertexOffset + static_cast<unsigned int>(i + 1);
                 const unsigned int i2 = vertexOffset + static_cast<unsigned int>(i + 2);
 
-                if (!texCoords.empty())
+                if (!texCoords.empty() && !meshData.m_normals.empty())
+                    out << "f "
+                    << i0 << "/" << i0 << "/" << i0 << " "
+                    << i1 << "/" << i1 << "/" << i1 << " "
+                    << i2 << "/" << i2 << "/" << i2 << "\n";
+                else if (!texCoords.empty())
                     out << "f "
                     << i0 << "/" << i0 << " "
                     << i1 << "/" << i1 << " "
