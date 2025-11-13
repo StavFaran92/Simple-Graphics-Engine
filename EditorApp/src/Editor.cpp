@@ -1213,7 +1213,7 @@ class GUI_Helper : public GuiMenu {
 							ShowModelCreatorWindow();
 						}
 						if (ImGui::MenuItem("Texture")) {
-							ShowTextureImportWindow();
+							EditorState::Instance().showTextureImportWindow = true;
 						}
 						if (ImGui::MenuItem("Animation")) {
 							// Action for importing animation
@@ -1327,6 +1327,7 @@ class GUI_Helper : public GuiMenu {
 		displayShaderCreatorDialog();
 		displayMaterialEditDialog();
 		displayProjectSettingsDialog();
+		displayTextureImportDialog();
         //ShowTextureDisplayWindow();
 
 		if (EditorState::Instance().showAssetSelectorWindow) 

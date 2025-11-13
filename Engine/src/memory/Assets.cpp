@@ -11,6 +11,7 @@
 #include "core/Factory.h"
 #include "render/ShaderBuilder.h"
 #include "memory/AssetFactory.h"
+#include "systems/UniqueNameManager.h"
 
 #include <filesystem>
 
@@ -39,6 +40,8 @@ void Assets::addAsset(AssetInfo& aInfo)
 	}
 
 	updateRegistry(aInfo);
+
+	Engine::get()->getSubSystem<UniqueNameManager>()->addName(aInfo.name);
 
 	aInfo.isValid = true;
 	m_assets[aInfo.uuid] = aInfo;
@@ -235,4 +238,5 @@ void Assets::deleteAsset(const AssetInfo& aInfo)
 	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.relativefilePath);
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
 	m_assets.erase(aInfo.uuid);
+	Engine::get()->getSubSystem<UniqueNameManager>()->removeName(aInfo.name);
 }

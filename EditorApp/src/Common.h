@@ -124,3 +124,4 @@ static void displayComponent(const std::string& componentName, std::function<voi
 	}
 }
 
+void suggestUniqueName(const std::string& hint, char* buffer, size_t bufferSize);

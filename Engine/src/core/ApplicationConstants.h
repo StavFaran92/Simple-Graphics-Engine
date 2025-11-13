@@ -20,13 +20,13 @@ namespace Constants {
 	static const glm::vec3 VEC3_ZERO = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	static const char* g_supportedFormats[] = {
-		"*.obj" ,"*.blend", "*.fbx", "*.dae", "*.gltf"
+		"*.obj" ,"*.blend", "*.fbx", "*.dae", "*.gltf", "*.glb"
 	};
 
 	//const char* supportedImageFormats[4] = { "*.png", "*.jpg", "*.bmp", "*.tga" };
 
 	static const char* g_textureSupportedFormats[] = {
-		"*.png", "*.jpg", "*.bmp", "*.tga",
+		"*.png", "*.jpg", "*.bmp", "*.hdr", "*.exr",
 	};
 
 	static const char* g_animationSupportedFormats[] = {

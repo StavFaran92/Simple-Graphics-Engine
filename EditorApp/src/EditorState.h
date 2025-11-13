@@ -28,6 +28,7 @@ public:
     bool showTextureDisplayWindow = false;
     bool showLuaScriptCreateWindow = false;
     bool showSettingsWindow = false;
+    bool showTextureImportWindow = false;
 
     bool showAssetSelectorWindow = false;
     AssetType assetSelectType;

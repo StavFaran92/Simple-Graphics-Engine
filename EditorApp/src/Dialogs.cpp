@@ -5,6 +5,9 @@
 #include "NativeScriptsLoader.h"
 #include "Common.h"
 #include "Widgets.h"
+#include "tinyfiledialogs.h"
+
+#include <imgui_stdlib.h>
 
 void displaySelectScriptDialog(std::string& scriptName)
 {
@@ -227,9 +230,7 @@ void displayTextureCreatorDialog()
 		ImGui::OpenPopup("CreateEmptyTexture");
 		EditorState::Instance().showTextureCreateWindow = false;
 
-		std::string suggestedName = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewTexture");
-		suggestedName.copy(textureName, sizeof(textureName) - 1);
-		textureName[suggestedName.size() < sizeof(textureName) ? suggestedName.size() : sizeof(textureName) - 1] = '\0';
+		suggestUniqueName("NewTexture", textureName, sizeof(textureName));
 	}
 	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
@@ -251,7 +252,6 @@ void displayTextureCreatorDialog()
 			}
 			else
 			{
-				Engine::get()->getSubSystem<UniqueNameManager>()->addName(textureName);
 				auto texture = Texture::createEmptyTexture(width, height);
 				
 				AssetCreateDescriptor aInfo;
@@ -401,6 +401,74 @@ void displayProjectSettingsDialog()
 		ImGui::Checkbox("SSAO", &graphics->useSSAO);
 
 		if (ImGui::Button("OK"))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void displayTextureImportDialog()
+{
+	static char textureName[256] = "";
+	static std::string textureFilepathString = "";
+	static ImGuiTextBuffer textureFilepath;
+	if (EditorState::Instance().showTextureImportWindow)
+	{
+		ImGui::OpenPopup("ImportTexture");
+		EditorState::Instance().showTextureImportWindow = false;
+	}
+	if (ImGui::BeginPopupModal("ImportTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::InputText("Name", textureName, IM_ARRAYSIZE(textureName));
+		
+		ImGui::InputText("##Filepath", &textureFilepathString);
+		ImGui::SameLine();
+		if (ImGui::Button("o"))
+		{
+			const char* filepath = tinyfd_openFileDialog(
+				"Select an asset to load",
+				"",
+				5,
+				Constants::g_textureSupportedFormats,
+				"",
+				0);
+
+			if (filepath)
+			{
+				textureFilepath.clear();
+				textureFilepath.append(filepath);
+				textureFilepathString = textureFilepath.c_str();
+
+				std::filesystem::path path(textureFilepathString);
+				std::string filename = path.filename().stem().string();
+
+				suggestUniqueName(filename, textureName, sizeof(textureName));
+			}
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(textureName))
+			{
+				logError("Name already used.");
+			}
+			else
+			{
+				Texture::TextureAssetDescriptor desc;
+				desc.name = textureName;
+				Texture::import(textureFilepathString, desc);
+
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
 			ImGui::CloseCurrentPopup();
 		}

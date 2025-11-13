@@ -23,3 +23,5 @@ void displayMaterialEditDialog();
 void displayAssetSelectDialog(AssetType aType, UUID& uuid);
 
 void displayProjectSettingsDialog();
+
+void displayTextureImportDialog();
