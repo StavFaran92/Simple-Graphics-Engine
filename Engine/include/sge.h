@@ -56,6 +56,7 @@
 #include "core/System.h"
 #include "utils/DebugHelper.h"
 #include "systems/WaterSystem.h"
+#include "systems/UniqueNameManager.h"
 #include "render/RenderCommand.h"
 #include "component/FoliageComponent.h"
 #include "component/PhysicsComponent.h"

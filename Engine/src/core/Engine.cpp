@@ -36,7 +36,6 @@
 #include "core/EventLayerStack.h"
 #include "core/EngineConfig.h"
 #include "render/DeferredRenderer.h"
-#include "render/Renderer.h"
 
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
@@ -45,6 +44,7 @@
 #include "component/RenderableComponent.h"
 #include "scripts/ScriptSystem.h"
 #include "core/GameLayer.h"
+#include "systems/UniqueNameManager.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"
@@ -197,6 +197,7 @@ bool Engine::init(const InitParams& initParams)
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
     auto assets = new Assets();
+    auto uniqueNameManager = new UniqueNameManager();
 
     
 

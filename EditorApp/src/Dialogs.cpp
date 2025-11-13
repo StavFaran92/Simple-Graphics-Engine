@@ -221,28 +221,47 @@ void displayTextureSelectDialog()
 
 void displayTextureCreatorDialog()
 {
+	static char textureName[256] = "";
 	if (EditorState::Instance().showTextureCreateWindow)
 	{
 		ImGui::OpenPopup("CreateEmptyTexture");
 		EditorState::Instance().showTextureCreateWindow = false;
+
+		std::string suggestedName = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewTexture");
+		suggestedName.copy(textureName, sizeof(textureName) - 1);
+		textureName[suggestedName.size() < sizeof(textureName) ? suggestedName.size() : sizeof(textureName) - 1] = '\0';
 	}
 	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		static int width = 512;
 		static int height = 512;
-		static char textureName[256] = "NewTexture";
+		
 
+		ImGui::InputText("Name", textureName, IM_ARRAYSIZE(textureName));
 		ImGui::InputInt("Width", &width);
 		ImGui::InputInt("Height", &height);
-		ImGui::InputText("Name", textureName, IM_ARRAYSIZE(textureName));
 
 		ImGui::Separator();
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			auto texture = Texture::createEmptyTexture(width, height);
-			Texture::addTexture2D(textureName, texture);
-			ImGui::CloseCurrentPopup();
+			if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(textureName))
+			{
+				logError("Name already used.");
+			}
+			else
+			{
+				Engine::get()->getSubSystem<UniqueNameManager>()->addName(textureName);
+				auto texture = Texture::createEmptyTexture(width, height);
+				
+				AssetCreateDescriptor aInfo;
+				aInfo.aType = AssetType::TEXTURE;
+				aInfo.name = textureName;
+				aInfo.attributes = texture->getTextureAssetAttributes().toMap();
+				Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
+
+				ImGui::CloseCurrentPopup();
+			}
 		}
 
 		ImGui::SameLine();
