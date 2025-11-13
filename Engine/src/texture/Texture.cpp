@@ -428,6 +428,23 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	if (textureData.isHDR)
 	{
 		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+
+		float* pixels = static_cast<float*>(textureData.data);
+
+		bool detectedOverflowRadianceValues = false;
+		for (int i = 0; i < textureData.width * textureData.height * textureData.bpp; ++i) {
+			if (!std::isfinite(pixels[i]) || std::abs(pixels[i]) > HALF_MAX)
+			{
+				pixels[i] = std::clamp(pixels[i], -HALF_MAX, HALF_MAX);
+				detectedOverflowRadianceValues = true;
+
+			}
+		}
+
+		if (detectedOverflowRadianceValues)
+		{
+			logWarning("Deteced texture values that are above half max, clamping to half max.");
+		}
 	}
 	else
 	{

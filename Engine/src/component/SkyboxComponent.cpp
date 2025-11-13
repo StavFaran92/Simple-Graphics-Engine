@@ -4,6 +4,7 @@
 #include "runtime/Scene.h"
 #include "utils/EquirectangularToCubemapConverter.h"
 #include "render/IBL.h"
+#include "texture/TextureTransformer.h"
 
 void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {
@@ -28,17 +29,19 @@ void SkyboxComponent::build()
 {
 	// TODO check if orig image is cube and support cubemap load
 
-	//RenderDocDebugHelper::startFrameCapture();
+	ResourceWrapper<Texture> flippedImage = TextureTransformer::flipVertical(originalImage.resource());
+	ResourceWrapper<Texture> flippedImageGammeCorrected = TextureTransformer::applyGammaCorrection(flippedImage);
+	cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImageGammeCorrected);
 
-	cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(originalImage.resource()); 
-    cubemap->generateMipMaps();
+	cubemapIBL = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImage);
+	cubemapIBL->generateMipMaps();
 
 	auto scene = Engine::get()->getContext()->getActiveScene().get();
-	auto irradianceMap = IBL::generateIrradianceMap(cubemap, scene);
-	auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemap, scene);
+	auto irradianceMap = IBL::generateIrradianceMap(cubemapIBL, scene);
+	auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemapIBL, scene);
 
 	scene->setIBLData(irradianceMap, prefilterEnvMap);
 
-	//RenderDocDebugHelper::stopFrameCapture();
+	
 
 }

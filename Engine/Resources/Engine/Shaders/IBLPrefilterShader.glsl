@@ -130,25 +130,14 @@ void main()
 
             vec3 sample = textureLod(environmentMap, L, mipLevel).rgb;
 
-            if(length(sample) > 10000)
-            {
-                continue;
-            }
+            // if(length(sample) > 10000)
+            // {
+            //     continue;
+            // }
 
             prefilteredColor += sample * NdotL;
             totalWeight += NdotL;
         }
-
-        // vec3 sample = texture(environmentMap, L).rgb;
-
-        // if(length(sample) > 10000)
-        // {
-        //     continue;
-        // }
-
-        // prefilteredColor += sample * NdotL;
-
-        // totalWeight += NdotL;
     }
 
     prefilteredColor /= totalWeight;
