@@ -483,60 +483,41 @@ void displayTextureImportDialog()
 
 void displayModelImportDialog()
 {
-	static std::string modelName = "";
-	static std::string modelFilepath = "";
+	static UniqueNameWidget uniqueName;
+	static FilepathWidget modelFilepath("##Filepath", Constants::g_supportedFormats, 6);
 	if (EditorState::Instance().showModelImportWindow)
 	{
 		ImGui::OpenPopup("ImportModel");
 		EditorState::Instance().showModelImportWindow = false;
+		uniqueName.clear();
+		modelFilepath.clear();
 	}
 	if (ImGui::BeginPopupModal("ImportModel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::InputText("Name", &modelName);
+		
 
-		ImGui::InputText("##Filepath", &modelFilepath);
-		ImGui::SameLine();
-		if (ImGui::Button("o"))
+		uniqueName.draw("Name");
+
+		modelFilepath.draw();
+		if (modelFilepath.accept())
 		{
-			const char* filepath = tinyfd_openFileDialog(
-				"Select an asset to load",
-				"",
-				6,
-				Constants::g_supportedFormats,
-				"",
-				0);
-
-			if (filepath)
-			{
-				modelFilepath = filepath;
-
-				std::filesystem::path path(modelFilepath);
-				std::string filename = path.filename().stem().string();
-
-				modelName = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
-			}
+			std::filesystem::path path(modelFilepath.m_filepath);
+			std::string filename = path.filename().stem().string();
+			uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
 		}
 
 		ImGui::Separator();
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(modelName))
+			if (uniqueName.isValid())
 			{
-				logError("Name already used.");
-			}
-			else if (modelName.empty())
-			{
-				logError("Name cannot be empty.");
-			}
-			else
-			{
-				auto entity = Engine::get()->getContext()->getActiveScene()->createEntity(modelName);
+				auto entity = Engine::get()->getContext()->getActiveScene()->createEntity(uniqueName.name);
 				entity.addComponent<RenderableComponent>();
 
 				ModelImportSettings desc;
-				desc.name = modelName;
-				auto mesh = MeshCollection::import(modelFilepath, desc);
+				desc.name = uniqueName.name;
+				auto mesh = MeshCollection::import(modelFilepath.m_filepath, desc);
 
 				entity.addComponent<MeshComponent>().mesh = mesh;
 
@@ -551,7 +532,7 @@ void displayModelImportDialog()
 				ResourceWrapper<Prefab> prefab = Prefab::create(entity);
 
 				AssetCreateDescriptor aInfo;
-				aInfo.name = modelName + "_PREFAB";
+				aInfo.name = uniqueName.name + "_PREFAB";
 				aInfo.aType = AssetType::PREFAB;
 				Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
 

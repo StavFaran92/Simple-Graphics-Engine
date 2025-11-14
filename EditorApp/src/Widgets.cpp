@@ -2,6 +2,8 @@
 
 #include "Dialogs.h"
 #include "EditorState.h"
+#include <imgui_stdlib.h>
+#include "tinyfiledialogs.h"
 
 void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
@@ -218,4 +220,74 @@ void addAssetSelectWidget(const std::string& name, AssetType aType, const std::f
 		EditorState::Instance().assetSelectType = aType;
 		EditorState::Instance().assetSelectCB = cb;
 	}
+}
+
+FilepathWidget::FilepathWidget(const std::string& label, char const* const* formats, size_t formatCount)
+{
+}
+
+bool UniqueNameWidget::isValid() const
+{
+	if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(name))
+	{
+		logError("Name already used.");
+		return false;
+	}
+	else if (name.empty())
+	{
+		logError("Name cannot be empty.");
+		return false;
+	}
+	return true;
+}
+
+void UniqueNameWidget::draw(const std::string& label)
+{
+	ImGui::InputText("Name", &name);
+}
+
+void UniqueNameWidget::clear()
+{
+
+	name = "";
+}
+
+bool FilepathWidget::isValid() const
+{
+	return std::filesystem::exists(m_filepath);
+}
+
+void FilepathWidget::draw()
+{
+	ImGui::InputText(m_label.c_str(), &m_filepath);
+	ImGui::SameLine();
+	m_isPressed = ImGui::Button("o");
+	if(m_isPressed)
+	{
+		const char* filepath = tinyfd_openFileDialog(
+			"Select an asset to load",
+			"",
+			m_formatCount,
+			formats,
+			"",
+			0);
+
+		if (filepath)
+		{
+			m_filepath = filepath;
+		}
+	}
+}
+
+void FilepathWidget::clear()
+{
+	m_filepath = "";
+	m_isPressed = false;
+}
+
+bool FilepathWidget::accept()
+{
+	bool tempIsPressed = m_isPressed;
+	m_isPressed = false;
+	return tempIsPressed;
 }

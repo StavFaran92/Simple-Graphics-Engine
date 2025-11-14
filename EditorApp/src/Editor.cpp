@@ -1174,60 +1174,60 @@ class GUI_Helper : public GuiMenu {
 	// Inherited via GuiMenu
 	virtual void display() override {
 
-		RenderCommand::clear();
+	RenderCommand::clear();
 
-		// Get the total screen size
-		int screenWidth = Engine::get()->getWindow()->getWidth();
-		int screenHeight = Engine::get()->getWindow()->getHeight();
+	// Get the total screen size
+	int screenWidth = Engine::get()->getWindow()->getWidth();
+	int screenHeight = Engine::get()->getWindow()->getHeight();
 
 		
 
 
-		// Render menu bar
+	// Render menu bar
+	if (ImGui::BeginMainMenuBar())
+	{
 		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::BeginMainMenuBar())
-			{
-				if (ImGui::BeginMenu("File")) 
-				{ // Start of File dropdown
-					if (ImGui::MenuItem("Open Project", "Ctrl+O")) {
+			if (ImGui::BeginMenu("File")) 
+			{ // Start of File dropdown
+				if (ImGui::MenuItem("Open Project", "Ctrl+O")) {
 
 
-						const char* lTheSelectFolderName = tinyfd_selectFolderDialog(
-							"let us just select a directory", "../../");
+					const char* lTheSelectFolderName = tinyfd_selectFolderDialog(
+						"let us just select a directory", "../../");
 
-						//nfdchar_t* outPath = NULL;
-						//nfdresult_t result = NFD_PickFolder(NULL, &outPath);
-						if (lTheSelectFolderName)
-						{
-							Engine::get()->loadProject(lTheSelectFolderName);
-							state.selectEntity(Entity::EmptyEntity);
-							updateScene();
-						}
+					//nfdchar_t* outPath = NULL;
+					//nfdresult_t result = NFD_PickFolder(NULL, &outPath);
+					if (lTheSelectFolderName)
+					{
+						Engine::get()->loadProject(lTheSelectFolderName);
+						state.selectEntity(Entity::EmptyEntity);
+						updateScene();
 					}
-					if (ImGui::MenuItem("Save Project", "Ctrl+S")) {
-						Engine::get()->saveProject();
+				}
+				if (ImGui::MenuItem("Save Project", "Ctrl+S")) {
+					Engine::get()->saveProject();
+				}
+				if (ImGui::BeginMenu("Import")) {
+					if (ImGui::MenuItem("Model")) {
+						EditorState::Instance().showModelImportWindow = true;
 					}
-					if (ImGui::BeginMenu("Import")) {
-						if (ImGui::MenuItem("Model")) {
-							EditorState::Instance().showModelImportWindow = true;
-						}
-						if (ImGui::MenuItem("Texture")) {
-							EditorState::Instance().showTextureImportWindow = true;
-						}
-						if (ImGui::MenuItem("Animation")) {
-							// Action for importing animation
-							ShowAnimationImportWindow();
-						}
-						if (ImGui::MenuItem("Lua Script")) {
-							// Action for importing animation
-							ShowLuaScriptImportWindow();
-						}
-						ImGui::EndMenu();
+					if (ImGui::MenuItem("Texture")) {
+						EditorState::Instance().showTextureImportWindow = true;
 					}
-					if (ImGui::MenuItem("Build", "")) {
-						// Path to the Python script
-						std::string pythonScriptPath = "../../scripts/build_shipping.py";
+					if (ImGui::MenuItem("Animation")) {
+						// Action for importing animation
+						ShowAnimationImportWindow();
+					}
+					if (ImGui::MenuItem("Lua Script")) {
+						// Action for importing animation
+						ShowLuaScriptImportWindow();
+					}
+					ImGui::EndMenu();
+				}
+				if (ImGui::MenuItem("Build", "")) {
+					// Path to the Python script
+					std::string pythonScriptPath = "../../scripts/build_shipping.py";
 
 			// Determine asset, output, and solution paths
 			std::string assetsFolder = Engine::get()->getInitParams().projectDir;
