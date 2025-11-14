@@ -44,8 +44,6 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		{
 			name = path.filename().stem().string();
 		}
-		ext = path.extension().string();
-		fileName = path.filename().string();
 	}
 	else if (isTransient)
 	{
@@ -71,10 +69,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		}
 	}
 
-	if (fileName.empty())
-	{
-		fileName = name + ext;
-	}
+	fileName = name + ext;
 
 	relativefilePath = "";
 	if (isEngineOwned)

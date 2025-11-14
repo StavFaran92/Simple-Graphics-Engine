@@ -1210,7 +1210,7 @@ class GUI_Helper : public GuiMenu {
 					}
 					if (ImGui::BeginMenu("Import")) {
 						if (ImGui::MenuItem("Model")) {
-							ShowModelCreatorWindow();
+							EditorState::Instance().showModelImportWindow = true;
 						}
 						if (ImGui::MenuItem("Texture")) {
 							EditorState::Instance().showTextureImportWindow = true;
@@ -1328,6 +1328,7 @@ class GUI_Helper : public GuiMenu {
 		displayMaterialEditDialog();
 		displayProjectSettingsDialog();
 		displayTextureImportDialog();
+		displayModelImportDialog();
         //ShowTextureDisplayWindow();
 
 		if (EditorState::Instance().showAssetSelectorWindow) 

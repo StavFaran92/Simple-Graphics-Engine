@@ -29,6 +29,7 @@ public:
     bool showLuaScriptCreateWindow = false;
     bool showSettingsWindow = false;
     bool showTextureImportWindow = false;
+    bool showModelImportWindow = false;
 
     bool showAssetSelectorWindow = false;
     AssetType assetSelectType;

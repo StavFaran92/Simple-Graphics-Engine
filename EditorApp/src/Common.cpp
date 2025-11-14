@@ -10,3 +10,8 @@ void suggestUniqueName(const std::string& hint, char* buffer, size_t bufferSize)
 	suggestedName.copy(buffer, bufferSize - 1);
 	buffer[suggestedName.size() < bufferSize ? suggestedName.size() : bufferSize - 1] = '\0';
 }
+
+void suggestUniqueName(const std::string& hint, std::string& name)
+{
+	name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(hint);
+}

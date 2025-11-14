@@ -87,6 +87,7 @@ void Assets::loadAssetsDatabase()
 	{
 		assetInfo.resource = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
 		m_assets[assetInfo.uuid] = assetInfo;
+		Engine::get()->getSubSystem<UniqueNameManager>()->addName(assetInfo.name);
 	}
 }
 

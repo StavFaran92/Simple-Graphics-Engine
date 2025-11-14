@@ -411,7 +411,7 @@ void displayProjectSettingsDialog()
 
 void displayTextureImportDialog()
 {
-	static char textureName[256] = "";
+	static std::string textureName = "";
 	static std::string textureFilepathString = "";
 	static ImGuiTextBuffer textureFilepath;
 	if (EditorState::Instance().showTextureImportWindow)
@@ -421,7 +421,7 @@ void displayTextureImportDialog()
 	}
 	if (ImGui::BeginPopupModal("ImportTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::InputText("Name", textureName, IM_ARRAYSIZE(textureName));
+		ImGui::InputText("Name", &textureName);
 		
 		ImGui::InputText("##Filepath", &textureFilepathString);
 		ImGui::SameLine();
@@ -444,7 +444,7 @@ void displayTextureImportDialog()
 				std::filesystem::path path(textureFilepathString);
 				std::string filename = path.filename().stem().string();
 
-				suggestUniqueName(filename, textureName, sizeof(textureName));
+				textureName = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
 			}
 		}
 
@@ -456,11 +456,106 @@ void displayTextureImportDialog()
 			{
 				logError("Name already used.");
 			}
+			else if (textureName.empty())
+			{
+				logError("Name cannot be empty.");
+			}
 			else
 			{
 				Texture::TextureAssetDescriptor desc;
 				desc.name = textureName;
 				Texture::import(textureFilepathString, desc);
+
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void displayModelImportDialog()
+{
+	static std::string modelName = "";
+	static std::string modelFilepath = "";
+	if (EditorState::Instance().showModelImportWindow)
+	{
+		ImGui::OpenPopup("ImportModel");
+		EditorState::Instance().showModelImportWindow = false;
+	}
+	if (ImGui::BeginPopupModal("ImportModel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::InputText("Name", &modelName);
+
+		ImGui::InputText("##Filepath", &modelFilepath);
+		ImGui::SameLine();
+		if (ImGui::Button("o"))
+		{
+			const char* filepath = tinyfd_openFileDialog(
+				"Select an asset to load",
+				"",
+				6,
+				Constants::g_supportedFormats,
+				"",
+				0);
+
+			if (filepath)
+			{
+				modelFilepath = filepath;
+
+				std::filesystem::path path(modelFilepath);
+				std::string filename = path.filename().stem().string();
+
+				modelName = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
+			}
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(modelName))
+			{
+				logError("Name already used.");
+			}
+			else if (modelName.empty())
+			{
+				logError("Name cannot be empty.");
+			}
+			else
+			{
+				auto entity = Engine::get()->getContext()->getActiveScene()->createEntity(modelName);
+				entity.addComponent<RenderableComponent>();
+
+				ModelImportSettings desc;
+				desc.name = modelName;
+				auto mesh = MeshCollection::import(modelFilepath, desc);
+
+				entity.addComponent<MeshComponent>().mesh = mesh;
+
+				auto& materials = MeshCollection::getLastLoadedMaterials();
+
+				auto& materialComponent = entity.addComponent<MaterialComponent>();
+				for (auto& [idx, m] : materials)
+				{
+					materialComponent.setMaterial(idx, m);
+				}
+
+				ResourceWrapper<Prefab> prefab = Prefab::create(entity);
+
+				AssetCreateDescriptor aInfo;
+				aInfo.name = modelName + "_PREFAB";
+				aInfo.aType = AssetType::PREFAB;
+				Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
+
+				entity.remove();
 
 				ImGui::CloseCurrentPopup();
 			}
