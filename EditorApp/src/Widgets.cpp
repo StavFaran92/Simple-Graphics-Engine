@@ -50,12 +50,12 @@ void addTextureEditWidget(AssetWrapper<Material> mat, const std::string& name, T
 	ImGui::Text(name.c_str());
 }
 
-void addSamplerEditWidget(AssetWrapper<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype)
+void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype)
 {
 	ImGui::PushID(name.c_str());
 
 	int texID = 0;
-	auto sampler = mat.resource()->getSampler(ttype);
+	auto sampler = mat->getSampler(ttype);
 
 	if (!sampler->texture.isEmpty())
 	{
@@ -121,7 +121,7 @@ void addSamplerEditWidget(AssetWrapper<Material> mat, ImVec2 size, const std::st
 
 		if (ImGui::Button("Cancel"))
 		{
-			mat.resource()->setSampler(ttype, EditorState::Instance().previousSampler);
+			mat->setSampler(ttype, EditorState::Instance().previousSampler);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -339,4 +339,22 @@ void TextureDataWidget::draw()
 
 	ImGui::Text("Wrap Mode");
 	ImGui::Combo("##WrapMode", (int*)&m_wrapMode, wrapModes, IM_ARRAYSIZE(wrapModes));
+}
+
+void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
+{
+	ImGui::Text(mat.get()->getName().c_str());
+
+	ImGui::Dummy(ImVec2(0, 4));
+
+	ImGui::ColorEdit3("Base Color", glm::value_ptr(mat.get()->colorDiffuse));
+	ImGui::DragFloat("Metallic", &mat.get()->metallicFactor, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("Roughness", &mat.get()->roughnessFactor, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("Opacity", &mat.get()->opacityFactor, 0.01f, 0.0f, 1.0f);
+
+	addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
+	addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
+	addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
+	addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
+	addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
 }

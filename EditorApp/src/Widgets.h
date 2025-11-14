@@ -12,7 +12,7 @@ void addTextureEditWidget(AssetWrapper<Texture> texture, ImVec2 size, std::funct
 
 void addTextureEditWidget(AssetWrapper<Material> mat, const std::string& name, Texture::TextureType ttype);
 
-void addSamplerEditWidget(AssetWrapper<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype);
+void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype);
 
 void displayChannelSelectWidget(int*& currentChannel);
 
@@ -77,4 +77,10 @@ public:
 	TextureFilter m_filterMode = TextureFilter::LinearMipLinear;
 	TextureWrap   m_wrapMode = TextureWrap::Repeat;
 	float         m_anisotropy = 1.0f;
+};
+
+class MaterialDataWidget
+{
+public:
+	void draw(const ResourceWrapper<Material>& mat);
 };

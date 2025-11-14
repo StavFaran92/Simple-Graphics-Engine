@@ -379,6 +379,49 @@ void displayLuaScriptCreatorDialog()
 	}
 }
 
+void displayMaterialCreatorDialog()
+{
+	static UniqueNameWidget uniqueName("Name");
+	static ResourceWrapper<Material> tempMaterial;
+	static MaterialDataWidget matData;
+	if (EditorState::Instance().showMaterialCreateWindow)
+	{
+		ImGui::OpenPopup("Create Material");
+		EditorState::Instance().showMaterialCreateWindow = false;
+		tempMaterial = Material::create();
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Material");
+	}
+	if (ImGui::BeginPopupModal("Create Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		uniqueName.draw();
+		ImGui::Separator();
+		matData.draw(tempMaterial);
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			if (uniqueName.isValid())
+			{
+				AssetCreateDescriptor desc;
+				desc.aType = AssetType::MATERIAL;
+				desc.name = uniqueName.name;
+				Engine::get()->getSubSystem<Assets>()->createAsset(tempMaterial, desc);
+				ImGui::CloseCurrentPopup();
+			}
+
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
 void displayProjectSettingsDialog()
 {
 	if (EditorState::Instance().showSettingsWindow)
@@ -634,30 +677,35 @@ void displayLuaScriptImportDialog()
 void displayMaterialEditDialog()
 {
 	static ResourceWrapper<Material> previousMaterial;
+	static MaterialDataWidget materialData;
 	if (EditorState::Instance().showMaterialEditWindow)
 	{
-		ImGui::OpenPopup("EditMaterial");
+		ImGui::OpenPopup("Edit Material");
 		
 		previousMaterial = EditorState::Instance().selectedMaterialForEdit.get()->clone(true);
 		EditorState::Instance().showMaterialEditWindow = false;
 	}
-	if (ImGui::BeginPopupModal("EditMaterial", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("Edit Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		auto& mat = EditorState::Instance().selectedMaterialForEdit;
-		ImGui::Text(mat.resource()->getName().c_str());
 
-		ImGui::Dummy(ImVec2(0, 4));
+		materialData.draw(mat.resource());
+		//ImGui::Text(mat.resource()->getName().c_str());
 
-		ImGui::ColorEdit3("Base Color", glm::value_ptr(mat.resource()->colorDiffuse));
-		ImGui::DragFloat("Metallic", &mat.resource()->metallicFactor, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("Roughness", &mat.resource()->roughnessFactor, 0.01f, 0.0f, 1.0f);
-		ImGui::DragFloat("Opacity", &mat.resource()->opacityFactor, 0.01f, 0.0f, 1.0f);
+		//ImGui::Dummy(ImVec2(0, 4));
 
-		addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
-		addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
-		addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
-		addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
-		addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
+
+
+		//ImGui::ColorEdit3("Base Color", glm::value_ptr(mat.resource()->colorDiffuse));
+		//ImGui::DragFloat("Metallic", &mat.resource()->metallicFactor, 0.01f, 0.0f, 1.0f);
+		//ImGui::DragFloat("Roughness", &mat.resource()->roughnessFactor, 0.01f, 0.0f, 1.0f);
+		//ImGui::DragFloat("Opacity", &mat.resource()->opacityFactor, 0.01f, 0.0f, 1.0f);
+
+		//addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
+		//addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
+		//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
+		//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
+		//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
 
 		ImGui::Separator();
 

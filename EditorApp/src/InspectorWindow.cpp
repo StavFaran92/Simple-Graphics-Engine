@@ -663,6 +663,11 @@ void InspectorWindow::display()
 				state.getSelectedEntity().addComponent<MeshComponent>();
 			}
 
+			if (ImGui::MenuItem("Material"))
+			{
+				state.getSelectedEntity().addComponent<MaterialComponent>();
+			}
+
 			if (ImGui::MenuItem("Camera"))
 			{
 				state.getSelectedEntity().addComponent<CameraComponent>();

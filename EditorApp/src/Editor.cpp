@@ -1077,7 +1077,11 @@ class GUI_Helper : public GuiMenu {
 				}
 				if (ImGui::BeginMenu("Edit")) {
 					if (ImGui::BeginMenu("Create")) {
-						if (ImGui::MenuItem("Empty Texture")) {
+						if (ImGui::MenuItem("Material")) {
+							EditorState::Instance().showMaterialCreateWindow = true;
+
+						}
+						if (ImGui::MenuItem("Texture")) {
 							EditorState::Instance().showTextureCreateWindow = true;
 							
 						}
@@ -1155,6 +1159,7 @@ class GUI_Helper : public GuiMenu {
 		displayModelImportDialog();
 		displayAnimationImportDialog();
 		displayLuaScriptImportDialog();
+		displayMaterialCreatorDialog();
         //ShowTextureDisplayWindow();
 
 		if (EditorState::Instance().showAssetSelectorWindow) 
