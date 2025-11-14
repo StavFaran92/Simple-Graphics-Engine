@@ -411,60 +411,42 @@ void displayProjectSettingsDialog()
 
 void displayTextureImportDialog()
 {
-	static std::string textureName = "";
-	static std::string textureFilepathString = "";
-	static ImGuiTextBuffer textureFilepath;
+	static UniqueNameWidget uniqueName("Name");
+	static FilepathWidget filepath("##Filepath", Constants::g_textureSupportedFormats, 5);
+	static TextureDataWidget textureDataWidget;
+
 	if (EditorState::Instance().showTextureImportWindow)
 	{
-		ImGui::OpenPopup("ImportTexture");
+		ImGui::OpenPopup("Import Texture");
 		EditorState::Instance().showTextureImportWindow = false;
+		uniqueName.clear();
+		filepath.clear();
 	}
-	if (ImGui::BeginPopupModal("ImportTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("Import Texture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::InputText("Name", &textureName);
-		
-		ImGui::InputText("##Filepath", &textureFilepathString);
-		ImGui::SameLine();
-		if (ImGui::Button("o"))
+		uniqueName.draw();
+		filepath.draw();
+
+		if (filepath.accept())
 		{
-			const char* filepath = tinyfd_openFileDialog(
-				"Select an asset to load",
-				"",
-				5,
-				Constants::g_textureSupportedFormats,
-				"",
-				0);
-
-			if (filepath)
-			{
-				textureFilepath.clear();
-				textureFilepath.append(filepath);
-				textureFilepathString = textureFilepath.c_str();
-
-				std::filesystem::path path(textureFilepathString);
-				std::string filename = path.filename().stem().string();
-
-				textureName = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
-			}
+			std::filesystem::path path(filepath.m_filepath);
+			std::string filename = path.filename().stem().string();
+			uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
 		}
+
+		ImGui::Separator();
+
+		textureDataWidget.draw();
 
 		ImGui::Separator();
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(textureName))
-			{
-				logError("Name already used.");
-			}
-			else if (textureName.empty())
-			{
-				logError("Name cannot be empty.");
-			}
-			else
+			if (uniqueName.isValid())
 			{
 				Texture::TextureAssetDescriptor desc;
-				desc.name = textureName;
-				Texture::import(textureFilepathString, desc);
+				desc.name = uniqueName.name;
+				Texture::import(filepath.m_filepath, desc);
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -483,25 +465,25 @@ void displayTextureImportDialog()
 
 void displayModelImportDialog()
 {
-	static UniqueNameWidget uniqueName;
-	static FilepathWidget modelFilepath("##Filepath", Constants::g_supportedFormats, 6);
+	static UniqueNameWidget uniqueName("Name");
+	static FilepathWidget filepath("##Filepath", Constants::g_supportedFormats, 6);
 	if (EditorState::Instance().showModelImportWindow)
 	{
-		ImGui::OpenPopup("ImportModel");
+		ImGui::OpenPopup("Import Model");
 		EditorState::Instance().showModelImportWindow = false;
 		uniqueName.clear();
-		modelFilepath.clear();
+		filepath.clear();
 	}
-	if (ImGui::BeginPopupModal("ImportModel", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("Import Model", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		
 
-		uniqueName.draw("Name");
+		uniqueName.draw();
 
-		modelFilepath.draw();
-		if (modelFilepath.accept())
+		filepath.draw();
+		if (filepath.accept())
 		{
-			std::filesystem::path path(modelFilepath.m_filepath);
+			std::filesystem::path path(filepath.m_filepath);
 			std::string filename = path.filename().stem().string();
 			uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
 		}
@@ -517,7 +499,7 @@ void displayModelImportDialog()
 
 				ModelImportSettings desc;
 				desc.name = uniqueName.name;
-				auto mesh = MeshCollection::import(modelFilepath.m_filepath, desc);
+				auto mesh = MeshCollection::import(filepath.m_filepath, desc);
 
 				entity.addComponent<MeshComponent>().mesh = mesh;
 
@@ -537,6 +519,106 @@ void displayModelImportDialog()
 				Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
 
 				entity.remove();
+
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void displayAnimationImportDialog()
+{
+	static UniqueNameWidget uniqueName("Name");
+	static FilepathWidget filepath("##Filepath", Constants::g_animationSupportedFormats, 1);
+	if (EditorState::Instance().showAnimationImportWindow)
+	{
+		ImGui::OpenPopup("Import Animation");
+		EditorState::Instance().showAnimationImportWindow = false;
+		uniqueName.clear();
+		filepath.clear();
+	}
+	if (ImGui::BeginPopupModal("Import Animation", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+
+
+		uniqueName.draw();
+
+		filepath.draw();
+		if (filepath.accept())
+		{
+			std::filesystem::path path(filepath.m_filepath);
+			std::string filename = path.filename().stem().string();
+			uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			if (uniqueName.isValid())
+			{
+				AnimationImportSettings desc;
+				desc.name = uniqueName.name;
+				Animation::import(filepath.m_filepath, desc);
+
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void displayLuaScriptImportDialog()
+{
+	static UniqueNameWidget uniqueName("Name");
+	static FilepathWidget filepath("##Filepath", Constants::g_luaScriptSupportedFormats, 1);
+	if (EditorState::Instance().showLuaScriptImportWindow)
+	{
+		ImGui::OpenPopup("Import Lua Script");
+		EditorState::Instance().showLuaScriptImportWindow = false;
+		uniqueName.clear();
+		filepath.clear();
+	}
+	if (ImGui::BeginPopupModal("Import Lua Script", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+
+
+		uniqueName.draw();
+
+		filepath.draw();
+		if (filepath.accept())
+		{
+			std::filesystem::path path(filepath.m_filepath);
+			std::string filename = path.filename().stem().string();
+			uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			if (uniqueName.isValid())
+			{
+				LuaScriptImportSettings desc;
+				desc.name = uniqueName.name;
+				LuaScript::import(filepath.m_filepath, desc);
 
 				ImGui::CloseCurrentPopup();
 			}

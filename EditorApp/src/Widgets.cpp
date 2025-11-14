@@ -223,6 +223,12 @@ void addAssetSelectWidget(const std::string& name, AssetType aType, const std::f
 }
 
 FilepathWidget::FilepathWidget(const std::string& label, char const* const* formats, size_t formatCount)
+	: m_label(label), m_formats(formats), m_formatCount(formatCount)
+{
+}
+
+UniqueNameWidget::UniqueNameWidget(const std::string& label)
+	: m_label(label)
 {
 }
 
@@ -241,7 +247,7 @@ bool UniqueNameWidget::isValid() const
 	return true;
 }
 
-void UniqueNameWidget::draw(const std::string& label)
+void UniqueNameWidget::draw()
 {
 	ImGui::InputText("Name", &name);
 }
@@ -268,7 +274,7 @@ void FilepathWidget::draw()
 			"Select an asset to load",
 			"",
 			m_formatCount,
-			formats,
+			m_formats,
 			"",
 			0);
 
@@ -290,4 +296,36 @@ bool FilepathWidget::accept()
 	bool tempIsPressed = m_isPressed;
 	m_isPressed = false;
 	return tempIsPressed;
+}
+
+
+void TextureDataWidget::draw()
+{
+	// --- Filter type ---
+	static const char* filterModes[] = {
+		"Nearest",
+		"Linear",
+		"Nearest Mip Nearest",
+		"Linear Mip Nearest",
+		"Nearest Mip Linear",
+		"Linear Mip Linear"
+	};
+
+	ImGui::Text("Filter Mode");
+	ImGui::Combo("##FilterMode", (int*)&m_filterMode, filterModes, IM_ARRAYSIZE(filterModes));
+
+	// --- Anisotropy ---
+	ImGui::Text("Anisotropy");
+	ImGui::SliderFloat("##Aniso", &m_anisotropy, 1.0f, 16.0f);
+
+	// --- Wrap mode (the one you meant: repeat / clamp-to-edge / clamp-to-border / mirrored-repeat) ---
+	static const char* wrapModes[] = {
+		"Repeat",
+		"Clamp to Edge",
+		"Clamp to Border",
+		"Mirrored Repeat"
+	};
+
+	ImGui::Text("Wrap Mode");
+	ImGui::Combo("##WrapMode", (int*)&m_wrapMode, wrapModes, IM_ARRAYSIZE(wrapModes));
 }

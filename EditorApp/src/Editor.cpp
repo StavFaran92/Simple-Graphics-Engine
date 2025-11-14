@@ -285,180 +285,6 @@ void LightCreatorWindow()
 
 }
 
-static void addAssetLoadWidget(const std::string& name, ImGuiTextBuffer& textBuffer, const char** assetSupportedFormats, int filterCount)
-{
-	ImGui::LabelText("", name.c_str());
-	if (ImGui::Button(std::string("Browse##" + name).c_str()))
-	{
-		const char* filepath = tinyfd_openFileDialog(
-			"Select an asset to load",
-			"",
-			filterCount,
-			assetSupportedFormats,
-			"",
-			0);
-
-		if (filepath)
-		{
-			textBuffer.clear();
-			textBuffer.append(filepath);
-		}
-	}
-	ImGui::SameLine();
-	ImGui::TextUnformatted(textBuffer.begin(), textBuffer.end());
-}
-
-void ShowLuaScriptImportWindow()
-{
-	static ImGuiTextBuffer pathBuffer;
-
-	const char* filepath = tinyfd_openFileDialog(
-		"Select an asset to load",
-		"",
-		1,
-		Constants::g_luaScriptSupportedFormats,
-		"",
-		0);
-
-	if (filepath)
-	{
-		pathBuffer.clear();
-		pathBuffer.append(filepath);
-	}
-
-	std::filesystem::path path(pathBuffer.c_str());
-
-	if (!std::filesystem::exists(path))
-	{
-		logWarning("Path not found: " + path.string());
-		return;
-	}
-
-	LuaScript::import(pathBuffer.c_str());
-
-	pathBuffer.clear();
-}
-
-void ShowTextureImportWindow()
-{
-	static ImGuiTextBuffer texturePathBuffer;
-
-	const char* filepath = tinyfd_openFileDialog(
-		"Select an asset to load",
-		"",
-		4,
-		Constants::g_textureSupportedFormats,
-		"",
-		0);
-
-	if (filepath)
-	{
-		texturePathBuffer.clear();
-		texturePathBuffer.append(filepath);
-	}
-
-	std::filesystem::path path(texturePathBuffer.c_str());
-
-	if (!std::filesystem::exists(path))
-	{
-		logError("Texture Path not found: " + path.string());
-		return;
-	}
-
-	Texture::import(texturePathBuffer.c_str());
-
-	texturePathBuffer.clear();
-}
-
-void ShowAnimationImportWindow()
-{
-	static ImGuiTextBuffer animationPathBuffer;
-
-	const char* filepath = tinyfd_openFileDialog(
-		"Select an asset to load",
-		"",
-		1,
-		Constants::g_animationSupportedFormats,
-		"",
-		0);
-
-	if (filepath)
-	{
-		animationPathBuffer.clear();
-		animationPathBuffer.append(filepath);
-	}
-
-	std::filesystem::path path(animationPathBuffer.c_str());
-
-	if (!std::filesystem::exists(path))
-	{
-		logError("Animation Path not found: " + path.string());
-		return;
-	}
-
-	Animation::import(animationPathBuffer.c_str());
-	//Engine::get()->getSubSystem<AnimationLoader>()->import(animationPathBuffer.c_str());
-
-	animationPathBuffer.clear();
-}
-
-void ShowModelCreatorWindow()
-{
-	static ImGuiTextBuffer modelPathBuffer;
-
-	const char* filepath = tinyfd_openFileDialog(
-		"Select an asset to load",
-		"",
-		5,
-		Constants::g_supportedFormats,
-		"",
-		0);
-
-	if (filepath)
-	{
-		modelPathBuffer.clear();
-		modelPathBuffer.append(filepath);
-	}
-
-	std::filesystem::path path(modelPathBuffer.c_str());
-
-	if (!std::filesystem::exists(path))
-	{
-		logError("Model Path not found: " + path.string());
-		return;
-	}
-
-	auto modelName = path.filename().replace_extension().string();
-
-	auto entity = Engine::get()->getContext()->getActiveScene()->createEntity(modelName);
-	entity.addComponent<RenderableComponent>();
-
-	auto mesh = MeshCollection::import(modelPathBuffer.c_str());
-	entity.addComponent<MeshComponent>().mesh = mesh;
-
-	auto& materials = MeshCollection::getLastLoadedMaterials();
-
-	auto& materialComponent = entity.addComponent<MaterialComponent>();
-	for(auto& [idx, m] : materials)
-	{
-		materialComponent.setMaterial(idx, m);
-	}
-
-	
-	ResourceWrapper<Prefab> prefab = Prefab::create(entity);
-
-	AssetCreateDescriptor aInfo;
-	aInfo.name = modelName;
-	aInfo.aType = AssetType::PREFAB;
-	Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
-
-	entity.remove();
-
-	modelPathBuffer.clear();
-
-	updateScene();
-}
-
 void displayentityName(const Entity& e)
 {
 	auto& obj = e.getComponent<ObjectComponent>();
@@ -1216,12 +1042,10 @@ class GUI_Helper : public GuiMenu {
 						EditorState::Instance().showTextureImportWindow = true;
 					}
 					if (ImGui::MenuItem("Animation")) {
-						// Action for importing animation
-						ShowAnimationImportWindow();
+						EditorState::Instance().showAnimationImportWindow = true;
 					}
 					if (ImGui::MenuItem("Lua Script")) {
-						// Action for importing animation
-						ShowLuaScriptImportWindow();
+						EditorState::Instance().showLuaScriptImportWindow = true;
 					}
 					ImGui::EndMenu();
 				}
@@ -1329,6 +1153,8 @@ class GUI_Helper : public GuiMenu {
 		displayProjectSettingsDialog();
 		displayTextureImportDialog();
 		displayModelImportDialog();
+		displayAnimationImportDialog();
+		displayLuaScriptImportDialog();
         //ShowTextureDisplayWindow();
 
 		if (EditorState::Instance().showAssetSelectorWindow) 

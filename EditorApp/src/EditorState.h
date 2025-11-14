@@ -30,6 +30,8 @@ public:
     bool showSettingsWindow = false;
     bool showTextureImportWindow = false;
     bool showModelImportWindow = false;
+    bool showAnimationImportWindow = false;
+    bool showLuaScriptImportWindow = false;
 
     bool showAssetSelectorWindow = false;
     AssetType assetSelectType;

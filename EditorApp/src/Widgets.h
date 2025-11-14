@@ -25,10 +25,12 @@ void addAssetSelectWidget(const std::string& name, AssetType aType, const std::f
 class UniqueNameWidget
 {
 public:
+	UniqueNameWidget(const std::string& label);
 	bool isValid() const;
-	void draw(const std::string& label);
+	void draw();
 	void clear();
 
+	std::string m_label;
 	std::string name;
 };
 
@@ -45,5 +47,34 @@ public:
 	bool m_isPressed = false;
 	std::string m_label;
 	size_t m_formatCount = 0;
-	const char* const *formats = nullptr;
+	const char* const *m_formats = nullptr;
+};
+
+class TextureDataWidget
+{
+public:
+	enum class TextureFilter
+	{
+		Nearest,
+		Linear,
+		NearestMipNearest,
+		LinearMipNearest,
+		NearestMipLinear,
+		LinearMipLinear
+	};
+
+	enum class TextureWrap
+	{
+		Repeat,
+		ClampToEdge,
+		ClampToBorder,
+		MirroredRepeat
+	};
+
+	TextureDataWidget() = default;
+	void draw();
+
+	TextureFilter m_filterMode = TextureFilter::LinearMipLinear;
+	TextureWrap   m_wrapMode = TextureWrap::Repeat;
+	float         m_anisotropy = 1.0f;
 };
