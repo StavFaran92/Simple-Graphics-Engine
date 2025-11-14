@@ -22,7 +22,7 @@ Entity WaterSystem::createPool()
 	planeTransform.rotate({ 1,0,0 }, 90);
 	planeTransform.scale({ 100, 100, 1 });
 
-	auto& shader = Shader::createOverrideShader("WaterShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
+	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
 
 	AssetCreateDescriptor desc;
 	desc.aType = AssetType::SHADER;

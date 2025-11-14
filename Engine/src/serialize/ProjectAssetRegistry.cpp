@@ -156,8 +156,8 @@ void ProjectAssetRegistry::removeAssetRegistry(const AssetInfo& asset)
 	for (int i=0; i< m_assetRegistry[assetTypeName].size(); i++)
 	{
 		auto aReg = m_assetRegistry[assetTypeName][i];
-		std::string uuid = aReg.at("uuid").get<std::string>();
-		if (uuid == asset.uuid.str())
+		UUID uuid = aReg.at("uuid").get<UUID>();
+		if (uuid == asset.uuid)
 		{
 			m_assetRegistry[assetTypeName].erase(i);
 			sync();

@@ -96,7 +96,7 @@ public:
 	const std::string& getSourceCode() const;
 
 	static AssetWrapper<Shader> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
-	static ResourceWrapper<Shader> createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
+	static ResourceWrapper<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
 	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);

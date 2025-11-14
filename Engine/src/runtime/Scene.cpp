@@ -197,8 +197,8 @@ void Scene::init(Context* context)
 	m_highlightRenderView = std::make_shared<RenderView>(Viewport{ 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight() }, Entity::EmptyEntity);
 
 	m_highlightMaskShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl");
-	m_highlightEdgeDetectionShader = Shader::createOverrideShader("HighlightEdgeDetectionShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
-	m_highlightMergeShader = Shader::createOverrideShader("HighlightMergeShader", SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
+	m_highlightEdgeDetectionShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
+	m_highlightMergeShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
 
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
 

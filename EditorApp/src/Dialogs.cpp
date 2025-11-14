@@ -224,39 +224,36 @@ void displayTextureSelectDialog()
 
 void displayTextureCreatorDialog()
 {
-	static char textureName[256] = "";
+	static UniqueNameWidget uniqueName("Name");
+	static TextureDataWidget textureDataWidget;
 	if (EditorState::Instance().showTextureCreateWindow)
 	{
 		ImGui::OpenPopup("CreateEmptyTexture");
 		EditorState::Instance().showTextureCreateWindow = false;
 
-		suggestUniqueName("NewTexture", textureName, sizeof(textureName));
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewTexture");
 	}
 	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		static int width = 512;
 		static int height = 512;
-		
-
-		ImGui::InputText("Name", textureName, IM_ARRAYSIZE(textureName));
+	
+		uniqueName.draw();
 		ImGui::InputInt("Width", &width);
 		ImGui::InputInt("Height", &height);
+		textureDataWidget.draw();
 
 		ImGui::Separator();
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(textureName))
-			{
-				logError("Name already used.");
-			}
-			else
+			if (uniqueName.isValid())
 			{
 				auto texture = Texture::createEmptyTexture(width, height);
 				
 				AssetCreateDescriptor aInfo;
 				aInfo.aType = AssetType::TEXTURE;
-				aInfo.name = textureName;
+				aInfo.name = uniqueName.name;
 				aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 				Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 
@@ -277,24 +274,20 @@ void displayTextureCreatorDialog()
 
 void displayShaderCreatorDialog()
 {
+	static UniqueNameWidget uniqueName("Name");
+	static FilepathWidget filepath("##Filepath", Constants::g_shaderSupportedFormats, 1);
 	if (EditorState::Instance().showShaderCreateWindow)
 	{
 		ImGui::OpenPopup("CreateShader");
 		EditorState::Instance().showShaderCreateWindow = false;
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Shader");
 	}
 	if (ImGui::BeginPopupModal("CreateShader", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		static char shaderName[256] = "New Shader";
-		static char filepath[256] = "";
+		uniqueName.draw();
+		filepath.draw();
+
 		static ShaderOverride shaderOverrideType = ShaderOverride::None;
-
-		// Shader Name
-		ImGui::Text("Name");
-		ImGui::InputText("##ShaderName", shaderName, IM_ARRAYSIZE(shaderName), ImGuiInputTextFlags_EnterReturnsTrue);
-
-		// Shader File Path
-		ImGui::Text("Filepath");
-		ImGui::InputText("##ShaderFilePath", filepath, IM_ARRAYSIZE(filepath), ImGuiInputTextFlags_EnterReturnsTrue);
 
 		// Override Type Drop-down
 		int currentIndex = 0;
@@ -324,11 +317,11 @@ void displayShaderCreatorDialog()
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			auto& shader = Shader::createOverrideShader(shaderName, filepath, shaderOverrideType); // todo fix
+			auto& shader = Shader::createOverrideShader(filepath.m_filepath, shaderOverrideType); // todo fix
 
 			AssetCreateDescriptor desc;
-			desc.name = shaderName;
-			desc.origFilePath = filepath;
+			desc.name = uniqueName.name;
+			desc.origFilePath = filepath.m_filepath;
 			desc.aType = AssetType::SHADER;
 			desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(shaderOverrideType);
 			Engine::get()->getSubSystem<Assets>()->createAsset(shader, desc);
@@ -348,28 +341,31 @@ void displayShaderCreatorDialog()
 
 void displayLuaScriptCreatorDialog()
 {
+	static UniqueNameWidget uniqueName("Name");
 	if (EditorState::Instance().showLuaScriptCreateWindow)
 	{
 		ImGui::OpenPopup("CreateLuaScript");
 		EditorState::Instance().showLuaScriptCreateWindow = false;
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewLuaScript");
 	}
 	if (ImGui::BeginPopupModal("CreateLuaScript", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		static char luaScriptName[256] = "NewLuaScript";
-
-		ImGui::InputText("Name", luaScriptName, IM_ARRAYSIZE(luaScriptName));
-
+		uniqueName.draw();
 		ImGui::Separator();
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			ResourceWrapper<LuaScript> script = LuaScript::create();
+			if (uniqueName.isValid())
+			{
+				ResourceWrapper<LuaScript> script = LuaScript::create();
 
-			AssetCreateDescriptor desc;
-			desc.aType = AssetType::LUA_SCRIPT;
-			desc.name = luaScriptName;
-			Engine::get()->getSubSystem<Assets>()->createAsset(script, desc);
-			ImGui::CloseCurrentPopup();
+				AssetCreateDescriptor desc;
+				desc.aType = AssetType::LUA_SCRIPT;
+				desc.name = uniqueName.name;
+				Engine::get()->getSubSystem<Assets>()->createAsset(script, desc);
+				ImGui::CloseCurrentPopup();
+			}
+
 		}
 
 		ImGui::SameLine();

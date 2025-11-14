@@ -531,7 +531,7 @@ void replaceDirective(std::string& source, const std::string& directive, std::st
 	}
 }
 
-ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& name, const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned)
+ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned)
 {
 	ResourceWrapper<Shader> shader = Factory<Shader>::create();
 

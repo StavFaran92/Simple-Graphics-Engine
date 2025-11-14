@@ -37,6 +37,10 @@ namespace Constants {
 		"*.lua",
 	};
 
+	static const char* g_shaderSupportedFormats[] = {
+		"*.glsl",
+	};
+
 	
 
 

@@ -474,7 +474,8 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
 	}
 	else {
-		throw std::runtime_error("Unsupported texture format!");
+		logError("Unsupported texture format!");
+		return;
 	}
 
 	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
