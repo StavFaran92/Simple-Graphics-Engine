@@ -236,12 +236,10 @@ bool UniqueNameWidget::isValid() const
 {
 	if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(name))
 	{
-		logError("Name already used.");
 		return false;
 	}
 	else if (name.empty())
 	{
-		logError("Name cannot be empty.");
 		return false;
 	}
 	return true;
@@ -250,6 +248,19 @@ bool UniqueNameWidget::isValid() const
 void UniqueNameWidget::draw()
 {
 	ImGui::InputText("Name", &name);
+
+	if (!isValid())
+	{
+		// TODO fix, font is blurry
+
+		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 80, 80, 255)); // soft red
+		//ImGui::SetWindowFontScale(0.9f);                                 // a bit smaller
+
+		ImGui::TextUnformatted("*Name is taken or empty");
+
+		//ImGui::SetWindowFontScale(1.0f);                                 // restore
+		ImGui::PopStyleColor();
+	}
 }
 
 void UniqueNameWidget::clear()

@@ -1238,6 +1238,16 @@ void setStyleAndColors()
 	style.GrabRounding = 4.0f;
 	style.ScrollbarRounding = 6.0f;
 	style.WindowBorderSize = 1.0f;
+
+	//ImGuiIO& io = ImGui::GetIO();
+	//io.Fonts->AddFontDefault();                    // normal font
+	//io.Fonts->AddFontDefault()->FontSize = 14.0f; // or specify config
+
+	//ImFont* smallFont = io.Fonts->AddFontDefault();
+	//// optionally configure
+	// ImFontConfig cfg;
+	// cfg.SizePixels = 12.0f;
+	// ImFont* smallFont = io.Fonts->AddFontDefault(&cfg);
 }
 
 
