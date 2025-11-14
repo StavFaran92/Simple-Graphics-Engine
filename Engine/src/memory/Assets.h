@@ -25,6 +25,7 @@ public:
 	std::string name;
 	bool isEngineOwned = false;
 	bool isTransient = false;
+	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 
 	virtual nlohmann::json fillParams() const { return {}; }
 	

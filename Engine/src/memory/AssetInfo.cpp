@@ -28,6 +28,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	attributes = assetDesc.attributes;
 	isEngineOwned = assetDesc.isEngineOwned;
 	isTransient = assetDesc.isTransient;
+	isCompositeAsset = assetDesc.isCompositeAsset;
 
 	if (aType == AssetType::NONE)
 	{
@@ -35,6 +36,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		return;
 	}
 
+	// Extract name
 	if (!origFilePath.empty())
 	{
 		auto& path = std::filesystem::path(origFilePath);
@@ -51,6 +53,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		return;
 	}
 
+	// Generate UUID
 	uuid = UUID::generate_uuid_v4();
 
 	if (name.empty())
@@ -58,6 +61,16 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 		name = uuid;
 	}
 
+	// Extract Extension
+	if (!origFilePath.empty())
+	{
+		auto& path = std::filesystem::path(origFilePath);
+
+		if (path.has_extension())
+		{
+			ext = path.extension().string();
+		}
+	}
 	if (ext.empty())
 	{
 		ext = getExtensionFromType(aType);
@@ -79,6 +92,11 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	else
 	{
 		relativefilePath += "Content/";
+	}
+
+	if (isCompositeAsset)
+	{
+		assetDirectory = name;
 	}
 
 	if (!assetDirectory.empty())

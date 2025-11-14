@@ -98,8 +98,7 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 AssetWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, ModelImportSettings desc)
 {
 	desc.aType = AssetType::MESH;
-	desc.assetDirectory = std::filesystem::path(fileLocation).filename().stem().generic_string();
-	desc.origFilePath = fileLocation;
+	desc.isCompositeAsset = true;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MeshCollection>();
 }
 

@@ -29,6 +29,7 @@ struct EngineAPI AssetInfo
 	std::string name;
 	bool isEngineOwned = false;
 	bool isTransient = false;
+	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	nlohmann::json importSettings;
 	ResourceWrapper<ResourceBase> resource = ResourceWrapper<ResourceBase>::empty;
 
