@@ -28,6 +28,9 @@
 #include "Dialogs.h"
 #include "Dialogs/MaterialCreateDialog.h"
 #include "Dialogs/ModelImportDialog.h"
+#include "Dialogs/AnimationImportDialog.h"
+#include "Dialogs/TextureImportDialog.h"
+#include "Dialogs/LuaScriptImportDialog.h"
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
@@ -70,6 +73,9 @@ static bool g_scrollConsole = false;
 
 static MaterialCreateDialog materialCreateDialog;
 static ModelImportDialog modelImportDialog;
+static AnimationImportDialog animationImportDialog;
+static TextureImportDialog textureImportDialog;
+static LuaScriptImportDialog luaScriptImportDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -1044,13 +1050,13 @@ class GUI_Helper : public GuiMenu {
 						modelImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Texture")) {
-						EditorState::Instance().showTextureImportWindow = true;
+						textureImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Animation")) {
-						EditorState::Instance().showAnimationImportWindow = true;
+						animationImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Lua Script")) {
-						EditorState::Instance().showLuaScriptImportWindow = true;
+						luaScriptImportDialog.activate();
 					}
 					ImGui::EndMenu();
 				}
@@ -1161,10 +1167,9 @@ class GUI_Helper : public GuiMenu {
 		displayShaderCreatorDialog();
 		displayMaterialEditDialog();
 		displayProjectSettingsDialog();
-		displayTextureImportDialog();
-		//displayModelImportDialog();
-		displayAnimationImportDialog();
-		displayLuaScriptImportDialog();
+		luaScriptImportDialog.display();
+		textureImportDialog.display();
+		animationImportDialog.display();
 		modelImportDialog.display();
 		materialCreateDialog.display();
 		//displayMaterialCreatorDialog();
