@@ -3,6 +3,10 @@
 #include "DialogBase.h"
 #include "Widgets.h"
 
+#include "Widgets/UniqueNameWidget.h"
+#include "Widgets/FilepathWidget.h"
+#include "Widgets/TextureDataWidget.h"
+
 class TextureImportDialog : public DialogBase
 {
 public:

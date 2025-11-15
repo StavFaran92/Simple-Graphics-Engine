@@ -3,6 +3,9 @@
 #include "DialogBase.h"
 #include "Widgets.h"
 
+#include "Widgets/UniqueNameWidget.h"
+#include "Widgets/FilepathWidget.h"
+
 class MaterialCreateDialog : public DialogBase
 {
 public:

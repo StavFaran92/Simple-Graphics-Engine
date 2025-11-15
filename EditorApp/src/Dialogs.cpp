@@ -9,6 +9,10 @@
 
 #include <imgui_stdlib.h>
 
+#include "Widgets/UniqueNameWidget.h"
+#include "Widgets/FilepathWidget.h"
+#include "Widgets/TextureDataWidget.h"
+
 
 void displaySelectScriptDialog(std::string& scriptName)
 {

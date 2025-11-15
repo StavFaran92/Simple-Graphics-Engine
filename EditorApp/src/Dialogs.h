@@ -9,7 +9,6 @@
 void displayTextureCreatorDialog();
 void displayShaderCreatorDialog();
 void displayLuaScriptCreatorDialog();
-void displayMaterialCreatorDialog();
 
 // Edit
 void displayMaterialEditDialog();
