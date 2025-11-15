@@ -1,5 +1,10 @@
 #include "MaterialCreateDialog.h"
 
+MaterialCreateDialog::MaterialCreateDialog()
+	: DialogBase("MaterialCreateDialog")
+{
+}
+
 void MaterialCreateDialog::appearContent()
 {
 	m_tempMaterial = Material::create();

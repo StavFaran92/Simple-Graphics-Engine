@@ -27,6 +27,7 @@
 #include "InspectorWindow.h"
 #include "Dialogs.h"
 #include "Dialogs/MaterialCreateDialog.h"
+#include "Dialogs/ModelImportDialog.h"
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
@@ -68,6 +69,7 @@ static std::mutex g_consoleMutex;
 static bool g_scrollConsole = false;
 
 static MaterialCreateDialog materialCreateDialog;
+static ModelImportDialog modelImportDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -1039,7 +1041,7 @@ class GUI_Helper : public GuiMenu {
 				}
 				if (ImGui::BeginMenu("Import")) {
 					if (ImGui::MenuItem("Model")) {
-						EditorState::Instance().showModelImportWindow = true;
+						modelImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Texture")) {
 						EditorState::Instance().showTextureImportWindow = true;
@@ -1160,9 +1162,10 @@ class GUI_Helper : public GuiMenu {
 		displayMaterialEditDialog();
 		displayProjectSettingsDialog();
 		displayTextureImportDialog();
-		displayModelImportDialog();
+		//displayModelImportDialog();
 		displayAnimationImportDialog();
 		displayLuaScriptImportDialog();
+		modelImportDialog.display();
 		materialCreateDialog.display();
 		//displayMaterialCreatorDialog();
         //ShowTextureDisplayWindow();

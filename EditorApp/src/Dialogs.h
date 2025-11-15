@@ -25,6 +25,5 @@ void displayProjectSettingsDialog();
 
 // Import
 void displayTextureImportDialog();
-void displayModelImportDialog();
 void displayAnimationImportDialog();
 void displayLuaScriptImportDialog();

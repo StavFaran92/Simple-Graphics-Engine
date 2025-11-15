@@ -2,6 +2,11 @@
 
 #include "EditorState.h"
 
+DialogBase::DialogBase(const std::string& label)
+	: m_label(label)
+{
+}
+
 void DialogBase::appear()
 {
 	if (EditorState::Instance().getState(m_label))
