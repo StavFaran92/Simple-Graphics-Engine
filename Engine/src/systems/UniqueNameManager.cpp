@@ -1,13 +1,15 @@
 #include "systems/UniqueNameManager.h"
 
 #include "core/Engine.h"
+#include <filesystem>
+namespace fs = std::filesystem;
 
 UniqueNameManager::UniqueNameManager()
 {
 	Engine::get()->registerSubSystem<UniqueNameManager>(this);
 }
 
-std::string UniqueNameManager::suggestUniqueName(const std::string& hint) const
+std::string UniqueNameManager::suggestUniqueName(const std::string& hint, const std::string& folder) const
 {
 	std::string origNameCandidate;
 	std::string currentNameCandidate;
@@ -23,7 +25,7 @@ std::string UniqueNameManager::suggestUniqueName(const std::string& hint) const
 	currentNameCandidate = origNameCandidate;
 
 	int counter = 0;
-	while (isNameExists(currentNameCandidate))
+	while (isNameExists(currentNameCandidate, folder))
 	{
 		currentNameCandidate = origNameCandidate + "_" + std::to_string(counter);
 		counter++;
@@ -32,17 +34,20 @@ std::string UniqueNameManager::suggestUniqueName(const std::string& hint) const
 	return currentNameCandidate;
 }
 
-bool UniqueNameManager::isNameExists(const std::string& name) const
+bool UniqueNameManager::isNameExists(const std::string& name, const std::string& folder) const
 {
-	return m_uniqueNames.find(name) != m_uniqueNames.end();
-}
+	std::filesystem::path folderPath(folder);
 
-void UniqueNameManager::addName(const std::string& name)
-{
-	m_uniqueNames.insert(name);
-}
+	if (!fs::exists(folderPath) || !fs::is_directory(folderPath))
+		return false; // folder doesn't exist -> no conflict
 
-void UniqueNameManager::removeName(const std::string& name)
-{
-	m_uniqueNames.erase(name);
+	for (const auto& entry : fs::directory_iterator(folderPath))
+	{
+		std::string filename = entry.path().stem().string(); // name without extension
+
+		if (filename == name)
+			return true;
+	}
+
+	return false;
 }

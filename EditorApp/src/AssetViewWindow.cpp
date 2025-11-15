@@ -37,7 +37,7 @@ void AssetViewWindow::display()
 
 	ImGui::Begin("Asset View", nullptr, windowFlags);
 
-	static std::filesystem::path cwd = Engine::get()->getProjectDirectory();
+	std::filesystem::path cwd = EditorState::Instance().getWorkingDir();
 	std::filesystem::path rel = std::filesystem::relative(cwd, Engine::get()->getProjectDirectory());
 	if (rel == ".") rel = "";
 
@@ -65,7 +65,7 @@ void AssetViewWindow::display()
 	// Only handle click if it's allowed
 	if (clicked && canGoBack)
 	{
-		cwd = cwd.parent_path();
+		EditorState::Instance().setWorkingDir(cwd.parent_path());
 	}
 
 
@@ -135,7 +135,7 @@ void AssetViewWindow::display()
 
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 				{
-					cwd /= fMetadata.filename;
+					EditorState::Instance().setWorkingDir(cwd /fMetadata.filename);
 					break;
 				}
 			}

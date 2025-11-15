@@ -12,14 +12,14 @@ class EngineAPI UniqueNameManager : public SubSystem
 public:
 	UniqueNameManager();
 
-	std::string suggestUniqueName(const std::string& hint = "") const;
+	std::string suggestUniqueName(const std::string& hint, const std::string& folder) const;
 
-	bool isNameExists(const std::string& name) const;
+	bool isNameExists(const std::string& name, const std::string& folder) const;
 
-	void addName(const std::string& name);
-
-	void removeName(const std::string& name);
-
-private:
-	std::unordered_set<std::string> m_uniqueNames;
+//	void addName(const std::string& name);
+//
+//	void removeName(const std::string& name);
+//
+//private:
+//	std::unordered_set<std::string> m_uniqueNames;
 };

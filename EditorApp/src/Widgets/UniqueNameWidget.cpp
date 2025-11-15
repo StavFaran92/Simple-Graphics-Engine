@@ -1,4 +1,5 @@
 #include "UniqueNameWidget.h"
+#include "EditorState.h"
 
 #include "sge.h"
 
@@ -11,7 +12,7 @@ UniqueNameWidget::UniqueNameWidget(const std::string& label)
 
 bool UniqueNameWidget::isValid() const
 {
-	if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(name))
+	if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(name, EditorState::Instance().getWorkingDir().string()))
 	{
 		return false;
 	}

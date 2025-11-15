@@ -55,6 +55,9 @@ public:
 
     AssetWrapper<Material> selectedMaterialForEdit;
 
+    std::filesystem::path getWorkingDir() const;
+    void setWorkingDir(std::filesystem::path path);
+
     // Delete copy/move constructors to enforce singleton
     EditorState(const EditorState&) = delete;
     EditorState& operator=(const EditorState&) = delete;
@@ -66,4 +69,6 @@ private:
     EditorState() = default;
 
     std::unordered_map<std::string, bool> m_states;
+
+    std::filesystem::path cwd = Engine::get()->getProjectDirectory();
 };

@@ -123,6 +123,3 @@ static void displayComponent(const std::string& componentName, std::function<voi
 		//ImGui::GetWindowDrawList()->AddRect(startPos, endPos, ImGui::GetColorU32(ImGuiCol_Header), 0.f, 0, 2.f);
 	}
 }
-
-void suggestUniqueName(const std::string& hint, char* buffer, size_t bufferSize);
-void suggestUniqueName(const std::string& hint, std::string& name);

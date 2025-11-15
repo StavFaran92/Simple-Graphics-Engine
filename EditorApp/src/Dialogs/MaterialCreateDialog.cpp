@@ -1,4 +1,5 @@
 #include "MaterialCreateDialog.h"
+#include "EditorState.h"
 
 MaterialCreateDialog::MaterialCreateDialog()
 	: DialogBase("MaterialCreateDialog")
@@ -8,7 +9,7 @@ MaterialCreateDialog::MaterialCreateDialog()
 void MaterialCreateDialog::appearContent()
 {
 	m_tempMaterial = Material::create();
-	m_uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Material");
+	m_uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Material", EditorState::Instance().getWorkingDir().string());
 }
 
 void MaterialCreateDialog::drawContent()

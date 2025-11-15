@@ -14,3 +14,13 @@ bool EditorState::setState(const std::string& state, bool enabled)
     m_states[state] = enabled;
     return old;
 }
+
+std::filesystem::path EditorState::getWorkingDir() const
+{
+    return cwd;
+}
+
+void EditorState::setWorkingDir(std::filesystem::path path)
+{
+    cwd = path;
+}

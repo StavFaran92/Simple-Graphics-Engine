@@ -1,4 +1,5 @@
 #include "ModelImportDialog.h"
+#include "EditorState.h"
 
 ModelImportDialog::ModelImportDialog()
 	: DialogBase("ModelImportDialog")
@@ -20,7 +21,7 @@ void ModelImportDialog::drawContent()
 	{
 		std::filesystem::path path(filepath.m_filepath);
 		std::string filename = path.filename().stem().string();
-		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename);
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename, EditorState::Instance().getWorkingDir().string());
 	}
 	ImGui::Separator();
 }

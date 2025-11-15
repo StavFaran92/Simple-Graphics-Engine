@@ -236,7 +236,7 @@ void displayTextureCreatorDialog()
 		ImGui::OpenPopup("CreateEmptyTexture");
 		EditorState::Instance().showTextureCreateWindow = false;
 
-		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewTexture");
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewTexture", EditorState::Instance().getWorkingDir().string());
 	}
 	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
@@ -285,7 +285,7 @@ void displayShaderCreatorDialog()
 	{
 		ImGui::OpenPopup("CreateShader");
 		EditorState::Instance().showShaderCreateWindow = false;
-		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Shader");
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Shader", EditorState::Instance().getWorkingDir().string());
 	}
 	if (ImGui::BeginPopupModal("CreateShader", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
@@ -351,7 +351,7 @@ void displayLuaScriptCreatorDialog()
 	{
 		ImGui::OpenPopup("CreateLuaScript");
 		EditorState::Instance().showLuaScriptCreateWindow = false;
-		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewLuaScript");
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewLuaScript", EditorState::Instance().getWorkingDir().string());
 	}
 	if (ImGui::BeginPopupModal("CreateLuaScript", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
