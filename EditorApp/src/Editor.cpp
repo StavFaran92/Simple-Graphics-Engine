@@ -26,6 +26,7 @@
 #include "EntityState.h"
 #include "InspectorWindow.h"
 #include "Dialogs.h"
+#include "Dialogs/MaterialCreateDialog.h"
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
@@ -65,6 +66,8 @@ inline ImVec4 LogLevelToColor(spdlog::level::level_enum level)
 static std::vector<Message> g_consoleLog;
 static std::mutex g_consoleMutex;
 static bool g_scrollConsole = false;
+
+static MaterialCreateDialog materialCreateDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -1078,7 +1081,8 @@ class GUI_Helper : public GuiMenu {
 				if (ImGui::BeginMenu("Edit")) {
 					if (ImGui::BeginMenu("Create")) {
 						if (ImGui::MenuItem("Material")) {
-							EditorState::Instance().showMaterialCreateWindow = true;
+							materialCreateDialog.activate();
+							//EditorState::Instance().showMaterialCreateWindow = true;
 
 						}
 						if (ImGui::MenuItem("Texture")) {
@@ -1159,7 +1163,8 @@ class GUI_Helper : public GuiMenu {
 		displayModelImportDialog();
 		displayAnimationImportDialog();
 		displayLuaScriptImportDialog();
-		displayMaterialCreatorDialog();
+		materialCreateDialog.display();
+		//displayMaterialCreatorDialog();
         //ShowTextureDisplayWindow();
 
 		if (EditorState::Instance().showAssetSelectorWindow) 

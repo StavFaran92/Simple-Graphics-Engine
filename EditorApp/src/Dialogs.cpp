@@ -9,6 +9,7 @@
 
 #include <imgui_stdlib.h>
 
+
 void displaySelectScriptDialog(std::string& scriptName)
 {
 	if (EditorState::Instance().showScriptSelector)
@@ -381,45 +382,49 @@ void displayLuaScriptCreatorDialog()
 
 void displayMaterialCreatorDialog()
 {
-	static UniqueNameWidget uniqueName("Name");
-	static ResourceWrapper<Material> tempMaterial;
-	static MaterialDataWidget matData;
-	if (EditorState::Instance().showMaterialCreateWindow)
-	{
-		ImGui::OpenPopup("Create Material");
-		EditorState::Instance().showMaterialCreateWindow = false;
-		tempMaterial = Material::create();
-		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Material");
-	}
-	if (ImGui::BeginPopupModal("Create Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		uniqueName.draw();
-		ImGui::Separator();
-		matData.draw(tempMaterial);
-		ImGui::Separator();
+	//static MaterialCreateDialog dialog;
+	//dialog.appear();
+	//dialog.draw(); //Love Love Love.... <3<3
 
-		if (ImGui::Button("OK", ImVec2(120, 0)))
-		{
-			if (uniqueName.isValid())
-			{
-				AssetCreateDescriptor desc;
-				desc.aType = AssetType::MATERIAL;
-				desc.name = uniqueName.name;
-				Engine::get()->getSubSystem<Assets>()->createAsset(tempMaterial, desc);
-				ImGui::CloseCurrentPopup();
-			}
+	//static UniqueNameWidget uniqueName("Name");
+	//static ResourceWrapper<Material> tempMaterial;
+	//static MaterialDataWidget matData;
+	//if (EditorState::Instance().showMaterialCreateWindow)
+	//{
+	//	ImGui::OpenPopup("Create Material");
+	//	EditorState::Instance().showMaterialCreateWindow = false;
+	//	tempMaterial = Material::create();
+	//	uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Material");
+	//}
+	//if (ImGui::BeginPopupModal("Create Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	//{
+	//	uniqueName.draw();
+	//	ImGui::Separator();
+	//	matData.draw(tempMaterial);
+	//	ImGui::Separator();
 
-		}
+	//	if (ImGui::Button("OK", ImVec2(120, 0)))
+	//	{
+	//		if (uniqueName.isValid())
+	//		{
+	//			AssetCreateDescriptor desc;
+	//			desc.aType = AssetType::MATERIAL;
+	//			desc.name = uniqueName.name;
+	//			Engine::get()->getSubSystem<Assets>()->createAsset(tempMaterial, desc);
+	//			ImGui::CloseCurrentPopup();
+	//		}
 
-		ImGui::SameLine();
+	//	}
 
-		if (ImGui::Button("Cancel", ImVec2(120, 0)))
-		{
-			ImGui::CloseCurrentPopup();
-		}
+	//	ImGui::SameLine();
 
-		ImGui::EndPopup();
-	}
+	//	if (ImGui::Button("Cancel", ImVec2(120, 0)))
+	//	{
+	//		ImGui::CloseCurrentPopup();
+	//	}
+
+	//	ImGui::EndPopup();
+	//}
 }
 
 void displayProjectSettingsDialog()

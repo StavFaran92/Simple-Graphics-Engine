@@ -3,6 +3,8 @@
 #include <string>
 #include <functional>
 
+#include "sge.h"
+
 class EditorState {
 public:
     // Access the singleton instance
@@ -40,7 +42,8 @@ public:
 
     std::string selectedTextureName;
 
-
+    bool getState(const std::string& state);
+    bool setState(const std::string& state, bool enabled);
     
 
     std::function<void(UUID uuid)> assetTextureSelectCB;
@@ -61,4 +64,6 @@ public:
 private:
     // Private constructor
     EditorState() = default;
+
+    std::unordered_map<std::string, bool> m_states;
 };

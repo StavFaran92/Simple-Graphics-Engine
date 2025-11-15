@@ -3,6 +3,7 @@
 #include "sge.h"
 
 #include <string>
+#include "Widgets.h"
 
 // Create
 void displayTextureCreatorDialog();
