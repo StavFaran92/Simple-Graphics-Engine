@@ -6,6 +6,7 @@
 #include "core/Configurations.h"
 #include "memory/ResourceBase.h"
 #include "memory/ResourceWrapper.h"
+#include "fileSystem/Path.h"
 
 struct AssetCreateDescriptor;
 struct AssetUpdateDescriptor;
@@ -24,7 +25,7 @@ struct EngineAPI AssetInfo
 	UUID uuid = EMPTY_UUID;
 	std::string origFilePath;
 	std::string assetDirectory;
-	std::string targetDirectory;
+	Path targetDirectory;
 	AssetType aType = AssetType::NONE;
 	std::map<std::string, std::string> attributes;
 	std::string name;

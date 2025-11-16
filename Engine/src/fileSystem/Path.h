@@ -6,8 +6,10 @@
 class EngineAPI Path
 {
 public:
+	Path() = default;
 	Path(std::filesystem::path path, std::filesystem::path root);
 	virtual ~Path() = default;
+
 
 	std::filesystem::path raw() const;
 
@@ -17,7 +19,7 @@ public:
 
 protected: 
 	std::filesystem::path m_path;
-	const std::filesystem::path m_root;
+	std::filesystem::path m_root;
 
 
 };

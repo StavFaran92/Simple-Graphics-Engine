@@ -35,7 +35,7 @@ bool TextureImportDialog::acceptContent()
 	{
 		Texture::TextureAssetDescriptor desc;
 		desc.name = uniqueName.name;
-		desc.targetDirectory = EditorState::Instance().getWorkingDir().string();
+		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		Texture::import(filepath.m_filepath, desc);
 
 		return true;

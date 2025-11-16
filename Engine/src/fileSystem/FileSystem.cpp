@@ -18,5 +18,5 @@ fs::path FileSystem::getContentDirectory() const
 
 fs::path FileSystem::getEngineDirectory() const
 {
-    return fs::path(Engine::get()->getProjectDirectory()) / "Engine";
+    return "Engine";
 }
