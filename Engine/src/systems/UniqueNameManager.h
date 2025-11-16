@@ -5,6 +5,8 @@
 
 #include "core/Core.h"
 #include "systems/SubSystem.h"
+#include "fileSystem/Path.h"
+
 
 
 class EngineAPI UniqueNameManager : public SubSystem
@@ -12,9 +14,9 @@ class EngineAPI UniqueNameManager : public SubSystem
 public:
 	UniqueNameManager();
 
-	std::string suggestUniqueName(const std::string& hint, const std::string& folder) const;
+	std::string suggestUniqueName(const std::string& hint, const Path& folder) const;
 
-	bool isNameExists(const std::string& name, const std::string& folder) const;
+	bool isNameExists(const std::string& name, const Path& folder) const;
 
 //	void addName(const std::string& name);
 //

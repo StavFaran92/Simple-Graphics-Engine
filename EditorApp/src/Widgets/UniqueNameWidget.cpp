@@ -12,7 +12,7 @@ UniqueNameWidget::UniqueNameWidget(const std::string& label)
 
 bool UniqueNameWidget::isValid() const
 {
-	if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(name, EditorState::Instance().getWorkingDir().string()))
+	if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(name, EditorState::Instance().getWorkingDir().path()))
 	{
 		return false;
 	}

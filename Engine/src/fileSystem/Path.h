@@ -11,6 +11,8 @@ public:
 
 	std::filesystem::path raw() const;
 
+	std::filesystem::path absolute() const;
+
 	void setPath(std::filesystem::path path);
 
 protected: 

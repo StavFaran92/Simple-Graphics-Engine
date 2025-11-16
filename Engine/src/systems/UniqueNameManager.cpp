@@ -2,6 +2,8 @@
 
 #include "core/Engine.h"
 #include <filesystem>
+
+#include "fileSystem/Path.h"
 namespace fs = std::filesystem;
 
 UniqueNameManager::UniqueNameManager()
@@ -9,7 +11,7 @@ UniqueNameManager::UniqueNameManager()
 	Engine::get()->registerSubSystem<UniqueNameManager>(this);
 }
 
-std::string UniqueNameManager::suggestUniqueName(const std::string& hint, const std::string& folder) const
+std::string UniqueNameManager::suggestUniqueName(const std::string& hint, const Path& folder) const
 {
 	std::string origNameCandidate;
 	std::string currentNameCandidate;
@@ -34,9 +36,9 @@ std::string UniqueNameManager::suggestUniqueName(const std::string& hint, const 
 	return currentNameCandidate;
 }
 
-bool UniqueNameManager::isNameExists(const std::string& name, const std::string& folder) const
+bool UniqueNameManager::isNameExists(const std::string& name, const Path& folder) const
 {
-	std::filesystem::path folderPath(folder);
+	std::filesystem::path folderPath = folder.absolute();
 
 	if (!fs::exists(folderPath) || !fs::is_directory(folderPath))
 		return false; // folder doesn't exist -> no conflict

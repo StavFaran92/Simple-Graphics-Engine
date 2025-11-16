@@ -18,6 +18,11 @@ std::filesystem::path Path::raw() const
     return fs::weakly_canonical(m_root / m_path);
 }
 
+std::filesystem::path Path::absolute() const
+{
+    return FileSystem::toAbsolute(raw());
+}
+
 void Path::setPath(std::filesystem::path path)
 {
     fs::path candidate = fs::weakly_canonical(FileSystem::toAbsolute(path));

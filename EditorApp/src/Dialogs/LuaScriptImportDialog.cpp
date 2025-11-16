@@ -22,7 +22,7 @@ void LuaScriptImportDialog::drawContent()
 	{
 		std::filesystem::path path(filepath.m_filepath);
 		std::string filename = path.filename().stem().string();
-		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename, EditorState::Instance().getWorkingDir().string());
+		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename, EditorState::Instance().getWorkingDir().path());
 	}
 }
 
