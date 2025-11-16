@@ -24,6 +24,7 @@ struct EngineAPI AssetInfo
 	UUID uuid = EMPTY_UUID;
 	std::string origFilePath;
 	std::string assetDirectory;
+	std::string targetDirectory;
 	AssetType aType = AssetType::NONE;
 	std::map<std::string, std::string> attributes;
 	std::string name;

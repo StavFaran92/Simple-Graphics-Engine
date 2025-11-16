@@ -37,44 +37,42 @@ void AssetViewWindow::display()
 
 	ImGui::Begin("Asset View", nullptr, windowFlags);
 
-	std::filesystem::path cwd = EditorState::Instance().getWorkingDir();
-	std::filesystem::path rel = std::filesystem::relative(cwd, Engine::get()->getProjectDirectory());
-	if (rel == ".") rel = "";
+	WorkingDirectory& cwd = EditorState::Instance().getWorkingDir();
+	//std::filesystem::path rel = std::filesystem::relative(cwd, Engine::get()->getProjectDirectory());
+	//if (rel == ".") rel = "";
 
-	bool canGoBack = cwd != Engine::get()->getProjectDirectory();
+	//bool canGoBack = cwd != Engine::get()->getProjectDirectory();
 
-	if (!canGoBack)
-	{
-		// Make button look disabled
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f); // 50% transparency
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Gray color
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
-	}
+	//if (!canGoBack)
+	//{
+	//	// Make button look disabled
+	//	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f); // 50% transparency
+	//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Gray color
+	//	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+	//	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+	//}
 
 	// Back button
 	bool clicked = ImGui::Button("<-", ImVec2(30, 30));
 
 	// Restore style if it was pushed
-	if (!canGoBack)
-	{
-		ImGui::PopStyleColor(3);
-		ImGui::PopStyleVar();
-	}
+	//if (!canGoBack)
+	//{
+	//	ImGui::PopStyleColor(3);
+	//	ImGui::PopStyleVar();
+	//}
 
 	// Only handle click if it's allowed
-	if (clicked && canGoBack)
+	if (clicked)
 	{
-		EditorState::Instance().setWorkingDir(cwd.parent_path());
+		cwd.back();
 	}
 
 
 	ImGui::SameLine();
 
 	// Header (fixed at top)
-	ImGui::SetWindowFontScale(1.3f);
 	ImGui::Text("%s", cwd.string().c_str());
-	ImGui::SetWindowFontScale(1.0f);
 	ImGui::Separator();
 
 	// Scrollable region
@@ -96,7 +94,8 @@ void AssetViewWindow::display()
 		};
 		std::vector<FileMetadata> fileMetadataTable;
 
-		for (const auto& entry : std::filesystem::directory_iterator(cwd))
+		auto iter = cwd.iter();
+		for (const auto& entry : iter)
 		{
 			FileMetadata fMetadata;
 			fMetadata.filename = entry.path().filename().string();
@@ -135,7 +134,7 @@ void AssetViewWindow::display()
 
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 				{
-					EditorState::Instance().setWorkingDir(cwd /fMetadata.filename);
+					cwd.enterFolder(fMetadata.filename);
 					break;
 				}
 			}
@@ -147,7 +146,7 @@ void AssetViewWindow::display()
 					continue; // Skip unwanted files
 
 				
-				std::string relativeFilePath = (rel / filename).generic_string();
+				std::string relativeFilePath = (cwd.path().raw() / filename).generic_string();
 				UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 				if (!assets->hasAsset(uuid)) continue;
 
@@ -220,7 +219,7 @@ void AssetViewWindow::display()
 				
 				if (!fMetadata.isDirectory)
 				{
-					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (cwd.path().raw() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 					ImGui::TextUnformatted(aInfo.name.c_str());
@@ -250,7 +249,7 @@ void AssetViewWindow::display()
 			{
 				if (ImGui::Selectable("Open"))
 				{
-					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (cwd.path().raw() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 
@@ -282,7 +281,7 @@ void AssetViewWindow::display()
 
 				if (ImGui::Selectable("Delete"))
 				{
-					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (cwd.path().raw() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					auto asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 					std::string path = asset.relativefilePath;
@@ -305,7 +304,7 @@ void AssetViewWindow::display()
 
 				if (!fMetadata.isDirectory)
 				{
-					std::string relativeFilePath = (rel / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (cwd.path().raw() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 

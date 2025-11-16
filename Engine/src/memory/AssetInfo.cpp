@@ -29,6 +29,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	isEngineOwned = assetDesc.isEngineOwned;
 	isTransient = assetDesc.isTransient;
 	isCompositeAsset = assetDesc.isCompositeAsset;
+	targetDirectory = assetDesc.targetDirectory;
 
 	if (aType == AssetType::NONE)
 	{

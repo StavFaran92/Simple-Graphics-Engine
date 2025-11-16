@@ -45,6 +45,7 @@
 #include "scripts/ScriptSystem.h"
 #include "core/GameLayer.h"
 #include "systems/UniqueNameManager.h"
+#include "fileSystem/FileSystem.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"
@@ -141,6 +142,8 @@ bool Engine::init(const InitParams& initParams)
         std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/Content");
 
     }
+
+    auto filesystem = new FileSystem();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_3D);

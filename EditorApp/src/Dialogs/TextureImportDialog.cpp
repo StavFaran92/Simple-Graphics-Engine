@@ -21,6 +21,7 @@ void TextureImportDialog::drawContent()
 	{
 		std::filesystem::path path(filepath.m_filepath);
 		std::string filename = path.filename().stem().string();
+
 		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(filename, EditorState::Instance().getWorkingDir().string());
 	}
 	ImGui::Separator();
@@ -34,6 +35,7 @@ bool TextureImportDialog::acceptContent()
 	{
 		Texture::TextureAssetDescriptor desc;
 		desc.name = uniqueName.name;
+		desc.targetDirectory = EditorState::Instance().getWorkingDir().string();
 		Texture::import(filepath.m_filepath, desc);
 
 		return true;
