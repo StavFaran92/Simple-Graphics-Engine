@@ -256,11 +256,12 @@ void displayTextureCreatorDialog()
 			{
 				auto texture = Texture::createEmptyTexture(width, height);
 				
-				AssetCreateDescriptor aInfo;
-				aInfo.aType = AssetType::TEXTURE;
-				aInfo.name = uniqueName.name;
-				aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-				Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
+				AssetCreateDescriptor desc;
+				desc.aType = AssetType::TEXTURE;
+				desc.name = uniqueName.name;
+				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
+				desc.attributes = texture->getTextureAssetAttributes().toMap();
+				Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -328,6 +329,7 @@ void displayShaderCreatorDialog()
 			desc.name = uniqueName.name;
 			desc.origFilePath = filepath.m_filepath;
 			desc.aType = AssetType::SHADER;
+			desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 			desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(shaderOverrideType);
 			Engine::get()->getSubSystem<Assets>()->createAsset(shader, desc);
 			ImGui::CloseCurrentPopup();
@@ -367,6 +369,7 @@ void displayLuaScriptCreatorDialog()
 				AssetCreateDescriptor desc;
 				desc.aType = AssetType::LUA_SCRIPT;
 				desc.name = uniqueName.name;
+				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 				Engine::get()->getSubSystem<Assets>()->createAsset(script, desc);
 				ImGui::CloseCurrentPopup();
 			}

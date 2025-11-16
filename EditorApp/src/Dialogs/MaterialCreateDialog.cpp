@@ -27,6 +27,7 @@ bool MaterialCreateDialog::acceptContent()
 		AssetCreateDescriptor desc;
 		desc.aType = AssetType::MATERIAL;
 		desc.name = m_uniqueName.name;
+		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		Engine::get()->getSubSystem<Assets>()->createAsset(m_tempMaterial, desc);
 		return true;
 	}

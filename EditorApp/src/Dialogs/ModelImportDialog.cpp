@@ -52,6 +52,7 @@ bool ModelImportDialog::acceptContent()
 		AssetCreateDescriptor aInfo;
 		aInfo.name = uniqueName.name + "_PREFAB";
 		aInfo.aType = AssetType::PREFAB;
+		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
 
 		entity.remove();

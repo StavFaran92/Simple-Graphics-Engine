@@ -32,6 +32,7 @@ bool AnimationImportDialog::acceptContent()
 	{
 		AnimationImportSettings desc;
 		desc.name = uniqueName.name;
+		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		Animation::import(filepath.m_filepath, desc);
 
 		return true;
