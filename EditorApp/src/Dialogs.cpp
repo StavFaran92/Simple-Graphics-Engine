@@ -520,31 +520,50 @@ void displayAssetSelectDialog(AssetType aType, UUID& uuid)
 	{
 		std::string label = "Select " + getAssetTypeAsStr(aType);
 		ImGui::Begin(label.c_str(), &EditorState::Instance().showAssetSelectorWindow, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text("Available Animations:");
+		ImGui::Text("Available Assets:");
 		ImGui::Separator();
 
 		static int selectedAssetIndex = -1;
 
-		auto& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(aType);
+		const std::vector<AssetInfo>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(aType);
 
 		for (int i = 0; i < assetList.size(); i++)
 		{
-			bool isSelected = (selectedAssetIndex == i);
-			if (isSelected)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f)); // Change background color
-			}
-			if (!isSelected)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
-			}
+			ImVec2 cursorStart = ImGui::GetCursorScreenPos();
+			ImVec2 totalSize = ImVec2(ImGui::GetContentRegionAvail().x, 0);
 
-			if (ImGui::Selectable(assetList[i].name.c_str()))
-			{
-				selectedAssetIndex = i;
-			}
+			
+
+			bool isSelected = (selectedAssetIndex == i);
+
+
+			// Draw normal part
+			ImGui::TextUnformatted(assetList[i].name.c_str());
+			ImGui::SameLine();
+
+			// Draw gray part
+			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255));
+			std::string grayText = "(" + assetList[i].relativefilePath + ")";
+			ImGui::TextUnformatted(grayText.c_str());
 
 			ImGui::PopStyleColor();
+
+			std::string fullText;
+			if (isSelected)
+			{
+				fullText  = assetList[i].name + grayText;
+			}
+			else
+			{
+				fullText = "##select_" + std::to_string(i);
+			}
+
+			// Create invisible selectable
+			ImGui::SetCursorScreenPos(cursorStart);
+			bool selected = ImGui::Selectable(fullText.c_str(), isSelected, 0, totalSize);
+			if (selected) {
+				selectedAssetIndex = i;
+			}
 		}
 
 		ImGui::Separator();
