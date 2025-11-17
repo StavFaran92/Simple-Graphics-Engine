@@ -35,6 +35,7 @@ bool ModelImportDialog::acceptContent()
 
 		ModelImportSettings desc;
 		desc.name = uniqueName.name;
+		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		auto mesh = MeshCollection::import(filepath.m_filepath, desc);
 
 		entity.addComponent<MeshComponent>().mesh = mesh;
@@ -52,7 +53,7 @@ bool ModelImportDialog::acceptContent()
 		AssetCreateDescriptor aInfo;
 		aInfo.name = uniqueName.name + "_PREFAB";
 		aInfo.aType = AssetType::PREFAB;
-		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
+		aInfo.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
 
 		entity.remove();

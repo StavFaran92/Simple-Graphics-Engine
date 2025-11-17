@@ -93,15 +93,6 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	fileName = name + ext;
 
 	relativefilePath = "";
-	//if (isEngineOwned)
-	//{
-	//	relativefilePath += "Engine/";
-	//}
-	//else
-	//{
-	//	relativefilePath += "Content/";
-	//}
-
 	relativefilePath += targetDirectory.raw().generic_string();
 
 	if (isCompositeAsset)
@@ -111,7 +102,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 
 	if (!assetDirectory.empty())
 	{
-		relativefilePath += assetDirectory + "/";
+		relativefilePath += "/" + assetDirectory + "/";
 	}
 
 	relativefilePath += "/" + fileName;

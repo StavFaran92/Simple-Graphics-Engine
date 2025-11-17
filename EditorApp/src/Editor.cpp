@@ -31,6 +31,7 @@
 #include "Dialogs/AnimationImportDialog.h"
 #include "Dialogs/TextureImportDialog.h"
 #include "Dialogs/LuaScriptImportDialog.h"
+#include "Dialogs/FolderCreateDialog.h"
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
@@ -76,6 +77,7 @@ static ModelImportDialog modelImportDialog;
 static AnimationImportDialog animationImportDialog;
 static TextureImportDialog textureImportDialog;
 static LuaScriptImportDialog luaScriptImportDialog;
+static FolderCreateDialog folderCreateDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -1088,6 +1090,11 @@ class GUI_Helper : public GuiMenu {
 				}
 				if (ImGui::BeginMenu("Edit")) {
 					if (ImGui::BeginMenu("Create")) {
+						if (ImGui::MenuItem("Folder")) {
+							folderCreateDialog.activate();
+							//EditorState::Instance().showMaterialCreateWindow = true;
+
+						}
 						if (ImGui::MenuItem("Material")) {
 							materialCreateDialog.activate();
 							//EditorState::Instance().showMaterialCreateWindow = true;
@@ -1172,6 +1179,7 @@ class GUI_Helper : public GuiMenu {
 		animationImportDialog.display();
 		modelImportDialog.display();
 		materialCreateDialog.display();
+		folderCreateDialog.display();
 		//displayMaterialCreatorDialog();
         //ShowTextureDisplayWindow();
 

@@ -359,6 +359,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			AssetCreateDescriptor materialAssetInfo;
 			materialAssetInfo.isEngineOwned = aInfo.isEngineOwned;
 			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
+			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
 			AssetWrapper<Material> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo).as<Material>();
@@ -630,6 +631,7 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 		textureAssetDesc.name = tData.textureName;
 		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
+		textureAssetDesc.targetDirectory = aInfo.targetDirectory;
 		textureAssetDesc.attributes = texture->getTextureAssetAttributes().toMap();
 		AssetTexture = Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc).as<Texture>();
 
