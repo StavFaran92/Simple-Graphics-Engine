@@ -76,4 +76,4 @@
 #include "memory/BuiltInAssets.h"
 
 #include "fileSystem/WorkingDirectory.h"
-#include "fileSystem/ContentPath.h"
+#include "fileSystem/ScopedPath.h"

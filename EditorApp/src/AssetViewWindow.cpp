@@ -146,7 +146,7 @@ void AssetViewWindow::display()
 					continue; // Skip unwanted files
 
 				
-				std::string relativeFilePath = (cwd.path().raw() / filename).generic_string();
+				std::string relativeFilePath = (cwd.path().scoped() / filename).generic_string();
 				UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 				if (!assets->hasAsset(uuid)) continue;
 
@@ -219,7 +219,7 @@ void AssetViewWindow::display()
 				
 				if (!fMetadata.isDirectory)
 				{
-					std::string relativeFilePath = (cwd.path().raw() / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 					ImGui::TextUnformatted(aInfo.name.c_str());
@@ -249,7 +249,7 @@ void AssetViewWindow::display()
 			{
 				if (ImGui::Selectable("Open"))
 				{
-					std::string relativeFilePath = (cwd.path().raw() / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 
@@ -281,7 +281,7 @@ void AssetViewWindow::display()
 
 				if (ImGui::Selectable("Delete"))
 				{
-					std::string relativeFilePath = (cwd.path().raw() / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					auto asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 					std::string path = asset.relativefilePath;
@@ -304,7 +304,7 @@ void AssetViewWindow::display()
 
 				if (!fMetadata.isDirectory)
 				{
-					std::string relativeFilePath = (cwd.path().raw() / fMetadata.filename).generic_string();
+					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
 					const AssetInfo& aInfo = assets->getAsset(uuid);
 

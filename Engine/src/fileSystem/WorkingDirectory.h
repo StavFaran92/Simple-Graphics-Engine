@@ -1,9 +1,8 @@
 #pragma once
 
 #include <string>
-#include "fileSystem/Path.h"
+#include "fileSystem/ScopedPath.h"
 #include "fileSystem/FileSystem.h"
-#include "fileSystem/ContentPath.h"
 
 #include "core/Core.h"
 
@@ -13,7 +12,7 @@ class EngineAPI WorkingDirectory
 {
 public:
 	WorkingDirectory();
-	ContentPath path() const;
+	ScopedPath path() const;
 
 	void back();
 
@@ -25,5 +24,5 @@ public:
 public:
 	//Path m_path;
 
-	ContentPath m_path;
+	ScopedPath m_path;
 };

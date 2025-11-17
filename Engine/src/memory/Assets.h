@@ -6,7 +6,7 @@
 #include "core/Core.h"
 #include "core/Configurations.h"
 #include "systems/SubSystem.h"
-#include "fileSystem/Path.h"
+#include "fileSystem/ScopedPath.h"
 
 #include <unordered_set>
 
@@ -27,7 +27,7 @@ public:
 	bool isEngineOwned = false;
 	bool isTransient = false;
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
-	Path targetDirectory;
+	ScopedPath targetDirectory;
 
 	virtual nlohmann::json fillParams() const { return {}; }
 	

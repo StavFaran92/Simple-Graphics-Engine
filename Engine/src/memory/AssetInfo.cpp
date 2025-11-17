@@ -3,7 +3,7 @@
 #include "core/Engine.h"
 #include "memory/Assets.h"
 #include "memory/AssetWrapper.h"
-#include "fileSystem/EnginePath.h"
+#include "fileSystem/ScopedPath.h"
 
 void AssetInfo::establishFilepath()
 {
@@ -35,7 +35,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	// TODO this is a temporary fix to not break all the engine assets, it prevents me from using nested folder in the engine folder and should be fixed.
 	if (isEngineOwned)
 	{
-		targetDirectory = EnginePath();
+		targetDirectory = ScopedPath::EnginePath(targetDirectory.relative());
 	}
 
 	if (aType == AssetType::NONE)
@@ -93,7 +93,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	fileName = name + ext;
 
 	relativefilePath = "";
-	relativefilePath += targetDirectory.raw().generic_string();
+	relativefilePath += targetDirectory.scoped().generic_string();
 
 	if (isCompositeAsset)
 	{

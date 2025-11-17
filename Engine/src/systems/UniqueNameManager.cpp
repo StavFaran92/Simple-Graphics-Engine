@@ -3,7 +3,7 @@
 #include "core/Engine.h"
 #include <filesystem>
 
-#include "fileSystem/Path.h"
+#include "fileSystem/ScopedPath.h"
 namespace fs = std::filesystem;
 
 UniqueNameManager::UniqueNameManager()
@@ -11,7 +11,7 @@ UniqueNameManager::UniqueNameManager()
 	Engine::get()->registerSubSystem<UniqueNameManager>(this);
 }
 
-std::string UniqueNameManager::suggestUniqueName(const std::string& hint, const Path& folder) const
+std::string UniqueNameManager::suggestUniqueName(const std::string& hint, const ScopedPath& folder) const
 {
 	std::string origNameCandidate;
 	std::string currentNameCandidate;
@@ -36,7 +36,7 @@ std::string UniqueNameManager::suggestUniqueName(const std::string& hint, const 
 	return currentNameCandidate;
 }
 
-bool UniqueNameManager::isNameExists(const std::string& name, const Path& folder) const
+bool UniqueNameManager::isNameExists(const std::string& name, const ScopedPath& folder) const
 {
 	std::filesystem::path folderPath = folder.absolute();
 
