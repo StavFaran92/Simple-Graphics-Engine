@@ -46,7 +46,9 @@ void InspectorWindow::display()
 {
 	auto assets = Engine::get()->getSubSystem<Assets>();
 
-	ImGui::Begin("Inspector", NULL, windowFlags);
+	ImGui::Begin("Inspector", NULL, windowFlags & 
+		~ImGuiWindowFlags_NoScrollbar &
+		~ImGuiWindowFlags_NoScrollWithMouse);
 
 	//displayWindowHeader("Inspector");
 
