@@ -167,7 +167,7 @@ void InspectorWindow::display()
 			BEGIN_IMGUI_TABLE("Mesh");
 
 			addTableRow("Vertices count:", [&](std::string id) {
-				rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()).c_str());
+				rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()));
 			});
 
 			END_IMGUI_TABLE();
@@ -175,7 +175,7 @@ void InspectorWindow::display()
 			std::string meshName = "None";
 			if (!meshComponent.mesh.isEmpty())
 			{
-				meshName = meshComponent.mesh.getUID();
+				meshName = meshComponent.mesh.info().name;
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uid) {
