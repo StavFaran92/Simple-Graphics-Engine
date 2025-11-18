@@ -40,7 +40,7 @@ public:
 		SERIALIZED_MEMBER(color);
 	}
 
-private:
+public:
 	Attenuation attenuation;
 	
 };

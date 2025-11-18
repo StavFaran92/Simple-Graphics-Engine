@@ -23,7 +23,7 @@ public:
 
 	virtual ~Light();
 
-protected:
+public:
 	glm::vec3 color;
 	float m_ambientIntensity = 0;
 	float m_diffuseIntensity = 0;

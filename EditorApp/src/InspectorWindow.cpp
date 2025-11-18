@@ -252,7 +252,7 @@ void InspectorWindow::display()
 				std::string matName = "None";
 				if (!mat.isEmpty())
 				{
-					matName = mat.resource()->getName();
+					matName = mat.info().name;
 					if (matName.empty())
 					{
 						matName = "Material " + std::to_string(index);
@@ -269,24 +269,19 @@ void InspectorWindow::display()
 			});
 
 		displayComponent<DirectionalLight>("Directional Light", [](DirectionalLight& dLight) {
-			auto& color = dLight.getColor();
-			if (ImGui::ColorEdit3("Color", glm::value_ptr(color))) {
-				dLight.SetColor(color);
-			}
-			});
+			ImGui::ColorEdit3("Color", glm::value_ptr(dLight.color));
+		});
 
 		displayComponent<PointLight>("Point Light", [](PointLight& pLight) {
-			auto& color = pLight.getColor();
-			if (ImGui::ColorEdit3("Color", glm::value_ptr(color))) {
-				pLight.SetColor(color);
-			}
+			//auto& color = pLight.getColor();
+			ImGui::ColorEdit3("Color", glm::value_ptr(pLight.color));
 
-			Attenuation& attenuation = pLight.getAttenuation();
+			//Attenuation& attenuation = pLight.getAttenuation();
 			ImGui::LabelText("", "Attenuation");
-			ImGui::DragFloat("constant", &attenuation.constant, 0.01f);
-			ImGui::DragFloat("linear", &attenuation.linear, 0.01f);
-			ImGui::DragFloat("quadratic", &attenuation.quadratic, 0.01f);
-			pLight.SetAttenuation(attenuation);
+			ImGui::DragFloat("constant", &pLight.attenuation.constant, 0.01f);
+			ImGui::DragFloat("linear", &pLight.attenuation.linear, 0.01f);
+			ImGui::DragFloat("quadratic", &pLight.attenuation.quadratic, 0.01f);
+			//pLight.SetAttenuation(attenuation);
 		});
 
 		displayComponent<InstanceBatch>("Instance Batch", [](InstanceBatch& instanceBatch) {

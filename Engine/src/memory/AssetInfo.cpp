@@ -35,7 +35,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	// TODO this is a temporary fix to not break all the engine assets, it prevents me from using nested folder in the engine folder and should be fixed.
 	if (isEngineOwned)
 	{
-		targetDirectory = ScopedPath::EnginePath(targetDirectory.relative());
+		targetDirectory = ScopedPath::EnginePath(assetDesc.targetDirectory.relative());
 	}
 
 	if (aType == AssetType::NONE)

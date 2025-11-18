@@ -669,7 +669,7 @@ void RenderSceneHierarchyWindow()
 	ImGui::End();
 }
 
-void RenderViewWindow()
+void RenderSceneViewWindow()
 {
 	ImGui::Begin("View", nullptr, windowFlags);
 
@@ -1164,7 +1164,7 @@ class GUI_Helper : public GuiMenu {
 
 		// Render UI
 		RenderSimulationControlView();
-		RenderViewWindow();
+		RenderSceneViewWindow();
 		RenderSceneHierarchyWindow();
 		InspectorWindow::display();
         AssetViewWindow::display();

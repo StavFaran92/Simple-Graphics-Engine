@@ -33,7 +33,7 @@ ScopedPath::ScopedPath(fs::path path, fs::path root)
 
 std::filesystem::path ScopedPath::relative() const
 {
-    return fs::weakly_canonical(m_path);
+    return m_path;
 }
 
 std::filesystem::path ScopedPath::absolute() const
