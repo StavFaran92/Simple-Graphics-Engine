@@ -40,6 +40,7 @@
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshComponent.h"
+#include "component/PostProcessComponent.h"
 #include "component/MaterialComponent.h"
 #include "component/RenderableComponent.h"
 #include "scripts/ScriptSystem.h"
@@ -568,6 +569,21 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.addComponent<RenderableComponent>();
 
     m_context->getActiveScene()->setGameCamera(mainCamera);
+
+    // Add default dir light
+    auto eFXAA = startupScene->createEntity("FXAA");
+    auto& postProcess = eFXAA.addComponent<PostProcessComponent>();
+
+
+    auto FXAAShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/SamplePostProcessShader.glsl", ShaderOverride::PostProcess);
+    AssetCreateDescriptor desc;
+    desc.aType = AssetType::SHADER;
+    desc.name = "FXAAShader";
+    desc.isEngineOwned = true;
+    desc.origFilePath = SGE_ROOT_DIR + "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
+    desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::PostProcess);
+    auto FXAAShaderAsset = getSubSystem<Assets>()->createAsset(FXAAShader, desc);
+    postProcess.shader = FXAAShaderAsset.as<Shader>();
 
     if (initParams.templateScene)
     {
