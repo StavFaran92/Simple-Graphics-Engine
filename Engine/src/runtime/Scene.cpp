@@ -162,7 +162,7 @@ void Scene::init(Context* context)
 		logError("Light System init failed!");
 	}
 
-	m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)4 / 3, 0.1f, 1000.0f);
+	m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)width / height, 0.1f, 1000.0f);
 
 	m_defaultUIProjection = glm::ortho(0.0f, (float)Engine::get()->getWindow()->getWidth(), (float)Engine::get()->getWindow()->getHeight(), 0.0f, -1.0f, 1.0f);
 

@@ -454,7 +454,7 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	// load validation
 	if (!textureData.data)
 	{
-		logError("Failed to find: {}", fileLocation.c_str());
+		logError("Failed to load file: {}", fileLocation);
 	}
 
 	// Determine format based on bits per pixel (bpp)
