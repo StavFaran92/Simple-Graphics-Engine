@@ -1306,7 +1306,7 @@ public:
 
 		// set Editor camera as active camera
 		auto editorCamera = m_editorRegistry->createEntity("Editor Camera");
-		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 3000.0f));
+		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 3000.0f));
 		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
 		auto& nsc = editorCamera.getComponent<NativeScriptComponent>();
 		nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);

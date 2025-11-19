@@ -7,6 +7,7 @@
 #include "component/MeshComponent.h"
 #include "component/RenderableComponent.h"
 #include "memory/BuiltInAssets.h"
+#include "core/Window.h"
 
 
 Archiver* Archiver::instance = new Archiver();
@@ -79,7 +80,7 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 		logError("Invalid game camera serialized, creating a new camera.");
 
 		gameCameraEntity = scene.createEntity("Main Camera");
-		gameCameraEntity.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)4 / 3, 0.1f, 1000.0f));
+		gameCameraEntity.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 1000.0f));
 		gameCameraEntity.getComponent<Transformation>().setLocalPosition({ 10,10,10 });
 		gameCameraEntity.getComponent<CameraComponent>().center = { 0,0,0 };
 		gameCameraEntity.getComponent<CameraComponent>().up = { 0,1,0 };
