@@ -100,11 +100,11 @@ int ObjectPicker::pickObject(int x, int y, Entity camera)
 		if (entityhandler.HasComponent<SkyboxComponent>())
 			continue;
 		m_pickingShader->setUniformValue("objectIndex", (unsigned int)entityhandler.handlerID());
-		m_pickingShader->setUniformValue("model", transform.getWorldTransformation());
+		
 
 		for (auto& mesh : meshComponent.mesh.get()->getMeshes())
 		{
-
+			m_pickingShader->setUniformValue("model", transform.getWorldTransformation() * mesh->getRestTransform());
 			auto vao = mesh->getVAO();
 
 			// render to quad

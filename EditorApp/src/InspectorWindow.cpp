@@ -189,7 +189,7 @@ void InspectorWindow::display()
 
 		displayComponent<CameraComponent>("Camera", [](CameraComponent& cameraComponent) {
 			// TBD
-			
+
 			static const char* projectionMode[] = { "Perspective", "Orthographic" };
 			static int currentProjection = 0; // Index of the selected item
 			currentProjection = cameraComponent.type;
@@ -212,15 +212,25 @@ void InspectorWindow::display()
 				ImGui::EndCombo();
 			}
 
-			static float tempFOVY;
-			tempFOVY = cameraComponent.getFOVYInDegrees();
-			if (ImGui::DragFloat("FOVY", &tempFOVY, .1f))
+			if (currentProjection == CameraComponent::CamType::PERSPECTIVE)
 			{
-				cameraComponent.setFOVY(tempFOVY);
+				static float tempFOVY;
+				tempFOVY = cameraComponent.getFOVYInDegrees();
+				if (ImGui::DragFloat("FOVY", &tempFOVY, .1f))
+				{
+					cameraComponent.setFOVY(tempFOVY);
+				}
+				ImGui::DragFloat("aspect", &cameraComponent.aspect, .01f);
+				ImGui::DragFloat("z near", &cameraComponent.znear);
+				ImGui::DragFloat("z far", &cameraComponent.zfar);
 			}
-			ImGui::DragFloat("aspect", &cameraComponent.aspect, .01f);
-			ImGui::DragFloat("z near", &cameraComponent.znear);
-			ImGui::DragFloat("z far", &cameraComponent.zfar);
+			else if (currentProjection == CameraComponent::CamType::ORTHOGRAPHIC)
+			{
+				ImGui::DragFloat("left", &cameraComponent.ortho_left, .1f);
+				ImGui::DragFloat("right", &cameraComponent.ortho_right, .1f);
+				ImGui::DragFloat("bottom", &cameraComponent.ortho_bottom, .1f);
+				ImGui::DragFloat("top", &cameraComponent.ortho_top, .1f);
+			}
 			});
 
 		displayComponent<NativeScriptComponent>("Script", [](NativeScriptComponent& nsc) {

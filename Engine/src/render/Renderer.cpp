@@ -113,7 +113,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
             // object is behind the camera
             if (distance < 0)
             {
-                continue;
+                //continue; // TODO fix
             }
 
             transparentEntities[distance] = entityHandler;

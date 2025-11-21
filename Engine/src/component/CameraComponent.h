@@ -21,6 +21,10 @@ struct EngineAPI CameraComponent : public Component
 		SERIALIZED_MEMBER(znear);
 		SERIALIZED_MEMBER(zfar);
 		SERIALIZED_MEMBER(type);
+		SERIALIZED_MEMBER(ortho_left);
+		SERIALIZED_MEMBER(ortho_right);
+		SERIALIZED_MEMBER(ortho_bottom);
+		SERIALIZED_MEMBER(ortho_top);
 	}
 
 	static CameraComponent createPerspectiveCamera(float fovy, float aspect, float znear, float zfar)
@@ -50,9 +54,16 @@ struct EngineAPI CameraComponent : public Component
 	glm::mat4 getProjection() const;
 
 	
+	float fovyRadians = 0; // Should be accessed through the getters and setters avaiable
 	float aspect = 0;
 	float znear = 0;
 	float zfar = 0;
+
+	// Only avaiable to orthographic projection
+	float ortho_left = 0;
+	float ortho_right = 10;
+	float ortho_bottom = 0;
+	float ortho_top = 10;
 
 	enum CamType
 	{
@@ -66,9 +77,6 @@ struct EngineAPI CameraComponent : public Component
 	glm::vec3 right;
 	glm::vec3 center{ 0,0,0 };
 	glm::vec3 up{ 0,1,0 };
-	
-private:
-	float fovyRadians = 0;
 };
 
 REGISTER_COMPONENT(CameraComponent)
