@@ -16,7 +16,7 @@ struct EngineAPI CameraComponent : public Component
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(center);
 		SERIALIZED_MEMBER(up);
-		SERIALIZED_MEMBER(fovy);
+		SERIALIZED_MEMBER(fovyRadians);
 		SERIALIZED_MEMBER(aspect);
 		SERIALIZED_MEMBER(znear);
 		SERIALIZED_MEMBER(zfar);
@@ -26,7 +26,7 @@ struct EngineAPI CameraComponent : public Component
 	static CameraComponent createPerspectiveCamera(float fovy, float aspect, float znear, float zfar)
 	{
 		CameraComponent cam;
-		cam.fovy = fovy;
+		cam.fovyRadians = glm::radians(fovy);
 		cam.aspect = aspect;
 		cam.znear = znear;
 		cam.zfar = zfar;
@@ -34,9 +34,22 @@ struct EngineAPI CameraComponent : public Component
 		return cam;
 	}
 
+	float getFOVYInDegrees() const
+	{
+		return glm::degrees(fovyRadians);
+	}
+	float getFOVYInRadians() const
+	{
+		return fovyRadians;
+	}
+	void setFOVY(float FOVY)
+	{
+		fovyRadians = glm::radians(FOVY);
+	}
+
 	glm::mat4 getProjection() const;
 
-	float fovy = 0;
+	
 	float aspect = 0;
 	float znear = 0;
 	float zfar = 0;
@@ -54,6 +67,8 @@ struct EngineAPI CameraComponent : public Component
 	glm::vec3 center{ 0,0,0 };
 	glm::vec3 up{ 0,1,0 };
 	
+private:
+	float fovyRadians = 0;
 };
 
 REGISTER_COMPONENT(CameraComponent)

@@ -111,11 +111,6 @@ void Scene::setIBLData(ResourceWrapper<Texture> irradianceMap, ResourceWrapper<T
 	m_prefilterEnvMap = prefilterEnvMap;
 }
 
-glm::mat4 Scene::getProjection() const
-{
-	return m_defaultPerspectiveProjection;
-}
-
 Entity Scene::getGameCamera() const
 {
 	assert(m_renderViews.size() > 0);
@@ -314,7 +309,7 @@ void Scene::draw(float deltaTime)
 		graphics->scene = this;
 		graphics->context = m_context;
 		graphics->view = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
-		graphics->projection = m_defaultPerspectiveProjection;
+		graphics->projection = primaryCamera.getProjection();
 		graphics->cameraPos = primaryCameraTransform.getWorldPosition();
 		graphics->irradianceMap = m_irradianceMap;
 		graphics->prefilterEnvMap = m_prefilterEnvMap;
@@ -326,7 +321,7 @@ void Scene::draw(float deltaTime)
 			primaryCamera.up,
 			primaryCamera.right,
 			primaryCamera.aspect,
-			primaryCamera.fovy,
+			primaryCamera.getFOVYInRadians(),
 			primaryCamera.znear,
 			primaryCamera.zfar);
 

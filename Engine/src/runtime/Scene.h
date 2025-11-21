@@ -94,8 +94,6 @@ public:
 
 	//int getRenderTarget() const;
 
-	glm::mat4 getProjection() const;
-
 	void startSimulation();
 	void stopSimulation();
 	bool isSimulationActive() const;

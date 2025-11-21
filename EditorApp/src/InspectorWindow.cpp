@@ -212,8 +212,13 @@ void InspectorWindow::display()
 				ImGui::EndCombo();
 			}
 
-			ImGui::DragFloat("FOVY", &cameraComponent.fovy);
-			ImGui::DragFloat("aspect", &cameraComponent.aspect);
+			static float tempFOVY;
+			tempFOVY = cameraComponent.getFOVYInDegrees();
+			if (ImGui::DragFloat("FOVY", &tempFOVY, .1f))
+			{
+				cameraComponent.setFOVY(tempFOVY);
+			}
+			ImGui::DragFloat("aspect", &cameraComponent.aspect, .01f);
 			ImGui::DragFloat("z near", &cameraComponent.znear);
 			ImGui::DragFloat("z far", &cameraComponent.zfar);
 			});

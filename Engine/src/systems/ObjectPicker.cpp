@@ -91,7 +91,7 @@ int ObjectPicker::pickObject(int x, int y, Entity camera)
 
 	auto activeScene = Engine::get()->getContext()->getActiveScene();
 
-	m_pickingShader->setUniformValue("projection", activeScene->getProjection());
+	m_pickingShader->setUniformValue("projection", primaryCamera.getProjection());
 	m_pickingShader->setUniformValue("view", view);
 
 	for (auto& [entity, meshComponent, transform] : activeScene->getRegistry().getRegistry().view<MeshComponent, Transformation>().each())

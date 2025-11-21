@@ -144,15 +144,15 @@ void focusOnEntity(Entity e)
 		// set destination to location + forward
 		targetLocation = targetTransform.getWorldPosition() - front * 5.f + targetAABB.extents() * .5f;
 
-// create fake frustum
-Frustum fakeFrustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
+		// create fake frustum
+		Frustum fakeFrustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.getFOVYInRadians(), camera.znear, camera.zfar);
 
-// we start at the target object location and step back until the object AABB is inside the frustum.
-while (!targetAABB.isOnFrustum(fakeFrustum))
-{
-	targetLocation -= front;
-	fakeFrustum = Frustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.fovy, camera.znear, camera.zfar);
-}
+		// we start at the target object location and step back until the object AABB is inside the frustum.
+		while (!targetAABB.isOnFrustum(fakeFrustum))
+		{
+			targetLocation -= front;
+			fakeFrustum = Frustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.getFOVYInRadians(), camera.znear, camera.zfar);
+		}
 	}
 
 	auto& transform = g_editorCamera.getComponent<Transformation>();
@@ -186,50 +186,6 @@ void RenderSimulationControlView()
 
 	ImGui::End(); // End the window
 }                                           
-
-std::string OpenFile(const char* filter)
-{
-	OPENFILENAMEA ofn;
-	CHAR szFile[260] = { 0 };
-	CHAR currentDir[256] = { 0 };
-	ZeroMemory(&ofn, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = (HWND)Engine::get()->getWindow()->GetNativeWindow();
-	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = sizeof(szFile);
-	if (GetCurrentDirectoryA(256, currentDir))
-		ofn.lpstrInitialDir = currentDir;
-	ofn.lpstrFilter = filter;
-	ofn.nFilterIndex = 1;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-
-	if (GetOpenFileNameA(&ofn) == TRUE)
-		return ofn.lpstrFile;
-
-	return std::string();
-}
-
-std::string SaveFile(const char* filter)
-{
-	OPENFILENAMEA ofn;
-	CHAR szFile[260] = { 0 };
-	CHAR currentDir[256] = { 0 };
-	ZeroMemory(&ofn, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = (HWND)Engine::get()->getWindow()->GetNativeWindow();
-	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = sizeof(szFile);
-	if (GetCurrentDirectoryA(256, currentDir))
-		ofn.lpstrInitialDir = currentDir;
-	ofn.lpstrFilter = filter;
-	ofn.nFilterIndex = 1;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-
-	if (GetSaveFileNameA(&ofn) == TRUE)
-		return ofn.lpstrFile;
-
-	return std::string();
-}
 
 void LightCreatorWindow()
 {
@@ -855,7 +811,7 @@ void RenderSceneViewWindow()
 			auto camView = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
 			const float* camViewPtr = glm::value_ptr(camView);
 
-			auto projection = Engine::get()->getContext()->getActiveScene()->getProjection();
+			auto projection = primaryCamera.getProjection();
 			const float* projectionPtr = glm::value_ptr(projection);
 
 			ImGuizmo::SetDrawlist();
