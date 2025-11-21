@@ -105,7 +105,9 @@ public:
 
 	void addRenderView(const std::string& name, int x, int y, int w, int h, const Entity& e);
 	//void setActiveRenderView(const std::string& name);
-	void setRenderViewEnabled(bool enabled);
+	void setRenderViewEnabled(const std::string& name, bool enabled);
+	void setGameRenderViewEnabled(bool enabled);
+	
 
 	unsigned int getRenderViewFrameBufferID(const std::string& name) const;
 	unsigned int getRenderViewTextureID(const std::string& name) const;

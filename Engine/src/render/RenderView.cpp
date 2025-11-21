@@ -119,3 +119,13 @@ const Entity& RenderView::getCamera() const
 {
     return m_camera;
 }
+
+
+void RenderView::setEnabled(bool isEnabled)
+{
+	m_isEnabled = isEnabled;
+}
+bool RenderView::isEnabled() const
+{
+	return m_isEnabled;
+}

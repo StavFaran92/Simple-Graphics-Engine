@@ -51,6 +51,9 @@ public:
 	void swapToAdditionalTarget();
 	void swapBackToMainTarget();
 
+	void setEnabled(bool isEnabled);
+	bool isEnabled() const;
+
 	std::string getName() const;
 
 	//void setRenderTargetID(unsigned int targetID);
@@ -62,6 +65,8 @@ private:
 	RenderTarget renderTargets[2];
 
 	unsigned int m_boundTargetTextureSlot = 0;
+
+	bool m_isEnabled = true;
 
 	const std::string m_name;
 };

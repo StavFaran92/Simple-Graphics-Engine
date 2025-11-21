@@ -289,6 +289,9 @@ void Scene::draw(float deltaTime)
 
 	for (auto& [rName, renderView] : m_renderViews)
 	{
+		if (!renderView->isEnabled())
+			continue;
+
 		auto viewport = renderView->getViewport();
 
 		renderView->bind();
@@ -1104,6 +1107,21 @@ physx::PxScene* Scene::getPhysicsScene() const
 void Scene::addRenderView(const std::string& name, int x, int y, int w, int h, const Entity& e)
 {
 	m_renderViews[name] = std::make_shared<RenderView>(Viewport{x, y, w, h}, e, name);
+}
+
+void Scene::setRenderViewEnabled(const std::string& name, bool enabled)
+{
+	auto renderView = getRenderView(name);
+
+	if (renderView)
+	{
+		renderView->setEnabled(enabled);
+	}
+}
+
+void Scene::setGameRenderViewEnabled(bool enabled)
+{
+	setRenderViewEnabled("Game View", enabled);
 }
 
 unsigned int Scene::getRenderViewFrameBufferID(const std::string& name) const

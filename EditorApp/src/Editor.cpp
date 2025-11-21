@@ -107,7 +107,8 @@ static void stopSimulation()
 	Engine::get()->getContext()->getActiveScene()->stopSimulation();
 
 	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_editorCamera);
-
+	Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(false);
+	Engine::get()->getContext()->getActiveScene()->setRenderViewEnabled("Editor View", true);
 	uiLayer->setEnabled(true);
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->unlock(); //TODO this should be in camera event
 }
@@ -118,8 +119,9 @@ static void startsimulation()
 	Engine::get()->getContext()->getActiveScene()->startSimulation();
 
 	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
-
 	uiLayer->setEnabled(false);
+	Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(true);
+	Engine::get()->getContext()->getActiveScene()->setRenderViewEnabled("Editor View", false);
 	state.selectEntity(Entity::EmptyEntity);
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock(); //TODO this should be in camera event
 
@@ -851,39 +853,48 @@ void RenderSceneViewWindow()
 
 	}
 
-	if(state.getSelectedEntity() != Entity::EmptyEntity && 
-		state.getSelectedEntity().HasComponent<CameraComponent>() && 
-		state.getSelectedEntity() == Engine::get()->getContext()->getActiveScene()->getGameCamera())
+	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
 	{
-		// Create a child window
+		if (state.getSelectedEntity() != Entity::EmptyEntity &&
+			state.getSelectedEntity().HasComponent<CameraComponent>() &&
+			state.getSelectedEntity() == Engine::get()->getContext()->getActiveScene()->getGameCamera())
+		{
+			// This is a shit hack and it will break at some point in the future, should use events or something as a better solution.
+			Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(true);
 
-		ImVec2 cameraPreviewSize = ImVec2(300, 200);
-		// Placeholder for camera frame
+			ImVec2 cameraPreviewSize = ImVec2(300, 200);
+			// Placeholder for camera frame
 
-		ImVec2 bottomRightOffset = ImVec2(10, 10);  // Padding from the bottom-right corne
+			ImVec2 bottomRightOffset = ImVec2(10, 10);  // Padding from the bottom-right corne
 
-		// Adjust cursor position for the child window
-		ImVec2 childPos = ImVec2(
-			renderViewWindowSize.x - cameraPreviewSize.x - bottomRightOffset.x,
-			renderViewWindowSize.y - cameraPreviewSize.y - bottomRightOffset.y);
+			// Adjust cursor position for the child window
+			ImVec2 childPos = ImVec2(
+				renderViewWindowSize.x - cameraPreviewSize.x - bottomRightOffset.x,
+				renderViewWindowSize.y - cameraPreviewSize.y - bottomRightOffset.y);
 
-		ImGui::SetCursorPos(childPos);
-		ImGui::BeginChild("Camera Preview", cameraPreviewSize, true, ImGuiWindowFlags_NoScrollbar);
+			ImGui::SetCursorPos(childPos);
+			ImGui::BeginChild("Camera Preview", cameraPreviewSize, true, ImGuiWindowFlags_NoScrollbar);
 
-		ImVec2 contentSize = ImGui::GetContentRegionAvail(); // Get size of the available region
+			ImVec2 contentSize = ImGui::GetContentRegionAvail(); // Get size of the available region
 
 
-		// Add content to the child window (camera preview)
-		ImGui::Text("Camera Preview");
-		ImGui::Separator();
+			// Add content to the child window (camera preview)
+			ImGui::Text("Camera Preview");
+			ImGui::Separator();
 
-		
 
-		auto renderTargetID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewTextureID();
-		ImGui::Image(reinterpret_cast<ImTextureID>(renderTargetID), cameraPreviewSize, ImVec2(0, 1), ImVec2(1, 0));
 
-		ImGui::EndChild();
+			auto renderTargetID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewTextureID();
+			ImGui::Image(reinterpret_cast<ImTextureID>(renderTargetID), cameraPreviewSize, ImVec2(0, 1), ImVec2(1, 0));
+
+			ImGui::EndChild();
+		}
+		else
+		{
+			Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(false);
+		}
 	}
+
 
 	ImGui::End();
 }
