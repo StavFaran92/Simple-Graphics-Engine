@@ -13,7 +13,7 @@
 #include "render/RenderCommand.h"
 #include <GL/glew.h>
 #include "geometry/MeshCollection.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 
@@ -56,7 +56,7 @@ void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, Resou
 	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
 	quad.RemoveComponent<RenderableComponent>();
 	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = quad.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
 
 	RenderCommand::clear();
 
@@ -103,7 +103,7 @@ void TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTextur
 	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
 	quad.RemoveComponent<RenderableComponent>();
 	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = quad.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
 
 	RenderCommand::clear();
 

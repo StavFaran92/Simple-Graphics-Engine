@@ -61,7 +61,7 @@
 #include "component/FoliageComponent.h"
 #include "component/PhysicsComponent.h"
 #include "camera/CameraControllerFreeLook.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/MaterialComponent.h"
 #include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"

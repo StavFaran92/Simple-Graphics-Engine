@@ -55,7 +55,7 @@
 #include "component/FoliageComponent.h"
 #include "systems/FoliageSystem.h"
 #include "component/CameraComponent.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/SkyboxComponent.h"
@@ -94,7 +94,7 @@ void Scene::displayWireframeMesh(Entity e)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-	for (auto& mesh : e.tryGetComponent<MeshComponent>()->mesh.get()->getMeshes())
+	for (auto& mesh : e.tryGetComponent<MeshRendererComponent>()->mesh.get()->getMeshes())
 	{
 		graphics->entity = e;
 		graphics->shader = m_tempOutlineShader;
@@ -276,7 +276,7 @@ void Scene::update(float deltaTime)
 		// Physics
 		Engine::get()->getPhysicsSystem()->update(this, deltaTime);
 
-		for (auto&& [entity, animator, mesh] : m_registry->get().view<Animator, MeshComponent>().each())
+		for (auto&& [entity, animator, mesh] : m_registry->get().view<Animator, MeshRendererComponent>().each())
 		{
 			animator.update(deltaTime);
 		}
@@ -577,7 +577,7 @@ void Scene::draw(float deltaTime)
 				if ((entity_id)entity == selectedObject)
 				{
 					Entity e(entity, &getRegistry());
-					auto mesh = e.tryGetComponent<MeshComponent>();
+					auto mesh = e.tryGetComponent<MeshRendererComponent>();
 
 					if (!mesh) break;
 
@@ -618,7 +618,7 @@ void Scene::draw(float deltaTime)
 						m_highlightEdgeDetectionShader->setUniformValue("uTexelSize", texelSize);
 						m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
 
-						auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -643,7 +643,7 @@ void Scene::draw(float deltaTime)
 
 						graphics->renderView->bind();
 
-						auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -693,7 +693,7 @@ void Scene::draw(float deltaTime)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		m_UIShader->use();
 		m_UIShader->setProjectionMatrix(m_defaultUIProjection);
-		auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+		auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
 
 		for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
 		{
@@ -807,7 +807,7 @@ void Scene::draw(float deltaTime)
 				//shader->setUniformValue("cameraLookAt", primaryCamera.front);
 
 				// bind mesh
-				auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); 
+				auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO(); 
 
 				// in frag shader i need access to mesh extentes & main texture -> set uniforms
 

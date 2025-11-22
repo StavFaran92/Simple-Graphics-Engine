@@ -21,7 +21,7 @@
 #include "component/Transformation.h"
 #include "geometry/MeshCollection.h"
 #include "component/CameraComponent.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/SkyboxComponent.h"
 
 #include "core/Logger.h"
@@ -94,7 +94,7 @@ int ObjectPicker::pickObject(int x, int y, Entity camera)
 	m_pickingShader->setUniformValue("projection", primaryCamera.getProjection());
 	m_pickingShader->setUniformValue("view", view);
 
-	for (auto& [entity, meshComponent, transform] : activeScene->getRegistry().getRegistry().view<MeshComponent, Transformation>().each())
+	for (auto& [entity, meshComponent, transform] : activeScene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation>().each())
 	{
 		Entity entityhandler{ entity, &activeScene->getRegistry() };
 		if (entityhandler.HasComponent<SkyboxComponent>())

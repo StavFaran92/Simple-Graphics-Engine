@@ -4,7 +4,7 @@
 
 #include "component/ComponentSerializer.h"
 #include "component/CameraComponent.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/RenderableComponent.h"
 #include "memory/BuiltInAssets.h"
 #include "core/Window.h"
@@ -84,7 +84,7 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 		gameCameraEntity.getComponent<Transformation>().setLocalPosition({ 10,10,10 });
 		gameCameraEntity.getComponent<CameraComponent>().center = { 0,0,0 };
 		gameCameraEntity.getComponent<CameraComponent>().up = { 0,1,0 };
-		gameCameraEntity.addComponent<MeshComponent>().mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_CAMERA);
+		gameCameraEntity.addComponent<MeshRendererComponent>().mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_CAMERA);
 		gameCameraEntity.addComponent<RenderableComponent>();
 	}
 	scene.setGameCamera(gameCameraEntity);

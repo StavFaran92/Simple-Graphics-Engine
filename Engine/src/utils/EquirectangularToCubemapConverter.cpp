@@ -18,7 +18,7 @@
 #include "runtime/Context.h"
 #include "texture/Cubemap.h"
 #include "texture/TextureTransformer.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 #include "memory/BuiltInAssets.h"

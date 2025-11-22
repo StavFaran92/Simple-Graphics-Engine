@@ -23,7 +23,7 @@
 #include "render/ScreenQuad.h"
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/MaterialComponent.h"
 #include "component/RenderableComponent.h"
 #include "component/ObjectComponent.h"
@@ -52,7 +52,7 @@ void Renderer::renderScene(Scene* scene)
     graphics->renderView->bind();
 
     for (auto&& [entity, mesh, transform, renderable] :
-        scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent>(entt::exclude<ShaderComponent>).each())
+        scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent>(entt::exclude<ShaderComponent>).each())
     {
         if (renderable.renderTechnique == RenderableComponent::RenderTechnique::Forward)
         {
@@ -60,7 +60,7 @@ void Renderer::renderScene(Scene* scene)
 
             graphics->entity = entityHandler;
             graphics->shader->use();
-            for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
+            for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.get()->getMeshes())
             {
 
                 if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -92,11 +92,11 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
     auto& camForward = camTransform.getForward();
 
     for (auto&& [entity, mesh, transform, renderable, material] :
-        scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent, MaterialComponent>(entt::exclude<ShaderComponent>).each())
+        scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent, MaterialComponent>(entt::exclude<ShaderComponent>).each())
     {
         Entity entityHandler{ entity, &scene->getRegistry() };
 
-        for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
+        for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.get()->getMeshes())
         {
             auto matIndex = mesh->getMaterialIndex();
             MaterialComponent& materialComponent = entityHandler.getComponent<MaterialComponent>();
@@ -128,7 +128,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
 
         graphics->entity = entityHandler;
         graphics->shader->use();
-        for (auto& mesh : entityHandler.getComponent<MeshComponent>().mesh.get()->getMeshes())
+        for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.get()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -200,7 +200,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
             if (shaderComponent.projection == ShaderComponent::DefaultProjection)
             {
-                meshCollecton = entityHandler.getComponent<MeshComponent>().mesh.resource();
+                meshCollecton = entityHandler.getComponent<MeshRendererComponent>().mesh.resource();
             }
             else if (shaderComponent.projection == ShaderComponent::Texture2D)
             {
@@ -299,7 +299,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
             if (shaderComponent.projection == ShaderComponent::DefaultProjection)
             {
-                meshCollecton = entityHandler.getComponent<MeshComponent>().mesh.resource();
+                meshCollecton = entityHandler.getComponent<MeshRendererComponent>().mesh.resource();
             }
             else if (shaderComponent.projection == ShaderComponent::Texture2D)
             {

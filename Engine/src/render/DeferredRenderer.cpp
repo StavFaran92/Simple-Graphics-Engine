@@ -20,7 +20,7 @@
 #include "geometry/ShapeFactory.h"
 #include "render/RenderView.h"
 #include "utils/DebugHelper.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/MaterialComponent.h"
 #include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
@@ -227,7 +227,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	graphics->entityGroup.clear();
 	for (auto&& [entity, mesh, transform, renderable] :
-		scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent>(entt::exclude<ShaderComponent>).each())
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent>().each())
 	{
 		if (renderable.renderTechnique == RenderableComponent::RenderTechnique::Deferred)
 		{
@@ -260,7 +260,9 @@ void DeferredRenderer::renderScene(Scene* scene)
 		std::string name = entityHandler.getComponent<ObjectComponent>().name;
 		logTrace("About to render {}", name);
 
-		ResourceWrapper<MeshCollection> meshCollecton = entityHandler.getComponent<MeshComponent>().mesh.resource();
+		MeshRendererComponent& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
+		ResourceWrapper<MeshCollection> meshCollecton = meshRenderer.mesh.resource();
 
 		auto animator = entityHandler.tryGetComponent<Animator>();
 		if (!animator || animator->m_currentAnimation.isEmpty())

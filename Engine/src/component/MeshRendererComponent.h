@@ -5,6 +5,7 @@
 
 struct EngineAPI MeshRendererComponent : public Component
 {
+	MeshRendererComponent(AssetWrapper<MeshCollection> mesh) : mesh(mesh) {};
 	MeshRendererComponent() = default;
 
 	void addMaterial(const AssetWrapper<Material>& mat)
@@ -35,7 +36,8 @@ struct EngineAPI MeshRendererComponent : public Component
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(mesh);
-		SERIALIZED_MEMBER(materialSlot);
+		SERIALIZED_MEMBER(count);
+		SERIALIZED_MEMBER(m_material);
 
 	}
 

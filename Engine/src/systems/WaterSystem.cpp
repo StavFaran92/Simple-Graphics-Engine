@@ -4,7 +4,7 @@
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
 #include "geometry/ModelImporter.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/ShaderComponent.h"
 #include "component/RenderableComponent.h"
 
@@ -15,7 +15,7 @@ Entity WaterSystem::createPool()
 	// TODO use grid instead
 	ModelImportSettings aDesc;
 	aDesc.isEngineOwned = true;
-	poolQuad.addComponent<MeshComponent>(MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx", aDesc));
+	poolQuad.addComponent<MeshRendererComponent>(MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx", aDesc));
 	poolQuad.addComponent<RenderableComponent>();
 
 	auto& planeTransform = poolQuad.getComponent<Transformation>();

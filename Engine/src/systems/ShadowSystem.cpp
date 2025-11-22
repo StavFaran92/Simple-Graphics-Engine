@@ -20,7 +20,7 @@
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"
 #include "utils/DebugHelper.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/RenderableComponent.h"
 
 
@@ -118,7 +118,7 @@ void ShadowSystem::renderToDepthMap()
 
 	// Render Scene 
 	for (auto&& [entity, mesh, transform, renderable] : 
-		m_scene->getRegistry().getRegistry().view<MeshComponent, Transformation, RenderableComponent>().each())
+		m_scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent>().each())
 	{
 		
 

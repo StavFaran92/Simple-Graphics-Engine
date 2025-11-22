@@ -6,7 +6,7 @@
 #include "component/MaterialComponent.h"
 #include "component/Transformation.h"
 #include "component/ObjectComponent.h"
-#include "component/MeshComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "animation/Animator.h"
 #include "core/Logger.h"
 
