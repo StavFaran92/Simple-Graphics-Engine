@@ -157,7 +157,7 @@ void Renderer::setUniforms()
     graphics->shader->setModelMatrix(graphics->model);
     graphics->shader->setViewMatrix(graphics->view);
     graphics->shader->setProjectionMatrix(graphics->projection);
-    graphics->material->use(graphics->shader);
+    graphics->material->use();
 
     graphics->shader->bindUniformBlockToBindPoint("Time", 0);
     graphics->shader->bindUniformBlockToBindPoint("Lights", 1);

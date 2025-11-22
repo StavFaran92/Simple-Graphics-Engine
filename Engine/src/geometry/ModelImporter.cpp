@@ -33,25 +33,25 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Materi
 	aiColor3D diffuseColor;
 	if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
 	{
-		mat->colorDiffuse = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+		mat->setUniformValue(SHADER_PROPERTY_PBR_COLOR_DIFFUSE, glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b));
 	}
 
 	ai_real rounghnessFactor;
 	if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, rounghnessFactor) == aiReturn_SUCCESS)
 	{
-		mat->roughnessFactor = rounghnessFactor;
+		mat->setUniformValue(SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR, rounghnessFactor);
 	}
 
 	ai_real metallicFactor;
 	if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallicFactor) == aiReturn_SUCCESS)
 	{
-		mat->metallicFactor = metallicFactor;
+		mat->setUniformValue(SHADER_PROPERTY_PBR_METALLIC_FACTOR, metallicFactor);
 	}
 
 	ai_real opacityFactor;
 	if (aiMat->Get(AI_MATKEY_OPACITY, opacityFactor) == aiReturn_SUCCESS)
 	{
-		mat->opacityFactor = opacityFactor;
+		mat->setUniformValue(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
 	}
 }
 
@@ -325,33 +325,46 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures, aInfo);
 			if (!diffuse.isEmpty())
 			{
-				material->setTexture(Texture::TextureType::Albedo, diffuse);
+				TextureSampler diffuseSampler(3);
+				diffuseSampler.texture = diffuse;
+				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, diffuseSampler);
 			}
 
 			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures, aInfo);
 			if (!normal.isEmpty())
 			{
-				material->setTexture(Texture::TextureType::Normal, normal);
+				TextureSampler normalSampler(3);
+				normalSampler.texture = diffuse;
+				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, normalSampler);
 			}
 
 			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, fileDir, cachedTextures, aInfo);
 			if (!roughness.isEmpty())
 			{
-				material->setTexture(Texture::TextureType::Roughness, roughness);
-				material->getSampler(Texture::TextureType::Roughness)->channelMaskR = TextureSampler::Color::G;
+				TextureSampler roughnessSampler(1);
+				roughnessSampler.texture = roughness;
+				roughnessSampler.channelMaskR = TextureSampler::Color::G;
+				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, roughnessSampler);
 			}
 
+			// Metallic map
 			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, fileDir, cachedTextures, aInfo);
 			if (!metallic.isEmpty())
 			{
-				material->setTexture(Texture::TextureType::Metallic, metallic);
-				material->getSampler(Texture::TextureType::Metallic)->channelMaskR = TextureSampler::Color::B;
+				TextureSampler metallicSampler(1);
+				metallicSampler.texture = metallic;
+				metallicSampler.channelMaskR = TextureSampler::Color::B;
+				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, metallicSampler);
 			}
 
+			// Ambient Occlusion map
 			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, fileDir, cachedTextures, aInfo);
 			if (!ao.isEmpty())
 			{
-				material->setTexture(Texture::TextureType::AmbientOcclusion, ao);
+				TextureSampler aoSampler(1);
+				aoSampler.texture = ao;
+				aoSampler.channelMaskR = TextureSampler::Color::R;
+				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_AO, aoSampler);
 			}
 
 			extractAiMaterialProperties(aMaterial, material);

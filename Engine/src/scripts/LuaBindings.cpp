@@ -233,20 +233,20 @@ void bindAssets(sol::state& lua)
     );
 
 
-
-    lua.new_usertype<Material>("Material",
-        "getSampler", &Material::getSampler,
-        "setSampler", &Material::setSampler,
-        "hasTexture", &Material::hasTexture,
-        "setTexture", &Material::setTexture,
-        "setName", &Material::setName,
-        "getName", &Material::getName,
-        "getAllTextures", &Material::getAllTextures,
-        "isOpaque", &Material::isOpaque,
-        "import", &Material::import,
-        "create", &Material::create,
-        "updateAsset", &Material::updateAsset
-    );
+    /// TODO fix
+    //lua.new_usertype<Material>("Material",
+    //    "getSampler", &Material::getSampler,
+    //    "setSampler", &Material::setSampler,
+    //    "hasTexture", &Material::hasTexture,
+    //    "setTexture", &Material::setTexture,
+    //    "setName", &Material::setName,
+    //    "getName", &Material::getName,
+    //    "getAllTextures", &Material::getAllTextures,
+    //    "isOpaque", &Material::isOpaque,
+    //    "import", &Material::import,
+    //    "create", &Material::create,
+    //    "updateAsset", &Material::updateAsset
+    //);
 
 
 

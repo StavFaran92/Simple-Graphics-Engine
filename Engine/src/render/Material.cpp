@@ -15,6 +15,7 @@
 #include <cereal/archives/json.hpp>
 #include <iostream>
 #include <fstream>
+#include <regex>
 #include "memory/BuiltInAssets.h"
 
 #include <filesystem>
@@ -75,14 +76,25 @@ Material::Material()
 
 }
 
-void Material::use(ResourceWrapper<Shader>& shader)
+void Material::use()
 {
-	setTexturesInShader(shader);
+	int count = 0;
+	for (const auto& [name, sampler] : m_samplers)
+	{
+		setTextureInShader(name, count++);
+	}
 
-	shader.get()->setUniformValue("material.roughnessFactor", roughnessFactor);
-	shader.get()->setUniformValue("material.metallicFactor", metallicFactor);
-	shader.get()->setUniformValue("material.colorDiffuse", colorDiffuse);
-	shader.get()->setUniformValue("material.opacityFactor", opacityFactor);
+	auto shaderResource = m_shader.resource();
+	for (const auto& [name, property] : m_uniformProperties)
+	{
+		shaderResource->setUniformValue(name, property);
+	}
+
+
+	//m_shader.get()->setUniformValue("material.roughnessFactor", roughnessFactor);
+	//m_shader.get()->setUniformValue("material.metallicFactor", metallicFactor);
+	//m_shader.get()->setUniformValue("material.colorDiffuse", colorDiffuse);
+	//m_shader.get()->setUniformValue("material.opacityFactor", opacityFactor);
 }
 
 void Material::release()
@@ -94,49 +106,48 @@ void Material::release()
 	}
 }
 
-std::shared_ptr<TextureSampler> Material::getSampler(Texture::TextureType textureType) const
+TextureSampler& Material::getSampler(const std::string& name)
 {
-	return m_samplers.at(textureType);
+	auto it = m_samplers.find(name);
+	if (it == m_samplers.end())
+	{
+		logError("Sampler '{}' not found in Material.", name);
+		throw std::runtime_error("");
+	}
+
+	return it->second;
 }
 
-void Material::setSampler(Texture::TextureType textureType, std::shared_ptr<TextureSampler> sampler)
+void Material::setSampler(const std::string& name, const TextureSampler& sampler)
 {
-	m_samplers[textureType] = sampler;
+	m_samplers[name] = sampler;
 }
 
-bool Material::hasTexture(Texture::TextureType textureType) const
+void Material::setTextureInShader(const std::string& name, int slot)
 {
-	auto iter = m_samplers.find(textureType);
-	return iter != m_samplers.end() && iter->second->texture.resource().get();
-}
-
-void Material::setTextureInShader(ResourceWrapper<Shader>& shader, Texture::TextureType ttype, int slot)
-{
-	auto sampler = getSampler(ttype);
-
-	// Activate texture unit i
-	glActiveTexture(GL_TEXTURE0 + slot);
+	auto sampler = getSampler(name);
 
 	// if texture is empty use dummy texture
-	AssetWrapper<Texture>& texture = sampler->texture;
-	if (sampler->texture.resource().isEmpty())
+	AssetWrapper<Texture>& texture = sampler.texture;
+	if (sampler.texture.resource().isEmpty())
 	{
 		texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
 	}
 
-	// Binds iterated texture to target GL_TEXTURE_2D on texture unit i
-	glBindTexture(GL_TEXTURE_2D, texture.resource().get()->getID());
+	texture.get()->setSlot(slot);
+	texture.get()->bind();
 
 	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".texture", slot);
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".xOffset", sampler->xOffset);
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".yOffset", sampler->yOffset);
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".xScale", sampler->xScale);
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".yScale", sampler->yScale);
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskR", sampler->channelMaskR);
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskG", sampler->channelCount > 1 ? sampler->channelMaskG : 0);
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskB", sampler->channelCount > 2 ? sampler->channelMaskB : 0);
-	shader->setUniformValue("material." + Texture::textureTypeToString(ttype) + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
+	auto shaderResource = m_shader.resource();
+	shaderResource->setUniformValue("material." + name + ".texture", slot);
+	shaderResource->setUniformValue("material." + name + ".xOffset", sampler.xOffset);
+	shaderResource->setUniformValue("material." + name + ".yOffset", sampler.yOffset);
+	shaderResource->setUniformValue("material." + name + ".xScale", sampler.xScale);
+	shaderResource->setUniformValue("material." + name + ".yScale", sampler.yScale);
+	shaderResource->setUniformValue("material." + name + ".channelMaskR", sampler.channelMaskR);
+	shaderResource->setUniformValue("material." + name + ".channelMaskG", sampler.channelCount > 1 ? sampler.channelMaskG : 0);
+	shaderResource->setUniformValue("material." + name + ".channelMaskB", sampler.channelCount > 2 ? sampler.channelMaskB : 0);
+	shaderResource->setUniformValue("material." + name + ".channelMaskA", sampler.channelCount > 3 ? sampler.channelMaskA : 0);
 }
 
 AssetWrapper<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
@@ -151,11 +162,11 @@ ResourceWrapper<Material> Material::create()
 
 	auto mat = Factory<Material>::create();
 
-	mat->m_samplers[Texture::TextureType::Albedo] = std::make_shared<TextureSampler>(3);
-	mat->m_samplers[Texture::TextureType::Normal] = std::make_shared<TextureSampler>(3);
-	mat->m_samplers[Texture::TextureType::Metallic] = std::make_shared<TextureSampler>(1);
-	mat->m_samplers[Texture::TextureType::Roughness] = std::make_shared<TextureSampler>(1);
-	mat->m_samplers[Texture::TextureType::AmbientOcclusion] = std::make_shared<TextureSampler>(1);
+	//mat->m_samplers[Texture::TextureType::Albedo] = std::make_shared<TextureSampler>(3);
+	//mat->m_samplers[Texture::TextureType::Normal] = std::make_shared<TextureSampler>(3);
+	//mat->m_samplers[Texture::TextureType::Metallic] = std::make_shared<TextureSampler>(1);
+	//mat->m_samplers[Texture::TextureType::Roughness] = std::make_shared<TextureSampler>(1);
+	//mat->m_samplers[Texture::TextureType::AmbientOcclusion] = std::make_shared<TextureSampler>(1);
 
 	return mat;
 }
@@ -165,63 +176,128 @@ void Material::updateAsset(const AssetWrapper<Material>& material, AssetUpdateDe
 	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
 }
 
-void Material::setTexturesInShader(ResourceWrapper<Shader>& shader)
-{
-	// It either has diffuse or albedo
-	//setTextureInShader(shader, Texture::Type::Diffuse, 0);
-	setTextureInShader(shader, Texture::TextureType::Albedo, 0);
-	setTextureInShader(shader, Texture::TextureType::Normal, 1);
-	setTextureInShader(shader, Texture::TextureType::Metallic, 2);
-	setTextureInShader(shader, Texture::TextureType::Roughness, 3);
-	setTextureInShader(shader, Texture::TextureType::AmbientOcclusion, 4);
-}
-
-void Material::setTexture(Texture::TextureType textureType, AssetWrapper<Texture> textureHandler)
-{
-	auto iter = m_samplers.find(textureType);
-	if (iter == m_samplers.end())
-	{
-		m_samplers[textureType] = std::make_shared<TextureSampler>();
-	}
-	m_samplers[textureType]->texture = textureHandler;
-}
-
-void Material::setName(const std::string& name)
-{
-	m_name = name;
-}
-
-std::string Material::getName() const
-{
-	return m_name;
-}
-
-std::vector<AssetWrapper<Texture>> Material::getAllTextures() const
-{
-	auto& res = std::vector<AssetWrapper<Texture>>();
-	for (auto& [_, sampler] : m_samplers)
-	{
-		res.push_back(sampler->texture);
-	}
-	return res;
-}
-
 ResourceWrapper<Material> Material::clone(bool isTransient) const
 {
-	//AssetDescriptor clonedAssetInfo;
-	//clonedAssetInfo.attributes = m_assetInfo.attributes;
-	//clonedAssetInfo.isTransient = isTransient;
-	auto newMaterial = Material::create(); // tODO rethink this
+	auto newMaterial = Material::create();
 
-	for (const auto& sampler : m_samplers)
-	{
-		newMaterial->setSampler(sampler.first, std::make_shared<TextureSampler>(*sampler.second.get()));
-	}
+	newMaterial->m_samplers = m_samplers;
+	newMaterial->m_shader = m_shader;
+	newMaterial->m_uniformProperties = m_uniformProperties;
 
 	return newMaterial;
 }
 
 bool Material::isOpaque() const
 {
-	return opacityFactor == 1;
+	return 1; // todo fix
+	//return opacityFactor == 1;
+}
+
+void Material::parseUniforms(const std::string& sourceCode)
+{
+	m_uniformProperties.clear();
+	m_samplers.clear();
+
+	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
+	std::smatch match;
+	std::string::const_iterator searchStart(sourceCode.cbegin());
+
+	auto& uniformProperties = m_uniformProperties;
+
+	while (std::regex_search(searchStart, sourceCode.cend(), match, uniformRegex)) {
+		std::string type = match[1].str();
+		std::string name = match[2].str();
+
+		if (type == "float") {
+			uniformProperties[name] = 0.0f;
+		}
+		else if (type == "vec2") {
+			uniformProperties[name] = glm::vec2(0.0f);
+		}
+		else if (type == "vec3") {
+			uniformProperties[name] = glm::vec3(0.0f);
+		}
+		else if (type == "vec4") {
+			uniformProperties[name] = glm::vec4(0.0f);
+		}
+		else if (type == "int") {
+			uniformProperties[name] = 0;
+		}
+		else if (type == "uint") {
+			uniformProperties[name] = 0u;
+		}
+		else if (type == "mat3") {
+			uniformProperties[name] = glm::mat3(1.0f);
+		}
+		else if (type == "mat4") {
+			uniformProperties[name] = glm::mat4(1.0f);
+		}
+		else if (type == "sampler2D") {
+			m_samplers[name] = TextureSampler();
+		}
+
+		searchStart = match.suffix().first;
+	}
+}
+
+void Material::setShader(AssetWrapper<Shader> shader)
+{
+	m_shader = shader;
+
+	const std::string& sourceCode = shader.resource()->getSourceCode();
+	parseUniforms(sourceCode);
+}
+
+void Material::update()
+{
+	auto oldUniforms = m_uniformProperties;
+	auto oldSamplers = m_samplers;
+
+	parseUniforms(m_shader.resource()->getSourceCode());
+
+
+	auto& newSamplers = m_samplers;
+	for (const auto [name, sampler] : oldSamplers)
+	{
+		auto iter = newSamplers.find(name);
+		if (iter != newSamplers.end())
+		{
+			iter->second = sampler;
+		}
+	}
+
+	auto& newUniforms = m_uniformProperties;
+	for (const auto [name, value] : oldUniforms)
+	{
+		auto iter = newUniforms.find(name);
+		if (iter != newUniforms.end())
+		{
+			iter->second = value;
+		}
+	}
+
+	for (const auto& [name, value] : m_uniformProperties)
+	{
+		m_shader.resource()->setUniformValue(name, value);
+	}
+
+	// TODO fix
+	//if (!projectionTexture.resource().isEmpty())
+	//{
+	//	setProjectionTexture(projectionTexture);
+	//}
+}
+
+void Material::setUniformValue(const std::string& name, const Value& v)
+{
+	m_uniformProperties[name] = v;
+}
+
+void Material::setName(const std::string& name)
+{
+	m_name = name;
+}
+std::string Material::getName() const
+{
+	return m_name;
 }

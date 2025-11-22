@@ -10,6 +10,17 @@
 #include "texture/TextureSampler.h"
 #include "memory/Asset.h"
 
+static const std::string SHADER_PROPERTY_PBR_COLOR_DIFFUSE = "colorDiffuse";
+static const std::string SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR = "roughnessFactor";
+static const std::string SHADER_PROPERTY_PBR_METALLIC_FACTOR = "metallicFactor";
+static const std::string SHADER_PROPERTY_PBR_OPACITY_FACTOR = "opacityFactor";
+
+static const std::string SHADER_PROPERTY_PBR_SAMPLER_ALBEDO = "samplerAlbedo";
+static const std::string SHADER_PROPERTY_PBR_SAMPLER_NORMAL = "samplerNormal";
+static const std::string SHADER_PROPERTY_PBR_SAMPLER_METALLIC = "samplerMetallic";
+static const std::string SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS = "samplerRoughness";
+static const std::string SHADER_PROPERTY_PBR_SAMPLER_AO = "samplerAO";
+
 struct MaterialImportSettings : public AssetCreateDescriptor
 {
 
@@ -28,39 +39,40 @@ public:
 	Material();
 	~Material() = default;
 
-	virtual void use(ResourceWrapper<Shader>& shader);
+	void use();
+	void release();
 
-	virtual void release();
+	TextureSampler& getSampler(const std::string& name);
+	void setSampler(const std::string& name, const TextureSampler& sampler);
 
-	/**
-	 * Gets the mesh's Textures.
-	 *
-	 * \param colors
-	 */
-	std::shared_ptr<TextureSampler> getSampler(Texture::TextureType textureType) const;
-	void setSampler(Texture::TextureType textureType, std::shared_ptr<TextureSampler> sampler);
+	void setUniformValue(const std::string& name, const Value& v);
 
-	bool hasTexture(Texture::TextureType textureType) const;
+	//bool hasTexture(const std::string& name) const;
 
-	void setTexture(Texture::TextureType textureType, AssetWrapper<Texture> textureHandler);
+	//void setTexture(const std::string& name, AssetWrapper<Texture> textureHandler);
 
 	void setName(const std::string& name);
 	std::string getName() const;
-
-	std::vector<AssetWrapper<Texture>> getAllTextures() const;
 
 	ResourceWrapper<Material> clone(bool isEngineOwned) const;
 
 	bool isOpaque() const;
 
+	//void addTexture(const std::string& name, AssetWrapper<Texture> texture);
+
+	void setProjectionTexture(AssetWrapper<Texture> texture);
+
+	void update();
+
+	void parseUniforms(const std::string& sourceCode);
+
+	void setShader(AssetWrapper<Shader> shader);
+
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(m_shader);
 		SERIALIZED_MEMBER(m_samplers);
-		SERIALIZED_MEMBER(m_name);
-		SERIALIZED_MEMBER(colorDiffuse);
-		SERIALIZED_MEMBER(roughnessFactor);
-		SERIALIZED_MEMBER(metallicFactor);
-		SERIALIZED_MEMBER(opacityFactor);
+		//SERIALIZED_MEMBER(m_uniformProperties); // TODO fix
 	}
 
 	static AssetWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
@@ -68,15 +80,30 @@ public:
 	static void updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc);
 
 protected:
-	void setTexturesInShader(ResourceWrapper<Shader>& shader);
-	void setTextureInShader(ResourceWrapper<Shader>& shader, Texture::TextureType ttype, int slot);
+	void setTextureInShader(const std::string& name, int slot);
 
 public:
+	//std::string m_name;
+	//std::map<Texture::TextureType, std::shared_ptr<TextureSampler>> m_samplers;
+	//glm::vec3 colorDiffuse{1.0f, 1.0f, 1.0f};
+	//float roughnessFactor = 1.f;
+	//float metallicFactor = 0.f;
+	//float opacityFactor = 1.f;
+
+	//enum ProjectionType : int
+	//{
+	//	DefaultProjection = 0,
+	//	Texture2D = 1
+	//};
+
+	// This will only be used by forward renderer, ignored by deffered
 	std::string m_name;
-	std::map<Texture::TextureType, std::shared_ptr<TextureSampler>> m_samplers;
-	glm::vec3 colorDiffuse{1.0f, 1.0f, 1.0f};
-	float roughnessFactor = 1.f;
-	float metallicFactor = 0.f;
-	float opacityFactor = 1.f;
+	AssetWrapper<Shader> m_shader;
+	std::map<std::string, TextureSampler> m_samplers;
+	std::map<std::string, Value> m_uniformProperties;
+
+	//ProjectionType projection = ProjectionType::DefaultProjection;
+	//AssetWrapper<Texture> projectionTexture;
+	//std::shared_ptr<RenderView> renderViewProjection;
 
 };

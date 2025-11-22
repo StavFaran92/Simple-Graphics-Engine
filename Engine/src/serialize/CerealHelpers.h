@@ -36,3 +36,4 @@ namespace glm
 		SERIALIZED_MEMBER(q.w);
 	}
 };
+
