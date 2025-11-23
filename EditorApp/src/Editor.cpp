@@ -138,7 +138,7 @@ void focusOnEntity(Entity e)
 		
 	glm::vec3 targetLocation = targetTransform.getWorldPosition() - front * 5.f;
 
-	auto targetMesh = e.tryGetComponent<MeshComponent>();
+	auto targetMesh = e.tryGetComponent<MeshRendererComponent>();
 	if (targetMesh)
 	{
 		auto& targetAABB = targetMesh->mesh.get()->getPrimaryMesh()->getAABB();

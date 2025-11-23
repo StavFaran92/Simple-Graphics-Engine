@@ -154,7 +154,7 @@ void InspectorWindow::display()
 		//	ImGui::Combo("##LayerMask", (int*)&collisionSphere.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
 		//	});
 
-		//displayComponent<CollisionMeshComponent>("Collision Mesh", [](CollisionMeshComponent& collisionMesh) {
+		//displayComponent<CollisionMeshRendererComponent>("Collision Mesh", [](CollisionMeshRendererComponent& collisionMesh) {
 		//	ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
 		//	});
 
@@ -163,7 +163,7 @@ void InspectorWindow::display()
 			//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
 			});
 
-		displayComponent<MeshComponent>("Mesh", [](MeshComponent& meshComponent) {
+		displayComponent<MeshRendererComponent>("Mesh", [](MeshRendererComponent& meshComponent) {
 			if (meshComponent.mesh.isEmpty()) return;
 
 			BEGIN_IMGUI_TABLE("Mesh");
@@ -672,7 +672,7 @@ void InspectorWindow::display()
 
 			if (ImGui::MenuItem("Mesh"))
 			{
-				state.getSelectedEntity().addComponent<MeshComponent>();
+				state.getSelectedEntity().addComponent<MeshRendererComponent>();
 			}
 
 			if (ImGui::MenuItem("Material"))
@@ -692,7 +692,7 @@ void InspectorWindow::display()
 
 			if (ImGui::MenuItem("InstanceBatch"))
 			{
-				auto meshComponent = state.getSelectedEntity().tryGetComponent<MeshComponent>();
+				auto meshComponent = state.getSelectedEntity().tryGetComponent<MeshRendererComponent>();
 				if (meshComponent)
 				{
 					throw std::runtime_error("Not implemented");

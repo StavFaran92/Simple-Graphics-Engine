@@ -33,30 +33,28 @@ void addTextureEditWidget(AssetWrapper<Texture> texture, ImVec2 size, std::funct
 	displayTextureSelectDialog();
 }
 
-void addTextureEditWidget(AssetWrapper<Material> mat, const std::string& name, Texture::TextureType ttype)
-{
-	AssetWrapper<Texture> tex = AssetWrapper<Texture>::empty;
-	if (mat.resource()->hasTexture(ttype))
-	{
-		tex = mat.resource()->getSampler(ttype)->texture;
-	}
+//void addTextureEditWidget(AssetWrapper<Material> mat, const std::string& name, Texture::TextureType ttype)
+//{
+//	AssetWrapper<Texture> tex = AssetWrapper<Texture>::empty;
+//	if (mat.resource()->hasTexture(ttype))
+//	{
+//		tex = mat.resource()->getSampler(ttype)->texture;
+//	}
+//
+//	addTextureEditWidget(tex, { 20, 20 }, [=](UUID uuid) {
+//		mat.get()->setTexture(ttype, AssetWrapper<Texture>(uuid));
+//		});
+//
+//	ImGui::SameLine();
+//
+//	ImGui::Text(name.c_str());
+//}
 
-	addTextureEditWidget(tex, { 20, 20 }, [=](UUID uuid) {
-		mat.get()->setTexture(ttype, AssetWrapper<Texture>(uuid));
-		});
-
-	ImGui::SameLine();
-
-	ImGui::Text(name.c_str());
-}
-
-void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype)
+void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, const std::string& name)
 {
 	ImGui::PushID(name.c_str());
 
 	int texID = 0;
-	auto sampler = mat->getSampler(ttype);
-
 	if (!sampler->texture.isEmpty())
 	{
 		texID = sampler->texture.get()->getID();
@@ -121,7 +119,7 @@ void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std:
 
 		if (ImGui::Button("Cancel"))
 		{
-			mat->setSampler(ttype, EditorState::Instance().previousSampler);
+			*sampler = *EditorState::Instance().previousSampler;
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -231,14 +229,85 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 
 	ImGui::Dummy(ImVec2(0, 4));
 
-	ImGui::ColorEdit3("Base Color", glm::value_ptr(mat.get()->colorDiffuse));
-	ImGui::DragFloat("Metallic", &mat.get()->metallicFactor, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("Roughness", &mat.get()->roughnessFactor, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("Opacity", &mat.get()->opacityFactor, 0.01f, 0.0f, 1.0f);
+	// Custom Textures Array
+	if (ImGui::CollapsingHeader("Samplers"))
+	{
+		for (auto& [name, sampler] : mat.get()->m_samplers)
+		{
+			ImGui::PushID(name.c_str());
+			ImGui::Text(name.c_str());
+			addSamplerEditWidget(sampler, { 40, 40 }, name);
+			ImGui::PopID();
+		}
 
-	addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
-	addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
-	addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
-	addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
-	addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
+	}
+
+	// Display Uniforms and Update Shader
+	if (ImGui::CollapsingHeader("Uniforms"))
+	{
+		for (auto& [name, value] : mat.get()->m_uniformProperties)
+		{
+			ImGui::PushID(name.c_str());
+			bool updated = false; // Track if the value was changed
+			std::visit([&](auto& v)
+				{
+					using T = std::decay_t<decltype(v)>;
+					ImGui::Text("%s:", name.c_str());
+
+					if constexpr (std::is_same_v<T, float>)
+					{
+						updated = ImGui::DragFloat(("##" + name).c_str(), &v, 0.1f);
+					}
+					else if constexpr (std::is_same_v<T, glm::vec2>)
+					{
+						updated = ImGui::DragFloat2(("##" + name).c_str(), &v[0], 0.1f);
+					}
+					else if constexpr (std::is_same_v<T, glm::vec3>)
+					{
+						updated = ImGui::DragFloat3(("##" + name).c_str(), &v[0], 0.1f);
+					}
+					else if constexpr (std::is_same_v<T, glm::vec4>)
+					{
+						updated = ImGui::DragFloat4(("##" + name).c_str(), &v[0], 0.1f);
+					}
+					else if constexpr (std::is_same_v<T, int>)
+					{
+						updated = ImGui::InputInt(("##" + name).c_str(), &v);
+					}
+					else if constexpr (std::is_same_v<T, unsigned int>)
+					{
+						updated = ImGui::InputScalar(("##" + name).c_str(), ImGuiDataType_U32, &v);
+					}
+					else if constexpr (std::is_same_v<T, glm::mat3>)
+					{
+						for (int i = 0; i < 3; ++i)
+							updated |= ImGui::DragFloat3((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
+					}
+					else if constexpr (std::is_same_v<T, glm::mat4>)
+					{
+						for (int i = 0; i < 4; ++i)
+							updated |= ImGui::DragFloat4((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
+					}
+				}, value);
+
+			// If the value changed, update the shader
+			if (updated)
+			{
+				mat.get()->setUniformValue(name, value);
+			}
+
+			ImGui::PopID();
+		}
+	}
+
+	//ImGui::ColorEdit3("Base Color", glm::value_ptr(mat.get()->colorDiffuse));
+	//ImGui::DragFloat("Metallic", &mat.get()->metallicFactor, 0.01f, 0.0f, 1.0f);
+	//ImGui::DragFloat("Roughness", &mat.get()->roughnessFactor, 0.01f, 0.0f, 1.0f);
+	//ImGui::DragFloat("Opacity", &mat.get()->opacityFactor, 0.01f, 0.0f, 1.0f);
+
+	//addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
 }

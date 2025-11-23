@@ -76,18 +76,51 @@ Material::Material()
 
 }
 
-void Material::use()
+void Material::use(ResourceWrapper<Shader> externalShader)
 {
-	int count = 0;
-	for (const auto& [name, sampler] : m_samplers)
+	ResourceWrapper<Shader> shader;
+	if (externalShader.isEmpty())
 	{
-		setTextureInShader(name, count++);
+		shader = m_shader.resource();
+	}
+	if (shader.isEmpty())
+	{
+		logError("Invalid shader for material. ");
+		return;
 	}
 
-	auto shaderResource = m_shader.resource();
+	int slot = 0;
+	for (const auto& [name, sampler] : m_samplers)
+	{
+		// if texture is empty use dummy texture
+		AssetWrapper<Texture> texture = sampler->texture;
+		if (sampler->texture.resource().isEmpty())
+		{
+			texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
+		}
+
+		texture.get()->setSlot(slot);
+		texture.get()->bind();
+
+		
+
+		// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
+		shader->setUniformValue("material." + name + ".texture", slot);
+		shader->setUniformValue("material." + name + ".xOffset", sampler->xOffset);
+		shader->setUniformValue("material." + name + ".yOffset", sampler->yOffset);
+		shader->setUniformValue("material." + name + ".xScale", sampler->xScale);
+		shader->setUniformValue("material." + name + ".yScale", sampler->yScale);
+		shader->setUniformValue("material." + name + ".channelMaskR", sampler->channelMaskR);
+		shader->setUniformValue("material." + name + ".channelMaskG", sampler->channelCount > 1 ? sampler->channelMaskG : 0);
+		shader->setUniformValue("material." + name + ".channelMaskB", sampler->channelCount > 2 ? sampler->channelMaskB : 0);
+		shader->setUniformValue("material." + name + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
+
+		slot++;
+	}
+
 	for (const auto& [name, property] : m_uniformProperties)
 	{
-		shaderResource->setUniformValue(name, property);
+		shader->setUniformValue(name, property);
 	}
 
 
@@ -106,7 +139,7 @@ void Material::release()
 	}
 }
 
-TextureSampler& Material::getSampler(const std::string& name)
+std::shared_ptr<TextureSampler> Material::getSampler(const std::string& name)
 {
 	auto it = m_samplers.find(name);
 	if (it == m_samplers.end())
@@ -118,36 +151,9 @@ TextureSampler& Material::getSampler(const std::string& name)
 	return it->second;
 }
 
-void Material::setSampler(const std::string& name, const TextureSampler& sampler)
+void Material::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
 {
 	m_samplers[name] = sampler;
-}
-
-void Material::setTextureInShader(const std::string& name, int slot)
-{
-	auto sampler = getSampler(name);
-
-	// if texture is empty use dummy texture
-	AssetWrapper<Texture>& texture = sampler.texture;
-	if (sampler.texture.resource().isEmpty())
-	{
-		texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
-	}
-
-	texture.get()->setSlot(slot);
-	texture.get()->bind();
-
-	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-	auto shaderResource = m_shader.resource();
-	shaderResource->setUniformValue("material." + name + ".texture", slot);
-	shaderResource->setUniformValue("material." + name + ".xOffset", sampler.xOffset);
-	shaderResource->setUniformValue("material." + name + ".yOffset", sampler.yOffset);
-	shaderResource->setUniformValue("material." + name + ".xScale", sampler.xScale);
-	shaderResource->setUniformValue("material." + name + ".yScale", sampler.yScale);
-	shaderResource->setUniformValue("material." + name + ".channelMaskR", sampler.channelMaskR);
-	shaderResource->setUniformValue("material." + name + ".channelMaskG", sampler.channelCount > 1 ? sampler.channelMaskG : 0);
-	shaderResource->setUniformValue("material." + name + ".channelMaskB", sampler.channelCount > 2 ? sampler.channelMaskB : 0);
-	shaderResource->setUniformValue("material." + name + ".channelMaskA", sampler.channelCount > 3 ? sampler.channelMaskA : 0);
 }
 
 AssetWrapper<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
@@ -233,7 +239,7 @@ void Material::parseUniforms(const std::string& sourceCode)
 			uniformProperties[name] = glm::mat4(1.0f);
 		}
 		else if (type == "sampler2D") {
-			m_samplers[name] = TextureSampler();
+			m_samplers[name] = std::make_shared<TextureSampler>();
 		}
 
 		searchStart = match.suffix().first;

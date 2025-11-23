@@ -10,9 +10,9 @@ void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(UUID uu
 
 void addTextureEditWidget(AssetWrapper<Texture> texture, ImVec2 size, std::function<void(UUID uuid)> callback);
 
-void addTextureEditWidget(AssetWrapper<Material> mat, const std::string& name, Texture::TextureType ttype);
+//void addTextureEditWidget(AssetWrapper<Material> mat, const std::string& name, Texture::TextureType ttype);
 
-void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std::string& name, Texture::TextureType ttype);
+void addSamplerEditWidget(ResourceWrapper<Material> mat, ImVec2 size, const std::string& name);
 
 void displayChannelSelectWidget(int*& currentChannel);
 

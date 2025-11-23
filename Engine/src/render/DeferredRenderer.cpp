@@ -205,7 +205,7 @@ void DeferredRenderer::render()
 	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
 	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
 
-	graphics->material->use();
+	graphics->material->use(graphics->shader);
 
 	// Draw
 	auto instanceBatch = graphics->entity.tryGetComponent<InstanceBatch>();

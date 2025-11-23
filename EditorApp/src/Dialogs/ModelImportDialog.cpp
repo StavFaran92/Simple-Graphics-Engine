@@ -38,7 +38,7 @@ bool ModelImportDialog::acceptContent()
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		auto mesh = MeshCollection::import(filepath.m_filepath, desc);
 
-		entity.addComponent<MeshComponent>().mesh = mesh;
+		entity.addComponent<MeshRendererComponent>().mesh = mesh;
 
 		auto& materials = MeshCollection::getLastLoadedMaterials();
 

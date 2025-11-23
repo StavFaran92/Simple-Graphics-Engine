@@ -325,25 +325,25 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures, aInfo);
 			if (!diffuse.isEmpty())
 			{
-				TextureSampler diffuseSampler(3);
-				diffuseSampler.texture = diffuse;
+				auto diffuseSampler = std::make_shared<TextureSampler>(3);
+				diffuseSampler->texture = diffuse;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, diffuseSampler);
 			}
 
 			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures, aInfo);
 			if (!normal.isEmpty())
 			{
-				TextureSampler normalSampler(3);
-				normalSampler.texture = diffuse;
+				auto normalSampler = std::make_shared<TextureSampler>(3);
+				normalSampler->texture = diffuse;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, normalSampler);
 			}
 
 			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, fileDir, cachedTextures, aInfo);
 			if (!roughness.isEmpty())
 			{
-				TextureSampler roughnessSampler(1);
-				roughnessSampler.texture = roughness;
-				roughnessSampler.channelMaskR = TextureSampler::Color::G;
+				auto roughnessSampler = std::make_shared<TextureSampler>(1);
+				roughnessSampler->texture = roughness;
+				roughnessSampler->channelMaskR = TextureSampler::Color::G;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, roughnessSampler);
 			}
 
@@ -351,9 +351,9 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, fileDir, cachedTextures, aInfo);
 			if (!metallic.isEmpty())
 			{
-				TextureSampler metallicSampler(1);
-				metallicSampler.texture = metallic;
-				metallicSampler.channelMaskR = TextureSampler::Color::B;
+				auto metallicSampler = std::make_shared<TextureSampler>(1);
+				metallicSampler->texture = metallic;
+				metallicSampler->channelMaskR = TextureSampler::Color::B;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, metallicSampler);
 			}
 
@@ -361,9 +361,9 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, fileDir, cachedTextures, aInfo);
 			if (!ao.isEmpty())
 			{
-				TextureSampler aoSampler(1);
-				aoSampler.texture = ao;
-				aoSampler.channelMaskR = TextureSampler::Color::R;
+				auto aoSampler = std::make_shared<TextureSampler>(1);
+				aoSampler->texture = ao;
+				aoSampler->channelMaskR = TextureSampler::Color::R;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_AO, aoSampler);
 			}
 

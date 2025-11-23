@@ -39,11 +39,11 @@ public:
 	Material();
 	~Material() = default;
 
-	void use();
+	void use(ResourceWrapper<Shader> shader = nullptr);
 	void release();
 
-	TextureSampler& getSampler(const std::string& name);
-	void setSampler(const std::string& name, const TextureSampler& sampler);
+	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
+	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
 
 	void setUniformValue(const std::string& name, const Value& v);
 
@@ -80,7 +80,6 @@ public:
 	static void updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc);
 
 protected:
-	void setTextureInShader(const std::string& name, int slot);
 
 public:
 	//std::string m_name;
@@ -99,7 +98,7 @@ public:
 	// This will only be used by forward renderer, ignored by deffered
 	std::string m_name;
 	AssetWrapper<Shader> m_shader;
-	std::map<std::string, TextureSampler> m_samplers;
+	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
 	std::map<std::string, Value> m_uniformProperties;
 
 	//ProjectionType projection = ProjectionType::DefaultProjection;
