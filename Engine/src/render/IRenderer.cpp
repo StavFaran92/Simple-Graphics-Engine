@@ -14,6 +14,8 @@ bool IRenderer::prepareMeshForRender(Mesh* mesh, const Entity& entityHandler)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
+	auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
 	graphics->mesh = mesh;
 	auto& transform = entityHandler.getComponent<Transformation>();
 	glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
@@ -30,20 +32,7 @@ bool IRenderer::prepareMeshForRender(Mesh* mesh, const Entity& entityHandler)
 	//DebugHelper::getInstance().drawAABB(aabb);
 
 	auto matIndex = mesh->getMaterialIndex();
-	auto materialComponent = entityHandler.tryGetComponent<MaterialComponent>();
-
-	ResourceWrapper<Material> material;
-
-	if (materialComponent)
-	{
-		material = materialComponent->at(matIndex);
-	}
-	else
-	{
-		material = BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT).resource();
-	}
-
-	graphics->material = material;
+	graphics->material = meshRenderer.at(matIndex);
 
 	return true;
 }

@@ -76,20 +76,10 @@ Material::Material()
 
 }
 
-void Material::use(ResourceWrapper<Shader> externalShader)
+void Material::use()
 {
-	ResourceWrapper<Shader> shader;
-	if (externalShader.isEmpty())
-	{
-		shader = m_shader.resource();
-	}
-	if (shader.isEmpty())
-	{
-		logError("Invalid shader for material. ");
-		return;
-	}
-
 	int slot = 0;
+	auto shader = m_shader.resource();
 	for (const auto& [name, sampler] : m_samplers)
 	{
 		// if texture is empty use dummy texture
@@ -306,4 +296,19 @@ void Material::setName(const std::string& name)
 std::string Material::getName() const
 {
 	return m_name;
+}
+
+void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
+{
+	m_renderMode = renderMode;
+
+	if (m_renderMode == MaterialRenderMode::Opaque)
+	{
+		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM));
+	}
+}
+
+MaterialRenderMode Material::getMaterialRenderMode() const
+{
+	return m_renderMode;
 }

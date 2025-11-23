@@ -21,6 +21,16 @@ static const std::string SHADER_PROPERTY_PBR_SAMPLER_METALLIC = "samplerMetallic
 static const std::string SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS = "samplerRoughness";
 static const std::string SHADER_PROPERTY_PBR_SAMPLER_AO = "samplerAO";
 
+enum class MaterialRenderMode : int
+{
+	Opaque,
+	Transparent,
+	Skybox,
+	Unlit,
+	UI,
+	Custom,
+};
+
 struct MaterialImportSettings : public AssetCreateDescriptor
 {
 
@@ -39,7 +49,7 @@ public:
 	Material();
 	~Material() = default;
 
-	void use(ResourceWrapper<Shader> shader = nullptr);
+	void use();
 	void release();
 
 	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
@@ -53,6 +63,9 @@ public:
 
 	void setName(const std::string& name);
 	std::string getName() const;
+
+	void setMaterialRenderMode(MaterialRenderMode renderMode);
+	MaterialRenderMode getMaterialRenderMode() const;
 
 	ResourceWrapper<Material> clone(bool isEngineOwned) const;
 
@@ -97,6 +110,7 @@ public:
 
 	// This will only be used by forward renderer, ignored by deffered
 	std::string m_name;
+	MaterialRenderMode m_renderMode = MaterialRenderMode::Opaque;
 	AssetWrapper<Shader> m_shader;
 	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
 	std::map<std::string, Value> m_uniformProperties;

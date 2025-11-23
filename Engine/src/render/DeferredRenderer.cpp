@@ -178,7 +178,7 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 bool DeferredRenderer::init()
 {
-	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
+	m_gBufferShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM).resource(); //Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
 	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
 
 	auto width = Engine::get()->getWindow()->getWidth();
@@ -205,7 +205,7 @@ void DeferredRenderer::render()
 	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
 	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
 
-	graphics->material->use(graphics->shader);
+	graphics->material->use();
 
 	// Draw
 	auto instanceBatch = graphics->entity.tryGetComponent<InstanceBatch>();

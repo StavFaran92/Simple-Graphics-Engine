@@ -15,6 +15,7 @@
 #include "geometry/Grid.h"
 
 #include "geometry/ModelImporter.h"
+#include "memory/BuiltInAssets.h"
 
 
 void acquireTexture(const std::string& name, const std::string& path)
@@ -145,9 +146,19 @@ void BuiltInAssetsLoader::loadMeshes()
 	}
 }
 
+void BuiltInAssetsLoader::loadShaders()
+{
+	ShaderAssetDescriptor desc;
+	desc.isEngineOwned = true;
+	desc.name = SGE_SHADER_DEFFERED_PBR_GEOM;
+	Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl", desc);
+}
+
 void BuiltInAssetsLoader::loadAssets()
 {
 	loadTextures();
 	loadMaterials();
 	loadMeshes();
+	loadShaders();
 }
+

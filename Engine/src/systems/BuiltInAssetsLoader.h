@@ -11,4 +11,5 @@ private:
 	static void loadTextures();
 	static void loadMaterials();
 	static void loadMeshes();
+	static void loadShaders();
 };
