@@ -183,6 +183,29 @@ void InspectorWindow::display()
 			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uid) {
 				meshComponent.mesh = AssetWrapper<MeshCollection>(uid);
 			});
+
+			int index = 0;
+			for (auto& [id, mat] : meshComponent.m_material)
+			{
+				ImGui::PushID(&mat);
+
+				std::string matName = "None";
+				if (!mat.isEmpty())
+				{
+					matName = mat.info().name;
+					if (matName.empty())
+					{
+						matName = "Material " + std::to_string(index);
+					}
+				}
+
+				addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
+					mat = AssetWrapper<Material>(uid);
+					});
+
+				++index;
+				ImGui::PopID();
+			}
 			
 			
 		});

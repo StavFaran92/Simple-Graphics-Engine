@@ -156,9 +156,9 @@ void BuiltInAssetsLoader::loadShaders()
 
 void BuiltInAssetsLoader::loadAssets()
 {
+	loadShaders();
 	loadTextures();
 	loadMaterials();
 	loadMeshes();
-	loadShaders();
 }
 

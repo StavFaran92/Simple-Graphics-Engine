@@ -130,7 +130,32 @@ layout (location = 5) out vec3 gNormalVS;
 
 
 // ----- Uniforms ----- //
-uniform PBR_Material material; 
+#pragma editable
+uniform PBR_Sampler samplerAlbedo;
+
+#pragma editable
+uniform PBR_Sampler samplerNormal;
+
+#pragma editable
+uniform PBR_Sampler samplerMetallic;
+
+#pragma editable
+uniform PBR_Sampler samplerRoughness;
+
+#pragma editable
+uniform PBR_Sampler samplerAO;
+
+#pragma editable
+uniform float roughnessFactor;
+
+#pragma editable
+uniform float metallicFactor;
+
+#pragma editable
+uniform vec3 colorDiffuse;
+
+#pragma editable
+uniform float opacityFactor;
 
 // ----- Forward Declerations ----- //
 
@@ -165,11 +190,11 @@ vec4 getPBRTexture(PBR_Sampler s)
 void main() 
 { 	
 	gPosition = fs_in.fragPos;
-	gNormal = normalize(fs_in.normal) * getPBRTexture(material.samplerNormal).rgb;
-	gAlbedo = getPBRTexture(material.samplerAlbedo).rgb * material.colorDiffuse;
-	gMRA.r = getPBRTexture(material.samplerMetallic).r * material.metallicFactor;
-	gMRA.g = getPBRTexture(material.samplerRoughness).r * material.roughnessFactor;
-	gMRA.b = getPBRTexture(material.samplerAO).r;
+	gNormal = normalize(fs_in.normal) * getPBRTexture(samplerNormal).rgb;
+	gAlbedo = getPBRTexture(samplerAlbedo).rgb * colorDiffuse;
+	gMRA.r = getPBRTexture(samplerMetallic).r * metallicFactor;
+	gMRA.g = getPBRTexture(samplerRoughness).r * roughnessFactor;
+	gMRA.b = getPBRTexture(samplerAO).r;
 	gPositionVS = fs_in.fragPosVS;
 	gNormalVS = normalize(fs_in.normalVS);
 } 

@@ -5,7 +5,7 @@
 
 struct EngineAPI MeshRendererComponent : public Component
 {
-	MeshRendererComponent(AssetWrapper<MeshCollection> mesh) : mesh(mesh) {};
+	MeshRendererComponent(AssetWrapper<MeshCollection> mesh);
 	MeshRendererComponent() = default;
 
 	void addMaterial(const AssetWrapper<Material>& mat)

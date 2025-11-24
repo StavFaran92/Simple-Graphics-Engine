@@ -34,5 +34,10 @@ bool IRenderer::prepareMeshForRender(Mesh* mesh, const Entity& entityHandler)
 	auto matIndex = mesh->getMaterialIndex();
 	graphics->material = meshRenderer.at(matIndex);
 
+	if (graphics->material.isEmpty())
+	{
+		graphics->material = BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT).resource();
+	}
+
 	return true;
 }

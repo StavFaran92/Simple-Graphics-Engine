@@ -73,7 +73,7 @@ void MaterialAssetManager::save(const AssetWrapper<ResourceBase>& mat, const Ass
 
 Material::Material()
 {
-
+	setMaterialRenderMode(MaterialRenderMode::Opaque);
 }
 
 void Material::use()
@@ -95,15 +95,15 @@ void Material::use()
 		
 
 		// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-		shader->setUniformValue("material." + name + ".texture", slot);
-		shader->setUniformValue("material." + name + ".xOffset", sampler->xOffset);
-		shader->setUniformValue("material." + name + ".yOffset", sampler->yOffset);
-		shader->setUniformValue("material." + name + ".xScale", sampler->xScale);
-		shader->setUniformValue("material." + name + ".yScale", sampler->yScale);
-		shader->setUniformValue("material." + name + ".channelMaskR", sampler->channelMaskR);
-		shader->setUniformValue("material." + name + ".channelMaskG", sampler->channelCount > 1 ? sampler->channelMaskG : 0);
-		shader->setUniformValue("material." + name + ".channelMaskB", sampler->channelCount > 2 ? sampler->channelMaskB : 0);
-		shader->setUniformValue("material." + name + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
+		shader->setUniformValue(name + ".texture", slot);
+		shader->setUniformValue(name + ".xOffset", sampler->xOffset);
+		shader->setUniformValue(name + ".yOffset", sampler->yOffset);
+		shader->setUniformValue(name + ".xScale", sampler->xScale);
+		shader->setUniformValue(name + ".yScale", sampler->yScale);
+		shader->setUniformValue(name + ".channelMaskR", sampler->channelMaskR);
+		shader->setUniformValue(name + ".channelMaskG", sampler->channelCount > 1 ? sampler->channelMaskG : 0);
+		shader->setUniformValue(name + ".channelMaskB", sampler->channelCount > 2 ? sampler->channelMaskB : 0);
+		shader->setUniformValue(name + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
 
 		slot++;
 	}
@@ -194,45 +194,61 @@ void Material::parseUniforms(const std::string& sourceCode)
 	m_uniformProperties.clear();
 	m_samplers.clear();
 
-	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
-	std::smatch match;
-	std::string::const_iterator searchStart(sourceCode.cbegin());
+	std::istringstream stream(sourceCode);
+	std::string line;
+	bool nextUniformIsEditable = false;
 
 	auto& uniformProperties = m_uniformProperties;
 
-	while (std::regex_search(searchStart, sourceCode.cend(), match, uniformRegex)) {
-		std::string type = match[1].str();
-		std::string name = match[2].str();
+	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
 
-		if (type == "float") {
-			uniformProperties[name] = 0.0f;
-		}
-		else if (type == "vec2") {
-			uniformProperties[name] = glm::vec2(0.0f);
-		}
-		else if (type == "vec3") {
-			uniformProperties[name] = glm::vec3(0.0f);
-		}
-		else if (type == "vec4") {
-			uniformProperties[name] = glm::vec4(0.0f);
-		}
-		else if (type == "int") {
-			uniformProperties[name] = 0;
-		}
-		else if (type == "uint") {
-			uniformProperties[name] = 0u;
-		}
-		else if (type == "mat3") {
-			uniformProperties[name] = glm::mat3(1.0f);
-		}
-		else if (type == "mat4") {
-			uniformProperties[name] = glm::mat4(1.0f);
-		}
-		else if (type == "sampler2D") {
-			m_samplers[name] = std::make_shared<TextureSampler>();
+	while (std::getline(stream, line)) {
+		// Trim whitespace
+		line.erase(0, line.find_first_not_of(" \t"));
+
+		// Check for pragma
+		if (line.find("#pragma editable") == 0) {
+			nextUniformIsEditable = true;
+			continue;
 		}
 
-		searchStart = match.suffix().first;
+		// Match uniform declaration
+		std::smatch match;
+		if (std::regex_search(line, match, uniformRegex)) {
+			if (!nextUniformIsEditable) continue; // skip if not marked editable
+			nextUniformIsEditable = false; // reset after one use
+
+			std::string type = match[1].str();
+			std::string name = match[2].str();
+
+			if (type == "float") {
+				uniformProperties[name] = 0.0f;
+			}
+			else if (type == "vec2") {
+				uniformProperties[name] = glm::vec2(0.0f);
+			}
+			else if (type == "vec3") {
+				uniformProperties[name] = glm::vec3(0.0f);
+			}
+			else if (type == "vec4") {
+				uniformProperties[name] = glm::vec4(0.0f);
+			}
+			else if (type == "int") {
+				uniformProperties[name] = 0;
+			}
+			else if (type == "uint") {
+				uniformProperties[name] = 0u;
+			}
+			else if (type == "mat3") {
+				uniformProperties[name] = glm::mat3(1.0f);
+			}
+			else if (type == "mat4") {
+				uniformProperties[name] = glm::mat4(1.0f);
+			}
+			else if (type == "PBR_Sampler") {
+				m_samplers[name] = std::make_shared<TextureSampler>();
+			}
+		}
 	}
 }
 

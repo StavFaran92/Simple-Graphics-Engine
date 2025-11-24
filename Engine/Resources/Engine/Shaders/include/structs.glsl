@@ -28,14 +28,6 @@ struct PBR_Material
 	PBR_Sampler samplerMetallic;
 	PBR_Sampler samplerRoughness;
 	PBR_Sampler samplerAO;
-
-	// textures 
-	// sampler2D texture_albedo; 
-	// sampler2D texture_normal; 
-	// sampler2D texture_metallic;
-	// sampler2D texture_roughness;
-	// sampler2D texture_ao;
-
 	float roughnessFactor;
 	float metallicFactor;
 	vec3 colorDiffuse;
