@@ -184,28 +184,33 @@ void InspectorWindow::display()
 				meshComponent.mesh = AssetWrapper<MeshCollection>(uid);
 			});
 
-			int index = 0;
-			for (auto& [id, mat] : meshComponent.m_material)
+			if (ImGui::CollapsingHeader("Materials"))
 			{
-				ImGui::PushID(&mat);
-
-				std::string matName = "None";
-				if (!mat.isEmpty())
+				int index = 0;
+				for (auto& [id, mat] : meshComponent.m_material)
 				{
-					matName = mat.info().name;
-					if (matName.empty())
+					ImGui::PushID(&mat);
+
+					std::string matName = "None";
+					if (!mat.isEmpty())
 					{
-						matName = "Material " + std::to_string(index);
+						matName = mat.info().name;
+						if (matName.empty())
+						{
+							matName = "Material " + std::to_string(index);
+						}
 					}
+
+					addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
+						mat = AssetWrapper<Material>(uid);
+						});
+
+					++index;
+					ImGui::PopID();
 				}
-
-				addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
-					mat = AssetWrapper<Material>(uid);
-					});
-
-				++index;
-				ImGui::PopID();
 			}
+
+
 			
 			
 		});
