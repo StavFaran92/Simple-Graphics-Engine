@@ -21,7 +21,7 @@
 #include "component/PhysicsComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
-#include "component/MaterialComponent.h"
+
 #include "component/ImageComponent.h"
 #include "physics/Physics.h"
 
@@ -73,10 +73,6 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
 
     { "Renderable", [](Entity& e, sol::this_state lua) -> sol::object {
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<RenderableComponent>()));
-    } },
-
-    { "Material", [](Entity& e, sol::this_state lua) -> sol::object {
-        return sol::object(lua, sol::in_place, std::ref(e.getComponent<MaterialComponent>()));
     } },
 
     { "Image", [](Entity& e, sol::this_state lua) -> sol::object {
@@ -204,12 +200,6 @@ void bindComponents(sol::state& lua)
         "getColor", &PointLight::getColor,
         "SetAttenuation", &PointLight::SetAttenuation,
         "getAttenuation", &PointLight::getAttenuation
-    );
-
-    lua.new_usertype<MaterialComponent>("MaterialComponent",
-        "addMaterial", &MaterialComponent::addMaterial,
-        "setMaterial", &MaterialComponent::setMaterial,
-        "at", &MaterialComponent::at
     );
 
     lua.new_usertype<PlayerController>("PlayerController",

@@ -17,7 +17,7 @@
 #include "core/CacheSystem.h"
 
 #include "component/MeshRendererComponent.h"
-#include "component/MaterialComponent.h"
+
 #include "component/RenderableComponent.h"
 #include "memory/BuiltInAssets.h"
 

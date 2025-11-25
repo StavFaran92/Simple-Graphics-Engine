@@ -3,7 +3,7 @@
 #include "Graphics.h"
 #include "geometry/AABB.h"
 #include "memory/BuiltInAssets.h"
-#include "component/MaterialComponent.h"
+
 #include "component/Transformation.h"
 #include "component/ObjectComponent.h"
 #include "component/MeshRendererComponent.h"

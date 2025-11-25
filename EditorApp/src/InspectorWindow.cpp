@@ -286,31 +286,6 @@ void InspectorWindow::display()
 			}
 			});
 
-		displayComponent<MaterialComponent>("Materials", [](MaterialComponent& materials) {
-			int index = 0;
-			for (auto& [id, mat] : materials)
-			{
-				ImGui::PushID(&mat);
-				
-				std::string matName = "None";
-				if (!mat.isEmpty())
-				{
-					matName = mat.info().name;
-					if (matName.empty())
-					{
-						matName = "Material " + std::to_string(index);
-					}
-				}
-
-				addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
-					mat = AssetWrapper<Material>(uid);
-				});
-
-				++index;
-				ImGui::PopID();
-			}
-			});
-
 		displayComponent<DirectionalLight>("Directional Light", [](DirectionalLight& dLight) {
 			ImGui::ColorEdit3("Color", glm::value_ptr(dLight.color));
 		});
@@ -701,11 +676,6 @@ void InspectorWindow::display()
 			if (ImGui::MenuItem("Mesh"))
 			{
 				state.getSelectedEntity().addComponent<MeshRendererComponent>();
-			}
-
-			if (ImGui::MenuItem("Material"))
-			{
-				state.getSelectedEntity().addComponent<MaterialComponent>();
 			}
 
 			if (ImGui::MenuItem("Camera"))

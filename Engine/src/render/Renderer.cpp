@@ -24,7 +24,7 @@
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"
 #include "component/MeshRendererComponent.h"
-#include "component/MaterialComponent.h"
+
 #include "component/RenderableComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/ShaderComponent.h"

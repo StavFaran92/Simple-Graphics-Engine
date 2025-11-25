@@ -41,7 +41,7 @@
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/PostProcessComponent.h"
-#include "component/MaterialComponent.h"
+
 #include "component/RenderableComponent.h"
 #include "scripts/ScriptSystem.h"
 #include "core/GameLayer.h"
