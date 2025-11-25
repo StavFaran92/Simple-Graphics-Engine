@@ -229,6 +229,34 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 
 	ImGui::Dummy(ImVec2(0, 4));
 
+	// TODO replace using magic enum
+	static const char* RenderModeNames[] = {
+		"Opaque",
+		"Transparent",
+		"Skybox",
+		"Unlit",
+		"UI",
+		"Custom"
+	};
+
+	static MaterialRenderMode currentMode;
+	currentMode = mat.get()->getMaterialRenderMode();
+	int currentIndex = static_cast<int>(currentMode);
+
+	if (ImGui::BeginCombo("Render Mode", RenderModeNames[currentIndex])) {
+		for (int i = 0; i < IM_ARRAYSIZE(RenderModeNames); ++i) {
+			bool isSelected = (i == currentIndex);
+			if (ImGui::Selectable(RenderModeNames[i], isSelected)) {
+				currentIndex = i;
+				currentMode = static_cast<MaterialRenderMode>(i);
+				mat.get()->setMaterialRenderMode(currentMode);
+			}
+			if (isSelected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
 	// Custom Textures Array
 	if (ImGui::CollapsingHeader("Samplers"))
 	{

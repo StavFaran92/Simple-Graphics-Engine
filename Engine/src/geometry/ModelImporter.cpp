@@ -30,6 +30,17 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Materi
 		return;
 	}
 
+	ai_real opacityFactor;
+	if (aiMat->Get(AI_MATKEY_OPACITY, opacityFactor) == aiReturn_SUCCESS)
+	{
+		if (opacityFactor < 1.f)
+		{
+			mat->setMaterialRenderMode(MaterialRenderMode::Transparent);
+			mat->setUniformValue(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
+		}
+
+	}
+
 	aiColor3D diffuseColor;
 	if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
 	{
@@ -48,11 +59,7 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Materi
 		mat->setUniformValue(SHADER_PROPERTY_PBR_METALLIC_FACTOR, metallicFactor);
 	}
 
-	ai_real opacityFactor;
-	if (aiMat->Get(AI_MATKEY_OPACITY, opacityFactor) == aiReturn_SUCCESS)
-	{
-		mat->setUniformValue(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
-	}
+
 }
 
 void PrintMaterialProperties(const aiMaterial* mat) {
@@ -318,6 +325,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 			// get uuid using tex name from association map
 			auto& material = Material::create();
+
+			extractAiMaterialProperties(aMaterial, material);
 			
 			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
 			material->setName(materialName);
@@ -367,7 +376,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_AO, aoSampler);
 			}
 
-			extractAiMaterialProperties(aMaterial, material);
+			
 
 			AssetCreateDescriptor materialAssetInfo;
 			materialAssetInfo.isEngineOwned = aInfo.isEngineOwned;

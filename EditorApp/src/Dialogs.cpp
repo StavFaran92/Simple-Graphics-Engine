@@ -476,22 +476,6 @@ void displayMaterialEditDialog()
 		auto& mat = EditorState::Instance().selectedMaterialForEdit;
 
 		materialData.draw(mat.resource());
-		//ImGui::Text(mat.resource()->getName().c_str());
-
-		//ImGui::Dummy(ImVec2(0, 4));
-
-
-
-		//ImGui::ColorEdit3("Base Color", glm::value_ptr(mat.resource()->colorDiffuse));
-		//ImGui::DragFloat("Metallic", &mat.resource()->metallicFactor, 0.01f, 0.0f, 1.0f);
-		//ImGui::DragFloat("Roughness", &mat.resource()->roughnessFactor, 0.01f, 0.0f, 1.0f);
-		//ImGui::DragFloat("Opacity", &mat.resource()->opacityFactor, 0.01f, 0.0f, 1.0f);
-
-		//addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
-		//addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
-		//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
-		//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
-		//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
 
 		ImGui::Separator();
 

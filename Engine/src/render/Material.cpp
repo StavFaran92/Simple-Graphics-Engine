@@ -185,8 +185,12 @@ ResourceWrapper<Material> Material::clone(bool isTransient) const
 
 bool Material::isOpaque() const
 {
-	return 1; // todo fix
-	//return opacityFactor == 1;
+	auto it = m_uniformProperties.find(SHADER_PROPERTY_PBR_OPACITY_FACTOR);
+	if (it != m_uniformProperties.end()) {
+		float opacity = std::get<float>(it->second);  // throws if wrong type
+		return opacity == 1.f;
+	}
+	return true;
 }
 
 void Material::parseUniforms(const std::string& sourceCode)
@@ -321,6 +325,10 @@ void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
 	if (m_renderMode == MaterialRenderMode::Opaque)
 	{
 		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM));
+	}
+	else if (m_renderMode == MaterialRenderMode::Transparent)
+	{
+		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR));
 	}
 }
 

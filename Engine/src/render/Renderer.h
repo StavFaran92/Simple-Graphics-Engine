@@ -34,6 +34,6 @@ private:
 protected:
 	bool m_wireFrameMode = false;
 
-	ResourceWrapper<Shader> m_pbrShader = nullptr;
+	//ResourceWrapper<Shader> m_pbrShader = nullptr;
 	ResourceWrapper<MeshCollection> m_quad = nullptr;
 };

@@ -152,10 +152,7 @@ uniform float roughnessFactor;
 uniform float metallicFactor;
 
 #pragma editable
-uniform vec3 colorDiffuse;
-
-#pragma editable
-uniform float opacityFactor;
+uniform vec3 color;
 
 // ----- Forward Declerations ----- //
 
@@ -191,7 +188,7 @@ void main()
 { 	
 	gPosition = fs_in.fragPos;
 	gNormal = normalize(fs_in.normal) * getPBRTexture(samplerNormal).rgb;
-	gAlbedo = getPBRTexture(samplerAlbedo).rgb * colorDiffuse;
+	gAlbedo = getPBRTexture(samplerAlbedo).rgb * color;
 	gMRA.r = getPBRTexture(samplerMetallic).r * metallicFactor;
 	gMRA.g = getPBRTexture(samplerRoughness).r * roughnessFactor;
 	gMRA.b = getPBRTexture(samplerAO).r;

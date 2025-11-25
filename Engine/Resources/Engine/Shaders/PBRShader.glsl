@@ -116,11 +116,37 @@ out vec4 FragColor;
 // ----- Uniforms ----- //
 
 uniform vec3 cameraPos;
-uniform PBR_Material material;
 uniform samplerCube gIrradianceMap;
 uniform samplerCube gPrefilterEnvMap;
 uniform sampler2D gBRDFIntegrationLUT;
 uniform sampler2D gShadowMap;
+
+#pragma editable
+uniform PBR_Sampler samplerAlbedo;
+
+#pragma editable
+uniform PBR_Sampler samplerNormal;
+
+#pragma editable
+uniform PBR_Sampler samplerMetallic;
+
+#pragma editable
+uniform PBR_Sampler samplerRoughness;
+
+#pragma editable
+uniform PBR_Sampler samplerAO;
+
+#pragma editable
+uniform float roughnessFactor;
+
+#pragma editable
+uniform float metallicFactor;
+
+#pragma editable
+uniform vec3 color;
+
+#pragma editable
+uniform float opacityFactor;
 
 // ----- Methods ----- //
 
@@ -289,10 +315,10 @@ float getTime()
 void main()
 {
     vec3 normal = normalize(fs_in.normal);
-    vec3 albedo = pow(getPBRTexture(material.samplerAlbedo).rgb  * material.colorDiffuse, vec3(2.2));
-    float metallic = getPBRTexture(material.samplerMetallic).r * material.metallicFactor;
-    float roughness = getPBRTexture(material.samplerRoughness).r* material.roughnessFactor;
-    float ao = getPBRTexture(material.samplerAO).r;
+    vec3 albedo = pow(getPBRTexture(samplerAlbedo).rgb  * color, vec3(2.2));
+    float metallic = getPBRTexture(samplerMetallic).r * metallicFactor;
+    float roughness = getPBRTexture(samplerRoughness).r* roughnessFactor;
+    float ao = getPBRTexture(samplerAO).r;
 
 #ifdef CUSTOM_SHADER
     frag(albedo, normal, metallic, roughness, ao);
@@ -345,5 +371,5 @@ void main()
     // gamma correct
     color = pow(color, vec3(1.0/2.2));
 
-    FragColor = vec4(color, material.opacityFactor);
+    FragColor = vec4(color, opacityFactor);
 }

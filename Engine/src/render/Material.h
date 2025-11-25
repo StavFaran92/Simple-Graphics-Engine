@@ -10,7 +10,7 @@
 #include "texture/TextureSampler.h"
 #include "memory/Asset.h"
 
-static const std::string SHADER_PROPERTY_PBR_COLOR_DIFFUSE = "colorDiffuse";
+static const std::string SHADER_PROPERTY_PBR_COLOR_DIFFUSE = "color";
 static const std::string SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR = "roughnessFactor";
 static const std::string SHADER_PROPERTY_PBR_METALLIC_FACTOR = "metallicFactor";
 static const std::string SHADER_PROPERTY_PBR_OPACITY_FACTOR = "opacityFactor";

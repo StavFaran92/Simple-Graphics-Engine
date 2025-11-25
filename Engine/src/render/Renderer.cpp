@@ -32,7 +32,7 @@
 
 bool Renderer::init()
 {
-	m_pbrShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
+	//m_pbrShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
 
     m_quad = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_QUAD).resource();
 
@@ -91,19 +91,21 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
     auto& camTransform = camera.getComponent<Transformation>();
     auto& camForward = camTransform.getForward();
 
-    for (auto&& [entity, mesh, transform, renderable, material] :
-        scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent, MaterialComponent>(entt::exclude<ShaderComponent>).each())
+    for (auto&& [entity, mesh, transform, renderable] :
+        scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent>().each())
     {
         Entity entityHandler{ entity, &scene->getRegistry() };
 
-        for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.get()->getMeshes())
+        auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
+        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
         {
             auto matIndex = mesh->getMaterialIndex();
-            MaterialComponent& materialComponent = entityHandler.getComponent<MaterialComponent>();
-            auto& material = materialComponent.at(matIndex);
+            
+            auto& material = meshRenderer.at(matIndex);
 
             // Only render transparent objects
-            if (material->isOpaque())
+            if (material->getMaterialRenderMode() != MaterialRenderMode::Transparent)
             {
                 continue;
             }
@@ -120,7 +122,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
         }
     }
 
-    graphics->shader = m_pbrShader;
+    graphics->shader = BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR).resource();
     auto iter = transparentEntities.rbegin();
     while (iter != transparentEntities.rend())
     {

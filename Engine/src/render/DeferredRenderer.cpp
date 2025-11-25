@@ -289,7 +289,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 			}
 
 			// Only render Opaque objects
-			if (!graphics->material->isOpaque())
+			if (graphics->material->getMaterialRenderMode() != MaterialRenderMode::Opaque)
 			{
 				continue;
 			}

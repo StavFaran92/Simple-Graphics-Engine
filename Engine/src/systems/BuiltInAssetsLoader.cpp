@@ -148,10 +148,19 @@ void BuiltInAssetsLoader::loadMeshes()
 
 void BuiltInAssetsLoader::loadShaders()
 {
-	ShaderAssetDescriptor desc;
-	desc.isEngineOwned = true;
-	desc.name = SGE_SHADER_DEFFERED_PBR_GEOM;
-	Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl", desc);
+	{
+		ShaderAssetDescriptor desc;
+		desc.isEngineOwned = true;
+		desc.name = SGE_SHADER_DEFFERED_PBR_GEOM;
+		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl", desc);
+	}
+
+	{
+		ShaderAssetDescriptor desc;
+		desc.isEngineOwned = true;
+		desc.name = SGE_SHADER_FORWARD_PBR;
+		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl", desc);
+	}
 }
 
 void BuiltInAssetsLoader::loadAssets()
