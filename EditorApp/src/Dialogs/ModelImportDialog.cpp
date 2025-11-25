@@ -38,14 +38,14 @@ bool ModelImportDialog::acceptContent()
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		auto mesh = MeshCollection::import(filepath.m_filepath, desc);
 
-		entity.addComponent<MeshRendererComponent>().mesh = mesh;
+		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
 
 		auto& materials = MeshCollection::getLastLoadedMaterials();
 
-		auto& materialComponent = entity.addComponent<MaterialComponent>();
 		for (auto& [idx, m] : materials)
 		{
-			materialComponent.setMaterial(idx, m);
+			meshRenderer.setMaterial(idx, m);
+
 		}
 
 		ResourceWrapper<Prefab> prefab = Prefab::create(entity);
