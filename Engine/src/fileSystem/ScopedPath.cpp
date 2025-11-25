@@ -8,20 +8,19 @@ namespace fs = std::filesystem;
 
 ScopedPath::ScopedPath()
 {
-    *this = ContentPath("");
 }
 
 ScopedPath ScopedPath::ContentPath(std::filesystem::path path)
 {
     ScopedPath sPath(path, Engine::get()->getSubSystem<FileSystem>()->getContentDirectory());
-    sPath.type = Type::Content;
+    sPath.m_type = Type::Content;
     return sPath;
 }
 
 ScopedPath ScopedPath::EnginePath(std::filesystem::path path)
 {
     ScopedPath sPath(path, Engine::get()->getSubSystem<FileSystem>()->getEngineDirectory());
-    sPath.type = Type::Engine;
+    sPath.m_type = Type::Engine;
     return sPath;
 }
 
@@ -63,4 +62,9 @@ void ScopedPath::setPath(std::filesystem::path path)
     }
 
     m_path = rel;
+}
+
+ScopedPath::Type ScopedPath::type() const
+{
+    return m_type;
 }

@@ -37,6 +37,11 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	{
 		targetDirectory = ScopedPath::EnginePath(assetDesc.targetDirectory.relative());
 	}
+	
+	if (targetDirectory.type() == ScopedPath::Type::None)
+	{
+		targetDirectory = ScopedPath::ContentPath("");
+	}
 
 	if (aType == AssetType::NONE)
 	{

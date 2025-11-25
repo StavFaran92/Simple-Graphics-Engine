@@ -6,7 +6,7 @@
 class EngineAPI ScopedPath
 {
 public:
-	enum class Type { Content, Engine };
+	enum class Type { None, Content, Engine };
 
 
 	ScopedPath();
@@ -17,6 +17,8 @@ public:
 	std::filesystem::path absolute() const;
 	std::filesystem::path scoped() const;
 
+	ScopedPath::Type type() const;
+
 	void setPath(std::filesystem::path path);
 
 private: 
@@ -24,5 +26,5 @@ private:
 
 	std::filesystem::path m_path;
 	std::filesystem::path m_root;
-	Type type = Type::Content;
+	Type m_type = Type::None;
 };
