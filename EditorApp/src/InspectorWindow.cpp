@@ -442,30 +442,69 @@ void InspectorWindow::display()
 			ImGui::DragInt("width", &terrain.m_width);
 			ImGui::DragInt("scale", &terrain.m_scale);
 
-
 			ImGui::Separator();
-			ImGui::LabelText("Textures", "");
-
-			ImGui::SliderInt("Textures", &terrain.m_textureCount, 0, MAX_TEXTURE_COUNT);
-			for (int i = 0; i < terrain.m_textureCount; i++)
+			
+			if (ImGui::CollapsingHeader("Materials"))
 			{
-				ImGui::PushID(i);
-				auto texture = terrain.getTexture(i);
-				addTextureEditWidget(texture, { 50, 50 }, [i, &terrain](UUID uuid) {
-					terrain.setTexture(i, AssetWrapper<Texture>(uuid));
-				});
-				ImGui::DragFloat("Height blend", &terrain.m_textureBlends[i].blend, .01f);
-				auto scale = terrain.getTextureScale(i);
-				if (ImGui::DragFloat("scaleX", &scale.r, .01f))
+				std::string matName = "None";
+				if (!terrain.m_material.isEmpty())
 				{
-					terrain.setTextureScaleX(i, scale.r);
+					matName = terrain.m_material.info().name;
 				}
-				if (ImGui::DragFloat("scaleY", &scale.g, .01f))
-				{
-					terrain.setTextureScaleY(i, scale.g);
-				}
-				ImGui::PopID();
+				addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uid) {
+					terrain.m_material = AssetWrapper<Material>(uid);
+					});
+
+
+
+				//int index = 0;
+				//for (auto& [id, mat] : meshComponent.m_material)
+				//{
+				//	ImGui::PushID(&mat);
+
+				//	std::string matName = "None";
+				//	if (!mat.isEmpty())
+				//	{
+				//		matName = mat.info().name;
+				//		if (matName.empty())
+				//		{
+				//			matName = "Material " + std::to_string(index);
+				//		}
+				//	}
+
+				//	addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
+				//		mat = AssetWrapper<Material>(uid);
+				//		});
+
+				//	++index;
+				//	ImGui::PopID();
+				//}
 			}
+
+
+			//ImGui::Separator();
+			//ImGui::LabelText("Textures", "");
+
+			//ImGui::SliderInt("Textures", &terrain.m_textureCount, 0, MAX_TEXTURE_COUNT);
+			//for (int i = 0; i < terrain.m_textureCount; i++)
+			//{
+			//	ImGui::PushID(i);
+			//	auto texture = terrain.getTexture(i);
+			//	addTextureEditWidget(texture, { 50, 50 }, [i, &terrain](UUID uuid) {
+			//		terrain.setTexture(i, AssetWrapper<Texture>(uuid));
+			//	});
+			//	ImGui::DragFloat("Height blend", &terrain.m_textureBlends[i].blend, .01f);
+			//	auto scale = terrain.getTextureScale(i);
+			//	if (ImGui::DragFloat("scaleX", &scale.r, .01f))
+			//	{
+			//		terrain.setTextureScaleX(i, scale.r);
+			//	}
+			//	if (ImGui::DragFloat("scaleY", &scale.g, .01f))
+			//	{
+			//		terrain.setTextureScaleY(i, scale.g);
+			//	}
+			//	ImGui::PopID();
+			//}
 		});
 
 		displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {

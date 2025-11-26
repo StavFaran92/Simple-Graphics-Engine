@@ -26,6 +26,7 @@ enum class MaterialRenderMode : int
 {
 	Opaque,
 	Transparent,
+	Terrain,
 	Skybox,
 	Unlit,
 	UI,

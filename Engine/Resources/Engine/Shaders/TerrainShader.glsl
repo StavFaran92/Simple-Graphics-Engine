@@ -94,6 +94,7 @@ out vec2 texCoord;
 // Send to fragment shader for coloring
 out float height;
 out vec3 fragPos;
+out vec3 fragNormal;
 
 void main()
 {
@@ -128,6 +129,7 @@ void main()
     vec4 uVec = p01 - p00;  // X-Axis
     vec4 vVec = p10 - p00;  // Y-Axis
     vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
+    fragNormal = vec3(normal);
 
     // bilinearly interpolate position coordinate across patch
     vec4 p0 = (p01 - p00) * u + p00;
@@ -146,6 +148,12 @@ void main()
 
 #version 410 core
 
+#include ../../../../Engine/Resources/Engine/Shaders/include/defines.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/PBR.glsl
+
 uniform int textureCount;
 
 uniform sampler2D texture_0;
@@ -158,14 +166,32 @@ uniform vec2 textureScale[4];
 
 uniform float scale;
 
-uniform sampler2D shadowMap;
-uniform mat4 lightSpaceMatrix;
+uniform vec3 cameraPos;
+uniform samplerCube gIrradianceMap;
+uniform samplerCube gPrefilterEnvMap;
+uniform sampler2D gBRDFIntegrationLUT;
+
+#pragma editable
+uniform PBR_Sampler samplerAlbedo;
+
+#pragma editable
+uniform PBR_Sampler samplerNormal;
+
+#pragma editable
+uniform float roughnessFactor;
+
+#pragma editable
+uniform float metallicFactor;
+
+#pragma editable
+uniform vec3 color;
 
 in float height;
 in vec2 texCoord;
 in vec3 fragPos;
+in vec3 fragNormal;
 
-out vec4 color;
+out vec4 FragColor;
 
 vec4 sampleFromTexture(int textureIndex, vec2 uv)
 {
@@ -179,68 +205,84 @@ vec4 sampleFromTexture(int textureIndex, vec2 uv)
     return vec4(0.0); // Return black if index is out of bounds
 }
 
-float shadowCalculations(vec4 fragPosInLightSpace)
+#define CHANNEL_NONE 0
+#define CHANNEL_R 1
+#define CHANNEL_G 2
+#define CHANNEL_B 3
+#define CHANNEL_A 4
+
+float extractChannel(vec4 inputColor, int channelMask) 
 {
-	// perform perspective divide
-    vec3 projCoords = fragPosInLightSpace.xyz / fragPosInLightSpace.w;
-	
-	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-	
-	projCoords = projCoords * 0.5 + 0.5; 
-	
-	float borderBias =  max(texelSize.x, texelSize.y) * 2;
-	
-	if(projCoords.x >= 1.0 - borderBias || projCoords.x <= borderBias ||
-		projCoords.y >= 1.0 - borderBias || projCoords.y <= borderBias ||
-		projCoords.z >= 1.0 - borderBias || projCoords.z <= borderBias)
-        return 0.0;
-	
-	float shadow = 0;
-	float bias = 0.005;
-	float currentDepth = projCoords.z;
-	
-	
-	for(int x = -1; x <= 1; ++x)
-	{
-		for(int y = -1; y <= 1; ++y)
-		{
-			float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-			shadow += (currentDepth - bias > pcfDepth) ? 1.0 : 0.0;
-		}
-	}
-	
-	shadow /= 9.0;
-	
-	return shadow;
+    if (channelMask == CHANNEL_NONE) return 0.f;
+    if (channelMask == CHANNEL_R) return inputColor.r;
+    if (channelMask == CHANNEL_G) return inputColor.g;
+    if (channelMask == CHANNEL_B) return inputColor.b;
+    if (channelMask == CHANNEL_A) return inputColor.a;
+
+    return 0;
+}
+
+vec4 getPBRTexture(PBR_Sampler s)
+{
+	vec4 color = texture(s.texture, texCoord * vec2(s.xScale, s.yScale) + vec2(s.xOffset, s.yOffset)).rgba;
+	return vec4(extractChannel(color, s.channelMaskR), 
+				extractChannel(color, s.channelMaskG), 
+				extractChannel(color, s.channelMaskB), 
+				extractChannel(color, s.channelMaskA));
 }
 
 void main()
 {
-    if(height < textureBlend[0])
-    {
-        color = sampleFromTexture(0, texCoord);
-    }
-    else if(height >= textureBlend[textureCount - 1])
-    {
-        color = sampleFromTexture(textureCount - 1, texCoord);
-    }
-    else
-    {
-        for(int i=0; i < textureCount - 1; i++)
-        {
-            if(height >= textureBlend[i] && height < textureBlend[i + 1])
-            {
-                float b1 = height - textureBlend[i];
-                float b2  = textureBlend[i + 1] - height;
-                float blend = b1 / (b1 + b2);
-                color = mix(sampleFromTexture(i, texCoord), sampleFromTexture(i + 1, texCoord), blend);
-                break;
-            }
-        }
-    }
+    vec3 albedo = pow(getPBRTexture(samplerAlbedo).rgb * color, vec3(2.2));
+    vec3 normal = normalize(fragNormal);
+    float metallic = metallicFactor;
+    float roughness = roughnessFactor;
 
-    vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
-	float shadow = shadowCalculations(fragPosInLightSpace) * 0.8; // 0.8 to generate some ambient light
+    vec3 color = calculatePBR(
+		albedo, 
+		normal, 
+		metallic, 
+		roughness, 
+		1.f, 
+		cameraPos, 
+		fragPos,
+		1.f,
+		gPrefilterEnvMap, 
+		gIrradianceMap, 
+		gBRDFIntegrationLUT);
 
-    color = color * (1.0 - shadow);
+    // HDR tonemapping
+    color = color / (color + vec3(1.0));
+    // gamma correct
+    color = pow(color, vec3(1.0/2.2));
+
+    FragColor = vec4(color, 1.);
+
+    // if(height < textureBlend[0])
+    // {
+    //     color = sampleFromTexture(0, texCoord);
+    // }
+    // else if(height >= textureBlend[textureCount - 1])
+    // {
+    //     color = sampleFromTexture(textureCount - 1, texCoord);
+    // }
+    // else
+    // {
+    //     for(int i=0; i < textureCount - 1; i++)
+    //     {
+    //         if(height >= textureBlend[i] && height < textureBlend[i + 1])
+    //         {
+    //             float b1 = height - textureBlend[i];
+    //             float b2  = textureBlend[i + 1] - height;
+    //             float blend = b1 / (b1 + b2);
+    //             color = mix(sampleFromTexture(i, texCoord), sampleFromTexture(i + 1, texCoord), blend);
+    //             break;
+    //         }
+    //     }
+    // }
+
+    // vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
+	// float shadow = shadowCalculations(fragPosInLightSpace) * 0.8; // 0.8 to generate some ambient light
+
+    // color = color * (1.0 - shadow);
 }

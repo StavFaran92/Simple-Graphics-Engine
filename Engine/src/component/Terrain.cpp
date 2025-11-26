@@ -71,6 +71,8 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, AssetWrappe
 		terrain.m_textureBlends.push_back(blend);
 	}
 
+
+	//terrain.m_material = BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT);
 	return terrain; // todo fix
 }
 

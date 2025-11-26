@@ -58,11 +58,18 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		archive(m_mesh, m_heightmap, m_width, m_height, m_scale, m_textureCount, m_textureBlends);
+		SERIALIZED_MEMBER(m_mesh);
+		SERIALIZED_MEMBER(m_heightmap);
+		SERIALIZED_MEMBER(m_width);
+		SERIALIZED_MEMBER(m_height);
+		SERIALIZED_MEMBER(m_scale);
+		SERIALIZED_MEMBER(m_material);
 	}
+
 
 	
 	AssetWrapper<Texture> m_heightmap;
+	
 
 	int m_width = 100;
 	int m_height = 100;
@@ -72,6 +79,7 @@ public:
 	std::vector<TextureBlend> m_textureBlends {  };
 	//std::vector<Resource<Texture>> m_textures{  };
 	//std::vector<float> m_blends{ };
+	AssetWrapper<Material> m_material;
 
 private:
 	AssetWrapper<MeshCollection> m_mesh;

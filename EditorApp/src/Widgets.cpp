@@ -233,6 +233,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	static const char* RenderModeNames[] = {
 		"Opaque",
 		"Transparent",
+		"Terrain",
 		"Skybox",
 		"Unlit",
 		"UI",

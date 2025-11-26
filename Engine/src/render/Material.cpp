@@ -321,6 +321,10 @@ void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
 	{
 		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR));
 	}
+	else if (m_renderMode == MaterialRenderMode::Terrain)
+	{
+		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN));
+	}
 }
 
 MaterialRenderMode Material::getMaterialRenderMode() const

@@ -166,7 +166,7 @@ void Scene::init(Context* context)
 	m_quadUI.RemoveComponent<ObjectComponent>();
 
 	m_UIShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/UIShader.glsl");
-	m_terrainShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/TerrainShader.glsl"); // todo consider move to context (or even Engine)
+	m_terrainShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN).resource();
 	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl");
 
 	m_uboTime = std::make_shared<UniformBufferObject>(sizeof(float));
@@ -413,6 +413,15 @@ void Scene::draw(float deltaTime)
 			// Render terrain
 			for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
 			{
+				// TODO change bhaviour-> use default terrain material
+				if (terrain.m_material.isEmpty())
+					continue;
+
+				ResourceWrapper<Texture> heightmap = terrain.getHeightmap();
+
+				if (heightmap.isEmpty())
+					continue;
+
 				m_terrainShader->use();
 				m_terrainShader->setUniformValue("view", graphics->view);
 				m_terrainShader->setUniformValue("projection", graphics->projection);
@@ -421,32 +430,33 @@ void Scene::draw(float deltaTime)
 				m_terrainShader->setUniformValue("width", terrain.getWidth());
 				m_terrainShader->setUniformValue("height", terrain.getHeight());
 				m_terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
-				m_terrainShader->setTextureInShader(graphics->shadowMap, "shadowMap", 5);
-				ResourceWrapper<Texture> heightmap = terrain.getHeightmap();
+				m_terrainShader->setUniformValue("cameraPos", graphics->cameraPos);
+				m_terrainShader->bindUniformBlockToBindPoint("Time", 0);
+				m_terrainShader->bindUniformBlockToBindPoint("Lights", 1);
+				m_terrainShader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 5);
+				m_terrainShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 6);
+				m_terrainShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 7);
+				m_terrainShader->setTextureInShader(graphics->shadowMap, "shadowMap", 8);
+				m_terrainShader->setTextureInShader(heightmap, "heightMap", 9);
 
-				if (heightmap.isEmpty())
-					continue;
+				terrain.m_material.get()->use();
 
-				heightmap.get()->bind();
-				heightmap.get()->setSlot(0);
-				m_terrainShader->setUniformValue("heightMap", 0);
+				//int textureCount = terrain.getTextureCount();
+				//m_terrainShader->setUniformValue("textureCount", textureCount);
 
-				int textureCount = terrain.getTextureCount();
-				m_terrainShader->setUniformValue("textureCount", textureCount);
+				//for (int i = 0; i < textureCount; i++)
+				//{
+				//	auto texture = terrain.getTexture(i).resource();
+				//	texture.get()->setSlot(i + 1);
+				//	texture.get()->bind();
+				//	m_terrainShader->setUniformValue("texture_" + std::to_string(i), i + 1);
 
-				for (int i = 0; i < textureCount; i++)
-				{
-					auto texture = terrain.getTexture(i).resource();
-					texture.get()->setSlot(i + 1);
-					texture.get()->bind();
-					m_terrainShader->setUniformValue("texture_" + std::to_string(i), i + 1);
+				//	auto textureBlend = terrain.getTextureBlend(i);
+				//	m_terrainShader->setUniformValue("textureBlend[" + std::to_string(i) + "]", textureBlend);
 
-					auto textureBlend = terrain.getTextureBlend(i);
-					m_terrainShader->setUniformValue("textureBlend[" + std::to_string(i) + "]", textureBlend);
-
-					glm::vec2 textureScale = terrain.getTextureScale(i);
-					m_terrainShader->setUniformValue("textureScale[" + std::to_string(i) + "]", textureScale);
-				}
+				//	glm::vec2 textureScale = terrain.getTextureScale(i);
+				//	m_terrainShader->setUniformValue("textureScale[" + std::to_string(i) + "]", textureScale);
+				//}
 
 				auto& terrainMesh = terrain.getMesh();
 				if (!terrainMesh.isEmpty())
