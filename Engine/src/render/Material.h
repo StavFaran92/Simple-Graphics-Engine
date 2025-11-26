@@ -9,6 +9,7 @@
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
 #include "memory/Asset.h"
+#include "serialize/CerealHelpers.h"
 
 static const std::string SHADER_PROPERTY_PBR_COLOR_DIFFUSE = "color";
 static const std::string SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR = "roughnessFactor";
@@ -86,6 +87,8 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(m_name);
+		SERIALIZED_MEMBER(m_renderMode);
 		SERIALIZED_MEMBER(m_shader);
 		SERIALIZED_MEMBER(m_samplers);
 		SERIALIZED_MEMBER(m_uniformProperties);
