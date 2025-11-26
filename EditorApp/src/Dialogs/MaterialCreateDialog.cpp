@@ -8,7 +8,7 @@ MaterialCreateDialog::MaterialCreateDialog()
 
 void MaterialCreateDialog::appearContent()
 {
-	m_tempMaterial = Material::create();
+	m_tempMaterial = Material::create(MaterialRenderMode::Opaque);
 	m_uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Material", EditorState::Instance().getWorkingDir().path());
 }
 

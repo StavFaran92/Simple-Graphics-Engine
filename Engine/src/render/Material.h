@@ -29,6 +29,9 @@ enum class MaterialRenderMode : int
 	Unlit,
 	UI,
 	Custom,
+
+	// This must be last
+	None,
 };
 
 struct MaterialImportSettings : public AssetCreateDescriptor
@@ -85,11 +88,11 @@ public:
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_shader);
 		SERIALIZED_MEMBER(m_samplers);
-		//SERIALIZED_MEMBER(m_uniformProperties); // TODO fix
+		SERIALIZED_MEMBER(m_uniformProperties);
 	}
 
 	static AssetWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
-	static ResourceWrapper<Material> create();
+	static ResourceWrapper<Material> create(MaterialRenderMode renderMode);
 	static void updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc);
 
 protected:
@@ -110,7 +113,7 @@ public:
 
 	// This will only be used by forward renderer, ignored by deffered
 	std::string m_name;
-	MaterialRenderMode m_renderMode = MaterialRenderMode::Opaque;
+	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 	AssetWrapper<Shader> m_shader;
 	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
 	std::map<std::string, Value> m_uniformProperties;

@@ -103,7 +103,7 @@ void BuiltInAssetsLoader::loadMaterials()
 		aDesc.isEngineOwned = true;
 		aDesc.name = "SGE_MATERIAL_DEFAULT";
 		aDesc.aType = AssetType::MATERIAL;
-		ResourceWrapper<Material> material = Material::create();
+		ResourceWrapper<Material> material = Material::create(MaterialRenderMode::Opaque);
 		Engine::get()->getSubSystem<Assets>()->createAsset(material, aDesc);
 	}
 }

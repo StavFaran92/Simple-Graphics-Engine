@@ -72,9 +72,7 @@ void MaterialAssetManager::save(const AssetWrapper<ResourceBase>& mat, const Ass
 //static AssetFnRegister<AssetType::MATERIAL> assetRegister(AssetTraits<Material>::load);
 
 Material::Material()
-{
-	setMaterialRenderMode(MaterialRenderMode::Opaque);
-}
+{}
 
 void Material::use()
 {
@@ -153,17 +151,10 @@ AssetWrapper<Material> Material::import(const std::string& fileLocation, Materia
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Material>();
 }
 
-ResourceWrapper<Material> Material::create()
+ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
 {
-
 	auto mat = Factory<Material>::create();
-
-	//mat->m_samplers[Texture::TextureType::Albedo] = std::make_shared<TextureSampler>(3);
-	//mat->m_samplers[Texture::TextureType::Normal] = std::make_shared<TextureSampler>(3);
-	//mat->m_samplers[Texture::TextureType::Metallic] = std::make_shared<TextureSampler>(1);
-	//mat->m_samplers[Texture::TextureType::Roughness] = std::make_shared<TextureSampler>(1);
-	//mat->m_samplers[Texture::TextureType::AmbientOcclusion] = std::make_shared<TextureSampler>(1);
-
+	mat->setMaterialRenderMode(renderMode);
 	return mat;
 }
 
@@ -174,7 +165,7 @@ void Material::updateAsset(const AssetWrapper<Material>& material, AssetUpdateDe
 
 ResourceWrapper<Material> Material::clone(bool isTransient) const
 {
-	auto newMaterial = Material::create();
+	auto newMaterial = Material::create(m_renderMode);
 
 	newMaterial->m_samplers = m_samplers;
 	newMaterial->m_shader = m_shader;
