@@ -587,9 +587,24 @@ void Scene::draw(float deltaTime)
 				if ((entity_id)entity == selectedObject)
 				{
 					Entity e(entity, &getRegistry());
-					auto mesh = e.tryGetComponent<MeshRendererComponent>();
-
-					if (!mesh) break;
+					ResourceWrapper<MeshCollection> mesh;
+					auto meshRenderer = e.tryGetComponent<MeshRendererComponent>();
+					if (meshRenderer)
+					{
+						mesh = meshRenderer->mesh.resource();
+					}
+					else
+					{
+						auto terrain = e.tryGetComponent<Terrain>();
+						if (terrain)
+						{
+							mesh = terrain->getMesh();
+						}
+					}
+					if (mesh.isEmpty())
+					{
+						continue;
+					}
 
 					glDisable(GL_DEPTH_TEST);
 
@@ -604,7 +619,7 @@ void Scene::draw(float deltaTime)
 						m_highlightMaskShader->setViewMatrix(graphics->view);
 						m_highlightMaskShader->setProjectionMatrix(graphics->projection);
 
-						for (auto& m : mesh->mesh.resource()->getMeshes())
+						for (auto& m : mesh->getMeshes())
 						{
 							m_highlightMaskShader->setModelMatrix(e.getComponent<Transformation>().getWorldTransformation() * m->getRestTransform());
 							RenderCommand::draw(m->getVAO());
