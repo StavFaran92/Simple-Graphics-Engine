@@ -98,8 +98,8 @@ void main()
 #include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
-
-const float MAX_REFLECTION_LOD = 4.0;
+#include ../../../../Engine/Resources/Engine/Shaders/include/PBR.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/Shadows.glsl
 
 // ----- In ----- //
 
@@ -149,103 +149,6 @@ uniform vec3 color;
 uniform float opacityFactor;
 
 // ----- Methods ----- //
-
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-}
-
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-}   
-
-float geometrySchlickGGX(float NdotV, float roughness)
-{
-    float r = (roughness);
-    float k = (r * r) / 8.0;
-
-    float num = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-
-    return num / denom;
-}
-
-float geometrySmith(vec3 N, vec3 V, vec3 L, float k)
-{
-    float NdotV = max(0.0, dot(N, V));
-    float NdotL = max(0.0, dot(N, L));
-    return geometrySchlickGGX(NdotV, k) * geometrySchlickGGX(NdotL, k);
-}
-
-float distributionGGX(vec3 N, vec3 H, float a)
-{
-    float a2 = a * a;
-    float NdotH = max(0.0, dot(N, H));
-    float NdotH2 = NdotH * NdotH;
-
-    float nom = a2;
-    float denom = NdotH2 * (a2 - 1.0) + 1.0;
-    denom = denom * denom * PI;
-
-    return nom / denom;
-}
-
-struct Surface
-{
-    vec3 fragPos;
-    vec3 V;
-    vec3 N;
-    vec3 H;
-    vec3 L;
-    vec3 F0;
-    vec3 albedo;
-    float metallic;
-    float roughness;
-};
-
-vec3 calculateBRDF(Surface s)
-{
-    vec3 F = fresnelSchlick(max(0.0, dot(s.H, s.V)), s.F0);
-    vec3 ks = F;
-    vec3 kd = 1.0 - ks;
-    kd *= 1.0 - s.metallic;
-
-    float NDF = distributionGGX(s.N, s.H, s.roughness);
-    float G = geometrySmith(s.N, s.V, s.L, s.roughness);
-
-    vec3 numerator = NDF * G * F;
-    float denominator = 4.0 * max(0.0, dot(s.N, s.V)) * max(0.0, dot(s.N, s.L)) + 0.0001;
-    vec3 specular = numerator / denominator;
-
-    return (specular + kd * s.albedo / PI);
-}
-
-vec3 PointLightRadiance(PointLight pLight, Surface s)
-{
-    s.L = normalize(pLight.position.rgb - s.fragPos);
-    s.H = normalize(s.V + s.L);
-    float distance = length(s.L);
-    float attenuation = 1.0 / (distance * distance);
-    vec3 radiance = pLight.color.rgb * attenuation;
-    float cosTheta = max(0.0, dot(s.N, s.L));
-
-    return calculateBRDF(s) * radiance * cosTheta;
-}
-
-vec3 DirLightRadiance(DirLight dLight, Surface s)
-{
-	s.L = normalize(-dLight.direction.xyz);
-	s.H = normalize(s.V + s.L);
-
-	// Calculate Li
-	vec3 radiance = dLight.color.rgb;
-
-	// Calculate cosTheta
-	float cosTheta = max(0.0, dot(s.N, s.L));
-
-	return calculateBRDF(s) * radiance * cosTheta;
-}
 
 #define CHANNEL_NONE 0
 #define CHANNEL_R 1
@@ -314,8 +217,8 @@ float getTime()
 
 void main()
 {
-    vec3 normal = normalize(fs_in.normal);
     vec3 albedo = pow(getPBRTexture(samplerAlbedo).rgb  * color, vec3(2.2));
+    vec3 normal = normalize(fs_in.normal);
     float metallic = getPBRTexture(samplerMetallic).r * metallicFactor;
     float roughness = getPBRTexture(samplerRoughness).r* roughnessFactor;
     float ao = getPBRTexture(samplerAO).r;
@@ -324,47 +227,20 @@ void main()
     frag(albedo, normal, metallic, roughness, ao);
 #endif
 
-    vec3 V = normalize(cameraPos - fs_in.fragPos);
-    vec3 R = reflect(-V, normal);
+    float ssaoFinal = ao;
 
-    vec3 F0 = mix(vec3(0.04), albedo, metallic);
-
-    Surface s;
-    s.fragPos = fs_in.fragPos;
-    s.V = V;
-    s.N = normal;
-    s.F0 = F0;
-    s.metallic = metallic;
-    s.roughness = roughness;
-    s.albedo = albedo;
-
-    vec3 L0 = vec3(0.0);
-    for (int i = 0; i < pointLightCount; ++i)
-    {
-        L0 += PointLightRadiance(pointLights[i], s);
-    }
-
-    for(int i = 0; i < dirLightCount; ++i)
-	{
-		L0 += DirLightRadiance(dirLight[i], s);
-	}
-
-    // generate Kd to accomodate only for diffuse (exclude specular)
-	vec3 F = fresnelSchlickRoughness(max(0.0, dot(normal, V)), F0, roughness);
-	
-	vec3 prefilterColor = textureLod(gPrefilterEnvMap, R, roughness * MAX_REFLECTION_LOD).rgb;
-	vec2 envBRDF = texture(gBRDFIntegrationLUT, vec2(max(dot(normal, V), 0.0), roughness)).rg;
-	vec3 specular = prefilterColor * (envBRDF.x * F + envBRDF.y); 
-
-	vec3 ks = F;
-	vec3 kd = 1.0 - ks;
-
-	// ambient diffuse irradiance
-	vec3 irradiance = texture(gIrradianceMap, normal).rgb;
-	vec3 diffuse = irradiance * albedo;
-	vec3 ambient = (kd * diffuse + specular) * ao /** ssao*/ * vec3(1.f);
-
-    vec3 color = L0 + ambient;
+    vec3 color = calculatePBR(
+		albedo, 
+		normal, 
+		metallic, 
+		roughness, 
+		ssaoFinal, 
+		cameraPos, 
+		fs_in.fragPos,
+		1.f,
+		gPrefilterEnvMap, 
+		gIrradianceMap, 
+		gBRDFIntegrationLUT);
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));

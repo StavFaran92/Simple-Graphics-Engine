@@ -166,11 +166,6 @@ vec3 calculatePBR(
 	vec3 diffuse = irradiance * albedo;
 	vec3 ambient = (kd * diffuse + specular) * ao  * vec3(1.f);
 
-	// if(useSSAO)
-	// {
-	// 	ambient *= pow(ssao, 3);
-	// }
-
 	// combine results
 	return L0 + ambient;
 }
