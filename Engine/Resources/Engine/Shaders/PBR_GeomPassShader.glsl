@@ -16,9 +16,7 @@ layout (location = 7) in mat4 instanceModel;
 #include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
-
-const int MAX_BONES = 100;
-const int MAX_BONE_INFLUENCE = 3;
+#include ../../../../Engine/Resources/Engine/Shaders/include/animation.glsl
 
 // ----- Structs ----- //
 
@@ -31,10 +29,6 @@ out VS_OUT {
     vec3 fragPosVS;
 	vec3 normalVS;
 } vs_out;
-
-// ----- Uniforms ----- //
-
-uniform mat4 finalBonesMatrices[MAX_BONES];
 
 // ----- Forward Declerations ----- //
 
@@ -58,31 +52,9 @@ void main()
 		aModel = model * instanceModel;
 	}
 
-	vec4 totalPosition = vec4(pos, 1.0f);
-	vec3 totalNormal = norm;
-	
-	if(isAnimated)
-	{
-		totalPosition = vec4(0.0f);
-		totalNormal = vec3(0.0f);
-
-		for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
-		{
-			if(boneIDs[i] == -1) 
-				continue;
-			if(boneIDs[i] >=MAX_BONES) 
-			{
-				totalPosition = vec4(pos,1.0f);
-				totalNormal = norm;
-				break;
-			}
-
-			vec4 localPosition = finalBonesMatrices[boneIDs[i]] * vec4(pos,1.0f);
-			totalPosition += localPosition * boneWeights[i];
-			vec3 localNormal = mat3(finalBonesMatrices[boneIDs[i]]) * norm;
-			totalNormal += localNormal * boneWeights[i];
-		}
-	}
+        vec4 totalPosition;
+        vec3 totalNormal;
+        applySkinning(pos, norm, boneIDs, boneWeights, totalPosition, totalNormal);
 
 	vec3 aNorm = mat3(transpose(inverse(aModel))) * totalNormal;
 #ifdef CUSTOM_SHADER

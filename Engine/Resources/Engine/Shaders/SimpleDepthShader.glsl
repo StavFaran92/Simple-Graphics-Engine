@@ -6,40 +6,19 @@ layout (location = 0) in vec3 pos;
 layout (location = 5) in ivec3 boneIDs;
 layout (location = 6) in vec3 boneWeights;
 
-const int MAX_BONES = 100;
-const int MAX_BONE_INFLUENCE = 3;
-
-uniform mat4 lightSpaceMatrix;
-uniform mat4 model;
-uniform bool isAnimated;
-
-uniform mat4 finalBonesMatrices[MAX_BONES];
+#include ../../../../Engine/Resources/Engine/Shaders/include/defines.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/animation.glsl
 
 void main()
 {
-    vec4 totalPosition = vec4(pos, 1.0f);
-
-    if(isAnimated)
-	{
-		totalPosition = vec4(0.0f);
-
-		for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
-		{
-			if(boneIDs[i] == -1) 
-				continue;
-			if(boneIDs[i] >=MAX_BONES) 
-			{
-				totalPosition = vec4(pos,1.0f);
-				break;
-			}
-
-			vec4 localPosition = finalBonesMatrices[boneIDs[i]] * vec4(pos,1.0f);
-			totalPosition += localPosition * boneWeights[i];
-		}
-	}
+    vec4 totalPosition;
+    applySkinningPosition(pos, boneIDs, boneWeights, totalPosition);
 
     gl_Position = lightSpaceMatrix * model * totalPosition;
-}  
+}
 
 #frag
 
