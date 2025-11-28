@@ -153,6 +153,7 @@ void main()
 #include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/PBR.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/Shadows.glsl
 
 uniform int textureCount;
 
@@ -170,6 +171,7 @@ uniform vec3 cameraPos;
 uniform samplerCube gIrradianceMap;
 uniform samplerCube gPrefilterEnvMap;
 uniform sampler2D gBRDFIntegrationLUT;
+uniform sampler2D gShadowMap;
 
 #pragma editable
 uniform PBR_Sampler samplerAlbedo;
@@ -238,18 +240,21 @@ void main()
     float metallic = metallicFactor;
     float roughness = roughnessFactor;
 
+    vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
+    float shadow = calculateShadows(fragPosInLightSpace, gShadowMap);
+
     vec3 color = calculatePBR(
-		albedo, 
-		normal, 
-		metallic, 
-		roughness, 
-		1.f, 
-		cameraPos, 
-		fragPos,
-		1.f,
-		gPrefilterEnvMap, 
-		gIrradianceMap, 
-		gBRDFIntegrationLUT);
+                albedo,
+                normal,
+                metallic,
+                roughness,
+                1.f,
+                cameraPos,
+                fragPos,
+                shadow,
+                gPrefilterEnvMap,
+                gIrradianceMap,
+                gBRDFIntegrationLUT);
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));

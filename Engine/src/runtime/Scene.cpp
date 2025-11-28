@@ -436,7 +436,7 @@ void Scene::draw(float deltaTime)
 				m_terrainShader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 5);
 				m_terrainShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 6);
 				m_terrainShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 7);
-				m_terrainShader->setTextureInShader(graphics->shadowMap, "shadowMap", 8);
+				m_terrainShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 8);
 				m_terrainShader->setTextureInShader(heightmap, "heightMap", 9);
 
 				terrain.m_material.get()->use();
