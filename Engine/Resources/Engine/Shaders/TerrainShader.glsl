@@ -177,13 +177,13 @@ uniform PBR_Sampler samplerAlbedo;
 #pragma editable
 uniform PBR_Sampler samplerNormal;
 
-#pragma editable
+#pragma editable (default=1.0)
 uniform float roughnessFactor;
 
-#pragma editable
+#pragma editable (default=0.0)
 uniform float metallicFactor;
 
-#pragma editable
+#pragma editable (default=(1.0, 1.0, 1.0))
 uniform vec3 color;
 
 in float height;

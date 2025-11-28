@@ -136,16 +136,16 @@ uniform PBR_Sampler samplerRoughness;
 #pragma editable
 uniform PBR_Sampler samplerAO;
 
-#pragma editable
+#pragma editable (default=1.0)
 uniform float roughnessFactor;
 
-#pragma editable
+#pragma editable (default=0.0)
 uniform float metallicFactor;
 
-#pragma editable
+#pragma editable (default=(1.0, 1.0, 1.0))
 uniform vec3 color;
 
-#pragma editable
+#pragma editable (default=1.0)
 uniform float opacityFactor;
 
 // ----- Methods ----- //

@@ -108,7 +108,7 @@ void Material::use()
 
 	for (const auto& [name, property] : m_uniformProperties)
 	{
-		shader->setUniformValue(name, property);
+		shader->setUniformValue(name, property.value);
 	}
 
 
@@ -174,14 +174,59 @@ ResourceWrapper<Material> Material::clone(bool isTransient) const
 	return newMaterial;
 }
 
-bool Material::isOpaque() const
-{
-	auto it = m_uniformProperties.find(SHADER_PROPERTY_PBR_OPACITY_FACTOR);
-	if (it != m_uniformProperties.end()) {
-		float opacity = std::get<float>(it->second);  // throws if wrong type
-		return opacity == 1.f;
+//bool Material::isOpaque() const
+//{
+//	auto it = m_uniformProperties.find(SHADER_PROPERTY_PBR_OPACITY_FACTOR);
+//	if (it != m_uniformProperties.end()) {
+//		float opacity = std::get<float>(it->second);  // throws if wrong type
+//		return opacity == 1.f;
+//	}
+//	return true;
+//}
+
+bool parseEditablePragmaLine(const std::string& line, Material::EditableUniform& editableUniform) {
+	// Check if line contains #pragma editable
+	std::regex pragmaRegex(R"(^\s*#pragma\s+editable)");
+
+	if (!std::regex_search(line, pragmaRegex)) {
+		logWarning("Invalid pragma editable line: {}", line);
+		return false;
 	}
+
+	// Parse default: capture content inside parentheses OR a scalar value
+	std::regex defaultRegex(R"(default\s*=\s*(?:\(([^)]*)\)|([0-9.+-eEfF]+)))");
+	std::regex minRegex(R"(min\s*=\s*([0-9.+-eEfF]+))");
+	std::regex maxRegex(R"(max\s*=\s*([0-9.+-eEfF]+))");
+
+	std::smatch m;
+
+	if (std::regex_search(line, m, defaultRegex)) {
+		// m[1] has parenthesized content, m[2] has scalar
+		editableUniform.defaultValueRaw = m[1].matched ? m[1].str() : m[2].str();
+	}
+
+	if (std::regex_search(line, m, minRegex)) {
+		editableUniform.minValue = std::stof(m[1].str());
+	}
+
+	if (std::regex_search(line, m, maxRegex)) {
+		editableUniform.maxValue = std::stof(m[1].str());
+	}
+
 	return true;
+}
+
+std::vector<float> parseFloatTuple(const std::string& s) {
+	std::vector<float> values;
+	std::regex numRegex(R"([0-9.+-]+)");
+	std::smatch match;
+	std::string copy = s;
+
+	while (std::regex_search(copy, match, numRegex)) {
+		values.push_back(std::stof(match[0].str()));
+		copy = match.suffix();
+	}
+	return values;
 }
 
 void Material::parseUniforms(const std::string& sourceCode)
@@ -191,58 +236,91 @@ void Material::parseUniforms(const std::string& sourceCode)
 
 	std::istringstream stream(sourceCode);
 	std::string line;
-	bool nextUniformIsEditable = false;
 
 	auto& uniformProperties = m_uniformProperties;
 
 	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
+	EditableUniform pendingMeta;
+	bool isNextLineEditableUniform = false;
 
 	while (std::getline(stream, line)) {
-		// Trim whitespace
+		// Trim
 		line.erase(0, line.find_first_not_of(" \t"));
 
-		// Check for pragma
 		if (line.find("#pragma editable") == 0) {
-			nextUniformIsEditable = true;
+			isNextLineEditableUniform = parseEditablePragmaLine(line, pendingMeta);
 			continue;
 		}
 
-		// Match uniform declaration
 		std::smatch match;
-		if (std::regex_search(line, match, uniformRegex)) {
-			if (!nextUniformIsEditable) continue; // skip if not marked editable
-			nextUniformIsEditable = false; // reset after one use
+		if (isNextLineEditableUniform && std::regex_search(line, match, uniformRegex)) {
+			std::string type = match[1];
+			std::string name = match[2];
 
-			std::string type = match[1].str();
-			std::string name = match[2].str();
+			pendingMeta.uniformName = name;
+			pendingMeta.type = type;
 
-			if (type == "float") {
-				uniformProperties[name] = 0.0f;
+			
+
+			// Parse default
+			std::vector<float> defVals = parseFloatTuple(pendingMeta.defaultValueRaw);
+
+			if (type == "float") 
+			{
+				pendingMeta.value = defVals.size() > 0 ? defVals[0] : 0.0f;
+				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "vec2") {
-				uniformProperties[name] = glm::vec2(0.0f);
+			else if (type == "int") 
+			{
+				pendingMeta.value = defVals.size() > 0 ? static_cast<int>(defVals[0]) : 0;
+				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "vec3") {
-				uniformProperties[name] = glm::vec3(0.0f);
+			else if (type == "uint") 
+			{
+				pendingMeta.value = defVals.size() > 0 ? static_cast<unsigned int>(defVals[0]) : 0u;
+				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "vec4") {
-				uniformProperties[name] = glm::vec4(0.0f);
+			else if (type == "vec2") 
+			{
+				glm::vec2 val(0.0f);
+				for (size_t i = 0; i < std::min<size_t>(2, defVals.size()); ++i)
+					val[i] = defVals[i];
+				pendingMeta.value = val;
+				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "int") {
-				uniformProperties[name] = 0;
+			else if (type == "vec3") 
+			{
+				glm::vec3 val(0.0f);
+				for (size_t i = 0; i < std::min<size_t>(3, defVals.size()); ++i)
+					val[i] = defVals[i];
+				pendingMeta.value = val;
+				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "uint") {
-				uniformProperties[name] = 0u;
+			else if (type == "vec4") 
+			{
+				glm::vec4 val(0.0f);
+				for (size_t i = 0; i < std::min<size_t>(4, defVals.size()); ++i)
+					val[i] = defVals[i];
+				pendingMeta.value = val;
+				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "mat3") {
-				uniformProperties[name] = glm::mat3(1.0f);
+			else if (type == "mat3") 
+			{
+				pendingMeta.value = glm::mat3(1.0f);
+				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "mat4") {
-				uniformProperties[name] = glm::mat4(1.0f);
+			else if (type == "mat4") 
+			{
+				pendingMeta.value = glm::mat4(1.0f);
+				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "PBR_Sampler") {
+			else if (type == "PBR_Sampler") 
+			{
 				m_samplers[name] = std::make_shared<TextureSampler>();
 			}
+
+			
+			isNextLineEditableUniform = false;
 		}
 	}
 }
@@ -283,9 +361,9 @@ void Material::update()
 		}
 	}
 
-	for (const auto& [name, value] : m_uniformProperties)
+	for (const auto& [name, uniform] : m_uniformProperties)
 	{
-		m_shader.resource()->setUniformValue(name, value);
+		m_shader.resource()->setUniformValue(name, uniform.value);
 	}
 
 	// TODO fix
@@ -297,7 +375,7 @@ void Material::update()
 
 void Material::setUniformValue(const std::string& name, const Value& v)
 {
-	m_uniformProperties[name] = v;
+	m_uniformProperties[name].value = v;
 }
 
 void Material::setName(const std::string& name)

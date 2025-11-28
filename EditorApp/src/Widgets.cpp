@@ -274,7 +274,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	// Display Uniforms and Update Shader
 	if (ImGui::CollapsingHeader("Uniforms"))
 	{
-		for (auto& [name, value] : mat.get()->m_uniformProperties)
+		for (auto& [name, uniform] : mat.get()->m_uniformProperties)
 		{
 			ImGui::PushID(name.c_str());
 			bool updated = false; // Track if the value was changed
@@ -317,12 +317,12 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 						for (int i = 0; i < 4; ++i)
 							updated |= ImGui::DragFloat4((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
 					}
-				}, value);
+				}, uniform.value);
 
 			// If the value changed, update the shader
 			if (updated)
 			{
-				mat.get()->setUniformValue(name, value);
+				mat.get()->setUniformValue(name, uniform.value);
 			}
 
 			ImGui::PopID();

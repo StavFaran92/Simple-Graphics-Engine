@@ -115,12 +115,31 @@ public:
 	//	Texture2D = 1
 	//};
 
+	struct EditableUniform {
+		std::string uniformName;
+		std::string type;
+		std::string defaultValueRaw; 
+		float minValue = std::numeric_limits<float>::lowest();
+		float maxValue = std::numeric_limits<float>::max();
+		Value value;
+
+		template <class Archive>
+		void serialize(Archive& archive) {
+			SERIALIZED_MEMBER(uniformName);
+			SERIALIZED_MEMBER(type);
+			SERIALIZED_MEMBER(defaultValueRaw);
+			SERIALIZED_MEMBER(minValue);
+			SERIALIZED_MEMBER(maxValue);
+			SERIALIZED_MEMBER(value);
+		}
+	};
+
 	// This will only be used by forward renderer, ignored by deffered
 	std::string m_name;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 	AssetWrapper<Shader> m_shader;
 	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
-	std::map<std::string, Value> m_uniformProperties;
+	std::map<std::string, EditableUniform> m_uniformProperties;
 
 	//ProjectionType projection = ProjectionType::DefaultProjection;
 	//AssetWrapper<Texture> projectionTexture;

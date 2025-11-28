@@ -281,12 +281,19 @@ void AssetViewWindow::display()
 
 				if (ImGui::Selectable("Delete"))
 				{
-					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
-					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-					auto asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
-					std::string path = asset.relativefilePath;
-					Engine::get()->getSubSystem<Assets>()->deleteAsset(asset);
-					std::filesystem::remove(Engine::get()->getProjectDirectory() + "/" + path);
+					if (!fMetadata.isDirectory)
+					{
+						std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
+						UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
+						auto asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
+						std::string path = asset.relativefilePath;
+						Engine::get()->getSubSystem<Assets>()->deleteAsset(asset);
+						std::filesystem::remove(Engine::get()->getProjectDirectory() + "/" + path);
+					}
+					else
+					{
+						// TODO implement directory recursive delete
+					}
 				}
 
 				if (ImGui::Selectable("Properties"))
