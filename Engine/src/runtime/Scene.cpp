@@ -614,15 +614,34 @@ void Scene::draw(float deltaTime)
 						// 1st pass
 						m_highlightRenderView->bind();
 						RenderCommand::clear();
-						m_highlightMaskShader->use();
-						
-						m_highlightMaskShader->setViewMatrix(graphics->view);
-						m_highlightMaskShader->setProjectionMatrix(graphics->projection);
+                                                m_highlightMaskShader->use();
 
-						for (auto& m : mesh->getMeshes())
-						{
-							m_highlightMaskShader->setModelMatrix(e.getComponent<Transformation>().getWorldTransformation() * m->getRestTransform());
-							RenderCommand::draw(m->getVAO());
+                                                m_highlightMaskShader->setViewMatrix(graphics->view);
+                                                m_highlightMaskShader->setProjectionMatrix(graphics->projection);
+
+                                                m_highlightMaskShader->setUniformValue("isGpuInstanced", false);
+
+                                                auto animator = e.tryGetComponent<Animator>();
+                                                if (!animator || animator->m_currentAnimation.isEmpty())
+                                                {
+                                                        m_highlightMaskShader->setUniformValue("isAnimated", false);
+                                                }
+                                                else
+                                                {
+                                                        std::vector<glm::mat4> finalBoneMatrices;
+                                                        animator->getFinalBoneMatrices(mesh.get(), finalBoneMatrices);
+                                                        for (int i = 0; i < finalBoneMatrices.size(); ++i)
+                                                        {
+                                                                m_highlightMaskShader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
+                                                        }
+
+                                                        m_highlightMaskShader->setUniformValue("isAnimated", true);
+                                                }
+
+                                                for (auto& m : mesh->getMeshes())
+                                                {
+                                                        m_highlightMaskShader->setModelMatrix(e.getComponent<Transformation>().getWorldTransformation() * m->getRestTransform());
+                                                        RenderCommand::draw(m->getVAO());
 						}
 
 						glPopDebugGroup();
