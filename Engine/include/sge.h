@@ -7,12 +7,6 @@
 //#include "EntryPoint.h"
 #endif
 
-//external
-#ifdef GUI
-#include "ui/ImguiHandler.h"
-#include "imgui.h"
-#endif
-
 //sge
 #include "runtime/Context.h"
 #include "core/Window.h"
@@ -37,7 +31,6 @@
 #include "core/Configurations.h"
 #include "geometry/ModelImporter.h"
 #include "memory/ResourceWrapper.h"
-#include "ui/GuiMenu.h"
 #include "runtime/Entity.h"
 #include "geometry/ShapeFactory.h"
 #include "component/Component.h"
@@ -77,3 +70,4 @@
 
 #include "fileSystem/WorkingDirectory.h"
 #include "fileSystem/ScopedPath.h"
+#include "core/GUILayer.h"

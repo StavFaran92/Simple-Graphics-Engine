@@ -168,10 +168,10 @@ Window* Context::getWindow() const
 	return Engine::get()->getWindow();
 }
 
-ImguiHandler* Context::getImguiHandler() const
-{
-	return Engine::get()->getImguiHandler();
-}
+//ImguiHandler* Context::getImguiHandler() const
+//{
+//	return Engine::get()->getImguiHandler();
+//}
 
 Input* Context::getInput() const
 {

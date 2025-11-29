@@ -3,7 +3,6 @@
 #include "runtime/Context.h"
 #include "render/Renderer.h"
 #include "core/Window.h"
-#include "ui/ImguiHandler.h"
 #include "camera/ICamera.h"
 #include "runtime/Scene.h"
 #include "systems/Skybox.h"
@@ -187,12 +186,22 @@ bool Engine::init(const InitParams& initParams)
     lParams.extendShader = true;
     m_shaderLoader = std::make_shared<ShaderLoader>(shaderParser, lParams);
 
-    m_imguiHandler = std::make_shared<ImguiHandler>();
-    if (!m_imguiHandler->init(m_window->GetWindow(), m_window->GetContext()))
+    for (auto& GUILayer : m_GUILayers)
     {
-        logError("Imgui init failed!");
-        return false;
+        if(!GUILayer->init())
+        {
+            logError("Imgui init failed!");
+            return false;
+        }
+
     }
+
+    //m_imguiHandler = std::make_shared<ImguiHandler>();
+    //if (!m_imguiHandler->init(m_window->GetWindow(), m_window->GetContext()))
+    //{
+    //    logError("Imgui init failed!");
+    //    return false;
+    //}
 
     auto modelImporter = new ModelImporter();
     auto animationLoader = new AnimationLoader();
@@ -368,7 +377,11 @@ void Engine::run(Application* app)
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "GUI render pass");
-        m_imguiHandler->render();
+        for (auto& GUILayer : m_GUILayers)
+        {
+            GUILayer->render();
+
+        }
         glPopDebugGroup();
 
         m_window->SwapBuffer();
@@ -393,7 +406,11 @@ void Engine::close()
 
     m_context->close();
 
-    m_imguiHandler->close();
+    for (auto& GUILayer : m_GUILayers)
+    {
+        GUILayer->close();
+
+    }
 
     m_window->close();
 
@@ -405,10 +422,10 @@ void Engine::close()
     //instance = nullptr;
 }
 
-ImguiHandler* Engine::getImguiHandler() const
-{
-    return m_imguiHandler.get();
-}
+//ImguiHandler* Engine::getImguiHandler() const
+//{
+//    return m_imguiHandler.get();
+//}
 
 Input* Engine::getInput() const
 {
@@ -485,6 +502,11 @@ Renderer& Engine::getForwardRenderer() const
     return *m_forwardRenderer.get();
 }
 
+void Engine::addGUILayer(const std::shared_ptr<GUILayer>& GUILayer)
+{
+    m_GUILayers.push_back(GUILayer);
+}
+
 void Engine::loadProject(const std::string& dirPath)
 {
     m_projectDirectory = dirPath;
@@ -525,7 +547,7 @@ void Engine::handleEvents(bool& quit)
 
 
 
-        m_imguiHandler->proccessEvents(e);
+        //m_imguiHandler->proccessEvents(e);
 
         if (e.type == SDL_WINDOWEVENT &&
             (e.window.event == SDL_WINDOWEVENT_RESIZED || e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED))

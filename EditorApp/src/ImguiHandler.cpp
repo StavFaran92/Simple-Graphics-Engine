@@ -1,4 +1,4 @@
-#include "ui/ImguiHandler.h"
+#include "ImguiHandler.h"
 
 #include "ui/Menu.h"
 
@@ -8,10 +8,10 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
-#include "ui/GuiMenu.h"
+#include "GuiMenu.h"
 #include "ImGuizmo.h"
 
-bool ImguiHandler::init(SDL_Window* window, const SDL_GLContext& context)
+bool ImguiHandler::init()
 {
 	const char* glsl_version = "#version 140";
 
@@ -28,7 +28,7 @@ bool ImguiHandler::init(SDL_Window* window, const SDL_GLContext& context)
 	ImGui::StyleColorsLight();
 
 	// Init ImGui_SDL
-	if (!ImGui_ImplSDL2_InitForOpenGL(window, context))
+	if (!ImGui_ImplSDL2_InitForOpenGL(Engine::get()->getWindow()->GetWindow(), m_imguiContext))
 	{
 		logError("Init Imgui_SDL failed.");
 		return false;
@@ -44,11 +44,6 @@ bool ImguiHandler::init(SDL_Window* window, const SDL_GLContext& context)
 	logInfo("Imgui has initialized successfully.");
 
     return true;
-}
-
-void ImguiHandler::proccessEvents(SDL_Event& e)
-{
-	ImGui_ImplSDL2_ProcessEvent(&e);
 }
 
 void ImguiHandler::render()
@@ -71,7 +66,7 @@ void ImguiHandler::render()
 
 }
 
-bool ImguiHandler::close()
+void ImguiHandler::close()
 {
 
 
@@ -83,9 +78,6 @@ bool ImguiHandler::close()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext((ImGuiContext*)m_imguiContext);
-
-
-    return true;
 }
 
 void ImguiHandler::addGUI(GuiMenu* menu)

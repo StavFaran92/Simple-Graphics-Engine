@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "core/Core.h"
 #include "memory/UUID.h"
+#include "core/GUILayer.h"
 
 
 class Context;
@@ -85,7 +86,7 @@ public:
 
     Window* getWindow() const;
     Context* getContext() const;
-    ImguiHandler* getImguiHandler() const;
+    //ImguiHandler* getImguiHandler() const;
     Input* getInput() const;
     EventSystem* getEventSystem() const;
     CacheSystem* getMemoryManagementSystem() const;
@@ -101,6 +102,7 @@ public:
     MemoryPool<ResourceBase>& getMemoryPool() const;
     DeferredRenderer& getDeferredRenderer() const;
     Renderer& getForwardRenderer() const;
+    void addGUILayer(const std::shared_ptr<GUILayer>& GUILayer);
     
     void loadProject(const std::string& dirPath);
     void saveProject();
@@ -171,7 +173,8 @@ protected:
 
     std::shared_ptr<Window> m_window;
     std::shared_ptr<Context> m_context;
-    std::shared_ptr<ImguiHandler> m_imguiHandler;
+    //std::shared_ptr<ImguiHandler> m_imguiHandler;
+    std::vector<std::shared_ptr<GUILayer>> m_GUILayers;
     std::shared_ptr<Input> m_input;
     std::shared_ptr<EventSystem> m_eventSystem;
     std::shared_ptr<CacheSystem> m_memoryManagementSystem;

@@ -2,7 +2,7 @@
 
 #include "core/Core.h"
 
-class EngineAPI GuiMenu
+class GuiMenu
 {
 public:
 	GuiMenu() = default;

@@ -39,4 +39,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	NativeScripts
 )
 
-
+add_subdirectory(extern)

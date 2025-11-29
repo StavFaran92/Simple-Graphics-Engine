@@ -1,5 +1,7 @@
 #include "DialogBase.h"
 
+#include "imgui.h"
+
 #include "EditorState.h"
 
 DialogBase::DialogBase(const std::string& label)

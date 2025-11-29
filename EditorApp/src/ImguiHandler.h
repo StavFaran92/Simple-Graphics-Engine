@@ -1,19 +1,18 @@
 #pragma once
 
 #include "SDL2/SDL.h"
-#include "core/Core.h"
+#include "sge.h"
 
 #include <vector>
 
 class GuiMenu;
 
-class EngineAPI ImguiHandler
+class ImguiHandler : public GUILayer
 {
 public:
-	bool init(SDL_Window* window, const SDL_GLContext& context);
-	void proccessEvents(SDL_Event& e);
-	void render();
-	bool close();
+	bool init() override;
+	void render()override;
+	void close() override;
 
 	void addGUI(GuiMenu* menu);
 	void removeGUI(GuiMenu* menu);

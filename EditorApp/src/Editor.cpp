@@ -33,6 +33,9 @@
 #include "Dialogs/LuaScriptImportDialog.h"
 #include "Dialogs/FolderCreateDialog.h"
 
+#include "ImguiHandler.h"
+#include "GUIMenu.h"
+
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 
@@ -1255,7 +1258,11 @@ public:
 
 		m_editorRegistry = std::make_shared<SGE_Regsitry>();
 		
-		ImGui::SetCurrentContext((ImGuiContext * )Engine::get()->getImguiHandler()->getCurrentContext());
+		auto gui = std::make_shared<ImguiHandler>();
+		gui->init();
+		gui->addGUI(new GUI_Helper);
+		Engine::get()->addGUILayer(gui);
+		ImGui::SetCurrentContext((ImGuiContext * )gui->getCurrentContext());
 
         setStyleAndColors();
 
@@ -1297,8 +1304,7 @@ public:
 
 		updateScene();
 
-		auto gui = new GUI_Helper();
-		Engine::get()->getImguiHandler()->addGUI(gui);
+		
 
 		icons["mesh"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png");
 		icons["texture"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png");

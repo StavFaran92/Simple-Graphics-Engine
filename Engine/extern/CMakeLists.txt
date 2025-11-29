@@ -1,5 +1,3 @@
-add_subdirectory(imgui)
-add_subdirectory(ImGuizmo)
 add_subdirectory(tinyfiledialogs)
 
 target_include_directories(Engine PUBLIC 	
@@ -13,8 +11,6 @@ target_include_directories(Engine PUBLIC
 	cereal/include
 	json
 	stb_image
-	imgui
-	ImGuizmo
 	nativefiledialog/include
 	tinyfiledialogs
 	physx/PhysX/include
@@ -49,9 +45,7 @@ target_link_libraries(Engine PUBLIC
 	glew32
 	assimp-vc142-mt
 	spdlog
-	ImGui
 	nfd
-	ImGuizmo
 	tinyfiledialogs
 	lua54
 )
