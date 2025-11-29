@@ -4,6 +4,7 @@
 #include "EditorState.h"
 #include <imgui_stdlib.h>
 #include "tinyfiledialogs.h"
+#include "dialogs/AssetSelectDialog.h"
 
 void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
@@ -208,15 +209,24 @@ void displayColoredLabelWidget(const char* label)
 	ImGui::Dummy(ImVec2(0.0f, 2.0f)); // Add a vertical gap
 }
 
+extern AssetSelectDialog assetSelectDialog;
+
 void addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& cb)
 {
 	float width = ImGui::GetContentRegionAvail().x;
 
 	if (ImGui::Button(name.c_str(), ImVec2(width, 0)))
 	{
-		EditorState::Instance().showAssetSelectorWindow = true;
-		EditorState::Instance().assetSelectType = aType;
-		EditorState::Instance().assetSelectCB = cb;
+		assetSelectDialog.activate();
+		assetSelectDialog.setType(aType);
+		//EditorState::Instance().showAssetSelectorWindow = true;
+		//EditorState::Instance().assetSelectType = aType;
+		//EditorState::Instance().assetSelectCB = cb;
+	}
+
+	if (assetSelectDialog.acceptContent())
+	{
+		cb(assetSelectDialog.getSelectedUUID());
 	}
 }
 

@@ -32,6 +32,7 @@
 #include "Dialogs/TextureImportDialog.h"
 #include "Dialogs/LuaScriptImportDialog.h"
 #include "Dialogs/FolderCreateDialog.h"
+#include "Dialogs/AssetSelectDialog.h"
 
 #include "ImguiHandler.h"
 #include "GUIMenu.h"
@@ -81,6 +82,7 @@ static AnimationImportDialog animationImportDialog;
 static TextureImportDialog textureImportDialog;
 static LuaScriptImportDialog luaScriptImportDialog;
 static FolderCreateDialog folderCreateDialog;
+AssetSelectDialog assetSelectDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -1150,21 +1152,22 @@ class GUI_Helper : public GuiMenu {
 		modelImportDialog.display();
 		materialCreateDialog.display();
 		folderCreateDialog.display();
+		assetSelectDialog.display();
 		//displayMaterialCreatorDialog();
         //ShowTextureDisplayWindow();
 
-		if (EditorState::Instance().showAssetSelectorWindow) 
-		{
-			UUID uuid;
-			displayAssetSelectDialog(EditorState::Instance().assetSelectType, uuid);
-			if (!uuid.empty())
-			{
-				if (EditorState::Instance().assetSelectCB)
-				{
-					EditorState::Instance().assetSelectCB(uuid);
-				}
-			}
-		}
+		//if (EditorState::Instance().showAssetSelectorWindow) 
+		//{
+		//	UUID uuid;
+		//	displayAssetSelectDialog(EditorState::Instance().assetSelectType, uuid);
+		//	if (!uuid.empty())
+		//	{
+		//		if (EditorState::Instance().assetSelectCB)
+		//		{
+		//			EditorState::Instance().assetSelectCB(uuid);
+		//		}
+		//	}
+		//}
 
 		DisplayDebugInfoWindow();
 		
