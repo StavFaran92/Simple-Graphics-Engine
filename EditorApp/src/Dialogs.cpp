@@ -60,51 +60,51 @@ void displaySelectScriptDialog(std::string& scriptName)
 	}
 }
 
-void displaySelectShaderDialog(UUID& uuid)
-{
-	if (EditorState::Instance().showShaderSelector)
-	{
-		ImGui::Begin("Select Shader", &EditorState::Instance().showShaderSelector, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text("Available Shaders:");
-		ImGui::Separator();
-
-		static int selectedShaderIndex = -1;
-
-		auto& shaderList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(AssetType::SHADER);
-
-
-		for (int i = 0; i < shaderList.size(); i++)
-		{
-			bool isSelected = (selectedShaderIndex == i);
-
-			if (ImGui::Selectable(shaderList[i].name.c_str(), &isSelected))
-			{
-				selectedShaderIndex = i;
-			}
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK"))
-		{
-			if (selectedShaderIndex >= 0 && selectedShaderIndex < shaderList.size())
-			{
-				uuid = shaderList[selectedShaderIndex].uuid;
-
-			}
-			EditorState::Instance().showShaderSelector = false;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel"))
-		{
-			EditorState::Instance().showShaderSelector = false;
-		}
-
-		ImGui::End();
-	}
-}
+//void displaySelectShaderDialog(UUID& uuid)
+//{
+//	if (EditorState::Instance().showShaderSelector)
+//	{
+//		ImGui::Begin("Select Shader", &EditorState::Instance().showShaderSelector, ImGuiWindowFlags_AlwaysAutoResize);
+//		ImGui::Text("Available Shaders:");
+//		ImGui::Separator();
+//
+//		static int selectedShaderIndex = -1;
+//
+//		auto& shaderList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(AssetType::SHADER);
+//
+//
+//		for (int i = 0; i < shaderList.size(); i++)
+//		{
+//			bool isSelected = (selectedShaderIndex == i);
+//
+//			if (ImGui::Selectable(shaderList[i].name.c_str(), &isSelected))
+//			{
+//				selectedShaderIndex = i;
+//			}
+//		}
+//
+//		ImGui::Separator();
+//
+//		if (ImGui::Button("OK"))
+//		{
+//			if (selectedShaderIndex >= 0 && selectedShaderIndex < shaderList.size())
+//			{
+//				uuid = shaderList[selectedShaderIndex].uuid;
+//
+//			}
+//			EditorState::Instance().showShaderSelector = false;
+//		}
+//
+//		ImGui::SameLine();
+//
+//		if (ImGui::Button("Cancel"))
+//		{
+//			EditorState::Instance().showShaderSelector = false;
+//		}
+//
+//		ImGui::End();
+//	}
+//}
 
 void displayEntitySelectDialog(Entity& entity)
 {
@@ -495,80 +495,5 @@ void displayMaterialEditDialog()
 		}
 
 		ImGui::EndPopup();
-	}
-}
-
-void displayAssetSelectDialog(AssetType aType, UUID& uuid)
-{
-	if (EditorState::Instance().showAssetSelectorWindow)
-	{
-		std::string label = "Select " + getAssetTypeAsStr(aType);
-		ImGui::Begin(label.c_str(), &EditorState::Instance().showAssetSelectorWindow, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text("Available Assets:");
-		ImGui::Separator();
-
-		static int selectedAssetIndex = -1;
-
-		const std::vector<AssetInfo>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(aType);
-
-		for (int i = 0; i < assetList.size(); i++)
-		{
-			ImVec2 cursorStart = ImGui::GetCursorScreenPos();
-			ImVec2 totalSize = ImVec2(ImGui::GetContentRegionAvail().x, 0);
-
-			
-
-			bool isSelected = (selectedAssetIndex == i);
-
-
-			// Draw normal part
-			ImGui::TextUnformatted(assetList[i].name.c_str());
-			ImGui::SameLine();
-
-			// Draw gray part
-			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255));
-			std::string grayText = "(" + assetList[i].relativefilePath + ")";
-			ImGui::TextUnformatted(grayText.c_str());
-
-			ImGui::PopStyleColor();
-
-			std::string fullText;
-			if (isSelected)
-			{
-				fullText  = assetList[i].name + grayText;
-			}
-			else
-			{
-				fullText = "##select_" + std::to_string(i);
-			}
-
-			// Create invisible selectable
-			ImGui::SetCursorScreenPos(cursorStart);
-			bool selected = ImGui::Selectable(fullText.c_str(), isSelected, 0, totalSize);
-			if (selected) {
-				selectedAssetIndex = i;
-			}
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK")) 
-		{
-			if (selectedAssetIndex >= 0 && selectedAssetIndex < assetList.size())
-			{
-				uuid = assetList[selectedAssetIndex].uuid;
-
-			}
-			EditorState::Instance().showAssetSelectorWindow = false;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel")) 
-		{
-			EditorState::Instance().showAssetSelectorWindow = false;
-		}
-
-		ImGui::End();
 	}
 }

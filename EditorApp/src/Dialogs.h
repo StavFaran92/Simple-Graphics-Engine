@@ -15,9 +15,8 @@ void displayMaterialEditDialog();
 
 // Select
 void displayTextureSelectDialog();
-void displayAssetSelectDialog(AssetType aType, UUID& uuid);
 void displayEntitySelectDialog(Entity& e);
-void displaySelectShaderDialog(UUID& uuid);
+//void displaySelectShaderDialog(UUID& uuid);
 void displaySelectScriptDialog(std::string& scriptName);
 
 void displayProjectSettingsDialog();

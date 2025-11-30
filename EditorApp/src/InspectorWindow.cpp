@@ -448,123 +448,123 @@ void InspectorWindow::display()
 			}
 		});
 
-		displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {
-			//auto& state = g_states[selectedEntity.handlerID()];
+		//displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {
+		//	//auto& state = g_states[selectedEntity.handlerID()];
 
-			if (ImGui::Button("Select Shader"))
-			{
-				EditorState::Instance().showShaderSelector = true;
-			}
+		//	if (ImGui::Button("Select Shader"))
+		//	{
+		//		EditorState::Instance().showShaderSelector = true;
+		//	}
 
-			UUID selectedShaderUID;
-			displaySelectShaderDialog(selectedShaderUID);
+		//	UUID selectedShaderUID;
+		//	displaySelectShaderDialog(selectedShaderUID);
 
-			if (!selectedShaderUID.empty())
-			{
-				shaderComponent.setShader(AssetWrapper<Shader>(selectedShaderUID));
-			}
+		//	if (!selectedShaderUID.empty())
+		//	{
+		//		shaderComponent.setShader(AssetWrapper<Shader>(selectedShaderUID));
+		//	}
 
-			if (!shaderComponent.m_customShader.isEmpty())
-			{
-				auto name = Engine::get()->getSubSystem<Assets>()->getAlias(shaderComponent.m_customShader.getUID());
-				ImGui::Text(name.c_str());
-			}
-			
-			// Compile Button
-			if (ImGui::Button("recompile"))
-			{
-				shaderComponent.m_customShader.resource()->recompile();
-				shaderComponent.update();
-			}
+		//	if (!shaderComponent.m_customShader.isEmpty())
+		//	{
+		//		auto name = Engine::get()->getSubSystem<Assets>()->getAlias(shaderComponent.m_customShader.getUID());
+		//		ImGui::Text(name.c_str());
+		//	}
+		//	
+		//	// Compile Button
+		//	if (ImGui::Button("recompile"))
+		//	{
+		//		shaderComponent.m_customShader.resource()->recompile();
+		//		shaderComponent.update();
+		//	}
 
-			ImGui::Separator();
+		//	ImGui::Separator();
 
-			// Projection Type Drop-down
-			const char* projectionTypes[] = { "Default", "Texture2D" };
-			ImGui::Combo("Projection Type", (int*)&shaderComponent.projection, projectionTypes, IM_ARRAYSIZE(projectionTypes));
+		//	// Projection Type Drop-down
+		//	const char* projectionTypes[] = { "Default", "Texture2D" };
+		//	ImGui::Combo("Projection Type", (int*)&shaderComponent.projection, projectionTypes, IM_ARRAYSIZE(projectionTypes));
 
-			if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
-			{
-				// Projection Texture
-				ImGui::Text("Projection Texture:");
-				addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](UUID uuid) {
-					shaderComponent.setProjectionTexture(AssetWrapper<Texture>(uuid));
-				});
-			}
+		//	if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
+		//	{
+		//		// Projection Texture
+		//		ImGui::Text("Projection Texture:");
+		//		addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](UUID uuid) {
+		//			shaderComponent.setProjectionTexture(AssetWrapper<Texture>(uuid));
+		//		});
+		//	}
 
-			// Custom Textures Array
-			if (ImGui::CollapsingHeader("Textures"))
-			{
-				for (auto& [name, texture] : shaderComponent.customTextures)
-				{
-					ImGui::PushID(name.c_str());
-					ImGui::Text(name.c_str());
-					addTextureEditWidget(texture, { 100,100 }, [&](UUID uuid) {
-						texture = AssetWrapper<Texture>(uuid);
-						});
-					ImGui::PopID();
-				}
-				
-			}
+		//	// Custom Textures Array
+		//	if (ImGui::CollapsingHeader("Textures"))
+		//	{
+		//		for (auto& [name, texture] : shaderComponent.customTextures)
+		//		{
+		//			ImGui::PushID(name.c_str());
+		//			ImGui::Text(name.c_str());
+		//			addTextureEditWidget(texture, { 100,100 }, [&](UUID uuid) {
+		//				texture = AssetWrapper<Texture>(uuid);
+		//				});
+		//			ImGui::PopID();
+		//		}
+		//		
+		//	}
 
-			// Display Uniforms and Update Shader
-			if (ImGui::CollapsingHeader("Uniforms"))
-			{
-				for (auto& [name, value] : shaderComponent.m_uniformProperties)
-				{
-					ImGui::PushID(name.c_str());
-					bool updated = false; // Track if the value was changed
-					std::visit([&](auto& v)
-						{
-							using T = std::decay_t<decltype(v)>;
-							ImGui::Text("%s:", name.c_str());
+		//	// Display Uniforms and Update Shader
+		//	if (ImGui::CollapsingHeader("Uniforms"))
+		//	{
+		//		for (auto& [name, value] : shaderComponent.m_uniformProperties)
+		//		{
+		//			ImGui::PushID(name.c_str());
+		//			bool updated = false; // Track if the value was changed
+		//			std::visit([&](auto& v)
+		//				{
+		//					using T = std::decay_t<decltype(v)>;
+		//					ImGui::Text("%s:", name.c_str());
 
-							if constexpr (std::is_same_v<T, float>)
-							{
-								updated = ImGui::DragFloat(("##" + name).c_str(), &v, 0.1f);
-							}
-							else if constexpr (std::is_same_v<T, glm::vec2>)
-							{
-								updated = ImGui::DragFloat2(("##" + name).c_str(), &v[0], 0.1f);
-							}
-							else if constexpr (std::is_same_v<T, glm::vec3>)
-							{
-								updated = ImGui::DragFloat3(("##" + name).c_str(), &v[0], 0.1f);
-							}
-							else if constexpr (std::is_same_v<T, glm::vec4>)
-							{
-								updated = ImGui::DragFloat4(("##" + name).c_str(), &v[0], 0.1f);
-							}
-							else if constexpr (std::is_same_v<T, int>)
-							{
-								updated = ImGui::InputInt(("##" + name).c_str(), &v);
-							}
-							else if constexpr (std::is_same_v<T, unsigned int>)
-							{
-								updated = ImGui::InputScalar(("##" + name).c_str(), ImGuiDataType_U32, &v);
-							}
-							else if constexpr (std::is_same_v<T, glm::mat3>)
-							{
-								for (int i = 0; i < 3; ++i)
-									updated |= ImGui::DragFloat3((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
-							}
-							else if constexpr (std::is_same_v<T, glm::mat4>)
-							{
-								for (int i = 0; i < 4; ++i)
-									updated |= ImGui::DragFloat4((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
-							}
-						}, value);
+		//					if constexpr (std::is_same_v<T, float>)
+		//					{
+		//						updated = ImGui::DragFloat(("##" + name).c_str(), &v, 0.1f);
+		//					}
+		//					else if constexpr (std::is_same_v<T, glm::vec2>)
+		//					{
+		//						updated = ImGui::DragFloat2(("##" + name).c_str(), &v[0], 0.1f);
+		//					}
+		//					else if constexpr (std::is_same_v<T, glm::vec3>)
+		//					{
+		//						updated = ImGui::DragFloat3(("##" + name).c_str(), &v[0], 0.1f);
+		//					}
+		//					else if constexpr (std::is_same_v<T, glm::vec4>)
+		//					{
+		//						updated = ImGui::DragFloat4(("##" + name).c_str(), &v[0], 0.1f);
+		//					}
+		//					else if constexpr (std::is_same_v<T, int>)
+		//					{
+		//						updated = ImGui::InputInt(("##" + name).c_str(), &v);
+		//					}
+		//					else if constexpr (std::is_same_v<T, unsigned int>)
+		//					{
+		//						updated = ImGui::InputScalar(("##" + name).c_str(), ImGuiDataType_U32, &v);
+		//					}
+		//					else if constexpr (std::is_same_v<T, glm::mat3>)
+		//					{
+		//						for (int i = 0; i < 3; ++i)
+		//							updated |= ImGui::DragFloat3((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
+		//					}
+		//					else if constexpr (std::is_same_v<T, glm::mat4>)
+		//					{
+		//						for (int i = 0; i < 4; ++i)
+		//							updated |= ImGui::DragFloat4((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
+		//					}
+		//				}, value);
 
-					// If the value changed, update the shader
-					if (updated)
-					{
-						shaderComponent.m_customShader.resource()->setUniformValue(name, value);
-					}
+		//			// If the value changed, update the shader
+		//			if (updated)
+		//			{
+		//				shaderComponent.m_customShader.resource()->setUniformValue(name, value);
+		//			}
 
-					ImGui::PopID();
-				}
-			}
-		});
+		//			ImGui::PopID();
+		//		}
+		//	}
+		//});
 
 		displayComponent<FoliageComponent>("Foliage Component", [](FoliageComponent& foliage) {
 			// Compile Button
