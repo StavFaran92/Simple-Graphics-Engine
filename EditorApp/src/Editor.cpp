@@ -82,7 +82,6 @@ static AnimationImportDialog animationImportDialog;
 static TextureImportDialog textureImportDialog;
 static LuaScriptImportDialog luaScriptImportDialog;
 static FolderCreateDialog folderCreateDialog;
-AssetSelectDialog assetSelectDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -1146,13 +1145,7 @@ class GUI_Helper : public GuiMenu {
 		displayShaderCreatorDialog();
 		displayMaterialEditDialog();
 		displayProjectSettingsDialog();
-		luaScriptImportDialog.display();
-		textureImportDialog.display();
-		animationImportDialog.display();
-		modelImportDialog.display();
-		materialCreateDialog.display();
-		folderCreateDialog.display();
-		assetSelectDialog.display();
+		EditorState::Instance().displayDialogs();
 		//displayMaterialCreatorDialog();
         //ShowTextureDisplayWindow();
 
@@ -1258,7 +1251,7 @@ class EditorApp : public Application
 public:
 	void start() override
 	{
-
+		EditorState::Instance().init();
 		m_editorRegistry = std::make_shared<SGE_Regsitry>();
 		
 		auto gui = std::make_shared<ImguiHandler>();

@@ -7,18 +7,15 @@
 class AssetSelectDialog : public DialogBase
 {
 public:
-	AssetSelectDialog();
+	AssetSelectDialog(const std::string& name, AssetType assetType, const std::function<void(UUID)>& onAccpetCB);
 	// Inherited via DialogBase
 	void appearContent() override;
 	void drawContent() override;
 	bool acceptContent() override;
 	void cancelContent() override;
 
-	UUID getSelectedUUID() const;
-	void setType(AssetType aType);
-
 private:
 	int selectedAssetIndex = -1;
 	AssetType assetType = AssetType::NONE;
-	UUID selectedUUID = EMPTY_UUID;
+	const std::function<void(UUID)> onAccpetCB;
 };

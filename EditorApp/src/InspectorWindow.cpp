@@ -8,6 +8,7 @@
 #include "NativeScriptsLoader.h"
 #include "Dialogs.h"
 #include "Widgets.h"
+#include "dialogs/AssetSelectDialog.h"
 
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
@@ -163,7 +164,7 @@ void InspectorWindow::display()
 			//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
 			});
 
-		displayComponent<MeshRendererComponent>("Mesh", [](MeshRendererComponent& meshComponent) {
+		displayComponent<MeshRendererComponent>("Mesh Renderer", [](MeshRendererComponent& meshComponent) {
 			if (meshComponent.mesh.isEmpty()) return;
 
 			BEGIN_IMGUI_TABLE("Mesh");
@@ -180,9 +181,11 @@ void InspectorWindow::display()
 				meshName = meshComponent.mesh.info().name;
 			}
 
-			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uid) {
-				meshComponent.mesh = AssetWrapper<MeshCollection>(uid);
-			});
+			static AssetSelectDialog meshSelectDialog("MeshRenderer_Material", AssetType::MESH, [&meshComponent](UUID uuid) {
+				meshComponent.mesh = AssetWrapper<MeshCollection>(uuid);
+				});
+
+			addAssetSelectWidget(meshName, meshSelectDialog);
 
 			if (ImGui::CollapsingHeader("Materials"))
 			{
@@ -201,9 +204,11 @@ void InspectorWindow::display()
 						}
 					}
 
-					addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
-						mat = AssetWrapper<Material>(uid);
+					static AssetSelectDialog materialSelectDialog("Mesh_Material", AssetType::MATERIAL, [&mat](UUID uuid){
+							mat = AssetWrapper<Material>(uuid);
 						});
+
+					addAssetSelectWidget(matName, materialSelectDialog);
 
 					++index;
 					ImGui::PopID();
@@ -406,9 +411,10 @@ void InspectorWindow::display()
 						animationName = animation.getUID();
 					}
 
-					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uid) {
-						animator.addAnimation(name, AssetWrapper<Animation>(uid));
-					});
+					static AssetSelectDialog animationSelectDialog("Animator_Animation", AssetType::ANIMATION, [&animator, name](UUID uuid) {
+						animator.addAnimation(name, AssetWrapper<Animation>(uuid));
+						});
+
 
 					bool isSelected = (index == activeAnimationIndex);
 					if (ImGui::Checkbox("Make Active Animation", &isSelected))
@@ -451,9 +457,12 @@ void InspectorWindow::display()
 				{
 					matName = terrain.m_material.info().name;
 				}
-				addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uid) {
-					terrain.m_material = AssetWrapper<Material>(uid);
+
+				static AssetSelectDialog materialSelectDialog("Terrain_Material", AssetType::MATERIAL, [&terrain](UUID uuid) {
+					terrain.m_material = AssetWrapper<Material>(uuid);
 					});
+
+				addAssetSelectWidget(matName, materialSelectDialog);
 
 
 
@@ -660,8 +669,8 @@ void InspectorWindow::display()
 				scriptName = script.getScript().getUID();
 			}
 
-			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uid) {
-				script.script = AssetWrapper<LuaScript>(uid);
+			static AssetSelectDialog scriptSelectDialog("Script_LUA", AssetType::LUA_SCRIPT, [&script](UUID uuid) {
+				script.script = AssetWrapper<LuaScript>(uuid);
 				});
 			});
 
@@ -672,10 +681,10 @@ void InspectorWindow::display()
 				shaderName = postProcessComponent.shader.getUID();
 			}
 
-			addAssetSelectWidget(shaderName, AssetType::SHADER, [&postProcessComponent](UUID uid) {
-				postProcessComponent.shader = AssetWrapper<Shader>(uid);
+			static AssetSelectDialog shaderSelectDialog("PostProcess_Shader", AssetType::SHADER, [&postProcessComponent](UUID uuid) {
+				postProcessComponent.shader = AssetWrapper<Shader>(uuid);
 				});
-
+				
 			if (!postProcessComponent.shader.isEmpty())
 			{
 				// Compile Button

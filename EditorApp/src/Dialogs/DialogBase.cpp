@@ -7,6 +7,7 @@
 DialogBase::DialogBase(const std::string& label)
 	: m_label(label)
 {
+	EditorState::Instance().addDialogDisplay(this);
 }
 
 void DialogBase::appear()

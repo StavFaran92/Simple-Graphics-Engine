@@ -2,8 +2,8 @@
 #include "EditorState.h"
 #include "imgui.h"
 
-AssetSelectDialog::AssetSelectDialog()
-	: DialogBase("AssetSelectDialog")
+AssetSelectDialog::AssetSelectDialog(const std::string& name, AssetType assetType, const std::function<void(UUID)>& onAccpetCB)
+	: assetType(assetType), onAccpetCB(onAccpetCB), DialogBase(name)
 {
 }
 
@@ -61,7 +61,7 @@ bool AssetSelectDialog::acceptContent()
 	const std::vector<AssetInfo>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
 	if (selectedAssetIndex >= 0 && selectedAssetIndex < assetList.size())
 	{
-		selectedUUID = assetList[selectedAssetIndex].uuid;
+		onAccpetCB(assetList[selectedAssetIndex].uuid);
 		return true;
 	}
 	return false;
@@ -69,14 +69,4 @@ bool AssetSelectDialog::acceptContent()
 
 void AssetSelectDialog::cancelContent()
 {
-}
-
-UUID AssetSelectDialog::getSelectedUUID() const
-{
-	return selectedUUID;
-}
-
-void AssetSelectDialog::setType(AssetType aType)
-{
-	assetType = aType;
 }

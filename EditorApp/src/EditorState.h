@@ -5,6 +5,8 @@
 
 #include "sge.h"
 
+class DialogBase;
+
 class EditorState {
 public:
     // Access the singleton instance
@@ -12,6 +14,8 @@ public:
         static EditorState instance;
         return instance;
     }
+
+    void init();
 
     bool showLightCreatorWindow = false;
     bool showModelInspectorWindow = false;
@@ -44,6 +48,10 @@ public:
 
     bool getState(const std::string& state);
     bool setState(const std::string& state, bool enabled);
+
+    void addDialogDisplay(DialogBase* dialog);
+
+    void displayDialogs();
     
 
     std::function<void(UUID uuid)> assetTextureSelectCB;
@@ -71,4 +79,6 @@ private:
     std::unordered_map<std::string, bool> m_states;
 
     WorkingDirectory cwd;
+
+    std::vector<DialogBase*> m_dialogs;
 };

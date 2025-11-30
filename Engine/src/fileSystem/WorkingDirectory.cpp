@@ -3,7 +3,6 @@
 #include "core/Engine.h"
 
 WorkingDirectory::WorkingDirectory()
-    : m_path(ScopedPath::ContentPath())
 {
 }
 

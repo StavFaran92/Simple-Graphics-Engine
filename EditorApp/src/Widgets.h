@@ -5,6 +5,7 @@
 #include "imgui.h"
 
 #include <functional>
+class AssetSelectDialog;
 
 void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(UUID uuid)> callback);
 
@@ -20,7 +21,7 @@ void displayTextureWidget();
 
 void displayColoredLabelWidget(const char* label);
 
-void addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& uuid);
+bool addAssetSelectWidget(const std::string& name, AssetSelectDialog& dialog);
 
 class MaterialDataWidget
 {
