@@ -10,6 +10,8 @@
 #include "Widgets.h"
 #include "dialogs/AssetSelectDialog.h"
 
+AssetSelectDialog assetSelectDialog;
+
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
 	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -145,20 +147,6 @@ void InspectorWindow::display()
 			}
 		});
 
-		//displayComponent<CollisionBoxComponent>("Collision Box", [](CollisionBoxComponent& collisionBox) {
-		//	ImGui::InputFloat("Half Extent", &collisionBox.halfExtent);
-		//	ImGui::Combo("##LayerMask", (int*)&collisionBox.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-		//});
-
-		//displayComponent<CollisionSphereComponent>("Collision Sphere", [](CollisionSphereComponent& collisionSphere) {
-		//	ImGui::InputFloat("Radius", &collisionSphere.radius);
-		//	ImGui::Combo("##LayerMask", (int*)&collisionSphere.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-		//	});
-
-		//displayComponent<CollisionMeshRendererComponent>("Collision Mesh", [](CollisionMeshRendererComponent& collisionMesh) {
-		//	ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
-		//	});
-
 		displayComponent<PlayerController>("Player Controller", [](PlayerController& controller) {
 			ImGui::TextDisabled("Controller has no editable parameters.");
 			//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
@@ -181,11 +169,9 @@ void InspectorWindow::display()
 				meshName = meshComponent.mesh.info().name;
 			}
 
-			static AssetSelectDialog meshSelectDialog("MeshRenderer_Material", AssetType::MESH, [&meshComponent](UUID uuid) {
+			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uuid) {
 				meshComponent.mesh = AssetWrapper<MeshCollection>(uuid);
-				});
-
-			addAssetSelectWidget(meshName, meshSelectDialog);
+			});
 
 			if (ImGui::CollapsingHeader("Materials"))
 			{
@@ -204,11 +190,9 @@ void InspectorWindow::display()
 						}
 					}
 
-					static AssetSelectDialog materialSelectDialog("Mesh_Material", AssetType::MATERIAL, [&mat](UUID uuid){
-							mat = AssetWrapper<Material>(uuid);
-						});
-
-					addAssetSelectWidget(matName, materialSelectDialog);
+					addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uuid) {
+						mat = AssetWrapper<Material>(uuid);
+					});
 
 					++index;
 					ImGui::PopID();
@@ -411,9 +395,9 @@ void InspectorWindow::display()
 						animationName = animation.getUID();
 					}
 
-					static AssetSelectDialog animationSelectDialog("Animator_Animation", AssetType::ANIMATION, [&animator, name](UUID uuid) {
+					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uuid) {
 						animator.addAnimation(name, AssetWrapper<Animation>(uuid));
-						});
+					});
 
 
 					bool isSelected = (index == activeAnimationIndex);
@@ -458,62 +442,10 @@ void InspectorWindow::display()
 					matName = terrain.m_material.info().name;
 				}
 
-				static AssetSelectDialog materialSelectDialog("Terrain_Material", AssetType::MATERIAL, [&terrain](UUID uuid) {
+				addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uuid) {
 					terrain.m_material = AssetWrapper<Material>(uuid);
 					});
-
-				addAssetSelectWidget(matName, materialSelectDialog);
-
-
-
-				//int index = 0;
-				//for (auto& [id, mat] : meshComponent.m_material)
-				//{
-				//	ImGui::PushID(&mat);
-
-				//	std::string matName = "None";
-				//	if (!mat.isEmpty())
-				//	{
-				//		matName = mat.info().name;
-				//		if (matName.empty())
-				//		{
-				//			matName = "Material " + std::to_string(index);
-				//		}
-				//	}
-
-				//	addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uid) {
-				//		mat = AssetWrapper<Material>(uid);
-				//		});
-
-				//	++index;
-				//	ImGui::PopID();
-				//}
 			}
-
-
-			//ImGui::Separator();
-			//ImGui::LabelText("Textures", "");
-
-			//ImGui::SliderInt("Textures", &terrain.m_textureCount, 0, MAX_TEXTURE_COUNT);
-			//for (int i = 0; i < terrain.m_textureCount; i++)
-			//{
-			//	ImGui::PushID(i);
-			//	auto texture = terrain.getTexture(i);
-			//	addTextureEditWidget(texture, { 50, 50 }, [i, &terrain](UUID uuid) {
-			//		terrain.setTexture(i, AssetWrapper<Texture>(uuid));
-			//	});
-			//	ImGui::DragFloat("Height blend", &terrain.m_textureBlends[i].blend, .01f);
-			//	auto scale = terrain.getTextureScale(i);
-			//	if (ImGui::DragFloat("scaleX", &scale.r, .01f))
-			//	{
-			//		terrain.setTextureScaleX(i, scale.r);
-			//	}
-			//	if (ImGui::DragFloat("scaleY", &scale.g, .01f))
-			//	{
-			//		terrain.setTextureScaleY(i, scale.g);
-			//	}
-			//	ImGui::PopID();
-			//}
 		});
 
 		displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {
@@ -669,10 +601,10 @@ void InspectorWindow::display()
 				scriptName = script.getScript().getUID();
 			}
 
-			static AssetSelectDialog scriptSelectDialog("Script_LUA", AssetType::LUA_SCRIPT, [&script](UUID uuid) {
+			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uuid) {
 				script.script = AssetWrapper<LuaScript>(uuid);
-				});
 			});
+		});
 
 		displayComponent<PostProcessComponent>("Post Process Component", [](PostProcessComponent& postProcessComponent) {
 			std::string shaderName = "None";
@@ -681,9 +613,9 @@ void InspectorWindow::display()
 				shaderName = postProcessComponent.shader.getUID();
 			}
 
-			static AssetSelectDialog shaderSelectDialog("PostProcess_Shader", AssetType::SHADER, [&postProcessComponent](UUID uuid) {
+			addAssetSelectWidget(shaderName, AssetType::SHADER, [&postProcessComponent](UUID uuid) {
 				postProcessComponent.shader = AssetWrapper<Shader>(uuid);
-				});
+			});
 				
 			if (!postProcessComponent.shader.isEmpty())
 			{

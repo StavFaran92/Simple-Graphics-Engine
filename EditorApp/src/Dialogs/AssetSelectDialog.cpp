@@ -2,6 +2,11 @@
 #include "EditorState.h"
 #include "imgui.h"
 
+AssetSelectDialog::AssetSelectDialog() :
+	DialogBase("AssetSelectDialog")
+{
+}
+
 AssetSelectDialog::AssetSelectDialog(const std::string& name, AssetType assetType, const std::function<void(UUID)>& onAccpetCB)
 	: assetType(assetType), onAccpetCB(onAccpetCB), DialogBase(name)
 {
@@ -49,7 +54,7 @@ void AssetSelectDialog::drawContent()
 
 		// Create invisible selectable
 		ImGui::SetCursorScreenPos(cursorStart);
-		bool selected = ImGui::Selectable(fullText.c_str(), isSelected, 0, totalSize);
+		bool selected = ImGui::Selectable(fullText.c_str(), isSelected, ImGuiSelectableFlags_DontClosePopups, totalSize);
 		if (selected) {
 			selectedAssetIndex = i;
 		}

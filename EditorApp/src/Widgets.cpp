@@ -209,13 +209,18 @@ void displayColoredLabelWidget(const char* label)
 	ImGui::Dummy(ImVec2(0.0f, 2.0f)); // Add a vertical gap
 }
 
-bool addAssetSelectWidget(const std::string& name, AssetSelectDialog& dialog)
+// TODO fix
+extern AssetSelectDialog assetSelectDialog;
+
+bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& onAccpetCB)
 {
 	float width = ImGui::GetContentRegionAvail().x;
 
 	if (ImGui::Button(name.c_str(), ImVec2(width, 0)))
 	{
-		dialog.activate();
+		assetSelectDialog.assetType = aType;
+		assetSelectDialog.onAccpetCB = onAccpetCB;
+		assetSelectDialog.activate();
 	}
 
 	return false;

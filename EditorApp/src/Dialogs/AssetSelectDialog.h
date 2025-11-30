@@ -7,6 +7,7 @@
 class AssetSelectDialog : public DialogBase
 {
 public:
+	AssetSelectDialog();
 	AssetSelectDialog(const std::string& name, AssetType assetType, const std::function<void(UUID)>& onAccpetCB);
 	// Inherited via DialogBase
 	void appearContent() override;
@@ -14,8 +15,8 @@ public:
 	bool acceptContent() override;
 	void cancelContent() override;
 
-private:
+public:
 	int selectedAssetIndex = -1;
 	AssetType assetType = AssetType::NONE;
-	const std::function<void(UUID)> onAccpetCB;
+	std::function<void(UUID)> onAccpetCB;
 };
