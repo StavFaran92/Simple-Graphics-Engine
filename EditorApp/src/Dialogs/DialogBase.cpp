@@ -22,10 +22,13 @@ void DialogBase::appear()
 
 void DialogBase::header()
 {
+	headerContent();
 }
 
 void DialogBase::footer()
 {
+	footerContent();
+
 	if (ImGui::Button("OK", ImVec2(120, 0)))
 	{
 		if (acceptContent())

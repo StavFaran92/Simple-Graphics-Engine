@@ -14,6 +14,7 @@ public:
 	void drawContent() override;
 	bool acceptContent() override;
 	void cancelContent() override;
+	void headerContent() override;
 
 public:
 	int selectedAssetIndex = -1;

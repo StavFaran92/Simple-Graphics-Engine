@@ -20,6 +20,8 @@ protected:
 	virtual void drawContent() = 0;
 	virtual bool acceptContent() = 0;
 	virtual void cancelContent() = 0;
+	virtual void headerContent() {};
+	virtual void footerContent() {};
 
 	const std::string m_label;
 };

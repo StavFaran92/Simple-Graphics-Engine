@@ -7,11 +7,6 @@ AssetSelectDialog::AssetSelectDialog() :
 {
 }
 
-AssetSelectDialog::AssetSelectDialog(const std::string& name, AssetType assetType, const std::function<void(UUID)>& onAccpetCB)
-	: assetType(assetType), onAccpetCB(onAccpetCB), DialogBase(name)
-{
-}
-
 void AssetSelectDialog::appearContent()
 {
 	selectedAssetIndex = -1;
@@ -74,4 +69,18 @@ bool AssetSelectDialog::acceptContent()
 
 void AssetSelectDialog::cancelContent()
 {
+}
+
+void AssetSelectDialog::headerContent()
+{
+	if (assetType == AssetType::TEXTURE)
+	{
+		const std::vector<AssetInfo>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
+		if (selectedAssetIndex != -1)
+		{
+			ResourceWrapper<Texture> displayTexture = assetList.at(selectedAssetIndex).resource.as<Texture>();
+			ImVec2 imageSize(150, 150);
+			ImGui::Image(reinterpret_cast<ImTextureID>(displayTexture.get()->getID()), imageSize, ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
+		}
+	}
 }

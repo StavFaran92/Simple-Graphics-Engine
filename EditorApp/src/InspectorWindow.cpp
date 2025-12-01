@@ -425,9 +425,11 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<Terrain>("Terrain", [](Terrain& terrain) {
-			addTextureEditWidget(terrain.m_heightmap, { 50, 50 }, [&](UUID uuid) {
+
+			addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
 				terrain = Terrain::generateTerrain(terrain.m_width, terrain.m_height, terrain.m_scale, AssetWrapper<Texture>(uuid));
-			});
+				});
+
 			ImGui::DragInt("height", &terrain.m_height);
 			ImGui::DragInt("width", &terrain.m_width);
 			ImGui::DragInt("scale", &terrain.m_scale);

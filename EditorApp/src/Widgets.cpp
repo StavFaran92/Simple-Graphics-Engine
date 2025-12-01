@@ -6,17 +6,6 @@
 #include "tinyfiledialogs.h"
 #include "dialogs/AssetSelectDialog.h"
 
-void addTextureEditWidget(int textureID, ImVec2 size, std::function<void(UUID uuid)> callback)
-{
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(textureID), size))
-	{
-		ImGui::OpenPopup("EditTexturePopup");
-		EditorState::Instance().assetTextureSelectCB = callback;
-	}
-
-	displayTextureSelectDialog();
-}
-
 void addTextureEditWidget(AssetWrapper<Texture> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
 	int texID = 0;
@@ -33,23 +22,6 @@ void addTextureEditWidget(AssetWrapper<Texture> texture, ImVec2 size, std::funct
 
 	displayTextureSelectDialog();
 }
-
-//void addTextureEditWidget(AssetWrapper<Material> mat, const std::string& name, Texture::TextureType ttype)
-//{
-//	AssetWrapper<Texture> tex = AssetWrapper<Texture>::empty;
-//	if (mat.resource()->hasTexture(ttype))
-//	{
-//		tex = mat.resource()->getSampler(ttype)->texture;
-//	}
-//
-//	addTextureEditWidget(tex, { 20, 20 }, [=](UUID uuid) {
-//		mat.get()->setTexture(ttype, AssetWrapper<Texture>(uuid));
-//		});
-//
-//	ImGui::SameLine();
-//
-//	ImGui::Text(name.c_str());
-//}
 
 void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, const std::string& name)
 {
