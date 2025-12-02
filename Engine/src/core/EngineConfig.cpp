@@ -42,5 +42,7 @@ void EngineConfig::loadConfig()
             renderConfig.renderWireframeGrid = render["RenderWireframeGrid"].get<bool>();
         if (render.contains("RenderFoliagePass"))
             renderConfig.renderFoliagePass = render["RenderFoliagePass"].get<bool>();
+        if (render.contains("RenderWaterBodyPass"))
+            renderConfig.renderWaterBodyPass = render["RenderWaterBodyPass"].get<bool>();
     }
 }

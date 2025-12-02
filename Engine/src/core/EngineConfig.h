@@ -17,6 +17,7 @@ struct EngineConfig
 		bool renderFoliagePass = true;
 		bool renderNonOpaquePass = true;
 		bool renderPostProcess = true;
+		bool renderWaterBodyPass = true;
 	};
 
 	EngineConfig(const std::string& path);

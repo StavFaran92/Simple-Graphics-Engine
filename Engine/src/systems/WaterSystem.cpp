@@ -7,6 +7,12 @@
 #include "component/MeshRendererComponent.h"
 #include "component/ShaderComponent.h"
 #include "component/RenderableComponent.h"
+#include "component/WaterBodyComponent.h"
+
+WaterSystem::WaterSystem()
+{
+	Engine::get()->registerSubSystem<WaterSystem>(this);
+}
 
 Entity WaterSystem::createPool()
 {
@@ -45,4 +51,8 @@ Entity WaterSystem::createPool()
 	materialAsset.get()->setSampler("waterNormalSampler", waterNormalSampler);
 
 	return poolQuad;
+}
+
+void WaterSystem::drawWaterBody(const WaterBodyComponent& waterBody)
+{
 }

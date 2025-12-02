@@ -17,6 +17,7 @@
 #include "geometry/Mesh.h"
 #include "component/RenderableComponent.h"
 #include "component/Component.h"
+#include "component/WaterBodyComponent.h"
 #include "render/Material.h"
 #include "component/ScriptableEntity.h"
 #include "physics/PhysicsSystem.h"
@@ -54,6 +55,7 @@
 
 #include "component/FoliageComponent.h"
 #include "systems/FoliageSystem.h"
+#include "systems/WaterSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/ShaderComponent.h"
@@ -401,6 +403,20 @@ void Scene::draw(float deltaTime)
 				Engine::get()->getSubSystem<FoliageSystem>()->setFrustum(frustum);
 				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(foliage);
 				glDisable(GL_BLEND);
+			}
+
+			glPopDebugGroup();
+		}
+
+		if (Engine::get()->getConfig().renderConfig.renderWaterBodyPass)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Water Body render pass");
+
+			graphics->renderView->bind();
+
+			for (auto&& [entity, waterBody, transform] : m_registry->get().view<WaterBodyComponent, Transformation>().each())
+			{
+				Engine::get()->getSubSystem<WaterSystem>()->drawWaterBody(waterBody);
 			}
 
 			glPopDebugGroup();

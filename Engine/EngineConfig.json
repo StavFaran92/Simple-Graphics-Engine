@@ -8,5 +8,6 @@
     "RenderTerrainPass": true,
     "RenderVolumetricsPass": true,
     "RenderWireframeGrid": true
+    "RenderWaterBodyPass": true
   }
 }
