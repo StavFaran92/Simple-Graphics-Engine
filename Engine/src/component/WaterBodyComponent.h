@@ -13,6 +13,8 @@ struct EngineAPI WaterBodyComponent : public Component
 	{
 		attachSimple<WaterBodyComponent>(c, entityHandler);
 	}
+
+	Entity nestedImpl = Entity::EmptyEntity;
 };
 
 REGISTER_COMPONENT(WaterBodyComponent)

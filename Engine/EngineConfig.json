@@ -7,7 +7,7 @@
     "RenderSkyboxPass": true,
     "RenderTerrainPass": true,
     "RenderVolumetricsPass": true,
-    "RenderWireframeGrid": true
+    "RenderWireframeGrid": true,
     "RenderWaterBodyPass": true
   }
 }

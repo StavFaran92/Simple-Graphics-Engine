@@ -16,15 +16,19 @@ WaterSystem::WaterSystem()
 
 Entity WaterSystem::createPool()
 {
-	auto poolQuad = Engine::get()->getContext()->getActiveScene()->createEntity("Pool");
+	auto waterBodyEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Pool");
+	auto& waterBodyComponent = waterBodyEntity.addComponent<WaterBodyComponent>();
+
+	auto waterBodyNestedImpl = Engine::get()->getContext()->getActiveScene()->createEntity("NestedImpl");
+	waterBodyComponent.nestedImpl = waterBodyNestedImpl;
 
 	// TODO use grid instead
-	ModelImportSettings aDesc;
-	aDesc.isEngineOwned = true;
-	auto& meshRendererComponent = poolQuad.addComponent<MeshRendererComponent>(MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx", aDesc));
+	ModelImportSettings meshDesc;
+	meshDesc.isEngineOwned = true;
+	AssetWrapper<MeshCollection> mesh = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx", meshDesc);
+	auto& meshRendererComponent = waterBodyNestedImpl.addComponent<MeshRendererComponent>(mesh);
 
 	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
-
 	AssetCreateDescriptor shaderDesc;
 	shaderDesc.aType = AssetType::SHADER;
 	shaderDesc.origFilePath = SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl";
@@ -50,7 +54,7 @@ Entity WaterSystem::createPool()
 	waterNormalSampler->texture = waterNormal;
 	materialAsset.get()->setSampler("waterNormalSampler", waterNormalSampler);
 
-	return poolQuad;
+	return waterBodyEntity;
 }
 
 void WaterSystem::drawWaterBody(const WaterBodyComponent& waterBody)

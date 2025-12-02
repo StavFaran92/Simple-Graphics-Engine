@@ -410,16 +410,16 @@ void Scene::draw(float deltaTime)
 
 		if (Engine::get()->getConfig().renderConfig.renderWaterBodyPass)
 		{
-			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Water Body render pass");
+			//glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Water Body render pass");
 
-			graphics->renderView->bind();
+			//graphics->renderView->bind();
 
-			for (auto&& [entity, waterBody, transform] : m_registry->get().view<WaterBodyComponent, Transformation>().each())
-			{
-				Engine::get()->getSubSystem<WaterSystem>()->drawWaterBody(waterBody);
-			}
+			//for (auto&& [entity, waterBody, transform] : m_registry->get().view<WaterBodyComponent, Transformation>().each())
+			//{
+			//	Engine::get()->getSubSystem<WaterSystem>()->drawWaterBody(waterBody);
+			//}
 
-			glPopDebugGroup();
+			//glPopDebugGroup();
 		}
 
 		if (Engine::get()->getConfig().renderConfig.renderTerrainPass)
