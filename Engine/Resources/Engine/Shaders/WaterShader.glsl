@@ -6,7 +6,8 @@ void vert(inout vec3 aPos, inout vec3 aNorm)
 
 #frag
 
-uniform sampler2D waterNormalSampler;
+#pragma editable
+uniform PBR_Sampler waterNormalSampler;
 
 vec2 createNormalWave(vec3 aPos, float xSpeed, float ySpeed, float amp)
 {
@@ -15,7 +16,7 @@ vec2 createNormalWave(vec3 aPos, float xSpeed, float ySpeed, float amp)
 	float t = getTime();
 	worldPos.x += t * xSpeed;
 	worldPos.y += t * ySpeed;
-	return texture(waterNormalSampler, worldPos).rg;
+	return texture(waterNormalSampler.texture, worldPos).rg;
 }
 
 void frag(inout vec3 albedo, inout vec3 normal, inout float metallic, inout float roughness, inout float ao)

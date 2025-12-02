@@ -38,6 +38,7 @@ struct EngineAPI MeshRendererComponent : public Component
 		SERIALIZED_MEMBER(mesh);
 		SERIALIZED_MEMBER(count);
 		SERIALIZED_MEMBER(m_material);
+		SERIALIZED_MEMBER(renderTechnique);
 
 	}
 
@@ -45,6 +46,15 @@ struct EngineAPI MeshRendererComponent : public Component
 
 	int count = 0;
 	std::unordered_map<int, AssetWrapper<Material>> m_material;
+
+	enum class RenderTechnique : int
+	{
+		Forward,
+		Deferred
+	};
+
+	RenderTechnique renderTechnique = RenderTechnique::Deferred;
+
 	
 };
 

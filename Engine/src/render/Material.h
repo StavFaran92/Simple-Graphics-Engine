@@ -69,7 +69,7 @@ public:
 	void setName(const std::string& name);
 	std::string getName() const;
 
-	void setMaterialRenderMode(MaterialRenderMode renderMode);
+	void setMaterialRenderMode(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader = {});
 	MaterialRenderMode getMaterialRenderMode() const;
 
 	ResourceWrapper<Material> clone(bool isEngineOwned) const;
@@ -97,6 +97,7 @@ public:
 
 	static AssetWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
 	static ResourceWrapper<Material> create(MaterialRenderMode renderMode);
+	static ResourceWrapper<Material> create(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader);
 	static void updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc);
 
 protected:

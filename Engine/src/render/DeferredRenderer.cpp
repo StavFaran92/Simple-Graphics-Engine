@@ -224,17 +224,6 @@ void DeferredRenderer::render()
 void DeferredRenderer::renderScene(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-	graphics->entityGroup.clear();
-	for (auto&& [entity, mesh, transform, renderable] :
-		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent>().each())
-	{
-		if (renderable.renderTechnique == RenderableComponent::RenderTechnique::Deferred)
-		{
-			Entity entityhandler{ entity, &scene->getRegistry() };
-			graphics->entityGroup.push_back(entityhandler);
-		}
-	}
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, getGBuffer().getID());
 	RenderCommand::clear();
@@ -255,33 +244,17 @@ void DeferredRenderer::renderScene(Scene* scene)
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
 
 	// Render all objects
-	for (auto& entityHandler : graphics->entityGroup)
+	for (auto&& [entity, meshRenderer, transform, obj] :
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
 	{
+		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Deferred)
+			continue;
+
+		Entity entityHandler{ entity, &scene->getRegistry() };
 		std::string name = entityHandler.getComponent<ObjectComponent>().name;
-		logTrace("About to render {}", name);
+		logTrace("About to render using Deferred Render pass {}", name);
 
-		MeshRendererComponent& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
-
-		ResourceWrapper<MeshCollection> meshCollecton = meshRenderer.mesh.resource();
-
-		auto animator = entityHandler.tryGetComponent<Animator>();
-		if (!animator || animator->m_currentAnimation.isEmpty())
-		{
-			graphics->shader->setUniformValue("isAnimated", false);
-		}
-		else
-		{
-			std::vector<glm::mat4> finalBoneMatrices;
-			animator->getFinalBoneMatrices(meshCollecton.get(), finalBoneMatrices);
-			for (int i = 0; i < finalBoneMatrices.size(); ++i)
-			{
-				graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
-			}
-
-			graphics->shader->setUniformValue("isAnimated", true);
-		}
-
-		for (auto mesh : meshCollecton.get()->getMeshes())
+		for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
 		{
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
 			{

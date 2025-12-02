@@ -649,6 +649,7 @@ bool Shader::recompile()
 	BuildShaders(shadersInfo);
 
 	m_sourceCode = fullShaderCode;
+	m_shadersInfo = shadersInfo;
 
 	return true;
 }
@@ -656,6 +657,11 @@ bool Shader::recompile()
 const std::string& Shader::getSourceCode() const
 {
 	return m_sourceCode;
+}
+
+const ShadersInfo& Shader::getShadersInfo() const
+{
+	return m_shadersInfo;
 }
 
 Shader::~Shader() {

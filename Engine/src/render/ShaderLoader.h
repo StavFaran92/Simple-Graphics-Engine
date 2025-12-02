@@ -4,16 +4,7 @@
 #include <memory>
 
 #include "render/IShaderParser.h"
-
-struct ShadersInfo
-{
-	std::string vertexCode;
-	std::string fragmentCode;
-	std::string geometryCode;
-	std::string computeCode;
-	std::string tessControlCode;
-	std::string tessEvaluationCode;
-};
+#include "render/ShadersInfo.h"
 
 class ShaderLoader
 {

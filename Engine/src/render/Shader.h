@@ -14,6 +14,7 @@
 #include "glm/glm.hpp"
 
 #include <nlohmann/json.hpp>
+#include "render/ShadersInfo.h"
 
 using json = nlohmann::json;
 
@@ -94,6 +95,7 @@ public:
 	bool recompile();
 
 	const std::string& getSourceCode() const;
+	const ShadersInfo& getShadersInfo() const;
 
 	static AssetWrapper<Shader> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
@@ -161,4 +163,6 @@ protected:
 
 	std::string m_sourceCode;
 	std::string origSourceCode;
+
+	ShadersInfo m_shadersInfo;
 };

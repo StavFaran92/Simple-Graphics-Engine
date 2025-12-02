@@ -49,7 +49,7 @@ void main()
     vec3 totalNormal;
     applySkinning(pos, norm, boneIDs, boneWeights, totalPosition, totalNormal);
 
-    vec3 aNorm = transposeInverseModelMatrix * totalNormal;
+    vec3 aNorm = mat3(transpose(inverse(model))) * totalNormal;
 
 #ifdef CUSTOM_SHADER
     vert(totalPosition.xyz, aNorm);

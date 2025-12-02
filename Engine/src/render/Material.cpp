@@ -17,6 +17,7 @@
 #include <fstream>
 #include <regex>
 #include "memory/BuiltInAssets.h"
+#include "render/ShadersInfo.h"
 
 #include <filesystem>
 
@@ -155,6 +156,13 @@ ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
 {
 	auto mat = Factory<Material>::create();
 	mat->setMaterialRenderMode(renderMode);
+	return mat;
+}
+
+ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader)
+{
+	auto mat = Factory<Material>::create();
+	mat->setMaterialRenderMode(renderMode, customShader);
 	return mat;
 }
 
@@ -329,7 +337,15 @@ void Material::setShader(AssetWrapper<Shader> shader)
 {
 	m_shader = shader;
 
-	const std::string& sourceCode = shader.resource()->getSourceCode();
+	std::string sourceCode;
+	ShadersInfo sInfo = shader.resource()->getShadersInfo();
+	sourceCode += sInfo.vertexCode + "\n";
+	sourceCode += sInfo.fragmentCode + "\n";
+	sourceCode += sInfo.computeCode + "\n";
+	sourceCode += sInfo.geometryCode + "\n";
+	sourceCode += sInfo.tessControlCode + "\n";
+	sourceCode += sInfo.tessEvaluationCode + "\n";
+
 	parseUniforms(sourceCode);
 }
 
@@ -338,8 +354,7 @@ void Material::update()
 	auto oldUniforms = m_uniformProperties;
 	auto oldSamplers = m_samplers;
 
-	parseUniforms(m_shader.resource()->getSourceCode());
-
+	setShader(m_shader);
 
 	auto& newSamplers = m_samplers;
 	for (const auto [name, sampler] : oldSamplers)
@@ -387,7 +402,7 @@ std::string Material::getName() const
 	return m_name;
 }
 
-void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
+void Material::setMaterialRenderMode(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader)
 {
 	m_renderMode = renderMode;
 
@@ -402,6 +417,15 @@ void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
 	else if (m_renderMode == MaterialRenderMode::Terrain)
 	{
 		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN));
+	}
+	else if (m_renderMode == MaterialRenderMode::Custom)
+	{
+		if (customShader.isEmpty())
+		{
+			logError("Specified render mode is custom, therefore you must assign a valid shader as argument.");
+			return;
+		}
+		setShader(customShader);
 	}
 }
 
