@@ -179,11 +179,20 @@ uniform PBR_Sampler samplerAlbedo;
 #pragma editable
 uniform PBR_Sampler samplerNormal;
 
+#pragma editable
+uniform PBR_Sampler samplerRoughness;
+
+#pragma editable
+uniform PBR_Sampler samplerAO;
+
 #pragma editable (default=1.0)
 uniform float roughnessFactor;
 
 #pragma editable (default=0.0)
 uniform float metallicFactor;
+
+#pragma editable (default=0.0)
+uniform float aoFactor;
 
 #pragma editable (default=(1.0, 1.0, 1.0))
 uniform vec3 color;
@@ -236,9 +245,13 @@ vec4 getPBRTexture(PBR_Sampler s)
 void main()
 {
     vec3 albedo = pow(getPBRTexture(samplerAlbedo).rgb * color, vec3(2.2));
-    vec3 normal = normalize(fragNormal);
+    vec3 normalSample = getPBRTexture(samplerNormal).rgb;
+    normalSample = normalSample;// * 2.0 - 1.0; // [0,1] -> [-1, 1]
+    normalSample = normalize(normalSample);
+    vec3 normal = normalSample * normalize(fragNormal);
     float metallic = metallicFactor;
-    float roughness = roughnessFactor;
+    float roughness = getPBRTexture(samplerRoughness).r * roughnessFactor;
+    float ao = getPBRTexture(samplerAO).r * aoFactor;
 
     vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
     float shadow = calculateShadows(fragPosInLightSpace, gShadowMap);
@@ -248,7 +261,7 @@ void main()
                 normal,
                 metallic,
                 roughness,
-                1.f,
+                ao,
                 cameraPos,
                 fragPos,
                 shadow,
@@ -262,6 +275,7 @@ void main()
     color = pow(color, vec3(1.0/2.2));
 
     FragColor = vec4(color, 1.);
+    // FragColor = vec4(normalSample, 1.);
 
     // if(height < textureBlend[0])
     // {
