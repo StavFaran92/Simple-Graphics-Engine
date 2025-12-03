@@ -630,6 +630,11 @@ void InspectorWindow::display()
 
 			});
 
+		displayComponent<WaterBodyComponent>("Water Body Component", [](WaterBodyComponent& waterBody) {
+			std::shared_ptr<TextureSampler> sampler = waterBody.getWaterNormalSampler();
+			addSamplerEditWidget(sampler, { 50, 50 }, "Water Normal");
+		});
+
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
 			});
 

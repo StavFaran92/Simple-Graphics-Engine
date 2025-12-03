@@ -17,10 +17,10 @@ WaterSystem::WaterSystem()
 Entity WaterSystem::createPool()
 {
 	auto waterBodyEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Pool");
-	auto& waterBodyComponent = waterBodyEntity.addComponent<WaterBodyComponent>();
+	auto& waterBodyComponent = waterBodyEntity.addComponent<WaterBodyComponent>(waterBodyEntity);
 
 	auto waterBodyNestedImpl = Engine::get()->getContext()->getActiveScene()->createEntity("NestedImpl");
-	waterBodyComponent.nestedImpl = waterBodyNestedImpl;
+	waterBodyNestedImpl.setParent(waterBodyEntity);
 
 	// TODO use grid instead
 	ModelImportSettings meshDesc;

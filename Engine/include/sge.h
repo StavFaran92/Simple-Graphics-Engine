@@ -44,18 +44,18 @@
 #include "memory/Assets.h"
 #include "serialize/Archiver.h"
 #include "animation/AnimationLoader.h"
-#include "animation/Animator.h"
-#include "component/Terrain.h"
 #include "core/System.h"
 #include "utils/DebugHelper.h"
 #include "systems/WaterSystem.h"
 #include "systems/UniqueNameManager.h"
 #include "render/RenderCommand.h"
+#include "camera/CameraControllerFreeLook.h"
+
+#include "animation/Animator.h"
+#include "component/Terrain.h"
 #include "component/FoliageComponent.h"
 #include "component/PhysicsComponent.h"
-#include "camera/CameraControllerFreeLook.h"
 #include "component/MeshRendererComponent.h"
-
 #include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/NativeScriptComponent.h"
@@ -65,6 +65,8 @@
 #include "component/ScriptComponent.h"
 #include "component/ImageComponent.h"
 #include "component/PostProcessComponent.h"
+#include "component/WaterBodyComponent.h"
+
 #include "runtime/Prefab.h"
 #include "memory/BuiltInAssets.h"
 

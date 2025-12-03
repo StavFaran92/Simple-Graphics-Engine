@@ -23,16 +23,9 @@ const entt::registry& SGE_Regsitry::getRegistry() const
 
 Entity SGE_Regsitry::createEntity()
 {
-	std::string name = "temp";
-	return createEntity(name);
-}
-
-Entity SGE_Regsitry::createEntity(const std::string& name)
-{
 	entt::entity e = m_registry.create();
 	auto entityHandler = Entity(e, this);
 	entityHandler.addComponent<Transformation>(entityHandler);
-	entityHandler.addComponent<ObjectComponent>(entityHandler, name); //todo fix
 	return entityHandler;
 }
 

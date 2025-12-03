@@ -18,6 +18,8 @@ struct EngineAPI MeshRendererComponent : public Component
 		m_material[index] = mat;
 	}
 
+	AssetWrapper<Material> getMaterialBySlot(int slot) const;
+
 	ResourceWrapper<Material> at(int index)
 	{
 		auto iter = m_material.find(index);

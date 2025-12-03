@@ -15,8 +15,6 @@ public:
 
 	Entity createEntity();
 
-	Entity createEntity(const std::string& name);
-
 	void removeEntity(const Entity& e);
 private:
 

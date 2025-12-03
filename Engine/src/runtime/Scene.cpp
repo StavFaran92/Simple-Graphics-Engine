@@ -969,7 +969,10 @@ Entity Scene::createEntity()
 
 Entity Scene::createEntity(const std::string& name)
 {
-	return m_registry->createEntity(name);
+	Entity e = m_registry->createEntity();
+	e.addComponent<ObjectComponent>(e, name);
+	return e;
+
 }
 
 void Scene::removeEntity(const Entity& e)

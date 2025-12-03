@@ -24,7 +24,7 @@
 
 Entity ShapeFactory::createEntity(SGE_Regsitry* registry, const std::string& name)
 {
-	auto entity = registry->createEntity(name);
+	auto entity = registry->createEntity();
 	entity.addComponent<RenderableComponent>();
 	//entity.addComponent<MaterialComponent>();
 	//entity.addComponent<MeshRendererComponent>();
