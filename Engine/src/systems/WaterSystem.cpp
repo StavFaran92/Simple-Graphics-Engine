@@ -76,4 +76,5 @@ void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody)
 
 	materialResource->setUniformValue("uColorA", waterBody.colorA);
 	materialResource->setUniformValue("uColorB", waterBody.colorB);
+	materialResource->setUniformValue("opacityFactor", waterBody.opacity);
 }

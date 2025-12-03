@@ -634,16 +634,18 @@ void InspectorWindow::display()
 
 			addSamplerEditWidget(waterBody.waterBodyNormal, ImVec2(50, 50), "Water Normal");
 
-			ImGui::DragFloat2("Wave 1 Speed", glm::value_ptr(waterBody.wave1Speed), 0.01f, -10.0f, 10.0f);
-			ImGui::DragFloat2("Wave 2 Speed", glm::value_ptr(waterBody.wave2Speed), 0.01f, -10.0f, 10.0f);
-			ImGui::DragFloat2("Wave 3 Speed", glm::value_ptr(waterBody.wave3Speed), 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("Wave 1 Speed", glm::value_ptr(waterBody.wave1Speed), 0.001f, -10.0f, 10.0f);
+			ImGui::DragFloat2("Wave 2 Speed", glm::value_ptr(waterBody.wave2Speed), 0.001f, -10.0f, 10.0f);
+			ImGui::DragFloat2("Wave 3 Speed", glm::value_ptr(waterBody.wave3Speed), 0.001f, -10.0f, 10.0f);
 
-			ImGui::DragFloat("Wave 1 Amplitude", &waterBody.wave1Amp, 0.1f, 0.0f, 10.0f);
-			ImGui::DragFloat("Wave 2 Amplitude", &waterBody.wave2Amp, 0.1f, 0.0f, 10.0f);
-			ImGui::DragFloat("Wave 3 Amplitude", &waterBody.wave3Amp, 0.1f, 0.0f, 10.0f);
+			ImGui::DragFloat("Wave 1 Amplitude", &waterBody.wave1Amp, 0.01f, 0.0f, 10.0f);
+			ImGui::DragFloat("Wave 2 Amplitude", &waterBody.wave2Amp, 0.01f, 0.0f, 10.0f);
+			ImGui::DragFloat("Wave 3 Amplitude", &waterBody.wave3Amp, 0.01f, 0.0f, 10.0f);
 
 			ImGui::ColorEdit3("Color A", glm::value_ptr(waterBody.colorA));
 			ImGui::ColorEdit3("Color B", glm::value_ptr(waterBody.colorB));
+
+			ImGui::DragFloat("Opacity", &waterBody.opacity, 0.01f, 0.0f, 1.0f);
 
 		});
 

@@ -31,6 +31,8 @@ struct EngineAPI WaterBodyComponent : public Component
 
 	glm::vec3 colorA{ 0.023497, 0.451692, 1.0 };
 	glm::vec3 colorB{ 0.0, 0.05938, 0.135417 };
+
+	float opacity = 1.0;
 };
 
 REGISTER_COMPONENT(WaterBodyComponent)
