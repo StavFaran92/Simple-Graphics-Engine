@@ -37,6 +37,7 @@
 #include "render/DeferredRenderer.h"
 
 #include "systems/FoliageSystem.h"
+#include "systems/WaterSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/PostProcessComponent.h"
@@ -251,6 +252,8 @@ bool Engine::init(const InitParams& initParams)
         logError("Foliage System init failed!");
         return false;
     }
+
+    auto waterSystem = new WaterSystem();
 
     if (initParams.loadExistingProject)
     {

@@ -52,11 +52,28 @@ Entity WaterSystem::createPool()
 	auto waterNormal = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/water_new_height.png");
 	auto waterNormalSampler = std::make_shared<TextureSampler>(1);
 	waterNormalSampler->texture = waterNormal;
-	materialAsset.get()->setSampler("waterNormalSampler", waterNormalSampler);
+	waterBodyComponent.waterBodyNormal = waterNormalSampler;
 
 	return waterBodyEntity;
 }
 
 void WaterSystem::drawWaterBody(const WaterBodyComponent& waterBody)
 {
+}
+
+void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody)
+{
+	auto& materialResource = waterBody.getMaterial().resource();
+	materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal);
+
+	materialResource->setUniformValue("uWave1Speed", waterBody.wave1Speed);
+	materialResource->setUniformValue("uWave2Speed", waterBody.wave2Speed);
+	materialResource->setUniformValue("uWave3Speed", waterBody.wave3Speed);
+
+	materialResource->setUniformValue("uWave1Amp", waterBody.wave1Amp);
+	materialResource->setUniformValue("uWave2Amp", waterBody.wave2Amp);
+	materialResource->setUniformValue("uWave3Amp", waterBody.wave3Amp);
+
+	materialResource->setUniformValue("uColorA", waterBody.colorA);
+	materialResource->setUniformValue("uColorB", waterBody.colorB);
 }

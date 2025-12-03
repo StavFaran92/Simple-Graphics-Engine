@@ -82,10 +82,14 @@ void Material::use()
 	for (const auto& [name, sampler] : m_samplers)
 	{
 		// if texture is empty use dummy texture
-		AssetWrapper<Texture> texture = sampler->texture;
-		if (sampler->texture.resource().isEmpty())
+		AssetWrapper<Texture> texture;
+		if (!sampler || sampler->texture.isEmpty())
 		{
-			texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
+			texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
+		}
+		else
+		{
+			texture = sampler->texture;
 		}
 
 		texture.get()->setSlot(slot);
@@ -95,14 +99,15 @@ void Material::use()
 
 		// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
 		shader->setUniformValue(name + ".texture", slot);
-		shader->setUniformValue(name + ".xOffset", sampler->xOffset);
-		shader->setUniformValue(name + ".yOffset", sampler->yOffset);
-		shader->setUniformValue(name + ".xScale", sampler->xScale);
-		shader->setUniformValue(name + ".yScale", sampler->yScale);
-		shader->setUniformValue(name + ".channelMaskR", sampler->channelMaskR);
-		shader->setUniformValue(name + ".channelMaskG", sampler->channelCount > 1 ? sampler->channelMaskG : 0);
-		shader->setUniformValue(name + ".channelMaskB", sampler->channelCount > 2 ? sampler->channelMaskB : 0);
-		shader->setUniformValue(name + ".channelMaskA", sampler->channelCount > 3 ? sampler->channelMaskA : 0);
+
+		shader->setUniformValue(name + ".xOffset", sampler ? sampler->xOffset : 0.0f);
+		shader->setUniformValue(name + ".yOffset", sampler ? sampler->yOffset : 0.0f);
+		shader->setUniformValue(name + ".xScale", sampler ? sampler->xScale : 1.0f);
+		shader->setUniformValue(name + ".yScale", sampler ? sampler->yScale : 1.0f);
+		shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->channelMaskR : 1);
+		shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->channelCount > 1 ? sampler->channelMaskG : 0) : 0);
+		shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->channelCount > 2 ? sampler->channelMaskB : 0) : 0);
+		shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->channelCount > 3 ? sampler->channelMaskA : 0) : 0);
 
 		slot++;
 	}

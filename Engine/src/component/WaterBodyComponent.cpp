@@ -9,10 +9,15 @@ WaterBodyComponent::WaterBodyComponent(Entity entity)
 
 }
 
-std::shared_ptr<TextureSampler> WaterBodyComponent::getWaterNormalSampler()
+AssetWrapper<Material> WaterBodyComponent::getMaterial()
 {
+	if (!entity.valid())
+	{
+		logWarning("Invalid Entity set in water body");
+		return AssetWrapper<Material>::empty;
+	}
+
 	MeshRendererComponent& meshRenderer = entity.getComponentInChildren<MeshRendererComponent>(false); // todo fix this is unsafe (getComponentInChildren itself is)
-	AssetWrapper<Material> mat = meshRenderer.getMaterialBySlot(0);
-	std::shared_ptr<TextureSampler> sampler = mat.get()->getSampler("waterNormalSampler");
-	return sampler;
+	AssetWrapper<Material> mat = meshRenderer.getMaterialBySlot(0); // A water body plane only has single material
+	return mat;
 }

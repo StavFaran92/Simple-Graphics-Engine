@@ -13,4 +13,6 @@ public:
 	static Entity createPool();
 
 	static void drawWaterBody(const WaterBodyComponent& waterBody);
+
+	void prepareWaterBodyForRender(WaterBodyComponent& waterBody);
 };

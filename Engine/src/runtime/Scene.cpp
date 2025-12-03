@@ -342,6 +342,11 @@ void Scene::draw(float deltaTime)
 		graphics->lightSpaceMatrix = m_shadowSystem->getLightSpaceMat();
 		graphics->shadowMap = m_shadowSystem->getShadowMap();
 
+		for (auto&& [entity, waterBody, transform] : m_registry->get().view<WaterBodyComponent, Transformation>().each())
+		{
+			Engine::get()->getSubSystem<WaterSystem>()->prepareWaterBodyForRender(waterBody);
+		}
+
 		// PRE Render Phase
 		for (const auto& cb : m_renderCallbacks[RenderPhase::PRE_RENDER_BEGIN])
 		{
@@ -414,10 +419,7 @@ void Scene::draw(float deltaTime)
 
 			//graphics->renderView->bind();
 
-			//for (auto&& [entity, waterBody, transform] : m_registry->get().view<WaterBodyComponent, Transformation>().each())
-			//{
-			//	Engine::get()->getSubSystem<WaterSystem>()->drawWaterBody(waterBody);
-			//}
+			
 
 			//glPopDebugGroup();
 		}
