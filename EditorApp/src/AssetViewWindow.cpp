@@ -247,7 +247,7 @@ void AssetViewWindow::display()
 
 			if (ImGui::BeginPopupContextItem("AssetContextMenu"))
 			{
-				if (ImGui::Selectable("Open"))
+				if (ImGui::Selectable("Edit"))
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
@@ -272,6 +272,13 @@ void AssetViewWindow::display()
 					{
 						openInVSCode(Engine::get()->getProjectDirectory() + "/" + aInfo.relativefilePath);
 					}
+				}
+
+				if (ImGui::Selectable("Reimport"))
+				{
+					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
+					Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
 				}
 
 				if (ImGui::Selectable("Rename"))

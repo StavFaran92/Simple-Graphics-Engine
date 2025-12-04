@@ -15,6 +15,8 @@ struct AssetUpdateDescriptor;
 template<typename T>
 class AssetWrapper;
 
+using json = nlohmann::json;
+
 struct EngineAPI AssetInfo
 {
 	bool isValid = false;
@@ -45,3 +47,7 @@ struct EngineAPI AssetInfo
 	void update(const AssetUpdateDescriptor& desc);
 	void establishFilepath();
 };
+
+// Serialization (to JSON)
+void to_json(nlohmann::json& j, const AssetInfo& asset);
+void from_json(const nlohmann::json& j, AssetInfo& asset);

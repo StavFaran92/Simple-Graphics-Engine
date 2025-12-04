@@ -69,6 +69,8 @@ public:
 
 	void updateAsset(const AssetWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc = {});
 
+	void reimportAsset(UUID uuid);
+
 	AssetWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
 	AssetWrapper<ResourceBase> createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc);
@@ -77,6 +79,8 @@ public:
 
 private:
 	void updateRegistry(const AssetInfo& aInfo);
+
+	bool importAssetInner(AssetInfo& aInfo);
 private:
 	std::unordered_map<UUID, AssetInfo> m_assets;
 };

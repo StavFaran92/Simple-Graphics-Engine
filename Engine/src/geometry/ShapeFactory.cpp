@@ -14,6 +14,7 @@
 #include "core/Registry.h"
 //#include "component/RenderableComponent.h"
 #include "component/Component.h"
+#include "component/ObjectComponent.h"
 #include "core/CacheSystem.h"
 
 #include "component/MeshRendererComponent.h"
@@ -25,9 +26,7 @@
 Entity ShapeFactory::createEntity(SGE_Regsitry* registry, const std::string& name)
 {
 	auto entity = registry->createEntity();
-	entity.addComponent<RenderableComponent>();
-	//entity.addComponent<MaterialComponent>();
-	//entity.addComponent<MeshRendererComponent>();
+	entity.addComponent<ObjectComponent>(entity, name);
 	return entity;
 }
 

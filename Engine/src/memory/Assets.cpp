@@ -115,7 +115,41 @@ void Assets::updateRegistry(const AssetInfo& aInfo)
 		Engine::get()->getMemoryManagementSystem()->addNameReference(aInfo.name, aInfo.uuid);
 	}
 	Engine::get()->getMemoryManagementSystem()->addPathReference(aInfo.relativefilePath, aInfo.uuid); //TODO maybe use some naming convention here?
-	Engine::get()->getContext()->getProjectAssetRegistry()->addAssetRegistry(aInfo);
+	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
+}
+
+bool Assets::importAssetInner(AssetInfo& aInfo)
+{
+	std::string fileLocation = aInfo.origFilePath;
+
+	// Validate input
+	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+	{
+		logError("Invalid asset path specified.");
+		return false;
+	}
+
+	// Copy + Paste
+	if (!AssetFactory::getManager(aInfo.aType)->copyFiles(fileLocation, aInfo))
+	{
+		logError("Failed to copy file from {} to resource folder", fileLocation);
+		return false;
+	}
+
+	// Load
+	ResourceWrapper<ResourceBase> resource = AssetFactory::getManager(aInfo.aType)->load(aInfo);
+	if (resource.isEmpty() || !resource.get())
+	{
+		logError("Failed to load file {}", fileLocation);
+		return false;
+	}
+
+
+	// Add Asset
+	aInfo.resource = resource;
+	addAsset(aInfo);
+
+	return true;
 }
 
 std::string Assets::getAlias(UUID uid) const
@@ -152,37 +186,22 @@ void Assets::updateAsset(const AssetWrapper<ResourceBase>& asset, const AssetUpd
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 }
 
+void Assets::reimportAsset(UUID uuid)
+{
+	AssetInfo aInfo = getAsset(uuid);
+
+	importAssetInner(aInfo);
+}
+
 AssetWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
 {
 	desc.origFilePath = fileLocation;
 	AssetInfo aInfo(desc);
 
-	// Validate input
-	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+	if (!importAssetInner(aInfo))
 	{
-		logError("Invalid asset path specified.");
 		return AssetWrapper<ResourceBase>::empty;
 	}
-
-	// Copy + Paste
-	if (!AssetFactory::getManager(aInfo.aType)->copyFiles(fileLocation, aInfo))
-	{
-		logError("Failed to copy file from {} to resource folder", fileLocation);
-		return AssetWrapper<ResourceBase>::empty;
-	}
-
-	// Load
-	ResourceWrapper<ResourceBase> resource = AssetFactory::getManager(aInfo.aType)->load(aInfo);
-	if (resource.isEmpty() || !resource.get())
-	{
-		logError("Failed to load file {}", fileLocation);
-		return AssetWrapper<ResourceBase>::empty;
-	}
-
-
-	// Add Asset
-	aInfo.resource = resource;
-	addAsset(aInfo);
 
 	AssetWrapper<ResourceBase> asset(aInfo.uuid);
 

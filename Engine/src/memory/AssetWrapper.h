@@ -56,6 +56,11 @@ public:
 		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 	}
 
+	void reimportAsset()
+	{
+		Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
+	}
+
 	inline T* get() const
 	{
 		return resource().get();

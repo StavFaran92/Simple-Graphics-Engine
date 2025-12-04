@@ -36,6 +36,8 @@ public:
 
 	int getBoneID(const std::string& boneName) const;
 
+	int getMaterialCount() const;
+
 	static AssetWrapper<MeshCollection> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
 	static ResourceWrapper<MeshCollection> load(const std::string& fileLocation, ModelImportSettings aDesc = {});
 
@@ -46,4 +48,5 @@ private:
 	std::vector<std::shared_ptr<Mesh>> m_meshes;
 	std::vector<glm::mat4> m_bonesOffsets;
 	std::unordered_map<std::string, unsigned int> m_bonesNameToIDMap;
+	std::set<int> m_materialSlots{};
 };

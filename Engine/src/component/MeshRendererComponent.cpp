@@ -5,8 +5,8 @@
 MeshRendererComponent::MeshRendererComponent(AssetWrapper<MeshCollection> mesh)
 	: mesh(mesh)
 {
-	auto meshCount = MeshCollection::getLastLoadedMaterials().size();
-	for (int i = 0; i < meshCount; i++)
+	int materialCount = mesh.get()->getMaterialCount();
+	for (int i = 0; i < materialCount; i++)
 	{
 		addMaterial(BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT));
 	}

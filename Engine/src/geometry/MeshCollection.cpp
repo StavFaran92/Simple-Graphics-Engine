@@ -44,6 +44,8 @@ void MeshCollectionAssetManager::save(const AssetWrapper<ResourceBase>& mesh, co
 
 void MeshCollection::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
+	m_materialSlots.insert(mesh->getMaterialIndex());
+
 	m_meshes.push_back(mesh);
 }
 
@@ -93,6 +95,11 @@ int MeshCollection::getBoneID(const std::string& boneName) const
 	}
 
 	return m_bonesNameToIDMap.at(boneName);
+}
+
+int MeshCollection::getMaterialCount() const
+{
+	return m_materialSlots.size();
 }
 
 AssetWrapper<MeshCollection> MeshCollection::import(const std::string& fileLocation, ModelImportSettings desc)

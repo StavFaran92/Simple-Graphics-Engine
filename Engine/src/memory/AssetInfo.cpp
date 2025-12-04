@@ -5,6 +5,46 @@
 #include "memory/AssetWrapper.h"
 #include "fileSystem/ScopedPath.h"
 
+// Serialization (to JSON)
+void to_json(nlohmann::json& j, const AssetInfo& asset)
+{
+	j = nlohmann::json{
+		{"uuid", asset.uuid}, // Assuming UUID has a valid to_json
+		{"origFilePath", asset.origFilePath},
+		{"relativefilePath", asset.relativefilePath},
+		{"type", asset.aType}, // Assuming AssetType supports JSON conversion
+		{"isValid", asset.isValid},
+		{"attributes", asset.attributes},
+		{"importSettings", asset.importSettings},
+		{"name", asset.name},
+		{"isEngineOwned", asset.isEngineOwned},
+		{"filename", asset.fileName},
+		{"ext", asset.ext},
+		{"assetDirectory", asset.assetDirectory},
+		{"isCompositeAsset", asset.isCompositeAsset},
+	};
+}
+
+// Deserialization (from JSON)
+void from_json(const nlohmann::json& j, AssetInfo& asset)
+{
+	j.at("uuid").get_to(asset.uuid); // Assuming UUID has a valid from_json
+	j.at("origFilePath").get_to(asset.origFilePath);
+	j.at("relativefilePath").get_to(asset.relativefilePath);
+	j.at("type").get_to(asset.aType); // Assuming AssetType supports JSON conversion
+	j.at("isValid").get_to(asset.isValid);
+	j.at("attributes").get_to(asset.attributes);
+	j.at("importSettings").get_to(asset.importSettings);
+	j.at("name").get_to(asset.name);
+	j.at("isEngineOwned").get_to(asset.isEngineOwned);
+	j.at("filename").get_to(asset.fileName);
+	j.at("ext").get_to(asset.ext);
+	j.at("assetDirectory").get_to(asset.assetDirectory);
+	j.at("isCompositeAsset").get_to(asset.isCompositeAsset);
+
+	asset.establishFilepath();
+}
+
 void AssetInfo::establishFilepath()
 {
 	if (!isTransient)
