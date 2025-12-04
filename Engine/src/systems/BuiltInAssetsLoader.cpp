@@ -167,6 +167,13 @@ void BuiltInAssetsLoader::loadShaders()
 	{
 		ShaderAssetDescriptor desc;
 		desc.isEngineOwned = true;
+		desc.name = SGE_SHADER_DEFFERED_PBR_LIGHT;
+		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl", desc);
+	}
+
+	{
+		ShaderAssetDescriptor desc;
+		desc.isEngineOwned = true;
 		desc.name = SGE_SHADER_FORWARD_PBR;
 		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl", desc);
 	}

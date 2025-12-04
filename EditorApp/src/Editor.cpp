@@ -971,9 +971,9 @@ void DisplayDebugInfoWindow()
 		ImGui::EndGroup();
 	}
 
-	if (ImGui::Button("Reload Deferred Render Shaders"))
+	if (ImGui::Button("Reload Shaders"))
 	{
-		Engine::get()->getSubSystem<Graphics>()->reloadDefferedRendererShaders();
+		Engine::get()->getSubSystem<Graphics>()->reloadShaders();
 	}
 
 	ImGui::End();

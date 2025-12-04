@@ -29,7 +29,7 @@ public:
 	Graphics();
 	
 public:
-	void reloadDefferedRendererShaders();
+	void reloadShaders();
 public:
 	Scene* scene = nullptr;
 	Context* context = nullptr;

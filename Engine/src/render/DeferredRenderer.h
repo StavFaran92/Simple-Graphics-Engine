@@ -4,7 +4,7 @@
 
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/AssetWrapper.h"
 #include "runtime/Entity.h"
 #include "core/Window.h"
 #include "core/Configurations.h"
@@ -22,7 +22,7 @@ public:
 	void setUniforms(Shader* shader);
 
 	void resize(int w, int h);
-	void reloadShaders();
+	//void reloadShaders();
 
 	const FrameBufferObject& getGBuffer() const;
 
@@ -45,8 +45,8 @@ private:
 	ResourceWrapper<MeshCollection> m_quad;
 	ResourceWrapper<Shader> m_screenShader;
 	
-	ResourceWrapper<Shader> m_gBufferShader;
-	ResourceWrapper<Shader> m_lightPassShader;
+	AssetWrapper<Shader> m_gBufferShader;
+	AssetWrapper<Shader> m_lightPassShader;
 
 	// SSAO
 	FrameBufferObject m_ssaoFBO;

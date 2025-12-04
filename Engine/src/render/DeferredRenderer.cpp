@@ -178,8 +178,8 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 bool DeferredRenderer::init()
 {
-	m_gBufferShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM).resource(); //Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
-	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+	m_gBufferShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM); //Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
+	m_lightPassShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_LIGHT);
 
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
@@ -238,7 +238,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 		glLineWidth(1); // Size in pixels
 	}
 
-	graphics->shader = m_gBufferShader;
+	graphics->shader = m_gBufferShader.resource();
 	graphics->shader->use();
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
@@ -352,28 +352,24 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	// bind textures
 	// Todo solve slots issue
-	m_lightPassShader->setTextureInShader(m_positionTexture, "gPosition", 0);
-	m_lightPassShader->setTextureInShader(m_normalTexture, "gNormal", 1);
-	m_lightPassShader->setTextureInShader(m_albedoTexture, "gAlbedo", 2);
-	m_lightPassShader->setTextureInShader(m_MRATexture, "gMRA", 3);
-	m_lightPassShader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 4);
-	m_lightPassShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 5);
-	m_lightPassShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
-	m_lightPassShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
-	m_lightPassShader->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
+	ResourceWrapper<Shader> lightPassShaderResource = m_lightPassShader.resource();
+	lightPassShaderResource->use();
+	lightPassShaderResource->setTextureInShader(m_positionTexture, "gPosition", 0);
+	lightPassShaderResource->setTextureInShader(m_normalTexture, "gNormal", 1);
+	lightPassShaderResource->setTextureInShader(m_albedoTexture, "gAlbedo", 2);
+	lightPassShaderResource->setTextureInShader(m_MRATexture, "gMRA", 3);
+	lightPassShaderResource->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 4);
+	lightPassShaderResource->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 5);
+	lightPassShaderResource->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
+	lightPassShaderResource->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
+	lightPassShaderResource->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
+	lightPassShaderResource->bindUniformBlockToBindPoint("Time", 0);
+	lightPassShaderResource->bindUniformBlockToBindPoint("Lights", 1);
+	lightPassShaderResource->setUniformValue("cameraPos", graphics->cameraPos);
+	lightPassShaderResource->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
+	lightPassShaderResource->setUniformValue("useSSAO", graphics->useSSAO);
 
 	graphics->renderView->bind();
-
-	// bind fShader
-	m_lightPassShader->use();
-
-	m_lightPassShader->bindUniformBlockToBindPoint("Time", 0);
-	m_lightPassShader->bindUniformBlockToBindPoint("Lights", 1);
-
-	m_lightPassShader->setUniformValue("cameraPos", graphics->cameraPos);
-	m_lightPassShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
-
-	m_lightPassShader->setUniformValue("useSSAO", graphics->useSSAO);
 
 	{
 		// render to quad
@@ -397,9 +393,9 @@ void DeferredRenderer::resize(int w, int h)
 	setupSSAO(w, h);
 }
 
-void DeferredRenderer::reloadShaders()
-{
-	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl"); // TODO fix, now when its a built in asset it will cause issues
-	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
-	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
-}
+//void DeferredRenderer::reloadShaders()
+//{
+//	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl"); // TODO fix, now when its a built in asset it will cause issues
+//	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+//	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
+//}

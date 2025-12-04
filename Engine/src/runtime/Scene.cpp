@@ -168,7 +168,7 @@ void Scene::init(Context* context)
 	m_quadUI.RemoveComponent<ObjectComponent>();
 
 	m_UIShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/UIShader.glsl");
-	m_terrainShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN).resource();
+	m_terrainShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN);
 	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl");
 
 	m_uboTime = std::make_shared<UniformBufferObject>(sizeof(float));
@@ -428,6 +428,9 @@ void Scene::draw(float deltaTime)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Terrain render pass");
 
+			ResourceWrapper<Shader> terrainShader = m_terrainShader.resource();
+			terrainShader->use();
+
 			// Render terrain
 			for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
 			{
@@ -440,22 +443,21 @@ void Scene::draw(float deltaTime)
 				if (heightmap.isEmpty())
 					continue;
 
-				m_terrainShader->use();
-				m_terrainShader->setUniformValue("view", graphics->view);
-				m_terrainShader->setUniformValue("projection", graphics->projection);
-				m_terrainShader->setUniformValue("scale", terrain.getScale());
-				m_terrainShader->setUniformValue("model", transform.getWorldTransformation());
-				m_terrainShader->setUniformValue("width", terrain.getWidth());
-				m_terrainShader->setUniformValue("height", terrain.getHeight());
-				m_terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
-				m_terrainShader->setUniformValue("cameraPos", graphics->cameraPos);
-				m_terrainShader->bindUniformBlockToBindPoint("Time", 0);
-				m_terrainShader->bindUniformBlockToBindPoint("Lights", 1);
-				m_terrainShader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 5);
-				m_terrainShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 6);
-				m_terrainShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 7);
-				m_terrainShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 8);
-				m_terrainShader->setTextureInShader(heightmap, "heightMap", 9);
+				terrainShader->setUniformValue("view", graphics->view);
+				terrainShader->setUniformValue("projection", graphics->projection);
+				terrainShader->setUniformValue("scale", terrain.getScale());
+				terrainShader->setUniformValue("model", transform.getWorldTransformation());
+				terrainShader->setUniformValue("width", terrain.getWidth());
+				terrainShader->setUniformValue("height", terrain.getHeight());
+				terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
+				terrainShader->setUniformValue("cameraPos", graphics->cameraPos);
+				terrainShader->bindUniformBlockToBindPoint("Time", 0);
+				terrainShader->bindUniformBlockToBindPoint("Lights", 1);
+				terrainShader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 5);
+				terrainShader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 6);
+				terrainShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 7);
+				terrainShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 8);
+				terrainShader->setTextureInShader(heightmap, "heightMap", 9);
 
 				terrain.m_material.get()->use();
 

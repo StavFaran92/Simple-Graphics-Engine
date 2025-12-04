@@ -118,7 +118,7 @@ ResourceWrapper<MeshCollection> MeshCollection::load(const std::string& fileLoca
 
 std::map<int, AssetWrapper<Material>> MeshCollection::getLastLoadedMaterials()
 {
-	return dynamic_cast<MeshCollectionAssetManager*>(AssetFactory::getManager(AssetType::MESH))->getLoadedMaterials(); // todo fix
+	return Engine::get()->getSubSystem<ModelImporter>()->getLastImportedMaterial().materials;
 }
 
 
