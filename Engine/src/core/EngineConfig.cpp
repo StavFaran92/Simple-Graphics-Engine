@@ -44,5 +44,7 @@ void EngineConfig::loadConfig()
             renderConfig.renderFoliagePass = render["RenderFoliagePass"].get<bool>();
         if (render.contains("RenderWaterBodyPass"))
             renderConfig.renderWaterBodyPass = render["RenderWaterBodyPass"].get<bool>();
+        if (render.contains("renderDebugDataPass"))
+            renderConfig.renderDebugDataPass = render["renderDebugDataPass"].get<bool>();
     }
 }

@@ -752,6 +752,13 @@ void Scene::draw(float deltaTime)
 			glPopDebugGroup();
 		}
 
+		if (Engine::get()->getConfig().renderConfig.renderDebugDataPass)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Debug Data render pass");
+			Engine::get()->getForwardRenderer().renderDebugData(this);
+			glPopDebugGroup();
+		}
+
 		// Render UI
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

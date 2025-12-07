@@ -176,6 +176,43 @@ void Renderer::setUniforms()
     graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
 }
 
+void Renderer::renderDebugData(Scene* scene)
+{
+    auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+    glEnable(GL_DEPTH_TEST);
+    graphics->renderView->bind();
+
+    for (auto&& [entity, meshRenderer, transform, obj] :
+        scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+    {
+        Entity entityHandler{ entity, &scene->getRegistry() };
+        std::string name = entityHandler.getComponent<ObjectComponent>().name;
+        logTrace("About to display debug data for {}", name);
+
+        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        {
+
+            if (!prepareMeshForRender(mesh.get(), entityHandler))
+            {
+                continue;
+            }
+
+            graphics->shader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEBUG_DATA).resource();
+            graphics->shader->use();
+
+            graphics->shader->setModelMatrix(graphics->model);
+            graphics->shader->setViewMatrix(graphics->view);
+            graphics->shader->setProjectionMatrix(graphics->projection);
+            graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+            graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
+            // Draw
+            RenderCommand::draw(mesh->getVAO());
+        }
+    }
+}
+
 void Renderer::renderSceneUsingCustomShader(Scene* scene)
 {
 

@@ -184,6 +184,13 @@ void BuiltInAssetsLoader::loadShaders()
 		desc.name = SGE_SHADER_TERRAIN;
 		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/TerrainShader.glsl", desc);
 	}
+
+	{
+		ShaderAssetDescriptor desc;
+		desc.isEngineOwned = true;
+		desc.name = SGE_SHADER_DEBUG_DATA;
+		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/normalDisplayShader.glsl", desc);
+	}
 }
 
 void BuiltInAssetsLoader::loadAssets()

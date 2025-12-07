@@ -27,6 +27,8 @@ public:
 
 	void renderScene(Scene*);
 
+	void renderDebugData(Scene*);
+
 	void renderSceneNonOpaque(Scene*);
 
 private:
