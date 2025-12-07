@@ -5,6 +5,7 @@
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 norm;
 layout (location = 2) in vec2 tex;
+layout (location = 4) in vec3 aTangent;
 layout (location = 5) in ivec3 boneIDs;
 layout (location = 6) in vec3 boneWeights;
 layout (location = 7) in mat4 instanceModel;
@@ -23,6 +24,7 @@ out VS_OUT {
     vec3 fragPos;
     vec3 normal;
     vec2 texCoord;
+    mat3 TBN;
 } vs_out;
 
 uniform mat3 transposeInverseModelMatrix;
@@ -55,6 +57,13 @@ void main()
     vert(totalPosition.xyz, aNorm);
 #endif
 
+    vec3 bitangent = cross(aNorm, aTangent);
+
+	vec3 T = normalize(vec3(model * vec4(aTangent, 0.f)));
+	vec3 B = normalize(vec3(model * vec4(bitangent, 0.f)));
+	vec3 N = normalize(vec3(model * vec4(aNorm, 0.f)));
+	vs_out.TBN = mat3(T, B, N);
+
     vs_out.texCoord = tex;
     vs_out.normal = aNorm;
     vs_out.fragPos = (aModel * totalPosition).xyz;
@@ -81,6 +90,7 @@ in VS_OUT {
     vec3 fragPos;
     vec3 normal;
     vec2 texCoord;
+    mat3 TBN;
 } fs_in;
 
 // ----- Out ----- //
@@ -192,7 +202,13 @@ float getTime()
 void main()
 {
     vec3 albedo = pow(getPBRTexture(samplerAlbedo).rgb  * color, vec3(2.2));
-    vec3 normal = normalize(fs_in.normal);
+
+    vec3 normalSampleTS = getPBRTexture(samplerNormal).rgb * 2.0 - 1.0;
+    vec3 normalSampleWS = fs_in.TBN * normalSampleTS;
+    vec3 normal = normalize(normalSampleWS);
+
+    normal = normal.xyz;
+
     float metallic = getPBRTexture(samplerMetallic).r * metallicFactor;
     float roughness = getPBRTexture(samplerRoughness).r* roughnessFactor;
     float ao = getPBRTexture(samplerAO).r;

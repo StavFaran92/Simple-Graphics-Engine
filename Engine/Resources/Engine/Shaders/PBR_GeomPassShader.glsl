@@ -5,6 +5,7 @@
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 norm;
 layout (location = 2) in vec2 tex;
+layout (location = 3) in vec2 aTangent;
 layout (location = 5) in ivec3 boneIDs;
 layout (location = 6) in vec3 boneWeights;
 
@@ -52,9 +53,9 @@ void main()
 		aModel = model * instanceModel;
 	}
 
-        vec4 totalPosition;
-        vec3 totalNormal;
-        applySkinning(pos, norm, boneIDs, boneWeights, totalPosition, totalNormal);
+	vec4 totalPosition;
+	vec3 totalNormal;
+	applySkinning(pos, norm, boneIDs, boneWeights, totalPosition, totalNormal);
 
 	vec3 aNorm = mat3(transpose(inverse(aModel))) * totalNormal;
 #ifdef CUSTOM_SHADER

@@ -163,6 +163,11 @@ void InspectorWindow::display()
 
 			END_IMGUI_TABLE();
 
+			// Array of string names for the enum
+			const char* renderTechniqueNames[] = { "Forward", "Deferred" };
+
+			ImGui::Combo("Render Technique", (int*)&meshComponent.renderTechnique, renderTechniqueNames, IM_ARRAYSIZE(renderTechniqueNames));
+
 			std::string meshName = "None";
 			if (!meshComponent.mesh.isEmpty())
 			{

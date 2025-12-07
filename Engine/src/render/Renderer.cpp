@@ -202,11 +202,11 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
             if (graphics->material->getMaterialRenderMode() != MaterialRenderMode::Custom)
                 continue;
 
-            if (graphics->material->m_shader.get()->getShaderOverride() != ShaderOverride::PBR)
-            {
-                logWarning("Only PBR shader override is supported ATM.");
-                continue;
-            }
+            //if (graphics->material->m_shader.get()->getShaderOverride() != ShaderOverride::PBR)
+            //{
+            //    logWarning("Only PBR shader override is supported ATM.");
+            //    continue;
+            //}
 
             // draw model
 

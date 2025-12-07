@@ -236,6 +236,19 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 		ImGui::EndCombo();
 	}
 
+	if (currentMode == MaterialRenderMode::Custom)
+	{
+		std::string shaderName = "None";
+		if (!mat.get()->m_shader.isEmpty())
+		{
+			shaderName = mat.get()->m_shader.info().name;
+		}
+
+		addAssetSelectWidget(shaderName, AssetType::SHADER, [mat](UUID uuid) {
+			mat.get()->m_shader = AssetWrapper<Shader>(uuid);
+		});
+	}
+
 	// Custom Textures Array
 	if (ImGui::CollapsingHeader("Samplers"))
 	{
