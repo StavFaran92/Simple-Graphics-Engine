@@ -130,6 +130,7 @@ bool Mesh::build(MeshData& mData)
 				auto vOffset = stride * i + offset;
 				memcpy(vertices + vOffset + attribData.size * 0, &tangent.x, attribData.size);
 				memcpy(vertices + vOffset + attribData.size * 1, &tangent.y, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 2, &tangent.y, attribData.size);
 			}
 		}
 
