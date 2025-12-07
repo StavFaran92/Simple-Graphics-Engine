@@ -17,4 +17,5 @@ void Graphics::reloadShaders()
 	BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM).reimportAsset();
 	BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_LIGHT).reimportAsset();
 	BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR).reimportAsset();
+	BuiltInAssets::getByName<Shader>(SGE_SHADER_DEBUG_DATA).reimportAsset();
 }
