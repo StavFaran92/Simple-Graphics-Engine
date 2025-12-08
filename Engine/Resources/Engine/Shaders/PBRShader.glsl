@@ -2,9 +2,9 @@
 
 #version 330
 
-layout (location = 0) in vec3 pos;
-layout (location = 1) in vec3 norm;
-layout (location = 2) in vec2 tex;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNorm;
+layout (location = 2) in vec2 aTexCoord;
 layout (location = 4) in vec3 aTangent;
 layout (location = 5) in ivec3 boneIDs;
 layout (location = 6) in vec3 boneWeights;
@@ -40,35 +40,35 @@ float getTime()
 
 void main()
 {
-    mat4 aModel = model;
+    mat4 finalModel = model;
 
     if (isGpuInstanced)
     {
-        aModel = model * instanceModel;
+        finalModel = model * instanceModel;
     }
 
     vec4 totalPosition;
     vec3 totalNormal;
-    applySkinning(pos, norm, boneIDs, boneWeights, totalPosition, totalNormal);
+    applySkinning(aPos, aNorm, boneIDs, boneWeights, totalPosition, totalNormal);
 
-    vec3 aNorm = mat3(transpose(inverse(model))) * totalNormal;
+    vec3 normWS = mat3(transpose(inverse(model))) * totalNormal;
 
 #ifdef CUSTOM_SHADER
-    vert(totalPosition.xyz, aNorm);
+    vert(totalPosition.xyz, normWS);
 #endif
 
     vec3 bitangent = cross(normalize(totalNormal), aTangent);
 
 	vec3 T = normalize(vec3(model * vec4(aTangent, 0.f)));
 	vec3 B = normalize(vec3(model * vec4(bitangent, 0.f)));
-	vec3 N = normalize(aNorm);
+	vec3 N = normalize(normWS);
 	vs_out.TBN = mat3(T, B, N);
 
-    vs_out.texCoord = tex;
-    vs_out.normal = aNorm;
-    vs_out.fragPos = (aModel * totalPosition).xyz;
+    vs_out.texCoord = aTexCoord;
+    vs_out.normal = normWS;
+    vs_out.fragPos = (finalModel * totalPosition).xyz;
 
-    gl_Position = projection * view * aModel * totalPosition;
+    gl_Position = projection * view * finalModel * totalPosition;
 }
 
 #frag
