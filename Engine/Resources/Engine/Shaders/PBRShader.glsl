@@ -57,11 +57,11 @@ void main()
     vert(totalPosition.xyz, aNorm);
 #endif
 
-    vec3 bitangent = cross(aNorm, aTangent);
+    vec3 bitangent = cross(normalize(totalNormal), aTangent);
 
 	vec3 T = normalize(vec3(model * vec4(aTangent, 0.f)));
 	vec3 B = normalize(vec3(model * vec4(bitangent, 0.f)));
-	vec3 N = normalize(vec3(model * vec4(aNorm, 0.f)));
+	vec3 N = normalize(aNorm);
 	vs_out.TBN = mat3(T, B, N);
 
     vs_out.texCoord = tex;
@@ -207,8 +207,6 @@ void main()
     vec3 normalSampleWS = fs_in.TBN * normalSampleTS;
     vec3 normal = normalize(normalSampleWS);
 
-    normal = normal.xyz;
-
     float metallic = getPBRTexture(samplerMetallic).r * metallicFactor;
     float roughness = getPBRTexture(samplerRoughness).r* roughnessFactor;
     float ao = getPBRTexture(samplerAO).r;
@@ -237,5 +235,6 @@ void main()
     // gamma correct
     color = pow(color, vec3(1.0/2.2));
 
+    // FragColor = vec4(normal, opacityFactor);
     FragColor = vec4(color, opacityFactor);
 }
