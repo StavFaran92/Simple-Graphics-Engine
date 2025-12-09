@@ -60,14 +60,20 @@ bool DeferredRenderer::setupGBuffer(int width, int height)
 	m_normalTextureVS = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
 
-	unsigned int attachments[6] = { 
+	// Generate Texture for Tangent data
+	m_TangentTexture = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_gBuffer.attachTexture(m_TangentTexture.get()->getID(), GL_COLOR_ATTACHMENT6);
+
+	unsigned int attachments[7] = { 
 		GL_COLOR_ATTACHMENT0, 
 		GL_COLOR_ATTACHMENT1, 
 		GL_COLOR_ATTACHMENT2, 
 		GL_COLOR_ATTACHMENT3, 
 		GL_COLOR_ATTACHMENT4, 
-		GL_COLOR_ATTACHMENT5 };
-	glDrawBuffers(6, attachments);
+		GL_COLOR_ATTACHMENT5, 
+		GL_COLOR_ATTACHMENT6 
+	};
+	glDrawBuffers(7, attachments);
 
 	// Create RBO and attach to FBO
 	m_renderBuffer = RenderBufferObject(width, height);
@@ -363,6 +369,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 	lightPassShaderResource->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
 	lightPassShaderResource->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
 	lightPassShaderResource->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
+	lightPassShaderResource->setTextureInShader(m_TangentTexture, "gTangnet", 9);
 	lightPassShaderResource->bindUniformBlockToBindPoint("Time", 0);
 	lightPassShaderResource->bindUniformBlockToBindPoint("Lights", 1);
 	lightPassShaderResource->setUniformValue("cameraPos", graphics->cameraPos);

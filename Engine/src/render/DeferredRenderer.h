@@ -35,12 +35,14 @@ private:
 	
 	RenderBufferObject m_renderBuffer;
 	
+	// GBuffer
 	ResourceWrapper<Texture> m_positionTexture = nullptr;
 	ResourceWrapper<Texture> m_positionTextureVS = nullptr;
 	ResourceWrapper<Texture> m_normalTexture = nullptr;
 	ResourceWrapper<Texture> m_normalTextureVS = nullptr;
 	ResourceWrapper<Texture> m_albedoTexture = nullptr;
 	ResourceWrapper<Texture> m_MRATexture = nullptr;
+	ResourceWrapper<Texture> m_TangentTexture = nullptr;
 	
 	ResourceWrapper<MeshCollection> m_quad;
 	ResourceWrapper<Shader> m_screenShader;

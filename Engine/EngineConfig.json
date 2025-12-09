@@ -9,6 +9,6 @@
     "RenderVolumetricsPass": true,
     "RenderWireframeGrid": true,
     "RenderWaterBodyPass": true,
-    "renderDebugDataPass": false
+    "RenderDebugDataPass": false
   }
 }

@@ -2,13 +2,12 @@
 
 #version 330
 
-layout (location = 0) in vec3 pos;
-layout (location = 1) in vec3 norm;
-layout (location = 2) in vec2 tex;
-layout (location = 3) in vec2 aTangent;
-layout (location = 5) in ivec3 boneIDs;
-layout (location = 6) in vec3 boneWeights;
-
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec2 aTexCoord;
+layout (location = 4) in vec3 aTangent;
+layout (location = 5) in ivec3 aBoneIDs;
+layout (location = 6) in vec3 aBoneWeights;
 layout (location = 7) in mat4 instanceModel;
 
 // ----- Definitions ----- //
@@ -29,6 +28,8 @@ out VS_OUT {
     vec2 texCoord;
     vec3 fragPosVS;
 	vec3 normalVS;
+	vec3 tangent;
+	mat3 TBN;
 } vs_out;
 
 // ----- Forward Declerations ----- //
@@ -46,29 +47,38 @@ float getTime()
 
 void main()
 {
-	mat4 aModel = model;
+	mat4 finalModel = model;
 
-	if(isGpuInstanced)
-	{
-		aModel = model * instanceModel;
-	}
+    if (isGpuInstanced)
+    {
+        finalModel = model * instanceModel;
+    }
 
 	vec4 totalPosition;
 	vec3 totalNormal;
-	applySkinning(pos, norm, boneIDs, boneWeights, totalPosition, totalNormal);
+	applySkinning(aPos, aNormal, aBoneIDs, aBoneWeights, totalPosition, totalNormal);
 
-	vec3 aNorm = mat3(transpose(inverse(aModel))) * totalNormal;
+	vec3 normWS = mat3(transpose(inverse(model))) * totalNormal;
+
 #ifdef CUSTOM_SHADER
-	vert(totalPosition.xyz, aNorm);
+	vert(totalPosition.xyz, normWS);
 #endif
 
-	vs_out.texCoord = tex;
-	vs_out.normal =  aNorm;
-	vs_out.fragPos = (aModel * totalPosition).xyz;
+	vec3 bitangent = cross(normalize(totalNormal), aTangent);
+
+	vec3 T = normalize(vec3(model * vec4(aTangent, 0.f)));
+	vec3 B = normalize(vec3(model * vec4(bitangent, 0.f)));
+	vec3 N = normalize(normWS);
+	vs_out.TBN = mat3(T, B, N);
+
+	vs_out.texCoord = aTexCoord;
+	vs_out.normal =  normWS;
+	vs_out.fragPos = (finalModel * totalPosition).xyz;
 	vs_out.fragPosVS = (view * vec4(vs_out.fragPos,1.0)).xyz;
 	vs_out.normalVS = (view * vec4(vs_out.normal,0.0)).xyz;
+	vs_out.tangent = (finalModel * vec4(aTangent, 0.0)).xyz; // tangent is only direction ?
 
-	gl_Position = projection * view * aModel * totalPosition;
+	gl_Position = projection * view * finalModel * totalPosition;
 }
 
 #frag
@@ -90,6 +100,8 @@ in VS_OUT {
     vec2 texCoord;
     vec3 fragPosVS;
 	vec3 normalVS;
+	vec3 tangent;
+	mat3 TBN;
 } fs_in;
 
 // ----- Out ----- //
@@ -100,6 +112,7 @@ layout (location = 2) out vec3 gAlbedo;
 layout (location = 3) out vec3 gMRA;
 layout (location = 4) out vec3 gPositionVS;
 layout (location = 5) out vec3 gNormalVS;
+layout (location = 6) out vec3 gTangent;
 
 
 // ----- Uniforms ----- //
@@ -160,11 +173,13 @@ vec4 getPBRTexture(PBR_Sampler s)
 void main() 
 { 	
 	gPosition = fs_in.fragPos;
-	gNormal = normalize(fs_in.normal) * getPBRTexture(samplerNormal).rgb;
+	gNormal = fs_in.TBN * (getPBRTexture(samplerNormal).rgb * 2.0 - 1.0);
+	// gNormal = (fs_in.normal * .5 + 0.5 ) * getPBRTexture(samplerNormal).rgb; // todo fix fs_in.normal not pass
 	gAlbedo = getPBRTexture(samplerAlbedo).rgb * color;
 	gMRA.r = getPBRTexture(samplerMetallic).r * metallicFactor;
 	gMRA.g = getPBRTexture(samplerRoughness).r * roughnessFactor;
 	gMRA.b = getPBRTexture(samplerAO).r;
 	gPositionVS = fs_in.fragPosVS;
 	gNormalVS = normalize(fs_in.normalVS);
+	gTangent = normalize(fs_in.tangent);
 } 

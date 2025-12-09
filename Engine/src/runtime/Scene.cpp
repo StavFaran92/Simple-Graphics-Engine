@@ -759,27 +759,33 @@ void Scene::draw(float deltaTime)
 			glPopDebugGroup();
 		}
 
-		// Orientation gizmo in bottom-left corner
-		glViewport(10, 10, 100, 100);  // Small 100x100 viewport at bottom-left
-		glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth so gizmo is always on top
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Orientation Gizmo");
 
-		// Use orthographic or perspective projection
-		glm::mat4 gizmoProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 10.0f);
-		graphics->projection = gizmoProjection;
+			// Orientation gizmo in bottom-left corner
+			glViewport(10, 10, 100, 100);  // Small 100x100 viewport at bottom-left
+			glClear(GL_DEPTH_BUFFER_BIT);  // Clear depth so gizmo is always on top
 
-		// Use ONLY the rotation part of your view matrix (no translation)
-		glm::mat3 rotation = glm::mat3(graphics->view);
-		glm::mat4 gizmoView = glm::mat4(rotation);
-		gizmoView = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3)) * gizmoView;
-		graphics->view = gizmoView;
+			// Use orthographic or perspective projection
+			glm::mat4 gizmoProjection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 10.0f);
+			graphics->projection = gizmoProjection;
 
-		// Draw three lines from origin
-		DebugHelper::getInstance().drawLine(glm::vec3(0), glm::vec3(1, 0, 0), glm::vec3(1, 0, 0), 2);
-		DebugHelper::getInstance().drawLine(glm::vec3(0), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), 2);
-		DebugHelper::getInstance().drawLine(glm::vec3(0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), 2);
+			// Use ONLY the rotation part of your view matrix (no translation)
+			glm::mat3 rotation = glm::mat3(graphics->view);
+			glm::mat4 gizmoView = glm::mat4(rotation);
+			gizmoView = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3)) * gizmoView;
+			graphics->view = gizmoView;
 
-		// Reset viewport
-		RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
+			// Draw three lines from origin
+			DebugHelper::getInstance().drawLine(glm::vec3(0), glm::vec3(1, 0, 0), glm::vec3(1, 0, 0), 2);
+			DebugHelper::getInstance().drawLine(glm::vec3(0), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), 2);
+			DebugHelper::getInstance().drawLine(glm::vec3(0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), 2);
+
+			// Reset viewport
+			RenderCommand::setViewport(viewport.x, viewport.y, viewport.w, viewport.h);
+
+			glPopDebugGroup();
+		}
 
 		// Render UI
 		glEnable(GL_BLEND);
