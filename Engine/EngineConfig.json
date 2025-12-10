@@ -1,7 +1,7 @@
 {
   "Rendering": {
     "RenderShadowMap": true,
-    "RenderForwardPass": true,
+    "RenderForwardPass": false,
     "RenderDeferredPass": true,
     "RenderCustomShadersPass": true,
     "RenderSkyboxPass": true,
@@ -9,6 +9,7 @@
     "RenderVolumetricsPass": true,
     "RenderWireframeGrid": true,
     "RenderWaterBodyPass": true,
+    "RenderNonOpaquePass": true,
     "RenderDebugDataPass": false
   }
 }

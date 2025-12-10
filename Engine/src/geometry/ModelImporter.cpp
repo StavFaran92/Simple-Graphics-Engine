@@ -343,7 +343,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			if (!normal.isEmpty())
 			{
 				auto normalSampler = std::make_shared<TextureSampler>(3);
-				normalSampler->texture = diffuse;
+				normalSampler->texture = normal;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, normalSampler);
 			}
 
