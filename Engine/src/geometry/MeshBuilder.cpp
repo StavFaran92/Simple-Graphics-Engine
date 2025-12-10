@@ -103,14 +103,14 @@ MeshBuilder& MeshBuilder::addColors(const float* colors, size_t size)
 	return *this;
 }
 
-MeshBuilder& MeshBuilder::addTangent(const glm::vec3& tangent)
+MeshBuilder& MeshBuilder::addTangent(const glm::vec4& tangent)
 {
 	m_data.m_tangents.push_back(tangent);
 
 	return *this;
 }
 
-MeshBuilder& MeshBuilder::addTangents(const std::vector<glm::vec3>& tangents)
+MeshBuilder& MeshBuilder::addTangents(const std::vector<glm::vec4>& tangents)
 {
 	m_data.m_tangents.insert(m_data.m_tangents.end(), tangents.begin(), tangents.end());
 
@@ -121,7 +121,7 @@ MeshBuilder& MeshBuilder::addTangents(const float* tangents, size_t size)
 {
 	for (int i = 0; i < size; i++)
 	{
-		addTangent({ tangents[i * 3 + 0], tangents[i * 3 + 1], tangents[i * 3 + 2] });
+		addTangent({ tangents[i * 4 + 0], tangents[i * 4 + 1], tangents[i * 4 + 2], tangents[i * 4 + 3] });
 	}
 
 	return *this;
@@ -222,7 +222,7 @@ MeshBuilder& MeshBuilder::addRawVertices(const float* vertices, VertexLayout lay
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> texcoords;
 	std::vector<glm::vec3> colors;
-	std::vector<glm::vec3> tangents;
+	std::vector<glm::vec4> tangents;
 
 	for (auto entry : layout.attribs)
 	{
@@ -296,12 +296,12 @@ MeshBuilder& MeshBuilder::addRawVertices(const float* vertices, VertexLayout lay
 			tangents.reserve(layout.numOfVertices * getAttributeCompCount(entry));
 			for (int i = 0; i < layout.numOfVertices; i++)
 			{
-				glm::vec3 tangent;
+				glm::vec4 tangent;
 				for (int j = 0; j < getAttributeCompCount(entry); j++)
 				{
 					tangent[j] = vertices[stride * i + j + offset];
 				}
-				colors.emplace_back(tangent);
+				tangents.emplace_back(tangent);
 			}
 			addTangents(tangents);
 		}

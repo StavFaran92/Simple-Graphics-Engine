@@ -151,5 +151,5 @@ void main()
 	frag(color);
 #endif
     
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(normal, 1.0);
 } 

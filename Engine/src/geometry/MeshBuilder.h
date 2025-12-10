@@ -31,8 +31,8 @@ public:
 	MeshBuilder& addColors(const std::vector<glm::vec3>& colors);
 	MeshBuilder& addColors(const float* colors, size_t size);
 
-	MeshBuilder& addTangent(const glm::vec3& tangent);
-	MeshBuilder& addTangents(const std::vector<glm::vec3>& tangents);
+	MeshBuilder& addTangent(const glm::vec4& tangent);
+	MeshBuilder& addTangents(const std::vector<glm::vec4>& tangents);
 	MeshBuilder& addTangents(const float* tangents, size_t size);
 
 	MeshBuilder& addIndex(unsigned int index);

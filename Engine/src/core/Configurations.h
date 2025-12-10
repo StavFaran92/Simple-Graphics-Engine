@@ -51,7 +51,7 @@ const std::map<LayoutAttribute, AttributeData> g_attributeMetadata =
 	{ LayoutAttribute::Normals, AttributeData{3, sizeof(float), 1, typeid(float).name()}},
 	{ LayoutAttribute::Texcoords, AttributeData{2, sizeof(float), 2, typeid(float).name()}},
 	{ LayoutAttribute::Colors, AttributeData{3, sizeof(float), 3, typeid(float).name()}},
-	{ LayoutAttribute::Tangents, AttributeData{3, sizeof(float), 4, typeid(float).name()}},
+	{ LayoutAttribute::Tangents, AttributeData{4, sizeof(float), 4, typeid(float).name()}},
 	{ LayoutAttribute::BoneIDs, AttributeData{3, sizeof(int), 5, typeid(int).name()}},
 	{ LayoutAttribute::BoneWeights, AttributeData{3, sizeof(float), 6, typeid(float).name()}},
 

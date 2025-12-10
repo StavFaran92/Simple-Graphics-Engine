@@ -131,6 +131,7 @@ bool Mesh::build(MeshData& mData)
 				memcpy(vertices + vOffset + attribData.size * 0, &tangent.x, attribData.size);
 				memcpy(vertices + vOffset + attribData.size * 1, &tangent.y, attribData.size);
 				memcpy(vertices + vOffset + attribData.size * 2, &tangent.y, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 3, &tangent.y, attribData.size);
 			}
 		}
 

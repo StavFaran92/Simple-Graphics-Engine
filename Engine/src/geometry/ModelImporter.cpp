@@ -440,7 +440,7 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
-	std::vector<glm::vec3> tangents;
+	std::vector<glm::vec4> tangents;
 	std::vector<glm::vec2> texcoords;
 	std::vector<unsigned int> indices;
 
@@ -479,7 +479,12 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 
 		if (aiMesh->HasTangentsAndBitangents())
 		{
-			tangents.emplace_back(glm::vec3{ aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z });
+			glm::vec3 T(aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z);
+			glm::vec3 B(aiMesh->mBitangents[i].x, aiMesh->mBitangents[i].y, aiMesh->mBitangents[i].z);
+			glm::vec3 N(aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z);
+
+			float sign = (glm::dot(glm::cross(N, T), B) < 0.0f) ? -1.0f : 1.0f;
+			tangents.emplace_back(glm::vec4{ aiMesh->mTangents[i].x, aiMesh->mTangents[i].y, aiMesh->mTangents[i].z, sign });
 		}
 	}
 	// process indices
