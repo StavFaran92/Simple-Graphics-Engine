@@ -58,8 +58,8 @@ void Renderer::renderScene(Scene* scene)
             continue;
 
         Entity entityHandler{ entity, &scene->getRegistry() };
-        std::string name = entityHandler.getComponent<ObjectComponent>().name;
-        logTrace("About to render using Forward pass {}", name);
+
+        prepareEntityForRender(entityHandler);
 
         for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
         {
@@ -122,10 +122,10 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
         Entity& entityHandler = iter->second;
 
         std::string name = entityHandler.getComponent<ObjectComponent>().name;
-        logTrace("About to render using Non Opaque pass {}", name);
-
         std::string captionGPU = "About to render: '" + name + "'";
         glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
+
+        prepareEntityForRender(entityHandler);
 
         graphics->entity = entityHandler;
         graphics->shader->use();

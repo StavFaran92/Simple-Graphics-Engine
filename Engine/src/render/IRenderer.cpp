@@ -41,3 +41,34 @@ bool IRenderer::prepareMeshForRender(Mesh* mesh, const Entity& entityHandler)
 
 	return true;
 }
+
+bool IRenderer::prepareEntityForRender(const Entity& entityHandler)
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	// Display name
+	std::string name = entityHandler.getComponent<ObjectComponent>().name;
+	logTrace("About to render Entity {}", name);
+
+	// Apply animation logic
+	auto animator = entityHandler.tryGetComponent<Animator>();
+	if (!animator || animator->m_currentAnimation.isEmpty())
+	{
+		graphics->shader->setUniformValue("isAnimated", false);
+	}
+	else
+	{
+		auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
+		std::vector<glm::mat4> finalBoneMatrices;
+		animator->getFinalBoneMatrices(meshRenderer.mesh.get(), finalBoneMatrices);
+		for (int i = 0; i < finalBoneMatrices.size(); ++i)
+		{
+			graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
+		}
+
+		graphics->shader->setUniformValue("isAnimated", true);
+	}
+
+	return true;
+}

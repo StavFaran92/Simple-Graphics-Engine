@@ -9,4 +9,5 @@ public:
 	virtual ~IRenderer() = default;
 
 	bool prepareMeshForRender(Mesh* mesh, const Entity& entityHandler);
+	bool prepareEntityForRender(const Entity& entityHandler);
 };

@@ -10,12 +10,25 @@ struct EngineAPI WaterBodyComponent : public Component
 	WaterBodyComponent() = default;
 	WaterBodyComponent(Entity entity);
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-	{
-		attachSimple<WaterBodyComponent>(c, entityHandler);
-	}
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
 
 	AssetWrapper<Material> getMaterial();
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(entity);
+		SERIALIZED_MEMBER(waterBodyNormal);
+		SERIALIZED_MEMBER(wave1Speed);
+		SERIALIZED_MEMBER(wave2Speed);
+		SERIALIZED_MEMBER(wave3Speed);
+		SERIALIZED_MEMBER(wave1Amp);
+		SERIALIZED_MEMBER(wave2Amp);
+		SERIALIZED_MEMBER(wave3Amp);
+		SERIALIZED_MEMBER(colorA);
+		SERIALIZED_MEMBER(colorB);
+		SERIALIZED_MEMBER(opacity);
+
+	}
 
 	Entity entity = Entity::EmptyEntity;
 

@@ -257,11 +257,12 @@ void DeferredRenderer::renderScene(Scene* scene)
 			continue;
 
 		Entity entityHandler{ entity, &scene->getRegistry() };
-		std::string name = entityHandler.getComponent<ObjectComponent>().name;
-		logTrace("About to render using Deferred Render pass {}", name);
 
+		std::string name = entityHandler.getComponent<ObjectComponent>().name;
 		std::string captionGPU = "About to render Entity: '" + name + "'";
 		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
+
+		prepareEntityForRender(entityHandler);
 
 		for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
 		{
