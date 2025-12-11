@@ -201,14 +201,21 @@ float getTime()
 
 void main()
 {
-    vec3 albedo = pow(getPBRTexture(samplerAlbedo).rgb  * color, vec3(2.2));
-
-    normal = samplerNormal.isActive ? (fs_in.TBN * getPBRTexture(samplerNormal).rgb * 2.0 - 1.0) : fs_in.normal;
+    vec3 normal = samplerNormal.isActive ? (fs_in.TBN * getPBRTexture(samplerNormal).rgb * 2.0 - 1.0) : fs_in.normal;
     normal = normalize(normal);
 
-    float metallic = getPBRTexture(samplerMetallic).r * metallicFactor;
-    float roughness = getPBRTexture(samplerRoughness).r* roughnessFactor;
-    float ao = getPBRTexture(samplerAO).r;
+    vec3 albedoTex = samplerAlbedo.isActive ? getPBRTexture(samplerAlbedo).rgb : vec3(1.0);
+	vec3 albedo = albedoTex * color;
+	albedo = pow(albedo, vec3(2.2)); // Gamme Correction
+
+	float metallicTex = samplerMetallic.isActive ? getPBRTexture(samplerMetallic).r : 1.0;
+	float metallic = metallicTex * metallicFactor;
+
+	float roughnessTex = samplerRoughness.isActive ? getPBRTexture(samplerRoughness).r : 1.0;
+	float roughness = roughnessTex * roughnessFactor;
+
+	float aoTex = samplerAO.isActive ? getPBRTexture(samplerAO).r : 1.0;
+	float ao = aoTex;
 
 #ifdef CUSTOM_SHADER
     frag(albedo, normal, metallic, roughness, ao);

@@ -178,10 +178,22 @@ void main()
 
 	gNormal = samplerNormal.isActive ? (fs_in.TBN * getPBRTexture(samplerNormal).rgb * 2.0 - 1.0) : fs_in.normal;
 	
-	gAlbedo = getPBRTexture(samplerAlbedo).rgb * color;
-	gMRA.r = getPBRTexture(samplerMetallic).r * metallicFactor;
-	gMRA.g = getPBRTexture(samplerRoughness).r * roughnessFactor;
-	gMRA.b = getPBRTexture(samplerAO).r;
+	vec3 albedoTex = samplerAlbedo.isActive ? getPBRTexture(samplerAlbedo).rgb : vec3(1.0);
+	gAlbedo = albedoTex * color;
+
+	float metallicTex = samplerMetallic.isActive ? getPBRTexture(samplerMetallic).r : 1.0;
+	gMRA.r = metallicTex * metallicFactor;
+
+	float roughnessTex = samplerRoughness.isActive ? getPBRTexture(samplerRoughness).r : 1.0;
+	gMRA.g = roughnessTex * roughnessFactor;
+
+	float aoTex = samplerAO.isActive ? getPBRTexture(samplerAO).r : 1.0;
+	gMRA.b = aoTex;
+
+	// gAlbedo = getPBRTexture(samplerAlbedo).rgb * color;
+	// gMRA.r = getPBRTexture(samplerMetallic).r * metallicFactor;
+	// gMRA.g = getPBRTexture(samplerRoughness).r * roughnessFactor;
+	// gMRA.b = getPBRTexture(samplerAO).r;
 	gPositionVS = fs_in.fragPosVS;
 	gNormalVS = normalize(fs_in.normalVS);
 } 
