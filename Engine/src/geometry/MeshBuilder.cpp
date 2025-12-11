@@ -359,6 +359,8 @@ void GenerateTangentsForMesh(MeshData& mesh) {
 
 void MeshBuilder::build(Mesh& mesh)
 {
+	GenerateTangentsForMesh(m_data);
+
 	if (m_data.m_positions.size() > 0)
 	{
 		enableAttribute(LayoutAttribute::Positions);
@@ -394,7 +396,7 @@ void MeshBuilder::build(Mesh& mesh)
 		return getAttributeLocationInShader(l1) < getAttributeLocationInShader(l2);
 	});
 
-	GenerateTangentsForMesh(m_data);
+	
 
 	//auto& projectDir = Engine::get()->getProjectDirectory();
 
