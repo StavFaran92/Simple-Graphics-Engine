@@ -64,9 +64,9 @@ void main()
 	vert(totalPosition.xyz, normWS);
 #endif
 
-	vec3 tangent = aTangent.xyz ;
+	vec3 tangent = aTangent.xyz;
 
-	vec3 bitangent = cross(normalize(totalNormal), tangent)* aTangent.w;
+	vec3 bitangent = cross(normalize(totalNormal), tangent) * aTangent.w;
 
 	vec3 T = normalize(vec3(finalModel * vec4(tangent, 0.f)));
 	vec3 B = normalize(vec3(finalModel * vec4(bitangent, 0.f)));
@@ -175,16 +175,13 @@ vec4 getPBRTexture(PBR_Sampler s)
 void main() 
 { 	
 	gPosition = fs_in.fragPos;
-	//gNormal = fs_in.normal;
-	//gNormal = fs_in.TBN[1];
-	// gNormal = fs_in.TBN * getPBRTexture(samplerNormal).rgb * 2.0 - 1.0;
-	gNormal = fs_in.TBN[0];
-	//gNormal = (fs_in.normal * .5 + 0.5 ) * getPBRTexture(samplerNormal).rgb; // todo fix fs_in.normal not pass
+
+	gNormal = samplerNormal.isActive ? (fs_in.TBN * getPBRTexture(samplerNormal).rgb * 2.0 - 1.0) : fs_in.normal;
+	
 	gAlbedo = getPBRTexture(samplerAlbedo).rgb * color;
 	gMRA.r = getPBRTexture(samplerMetallic).r * metallicFactor;
 	gMRA.g = getPBRTexture(samplerRoughness).r * roughnessFactor;
 	gMRA.b = getPBRTexture(samplerAO).r;
 	gPositionVS = fs_in.fragPosVS;
 	gNormalVS = normalize(fs_in.normalVS);
-	//gTangent = normalize(fs_in.tangent);
 } 

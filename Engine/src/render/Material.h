@@ -60,6 +60,8 @@ public:
 	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
 	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
 
+	void setSamplerEnabled(const std::string& name, bool isEnabled);
+
 	void setUniformValue(const std::string& name, const Value& v);
 
 	//bool hasTexture(const std::string& name) const;

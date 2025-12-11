@@ -32,6 +32,8 @@ public:
 	float xScale = 1;
 	float yScale = 1;
 
+	bool isActive = false;
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(texture); 
@@ -44,5 +46,6 @@ public:
 		SERIALIZED_MEMBER(yOffset); 
 		SERIALIZED_MEMBER(xScale); 
 		SERIALIZED_MEMBER(yScale);
+		SERIALIZED_MEMBER(isActive);
 	}
 };

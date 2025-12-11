@@ -102,7 +102,6 @@ void main()
 	// retrieve data from G-buffer
 	vec3 fragPos = texture(gPosition, TexCoords).rgb;
 	vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
-	//vec3 normal = texture(gNormal, TexCoords).rgb;
 	vec3 albedo = pow(texture(gAlbedo, TexCoords).rgb, vec3(2.2));
 	float metallic = texture(gMRA, TexCoords).r;
 	float roughness = texture(gMRA, TexCoords).g;
@@ -110,23 +109,10 @@ void main()
 	vec3 tangent = normalize(texture(gTangent, TexCoords).rgb);
 	float ssao = texture(gSSAOColorBuffer, TexCoords).r;
 
-	// vec3 bitangent = cross(normal, tangent);
-
-	// vec3 T = tangent;
-	// vec3 B = bitangent;
-	// vec3 N = normal;
-	// mat3 TBN = mat3(T, B, N);
-
 	vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
 	float shadow = calculateShadows(fragPosInLightSpace, gShadowMap);
 
-	float ssaoFinal = 1.f;
-	if(useSSAO)
-	{
-		ssaoFinal = ao * ssao;
-	}
-
-	// vec3 normalSampleWS = TBN * normal;
+	float ssaoFinal = useSSAO ? ao * ssao : 1.0;
 
 	vec3 color = calculatePBR(
 		albedo, 
@@ -151,5 +137,5 @@ void main()
 	frag(color);
 #endif
     
-    FragColor = vec4(normal, 1.0);
+    FragColor = vec4(color, 1.0);
 } 

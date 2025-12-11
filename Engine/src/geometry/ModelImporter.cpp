@@ -339,6 +339,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 				auto diffuseSampler = std::make_shared<TextureSampler>(3);
 				diffuseSampler->texture = diffuse;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, diffuseSampler);
+				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, true);
 			}
 
 			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures, aInfo);
@@ -347,6 +348,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 				auto normalSampler = std::make_shared<TextureSampler>(3);
 				normalSampler->texture = normal;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, normalSampler);
+				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, true);
 			}
 
 			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, fileDir, cachedTextures, aInfo);
@@ -356,6 +358,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 				roughnessSampler->texture = roughness;
 				roughnessSampler->channelMaskR = TextureSampler::Color::G;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, roughnessSampler);
+				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, true);
 			}
 
 			// Metallic map
@@ -366,6 +369,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 				metallicSampler->texture = metallic;
 				metallicSampler->channelMaskR = TextureSampler::Color::B;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, metallicSampler);
+				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, true);
 			}
 
 			// Ambient Occlusion map
@@ -376,6 +380,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 				aoSampler->texture = ao;
 				aoSampler->channelMaskR = TextureSampler::Color::R;
 				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_AO, aoSampler);
+				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_AO, true);
 			}
 
 			

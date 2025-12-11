@@ -203,9 +203,8 @@ void main()
 {
     vec3 albedo = pow(getPBRTexture(samplerAlbedo).rgb  * color, vec3(2.2));
 
-    vec3 normalSampleTS = getPBRTexture(samplerNormal).rgb * 2.0 - 1.0;
-    vec3 normalSampleWS = fs_in.TBN * normalSampleTS;
-    vec3 normal = normalize(normalSampleWS);
+    normal = samplerNormal.isActive ? (fs_in.TBN * getPBRTexture(samplerNormal).rgb * 2.0 - 1.0) : fs_in.normal;
+    normal = normalize(normal);
 
     float metallic = getPBRTexture(samplerMetallic).r * metallicFactor;
     float roughness = getPBRTexture(samplerRoughness).r* roughnessFactor;

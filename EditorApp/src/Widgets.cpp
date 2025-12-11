@@ -256,6 +256,8 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 		{
 			ImGui::PushID(name.c_str());
 			ImGui::Text(name.c_str());
+			ImGui::Checkbox("", (bool*)&sampler->isActive);
+			ImGui::SameLine();
 			addSamplerEditWidget(sampler, { 40, 40 }, name);
 			ImGui::PopID();
 		}

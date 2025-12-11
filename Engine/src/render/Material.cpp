@@ -95,11 +95,10 @@ void Material::use()
 		texture.get()->setSlot(slot);
 		texture.get()->bind();
 
-		
-
 		// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
 		shader->setUniformValue(name + ".texture", slot);
 
+		shader->setUniformValue(name + ".isActive", sampler->isActive);
 		shader->setUniformValue(name + ".xOffset", sampler ? sampler->xOffset : 0.0f);
 		shader->setUniformValue(name + ".yOffset", sampler ? sampler->yOffset : 0.0f);
 		shader->setUniformValue(name + ".xScale", sampler ? sampler->xScale : 1.0f);
@@ -116,12 +115,6 @@ void Material::use()
 	{
 		shader->setUniformValue(name, property.value);
 	}
-
-
-	//m_shader.get()->setUniformValue("material.roughnessFactor", roughnessFactor);
-	//m_shader.get()->setUniformValue("material.metallicFactor", metallicFactor);
-	//m_shader.get()->setUniformValue("material.colorDiffuse", colorDiffuse);
-	//m_shader.get()->setUniformValue("material.opacityFactor", opacityFactor);
 }
 
 void Material::release()
@@ -148,6 +141,11 @@ std::shared_ptr<TextureSampler> Material::getSampler(const std::string& name)
 void Material::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
 {
 	m_samplers[name] = sampler;
+}
+
+void Material::setSamplerEnabled(const std::string& name, bool isEnabled)
+{
+	m_samplers[name]->isActive = isEnabled;
 }
 
 AssetWrapper<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
