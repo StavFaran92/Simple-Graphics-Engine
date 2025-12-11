@@ -93,6 +93,7 @@ void main()
 #include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/PBR.glsl
 
 // ----- In ----- //
 
@@ -145,55 +146,32 @@ uniform vec3 color;
 // ----- Forward Declerations ----- //
 
 // ----- Methods ----- //
-
-#define CHANNEL_NONE 0
-#define CHANNEL_R 1
-#define CHANNEL_G 2
-#define CHANNEL_B 3
-#define CHANNEL_A 4
-
-float extractChannel(vec4 inputColor, int channelMask) 
-{
-    if (channelMask == CHANNEL_NONE) return 0.f;
-    if (channelMask == CHANNEL_R) return inputColor.r;
-    if (channelMask == CHANNEL_G) return inputColor.g;
-    if (channelMask == CHANNEL_B) return inputColor.b;
-    if (channelMask == CHANNEL_A) return inputColor.a;
-
-    return 0;
-}
-
-vec4 getPBRTexture(PBR_Sampler s)
-{
-	vec4 color = texture(s.texture, fs_in.texCoord * vec2(s.xScale, s.yScale) + vec2(s.xOffset, s.yOffset)).rgba;
-	return vec4(extractChannel(color, s.channelMaskR), 
-				extractChannel(color, s.channelMaskG), 
-				extractChannel(color, s.channelMaskB), 
-				extractChannel(color, s.channelMaskA));
-}
  
 void main() 
 { 	
 	gPosition = fs_in.fragPos;
 
-	gNormal = samplerNormal.isActive ? (fs_in.TBN * getPBRTexture(samplerNormal).rgb * 2.0 - 1.0) : fs_in.normal;
-	
-	vec3 albedoTex = samplerAlbedo.isActive ? getPBRTexture(samplerAlbedo).rgb : vec3(1.0);
-	gAlbedo = albedoTex * color;
+	samplePBR(
+		// Input
+		fs_in.TBN,
+		fs_in.normal,
+		color,
+		metallicFactor,
+		roughnessFactor,
+		fs_in.texCoord,
 
-	float metallicTex = samplerMetallic.isActive ? getPBRTexture(samplerMetallic).r : 1.0;
-	gMRA.r = metallicTex * metallicFactor;
+		samplerNormal,
+		samplerAlbedo,
+		samplerMetallic,
+		samplerRoughness,
+		samplerAO,
 
-	float roughnessTex = samplerRoughness.isActive ? getPBRTexture(samplerRoughness).r : 1.0;
-	gMRA.g = roughnessTex * roughnessFactor;
+		// Output
+		gNormal,
+		gAlbedo,
+		gMRA
+	);
 
-	float aoTex = samplerAO.isActive ? getPBRTexture(samplerAO).r : 1.0;
-	gMRA.b = aoTex;
-
-	// gAlbedo = getPBRTexture(samplerAlbedo).rgb * color;
-	// gMRA.r = getPBRTexture(samplerMetallic).r * metallicFactor;
-	// gMRA.g = getPBRTexture(samplerRoughness).r * roughnessFactor;
-	// gMRA.b = getPBRTexture(samplerAO).r;
 	gPositionVS = fs_in.fragPosVS;
 	gNormalVS = normalize(fs_in.normalVS);
 } 

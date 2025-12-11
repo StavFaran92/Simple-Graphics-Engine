@@ -134,32 +134,6 @@ uniform float opacityFactor;
 
 // ----- Methods ----- //
 
-#define CHANNEL_NONE 0
-#define CHANNEL_R 1
-#define CHANNEL_G 2
-#define CHANNEL_B 3
-#define CHANNEL_A 4
-
-float extractChannel(vec4 inputColor, int channelMask) 
-{
-    if (channelMask == CHANNEL_NONE) return 0.f;
-    if (channelMask == CHANNEL_R) return inputColor.r;
-    if (channelMask == CHANNEL_G) return inputColor.g;
-    if (channelMask == CHANNEL_B) return inputColor.b;
-    if (channelMask == CHANNEL_A) return inputColor.a;
-
-    return 0;
-}
-
-vec4 getPBRTexture(PBR_Sampler s)
-{
-	vec4 color = texture(s.texture, fs_in.texCoord * vec2(s.xScale, s.yScale) + vec2(s.xOffset, s.yOffset)).rgba;
-	return vec4(extractChannel(color, s.channelMaskR), 
-				extractChannel(color, s.channelMaskG), 
-				extractChannel(color, s.channelMaskB), 
-				extractChannel(color, s.channelMaskA));
-}
-
 float getPixelDepth()
 {
 	return length(cameraPos - fs_in.fragPos);
@@ -201,34 +175,41 @@ float getTime()
 
 void main()
 {
-    vec3 normal = samplerNormal.isActive ? (fs_in.TBN * getPBRTexture(samplerNormal).rgb * 2.0 - 1.0) : fs_in.normal;
-    normal = normalize(normal);
+    vec3 normal;
+    vec3 albedo;
+    vec3 MRA;
 
-    vec3 albedoTex = samplerAlbedo.isActive ? getPBRTexture(samplerAlbedo).rgb : vec3(1.0);
-	vec3 albedo = albedoTex * color;
-	albedo = pow(albedo, vec3(2.2)); // Gamme Correction
+    samplePBR(
+		// Input
+		fs_in.TBN,
+		fs_in.normal,
+		color,
+		metallicFactor,
+		roughnessFactor,
+        fs_in.texCoord,
+        
+		samplerNormal,
+		samplerAlbedo,
+		samplerMetallic,
+		samplerRoughness,
+		samplerAO,
 
-	float metallicTex = samplerMetallic.isActive ? getPBRTexture(samplerMetallic).r : 1.0;
-	float metallic = metallicTex * metallicFactor;
-
-	float roughnessTex = samplerRoughness.isActive ? getPBRTexture(samplerRoughness).r : 1.0;
-	float roughness = roughnessTex * roughnessFactor;
-
-	float aoTex = samplerAO.isActive ? getPBRTexture(samplerAO).r : 1.0;
-	float ao = aoTex;
+		// Output
+		normal,
+		albedo,
+		MRA
+	);
 
 #ifdef CUSTOM_SHADER
-    frag(albedo, normal, metallic, roughness, ao);
+    frag(albedo, normal, MRA.r, MRA.g, MRA.b);
 #endif
-
-    float ssaoFinal = ao;
 
     vec3 color = calculatePBR(
 		albedo, 
 		normal, 
-		metallic, 
-		roughness, 
-		ssaoFinal, 
+		MRA.r, 
+		MRA.g, 
+		MRA.b, 
 		cameraPos, 
 		fs_in.fragPos,
 		1.f,

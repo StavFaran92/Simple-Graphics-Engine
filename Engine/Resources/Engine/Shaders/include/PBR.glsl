@@ -169,3 +169,65 @@ vec3 calculatePBR(
 	// combine results
 	return L0 + ambient;
 }
+
+#define CHANNEL_NONE 0
+#define CHANNEL_R 1
+#define CHANNEL_G 2
+#define CHANNEL_B 3
+#define CHANNEL_A 4
+
+float extractChannel(vec4 inputColor, int channelMask) 
+{
+    if (channelMask == CHANNEL_NONE) return 0.f;
+    if (channelMask == CHANNEL_R) return inputColor.r;
+    if (channelMask == CHANNEL_G) return inputColor.g;
+    if (channelMask == CHANNEL_B) return inputColor.b;
+    if (channelMask == CHANNEL_A) return inputColor.a;
+
+    return 0;
+}
+
+vec4 getPBRTexture(PBR_Sampler s, vec2 uv)
+{
+	vec4 color = texture(s.texture, uv * vec2(s.xScale, s.yScale) + vec2(s.xOffset, s.yOffset)).rgba;
+	return vec4(extractChannel(color, s.channelMaskR), 
+				extractChannel(color, s.channelMaskG), 
+				extractChannel(color, s.channelMaskB), 
+				extractChannel(color, s.channelMaskA));
+}
+
+void samplePBR(
+    in mat3 TBN,
+    in vec3 normalIn,
+    in vec3 color,
+    in float metallicFactor,
+    in float roughnessFactor,
+	in vec2 uv,
+
+    in PBR_Sampler samplerNormal,
+    in PBR_Sampler samplerAlbedo,
+    in PBR_Sampler samplerMetallic,
+    in PBR_Sampler samplerRoughness,
+    in PBR_Sampler samplerAO,
+
+    out vec3 outNormal,
+    out vec3 outAlbedo,
+    out vec3 outMRA
+)
+{
+    outNormal = samplerNormal.isActive ? (TBN * (getPBRTexture(samplerNormal, uv).rgb * 2.0 - 1.0)) 
+                                       : normalIn;
+
+    vec3 albedoTex = samplerAlbedo.isActive ? getPBRTexture(samplerAlbedo, uv).rgb : vec3(1.0);
+    outAlbedo = albedoTex * color;
+    outAlbedo = pow(outAlbedo, vec3(2.2)); // Gamma correction
+
+    float metallicTex = samplerMetallic.isActive ? getPBRTexture(samplerMetallic, uv).r : 1.0;
+    outMRA.r = metallicTex * metallicFactor;
+
+    float roughnessTex = samplerRoughness.isActive ? getPBRTexture(samplerRoughness, uv).r : 1.0;
+    outMRA.g = roughnessTex * roughnessFactor;
+
+    float aoTex = samplerAO.isActive ? getPBRTexture(samplerAO, uv).r : 1.0;
+    outMRA.b = aoTex;
+}

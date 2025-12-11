@@ -102,7 +102,7 @@ void main()
 	// retrieve data from G-buffer
 	vec3 fragPos = texture(gPosition, TexCoords).rgb;
 	vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
-	vec3 albedo = pow(texture(gAlbedo, TexCoords).rgb, vec3(2.2));
+	vec3 albedo = texture(gAlbedo, TexCoords).rgb;
 	float metallic = texture(gMRA, TexCoords).r;
 	float roughness = texture(gMRA, TexCoords).g;
 	float ao = texture(gMRA, TexCoords).b;

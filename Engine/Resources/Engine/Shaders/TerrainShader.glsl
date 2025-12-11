@@ -6,6 +6,7 @@ layout (location = 0) in vec3 aPos;
 layout (location = 2) in vec2 aTexCoords;                                        
 
 out vec2 texCoords;
+out mat3 TBN;
 
 uniform int width;
 uniform int height;
@@ -95,6 +96,8 @@ out vec2 texCoord;
 out float height;
 out vec3 fragPos;
 out vec3 fragNormal;
+out vec3 tangent;
+out vec3 bitangent;
 
 void main()
 {
@@ -130,6 +133,8 @@ void main()
     vec4 vVec = p10 - p00;  // Y-Axis
     vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
     fragNormal = vec3(normal);
+    tangent = uVec.xyz;
+    bitangent = vVec.xyz;
 
     // bilinearly interpolate position coordinate across patch
     vec4 p0 = (p01 - p00) * u + p00;
@@ -183,6 +188,9 @@ uniform PBR_Sampler samplerNormal;
 uniform PBR_Sampler samplerRoughness;
 
 #pragma editable
+uniform PBR_Sampler samplerMetallic;
+
+#pragma editable
 uniform PBR_Sampler samplerAO;
 
 #pragma editable (default=1.0)
@@ -201,6 +209,8 @@ in float height;
 in vec2 texCoord;
 in vec3 fragPos;
 in vec3 fragNormal;
+in vec3 tangent;
+in vec3 bitangent;
 
 out vec4 FragColor;
 
@@ -216,42 +226,43 @@ vec4 sampleFromTexture(int textureIndex, vec2 uv)
     return vec4(0.0); // Return black if index is out of bounds
 }
 
-#define CHANNEL_NONE 0
-#define CHANNEL_R 1
-#define CHANNEL_G 2
-#define CHANNEL_B 3
-#define CHANNEL_A 4
-
-float extractChannel(vec4 inputColor, int channelMask) 
-{
-    if (channelMask == CHANNEL_NONE) return 0.f;
-    if (channelMask == CHANNEL_R) return inputColor.r;
-    if (channelMask == CHANNEL_G) return inputColor.g;
-    if (channelMask == CHANNEL_B) return inputColor.b;
-    if (channelMask == CHANNEL_A) return inputColor.a;
-
-    return 0;
-}
-
-vec4 getPBRTexture(PBR_Sampler s)
-{
-	vec4 color = texture(s.texture, texCoord * vec2(s.xScale, s.yScale) + vec2(s.xOffset, s.yOffset)).rgba;
-	return vec4(extractChannel(color, s.channelMaskR), 
-				extractChannel(color, s.channelMaskG), 
-				extractChannel(color, s.channelMaskB), 
-				extractChannel(color, s.channelMaskA));
-}
-
 void main()
 {
-    vec3 albedo = pow(getPBRTexture(samplerAlbedo).rgb * color, vec3(2.2));
-    vec3 normalSample = getPBRTexture(samplerNormal).rgb;
-    normalSample = normalSample;// * 2.0 - 1.0; // [0,1] -> [-1, 1]
-    normalSample = normalize(normalSample);
-    vec3 normal = normalSample * normalize(fragNormal);
-    float metallic = metallicFactor;
-    float roughness = getPBRTexture(samplerRoughness).r * roughnessFactor;
-    float ao = getPBRTexture(samplerAO).r * aoFactor;
+    // vec3 albedo = pow(getPBRTexture(samplerAlbedo, texCoord).rgb * color, vec3(2.2));
+    // vec3 normalSample = getPBRTexture(samplerNormal, texCoord).rgb;
+    // normalSample = normalSample;// * 2.0 - 1.0; // [0,1] -> [-1, 1]
+    // normalSample = normalize(normalSample);
+    // vec3 normal = normalSample * normalize(fragNormal);
+    // float metallic = metallicFactor;
+    // float roughness = getPBRTexture(samplerRoughness, texCoord).r * roughnessFactor;
+    // float ao = getPBRTexture(samplerAO, texCoord).r * aoFactor;
+
+    // vec3 MRA = vec3(metallic, roughness, ao);
+
+    mat3 TBN = mat3(tangent, bitangent, fragNormal);
+    vec3 normal;
+    vec3 albedo;
+    vec3 MRA;
+    samplePBR(
+		// Input
+		TBN,
+		fragNormal,
+		color,
+		metallicFactor,
+		roughnessFactor,
+        texCoord,
+        
+		samplerNormal,
+		samplerAlbedo,
+		samplerMetallic, // todo fix
+		samplerRoughness,
+		samplerAO,
+
+		// Output
+		normal,
+		albedo,
+		MRA
+	);
 
     vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
     float shadow = calculateShadows(fragPosInLightSpace, gShadowMap);
@@ -259,9 +270,9 @@ void main()
     vec3 color = calculatePBR(
                 albedo,
                 normal,
-                metallic,
-                roughness,
-                ao,
+                MRA.r,
+                MRA.g,
+                MRA.b,
                 cameraPos,
                 fragPos,
                 shadow,
