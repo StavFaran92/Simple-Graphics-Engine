@@ -319,6 +319,42 @@ MeshBuilder& MeshBuilder::setMaterialIndex(int index)
 	return *this;
 }
 
+#include "utils/MikkTSpaceImpl.h"
+
+void GenerateTangentsForMesh(MeshData& mesh) {
+	if (mesh.m_positions.empty() ||
+		mesh.m_normals.empty() ||
+		mesh.m_texCoords.empty() ||
+		mesh.m_indices.empty()) {
+		std::cerr << "Mesh missing necessary data for tangent generation." << std::endl;
+		return;
+	}
+
+	// Ensure m_tangents is correctly sized
+	mesh.m_tangents.resize(mesh.m_positions.size(), glm::vec4(0.0f));
+
+	MikkMeshContext userData;
+	userData.mesh = &mesh;
+
+	SMikkTSpaceInterface iface{};
+	iface.m_getNumFaces = getNumFaces;
+	iface.m_getNumVerticesOfFace = getNumVertsOfFace;
+	iface.m_getPosition = getPosition;
+	iface.m_getNormal = getNormal;
+	iface.m_getTexCoord = getTexCoord;
+	iface.m_setTSpaceBasic = setTSpaceBasic;
+
+	SMikkTSpaceContext context{};
+	context.m_pInterface = &iface;
+	context.m_pUserData = &userData;
+
+	if (!genTangSpaceDefault(&context)) {
+		std::cerr << "MikkTSpace tangent generation failed." << std::endl;
+	}
+
+	logDebug("Tagnents generation finished.");
+}
+
 
 
 void MeshBuilder::build(Mesh& mesh)
@@ -357,6 +393,8 @@ void MeshBuilder::build(Mesh& mesh)
 	{
 		return getAttributeLocationInShader(l1) < getAttributeLocationInShader(l2);
 	});
+
+	GenerateTangentsForMesh(m_data);
 
 	//auto& projectDir = Engine::get()->getProjectDirectory();
 

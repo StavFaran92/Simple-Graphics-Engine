@@ -10,6 +10,7 @@ struct Material
 
 struct PBR_Sampler
 {
+	bool isActive;
 	sampler2D texture;
 	int channelMaskR;
 	int channelMaskG;

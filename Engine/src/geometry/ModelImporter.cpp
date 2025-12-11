@@ -22,6 +22,8 @@
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
 
+#include "Utils/MikkTSpaceImpl.h"
+
 void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Material>& mat)
 {
 	if (!aiMat)
@@ -247,7 +249,7 @@ void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::Mod
 		scene = m_importer->ReadFile(filepath, aiProcess_Triangulate |
 			aiProcess_GenSmoothNormals |
 			aiProcess_FlipUVs |
-			aiProcess_CalcTangentSpace |
+			//aiProcess_CalcTangentSpace |
 			aiProcess_ValidateDataStructure);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)

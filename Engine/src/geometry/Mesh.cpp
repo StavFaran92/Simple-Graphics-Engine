@@ -6,6 +6,8 @@
 
 #include <GL\glew.h>
 
+#include "utils/MikkTSpaceImpl.h"
+
 Mesh::Mesh()
 {
 }

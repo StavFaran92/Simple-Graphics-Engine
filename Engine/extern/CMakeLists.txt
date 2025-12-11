@@ -1,4 +1,5 @@
 add_subdirectory(tinyfiledialogs)
+add_subdirectory(MikkTSpace)
 
 target_include_directories(Engine PUBLIC 	
 	assimp/include
@@ -18,6 +19,7 @@ target_include_directories(Engine PUBLIC
 	FileWatch
 	sol2/include
 	lua/include
+	MikkTSpace
 )
 
 target_link_directories(Engine PUBLIC 
@@ -27,6 +29,7 @@ target_link_directories(Engine PUBLIC
 	spdlog/lib
 	nativefiledialog/lib
 	physx/PhysX/bin/win.x86_64.vc142.mt/checked
+	MikkTSpace
 	lua
 )
 
@@ -48,6 +51,7 @@ target_link_libraries(Engine PUBLIC
 	nfd
 	tinyfiledialogs
 	lua54
+	MikkTSpace
 )
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR})
