@@ -96,6 +96,9 @@ public:
 
 	glm::mat4 getRestTransform() const;
 
+	void setName(const std::string& name);
+	std::string getName() const;
+
 	/**
 	 * Build the mesh using the specified vertices data.
 	 * This call will initialize all the OpenGL related Buffer data
@@ -130,4 +133,5 @@ private:
 
 	AABB m_aabb;
 	int materialIndex{};
+	std::string m_name;
 };

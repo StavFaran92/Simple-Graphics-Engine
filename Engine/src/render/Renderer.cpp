@@ -97,23 +97,12 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
         scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
     {
         Entity entityHandler{ entity, &scene->getRegistry() };
-        std::string name = entityHandler.getComponent<ObjectComponent>().name;
-        logTrace("About to render using Non Opaque pass {}", name);
+        
 
         auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
 
         for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
-        {
-            auto matIndex = mesh->getMaterialIndex();
-            
-            auto& material = meshRenderer.at(matIndex);
-
-            // Only render transparent objects
-            if (material->getMaterialRenderMode() != MaterialRenderMode::Transparent)
-            {
-                continue;
-            }
-
+        {            
             float distance = glm::dot(transform.getWorldPosition(), camForward);
 
             // object is behind the camera
@@ -132,6 +121,12 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
     {
         Entity& entityHandler = iter->second;
 
+        std::string name = entityHandler.getComponent<ObjectComponent>().name;
+        logTrace("About to render using Non Opaque pass {}", name);
+
+        std::string captionGPU = "About to render: '" + name + "'";
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
+
         graphics->entity = entityHandler;
         graphics->shader->use();
         for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.get()->getMeshes())
@@ -142,14 +137,27 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
                 continue;
             }
 
+            // Only render transparent objects
+            if (graphics->material->getMaterialRenderMode() != MaterialRenderMode::Transparent)
+            {
+                continue;
+            }
+
             // draw model
             glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
             graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
             setUniforms();
 
+            std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
+            glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
+
             // Draw
             RenderCommand::draw(graphics->mesh->getVAO());
+
+            glPopDebugGroup();
         }
+
+        glPopDebugGroup();
 
         iter++;
     }

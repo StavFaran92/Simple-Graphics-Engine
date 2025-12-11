@@ -445,6 +445,8 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 
 	std::shared_ptr<Mesh> generatedMesh = std::make_shared<Mesh>();
 
+	generatedMesh->setName(aiMesh->mName.C_Str());
+
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec4> tangents;

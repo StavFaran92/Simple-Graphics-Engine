@@ -279,6 +279,16 @@ glm::mat4 Mesh::getRestTransform() const
 	return m_restTransform;
 }
 
+
+void Mesh::setName(const std::string& name)
+{
+	m_name = name;
+}
+std::string Mesh::getName() const
+{
+	return m_name;
+}
+
 Mesh::~Mesh()
 {
 	logDebug( __FUNCTION__ );

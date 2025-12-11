@@ -260,6 +260,9 @@ void DeferredRenderer::renderScene(Scene* scene)
 		std::string name = entityHandler.getComponent<ObjectComponent>().name;
 		logTrace("About to render using Deferred Render pass {}", name);
 
+		std::string captionGPU = "About to render Entity: '" + name + "'";
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
+
 		for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
 		{
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -273,9 +276,16 @@ void DeferredRenderer::renderScene(Scene* scene)
 				continue;
 			}
 
+			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
+
 			// draw model
 			render();
+
+			glPopDebugGroup();
 		}
+
+		glPopDebugGroup();
 		
 	};
 
