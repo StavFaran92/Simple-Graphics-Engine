@@ -205,6 +205,9 @@ uniform float aoFactor;
 #pragma editable (default=(1.0, 1.0, 1.0))
 uniform vec3 color;
 
+#pragma editable (default=(1.0, 1.0))
+uniform vec2 globalUV;
+
 in float height;
 in vec2 texCoord;
 in vec3 fragPos;
@@ -228,17 +231,6 @@ vec4 sampleFromTexture(int textureIndex, vec2 uv)
 
 void main()
 {
-    // vec3 albedo = pow(getPBRTexture(samplerAlbedo, texCoord).rgb * color, vec3(2.2));
-    // vec3 normalSample = getPBRTexture(samplerNormal, texCoord).rgb;
-    // normalSample = normalSample;// * 2.0 - 1.0; // [0,1] -> [-1, 1]
-    // normalSample = normalize(normalSample);
-    // vec3 normal = normalSample * normalize(fragNormal);
-    // float metallic = metallicFactor;
-    // float roughness = getPBRTexture(samplerRoughness, texCoord).r * roughnessFactor;
-    // float ao = getPBRTexture(samplerAO, texCoord).r * aoFactor;
-
-    // vec3 MRA = vec3(metallic, roughness, ao);
-
     mat3 TBN = mat3(tangent, bitangent, fragNormal);
     vec3 normal;
     vec3 albedo;
@@ -250,7 +242,7 @@ void main()
 		color,
 		metallicFactor,
 		roughnessFactor,
-        texCoord,
+        texCoord * globalUV,
         
 		samplerNormal,
 		samplerAlbedo,
