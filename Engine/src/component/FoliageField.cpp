@@ -16,8 +16,8 @@ void FoliageField::build()
 	tData.width = width;
 	tData.height = height;
 	tData.format = Texture::Format::RED;
-	tData.internalFormat = Texture::InternalFormat::R32F;
-	tData.type = Texture::Type::FLOAT;
+	tData.internalFormat = Texture::InternalFormat::R8;
+	tData.type = Texture::Type::UNSIGNED_BYTE;
 	tData.target = Texture::TextureTarget::TEXTURE_2D;
 
 	std::vector<float> data(height * width, 0.f);
@@ -27,6 +27,7 @@ void FoliageField::build()
 	AssetCreateDescriptor desc;
 	desc.isEngineOwned = true;
 	desc.aType = AssetType::TEXTURE;
+	desc.name = "Terrain_Foliage_SpreadMap"; // TODO Think of unique name mechanic here
 	m_foliageSpreadMap = Engine::get()->getSubSystem<Assets>()->createAsset(foliageSpreadMap, desc).as<Texture>();
 
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
