@@ -11,29 +11,29 @@
 
 void FoliageField::build()
 {
-	Texture::TextureData tData;
-	tData.bpp = 1;
-	tData.width = width;
-	tData.height = height;
-	tData.format = Texture::Format::RED;
-	tData.internalFormat = Texture::InternalFormat::R8;
-	tData.type = Texture::Type::UNSIGNED_BYTE;
-	tData.target = Texture::TextureTarget::TEXTURE_2D;
+	//Texture::TextureData tData;
+	//tData.bpp = 1;
+	//tData.width = width;
+	//tData.height = height;
+	//tData.format = Texture::Format::RED;
+	//tData.internalFormat = Texture::InternalFormat::R8;
+	//tData.type = Texture::Type::UNSIGNED_BYTE;
+	//tData.target = Texture::TextureTarget::TEXTURE_2D;
 
-	std::vector<float> data(height * width, 0.f);
-	tData.data = data.data();
-	ResourceWrapper<Texture> foliageSpreadMap = Texture::create2DTextureFromBuffer(tData);
+	//std::vector<float> data(height * width, 0.f);
+	//tData.data = data.data();
+	//ResourceWrapper<Texture> foliageSpreadMap = Texture::create2DTextureFromBuffer(tData);
 
-	AssetCreateDescriptor desc;
-	desc.isEngineOwned = true;
-	desc.aType = AssetType::TEXTURE;
-	desc.name = "Terrain_Foliage_SpreadMap"; // TODO Think of unique name mechanic here
-	m_foliageSpreadMap = Engine::get()->getSubSystem<Assets>()->createAsset(foliageSpreadMap, desc).as<Texture>();
+	//AssetCreateDescriptor desc;
+	//desc.isEngineOwned = true;
+	//desc.aType = AssetType::TEXTURE;
+	//desc.name = "Terrain_Foliage_SpreadMap"; // TODO Think of unique name mechanic here
+	//m_foliageSpreadMap = Engine::get()->getSubSystem<Assets>()->createAsset(foliageSpreadMap, desc).as<Texture>();
 
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
 	pixelPerPatch = width / m_patchCount.x;
 
-	glm::vec2 ratio = glm::vec2(foliageSpreadMap->getWidth() / width, foliageSpreadMap->getHeight() / height);
+	glm::vec2 ratio = glm::vec2(1.0f, 1.0f);
 
 	m_patches.clear();
 	m_patches.reserve(m_patchCount.x * m_patchCount.y);
@@ -51,11 +51,12 @@ void FoliageField::build()
 
 	}
 
-	foliageSpreadMap->bind();
-	std::vector<GLubyte> pixels(foliageSpreadMap->getWidth() * foliageSpreadMap->getHeight());
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
-	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	//foliageSpreadMap->bind();
+	m_foliageSpreadMap = std::vector<unsigned char>(width * height, 0);
+	//std::vector<GLubyte> pixels(height * width);
+	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	//glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
+	//glPixelStorei(GL_PACK_ALIGNMENT, 4);
 
 	auto foliageSystem = Engine::get()->getSubSystem<FoliageSystem>();
 
@@ -72,14 +73,14 @@ void FoliageField::build()
 				float xRelativeToImageOffset = xOffset * ratio.x;
 				float yRelativeToImageOffset = yOffset * ratio.y;
 
-				int xModOffset = (int)xRelativeToImageOffset % foliageSpreadMap->getHeight();
-				int yModOffset = (int)yRelativeToImageOffset % foliageSpreadMap->getWidth();
+				int xModOffset = (int)xRelativeToImageOffset % (int)height;
+				int yModOffset = (int)yRelativeToImageOffset % (int)width;
 
-				int xIndexOffset = xModOffset * foliageSpreadMap->getWidth();
+				int xIndexOffset = xModOffset * width;
 				int yIndexOffset = yModOffset;
 
-				int index = (xIndexOffset + yIndexOffset) % pixels.size();
-				float density = (float)pixels[index] / 255.f;
+				int index = (xIndexOffset + yIndexOffset) % (int)(height * width);
+				float density = (float)m_foliageSpreadMap[index] / 255.f;
 
 				int instanceCount = density * globalDensity * 255 ; // times max instances per texel
 				p->instanceCount += instanceCount;

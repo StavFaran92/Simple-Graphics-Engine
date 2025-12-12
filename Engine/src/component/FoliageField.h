@@ -39,7 +39,7 @@ struct EngineAPI FoliageField
 	    SERIALIZED_MEMBER(height);
 	}
 
-	AssetWrapper<Texture> m_foliageSpreadMap;
+	std::vector<unsigned char> m_foliageSpreadMap;
 	float globalDensity = 1.f;
 	glm::vec3 colorA = glm::vec3(0.1, 0.3, 0.1);
 	glm::vec3 colorB = glm::vec3(0.4, 0.8, 0.3);

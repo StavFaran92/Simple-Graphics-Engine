@@ -136,7 +136,7 @@ bool isInFrustum(const Frustum& frustum, glm::vec3 pos)
 
 void FoliageSystem::drawFoliage(FoliageField& foliage)
 {
-	if (foliage.m_foliageSpreadMap.isEmpty())
+	if (foliage.m_foliageSpreadMap.size() == 0)
 	{
 		return;
 	}
@@ -172,7 +172,6 @@ void FoliageSystem::drawFoliage(FoliageField& foliage)
 	foliageShader->setUniformValue("colorA", foliage.colorA);
 	foliageShader->setUniformValue("colorB", foliage.colorB);
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
-	foliageShader->setTextureInShader(foliage.m_foliageSpreadMap.resource(), "densityMap", 1);
 	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);
 	foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 
