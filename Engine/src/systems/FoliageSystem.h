@@ -2,7 +2,7 @@
 
 #include "memory/ResourceWrapper.h"
 #include "geometry/MeshCollection.h"
-#include "component/FoliageComponent.h"
+#include "component/FoliageField.h"
 #include "systems/SubSystem.h"
 
 class FoliageSystem : public SubSystem
@@ -16,7 +16,7 @@ public:
 
 	glm::vec3 getRandomLocation(int instanceID) const;
 
-	void drawFoliage(FoliageComponent& foliage);
+	void drawFoliage(FoliageField& foliage);
 
 private:
 	ResourceWrapper<MeshCollection> m_grassBlade;

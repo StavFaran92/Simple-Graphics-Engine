@@ -47,10 +47,6 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<Terrain>()));
     } },
 
-    { "Foliage", [](Entity& e, sol::this_state lua) -> sol::object {
-        return sol::object(lua, sol::in_place, std::ref(e.getComponent<FoliageComponent>()));
-    } },
-
     { "Skybox", [](Entity& e, sol::this_state lua) -> sol::object {
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<SkyboxComponent>()));
     } },

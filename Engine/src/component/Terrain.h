@@ -7,6 +7,8 @@
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
 
+#include "component/FoliageField.h"
+
 class Entity;
 
 static const int MAX_TEXTURE_COUNT = 4;
@@ -54,6 +56,8 @@ public:
 
 	int getTextureCount() const;
 
+	void buildFoliage();
+
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
 	template <class Archive>
@@ -64,6 +68,7 @@ public:
 		SERIALIZED_MEMBER(m_height);
 		SERIALIZED_MEMBER(m_scale);
 		SERIALIZED_MEMBER(m_material);
+		SERIALIZED_MEMBER(m_foliageField);
 	}
 
 
@@ -80,6 +85,8 @@ public:
 	//std::vector<Resource<Texture>> m_textures{  };
 	//std::vector<float> m_blends{ };
 	AssetWrapper<Material> m_material;
+
+	FoliageField m_foliageField;
 
 private:
 	AssetWrapper<MeshCollection> m_mesh;

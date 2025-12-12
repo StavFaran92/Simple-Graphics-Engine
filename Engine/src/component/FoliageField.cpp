@@ -1,4 +1,4 @@
-#include "component/FoliageComponent.h"
+#include "component/FoliageField.h"
 
 #include "component/Transformation.h"
 #include "systems/FoliageSystem.h"
@@ -9,9 +9,25 @@
 #include <algorithm>
 #include "runtime/Scene.h"
 
-void FoliageComponent::build()
+void FoliageField::build()
 {
-	auto foliageSpreadMap = m_foliageSpreadMap.resource();
+	Texture::TextureData tData;
+	tData.bpp = 1;
+	tData.width = width;
+	tData.height = height;
+	tData.format = Texture::Format::RED;
+	tData.internalFormat = Texture::InternalFormat::R32F;
+	tData.type = Texture::Type::FLOAT;
+	tData.target = Texture::TextureTarget::TEXTURE_2D;
+
+	std::vector<float> data(height * width, 0.f);
+	tData.data = data.data();
+	ResourceWrapper<Texture> foliageSpreadMap = Texture::create2DTextureFromBuffer(tData);
+
+	AssetCreateDescriptor desc;
+	desc.isEngineOwned = true;
+	desc.aType = AssetType::TEXTURE;
+	m_foliageSpreadMap = Engine::get()->getSubSystem<Assets>()->createAsset(foliageSpreadMap, desc).as<Texture>();
 
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
 	pixelPerPatch = width / m_patchCount.x;
@@ -32,12 +48,6 @@ void FoliageComponent::build()
 
 		}
 
-	}
-
-	Terrain* terrain = nullptr;
-	if (terrainRef != Entity::EmptyEntity)
-	{
-		terrain = terrainRef.tryGetComponent<Terrain>();
 	}
 
 	foliageSpreadMap->bind();
@@ -109,29 +119,12 @@ void FoliageComponent::build()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_patchInstanceDataSSBO);
 }
 
-glm::vec2 FoliageComponent::getPatchCount() const
+glm::vec2 FoliageField::getPatchCount() const
 {
 	return m_patchCount;
 }
 
-const std::vector<std::shared_ptr<FoliagePatch>>& FoliageComponent::getPatches() const
+const std::vector<std::shared_ptr<FoliagePatch>>& FoliageField::getPatches() const
 {
 	return m_patches;
-}
-
-void FoliageComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
-{
-	if (auto fc = std::dynamic_pointer_cast<FoliageComponent>(c))
-	{
-		auto& foliage = entityHandler.addComponent<FoliageComponent>(*fc);
-		foliage.terrainRef.setRegistry(&scene.getRegistry());
-		foliage.build();
-	}
-}
-
-Entity FoliageComponent::createGrassField()
-{
-	auto grassField = Engine::get()->getContext()->getActiveScene()->createEntity("Grass Field");
-	grassField.addComponent<FoliageComponent>();
-	return grassField;
 }

@@ -23,7 +23,6 @@
 #include "runtime/Context.h"
 #include "animation/Animator.h"
 #include "component/Terrain.h"
-#include "component/FoliageComponent.h"
 
 #include "serialize/CerealHelpers.h"
 

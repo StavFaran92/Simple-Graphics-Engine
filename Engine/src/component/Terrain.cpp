@@ -12,7 +12,6 @@
 
 #include "memory/BuiltInAssets.h"
 
-
 #include "GL/glew.h"
 
 Entity Terrain::createTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap)
@@ -298,4 +297,12 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	float height = (P0 + lerpX + lerpY) / 255.f * m_scale;
 
 	return height;
+}
+
+void Terrain::buildFoliage()
+{
+	m_foliageField.height = m_height;
+	m_foliageField.width = m_width;
+
+	m_foliageField.build();
 }

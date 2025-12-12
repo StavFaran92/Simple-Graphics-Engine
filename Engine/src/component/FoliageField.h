@@ -17,19 +17,15 @@ struct FoliagePatch
 	int instanceCount = 0;
 };
 
-struct EngineAPI FoliageComponent : public Component
+struct EngineAPI FoliageField
 {
-	FoliageComponent() = default;
+	FoliageField() = default;
 
 	void build();
 
 	glm::vec2 getPatchCount() const;
 
 	const std::vector<std::shared_ptr<FoliagePatch>>& getPatches() const;
-
-	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
-
-	static Entity createGrassField();
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -41,7 +37,6 @@ struct EngineAPI FoliageComponent : public Component
 	    SERIALIZED_MEMBER(patchHeight);
 	    SERIALIZED_MEMBER(width);
 	    SERIALIZED_MEMBER(height);
-	    SERIALIZED_MEMBER(terrainRef);
 	}
 
 	AssetWrapper<Texture> m_foliageSpreadMap;
@@ -54,8 +49,6 @@ struct EngineAPI FoliageComponent : public Component
 	float width = 10;
 	float height = 10;
 
-	Entity terrainRef = Entity::EmptyEntity;
-
 private:
 
 	std::vector<std::shared_ptr<FoliagePatch>> m_patches;
@@ -63,6 +56,3 @@ private:
 	unsigned int m_patchInstanceDataSSBO;
 	
 };
-
-
-REGISTER_COMPONENT(FoliageComponent)

@@ -53,7 +53,6 @@
 #include "core/EngineConfig.h"
 #include "geometry/WireframeGrid.h"
 
-#include "component/FoliageComponent.h"
 #include "systems/FoliageSystem.h"
 #include "systems/WaterSystem.h"
 #include "component/CameraComponent.h"
@@ -400,13 +399,13 @@ void Scene::draw(float deltaTime)
 
 			graphics->renderView->bind();
 
-			for (auto&& [entity, foliage, transform] : m_registry->get().view<FoliageComponent, Transformation>().each())
+			for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
 			{
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				Engine::get()->getSubSystem<FoliageSystem>()->setView(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getForward());
 				Engine::get()->getSubSystem<FoliageSystem>()->setFrustum(frustum);
-				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(foliage);
+				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(terrain.m_foliageField);
 				glDisable(GL_BLEND);
 			}
 

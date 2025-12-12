@@ -134,7 +134,7 @@ bool isInFrustum(const Frustum& frustum, glm::vec3 pos)
 		isForwardOfPlane(pos, frustum.m_down);
 }
 
-void FoliageSystem::drawFoliage(FoliageComponent& foliage)
+void FoliageSystem::drawFoliage(FoliageField& foliage)
 {
 	if (foliage.m_foliageSpreadMap.isEmpty())
 	{
