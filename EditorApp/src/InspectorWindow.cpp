@@ -472,6 +472,14 @@ void InspectorWindow::display()
 						terrain.buildFoliage();
 					}
 
+					if (ImGui::Button("test"))
+					{
+						static int x = 0;
+						static int y = 0;
+						terrain.m_foliageField.setPixel(x, y, 255);
+						x++;
+					}
+
 					ImGui::EndTabItem();
 				}
 

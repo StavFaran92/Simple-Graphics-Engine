@@ -5,6 +5,7 @@
 #include "component/ComponentSerializer.h"
 #include "serialize/CerealHelpers.h"
 #include <vector>
+#include <glm/glm.hpp>
 
 struct FoliagePatch
 {
@@ -24,6 +25,12 @@ struct EngineAPI FoliageField
 	void build();
 
 	glm::vec2 getPatchCount() const;
+
+	//std::shared_ptr<FoliagePatch> getPatch(int idx, int idy);
+
+	void setPixel(int idx, int idy, unsigned char value);
+
+	void update();
 
 	const std::vector<std::shared_ptr<FoliagePatch>>& getPatches() const;
 
@@ -54,5 +61,6 @@ private:
 	std::vector<std::shared_ptr<FoliagePatch>> m_patches;
 	glm::vec2 m_patchCount;
 	unsigned int m_patchInstanceDataSSBO;
+	glm::vec2 ratio{ 1.0f, 1.0f };
 	
 };

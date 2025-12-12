@@ -35,7 +35,6 @@ void FoliageField::build()
 	// Create Patches
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
 	pixelPerPatch = width / m_patchCount.x;
-	glm::vec2 ratio = glm::vec2(1.0f, 1.0f);
 	m_patches.clear();
 	m_patches.reserve(m_patchCount.x * m_patchCount.y);
 	for (int i = 0; i < m_patchCount.y; i++) // Rows
@@ -61,35 +60,35 @@ void FoliageField::build()
 
 	
 
-	// Read foliage data, calculate instance count for each patch (multiple loops since a patch can contain multiple pixels)
-	for (auto& p : m_patches)
-	{
-		for (int i = 0; i < pixelPerPatch; i++)
-		{
-			for (int j = 0; j < pixelPerPatch; j++)
-			{
-				// Sample density
-				int xOffset = p->idx * pixelPerPatch + j;
-				int yOffset = p->idy * pixelPerPatch + i;
+	//// Read foliage data, calculate instance count for each patch (multiple loops since a patch can contain multiple pixels)
+	//for (auto& p : m_patches)
+	//{
+	//	for (int i = 0; i < pixelPerPatch; i++)
+	//	{
+	//		for (int j = 0; j < pixelPerPatch; j++)
+	//		{
+	//			// Sample density
+	//			int xOffset = p->idx * pixelPerPatch + j;
+	//			int yOffset = p->idy * pixelPerPatch + i;
 
-				float xRelativeToImageOffset = xOffset * ratio.x;
-				float yRelativeToImageOffset = yOffset * ratio.y;
+	//			float xRelativeToImageOffset = xOffset * ratio.x;
+	//			float yRelativeToImageOffset = yOffset * ratio.y;
 
-				int xModOffset = (int)xRelativeToImageOffset % (int)height;
-				int yModOffset = (int)yRelativeToImageOffset % (int)width;
+	//			int xModOffset = (int)xRelativeToImageOffset % (int)height;
+	//			int yModOffset = (int)yRelativeToImageOffset % (int)width;
 
-				int xIndexOffset = xModOffset * width;
-				int yIndexOffset = yModOffset;
+	//			int xIndexOffset = xModOffset * width;
+	//			int yIndexOffset = yModOffset;
 
-				int index = (xIndexOffset + yIndexOffset) % (int)(height * width);
-				float density = (float)m_foliageSpreadMap[index] / 255.f;
+	//			int index = (xIndexOffset + yIndexOffset) % (int)(height * width);
+	//			float density = (float)m_foliageSpreadMap[index] / 255.f;
 
-				int instanceCount = density * globalDensity * 255 ; // times max instances per texel
-				p->instanceCount += instanceCount;
-			}
-		}
-		//p.density = r / 255.f;
-	}
+	//			int instanceCount = density * globalDensity * 255 ; // times max instances per texel
+	//			p->instanceCount += instanceCount;
+	//		}
+	//	}
+	//	//p.density = r / 255.f;
+	//}
 
 	// Build patch instance data based on patch locality
 	auto foliageSystem = Engine::get()->getSubSystem<FoliageSystem>();
@@ -130,6 +129,50 @@ void FoliageField::build()
 glm::vec2 FoliageField::getPatchCount() const
 {
 	return m_patchCount;
+}
+
+//std::shared_ptr<FoliagePatch> FoliageField::getPatch(int idx, int idy)
+//{
+//	return m_patches[idy * width + idx];
+//}
+
+void FoliageField::update()
+{
+	// Read foliage data, calculate instance count for each patch (multiple loops since a patch can contain multiple pixels)
+	for (auto& p : m_patches)
+	{
+		for (int i = 0; i < pixelPerPatch; i++)
+		{
+			for (int j = 0; j < pixelPerPatch; j++)
+			{
+				// Sample density
+				int xOffset = p->idx * pixelPerPatch + j;
+				int yOffset = p->idy * pixelPerPatch + i;
+
+				float xRelativeToImageOffset = xOffset * ratio.x;
+				float yRelativeToImageOffset = yOffset * ratio.y;
+
+				int xModOffset = (int)xRelativeToImageOffset % (int)height;
+				int yModOffset = (int)yRelativeToImageOffset % (int)width;
+
+				int xIndexOffset = xModOffset * width;
+				int yIndexOffset = yModOffset;
+
+				int index = (xIndexOffset + yIndexOffset) % (int)(height * width);
+				float density = (float)m_foliageSpreadMap[index] / 255.f;
+
+				int instanceCount = density * globalDensity * 255; // times max instances per texel
+				p->instanceCount += instanceCount;
+			}
+		}
+		//p.density = r / 255.f;
+	}
+}
+
+void FoliageField::setPixel(int idx, int idy, unsigned char value)
+{
+	m_foliageSpreadMap[idy * width + idx] = value;
+	update();
 }
 
 const std::vector<std::shared_ptr<FoliagePatch>>& FoliageField::getPatches() const
