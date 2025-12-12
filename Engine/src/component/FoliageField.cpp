@@ -30,11 +30,12 @@ void FoliageField::build()
 	//desc.name = "Terrain_Foliage_SpreadMap"; // TODO Think of unique name mechanic here
 	//m_foliageSpreadMap = Engine::get()->getSubSystem<Assets>()->createAsset(foliageSpreadMap, desc).as<Texture>();
 
+
+
+	// Create Patches
 	m_patchCount = glm::vec2(ceil(width / patchWidth), ceil(height / patchHeight));
 	pixelPerPatch = width / m_patchCount.x;
-
 	glm::vec2 ratio = glm::vec2(1.0f, 1.0f);
-
 	m_patches.clear();
 	m_patches.reserve(m_patchCount.x * m_patchCount.y);
 	for (int i = 0; i < m_patchCount.y; i++) // Rows
@@ -58,8 +59,9 @@ void FoliageField::build()
 	//glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
 	//glPixelStorei(GL_PACK_ALIGNMENT, 4);
 
-	auto foliageSystem = Engine::get()->getSubSystem<FoliageSystem>();
+	
 
+	// Read foliage data, calculate instance count for each patch (multiple loops since a patch can contain multiple pixels)
 	for (auto& p : m_patches)
 	{
 		for (int i = 0; i < pixelPerPatch; i++)
@@ -89,10 +91,11 @@ void FoliageField::build()
 		//p.density = r / 255.f;
 	}
 
+	// Build patch instance data based on patch locality
+	auto foliageSystem = Engine::get()->getSubSystem<FoliageSystem>();
 	std::vector<glm::vec4> patchInstanceData;
 	size_t totalSize = pixelPerPatch * pixelPerPatch * globalDensity * 255;
 	patchInstanceData.reserve(totalSize);
-
 	for (int i = 0; i < pixelPerPatch; i++)
 	{
 		for (int j = 0; j < pixelPerPatch; j++)
@@ -108,9 +111,12 @@ void FoliageField::build()
 			}
 		}
 	}
+
+	// We shuffle so the LOD distance culling will not be consecutive (we want to reduce amount randomely)
 	auto& gen = Engine::get()->getRandomSystem()->getGenerator();
 	std::shuffle(patchInstanceData.begin(), patchInstanceData.end(), gen);
 
+	// We fill the instance data UBO
 	if (m_patchInstanceDataSSBO)
 	{
 		glDeleteBuffers(1, &m_patchInstanceDataSSBO);
