@@ -124,3 +124,4 @@ static void displayComponent(const std::string& componentName, std::function<voi
 	}
 }
 
+void focusOnEntity(Entity e, Entity cameraEntity);
