@@ -38,6 +38,39 @@
 #include "ImguiHandler.h"
 #include "GUIMenu.h"
 
+extern bool g_testRay;
+
+AssetSelectDialog assetSelectDialog;
+
+std::pair<glm::vec3, glm::vec3 > ScreenPointToRay(
+	float mouseX, float mouseY,
+	float viewportWidth, float viewportHeight,
+	const glm::mat4& view,
+	const glm::mat4& projection
+) {
+	// 1. NDC
+	glm::vec2 ndc;
+	ndc.x = (mouseX * 2.0) / viewportWidth - 1.0f;
+	ndc.y = (mouseY * 2.0) / viewportHeight - 1.0f;
+
+	//logDebug("ndc x:{}, y:{}", ndc.x, ndc.y);
+
+	// 2. Clip space
+	glm::vec4 rayClip(ndc, -1.0f, 1.0f);
+
+	// 3. View space
+	glm::vec4 rayView = glm::inverse(projection) * rayClip;
+	rayView = glm::vec4(rayView.x, rayView.y, -1.0f, 0.0f);
+
+	// 4. World space
+	glm::vec3 rayDir = glm::normalize(glm::vec3(glm::inverse(view) * rayView));
+
+	// 5. Origin
+	glm::vec3 rayOrigin = glm::vec3(glm::inverse(view)[3]);
+
+	return { rayOrigin, rayDir };
+}
+
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 
@@ -463,6 +496,49 @@ void RenderSceneViewWindow()
 			transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
 		}
 
+	}
+
+
+	if (g_testRay)
+	{
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		ImVec2 renderViewWindowSize = ImGui::GetContentRegionAvail();
+		float innerWindowWidth = renderViewWindowSize.x;
+		float innerWindowHeight = 35.0f;
+		ImVec2 toolbarPos(windowPos.x + 10, windowPos.y + 30);
+
+		ImVec2 mousePos = ImGui::GetMousePos();
+		ImVec2 viewportOffset = ImGui::GetWindowContentRegionMin();
+		ImVec2 viewportPos{ windowPos.x + viewportOffset.x, windowPos.y + viewportOffset.y };
+
+		bool mouseInsideViewport = (mousePos.x >= viewportPos.x && mousePos.x <= viewportPos.x + renderViewWindowSize.x &&
+			mousePos.y >= viewportPos.y && mousePos.y <= viewportPos.y + renderViewWindowSize.y);
+		bool mouseInsideToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
+			mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
+
+		// We alter the mouse position from small window into full screen (the renderered object pick texture)
+		int alteredX = (mousePos.x - viewportPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
+		int alteredY = (mousePos.y - viewportPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
+
+		//logDebug("altered mouse x:{}, y:{}", alteredX, alteredY);
+
+		auto& cameraComponent = g_editorCamera.getComponent<CameraComponent>();
+		auto& cameraTransform = g_editorCamera.getComponent<Transformation>();
+		glm::mat4 view = glm::lookAt(cameraTransform.getWorldPosition(), cameraTransform.getWorldPosition() + cameraComponent.front, cameraComponent.up);
+		auto projection = g_editorCamera.getComponent<CameraComponent>().getProjection();
+
+		auto& [rayOrigin, rayDir] = ScreenPointToRay(alteredX, alteredY, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), view, projection);
+
+		//logDebug("Ray Origin {},{},{}, ray dir {},{},{}", rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDir.x, rayDir.y, rayDir.z);
+
+		//DebugHelper::getInstance().drawLine(rayOrigin, rayDir);
+
+		Physics::HitResult hitResults;
+		if (Physics::raycast(rayOrigin, rayDir, 10000, hitResults))
+		{
+			std::string name = hitResults.e.getComponent<ObjectComponent>().name;
+			logDebug("Hit Object {}", name);
+		}
 	}
 
 	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())

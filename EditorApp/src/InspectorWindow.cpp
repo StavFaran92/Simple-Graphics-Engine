@@ -10,7 +10,9 @@
 #include "Widgets.h"
 #include "dialogs/AssetSelectDialog.h"
 
-AssetSelectDialog assetSelectDialog;
+bool g_testRay = false;
+
+extern Entity g_editorCamera;
 
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
@@ -472,8 +474,10 @@ void InspectorWindow::display()
 						terrain.buildFoliage();
 					}
 
+
 					if (ImGui::Button("test"))
 					{
+						g_testRay = true;
 						static int x = 0;
 						static int y = 0;
 						terrain.m_foliageField.setPixel(x, y, 255);
