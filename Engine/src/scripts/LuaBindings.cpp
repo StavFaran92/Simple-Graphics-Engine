@@ -109,7 +109,7 @@ void bindComponents(sol::state& lua)
         "createTerrain", &Terrain::createTerrain,
         "getMesh", &Terrain::getMesh,
         "getHeightmap", &Terrain::getHeightmap,
-        "getHeightAtPoint", &Terrain::getHeightAtPoint,
+        //"getHeightAtPoint", &Terrain::getHeightAtPoint,
         "getScale", &Terrain::getScale,
         "getWidth", &Terrain::getWidth,
         "getHeight", &Terrain::getHeight,

@@ -39,7 +39,7 @@ public:
 
 	ResourceWrapper<MeshCollection> getMesh() const;
 	ResourceWrapper<Texture> getHeightmap() const;
-	float getHeightAtPoint(float x, float y) const;
+	bool getHeightAtPoint(float x, float y, float& outHeight) const;
 
 	float getScale() const;
 	int getWidth() const;
@@ -53,6 +53,8 @@ public:
 	AssetWrapper<Texture>& getTexture(int index);
 	float getTextureBlend(int index) const;
 	glm::vec2 getTextureScale(int index) const;
+
+	AABB getAABB() const;
 
 	int getTextureCount() const;
 

@@ -11,6 +11,7 @@
 #include "dialogs/AssetSelectDialog.h"
 
 bool g_testRay = false;
+Terrain* g_activeTerrain = 0;
 
 extern Entity g_editorCamera;
 
@@ -478,6 +479,7 @@ void InspectorWindow::display()
 					if (ImGui::Button("test"))
 					{
 						g_testRay = true;
+						g_activeTerrain = &terrain;
 						static int x = 0;
 						static int y = 0;
 						terrain.m_foliageField.setPixel(x, y, 255);

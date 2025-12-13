@@ -224,7 +224,7 @@ std::array<float, 4> getCornersSafe(
 	};
 }
 
-float Terrain::getHeightAtPoint(float x, float y) const
+bool Terrain::getHeightAtPoint(float x, float y, float& outHeight) const
 {
 	
 	// offset to match heightmap
@@ -232,7 +232,7 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	y += m_height / 2.f;
 
 	if (x < 0 || x >= m_width || y < 0 || y >= m_height) {
-		return 0.0f;
+		return false;
 	}
 
 	// Convert from world space to heightmap space
@@ -296,7 +296,9 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	// sum results
 	float height = (P0 + lerpX + lerpY) / 255.f * m_scale;
 
-	return height;
+	outHeight = height;
+
+	return true;
 }
 
 void Terrain::buildFoliage()
@@ -305,4 +307,9 @@ void Terrain::buildFoliage()
 	m_foliageField.width = m_width;
 
 	m_foliageField.build();
+}
+
+AABB Terrain::getAABB() const
+{
+	return AABB::createFromCenterExtents(glm::vec3(0.f), glm::vec3(m_width, m_scale, m_height)); // todo return member
 }
