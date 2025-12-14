@@ -195,9 +195,7 @@ std::pair<glm::vec3, glm::vec3 > ScreenPointToRay(
 	// 1. NDC
 	glm::vec2 ndc;
 	ndc.x = (mouseX * 2.0) / viewportWidth - 1.0f;
-	ndc.y = (mouseY * 2.0) / viewportHeight - 1.0f;
-
-	//logDebug("ndc x:{}, y:{}", ndc.x, ndc.y);
+	ndc.y = -((mouseY * 2.0) / viewportHeight - 1.0f);
 
 	// 2. Clip space
 	glm::vec4 rayClip(ndc, -1.0f, 1.0f);
@@ -676,11 +674,17 @@ void RenderSceneViewWindow()
 		RayHit results = RaycastTerrainHeightmap(Ray(rayOrigin, rayDir), *g_activeTerrain);
 		if (results.hit)
 		{
-			logDebug("hit position {},{},{}", results.position.x, results.position.y, results.position.z);
-			unsigned int editorFrameBufferID = Engine::get()->getContext()->getActiveScene()->getRenderViewFrameBufferID("Editor View");
-			glBindFramebuffer(GL_FRAMEBUFFER, editorFrameBufferID);
-			DebugHelper::getInstance().drawLine(results.position, results.position + glm::vec3(0, 100, 0), glm::vec3(1,0,0), 3.f);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			//if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_X) > 0)
+			{
+				Engine::get()->getSubSystem<Graphics>()->view = view;
+				Engine::get()->getSubSystem<Graphics>()->projection = projection;
+				//logDebug("ray origin {},{},{}, ray dir {},{},{}, hit position {},{},{}", rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDir.x, rayDir.y, rayDir.z, results.position.x, results.position.y, results.position.z);
+				unsigned int editorFrameBufferID = Engine::get()->getContext()->getActiveScene()->getRenderViewFrameBufferID("Editor View");
+				glBindFramebuffer(GL_FRAMEBUFFER, editorFrameBufferID);
+				DebugHelper::getInstance().drawLine(results.position, results.position + glm::vec3(0, 100, 0), glm::vec3(1, 0, 0), 3.f);
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			}
+
 		}
 
 		//logDebug("Ray Origin {},{},{}, ray dir {},{},{}", rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDir.x, rayDir.y, rayDir.z);
