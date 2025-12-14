@@ -377,7 +377,7 @@ void Engine::run(Application* app)
         //glBindFramebuffer(GL_READ_FRAMEBUFFER, m_context->getActiveScene()->getRenderTarget());
         //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         //glBlitFramebuffer(0, 0, m_window->getWidth(), m_window->getHeight(), 0, 0, m_window->getWidth(), m_window->getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "GUI render pass");
         for (auto& GUILayer : m_GUILayers)

@@ -677,11 +677,15 @@ void RenderSceneViewWindow()
 		if (results.hit)
 		{
 			logDebug("hit position {},{},{}", results.position.x, results.position.y, results.position.z);
+			unsigned int editorFrameBufferID = Engine::get()->getContext()->getActiveScene()->getRenderViewFrameBufferID("Editor View");
+			glBindFramebuffer(GL_FRAMEBUFFER, editorFrameBufferID);
+			DebugHelper::getInstance().drawLine(results.position, results.position + glm::vec3(0, 100, 0), glm::vec3(1,0,0), 3.f);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
 		//logDebug("Ray Origin {},{},{}, ray dir {},{},{}", rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDir.x, rayDir.y, rayDir.z);
 
-		//DebugHelper::getInstance().drawLine(rayOrigin, rayDir);
+		
 	}
 
 	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
