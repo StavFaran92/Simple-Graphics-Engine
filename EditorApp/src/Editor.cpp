@@ -685,6 +685,14 @@ void RenderSceneViewWindow()
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			}
 
+			if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_X) > 0)
+			{
+				glm::vec2 offsetPos = glm::vec2(results.position.x, results.position.z);
+				offsetPos.x += g_activeTerrain->getWidth() * .5f;
+				offsetPos.y += g_activeTerrain->getHeight() * .5f;
+				g_activeTerrain->m_foliageField.setPixel(offsetPos.x, offsetPos.y, 1);
+			}
+
 		}
 
 		//logDebug("Ray Origin {},{},{}, ray dir {},{},{}", rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDir.x, rayDir.y, rayDir.z);
