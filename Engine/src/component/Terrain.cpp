@@ -305,6 +305,7 @@ void Terrain::buildFoliage()
 {
 	m_foliageField.height = m_height;
 	m_foliageField.width = m_width;
+	m_foliageField.foliageHeightMap = m_heightmap.resource();
 
 	m_foliageField.build();
 }

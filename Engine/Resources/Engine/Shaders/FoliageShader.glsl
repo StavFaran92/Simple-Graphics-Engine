@@ -13,19 +13,17 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 norm;
 layout (location = 2) in vec2 tex;
 
-struct PatchInstance {
-    vec4 offsetInPatch;
-};
-
 layout(std430, binding = 0) buffer PatchInstanceData {
     vec4 instanceData[];
 };
 
 uniform sampler2D windNoise;
+uniform sampler2D foliageHeightMap;
 uniform mat4 scale;
 uniform float time;
 uniform mat4 rotation;
 uniform vec3 patchPosition;
+uniform vec2 patchID;
 
 out vec3 Normal;
 out vec3 fragPos;
@@ -36,6 +34,10 @@ void main()
 { 
     vec4 vPos = instanceData[gl_InstanceID];
     vPos += vec4(patchPosition, 0.0);
+
+    float heightSample = texture(foliageHeightMap, patchID).r;
+    vPos.y += heightSample;
+
     fragPosObjSpace = aPos;
 
     float posX = vPos.x;

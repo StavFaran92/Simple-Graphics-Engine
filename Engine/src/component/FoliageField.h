@@ -55,12 +55,14 @@ struct EngineAPI FoliageField
 	int pixelPerPatch = 1;
 	float width = 10;
 	float height = 10;
+	ResourceWrapper<Texture> foliageHeightMap;
 
 private:
 
 	std::vector<std::shared_ptr<FoliagePatch>> m_patches;
 	glm::vec2 m_patchCount;
 	unsigned int m_patchInstanceDataSSBO;
+	
 	glm::vec2 ratio{ 1.0f, 1.0f };
 	
 };
