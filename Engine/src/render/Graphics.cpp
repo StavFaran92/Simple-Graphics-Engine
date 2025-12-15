@@ -4,7 +4,7 @@
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
 #include "render/DeferredRenderer.h"
-#include "memory/BuiltInAssets.h"
+#include "memory/BuiltInResources.h"
 
 Graphics::Graphics()
 {
@@ -13,9 +13,5 @@ Graphics::Graphics()
 
 void Graphics::reloadShaders()
 {
-	BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN).reimportAsset();
-	BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM).reimportAsset();
-	BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_LIGHT).reimportAsset();
-	BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR).reimportAsset();
-	BuiltInAssets::getByName<Shader>(SGE_SHADER_DEBUG_DATA).reimportAsset();
+	Engine::get()->getSubSystem<BuiltInResources>()->loadAllResources();
 }

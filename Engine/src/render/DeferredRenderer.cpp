@@ -181,11 +181,11 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 	return true;
 }
-
+#include "memory/BuiltInResources.h"
 bool DeferredRenderer::init()
 {
-	m_gBufferShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM); //Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
-	m_lightPassShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_LIGHT);
+	m_gBufferShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
+	m_lightPassShader = BuiltInResources::get<Shader>(SGE_SHADER_DEFFERED_PBR_LIGHT);
 
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
@@ -244,7 +244,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 		glLineWidth(1); // Size in pixels
 	}
 
-	graphics->shader = m_gBufferShader.resource();
+	graphics->shader = m_gBufferShader;
 	graphics->shader->use();
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
@@ -369,7 +369,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	// bind textures
 	// Todo solve slots issue
-	ResourceWrapper<Shader> lightPassShaderResource = m_lightPassShader.resource();
+	ResourceWrapper<Shader> lightPassShaderResource = m_lightPassShader;
 	lightPassShaderResource->use();
 	lightPassShaderResource->setTextureInShader(m_positionTexture, "gPosition", 0);
 	lightPassShaderResource->setTextureInShader(m_normalTexture, "gNormal", 1);

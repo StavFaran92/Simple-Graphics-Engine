@@ -23,6 +23,9 @@ const std::string SGE_SHADER_FORWARD_PBR = "SGE_SHADER_FORWARD_PBR";
 const std::string SGE_SHADER_TERRAIN = "SGE_SHADER_TERRAIN";
 const std::string SGE_SHADER_DEBUG_DATA = "SGE_SHADER_DEBUG_DATA";
 
+// Registry for engine-shipped, user-selectable content.
+// Entries have stable UUIDs, are serialized when referenced,
+// and are exposed through the asset browser.
 class BuiltInAssets
 {
 public:

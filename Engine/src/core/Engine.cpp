@@ -46,6 +46,7 @@
 #include "scripts/ScriptSystem.h"
 #include "core/GameLayer.h"
 #include "systems/UniqueNameManager.h"
+#include "memory/BuiltInResources.h"
 #include "fileSystem/FileSystem.h"
 
 #include "core/Application.h"
@@ -204,10 +205,13 @@ bool Engine::init(const InitParams& initParams)
     //    return false;
     //}
 
+    auto builtInResources = new BuiltInResources();
+    builtInResources->loadAllResources();
+
     auto modelImporter = new ModelImporter();
     auto animationLoader = new AnimationLoader();
     auto graphics = new Graphics();
-    auto system = new System();
+    auto system = new System(); // TODO change to systemAnalytics
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
     auto assets = new Assets();
