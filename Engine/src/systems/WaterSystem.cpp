@@ -37,7 +37,8 @@ Entity WaterSystem::createPool()
 	shaderDesc.isEngineOwned = true;
 	auto& shaderAsset = Engine::get()->getSubSystem<Assets>()->createAsset(shader, shaderDesc).as<Shader>();
 
-	auto& material = Material::create(MaterialRenderMode::Custom, shaderAsset);
+	auto& material = Material::create(MaterialRenderMode::Custom);
+	material->setCustomShader(shaderAsset);
 	AssetCreateDescriptor materialDesc;
 	materialDesc.aType = AssetType::MATERIAL;
 	materialDesc.name = "WaterMaterial";

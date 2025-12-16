@@ -21,7 +21,6 @@ public:
 private:
 	ResourceWrapper<MeshCollection> m_grassBlade;
 	int count = 0;
-	ResourceWrapper<Shader> m_foliageShader;
 	ResourceWrapper<Shader> m_foliageQuadShader;
 
 	unsigned int m_foliagePatchesSSBO;

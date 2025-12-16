@@ -185,7 +185,7 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 bool DeferredRenderer::init()
 {
 	m_gBufferShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
-	m_lightPassShader = BuiltInResources::get<Shader>(SGE_SHADER_DEFFERED_PBR_LIGHT);
+	m_lightPassShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT);
 
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();

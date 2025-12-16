@@ -206,6 +206,8 @@ bool Engine::init(const InitParams& initParams)
     //}
 
     auto builtInResources = new BuiltInResources();
+    auto assets = new Assets();
+
     builtInResources->loadAllResources();
 
     auto modelImporter = new ModelImporter();
@@ -214,7 +216,6 @@ bool Engine::init(const InitParams& initParams)
     auto system = new System(); // TODO change to systemAnalytics
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
-    auto assets = new Assets();
     auto uniqueNameManager = new UniqueNameManager();
 
     

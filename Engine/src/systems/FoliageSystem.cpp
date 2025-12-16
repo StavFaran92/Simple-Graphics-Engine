@@ -14,6 +14,7 @@
 #include "systems/TimeManager.h"
 #include "component/Terrain.h"
 #include <glm/ext.hpp>
+#include "memory/BuiltInResources.h"
 
 FoliageSystem::FoliageSystem()
 {
@@ -22,7 +23,6 @@ FoliageSystem::FoliageSystem()
 
 bool FoliageSystem::init()
 {
-	m_foliageShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
 	m_foliageQuadShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl");
 
 	ModelImportSettings settings;
@@ -165,7 +165,7 @@ void FoliageSystem::drawFoliage(FoliageField& foliage)
 	//glDepthMask(GL_TRUE);
 	//glEnable(GL_CULL_FACE);
 
-	auto& foliageShader = m_foliageShader;
+	auto& foliageShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FOLIAGE);
 	foliageShader->use();
 	foliageShader->setUniformValue("view", graphics->view);
 	foliageShader->setUniformValue("projection", graphics->projection);

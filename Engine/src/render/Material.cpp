@@ -17,6 +17,7 @@
 #include <fstream>
 #include <regex>
 #include "memory/BuiltInAssets.h"
+#include "memory/BuiltInResources.h"
 #include "render/ShadersInfo.h"
 
 #include <filesystem>
@@ -77,8 +78,9 @@ Material::Material()
 
 void Material::use()
 {
+	ResourceWrapper<Shader> shader = getActiveShader();
+
 	int slot = 0;
-	auto shader = m_shader;
 	for (const auto& [name, sampler] : m_samplers)
 	{
 		// if texture is empty use dummy texture
@@ -162,13 +164,6 @@ ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
 	return mat;
 }
 
-ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader)
-{
-	auto mat = Factory<Material>::create();
-	mat->setMaterialRenderMode(renderMode, customShader);
-	return mat;
-}
-
 void Material::updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc)
 {
 	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
@@ -183,6 +178,18 @@ ResourceWrapper<Material> Material::clone(bool isTransient) const
 	newMaterial->m_uniformProperties = m_uniformProperties;
 
 	return newMaterial;
+}
+
+ResourceWrapper<Shader> Material::getActiveShader() const
+{
+	if (m_renderMode != MaterialRenderMode::Custom)
+	{
+		return m_shader;
+	}
+	else
+	{
+		return m_customShader.resource();
+	}
 }
 
 //bool Material::isOpaque() const
@@ -336,12 +343,12 @@ void Material::parseUniforms(const std::string& sourceCode)
 	}
 }
 
-void Material::setShader(AssetWrapper<Shader> shader)
+void Material::setShader(ResourceWrapper<Shader> shader)
 {
 	m_shader = shader;
 
 	std::string sourceCode;
-	ShadersInfo sInfo = shader.resource()->getShadersInfo();
+	ShadersInfo sInfo = shader->getShadersInfo();
 	sourceCode += sInfo.vertexCode + "\n";
 	sourceCode += sInfo.fragmentCode + "\n";
 	sourceCode += sInfo.computeCode + "\n";
@@ -405,31 +412,33 @@ std::string Material::getName() const
 	return m_name;
 }
 
-void Material::setMaterialRenderMode(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader)
+void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
 {
 	m_renderMode = renderMode;
 
 	if (m_renderMode == MaterialRenderMode::Opaque)
 	{
-		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM));
+		setShader(BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM));
 	}
 	else if (m_renderMode == MaterialRenderMode::Transparent)
 	{
-		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR));
+		setShader(BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR));
 	}
 	else if (m_renderMode == MaterialRenderMode::Terrain)
 	{
-		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN));
+		setShader(BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN));
 	}
-	else if (m_renderMode == MaterialRenderMode::Custom)
-	{
-		if (customShader.isEmpty())
-		{
-			logError("Specified render mode is custom, therefore you must assign a valid shader as argument.");
-			return;
-		}
-		setShader(customShader);
-	}
+}
+
+void Material::setCustomShader(AssetWrapper<Shader>& customShader)
+{
+	m_customShader = customShader;
+	setShader(customShader.resource());
+}
+
+AssetWrapper<Shader> Material::getCustomShader() const
+{
+	return m_customShader;
 }
 
 MaterialRenderMode Material::getMaterialRenderMode() const

@@ -71,10 +71,16 @@ public:
 	void setName(const std::string& name);
 	std::string getName() const;
 
-	void setMaterialRenderMode(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader = {});
+	void setMaterialRenderMode(MaterialRenderMode renderMode);
+
+	void setCustomShader(AssetWrapper<Shader>& customShader);
+	AssetWrapper<Shader> getCustomShader() const;
+
 	MaterialRenderMode getMaterialRenderMode() const;
 
 	ResourceWrapper<Material> clone(bool isEngineOwned) const;
+
+	ResourceWrapper<Shader> getActiveShader() const;
 
 	bool isOpaque() const;
 
@@ -86,7 +92,7 @@ public:
 
 	void parseUniforms(const std::string& sourceCode);
 
-	void setShader(AssetWrapper<Shader> shader);
+	void setShader(ResourceWrapper<Shader> shader);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -98,7 +104,6 @@ public:
 
 	static AssetWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
 	static ResourceWrapper<Material> create(MaterialRenderMode renderMode);
-	static ResourceWrapper<Material> create(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader);
 	static void updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc);
 
 protected:
@@ -138,10 +143,14 @@ public:
 
 	// This will only be used by forward renderer, ignored by deffered
 	std::string m_name;
-	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
-	ResourceWrapper<Shader> m_shader;
+
 	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
 	std::map<std::string, EditableUniform> m_uniformProperties;
+
+private:
+	ResourceWrapper<Shader> m_shader = ResourceWrapper<Shader>::empty;
+	AssetWrapper<Shader> m_customShader;
+	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 
 	//ProjectionType projection = ProjectionType::DefaultProjection;
 	//AssetWrapper<Texture> projectionTexture;

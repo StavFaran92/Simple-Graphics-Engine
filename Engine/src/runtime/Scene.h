@@ -175,7 +175,7 @@ private:
 	ResourceWrapper<Texture> m_BRDFIntegrationLUT;
 	ResourceWrapper<Shader> m_skyboxShader;
 	ResourceWrapper<Shader> m_UIShader;
-	AssetWrapper<Shader> m_terrainShader;
+	ResourceWrapper<Shader> m_terrainShader;
 
 	ResourceWrapper<MeshCollection> m_basicBox;
 

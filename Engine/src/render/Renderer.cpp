@@ -29,6 +29,7 @@
 #include "component/ObjectComponent.h"
 #include "component/ShaderComponent.h"
 #include "memory/BuiltInAssets.h"
+#include "memory/BuiltInResources.h"
 
 bool Renderer::init()
 {
@@ -71,7 +72,7 @@ void Renderer::renderScene(Scene* scene)
 
             // draw model
                 
-            graphics->shader = graphics->material->m_shader.resource();
+            graphics->shader = graphics->material->getActiveShader();
             graphics->shader->use();
             setUniforms();
 
@@ -115,7 +116,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
         }
     }
 
-    graphics->shader = BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR).resource();
+    graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
     auto iter = transparentEntities.rbegin();
     while (iter != transparentEntities.rend())
     {
@@ -168,7 +169,7 @@ void Renderer::setUniforms()
 
     auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-    graphics->shader = graphics->material->m_shader.resource();
+    graphics->shader = graphics->material->getActiveShader();
 
     graphics->shader->setModelMatrix(graphics->model);
     graphics->shader->setViewMatrix(graphics->view);
@@ -206,7 +207,7 @@ void Renderer::renderDebugData(Scene* scene)
                 continue;
             }
 
-            graphics->shader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEBUG_DATA).resource();
+            graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEBUG_DATA);
             graphics->shader->use();
 
             graphics->shader->setModelMatrix(graphics->model);
@@ -255,7 +256,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
             // draw model
 
-            graphics->shader = graphics->material->m_shader.resource();
+            graphics->shader = graphics->material->getActiveShader();
             graphics->shader->use();
             glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
             graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);

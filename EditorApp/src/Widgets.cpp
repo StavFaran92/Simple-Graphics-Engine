@@ -239,13 +239,13 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	if (currentMode == MaterialRenderMode::Custom)
 	{
 		std::string shaderName = "None";
-		if (!mat.get()->m_shader.isEmpty())
+		if (!mat.get()->getCustomShader().isEmpty())
 		{
-			shaderName = mat.get()->m_shader.info().name;
+			shaderName = mat.get()->getCustomShader().info().name;
 		}
 
 		addAssetSelectWidget(shaderName, AssetType::SHADER, [mat](UUID uuid) {
-			mat.get()->m_shader = AssetWrapper<Shader>(uuid);
+			mat.get()->setCustomShader(AssetWrapper<Shader>(uuid));
 		});
 	}
 

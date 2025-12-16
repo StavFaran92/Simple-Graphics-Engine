@@ -17,11 +17,11 @@ const std::string SGE_MESH_CAMERA = "SGE_MESH_CAMERA";
 const std::string SGE_MATERIAL_DEFAULT = "SGE_MATERIAL_DEFAULT";
 const std::string SGE_MATERIAL_TERRAIN_DEFAULT = "SGE_MATERIAL_TERRAIN_DEFAULT";
 
-const std::string SGE_SHADER_DEFFERED_PBR_GEOM = "SGE_SHADER_DEFFERED_PBR_GEOM";
-const std::string SGE_SHADER_DEFFERED_PBR_LIGHT = "SGE_SHADER_DEFFERED_PBR_LIGHT";
-const std::string SGE_SHADER_FORWARD_PBR = "SGE_SHADER_FORWARD_PBR";
-const std::string SGE_SHADER_TERRAIN = "SGE_SHADER_TERRAIN";
-const std::string SGE_SHADER_DEBUG_DATA = "SGE_SHADER_DEBUG_DATA";
+//const std::string SGE_SHADER_DEFFERED_PBR_GEOM = "SGE_SHADER_DEFFERED_PBR_GEOM";
+//const std::string SGE_SHADER_DEFFERED_PBR_LIGHT = "SGE_SHADER_DEFFERED_PBR_LIGHT";
+//const std::string SGE_SHADER_FORWARD_PBR = "SGE_SHADER_FORWARD_PBR";
+//const std::string SGE_SHADER_TERRAIN = "SGE_SHADER_TERRAIN";
+//const std::string SGE_SHADER_DEBUG_DATA = "SGE_SHADER_DEBUG_DATA";
 
 // Registry for engine-shipped, user-selectable content.
 // Entries have stable UUIDs, are serialized when referenced,
