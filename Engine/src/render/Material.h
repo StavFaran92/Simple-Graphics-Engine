@@ -92,7 +92,6 @@ public:
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_name);
 		SERIALIZED_MEMBER(m_renderMode);
-		SERIALIZED_MEMBER(m_shader);
 		SERIALIZED_MEMBER(m_samplers);
 		SERIALIZED_MEMBER(m_uniformProperties);
 	}
@@ -140,7 +139,7 @@ public:
 	// This will only be used by forward renderer, ignored by deffered
 	std::string m_name;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
-	AssetWrapper<Shader> m_shader;
+	ResourceWrapper<Shader> m_shader;
 	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
 	std::map<std::string, EditableUniform> m_uniformProperties;
 

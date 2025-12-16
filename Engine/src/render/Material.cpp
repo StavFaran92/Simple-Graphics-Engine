@@ -78,7 +78,7 @@ Material::Material()
 void Material::use()
 {
 	int slot = 0;
-	auto shader = m_shader.resource();
+	auto shader = m_shader;
 	for (const auto& [name, sampler] : m_samplers)
 	{
 		// if texture is empty use dummy texture
@@ -381,7 +381,7 @@ void Material::update()
 
 	for (const auto& [name, uniform] : m_uniformProperties)
 	{
-		m_shader.resource()->setUniformValue(name, uniform.value);
+		m_shader->setUniformValue(name, uniform.value);
 	}
 
 	// TODO fix
