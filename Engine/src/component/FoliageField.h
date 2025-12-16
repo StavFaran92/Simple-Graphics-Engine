@@ -55,6 +55,7 @@ struct EngineAPI FoliageField
 	int pixelPerPatch = 1;
 	float width = 10;
 	float height = 10;
+	float heightScale = 1;
 	ResourceWrapper<Texture> foliageHeightMap;
 
 private:

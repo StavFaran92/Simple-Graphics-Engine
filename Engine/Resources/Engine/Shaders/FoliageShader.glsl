@@ -21,6 +21,7 @@ uniform sampler2D windNoise;
 uniform sampler2D foliageHeightMap;
 uniform mat4 scale;
 uniform float time;
+uniform float heightScale ;
 uniform mat4 rotation;
 uniform vec3 patchPosition;
 uniform vec2 patchID;
@@ -36,7 +37,7 @@ void main()
     vPos += vec4(patchPosition, 0.0);
 
     float heightSample = texture(foliageHeightMap, patchID).r;
-    vPos.y += heightSample;
+    vPos.y += heightSample * heightScale;
 
     fragPosObjSpace = aPos;
 

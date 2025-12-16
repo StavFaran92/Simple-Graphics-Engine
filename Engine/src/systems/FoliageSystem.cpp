@@ -171,6 +171,7 @@ void FoliageSystem::drawFoliage(FoliageField& foliage)
 	foliageShader->setUniformValue("projection", graphics->projection);
 	foliageShader->setUniformValue("colorA", foliage.colorA);
 	foliageShader->setUniformValue("colorB", foliage.colorB);
+	foliageShader->setUniformValue("heightScale", foliage.heightScale);
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
 	foliageShader->setTextureInShader(foliage.foliageHeightMap, "foliageHeightMap", 1);
 	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);

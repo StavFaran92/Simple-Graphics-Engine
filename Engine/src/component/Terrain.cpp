@@ -35,6 +35,7 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 	if (auto tc = std::dynamic_pointer_cast<Terrain>(c))
 	{
 		entityHandler.addComponent<Terrain>(*tc);
+		tc->buildFoliage();
 	}
 }
 
@@ -305,6 +306,7 @@ void Terrain::buildFoliage()
 {
 	m_foliageField.height = m_height;
 	m_foliageField.width = m_width;
+	m_foliageField.heightScale = m_scale;
 	m_foliageField.foliageHeightMap = m_heightmap.resource();
 
 	m_foliageField.build();
