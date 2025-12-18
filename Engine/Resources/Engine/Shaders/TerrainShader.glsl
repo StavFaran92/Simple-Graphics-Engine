@@ -104,48 +104,64 @@ void main()
     float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
 
-    // retrieve control point texture coordinates
+    // Interpolate UVs across the patch
     vec2 t00 = outTexCoords[0];
     vec2 t01 = outTexCoords[1];
     vec2 t10 = outTexCoords[2];
     vec2 t11 = outTexCoords[3];
 
-    // bilinearly interpolate texture coordinate across patch
-    vec2 t0 = (t01 - t00) * u + t00;
-    vec2 t1 = (t11 - t10) * u + t10;
-    texCoord = (t1 - t0) * v + t0;
+    vec2 t0 = mix(t00, t01, u);
+    vec2 t1 = mix(t10, t11, u);
+    vec2 texCoordLocal = mix(t0, t1, v);
 
-    // lookup texel at patch coordinate for height and scale
-    // Clamp to avoid sampling outside due to interpolation and fractional spacing
+    // Clamp to valid texel range
     vec2 texSize = textureSize(heightMap, 0);
-    vec2 halfTexel = 0.5 / texSize;
-    vec2 clampedUV = clamp(texCoord, halfTexel, 1.0 - halfTexel);
-    height = texture(heightMap, clampedUV).r;
+    vec2 texel   = 1.0 / texSize;
+    vec2 halfTexel = 0.5 * texel;
+    texCoord = clamp(texCoordLocal, halfTexel, 1.0 - halfTexel);
 
-    // get point position
+    // Sample height and neighbors (central differences)
+    float h  = texture(heightMap, texCoord).r;
+    float hL = texture(heightMap, texCoord - vec2(texel.x, 0)).r;
+    float hR = texture(heightMap, texCoord + vec2(texel.x, 0)).r;
+    float hD = texture(heightMap, texCoord - vec2(0, texel.y)).r;
+    float hU = texture(heightMap, texCoord + vec2(0, texel.y)).r;
+
+    // Height derivatives
+    float dhdx = (hR - hL) * 0.5;
+    float dhdz = (hU - hD) * 0.5;
+
+    // Patch position interpolation (object space)
     vec4 p00 = gl_in[0].gl_Position;
     vec4 p01 = gl_in[1].gl_Position;
     vec4 p10 = gl_in[2].gl_Position;
     vec4 p11 = gl_in[3].gl_Position;
 
-    // compute patch surface normal
-    vec4 uVec = p01 - p00;  // X-Axis
-    vec4 vVec = p10 - p00;  // Y-Axis
-    vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
-    fragNormal = vec3(normal);
-    tangent = uVec.xyz;
-    bitangent = vVec.xyz;
+    vec4 p0 = mix(p00, p01, u);
+    vec4 p1 = mix(p10, p11, u);
+    vec4 p  = mix(p0, p1, v);
 
-    // bilinearly interpolate position coordinate across patch
-    vec4 p0 = (p01 - p00) * u + p00;
-    vec4 p1 = (p11 - p10) * u + p10;
-    vec4 p = (p1 - p0) * v + p0;
+    // Displace vertex
+    p.y += h * scale;
 
-    // displace point along normal
-    p += normal * height * scale;
+    // Build correct TBN for height surface y = f(x, z)
+    vec3 T = vec3(1.0, dhdx * scale, 0.0); // ∂P/∂x
+    vec3 B = vec3(0.0, dhdz * scale, 1.0); // ∂P/∂z
+
+    vec3 N = normalize(cross(B, T));
+
+    // Orthonormalize (important!)
+    T = normalize(T - N * dot(N, T));
+    B = normalize(cross(N, T));
+
+    // Transform to world space
+    mat3 normalMatrix = mat3(transpose(inverse(model)));
+
+    fragNormal = normalize(normalMatrix * N);
+    tangent    = normalize(normalMatrix * T);
+    bitangent  = normalize(normalMatrix * B);
 
     fragPos = (model * p).xyz;
-
     gl_Position = projection * view * model * p;
 }
 
