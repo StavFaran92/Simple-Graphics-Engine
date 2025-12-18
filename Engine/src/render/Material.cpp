@@ -44,6 +44,7 @@ ResourceWrapper<ResourceBase> MaterialAssetManager::load(AssetInfo& aInfo)
 	try
 	{
 		iarchive(*material.get());
+		material->setMaterialRenderMode(material->getMaterialRenderMode());
 		return material;
 
 	}
@@ -174,7 +175,7 @@ ResourceWrapper<Material> Material::clone(bool isTransient) const
 	auto newMaterial = Material::create(m_renderMode);
 
 	newMaterial->m_samplers = m_samplers;
-	newMaterial->m_shader = m_shader;
+	//newMaterial->m_shader = m_shader;
 	newMaterial->m_uniformProperties = m_uniformProperties;
 
 	return newMaterial;
@@ -184,7 +185,7 @@ ResourceWrapper<Shader> Material::getActiveShader() const
 {
 	if (m_renderMode != MaterialRenderMode::Custom)
 	{
-		return m_shader;
+		return getShaderFromRenderMode(m_renderMode);
 	}
 	else
 	{
@@ -192,15 +193,20 @@ ResourceWrapper<Shader> Material::getActiveShader() const
 	}
 }
 
-//bool Material::isOpaque() const
-//{
-//	auto it = m_uniformProperties.find(SHADER_PROPERTY_PBR_OPACITY_FACTOR);
-//	if (it != m_uniformProperties.end()) {
-//		float opacity = std::get<float>(it->second);  // throws if wrong type
-//		return opacity == 1.f;
-//	}
-//	return true;
-//}
+ResourceWrapper<Shader> Material::getShaderFromRenderMode(MaterialRenderMode renderMode)
+{
+	switch(renderMode)
+	{
+	case MaterialRenderMode::Opaque:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
+	case MaterialRenderMode::Transparent:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+	case MaterialRenderMode::Terrain:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);
+	}
+
+	return ResourceWrapper<Shader>::empty;
+}
 
 bool parseEditablePragmaLine(const std::string& line, Material::EditableUniform& editableUniform) {
 	// Check if line contains #pragma editable
@@ -343,10 +349,8 @@ void Material::parseUniforms(const std::string& sourceCode)
 	}
 }
 
-void Material::setShader(ResourceWrapper<Shader> shader)
+void Material::parseFromShader(ResourceWrapper<Shader> shader)
 {
-	m_shader = shader;
-
 	std::string sourceCode;
 	ShadersInfo sInfo = shader->getShadersInfo();
 	sourceCode += sInfo.vertexCode + "\n";
@@ -364,7 +368,12 @@ void Material::update()
 	auto oldUniforms = m_uniformProperties;
 	auto oldSamplers = m_samplers;
 
-	setShader(m_shader);
+	ResourceWrapper<Shader> shader = getActiveShader();
+
+	if (shader.isEmpty())
+		return;
+
+	parseFromShader(shader);
 
 	auto& newSamplers = m_samplers;
 	for (const auto [name, sampler] : oldSamplers)
@@ -388,7 +397,7 @@ void Material::update()
 
 	for (const auto& [name, uniform] : m_uniformProperties)
 	{
-		m_shader->setUniformValue(name, uniform.value);
+		shader->setUniformValue(name, uniform.value);
 	}
 
 	// TODO fix
@@ -407,6 +416,7 @@ void Material::setName(const std::string& name)
 {
 	m_name = name;
 }
+
 std::string Material::getName() const
 {
 	return m_name;
@@ -415,25 +425,13 @@ std::string Material::getName() const
 void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
 {
 	m_renderMode = renderMode;
-
-	if (m_renderMode == MaterialRenderMode::Opaque)
-	{
-		setShader(BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM));
-	}
-	else if (m_renderMode == MaterialRenderMode::Transparent)
-	{
-		setShader(BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR));
-	}
-	else if (m_renderMode == MaterialRenderMode::Terrain)
-	{
-		setShader(BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN));
-	}
+	update();
 }
 
 void Material::setCustomShader(AssetWrapper<Shader>& customShader)
 {
 	m_customShader = customShader;
-	setShader(customShader.resource());
+	update();
 }
 
 AssetWrapper<Shader> Material::getCustomShader() const

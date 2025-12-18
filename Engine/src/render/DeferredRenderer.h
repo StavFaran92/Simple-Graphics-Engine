@@ -46,9 +46,6 @@ private:
 	
 	ResourceWrapper<MeshCollection> m_quad;
 	ResourceWrapper<Shader> m_screenShader;
-	
-	ResourceWrapper<Shader> m_gBufferShader;
-	ResourceWrapper<Shader> m_lightPassShader;
 
 	// SSAO
 	FrameBufferObject m_ssaoFBO;

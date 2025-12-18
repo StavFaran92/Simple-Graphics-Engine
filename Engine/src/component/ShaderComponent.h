@@ -25,7 +25,7 @@ struct EngineAPI ShaderComponent : public Component
 
 	void parseUniforms(const std::string& sourceCode);
 
-	void setShader(AssetWrapper<Shader> shader);
+	void parseFromShader(AssetWrapper<Shader> shader);
 
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)

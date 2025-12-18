@@ -64,7 +64,7 @@ void ShaderComponent::parseUniforms(const std::string& sourceCode)
 	}
 }
 
-void ShaderComponent::setShader(AssetWrapper<Shader> shader)
+void ShaderComponent::parseFromShader(AssetWrapper<Shader> shader)
 {
 	m_customShader = shader;
 

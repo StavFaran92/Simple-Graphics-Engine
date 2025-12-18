@@ -26,6 +26,7 @@
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 #include "memory/BuiltInAssets.h"
+#include "memory/BuiltInResources.h"
 
 static float lerp(float a, float b, float t)
 {
@@ -181,11 +182,9 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 	return true;
 }
-#include "memory/BuiltInResources.h"
+
 bool DeferredRenderer::init()
 {
-	m_gBufferShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
-	m_lightPassShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT);
 
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
@@ -244,7 +243,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 		glLineWidth(1); // Size in pixels
 	}
 
-	graphics->shader = m_gBufferShader;
+	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
 	graphics->shader->use();
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
@@ -369,7 +368,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	// bind textures
 	// Todo solve slots issue
-	ResourceWrapper<Shader> lightPassShaderResource = m_lightPassShader;
+	ResourceWrapper<Shader> lightPassShaderResource = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT);
 	lightPassShaderResource->use();
 	lightPassShaderResource->setTextureInShader(m_positionTexture, "gPosition", 0);
 	lightPassShaderResource->setTextureInShader(m_normalTexture, "gNormal", 1);

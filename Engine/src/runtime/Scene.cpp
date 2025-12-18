@@ -168,7 +168,6 @@ void Scene::init(Context* context)
 	m_quadUI.RemoveComponent<ObjectComponent>();
 
 	m_UIShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/UIShader.glsl");
-	m_terrainShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);
 	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl");
 
 	m_uboTime = std::make_shared<UniformBufferObject>(sizeof(float));
@@ -428,7 +427,7 @@ void Scene::draw(float deltaTime)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Terrain render pass");
 
-			ResourceWrapper<Shader> terrainShader = m_terrainShader;
+			ResourceWrapper<Shader> terrainShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);;
 			terrainShader->use();
 
 			// Render terrain

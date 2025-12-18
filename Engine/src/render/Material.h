@@ -57,42 +57,35 @@ public:
 	void use();
 	void release();
 
-	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
 	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
-
+	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
 	void setSamplerEnabled(const std::string& name, bool isEnabled);
 
 	void setUniformValue(const std::string& name, const Value& v);
 
-	//bool hasTexture(const std::string& name) const;
-
-	//void setTexture(const std::string& name, AssetWrapper<Texture> textureHandler);
-
 	void setName(const std::string& name);
 	std::string getName() const;
-
-	void setMaterialRenderMode(MaterialRenderMode renderMode);
 
 	void setCustomShader(AssetWrapper<Shader>& customShader);
 	AssetWrapper<Shader> getCustomShader() const;
 
+	void setMaterialRenderMode(MaterialRenderMode renderMode);
 	MaterialRenderMode getMaterialRenderMode() const;
 
 	ResourceWrapper<Material> clone(bool isEngineOwned) const;
 
 	ResourceWrapper<Shader> getActiveShader() const;
-
-	bool isOpaque() const;
-
-	//void addTexture(const std::string& name, AssetWrapper<Texture> texture);
-
-	void setProjectionTexture(AssetWrapper<Texture> texture);
-
+private:
 	void update();
 
 	void parseUniforms(const std::string& sourceCode);
 
-	void setShader(ResourceWrapper<Shader> shader);
+	void parseFromShader(ResourceWrapper<Shader> shader);
+
+	void setProjectionTexture(AssetWrapper<Texture> texture);
+
+	static ResourceWrapper<Shader> getShaderFromRenderMode(MaterialRenderMode renderMode);
+public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -109,19 +102,6 @@ public:
 protected:
 
 public:
-	//std::string m_name;
-	//std::map<Texture::TextureType, std::shared_ptr<TextureSampler>> m_samplers;
-	//glm::vec3 colorDiffuse{1.0f, 1.0f, 1.0f};
-	//float roughnessFactor = 1.f;
-	//float metallicFactor = 0.f;
-	//float opacityFactor = 1.f;
-
-	//enum ProjectionType : int
-	//{
-	//	DefaultProjection = 0,
-	//	Texture2D = 1
-	//};
-
 	struct EditableUniform {
 		std::string uniformName;
 		std::string type;
@@ -148,7 +128,7 @@ public:
 	std::map<std::string, EditableUniform> m_uniformProperties;
 
 private:
-	ResourceWrapper<Shader> m_shader = ResourceWrapper<Shader>::empty;
+	//ResourceWrapper<Shader> m_shader = ResourceWrapper<Shader>::empty;
 	AssetWrapper<Shader> m_customShader;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 
