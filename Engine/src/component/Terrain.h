@@ -60,6 +60,8 @@ public:
 
 	void buildFoliage();
 
+	void resize(int newW, int newH);
+
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
 	template <class Archive>
@@ -78,19 +80,20 @@ public:
 	AssetWrapper<Texture> m_heightmap;
 	
 
-	int m_width = 100;
-	int m_height = 100;
+
 	int m_scale = 1;
 	int m_textureCount = 0;
 
 	std::vector<TextureBlend> m_textureBlends {  };
-	//std::vector<Resource<Texture>> m_textures{  };
-	//std::vector<float> m_blends{ };
+
 	AssetWrapper<Material> m_material;
 
 	FoliageField m_foliageField;
 
 private:
+	int m_width = 100;
+	int m_height = 100;
+
 	AssetWrapper<MeshCollection> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
 

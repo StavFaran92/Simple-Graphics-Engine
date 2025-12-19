@@ -439,12 +439,42 @@ void InspectorWindow::display()
 				if (ImGui::BeginTabItem("Layers"))
 				{
 					addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
-						terrain = Terrain::generateTerrain(terrain.m_width, terrain.m_height, terrain.m_scale, AssetWrapper<Texture>(uuid));
+						terrain = Terrain::generateTerrain(terrain.getWidth(), terrain.getHeight(), terrain.m_scale, AssetWrapper<Texture>(uuid));
 						});
 
-					ImGui::DragInt("height", &terrain.m_height);
-					ImGui::DragInt("width", &terrain.m_width);
+					
+
+					static int* newWidth = 0;
+					newWidth = &state.getCurrentEntityState().terrinTempWidth;
+					static int* newHeight = 0;
+					newHeight = &state.getCurrentEntityState().terrinTempHeight;
+
+					// UI
+					ImGui::DragInt("Width", newWidth, 1, 1, 8192);
+					ImGui::DragInt("Height", newHeight, 1, 1, 8192);
 					ImGui::DragInt("scale", &terrain.m_scale);
+
+					// Check if rebuild is needed
+					bool needsRebuild =
+						*newWidth != terrain.getWidth() ||
+						*newHeight != terrain.getHeight();
+
+					// Warning text
+					if (needsRebuild)
+					{
+						ImGui::TextColored(
+							ImVec4(1.0f, 0.2f, 0.2f, 1.0f),
+							"Terrain must be rebuilt"
+						);
+					}
+
+					// Build button
+					ImGui::BeginDisabled(!needsRebuild);
+					if (ImGui::Button("Build"))
+					{
+						terrain.resize(*newWidth, *newHeight);
+					}
+					ImGui::EndDisabled();
 
 					ImGui::Separator();
 
@@ -466,34 +496,42 @@ void InspectorWindow::display()
 
 				if (ImGui::BeginTabItem("Foliage"))
 				{
-					ImGui::ColorEdit3("Bottom Color", (float*)&terrain.m_foliageField.colorA);
-					ImGui::ColorEdit3("Top Color", (float*)&terrain.m_foliageField.colorB);
-					ImGui::DragFloat("Density", &terrain.m_foliageField.globalDensity, 0.01f, 0.0f, 1.0f);
-
-					if (ImGui::Button("build"))
+					if (!terrain.m_foliageField.isActive)
 					{
-						terrain.buildFoliage();
+						if (ImGui::Button("build"))
+						{
+							terrain.buildFoliage();
+						}
+					}
+					else
+					{
+						ImGui::ColorEdit3("Bottom Color", (float*)&terrain.m_foliageField.colorA);
+						ImGui::ColorEdit3("Top Color", (float*)&terrain.m_foliageField.colorB);
+						ImGui::DragFloat("Density", &terrain.m_foliageField.globalDensity, 0.01f, 0.0f, 1.0f);
+
+
+
+						bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::FoliagePainter;
+
+						if (isActive)
+						{
+							ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+						}
+
+						if (ImGui::Button("Foliage Painter"))
+						{
+							g_activeTerrain = &terrain;
+							EditorState::Instance().setActiveEditorTool(
+								isActive ? EditorTool::Type::None : EditorTool::Type::FoliagePainter
+							);
+						}
+
+						if (isActive)
+						{
+							ImGui::PopStyleColor();
+						}
 					}
 
-					bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::FoliagePainter;
-
-					if (isActive)
-					{
-						ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
-					}
-
-					if (ImGui::Button("Foliage Painter"))
-					{
-						g_activeTerrain = &terrain;
-						EditorState::Instance().setActiveEditorTool(
-							isActive ? EditorTool::Type::None : EditorTool::Type::FoliagePainter
-						);
-					}
-
-					if (isActive)
-					{
-						ImGui::PopStyleColor();
-					}
 
 
 					//if (ImGui::Button("test"))

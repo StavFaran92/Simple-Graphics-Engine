@@ -22,7 +22,7 @@ struct EngineAPI FoliageField
 {
 	FoliageField() = default;
 
-	void build();
+	void build(int width, int height);
 
 	glm::vec2 getPatchCount() const;
 
@@ -32,6 +32,8 @@ struct EngineAPI FoliageField
 	void paintCircle(int cx, int cy, int radius, unsigned char value);
 
 	void update();
+
+	void resize(int width, int height);
 
 	const std::vector<std::shared_ptr<FoliagePatch>>& getPatches() const;
 
@@ -43,8 +45,7 @@ struct EngineAPI FoliageField
 	    SERIALIZED_MEMBER(colorB);
 	    SERIALIZED_MEMBER(patchWidth);
 	    SERIALIZED_MEMBER(patchHeight);
-	    SERIALIZED_MEMBER(width);
-	    SERIALIZED_MEMBER(height);
+	    SERIALIZED_MEMBER(isActive);
 	}
 
 	std::vector<unsigned char> m_foliageSpreadMap;
@@ -56,8 +57,10 @@ struct EngineAPI FoliageField
 	int pixelPerPatch = 1;
 	float width = 10;
 	float height = 10;
-	float heightScale = 1;
-	ResourceWrapper<Texture> foliageHeightMap;
+	//float heightScale = 1;
+	//AssetWrapper<Texture> foliageHeightMap;
+
+	bool isActive = false;
 
 private:
 

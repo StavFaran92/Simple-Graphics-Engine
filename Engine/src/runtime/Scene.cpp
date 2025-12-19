@@ -405,7 +405,7 @@ void Scene::draw(float deltaTime)
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				Engine::get()->getSubSystem<FoliageSystem>()->setView(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getForward());
 				Engine::get()->getSubSystem<FoliageSystem>()->setFrustum(frustum);
-				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(terrain.m_foliageField);
+				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(terrain);
 				glDisable(GL_BLEND);
 			}
 

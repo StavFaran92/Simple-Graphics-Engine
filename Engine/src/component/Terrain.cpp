@@ -304,15 +304,18 @@ bool Terrain::getHeightAtPoint(float x, float y, float& outHeight) const
 
 void Terrain::buildFoliage()
 {
-	m_foliageField.height = m_height;
-	m_foliageField.width = m_width;
-	m_foliageField.heightScale = m_scale;
-	m_foliageField.foliageHeightMap = m_heightmap.resource();
-
-	m_foliageField.build();
+	m_foliageField.build(m_width, m_height);
 }
 
 AABB Terrain::getAABB() const
 {
 	return AABB::createFromCenterExtents(glm::vec3(0.f), glm::vec3(m_width, m_scale, m_height)); // todo return member
+}
+
+void Terrain::resize(int newW, int newH)
+{
+	m_width = newW;
+	m_height = newH;
+
+	m_foliageField.resize(newW, newH);
 }

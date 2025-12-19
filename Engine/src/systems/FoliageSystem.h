@@ -5,6 +5,8 @@
 #include "component/FoliageField.h"
 #include "systems/SubSystem.h"
 
+class Terrain;
+
 class FoliageSystem : public SubSystem
 {
 public:
@@ -16,7 +18,7 @@ public:
 
 	glm::vec3 getRandomLocation(int instanceID) const;
 
-	void drawFoliage(FoliageField& foliage);
+	void drawFoliage(Terrain& terrain);
 
 private:
 	ResourceWrapper<MeshCollection> m_grassBlade;

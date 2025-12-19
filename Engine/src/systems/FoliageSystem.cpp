@@ -134,9 +134,11 @@ bool isInFrustum(const Frustum& frustum, glm::vec3 pos)
 		isForwardOfPlane(pos, frustum.m_down);
 }
 
-void FoliageSystem::drawFoliage(FoliageField& foliage)
+void FoliageSystem::drawFoliage(Terrain& terrain)
 {
-	if (foliage.m_foliageSpreadMap.size() == 0)
+	const FoliageField& foliage = terrain.m_foliageField;
+
+	if (!foliage.isActive)
 	{
 		return;
 	}
@@ -171,9 +173,9 @@ void FoliageSystem::drawFoliage(FoliageField& foliage)
 	foliageShader->setUniformValue("projection", graphics->projection);
 	foliageShader->setUniformValue("colorA", foliage.colorA);
 	foliageShader->setUniformValue("colorB", foliage.colorB);
-	foliageShader->setUniformValue("heightScale", foliage.heightScale);
+	foliageShader->setUniformValue("heightScale", terrain.m_scale);
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
-	foliageShader->setTextureInShader(foliage.foliageHeightMap, "foliageHeightMap", 1);
+	foliageShader->setTextureInShader(terrain.getHeightmap(), "foliageHeightMap", 1);
 	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);
 	foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 

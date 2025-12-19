@@ -12,6 +12,9 @@ struct EntityState
 
 	std::string renameBuffer;
 
+	int terrinTempWidth = 0;
+	int terrinTempHeight= 0;
+
 	EntityState(Entity e)
 		: e(e)
 	{
@@ -34,7 +37,13 @@ struct EntityState
 			auto& obj = e.getComponent<ObjectComponent>();
 			renameBuffer = obj.name;
 		}
-		
+
+		if (e.HasComponent<Terrain>())
+		{
+			auto& terrain = e.getComponent<Terrain>();
+			terrinTempHeight = terrain.getHeight();
+			terrinTempWidth = terrain.getWidth();
+		}
 
 	}
 };

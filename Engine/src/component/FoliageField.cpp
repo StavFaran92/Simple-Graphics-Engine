@@ -9,8 +9,11 @@
 #include <algorithm>
 #include "runtime/Scene.h"
 
-void FoliageField::build()
+void FoliageField::build(int newW, int newH)
 {
+	width = newW;
+	height = newH;
+
 	//Texture::TextureData tData;
 	//tData.bpp = 1;
 	//tData.width = width;
@@ -124,6 +127,8 @@ void FoliageField::build()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_patchInstanceDataSSBO);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * patchInstanceData.size(), patchInstanceData.data(), GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_patchInstanceDataSSBO);
+
+	isActive = true;
 }
 
 glm::vec2 FoliageField::getPatchCount() const
@@ -203,4 +208,12 @@ void FoliageField::paintCircle(int cx, int cy, int radius, unsigned char value)
 const std::vector<std::shared_ptr<FoliagePatch>>& FoliageField::getPatches() const
 {
 	return m_patches;
+}
+
+void FoliageField::resize(int newW, int newH)
+{
+	width = newW;
+	height = newH;
+
+	build(width, height);
 }
