@@ -482,7 +482,7 @@ void InspectorWindow::display()
 						g_activeTerrain = &terrain;
 						static int x = 0;
 						static int y = 0;
-						terrain.m_foliageField.setPixel(x, y, 255);
+						terrain.m_foliageField.paintCircle(x, y, 5, 255);
 						x++;
 					}
 

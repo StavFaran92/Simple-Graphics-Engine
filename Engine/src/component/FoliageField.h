@@ -29,6 +29,7 @@ struct EngineAPI FoliageField
 	//std::shared_ptr<FoliagePatch> getPatch(int idx, int idy);
 
 	void setPixel(int idx, int idy, unsigned char value);
+	void paintCircle(int cx, int cy, int radius, unsigned char value);
 
 	void update();
 

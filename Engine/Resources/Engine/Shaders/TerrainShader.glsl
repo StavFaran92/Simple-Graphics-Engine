@@ -145,12 +145,12 @@ void main()
     p.y += h * scale;
 
     // Build correct TBN for height surface y = f(x, z)
-    vec3 T = vec3(1.0, dhdx * scale, 0.0); // ∂P/∂x
-    vec3 B = vec3(0.0, dhdz * scale, 1.0); // ∂P/∂z
+    vec3 T = vec3(1.0, dhdx * scale, 0.0); // dP/dx
+    vec3 B = vec3(0.0, dhdz * scale, 1.0); // dP/dz
 
     vec3 N = normalize(cross(B, T));
 
-    // Orthonormalize (important!)
+    // Orthonormalize
     T = normalize(T - N * dot(N, T));
     B = normalize(cross(N, T));
 

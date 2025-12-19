@@ -690,7 +690,8 @@ void RenderSceneViewWindow()
 				glm::vec2 offsetPos = glm::vec2(results.position.x, results.position.z);
 				offsetPos.x += g_activeTerrain->getWidth() * .5f;
 				offsetPos.y += g_activeTerrain->getHeight() * .5f;
-				g_activeTerrain->m_foliageField.setPixel(offsetPos.x, offsetPos.y, 1);
+				//g_activeTerrain->m_foliageField.setPixel(offsetPos.x, offsetPos.y, 1);
+				g_activeTerrain->m_foliageField.paintCircle(offsetPos.x, offsetPos.y, 5, 255);
 			}
 
 		}

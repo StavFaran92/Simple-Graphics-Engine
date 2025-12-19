@@ -175,6 +175,31 @@ void FoliageField::setPixel(int idx, int idy, unsigned char value)
 	update();
 }
 
+void FoliageField::paintCircle(int cx, int cy, int radius, unsigned char value)
+{
+	int r2 = radius * radius;
+
+	int minX = std::max(0, cx - radius);
+	int maxX = std::min(width - 1, (float)cx + radius);
+	int minY = std::max(0, cy - radius);
+	int maxY = std::min(height - 1, (float)cy + radius);
+
+	for (int y = minY; y <= maxY; ++y)
+	{
+		int dy = y - cy;
+		for (int x = minX; x <= maxX; ++x)
+		{
+			int dx = x - cx;
+			if (dx * dx + dy * dy <= r2)
+			{
+				m_foliageSpreadMap[y * width + x] = value;
+			}
+		}
+	}
+
+	update();
+}
+
 const std::vector<std::shared_ptr<FoliagePatch>>& FoliageField::getPatches() const
 {
 	return m_patches;
