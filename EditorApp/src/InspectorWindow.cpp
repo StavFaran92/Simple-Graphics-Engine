@@ -475,16 +475,33 @@ void InspectorWindow::display()
 						terrain.buildFoliage();
 					}
 
+					bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::FoliagePainter;
 
-					if (ImGui::Button("test"))
+					if (isActive)
 					{
-						g_testRay = true;
-						g_activeTerrain = &terrain;
-						static int x = 0;
-						static int y = 0;
-						terrain.m_foliageField.paintCircle(x, y, 5, 255);
-						x++;
+						ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
 					}
+
+					if (ImGui::Button("Foliage Painter"))
+					{
+						g_activeTerrain = &terrain;
+						EditorState::Instance().setActiveEditorTool(
+							isActive ? EditorTool::Type::None : EditorTool::Type::FoliagePainter
+						);
+					}
+
+					if (isActive)
+					{
+						ImGui::PopStyleColor();
+					}
+
+
+					//if (ImGui::Button("test"))
+					//{
+					//	g_activeTerrain = &terrain;
+					//	EditorState::Instance().setActiveEditorTool(EditorTool::Type::FoliagePainter);
+
+					//}
 
 					ImGui::EndTabItem();
 				}
@@ -492,34 +509,6 @@ void InspectorWindow::display()
 				ImGui::EndTabBar();
 			}
 		});
-
-		//displayComponent<FoliageComponent>("Foliage Component", [](FoliageComponent& foliage) {
-		//	// Compile Button
-		//	addTextureEditWidget(foliage.m_foliageSpreadMap, { 100,100 }, [&](UUID uuid) {
-		//		foliage.m_foliageSpreadMap = AssetWrapper<Texture>(uuid);
-		//		});
-
-		//	ImGui::ColorEdit3("Bottom Color", (float*)&foliage.colorA);
-		//	ImGui::ColorEdit3("Top Color", (float*)&foliage.colorB);
-		//	ImGui::DragFloat("Density", &foliage.globalDensity, 0.01f, 0.0f, 1.0f);
-		//	ImGui::DragFloat("Width", &foliage.width, 0.01f, 1.0f);
-		//	ImGui::DragFloat("Height", &foliage.height, 0.01f, 1.0f);
-		//	ImGui::DragInt("Patch Width", &foliage.patchWidth);
-		//	ImGui::DragInt("Patch Height", &foliage.patchHeight);
-		//	//ImGui::DragInt("Pixel Per Patch", &foliage.pixelPerPatch);
-
-		//	if (ImGui::Button("Select Terrain"))
-		//	{
-		//		logError("Not yet implemented.");
-		//	}
-
-		//	//displayEntitySelectDialog();
-
-		//	if (ImGui::Button("build"))
-		//	{
-		//		foliage.build();
-		//	}
-		//	});
 
 		displayComponent<ScriptComponent>("Lua Script Component", [](ScriptComponent& script) {
 			std::string scriptName = "None";

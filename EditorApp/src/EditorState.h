@@ -5,6 +5,8 @@
 
 #include "sge.h"
 
+#include "EditorTool.h"
+
 class DialogBase;
 
 class EditorState {
@@ -52,6 +54,10 @@ public:
     void addDialogDisplay(DialogBase* dialog);
 
     void displayDialogs();
+
+    void setActiveEditorTool(EditorTool::Type tool);
+    EditorTool::Type getActiveToolType() const;
+    std::shared_ptr<EditorTool> getActiveEditorTool();
     
 
     std::function<void(UUID uuid)> assetTextureSelectCB;
@@ -73,6 +79,9 @@ public:
     EditorState& operator=(EditorState&&) = delete;
 
 private:
+    static std::shared_ptr<EditorTool> getTool(EditorTool::Type type);
+
+private:
     // Private constructor
     EditorState() = default;
 
@@ -81,4 +90,7 @@ private:
     WorkingDirectory cwd;
 
     std::vector<DialogBase*> m_dialogs;
+
+    EditorTool::Type m_activeEditorToolType = EditorTool::Type::None;
+    std::shared_ptr<EditorTool> m_activeEditorTool;
 };

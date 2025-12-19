@@ -2,6 +2,8 @@
 
 #include "Dialogs/DialogBase.h"
 
+#include "FoliagePaintTool.h"
+
 void EditorState::init()
 {
     cwd.m_path = ScopedPath::ContentPath();
@@ -35,7 +37,49 @@ void EditorState::displayDialogs()
     }
 }
 
+void EditorState::setActiveEditorTool(EditorTool::Type toolType)
+{
+    // Deactive currently active tool
+    if (m_activeEditorToolType != EditorTool::Type::None && m_activeEditorTool)
+        m_activeEditorTool->onDeactivate();
+
+    // Set new tool
+    m_activeEditorToolType = toolType;
+    m_activeEditorTool = getTool(toolType);
+
+    // Activate new tool
+    if (m_activeEditorTool)
+        m_activeEditorTool->onActivate();
+}
+
+EditorTool::Type EditorState::getActiveToolType() const
+{
+    return m_activeEditorToolType;
+}
+
+std::shared_ptr<EditorTool> EditorState::getActiveEditorTool()
+{
+    return m_activeEditorTool;
+}
+
 WorkingDirectory& EditorState::getWorkingDir()
 {
     return cwd;
+}
+
+std::shared_ptr<EditorTool> EditorState::getTool(EditorTool::Type type)
+{
+    static std::unordered_map<EditorTool::Type, std::shared_ptr<EditorTool>> tools = {
+        { EditorTool::Type::FoliagePainter,   std::make_shared<FoliagePaintTool>() },
+        //{ EditorTool::Type::TerrainSculpt,  std::make_shared<TerrainSculptTool>() },
+        //{ EditorTool::Type::TerrainPaint,   std::make_shared<TerrainPaintTool>() },
+        //{ EditorTool::Type::Select,         std::make_shared<SelectTool>() },
+        //{ EditorTool::Type::Move,           std::make_shared<MoveTool>() }
+    };
+
+    auto it = tools.find(type);
+    if (it != tools.end())
+        return it->second;
+
+    return nullptr;
 }
