@@ -175,10 +175,9 @@ std::pair<glm::vec3, glm::vec3 > ScreenPointToRay(
 	return { rayOrigin, rayDir };
 }
 
-void FoliagePaintTool::update()
+void FoliagePaintTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 {
-	ImVec2 windowPos = ImGui::GetWindowPos();
-	ImVec2 renderViewWindowSize = ImGui::GetContentRegionAvail();
+	ImVec2 renderViewWindowSize = viewportSize;
 	float innerWindowWidth = renderViewWindowSize.x;
 	float innerWindowHeight = 35.0f;
 	ImVec2 toolbarPos(windowPos.x + 10, windowPos.y + 30);

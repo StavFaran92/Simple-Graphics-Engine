@@ -317,5 +317,6 @@ void Terrain::resize(int newW, int newH)
 	m_width = newW;
 	m_height = newH;
 
-	m_foliageField.resize(newW, newH);
+	if(m_foliageField.isActive)
+		m_foliageField.resize(newW, newH);
 }
