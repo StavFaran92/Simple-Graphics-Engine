@@ -37,9 +37,9 @@ public:
 	{
 		m_cameraController->onUpdate(deltaTime);
 	}
-	void onEvent(SDL_Event e)
+	bool onEvent(SDL_Event e)
 	{
-		m_cameraController->onEvent(e);
+		return m_cameraController->onEvent(e);
 	}
 private:
 	bool m_isLocked = true;

@@ -11,7 +11,7 @@ class EngineAPI CameraControllerFreeLook : public ICameraController
 public:
 	void onCreate(Entity& e) override;
 	void onUpdate(float deltaTime) override;
-	void onEvent(SDL_Event e) override;
+	bool onEvent(SDL_Event e) override;
 
 private:
 	enum class ControllerState

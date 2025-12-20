@@ -11,6 +11,6 @@ class ICameraController
 public:
 	virtual void onCreate(Entity& e) = 0;
 	virtual void onUpdate(float deltaTime) = 0;
-	virtual void onEvent(SDL_Event e) = 0;
+	virtual bool onEvent(SDL_Event e) = 0;
 	virtual ~ICameraController() = default;
 };

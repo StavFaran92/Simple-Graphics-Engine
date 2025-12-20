@@ -64,7 +64,7 @@ void CameraControllerFreeLook::onUpdate(float deltaTime)
 	m_cameraTransform->translate(finalMovement);
 }
 
-void CameraControllerFreeLook::onEvent(SDL_Event e)
+bool CameraControllerFreeLook::onEvent(SDL_Event e)
 {
 	if (e.type == SDL_MOUSEMOTION)
 	{
@@ -150,4 +150,6 @@ void CameraControllerFreeLook::onEvent(SDL_Event e)
 	{
 		m_cameraTransform->translate(m_cameraComponent->front * (float)e.wheel.y);
 	}
+
+	return false;
 }

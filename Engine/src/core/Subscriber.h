@@ -5,5 +5,5 @@
 class Subscriber
 {
 public:
-	virtual void onEvent(SDL_Event e) {};
+	virtual bool onEvent(SDL_Event e) { return false; };
 };

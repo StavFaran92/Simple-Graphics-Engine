@@ -46,7 +46,7 @@ void Mouse::onMousePressed(EventHandler handler, MouseButton code, MouseCallback
 		mEvent.clicks = e.button.clicks;
 		mEvent.x = e.button.x;
 		mEvent.y = e.button.y;
-		callback(mEvent);
+		return callback(mEvent);
 	});
 }
 
@@ -62,7 +62,7 @@ void Mouse::onMouseReleased(EventHandler handler, MouseButton code, MouseCallbac
 		mEvent.clicks = e.button.clicks;
 		mEvent.x = e.button.x;
 		mEvent.y = e.button.y;
-		callback(mEvent);
+		return callback(mEvent);
 	});
 }
 
@@ -78,7 +78,7 @@ void Mouse::onMouseMotion(EventHandler handler, MouseButton code, MouseCallback 
 		mEvent.y = e.motion.y;
 		mEvent.xrel = e.motion.xrel;
 		mEvent.yrel = e.motion.yrel;
-		callback(mEvent);
+		return callback(mEvent);
 	});
 }
 

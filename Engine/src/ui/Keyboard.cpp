@@ -37,8 +37,9 @@ void Keyboard::onKeyPressed(EventHandler handler, KeyCode code, KeyCallback call
 			kEvent.keysym = static_cast<KeyCode>(code);
 			kEvent.repeat = e.key.repeat != 0;
 			kEvent.state = KeyState::Pressed;
-			callback(kEvent);
+			return callback(kEvent);
 		}
+		return false;
 	});
 }
 
@@ -57,8 +58,9 @@ void Keyboard::onKeyReleased(EventHandler handler, KeyCode code, KeyCallback cal
 			kEvent.keysym = static_cast<KeyCode>(code);
 			kEvent.repeat = e.key.repeat != 0;
 			kEvent.state = KeyState::Released;
-			callback(kEvent);
+			return callback(kEvent);
 		}
+		return false;
 	});
 
 }

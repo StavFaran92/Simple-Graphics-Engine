@@ -12,7 +12,7 @@ void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Subsc
 		return;
 	}
 
-	layer->subscribe(handler, eventType, [=](SDL_Event e) { s->onEvent(e); });
+	layer->subscribe(handler, eventType, [=](SDL_Event e) { return s->onEvent(e); });
 }
 
 void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Callback c)

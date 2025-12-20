@@ -147,7 +147,7 @@ public:
 		applyMovement(deltaTime);		
 	}
 
-	void onEvent(SDL_Event e)
+	bool onEvent(SDL_Event e)
 	{
 		if (e.type == SDL_MOUSEMOTION)
 		{
@@ -199,6 +199,8 @@ public:
 					m_velocity.y = m_jumpForce;
 			}
 		}
+
+		return false;
 	}
 
 private:

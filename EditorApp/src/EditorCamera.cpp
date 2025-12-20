@@ -32,14 +32,17 @@ void EditorCamera::onUpdate(float deltaTime)
 	m_cameraController->onUpdate(deltaTime);
 }
 
-void EditorCamera::onEvent(SDL_Event e)
+bool EditorCamera::onEvent(SDL_Event e)
 {
 	if (m_isLocked)
-		return;
+		return false;
 
-	if (!EditorState::Instance().isMouseInSceneView) return;
+	if (!EditorState::Instance().isMouseInSceneView) 
+		return false;
 
 	m_cameraController->onEvent(e);
+
+	return false;
 }
 
 void EditorCamera::lock()

@@ -600,10 +600,11 @@ public:
 
 		g_editorCamera = editorCamera;
 
-		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](Keyboard::KeyEvent e) { stopSimulation(); });
+		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](Keyboard::KeyEvent e) { stopSimulation(); return false; });
 		
 		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiHandler, KeyCode::SCANCODE_X, [](Keyboard::KeyEvent e) {
 			debugTerrainFlag = true;
+			return false;
 			});
 
 		//g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView(0, 0, 300, 200, g_primaryCamera);

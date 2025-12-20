@@ -51,7 +51,7 @@ public:
 		MouseButton button = MouseButton::INVALID;
 	};
 
-	using MouseCallback = std::function<void(MouseEvent s)>;
+	using MouseCallback = std::function<bool(MouseEvent s)>;
 
 	const MouseState& getMouseState();
 	void getMousePosition(int& x, int& y);
