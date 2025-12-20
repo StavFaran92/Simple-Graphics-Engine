@@ -26,7 +26,7 @@ ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Textur
 
 void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture)
 {
-	auto shader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/FlipTextureShader.glsl");
+	auto shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/FlipTextureShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -73,7 +73,7 @@ ResourceWrapper<Texture> TextureTransformer::applyGammaCorrection(ResourceWrappe
 
 void TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture)
 {
-	auto shader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/ApplyGammaCorrectionShader.glsl");
+	auto shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/ApplyGammaCorrectionShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;

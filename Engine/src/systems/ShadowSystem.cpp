@@ -62,7 +62,7 @@ bool ShadowSystem::init()
 
 	m_fbo.unbind();
 
-	m_simpleDepthShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SimpleDepthShader.glsl");
+	m_simpleDepthShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SimpleDepthShader.glsl");
 
 	DebugHelper::getInstance().registerTextureForDebug("Depth map", m_depthMapTexture);
 

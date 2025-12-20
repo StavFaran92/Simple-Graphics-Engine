@@ -33,7 +33,7 @@ ObjectPicker::ObjectPicker()
 
 bool ObjectPicker::init()
 {
-	m_pickingShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl");
+	m_pickingShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PickingShader.glsl");
 
 	m_frameBuffer = std::make_shared<FrameBufferObject>();
 

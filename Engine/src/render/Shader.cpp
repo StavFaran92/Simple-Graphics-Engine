@@ -594,19 +594,19 @@ void embeddOverrideShaderInUberShader(ShadersInfo& shaderOverrideInfo, ShaderOve
 		std::string shaderPath;
 		if (shaderOverride == ShaderOverride::PBR)
 		{
-			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl";
+			shaderPath = SGE_ROOT_DIR "Resources/Engine/Shaders/PBRShader.glsl";
 		}
 		else if (shaderOverride == ShaderOverride::Pixel)
 		{
-			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl";
+			shaderPath = SGE_ROOT_DIR "Resources/Engine/Shaders/PixelShader.glsl";
 		}
 		else if (shaderOverride == ShaderOverride::PostProcess)
 		{
-			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PostProcessShader.glsl";
+			shaderPath = SGE_ROOT_DIR "Resources/Engine/Shaders/PostProcessShader.glsl";
 		}
 		else if (shaderOverride == ShaderOverride::Volume)
 		{
-			shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/VolumeShader.glsl";
+			shaderPath = SGE_ROOT_DIR "Resources/Engine/Shaders/VolumeShader.glsl";
 		}
 
 		std::string& pixelShaderSources = Engine::get()->getShaderLoader()->readShader(shaderPath);

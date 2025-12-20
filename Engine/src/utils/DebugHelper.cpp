@@ -13,8 +13,8 @@ DebugHelper::DebugHelper()
 {
 	m_vao = std::make_shared<VertexArrayObject>();
 
-	m_pointShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PointDebugShader.glsl");
-	m_lineShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/LineDebugShader.glsl");
+	m_pointShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PointDebugShader.glsl");
+	m_lineShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/LineDebugShader.glsl");
 }
 
 

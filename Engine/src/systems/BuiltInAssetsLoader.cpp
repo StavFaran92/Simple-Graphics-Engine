@@ -93,7 +93,7 @@ void BuiltInAssetsLoader::loadTextures()
 		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 	}
 
-	acquireTexture("SGE_TEXTURE_GRASS", SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
+	acquireTexture("SGE_TEXTURE_GRASS", SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
 }
 
 void BuiltInAssetsLoader::loadMaterials()
@@ -151,7 +151,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		aInfo.aType = AssetType::MESH;
 		aInfo.name = "SGE_MESH_CAMERA";
 		aInfo.isEngineOwned = true;
-		MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", aInfo);
+		MeshCollection::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
 	}
 }
 

@@ -167,8 +167,8 @@ void Scene::init(Context* context)
 	m_quadUI.RemoveComponent<RenderableComponent>();
 	m_quadUI.RemoveComponent<ObjectComponent>();
 
-	m_UIShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/UIShader.glsl");
-	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl");
+	m_UIShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/UIShader.glsl");
+	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/OutlineShader.glsl");
 
 	m_uboTime = std::make_shared<UniformBufferObject>(sizeof(float));
 	m_uboTime->attachToBindPoint(0);
@@ -182,7 +182,7 @@ void Scene::init(Context* context)
 	// Create BRDF look up texture
 	m_BRDFIntegrationLUT = IBL::generateBRDFIntegrationLUT(this);
 
-	m_skyboxShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SkyboxShader.glsl");
+	m_skyboxShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SkyboxShader.glsl");
 
 	m_basicBox = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX).resource();
 
@@ -192,9 +192,9 @@ void Scene::init(Context* context)
 
 	m_highlightRenderView = std::make_shared<RenderView>(Viewport{ 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight() }, Entity::EmptyEntity);
 
-	m_highlightMaskShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl");
-	m_highlightEdgeDetectionShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
-	m_highlightMergeShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
+	m_highlightMaskShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlighMaskShader.glsl");
+	m_highlightEdgeDetectionShader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
+	m_highlightMergeShader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
 
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
 
@@ -206,7 +206,7 @@ void Scene::init(Context* context)
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo); // Binding = 0
 
 
-	//m_sampleComputeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/SampleComputeShader.glsl");
+	//m_sampleComputeShader = Shader::create(SGE_ROOT_DIR "Resources/Engine/Shaders/SampleComputeShader.glsl");
 
 	//m_sampleComputeShader->use();
 	//glDispatchCompute((GLuint)data.size(), 1, 1);

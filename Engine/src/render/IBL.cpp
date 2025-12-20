@@ -28,7 +28,7 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Irradiance map");
 
-	auto irradianceShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/IrradianceShader.glsl");
+	auto irradianceShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/IrradianceShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -103,7 +103,7 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Prefilter Environemnt map");
 
-	auto prefilterShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/IBLPrefilterShader.glsl");
+	auto prefilterShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/IBLPrefilterShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -197,7 +197,7 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate BRDF Integration map");
 
-	auto BRDFIntegrationShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/BRDFIntegrationShader.glsl");
+	auto BRDFIntegrationShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/BRDFIntegrationShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;

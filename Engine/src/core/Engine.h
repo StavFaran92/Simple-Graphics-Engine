@@ -201,5 +201,3 @@ protected:
 
     std::shared_ptr<EventLayerStack> m_eventLayerStack;
 };
-
-#define SGE_ROOT_DIR Engine::get()->getRootDir()

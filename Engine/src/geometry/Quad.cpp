@@ -24,7 +24,7 @@ void Quad::createMesh(ResourceWrapper<MeshCollection>& meshCollection)
 	//ModelImporter::ModelImportSettings settings;
 	//settings.name = "SGE_QUAD_MESH";
 	//settings.isTransient = true;
-	//return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR + "Resources/Engine/Meshes/plane.gltf", settings).mesh;
+	//return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR "Resources/Engine/Meshes/plane.gltf", settings).mesh;
 
 	auto mesh = std::make_shared<Mesh>();
 

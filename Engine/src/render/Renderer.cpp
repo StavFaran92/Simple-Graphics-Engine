@@ -33,7 +33,7 @@
 
 bool Renderer::init()
 {
-	//m_pbrShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
+	//m_pbrShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBRShader.glsl");
 
     m_quad = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_QUAD).resource();
 

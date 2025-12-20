@@ -74,36 +74,14 @@ bool Engine::init(const InitParams& initParams)
     m_resourceManager = std::make_shared<ResourceManager>();
     if (!SGE_EXPORT_PACKAGE)
     {
-        auto found = false;
-        try
-        {
-            size_t len = 0;
-            char* sgeRoot = nullptr;
-            errno_t err = _dupenv_s(&sgeRoot, &len, "SGE");
-            if (err == 0 && sgeRoot)
-            {
-                found = true;
-                m_resourceManager->setRootDir(std::string(sgeRoot) + "/Engine/");
-            }
-            free(sgeRoot);
-        }
-        catch (std::exception e)
-        {
-            logError(e.what());
-        }
-
-        if (!found)
-        {
-            m_resourceManager->setRootDir("./");
-        }
-
+        m_resourceManager->setRootDir(SGE_ROOT_DIR "/");
     }
     else
     {
         m_resourceManager->setRootDir("./");
     }
 
-    m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR + "/EngineConfig.json");
+    m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR "/EngineConfig.json");
 
     m_projectDirectory = initParams.projectDir + "/";
 
@@ -605,12 +583,12 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     auto& postProcess = eFXAA.addComponent<PostProcessComponent>();
 
 
-    auto FXAAShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/SamplePostProcessShader.glsl", ShaderOverride::PostProcess);
+    auto FXAAShader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl", ShaderOverride::PostProcess);
     AssetCreateDescriptor desc;
     desc.aType = AssetType::SHADER;
     desc.name = "FXAAShader";
     desc.isEngineOwned = true;
-    desc.origFilePath = SGE_ROOT_DIR + "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
+    desc.origFilePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
     desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::PostProcess);
     auto FXAAShaderAsset = getSubSystem<Assets>()->createAsset(FXAAShader, desc);
     postProcess.shader = FXAAShaderAsset.as<Shader>();
@@ -618,12 +596,12 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     if (initParams.templateScene)
     {
         //Skybox::CreateSkyboxFromEquirectangularMap( "C:/dev/repos/LearnOpenGL/resources/textures/hdr/newport_loft.hdr", context->getActiveScene().get());
-        //Skybox::CreateSkyboxFromCubemap({ SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/right.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/left.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/top.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/bottom.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/front.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/back.jpg" }, context->getActiveScene().get());
+        //Skybox::CreateSkyboxFromCubemap({ SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/right.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/left.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/top.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/bottom.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/front.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/back.jpg" }, context->getActiveScene().get());
 
         // todo revert
         //{
@@ -631,7 +609,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
         //    auto& groundTransfrom = ground.getComponent<Transformation>();
         //    groundTransfrom.setLocalScale({ 50, .5f, 50 });
         //    auto& mat = ground.addComponent<MaterialComponent>();
-        //    auto tex = Engine::get()->getSubSystem<Assets>()->importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/floor.jpg");
+        //    auto tex = Engine::get()->getSubSystem<Assets>()->importTexture2D(SGE_ROOT_DIR "Resources/Engine/Textures/floor.jpg");
         //    mat.begin()->get()->setTexture(Texture::Type::Albedo, tex);
         //    auto& rb = ground.addComponent<RigidBodyComponent>(RigidbodyType::Static, 1.f);
         //    auto& collisionBox = ground.addComponent<CollisionBoxComponent>(.5f);

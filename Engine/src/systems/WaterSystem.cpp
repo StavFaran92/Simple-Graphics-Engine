@@ -25,13 +25,13 @@ Entity WaterSystem::createPool()
 	// TODO use grid instead
 	ModelImportSettings meshDesc;
 	meshDesc.isEngineOwned = true;
-	AssetWrapper<MeshCollection> mesh = MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/sd_plane.fbx", meshDesc);
+	AssetWrapper<MeshCollection> mesh = MeshCollection::import(SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx", meshDesc);
 	auto& meshRendererComponent = waterBodyNestedImpl.addComponent<MeshRendererComponent>(mesh);
 
-	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
+	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
 	AssetCreateDescriptor shaderDesc;
 	shaderDesc.aType = AssetType::SHADER;
-	shaderDesc.origFilePath = SGE_ROOT_DIR + "Resources/Engine/Shaders/WaterShader.glsl";
+	shaderDesc.origFilePath = SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl";
 	shaderDesc.name = "WaterShader";
 	shaderDesc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::PBR);
 	shaderDesc.isEngineOwned = true;
@@ -50,7 +50,7 @@ Entity WaterSystem::createPool()
 	//auto& shaderComponent = poolQuad.addComponent<ShaderComponent>();
 	//shaderComponent.setShader(shaderAsset);
 
-	auto waterNormal = Texture::import(SGE_ROOT_DIR + "Resources/Engine/Textures/water_new_height.png");
+	auto waterNormal = Texture::import(SGE_ROOT_DIR "Resources/Engine/Textures/water_new_height.png");
 	auto waterNormalSampler = std::make_shared<TextureSampler>(1);
 	waterNormalSampler->texture = waterNormal;
 	waterBodyComponent.waterBodyNormal = waterNormalSampler;

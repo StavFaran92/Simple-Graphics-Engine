@@ -30,7 +30,7 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 {
 	//equirectangularTexture = TextureTransformer::flipVertical(equirectangularTexture);
 
-	auto equirectangularShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/EquirectangularToCubemap.glsl");
+	auto equirectangularShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/EquirectangularToCubemap.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -107,7 +107,7 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 
 ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirectangular(ResourceWrapper<Texture> cubemapTexture)
 {
-	auto cubemapToEquirectangularShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/CubemapToEquirectangular.glsl");
+	auto cubemapToEquirectangularShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/CubemapToEquirectangular.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;

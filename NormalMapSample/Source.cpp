@@ -19,12 +19,12 @@ public:
 
 	void start() override
 	{
-		Skybox::CreateSkyboxFromEquirectangularMap({ SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/right.jpg",
-		SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/left.jpg",
-		SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/top.jpg",
-		SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/bottom.jpg",
-		SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/front.jpg",
-		SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/back.jpg" });
+		Skybox::CreateSkyboxFromEquirectangularMap({ SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/right.jpg",
+		SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/left.jpg",
+		SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/top.jpg",
+		SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/bottom.jpg",
+		SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/front.jpg",
+		SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/back.jpg" });
 
 
 		{

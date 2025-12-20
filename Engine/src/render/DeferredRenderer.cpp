@@ -156,7 +156,7 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 	m_ssaoFBO.unbind();
 
-	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
+	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SSAOPassShader.glsl");
 
 	// Initialize SSAO Blur
 	m_ssaoBlurFBO.bind();
@@ -176,7 +176,7 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 	m_ssaoBlurFBO.unbind();
 
-	m_ssaoBlurPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOBlurPassShader.glsl");
+	m_ssaoBlurPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SSAOBlurPassShader.glsl");
 
 	DebugHelper::getInstance().registerTextureForDebug("SSAO Color", m_ssaoBlurColorBuffer);
 
@@ -412,7 +412,7 @@ void DeferredRenderer::resize(int w, int h)
 
 //void DeferredRenderer::reloadShaders()
 //{
-//	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl"); // TODO fix, now when its a built in asset it will cause issues
-//	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
-//	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
+//	m_gBufferShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBR_GeomPassShader.glsl"); // TODO fix, now when its a built in asset it will cause issues
+//	m_lightPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+//	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SSAOPassShader.glsl");
 //}

@@ -9,6 +9,9 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
+# Engine root directory at configure time
+add_compile_definitions(SGE_ROOT_DIR="${CMAKE_SOURCE_DIR}/Engine/")
+
 add_subdirectory(Engine)
 add_subdirectory(NativeScripts)
 add_subdirectory(EditorApp)
