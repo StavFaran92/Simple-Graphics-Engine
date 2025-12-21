@@ -6,6 +6,8 @@
 #include "component/CameraComponent.h"
 #include "core/Subscriber.h"
 
+#include "ui/KeyCodes.h"
+
 class EngineAPI CameraControllerFreeLook : public ICameraController
 {
 public:
@@ -38,6 +40,15 @@ private:
 	float m_turnSpeed = 10.f;
 	float m_distance = 0;
 	float m_movementSpeed = 10.f;
+
+	std::unordered_map<KeyCode, bool> keyState = {
+	{ KeyCode::SCANCODE_W, false },
+	{ KeyCode::SCANCODE_S, false },
+	{ KeyCode::SCANCODE_A, false },
+	{ KeyCode::SCANCODE_D, false },
+	{ KeyCode::SCANCODE_Q, false },
+	{ KeyCode::SCANCODE_E, false }
+	};
 
 	ControllerState m_state = ControllerState::IDLE;
 

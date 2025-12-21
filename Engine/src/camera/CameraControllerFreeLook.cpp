@@ -20,48 +20,27 @@ void CameraControllerFreeLook::onCreate(Entity& e)
 
 void CameraControllerFreeLook::onUpdate(float deltaTime)
 {
-	if(Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_W))
-	{
-		m_velocityF = m_cameraComponent->front * velocity * deltaTime;
-	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_S))
-	{
-		m_velocityF = -m_cameraComponent->front * velocity * deltaTime;
-	}
-	else
-	{
-		m_velocityF = glm::vec3{ 0 };
-	}
+	glm::vec3 movement(0.0f);
 
-	if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_D))
-	{
-		m_velocityR = m_cameraComponent->right * velocity * deltaTime;
-	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_A))
-	{
-		m_velocityR = -m_cameraComponent->right * velocity * deltaTime;
-	}
-	else
-	{
-		m_velocityR = glm::vec3{ 0 };
-	}
+	if (keyState[KeyCode::SCANCODE_W])
+		movement += m_cameraComponent->front;
+	if (keyState[KeyCode::SCANCODE_S])
+		movement -= m_cameraComponent->front;
 
-	if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_E))
-	{
-		m_velocityU = glm::vec3{0,1,0} *velocity * deltaTime;
-	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_Q))
-	{
-		m_velocityU = glm::vec3{ 0,-1,0 }  * velocity * deltaTime;
-	}
-	else
-	{
-		m_velocityU = glm::vec3{ 0 };
-	}
+	if (keyState[KeyCode::SCANCODE_D])
+		movement += m_cameraComponent->right;
+	if (keyState[KeyCode::SCANCODE_A])
+		movement -= m_cameraComponent->right;
 
-	auto finalMovement = m_velocityF + m_velocityR + m_velocityU;
+	if (keyState[KeyCode::SCANCODE_E])
+		movement.y += 1.0f;
+	if (keyState[KeyCode::SCANCODE_Q])
+		movement.y -= 1.0f;
 
-	m_cameraTransform->translate(finalMovement);
+	if (glm::length(movement) > 0.0001f)
+		movement = glm::normalize(movement) * m_movementSpeed * deltaTime;
+
+	m_cameraTransform->translate(movement);
 }
 
 bool CameraControllerFreeLook::onEvent(SDL_Event e)
@@ -149,6 +128,23 @@ bool CameraControllerFreeLook::onEvent(SDL_Event e)
 	else if (e.type == SDL_MOUSEWHEEL)
 	{
 		m_cameraTransform->translate(m_cameraComponent->front * (float)e.wheel.y);
+	}
+	else if (e.type == SDL_KEYDOWN && !e.key.repeat)
+	{
+		auto it = keyState.find(static_cast<KeyCode>(e.key.keysym.scancode));
+		if (it != keyState.end())
+			it->second = true;
+
+		return false;
+	}
+
+	else if (e.type == SDL_KEYUP)
+	{
+		auto it = keyState.find(static_cast<KeyCode>(e.key.keysym.scancode));
+		if (it != keyState.end())
+			it->second = false;
+
+		return false;
 	}
 
 	return false;

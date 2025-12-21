@@ -6,6 +6,28 @@
 
 #include "EditorState.h"
 
+bool shouldSceneViewGetKeyboard()
+{
+    const ImGuiIO& io = ImGui::GetIO();
+    const auto& state = EditorState::Instance();
+
+    bool uiFocused =
+        ImGui::IsAnyItemActive() ||  // UI item is being edited
+        ImGui::IsAnyItemFocused() ||  // UI has keyboard focus
+        io.WantTextInput;              // text widgets
+
+    // If UI needs keyboard -> block scene
+    if (uiFocused)
+        return false;
+
+    // If mouse is NOT in scene view -> block scene
+    if (!state.isMouseInSceneView)
+        return false;
+
+    // Otherwise: Override ImGui's WantCaptureKeyboard
+    return true;
+}
+
 bool UIEventLayer::handleEvent(SDL_Event e)
 {
     if (!m_isEnabled)
@@ -13,12 +35,15 @@ bool UIEventLayer::handleEvent(SDL_Event e)
 
     ImGui_ImplSDL2_ProcessEvent(&e);
 
-    ImVec2 mouse = ImGui::GetMousePos();
+    if (e.type == SDL_KEYDOWN)
+    {
+        std::cout << "\n";
+    }
 
     bool isHandled = false;
 
-    // If mouse is inside scene view -> DO NOT BLOCK
-    bool shouldCaptureMouse = !EditorState::Instance().sceneViewRect.contains(glm::vec2(mouse.x, mouse.y));
+    if (!shouldSceneViewGetKeyboard())
+        return true; // block event
 
     //auto iter = m_listeners.find((SDL_EventType)e.type);
     //if (iter != m_listeners.end())
@@ -29,6 +54,5 @@ bool UIEventLayer::handleEvent(SDL_Event e)
     //    }
     //}
 
-    auto& io = ImGui::GetIO();
-    return (shouldCaptureMouse || io.WantCaptureKeyboard);
+    return false;
 }

@@ -22,14 +22,14 @@ public:
 
 	void onCreate() override
 	{
-		auto eventSystem = Engine::get()->getEventSystem();
+		//auto eventSystem = Engine::get()->getEventSystem();
 
-		eventHandler = eventSystem->bindToLayer("GameLayer");
+		//eventHandler = eventSystem->bindToLayer("GameLayer");
 
-		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
-		eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
-		eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONUP, this);
-		eventSystem->subscribe(eventHandler, SDL_MOUSEWHEEL, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONUP, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEWHEEL, this);
 
 		m_cameraController->onCreate(entity);
 	}
