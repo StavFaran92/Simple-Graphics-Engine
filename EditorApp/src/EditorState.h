@@ -69,6 +69,20 @@ public:
 
     AssetWrapper<Material> selectedMaterialForEdit;
 
+    struct Rect2D {
+        glm::vec2 min;
+        glm::vec2 max;
+
+        bool contains(const glm::vec2& p) const
+        {
+            return
+                p.x >= min.x && p.x <= max.x &&
+                p.y >= min.y && p.y <= max.y;
+        }
+    };
+
+    Rect2D sceneViewRect;
+
     WorkingDirectory& getWorkingDir();
     //void setWorkingDir(std::filesystem::path path);
 

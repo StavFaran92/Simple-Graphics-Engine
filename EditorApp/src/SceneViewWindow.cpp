@@ -9,7 +9,14 @@ void SceneViewWindow::display()
 {
 	ImGui::Begin("View", nullptr, windowFlags);
 
+	ImVec2 viewportMin = ImGui::GetWindowContentRegionMin();
+	ImVec2 viewportMax = ImGui::GetWindowContentRegionMax();
 	ImVec2 windowPos = ImGui::GetWindowPos();
+
+	EditorState::Instance().sceneViewRect = {
+		{windowPos.x + viewportMin.x, windowPos.y + viewportMin.y},
+		{windowPos.x + viewportMax.x, windowPos.y + viewportMax.y}
+	};
 
 	// Get the current window size to support resizing
 	ImVec2 renderViewWindowSize = ImGui::GetContentRegionAvail();

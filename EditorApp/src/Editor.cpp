@@ -47,6 +47,8 @@ AssetSelectDialog assetSelectDialog;
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 std::shared_ptr<EventLayer> uiEditorToolsLayer = std::make_shared<UIEditorToolsEventLayer>();
+std::shared_ptr<EventLayer> uiNavigationLayer = std::make_shared<EventLayer>("UINavigationLayer");
+std::shared_ptr<EventLayer> uiEntitySelectionLayer = std::make_shared<EventLayer>("UIEntitySelectionLayer");
 
 namespace fs = std::filesystem;
 
@@ -590,8 +592,10 @@ public:
 		4. Camera / navigation layer
 		5. Gameplay / scene input 
 		*/
-        Engine::get()->getEventSystem()->pushLayer(uiLayer);
+        Engine::get()->getEventSystem()->pushLayer(uiNavigationLayer);
+        Engine::get()->getEventSystem()->pushLayer(uiEntitySelectionLayer);
         Engine::get()->getEventSystem()->pushLayer(uiEditorToolsLayer);
+        Engine::get()->getEventSystem()->pushLayer(uiLayer);
 
 		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
