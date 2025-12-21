@@ -24,15 +24,6 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 	enum TransformMode { TRANSLATE, ROTATE, SCALE, UNIVERSAL };
 	static TransformMode currentMode = TRANSLATE;
 
-	// Gizmo mode variable
-	static ImGuizmo::MODE currentGizmoMode = ImGuizmo::LOCAL;
-
-	// Snap options
-	static bool useSnap = false;
-	static float snapValues[3] = { 1.0f, 1.0f, 1.0f };
-
-
-
 	if (ImGui::BeginChild("TransformWindow", ImVec2(innerWindowWidth, innerWindowHeight), true, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
 	{
 		// Radio buttons for transformation mode
@@ -46,14 +37,14 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 
 		// Button to toggle between local and world gizmo modes
 		ImGui::SameLine();
-		if (ImGui::Button(currentGizmoMode == ImGuizmo::LOCAL ? "Local" : "World"))
+		if (ImGui::Button(m_currentGizmoMode == ImGuizmo::LOCAL ? "Local" : "World"))
 		{
-			currentGizmoMode = (currentGizmoMode == ImGuizmo::LOCAL) ? ImGuizmo::WORLD : ImGuizmo::LOCAL;
+			m_currentGizmoMode = (m_currentGizmoMode == ImGuizmo::LOCAL) ? ImGuizmo::WORLD : ImGuizmo::LOCAL;
 		}
 
 		// Checkbox for snap
 		ImGui::SameLine();
-		ImGui::Checkbox("Snap", &useSnap);
+		ImGui::Checkbox("Snap", &m_useSnap);
 
 		// Input fields for snap values
 		ImGui::SameLine();
@@ -61,17 +52,17 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 		if (currentMode == TRANSLATE)
 		{
 			ImGui::SetNextItemWidth(snapInputWidth * 3);
-			ImGui::InputFloat3("Snap Translate", snapValues);
+			ImGui::InputFloat3("Snap Translate", m_snapValues);
 		}
 		else if (currentMode == ROTATE)
 		{
 			ImGui::SetNextItemWidth(snapInputWidth);
-			ImGui::InputFloat("Snap Angle", &snapValues[0]);
+			ImGui::InputFloat("Snap Angle", &m_snapValues[0]);
 		}
 		else if (currentMode == SCALE)
 		{
 			ImGui::SetNextItemWidth(snapInputWidth);
-			ImGui::InputFloat("Snap Scale", &snapValues[0]);
+			ImGui::InputFloat("Snap Scale", &m_snapValues[0]);
 		}
 
 		ImGui::SameLine();
@@ -124,24 +115,23 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 		ImGuizmo::SetRect(winPos.x + contentMin.x, winPos.y + contentMin.y, renderViewWindowSize.x, renderViewWindowSize.y);
 
 		// Set the operation mode based on the selected radio button
-		ImGuizmo::OPERATION operationMode = ImGuizmo::TRANSLATE;
 		switch (currentMode)
 		{
 		case TRANSLATE:
-			operationMode = ImGuizmo::TRANSLATE;
+			m_operationMode = ImGuizmo::TRANSLATE;
 			break;
 		case ROTATE:
-			operationMode = ImGuizmo::ROTATE;
+			m_operationMode = ImGuizmo::ROTATE;
 			break;
 		case SCALE:
-			operationMode = ImGuizmo::SCALE;
+			m_operationMode = ImGuizmo::SCALE;
 			break;
 		case UNIVERSAL:
-			operationMode = ImGuizmo::UNIVERSAL;
+			m_operationMode = ImGuizmo::UNIVERSAL;
 			break;
 		}
 
-		ImGuizmo::Manipulate(camViewPtr, projectionPtr, operationMode, currentGizmoMode, matrixPtr, NULL, useSnap ? &snapValues[0] : NULL, NULL, NULL);
+		ImGuizmo::Manipulate(camViewPtr, projectionPtr, m_operationMode, m_currentGizmoMode, matrixPtr, NULL, m_useSnap ? &m_snapValues[0] : NULL, NULL, NULL);
 
 		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
 		auto& localTransform = transform.worldToLocal(glmMat);
@@ -152,6 +142,17 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 		transform.setLocalRotation(glm::vec3(Constants::toRadians * matrixRotation[0], Constants::toRadians * matrixRotation[1], Constants::toRadians * matrixRotation[2]));
 		transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
 	}
+}
+
+bool TransformTool::onEvent(SDL_Event e)
+{
+	if (ImGuizmo::IsOver() || ImGuizmo::IsUsing())
+	{
+		// Consume input so selection / camera doesn't fire
+		return true;
+	}
+
+	return false;
 }
 
 const char* TransformTool::name() const

@@ -11,6 +11,7 @@
 
 #include "NativeScriptsLoader.h"
 #include "UIEventLayer.h"
+#include "UIEditorToolsEventLayer.h"
 
 #include "EditorCamera.h"
 #include "EditorState.h"
@@ -45,6 +46,7 @@ AssetSelectDialog assetSelectDialog;
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
+std::shared_ptr<EventLayer> uiEditorToolsLayer = std::make_shared<UIEditorToolsEventLayer>();
 
 namespace fs = std::filesystem;
 
@@ -579,6 +581,7 @@ public:
         NativeScriptsLoader::instance->init();
 
         Engine::get()->getEventSystem()->pushLayer(uiLayer);
+        Engine::get()->getEventSystem()->pushLayer(uiEditorToolsLayer);
 
 		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
