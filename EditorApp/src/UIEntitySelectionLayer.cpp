@@ -17,7 +17,7 @@ bool UIEntitySelectionLayer::handleEvent(SDL_Event e)
 			{
 				ImVec2 mousePos = ImGui::GetMousePos();
 				glm::vec2 viewportPos = EditorState::Instance().sceneViewRect.min;
-				glm::vec2 renderViewWindowSize = EditorState::Instance().sceneViewRect.max;
+				glm::vec2 renderViewWindowSize = EditorState::Instance().sceneViewRect.max - EditorState::Instance().sceneViewRect.min;
 				// We alter the mouse position from small window into full screen (the renderered object pick texture)
 				int alteredX = (mousePos.x - viewportPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
 				int alteredY = (mousePos.y - viewportPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();

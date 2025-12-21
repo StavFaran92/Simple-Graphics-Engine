@@ -12,8 +12,8 @@ bool shouldSceneViewGetKeyboard()
     const auto& state = EditorState::Instance();
 
     bool uiFocused =
-        ImGui::IsAnyItemActive() ||  // UI item is being edited
-        ImGui::IsAnyItemFocused() ||  // UI has keyboard focus
+        //ImGui::IsAnyItemActive() ||  // UI item is being edited
+        //ImGui::IsAnyItemFocused() ||  // UI has keyboard focus
         io.WantTextInput;              // text widgets
 
     // If UI needs keyboard -> block scene
@@ -35,7 +35,7 @@ bool UIEventLayer::handleEvent(SDL_Event e)
 
     ImGui_ImplSDL2_ProcessEvent(&e);
 
-    if (e.type == SDL_KEYDOWN)
+    if (e.type == SDL_MOUSEBUTTONUP)
     {
         std::cout << "\n";
     }
