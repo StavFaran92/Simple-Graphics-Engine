@@ -43,66 +43,14 @@ void SceneViewWindow::display()
 	ImVec2 mousePos = ImGui::GetMousePos();
 
 	// Check if the mouse is within the viewport bounds
-	if (mousePos.x >= viewportPos.x && mousePos.x <= viewportPos.x + renderViewWindowSize.x &&
-		mousePos.y >= viewportPos.y && mousePos.y <= viewportPos.y + renderViewWindowSize.y)
+	if (mousePos.x >= EditorState::Instance().sceneViewRect.min.x && mousePos.x <= EditorState::Instance().sceneViewRect.max.x &&
+		mousePos.y >= EditorState::Instance().sceneViewRect.min.y && mousePos.y <= EditorState::Instance().sceneViewRect.max.y)
 	{
 		EditorState::Instance().isMouseInSceneView = true;
 	}
 	else
 	{
 		EditorState::Instance().isMouseInSceneView = false;
-	}
-
-	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
-	{
-		// Define the size and position of the inner window
-		float innerWindowWidth = renderViewWindowSize.x;
-		float innerWindowHeight = 35.0f;
-		ImVec2 toolbarPos(windowPos.x + 10, windowPos.y + 30);
-
-		bool isPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-
-		if (!isPopupOpen && !ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered())
-		{
-			ImVec2 mousePos = ImGui::GetMousePos();
-			ImVec2 windowPos = ImGui::GetWindowPos();
-			ImVec2 viewportOffset = ImGui::GetWindowContentRegionMin();
-			ImVec2 viewportPos{ windowPos.x + viewportOffset.x, windowPos.y + viewportOffset.y };
-
-			bool mouseInsideViewport = (mousePos.x >= viewportPos.x && mousePos.x <= viewportPos.x + renderViewWindowSize.x &&
-				mousePos.y >= viewportPos.y && mousePos.y <= viewportPos.y + renderViewWindowSize.y);
-			bool mouseInsideToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
-				mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
-
-			if (mouseInsideViewport && !mouseInsideToolbar)
-			{
-				// We alter the mouse position from small window into full screen (the renderered object pick texture)
-				int alteredX = (mousePos.x - viewportPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
-				int alteredY = (mousePos.y - viewportPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
-				int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
-
-				if (selectedID == -1)
-				{
-					state.selectEntity(Entity::EmptyEntity);
-
-				}
-				else
-				{
-
-					for (auto& sceneObj : sceneObjects)
-					{
-						if (sceneObj.e.handlerID() == selectedID)
-						{
-							state.selectEntity(sceneObj.e);
-
-							EditorState::Instance().setActiveEditorTool(EditorTool::Type::TransformTool);
-
-							break;
-						}
-					}
-				}
-			}
-		}
 	}
 
 	auto activeEditorTool = EditorState::Instance().getActiveEditorTool();

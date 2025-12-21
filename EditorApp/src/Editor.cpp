@@ -12,6 +12,8 @@
 #include "NativeScriptsLoader.h"
 #include "UIEventLayer.h"
 #include "UIEditorToolsEventLayer.h"
+#include "UINavigationLayer.h"
+#include "UIEntitySelectionLayer.h"
 
 #include "EditorCamera.h"
 #include "EditorState.h"
@@ -47,8 +49,8 @@ AssetSelectDialog assetSelectDialog;
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 std::shared_ptr<EventLayer> uiEditorToolsLayer = std::make_shared<UIEditorToolsEventLayer>();
-std::shared_ptr<EventLayer> uiNavigationLayer = std::make_shared<EventLayer>("UINavigationLayer");
-std::shared_ptr<EventLayer> uiEntitySelectionLayer = std::make_shared<EventLayer>("UIEntitySelectionLayer");
+std::shared_ptr<EventLayer> uiNavigationLayer = std::make_shared<UINavigationLayer>();
+std::shared_ptr<EventLayer> uiEntitySelectionLayer = std::make_shared<UIEntitySelectionLayer>();
 
 namespace fs = std::filesystem;
 
@@ -610,7 +612,7 @@ public:
 		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 3000.0f));
 		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
 		auto& nsc = editorCamera.getComponent<NativeScriptComponent>();
-		nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
+		//nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
 
 		nsc.script->onCreate();
