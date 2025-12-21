@@ -580,6 +580,16 @@ public:
 
         NativeScriptsLoader::instance->init();
 
+		/*
+		* 
+		* Layer ordering:
+		* 
+		1. UI / ImGui layer (blocks everything if interacting with UI)
+		2. ToolsLayer (active tool : TRS, foliage paint, terrain sculpt, etc.)
+		3. SelectionLayer (entity picking, marquee, deselect)
+		4. Camera / navigation layer
+		5. Gameplay / scene input 
+		*/
         Engine::get()->getEventSystem()->pushLayer(uiLayer);
         Engine::get()->getEventSystem()->pushLayer(uiEditorToolsLayer);
 
