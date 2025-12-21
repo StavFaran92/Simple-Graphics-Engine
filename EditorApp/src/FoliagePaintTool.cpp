@@ -7,12 +7,7 @@
 extern Entity g_editorCamera;
 extern Terrain* g_activeTerrain;
 
-struct RayHit {
-	bool hit = false;
-	float t = 0.0f;
-	glm::vec3 position{};
-	glm::vec3 normal{};
-};
+
 
 struct Ray
 {
@@ -204,8 +199,8 @@ void FoliagePaintTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 
 	auto& [rayOrigin, rayDir] = ScreenPointToRay(alteredX, alteredY, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), view, projection);
 
-	RayHit results = RaycastTerrainHeightmap(Ray(rayOrigin, rayDir), *g_activeTerrain);
-	if (results.hit)
+	m_currentResult = RaycastTerrainHeightmap(Ray(rayOrigin, rayDir), *g_activeTerrain);
+	if (m_currentResult.hit)
 	{
 		//if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_X) > 0)
 		{
@@ -214,20 +209,27 @@ void FoliagePaintTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 			//logDebug("ray origin {},{},{}, ray dir {},{},{}, hit position {},{},{}", rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDir.x, rayDir.y, rayDir.z, results.position.x, results.position.y, results.position.z);
 			unsigned int editorFrameBufferID = Engine::get()->getContext()->getActiveScene()->getRenderViewFrameBufferID("Editor View");
 			glBindFramebuffer(GL_FRAMEBUFFER, editorFrameBufferID);
-			DebugHelper::getInstance().drawLine(results.position, results.position + glm::vec3(0, 100, 0), glm::vec3(1, 0, 0), 3.f);
+			DebugHelper::getInstance().drawLine(m_currentResult.position, m_currentResult.position + glm::vec3(0, 100, 0), glm::vec3(1, 0, 0), 3.f);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
-		if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_X) > 0)
-		{
-			glm::vec2 offsetPos = glm::vec2(results.position.x, results.position.z);
-			offsetPos.x += g_activeTerrain->getWidth() * .5f;
-			offsetPos.y += g_activeTerrain->getHeight() * .5f;
-			//g_activeTerrain->m_foliageField.setPixel(offsetPos.x, offsetPos.y, 1);
-			g_activeTerrain->m_foliageField.paintCircle(offsetPos.x, offsetPos.y, 5, 255);
-		}
-
 	}
+}
+
+bool FoliagePaintTool::onEvent(SDL_Event e)
+{
+	if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+	{
+		glm::vec2 offsetPos = glm::vec2(m_currentResult.position.x, m_currentResult.position.z);
+		offsetPos.x += g_activeTerrain->getWidth() * .5f;
+		offsetPos.y += g_activeTerrain->getHeight() * .5f;
+		//g_activeTerrain->m_foliageField.setPixel(offsetPos.x, offsetPos.y, 1);
+		g_activeTerrain->m_foliageField.paintCircle(offsetPos.x, offsetPos.y, 5, 255);
+
+		return true;
+	}
+
+	return false;
 }
 
 const char* FoliagePaintTool::name() const
