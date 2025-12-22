@@ -20,27 +20,40 @@ void CameraControllerFreeLook::onCreate(Entity& e)
 
 void CameraControllerFreeLook::onUpdate(float deltaTime)
 {
-	glm::vec3 movement(0.0f);
+	auto* mouse = Engine::get()->getInput()->getMouse();
+	bool rmb = mouse->getMouseState().rmb;
 
-	if (keyState[KeyCode::SCANCODE_W])
-		movement += m_cameraComponent->front;
-	if (keyState[KeyCode::SCANCODE_S])
-		movement -= m_cameraComponent->front;
+	if (!rmb)
+	{
+		if (m_state != ControllerState::IDLE)
+		{
+			m_state = ControllerState::IDLE;
+			Engine::get()->getWindow()->unlockMouse();
+		}
+	}
 
-	if (keyState[KeyCode::SCANCODE_D])
-		movement += m_cameraComponent->right;
-	if (keyState[KeyCode::SCANCODE_A])
-		movement -= m_cameraComponent->right;
+	auto* kb = Engine::get()->getInput()->getKeyboard();
+	glm::vec3 dir(0.0f);
 
-	if (keyState[KeyCode::SCANCODE_E])
-		movement.y += 1.0f;
-	if (keyState[KeyCode::SCANCODE_Q])
-		movement.y -= 1.0f;
+	if (kb->getKeyState(KeyCode::SCANCODE_W))
+		dir += m_cameraComponent->front;
+	if (kb->getKeyState(KeyCode::SCANCODE_S))
+		dir -= m_cameraComponent->front;
 
-	if (glm::length(movement) > 0.0001f)
-		movement = glm::normalize(movement) * m_movementSpeed * deltaTime;
+	if (kb->getKeyState(KeyCode::SCANCODE_D))
+		dir += m_cameraComponent->right;
+	if (kb->getKeyState(KeyCode::SCANCODE_A))
+		dir -= m_cameraComponent->right;
 
-	m_cameraTransform->translate(movement);
+	if (kb->getKeyState(KeyCode::SCANCODE_E))
+		dir.y += 1.0f;
+	if (kb->getKeyState(KeyCode::SCANCODE_Q))
+		dir.y -= 1.0f;
+
+	if (glm::length(dir) > 0.001f)
+		dir = glm::normalize(dir) * m_movementSpeed * deltaTime;
+
+	m_cameraTransform->translate(dir);
 }
 
 bool CameraControllerFreeLook::onEvent(SDL_Event e)
@@ -128,23 +141,6 @@ bool CameraControllerFreeLook::onEvent(SDL_Event e)
 	else if (e.type == SDL_MOUSEWHEEL)
 	{
 		m_cameraTransform->translate(m_cameraComponent->front * (float)e.wheel.y);
-	}
-	else if (e.type == SDL_KEYDOWN && !e.key.repeat)
-	{
-		auto it = keyState.find(static_cast<KeyCode>(e.key.keysym.scancode));
-		if (it != keyState.end())
-			it->second = true;
-
-		return false;
-	}
-
-	else if (e.type == SDL_KEYUP)
-	{
-		auto it = keyState.find(static_cast<KeyCode>(e.key.keysym.scancode));
-		if (it != keyState.end())
-			it->second = false;
-
-		return false;
 	}
 
 	return false;

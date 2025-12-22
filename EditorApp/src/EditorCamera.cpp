@@ -14,13 +14,6 @@ EditorCamera::EditorCamera()
 
 void EditorCamera::onCreate()
 {
-	auto eventSystem = Engine::get()->getEventSystem();
-
-	eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
-	eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
-	eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONUP, this);
-	eventSystem->subscribe(eventHandler, SDL_MOUSEWHEEL, this);
-
 	m_cameraController->onCreate(entity);
 }
 

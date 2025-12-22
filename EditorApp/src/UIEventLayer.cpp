@@ -35,15 +35,14 @@ bool UIEventLayer::handleEvent(SDL_Event e)
 
     ImGui_ImplSDL2_ProcessEvent(&e);
 
-    if (e.type == SDL_MOUSEBUTTONUP)
-    {
-        std::cout << "\n";
-    }
-
     bool isHandled = false;
 
+    //EditorState::Instance().uiCapture
+
     if (!shouldSceneViewGetKeyboard())
-        return true; // block event
+    {
+        isHandled = true; // block event
+    }
 
     //auto iter = m_listeners.find((SDL_EventType)e.type);
     //if (iter != m_listeners.end())
@@ -54,5 +53,5 @@ bool UIEventLayer::handleEvent(SDL_Event e)
     //    }
     //}
 
-    return false;
+    return isHandled;
 }
