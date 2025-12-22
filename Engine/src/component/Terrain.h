@@ -45,6 +45,8 @@ public:
 	int getWidth() const;
 	int getHeight() const;
 
+	void setPixel(int x, int y, unsigned char value);
+
 	void setTexture(int index, AssetWrapper<Texture> texture);
 	void setTextureScaleX(int index, float scaleX);
 	void setTextureScaleY(int index, float scaleY);

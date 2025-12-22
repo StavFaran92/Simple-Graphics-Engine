@@ -72,3 +72,4 @@
 #include "fileSystem/WorkingDirectory.h"
 #include "fileSystem/ScopedPath.h"
 #include "core/GUILayer.h"
+#include "component/TexturePainter.h"

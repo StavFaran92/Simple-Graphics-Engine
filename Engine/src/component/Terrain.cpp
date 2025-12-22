@@ -320,3 +320,8 @@ void Terrain::resize(int newW, int newH)
 	if(m_foliageField.isActive)
 		m_foliageField.resize(newW, newH);
 }
+
+void Terrain::setPixel(int x, int y, unsigned char value)
+{
+
+}
