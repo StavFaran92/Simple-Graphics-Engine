@@ -4,6 +4,7 @@
 
 #include "FoliagePaintTool.h"
 #include "TransformTool.h"
+#include "TerrainDeformTool.h"
 
 void EditorState::init()
 {
@@ -73,6 +74,7 @@ std::shared_ptr<EditorTool> EditorState::getTool(EditorTool::Type type)
     static std::unordered_map<EditorTool::Type, std::shared_ptr<EditorTool>> tools = {
         { EditorTool::Type::TransformTool,   std::make_shared<TransformTool>() },
         { EditorTool::Type::FoliagePainter,   std::make_shared<FoliagePaintTool>() },
+        { EditorTool::Type::TerrainDeformer,   std::make_shared<TerrainDeformTool>() },
         //{ EditorTool::Type::TerrainSculpt,  std::make_shared<TerrainSculptTool>() },
         //{ EditorTool::Type::TerrainPaint,   std::make_shared<TerrainPaintTool>() },
         //{ EditorTool::Type::Select,         std::make_shared<SelectTool>() },

@@ -11,7 +11,8 @@ public:
     {
         None,
         TransformTool,
-        FoliagePainter
+        FoliagePainter,
+        TerrainDeformer,
     };
 public:
     virtual ~EditorTool() = default;

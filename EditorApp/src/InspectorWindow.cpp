@@ -491,6 +491,24 @@ void InspectorWindow::display()
 							});
 					}
 
+					bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainDeformer;
+
+					if (isActive)
+					{
+						ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+					}
+
+					if (ImGui::Button("Terrain Deformer"))
+					{
+						g_activeTerrain = &terrain;
+						EditorState::Instance().setActiveEditorTool(isActive ? EditorTool::Type::None : EditorTool::Type::TerrainDeformer);
+					}
+
+					if (isActive)
+					{
+						ImGui::PopStyleColor();
+					}
+
 					ImGui::EndTabItem();
 				}
 

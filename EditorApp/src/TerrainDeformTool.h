@@ -8,10 +8,12 @@
 #include "component/Terrain.h"
 #include "sge.h"
 
-class TerrainDeformerTool : public EditorTool
+class TerrainDeformTool : public EditorTool
 {
 public:
-    TerrainDeformerTool() = default;
+    TerrainDeformTool() = default;
+
+    void onActivate() override;
 
     void update(ImVec2 viewportPos, ImVec2 viewportSize) override;
 

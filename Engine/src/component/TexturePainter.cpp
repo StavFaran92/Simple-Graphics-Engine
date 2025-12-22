@@ -1,9 +1,6 @@
 #include "TexturePainter.h"
 
-void TexturePainter::init()
-{
-    m_texturePaintShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/TexturePaintShader.glsl");
-}
+#include "memory/BuiltInResources.h"
 
 void TexturePainter::setTexture(const ResourceWrapper<Texture>& tex)
 {
@@ -29,10 +26,11 @@ void TexturePainter::applyBrush(int pixelX, int pixelY)
     int w = m_texture->getWidth();
     int h = m_texture->getHeight();
 
-    m_texturePaintShader->use();
-    m_texturePaintShader->setUniformValue("brushCenter", glm::vec2((float)pixelX, (float)pixelY));
-    m_texturePaintShader->setUniformValue("brushRadius", m_brushRadius);
-    m_texturePaintShader->setUniformValue("brushStrength", m_brushStrength);
+    ResourceWrapper<Shader> texturePaintShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TEXTURE_BRUSH_DEFORM);
+    texturePaintShader->use();
+    texturePaintShader->setUniformValue("brushCenter", glm::vec2((float)pixelX, (float)pixelY));
+    texturePaintShader->setUniformValue("brushRadius", m_brushRadius);
+    texturePaintShader->setUniformValue("brushStrength", m_brushStrength);
 
     glBindImageTexture(0, texID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 
