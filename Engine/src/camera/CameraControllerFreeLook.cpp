@@ -58,6 +58,8 @@ void CameraControllerFreeLook::onUpdate(float deltaTime)
 
 bool CameraControllerFreeLook::onEvent(SDL_Event e)
 {
+	// We only allow for state enter and TRS modify to be event based,
+	// state leave should ALWAYS be handled in onUpdate.
 	if (e.type == SDL_MOUSEMOTION)
 	{
 		auto system = Engine::get()->getSubSystem<System>();
@@ -130,14 +132,7 @@ bool CameraControllerFreeLook::onEvent(SDL_Event e)
 			}
 		}
 	}
-	else if (e.type == SDL_MOUSEBUTTONUP)
-	{
-		if (e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_MIDDLE)
-		{
-			m_state = ControllerState::IDLE;
-			Engine::get()->getWindow()->unlockMouse();
-		}
-	}
+
 	else if (e.type == SDL_MOUSEWHEEL)
 	{
 		m_cameraTransform->translate(m_cameraComponent->front * (float)e.wheel.y);

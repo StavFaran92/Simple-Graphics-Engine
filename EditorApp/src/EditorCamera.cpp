@@ -6,6 +6,19 @@
 
 #include "EditorState.h"
 
+bool shouldSceneViewGetKeyboardInner()
+{
+	const ImGuiIO& io = ImGui::GetIO();
+
+	bool uiFocused = io.WantTextInput;
+
+	// If UI needs keyboard -> block scene
+	if (uiFocused)
+		return false;
+
+	// Otherwise: Override ImGui's WantCaptureKeyboard
+	return true;
+}
 
 EditorCamera::EditorCamera()
 {
@@ -20,6 +33,9 @@ void EditorCamera::onCreate()
 void EditorCamera::onUpdate(float deltaTime)
 {
 	if (m_isLocked)
+		return;
+
+	if (!shouldSceneViewGetKeyboardInner())
 		return;
 
 	m_cameraController->onUpdate(deltaTime);

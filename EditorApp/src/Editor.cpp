@@ -646,27 +646,11 @@ public:
 		icons["lua_script"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-file-100.png");
 	}
 
-	bool shouldSceneViewGetKeyboardInner()
-	{
-		const ImGuiIO& io = ImGui::GetIO();
-
-		bool uiFocused = io.WantTextInput;
-
-		// If UI needs keyboard -> block scene
-		if (uiFocused)
-			return false;
-
-		// Otherwise: Override ImGui's WantCaptureKeyboard
-		return true;
-	}
-
 	void update(float deltaTime) override
 	{
-		if (shouldSceneViewGetKeyboardInner())
-		{
+		
 			g_editorCamera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
 			g_editorCamera.getComponent<Transformation>().update();
-		}
 
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
