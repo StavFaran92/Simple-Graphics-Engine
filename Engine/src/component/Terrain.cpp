@@ -14,18 +14,10 @@
 
 #include "GL/glew.h"
 
-Entity Terrain::createTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap)
+Entity Terrain::createTerrain(int width, int height)
 {
 	auto terrainEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
-
-	auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
-	terrainComponent.m_textureCount = 1;
-
-	auto& grassTexture = BuiltInAssets::getByName<Texture>("SGE_TEXTURE_GRASS");
-	terrainComponent.setTexture(0, grassTexture);
-
-	terrainEntity.addComponent<Terrain>(terrainComponent);
-
+	terrainEntity.addComponent<Terrain>(Terrain::createTerrainComponent(width, height));
 	return terrainEntity;
 }
 
@@ -39,30 +31,45 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 	}
 }
 
-Terrain Terrain::generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath)
-{
-	// Ensure height sampling does not wrap at borders so terrain edges use edge heights
-	Texture::TextureAssetDescriptor settings;
-	settings.params[GL_TEXTURE_WRAP_S] = GL_CLAMP_TO_EDGE;
-	settings.params[GL_TEXTURE_WRAP_T] = GL_CLAMP_TO_EDGE;
-	settings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
-	settings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-	settings.usage = Texture::TextureSemantic::Heightmap;
-	auto heightMap = Texture::import(heightMapFilepath, settings);
-
-	return generateTerrain(width, height, scale, heightMap);
-}
-
-Terrain Terrain::generateTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap)
+Terrain Terrain::createTerrainComponent(int width, int height)
 {
 	auto& meshCollection = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
 
+	std::vector<float> data(width * height, 0.0f);
+
+	Texture::TextureData tData;
+	tData.target = Texture::TextureTarget::TEXTURE_2D;
+	tData.width = width;
+	tData.height = height;
+	tData.bpp = 1;
+	tData.data = data.data();
+	tData.internalFormat = Texture::InternalFormat::R32F;
+	tData.format = Texture::Format::RED;
+	tData.type = Texture::Type::FLOAT;
+	tData.isEngineOwned = true;
+	tData.textureName = "SGE_TERRAIN_HEIGHTMAP";
+	tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
+					{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
+					{GL_TEXTURE_WRAP_S, GL_CLAMP},
+					{GL_TEXTURE_WRAP_T, GL_CLAMP } };
+
+	auto texture = Texture::create2DTextureFromBuffer(tData);
+
+	AssetCreateDescriptor aInfo;
+	aInfo.aType = AssetType::TEXTURE;
+	aInfo.name = tData.textureName;
+	aInfo.isEngineOwned = true;
+	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
+	auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo).as<Texture>();
+
 	Terrain terrain;
-	terrain.m_heightmap = heightMap;
-	terrain.m_scale = scale;
+	terrain.m_heightmap = heightmap;
+	terrain.m_scale = 1;
 	terrain.m_width = width;
 	terrain.m_height = height;
 	terrain.m_mesh = meshCollection;
+
+	terrain.m_textureCount = 1;
 
 	for (int i = 0; i < MAX_TEXTURE_COUNT; i++)
 	{
@@ -85,6 +92,13 @@ ResourceWrapper<MeshCollection> Terrain::getMesh() const
 float Terrain::getScale() const
 {
 	return m_scale;
+}
+
+void Terrain::setHeightmap(AssetWrapper<Texture> heightmap)
+{
+	m_heightmap = heightmap;
+
+	build();
 }
 
 ResourceWrapper<Texture> Terrain::getHeightmap() const
@@ -325,4 +339,97 @@ void Terrain::resize(int newW, int newH)
 void Terrain::setPixel(int x, int y, unsigned char value)
 {
 
+}
+
+void Terrain::build()
+{
+
+}
+
+RayHit Terrain::raycast(const Ray& ray, float maxDistance)
+{
+	RayHit result;
+
+	if (ray.direction.y >= 0.0f)
+		return result;
+
+	float dirXZ = glm::length(glm::vec2(ray.direction.x, ray.direction.z));
+	if (dirXZ < 1e-5f)
+		return result;
+
+	AABB bounds = getAABB();
+
+	float tStart, tEnd;
+	if (!Math3D::RayIntersectXZBounds(ray, bounds, tStart, tEnd))
+		return result;
+
+	tStart = std::max(tStart, 0.0f);
+	tEnd = std::min(tEnd, maxDistance);
+
+	constexpr float STEP_XZ = 0.5f;
+	float stepT = STEP_XZ / dirXZ;
+
+	float t = tStart;
+	float prevDiff = 0.0f;
+	bool first = true;
+
+	while (t <= tEnd) {
+		glm::vec3 p = ray.origin + ray.direction * t;
+
+		float h;
+		if (!getHeightAtPoint(p.x, p.z, h)) {
+			t += stepT;
+			first = true;
+			continue;
+		}
+
+		float diff = p.y - h;
+
+		if (!first && prevDiff > 0.0f && diff <= 0.0f) {
+			// refine hit
+			float t0 = t - stepT;
+			float t1 = t;
+
+			for (int i = 0; i < 5; ++i) {
+				float tm = 0.5f * (t0 + t1);
+				glm::vec3 pm = ray.origin + ray.direction * tm;
+
+				float hm;
+				getHeightAtPoint(pm.x, pm.z, hm);
+
+				if (pm.y > hm)
+					t0 = tm;
+				else
+					t1 = tm;
+			}
+
+			float tHit = 0.5f * (t0 + t1);
+
+			result.hit = true;
+			result.t = tHit;
+			result.position = ray.origin + ray.direction * tHit;
+
+			// normal
+			const float eps = 0.1f;
+			float hL, hR, hD, hU;
+			getHeightAtPoint(result.position.x - eps, result.position.z, hL);
+			getHeightAtPoint(result.position.x + eps, result.position.z, hR);
+			getHeightAtPoint(result.position.x, result.position.z - eps, hD);
+			getHeightAtPoint(result.position.x, result.position.z + eps, hU);
+
+			result.normal = glm::normalize(glm::vec3(
+				hL - hR,
+				2.0f * eps,
+				hD - hU
+			));
+
+			return result;
+		}
+
+		prevDiff = diff;
+		first = false;
+		t += stepT;
+	}
+
+	return result;
 }

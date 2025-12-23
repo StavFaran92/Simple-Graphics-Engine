@@ -9,6 +9,8 @@
 
 #include "component/FoliageField.h"
 
+#include "utils/Math3D.h"
+
 class Entity;
 
 static const int MAX_TEXTURE_COUNT = 4;
@@ -29,16 +31,15 @@ struct TextureBlend
 class EngineAPI Terrain : public Component
 {
 public:
-	static Terrain generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath);
-	static Terrain generateTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap);
-
-	static Entity createTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap);
-
-
 	Terrain() = default;
 
+	static Entity createTerrain(int width, int height);
+
 	ResourceWrapper<MeshCollection> getMesh() const;
+
+	void setHeightmap(AssetWrapper<Texture> heightmap);
 	ResourceWrapper<Texture> getHeightmap() const;
+
 	bool getHeightAtPoint(float x, float y, float& outHeight) const;
 
 	float getScale() const;
@@ -63,6 +64,10 @@ public:
 	void buildFoliage();
 
 	void resize(int newW, int newH);
+	
+	void build();
+
+	RayHit raycast(const Ray& ray, float maxDistance = 10000.0f);
 
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
@@ -77,12 +82,6 @@ public:
 		SERIALIZED_MEMBER(m_foliageField);
 	}
 
-
-	
-	AssetWrapper<Texture> m_heightmap;
-	
-
-
 	int m_scale = 1;
 	int m_textureCount = 0;
 
@@ -93,8 +92,11 @@ public:
 	FoliageField m_foliageField;
 
 private:
+	static Terrain createTerrainComponent(int width, int height);
+private:
 	int m_width = 100;
 	int m_height = 100;
+	AssetWrapper<Texture> m_heightmap;
 
 	AssetWrapper<MeshCollection> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;

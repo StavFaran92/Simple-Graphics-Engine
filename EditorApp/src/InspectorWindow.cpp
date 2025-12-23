@@ -438,9 +438,7 @@ void InspectorWindow::display()
 			{
 				if (ImGui::BeginTabItem("Layers"))
 				{
-					addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
-						terrain = Terrain::generateTerrain(terrain.getWidth(), terrain.getHeight(), terrain.m_scale, AssetWrapper<Texture>(uuid));
-						});
+					
 
 					
 
@@ -453,6 +451,10 @@ void InspectorWindow::display()
 					ImGui::DragInt("Width", newWidth, 1, 1, 8192);
 					ImGui::DragInt("Height", newHeight, 1, 1, 8192);
 					ImGui::DragInt("scale", &terrain.m_scale);
+
+					addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
+						terrain.setHeightmap(AssetWrapper<Texture>(uuid));
+						});
 
 					// Check if rebuild is needed
 					bool needsRebuild =
@@ -468,6 +470,8 @@ void InspectorWindow::display()
 						);
 					}
 
+
+
 					// Build button
 					ImGui::BeginDisabled(!needsRebuild);
 					if (ImGui::Button("Build"))
@@ -475,6 +479,7 @@ void InspectorWindow::display()
 						terrain.resize(*newWidth, *newHeight);
 					}
 					ImGui::EndDisabled();
+
 
 					ImGui::Separator();
 

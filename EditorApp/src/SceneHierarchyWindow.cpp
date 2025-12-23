@@ -296,7 +296,7 @@ void SceneHierarchyWindow::display()
 
 			if (ImGui::MenuItem("Terrain"))
 			{
-				Entity e = Terrain::createTerrain(100, 100, 1, BuiltInAssets::getByName<Texture>(SGE_TEXTURE_BLACK));
+				Entity e = Terrain::createTerrain(100, 100);
 				updateScene();
 				state.selectEntity(sceneObjects[0].e);
 			}

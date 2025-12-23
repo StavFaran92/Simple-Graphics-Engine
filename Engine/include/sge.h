@@ -73,3 +73,5 @@
 #include "fileSystem/ScopedPath.h"
 #include "core/GUILayer.h"
 #include "component/TexturePainter.h"
+
+#include "utils/Math3D.h"
