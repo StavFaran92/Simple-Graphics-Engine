@@ -42,6 +42,35 @@ public:
 		None
 	};
 
+	enum class TextureSemantic : int 
+	{
+		Color,
+		Normal,
+		Heightmap,
+		Mask,
+		Data,
+		Environment,
+		LUT
+	};
+
+	enum class TextureFilter
+	{
+		Nearest,
+		Linear,
+		NearestMipNearest,
+		LinearMipNearest,
+		NearestMipLinear,
+		LinearMipLinear
+	};
+
+	enum class TextureWrap
+	{
+		Repeat,
+		ClampToEdge,
+		ClampToBorder,
+		MirroredRepeat
+	};
+
 	enum InternalFormat : int
 	{
 		COMPRESSED_RED = 0x8225,
@@ -142,7 +171,8 @@ public:
 		bool genMipMap = false;
 		bool flip = false;
 		bool saveOnDisk = true;
-		InternalFormat GPUformat = InternalFormat::RGB32F;
+		//InternalFormat GPUformat = InternalFormat::RGB32F;
+		TextureSemantic usage = TextureSemantic::Color;
 		std::map<int, int> params;
 
 		json fillParams() const override
@@ -154,7 +184,8 @@ public:
 			genMipMap,
 			flip,
 			saveOnDisk,
-			GPUformat,
+			//GPUformat,
+			usage,
 			params
 		);
 	};

@@ -307,6 +307,32 @@ void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> tex
 	Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 }
 
+Texture::InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usage)
+{
+	switch (usage)
+	{
+	case Texture::TextureSemantic::Color:
+		return Texture::InternalFormat::RGB2;
+
+	case Texture::TextureSemantic::Normal:
+		return Texture::InternalFormat::RGB16F;
+
+	case Texture::TextureSemantic::Heightmap:
+		return Texture::InternalFormat::R32F;
+
+	case Texture::TextureSemantic::Mask:
+		return Texture::InternalFormat::R8UI;
+
+	case Texture::TextureSemantic::Data:
+		return Texture::InternalFormat::RGBA32F;
+
+	case Texture::TextureSemantic::Environment:
+		return Texture::InternalFormat::RGB16F;
+	}
+
+	return Texture::InternalFormat::RGB2;
+}
+
 void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData)
 {
 	textureData.params = settings.params;
@@ -337,7 +363,9 @@ void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& setti
 
 	textureData.genMipMap = settings.genMipMap;
 	textureData.flip = settings.flip;
-	textureData.internalFormat = settings.GPUformat;
+	textureData.internalFormat = getInternalFormatFromUsage(settings.usage);
+
+
 	//textureData.isTransient = settings.isTransient;
 	
 }

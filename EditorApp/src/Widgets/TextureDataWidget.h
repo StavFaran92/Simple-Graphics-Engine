@@ -1,30 +1,15 @@
 #pragma once
 
+#include "sge.h"
+
 class TextureDataWidget
 {
 public:
-	enum class TextureFilter
-	{
-		Nearest,
-		Linear,
-		NearestMipNearest,
-		LinearMipNearest,
-		NearestMipLinear,
-		LinearMipLinear
-	};
-
-	enum class TextureWrap
-	{
-		Repeat,
-		ClampToEdge,
-		ClampToBorder,
-		MirroredRepeat
-	};
-
-	TextureDataWidget() = default;
+		TextureDataWidget() = default;
 	void draw();
 
-	TextureFilter m_filterMode = TextureFilter::LinearMipLinear;
-	TextureWrap   m_wrapMode = TextureWrap::Repeat;
+	Texture::TextureFilter m_filterMode = Texture::TextureFilter::LinearMipLinear;
+	Texture::TextureWrap   m_wrapMode = Texture::TextureWrap::Repeat;
 	float         m_anisotropy = 1.0f;
+	Texture::TextureSemantic m_semantic = Texture::TextureSemantic::Color;
 };

@@ -36,7 +36,7 @@ bool TextureImportDialog::acceptContent()
 		Texture::TextureAssetDescriptor desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		desc.GPUformat = Texture::InternalFormat::R32F; // todo fix
+		desc.usage = textureDataWidget.m_semantic;
 		Texture::import(filepath.m_filepath, desc);
 
 		return true;

@@ -4,6 +4,18 @@
 
 void TextureDataWidget::draw()
 {
+	static const char* semanticNames[] = {
+		"Color (Albedo)",
+		"Normal Map",
+		"Heightmap",
+		"Mask",
+		"Data / Compute",
+		"Environment (HDR)",
+		"Lookup Table"
+	};
+
+	ImGui::Combo("Texture Usage", (int*)&m_semantic, semanticNames, IM_ARRAYSIZE(semanticNames));
+
 	// --- Filter type ---
 	static const char* filterModes[] = {
 		"Nearest",
