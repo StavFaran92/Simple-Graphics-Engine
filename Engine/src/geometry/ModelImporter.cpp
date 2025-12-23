@@ -693,6 +693,7 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 		Texture::TextureAssetDescriptor tSettings;
 		tSettings.assetDirectory = aInfo.assetDirectory;
 		tSettings.isEngineOwned = aInfo.isEngineOwned;
+		tSettings.GPUformat = Texture::InternalFormat::RGB2;
 		AssetTexture = Texture::import(path, tSettings);
 
 		cachedTextures.insert({ path, AssetTexture });

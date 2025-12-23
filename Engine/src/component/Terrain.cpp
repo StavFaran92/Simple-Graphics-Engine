@@ -47,6 +47,7 @@ Terrain Terrain::generateTerrain(int width, int height, float scale, const std::
 	settings.params[GL_TEXTURE_WRAP_T] = GL_CLAMP_TO_EDGE;
 	settings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
 	settings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
+	settings.GPUformat = Texture::InternalFormat::R32F;
 	auto heightMap = Texture::import(heightMapFilepath, settings);
 
 	return generateTerrain(width, height, scale, heightMap);

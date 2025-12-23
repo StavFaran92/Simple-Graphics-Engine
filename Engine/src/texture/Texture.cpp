@@ -337,6 +337,7 @@ void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& setti
 
 	textureData.genMipMap = settings.genMipMap;
 	textureData.flip = settings.flip;
+	textureData.internalFormat = settings.GPUformat;
 	//textureData.isTransient = settings.isTransient;
 	
 }
@@ -461,17 +462,17 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	if (textureData.bpp == 1)
 	{
 		textureData.format = (Texture::Format)GL_RED;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
+		//textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
 	}
 	else if (textureData.bpp == 3)
 	{
 		textureData.format = (Texture::Format)GL_RGB;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
+		//textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
 	}
 	else if (textureData.bpp == 4)
 	{
 		textureData.format = (Texture::Format)GL_RGBA;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
+		//textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
 	}
 	else {
 		logError("Unsupported texture format!");

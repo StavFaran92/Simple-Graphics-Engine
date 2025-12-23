@@ -142,6 +142,7 @@ public:
 		bool genMipMap = false;
 		bool flip = false;
 		bool saveOnDisk = true;
+		InternalFormat GPUformat = InternalFormat::RGB32F;
 		std::map<int, int> params;
 
 		json fillParams() const override
@@ -153,6 +154,7 @@ public:
 			genMipMap,
 			flip,
 			saveOnDisk,
+			GPUformat,
 			params
 		);
 	};
