@@ -21,8 +21,6 @@ void TexturePainter::setBrushStrength(float s)
 
 void TexturePainter::applyBrush(int pixelX, int pixelY)
 {
-    RenderDocDebugHelper::startFrameCapture();
-
     if (m_texture.isEmpty())
         return;
 
@@ -44,8 +42,6 @@ void TexturePainter::applyBrush(int pixelX, int pixelY)
     glDispatchCompute(groupX, groupY, 1);
 
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
-    RenderDocDebugHelper::stopFrameCapture();
 }
 
 std::vector<float> TexturePainter::readTextureData()

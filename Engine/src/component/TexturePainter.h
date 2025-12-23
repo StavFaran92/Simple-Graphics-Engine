@@ -19,7 +19,7 @@ public:
 
 private:
     ResourceWrapper<Texture> m_texture;
-    float m_brushRadius = 20.0f;
-    float m_brushStrength = 1.0f;
+    float m_brushRadius = 10.0f;
+    float m_brushStrength = .1f;
 
 };

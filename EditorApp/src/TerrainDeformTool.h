@@ -25,5 +25,6 @@ public:
     }
 
 private:
+    RayHit m_currentResult;
     TexturePainter m_texturePainter;
 };

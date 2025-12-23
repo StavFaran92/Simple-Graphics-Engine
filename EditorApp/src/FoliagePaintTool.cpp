@@ -7,27 +7,15 @@
 extern Entity g_editorCamera;
 extern Terrain* g_activeTerrain;
 
-void FoliagePaintTool::update(ImVec2 windowPos, ImVec2 viewportSize)
+void FoliagePaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 {
-	ImVec2 renderViewWindowSize = viewportSize;
-	float innerWindowWidth = renderViewWindowSize.x;
-	float innerWindowHeight = 35.0f;
-	ImVec2 toolbarPos(windowPos.x + 10, windowPos.y + 30);
-
 	ImVec2 mousePos = ImGui::GetMousePos();
 	ImVec2 viewportOffset = ImGui::GetWindowContentRegionMin();
-	ImVec2 viewportPos{ windowPos.x + viewportOffset.x, windowPos.y + viewportOffset.y };
-
-	bool mouseInsideViewport = (mousePos.x >= viewportPos.x && mousePos.x <= viewportPos.x + renderViewWindowSize.x &&
-		mousePos.y >= viewportPos.y && mousePos.y <= viewportPos.y + renderViewWindowSize.y);
-	bool mouseInsideToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
-		mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
+	ImVec2 viewportPosOffset{ viewportPos.x + viewportOffset.x, viewportPos.y + viewportOffset.y };
 
 	// We alter the mouse position from small window into full screen (the renderered object pick texture)
-	int alteredX = (mousePos.x - viewportPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
-	int alteredY = (mousePos.y - viewportPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
-
-	//logDebug("altered mouse x:{}, y:{}", alteredX, alteredY);
+	int alteredX = (mousePos.x - viewportPosOffset.x) / viewportSize.x * Engine::get()->getWindow()->getWidth();
+	int alteredY = (mousePos.y - viewportPosOffset.y) / viewportSize.y * Engine::get()->getWindow()->getHeight();
 
 	auto& cameraComponent = g_editorCamera.getComponent<CameraComponent>();
 	auto& cameraTransform = g_editorCamera.getComponent<Transformation>();
@@ -39,17 +27,13 @@ void FoliagePaintTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 	m_currentResult = g_activeTerrain->raycast(Ray(rayOrigin, rayDir));
 	if (m_currentResult.hit)
 	{
-		//if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_X) > 0)
-		{
-			Engine::get()->getSubSystem<Graphics>()->view = view;
-			Engine::get()->getSubSystem<Graphics>()->projection = projection;
-			//logDebug("ray origin {},{},{}, ray dir {},{},{}, hit position {},{},{}", rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDir.x, rayDir.y, rayDir.z, results.position.x, results.position.y, results.position.z);
-			unsigned int editorFrameBufferID = Engine::get()->getContext()->getActiveScene()->getRenderViewFrameBufferID("Editor View");
-			glBindFramebuffer(GL_FRAMEBUFFER, editorFrameBufferID);
-			DebugHelper::getInstance().drawLine(m_currentResult.position, m_currentResult.position + glm::vec3(0, 100, 0), glm::vec3(1, 0, 0), 3.f);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		}
-
+		Engine::get()->getSubSystem<Graphics>()->view = view;
+		Engine::get()->getSubSystem<Graphics>()->projection = projection;
+		//logDebug("ray origin {},{},{}, ray dir {},{},{}, hit position {},{},{}", rayOrigin.x, rayOrigin.y, rayOrigin.z, rayDir.x, rayDir.y, rayDir.z, results.position.x, results.position.y, results.position.z);
+		unsigned int editorFrameBufferID = Engine::get()->getContext()->getActiveScene()->getRenderViewFrameBufferID("Editor View");
+		glBindFramebuffer(GL_FRAMEBUFFER, editorFrameBufferID);
+		DebugHelper::getInstance().drawLine(m_currentResult.position, m_currentResult.position + glm::vec3(0, 100, 0), glm::vec3(1, 0, 0), 3.f);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }
 
