@@ -41,6 +41,27 @@ public:
 		return info().resource.as<T>();
 	}
 
+	void erase()
+	{
+		Engine::get()->getSubSystem<Assets>()->deleteAsset(info());
+	}
+
+	//void setResource(ResourceWrapper<T> newResource)
+	//{
+	//	//Engine::get()->getSubSystem<Assets>()->getAsset(uuid).resource;
+	//	//res = newResource;
+
+	//	//AssetInfo aInfo = getAsset(asset.getUID());
+	//	//aInfo.update(uDesc);
+
+	//	//AssetFactory::getManager(aInfo.aType)->save(asset, aInfo); // todo check for non engine generated 
+	//	//updateRegistry(aInfo);
+
+	//	//m_assets[aInfo.uuid] = aInfo;
+
+	//	//logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
+	//}
+
 	UUID getUID() const
 	{
 		return uuid;

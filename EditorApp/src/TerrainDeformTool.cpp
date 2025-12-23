@@ -53,6 +53,8 @@ bool TerrainDeformTool::onEvent(SDL_Event e)
 		offsetPos.y += g_activeTerrain->getHeight() * .5f;
 		m_texturePainter.applyBrush(offsetPos.x, offsetPos.y);
 
+		g_activeTerrain->syncHeightmap();
+
 		return true;
 	}
 

@@ -2,8 +2,6 @@
 
 #include "memory/BuiltInResources.h"
 
-#include "debug/RenderDocDebugHelper.h"
-
 void TexturePainter::setTexture(const ResourceWrapper<Texture>& tex)
 {
     m_texture = tex;

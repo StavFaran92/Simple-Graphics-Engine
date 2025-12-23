@@ -31,18 +31,16 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 	}
 }
 
-Terrain Terrain::createTerrainComponent(int width, int height)
+AssetWrapper<Texture> Terrain::generateHeightmap(int width, int height)
 {
-	auto& meshCollection = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
-
-	std::vector<float> data(width * height, 0.0f);
+	m_heightDataCPU = std::vector<float>(width * height, 0.0f);
 
 	Texture::TextureData tData;
 	tData.target = Texture::TextureTarget::TEXTURE_2D;
 	tData.width = width;
 	tData.height = height;
 	tData.bpp = 1;
-	tData.data = data.data();
+	tData.data = m_heightDataCPU.data();
 	tData.internalFormat = Texture::InternalFormat::R32F;
 	tData.format = Texture::Format::RED;
 	tData.type = Texture::Type::FLOAT;
@@ -57,13 +55,20 @@ Terrain Terrain::createTerrainComponent(int width, int height)
 
 	AssetCreateDescriptor aInfo;
 	aInfo.aType = AssetType::TEXTURE;
-	aInfo.name = tData.textureName;
+	aInfo.name = "SGE_TERRAIN_HEIGHTMAP";
 	aInfo.isEngineOwned = true;
 	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
 	auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo).as<Texture>();
 
+	return heightmap;
+}
+
+Terrain Terrain::createTerrainComponent(int width, int height)
+{
+	auto& meshCollection = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
+
 	Terrain terrain;
-	terrain.m_heightmap = heightmap;
+	terrain.m_heightmap = terrain.generateHeightmap(width, height);
 	terrain.m_scale = 1;
 	terrain.m_width = width;
 	terrain.m_height = height;
@@ -200,13 +205,12 @@ int Terrain::getTextureCount() const
 }
 
 std::array<float, 4> getCornersSafe(
-	const unsigned char* pixels,
+	const std::vector<float>& pixels,
 	int floorX, int floorY,
-	int stride, int bpp,
-	int width, int height
+	int stride, int width, int height
 ) {
 	auto getIndex = [&](int x, int y) -> int {
-		return (y * stride + x) * bpp;
+		return (y * stride + x);
 		};
 
 	int indexP0 = getIndex(floorX, floorY);
@@ -214,7 +218,7 @@ std::array<float, 4> getCornersSafe(
 	int indexP2 = getIndex(floorX, floorY + 1);
 	int indexP3 = getIndex(floorX + 1, floorY + 1);
 
-	int totalBytes = width * height * bpp;
+	int totalBytes = width * height;
 
 	auto safe = [&](int idx) -> float {
 		if (idx >= 0 && idx < totalBytes) {
@@ -262,7 +266,7 @@ bool Terrain::getHeightAtPoint(float x, float y, float& outHeight) const
 	float flippedY = normalizedY;// m_heightmap.get()->getHeight() - 1 - normalizedY;
 
 	// Access heightmap data
-	unsigned char* pixels = static_cast<unsigned char*>(m_heightmap.resource().get()->getData().data);
+	//unsigned char* pixels = static_cast<unsigned char*>(m_heightmap.resource().get()->getData().data);
 	int stride = m_heightmap.resource().get()->getWidth();
 
 	// Compute floor values
@@ -286,10 +290,9 @@ bool Terrain::getHeightAtPoint(float x, float y, float& outHeight) const
 	//     P2  |_______\|  P3
 
 	auto [P0, P1, P2, P3] = getCornersSafe(
-		pixels,
+		m_heightDataCPU,
 		floorX, floorY,
 		stride,
-		m_heightmap.resource().get()->getBitDepth(),
 		m_heightmap.resource().get()->getWidth(),
 		m_heightmap.resource().get()->getHeight()
 	);
@@ -310,7 +313,7 @@ bool Terrain::getHeightAtPoint(float x, float y, float& outHeight) const
 	}
 
 	// sum results
-	float height = (P0 + lerpX + lerpY) / 255.f * m_scale;
+	float height = (P0 + lerpX + lerpY) * m_scale;
 
 	outHeight = height;
 
@@ -332,6 +335,10 @@ void Terrain::resize(int newW, int newH)
 	m_width = newW;
 	m_height = newH;
 
+	m_heightmap.erase();
+
+	m_heightmap = generateHeightmap(newW, newH);
+
 	if(m_foliageField.isActive)
 		m_foliageField.resize(newW, newH);
 }
@@ -344,6 +351,25 @@ void Terrain::setPixel(int x, int y, unsigned char value)
 void Terrain::build()
 {
 
+}
+
+void Terrain::syncHeightmap()
+{
+	// If CPU buffer size is not the same as GPU buffer size reallocate
+	if (m_heightDataCPU.size() != m_heightmap.get()->getWidth() * m_heightmap.get()->getHeight())
+	{
+		m_heightDataCPU = std::vector<float>(m_heightmap.get()->getWidth() * m_heightmap.get()->getHeight(), 0.0f);
+	}
+
+	m_heightmap.get()->bind();
+
+	glGetTexImage(
+		GL_TEXTURE_2D,
+		0,
+		m_heightmap.get()->getData().format,
+		m_heightmap.get()->getData().type,
+		m_heightDataCPU.data()
+	);
 }
 
 RayHit Terrain::raycast(const Ray& ray, float maxDistance)

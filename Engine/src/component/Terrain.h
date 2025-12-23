@@ -67,6 +67,8 @@ public:
 	
 	void build();
 
+	void syncHeightmap();
+
 	RayHit raycast(const Ray& ray, float maxDistance = 10000.0f);
 
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
@@ -93,10 +95,12 @@ public:
 
 private:
 	static Terrain createTerrainComponent(int width, int height);
+	AssetWrapper<Texture> generateHeightmap(int width, int height);
 private:
 	int m_width = 100;
 	int m_height = 100;
 	AssetWrapper<Texture> m_heightmap;
+	std::vector<float> m_heightDataCPU;
 
 	AssetWrapper<MeshCollection> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
