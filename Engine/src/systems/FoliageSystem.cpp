@@ -152,6 +152,9 @@ void FoliageSystem::drawFoliage(Terrain& terrain)
 	{
 		if (isInFrustum(m_frustum, patches[i]->pos))
 		{
+			if (patches[i]->instanceCount == 0)
+				continue;
+
 			visiblePatches.push_back(patches[i]);
 		}
 	}
@@ -192,7 +195,6 @@ void FoliageSystem::drawFoliage(Terrain& terrain)
 	std::vector<std::shared_ptr<FoliagePatch>> patchesMaxLOD;
 	for (int i = 0; i < visiblePatches.size(); i++)
 	{
-
 		float distance = glm::dot(visiblePatches[i]->pos - m_camPos, m_camFront);
 
 		if (distance < maxFoliageViewDistance)

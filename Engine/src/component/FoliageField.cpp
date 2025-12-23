@@ -146,6 +146,7 @@ void FoliageField::update()
 	// Read foliage data, calculate instance count for each patch (multiple loops since a patch can contain multiple pixels)
 	for (auto& p : m_patches)
 	{
+		p->instanceCount = 0;
 		for (int i = 0; i < pixelPerPatch; i++)
 		{
 			for (int j = 0; j < pixelPerPatch; j++)
