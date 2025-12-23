@@ -84,7 +84,7 @@ public:
 		SERIALIZED_MEMBER(m_foliageField);
 	}
 
-	int m_scale = 1;
+	float m_scale = 1.0f;
 	int m_textureCount = 0;
 
 	std::vector<TextureBlend> m_textureBlends {  };

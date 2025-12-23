@@ -450,7 +450,7 @@ void InspectorWindow::display()
 					// UI
 					ImGui::DragInt("Width", newWidth, 1, 1, 8192);
 					ImGui::DragInt("Height", newHeight, 1, 1, 8192);
-					ImGui::DragInt("scale", &terrain.m_scale);
+					ImGui::DragFloat("scale", &terrain.m_scale);
 
 					addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
 						terrain.setHeightmap(AssetWrapper<Texture>(uuid));
