@@ -28,8 +28,8 @@ struct EngineAPI FoliageField
 
 	//std::shared_ptr<FoliagePatch> getPatch(int idx, int idy);
 
-	void setPixel(int idx, int idy, unsigned char value);
-	void paintCircle(int cx, int cy, int radius, unsigned char value);
+	void setPixel(int idx, int idy, float value);
+	void paintCircle(int cx, int cy, int radius, float value);
 
 	void update();
 
@@ -48,7 +48,7 @@ struct EngineAPI FoliageField
 	    SERIALIZED_MEMBER(isActive);
 	}
 
-	std::vector<unsigned char> m_foliageSpreadMap;
+	std::vector<float> m_foliageSpreadMap;
 	float globalDensity = 1.f;
 	glm::vec3 colorA = glm::vec3(0.1, 0.3, 0.1);
 	glm::vec3 colorB = glm::vec3(0.4, 0.8, 0.3);

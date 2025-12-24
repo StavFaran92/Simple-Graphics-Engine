@@ -11,5 +11,8 @@ class FoliagePaintTool : public EditorTool
 	const char* name() const override;
 
 private:
+	float m_brushRadius = 3.f;
+	float m_brushStrength = .01f;
+
 	RayHit m_currentResult;
 };

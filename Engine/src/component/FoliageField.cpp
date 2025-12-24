@@ -55,7 +55,7 @@ void FoliageField::build(int newW, int newH)
 	}
 
 	//foliageSpreadMap->bind();
-	m_foliageSpreadMap = std::vector<unsigned char>(width * height, 0);
+	m_foliageSpreadMap = std::vector<float>(width * height, 0.0f);
 	//std::vector<GLubyte> pixels(height * width);
 	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	//glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, pixels.data());
@@ -165,7 +165,7 @@ void FoliageField::update()
 				int yIndexOffset = yModOffset;
 
 				int index = (xIndexOffset + yIndexOffset) % (int)(height * width);
-				float density = (float)m_foliageSpreadMap[index] / 255.f;
+				float density = m_foliageSpreadMap[index];
 
 				int instanceCount = density * globalDensity * 255; // times max instances per texel
 				p->instanceCount += instanceCount;
@@ -175,13 +175,13 @@ void FoliageField::update()
 	}
 }
 
-void FoliageField::setPixel(int idx, int idy, unsigned char value)
+void FoliageField::setPixel(int idx, int idy, float value)
 {
 	m_foliageSpreadMap[idy * width + idx] = value;
 	update();
 }
 
-void FoliageField::paintCircle(int cx, int cy, int radius, unsigned char value)
+void FoliageField::paintCircle(int cx, int cy, int radius, float value)
 {
 	int r2 = radius * radius;
 
@@ -196,9 +196,17 @@ void FoliageField::paintCircle(int cx, int cy, int radius, unsigned char value)
 		for (int x = minX; x <= maxX; ++x)
 		{
 			int dx = x - cx;
-			if (dx * dx + dy * dy <= r2)
+			int d2 = dx * dx + dy * dy;
+
+			if (d2 <= r2)
 			{
-				m_foliageSpreadMap[y * width + x] = value;
+				float d = std::sqrt((float)d2);
+				float t = 1.0f - (d / radius);   // [1 at center -> 0 at edge]
+
+				float v = value * t;
+
+				m_foliageSpreadMap[y * width + x] += v;
+				std::clamp(m_foliageSpreadMap[y * width + x], 0.0f, 1.0f);
 			}
 		}
 	}
