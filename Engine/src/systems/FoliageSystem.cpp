@@ -177,6 +177,7 @@ void FoliageSystem::drawFoliage(Terrain& terrain)
 	foliageShader->setUniformValue("colorA", foliage.colorA);
 	foliageShader->setUniformValue("colorB", foliage.colorB);
 	foliageShader->setUniformValue("heightScale", terrain.m_scale);
+	foliageShader->setUniformValue("patchCount", foliage.getPatchCount());
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
 	foliageShader->setTextureInShader(terrain.getHeightmap(), "foliageHeightMap", 1);
 	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);
@@ -200,7 +201,7 @@ void FoliageSystem::drawFoliage(Terrain& terrain)
 		if (distance < maxFoliageViewDistance)
 		{
 			foliageShader->setUniformValue("patchPosition", visiblePatches[i]->pos);
-			foliageShader->setUniformValue("patchID", glm::vec2(visiblePatches[i]->idx, visiblePatches[i]->idy) / 100.0f);
+			foliageShader->setUniformValue("patchID", glm::vec2(visiblePatches[i]->idx, visiblePatches[i]->idy));
 
 			//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
 			auto& grassBlade = m_grassBlade;

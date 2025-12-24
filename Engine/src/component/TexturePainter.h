@@ -8,8 +8,12 @@ class EngineAPI TexturePainter
 {
 public:
     void setTexture(const ResourceWrapper<Texture>& tex);
+
     void setBrushRadius(float r);
+    float getBrushRadius() const;
+
     void setBrushStrength(float s);
+    float getBrushStrength()const;
 
     // brushCenter is in pixel coordinates
     void applyBrush(int pixelX, int pixelY);

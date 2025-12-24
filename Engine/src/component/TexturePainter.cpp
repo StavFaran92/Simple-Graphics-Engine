@@ -12,9 +12,19 @@ void TexturePainter::setBrushRadius(float r)
     m_brushRadius = r;
 }
 
+float TexturePainter::getBrushRadius() const
+{
+    return m_brushRadius;
+}
+
 void TexturePainter::setBrushStrength(float s)
 {
     m_brushStrength = s;
+}
+
+float TexturePainter::getBrushStrength() const
+{
+    return m_brushStrength;
 }
 
 void TexturePainter::applyBrush(int pixelX, int pixelY)

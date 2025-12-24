@@ -25,6 +25,7 @@ uniform float heightScale ;
 uniform mat4 rotation;
 uniform vec3 patchPosition;
 uniform vec2 patchID;
+uniform vec2 patchCount;
 
 out vec3 Normal;
 out vec3 fragPos;
@@ -36,7 +37,8 @@ void main()
     vec4 vPos = instanceData[gl_InstanceID];
     vPos += vec4(patchPosition, 0.0);
 
-    float heightSample = texture(foliageHeightMap, patchID.yx).r; // I am not sure why but the id is transposed, so i need to flip the xy
+    vec2 patchUV = patchID / patchCount;
+    float heightSample = texture(foliageHeightMap, patchUV.yx).r; // I am not sure why but the id is transposed, so i need to flip the xy
     vPos.y += heightSample * heightScale;
 
     fragPosObjSpace = aPos;
