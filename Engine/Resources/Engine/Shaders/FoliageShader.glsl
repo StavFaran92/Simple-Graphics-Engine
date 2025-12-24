@@ -26,6 +26,7 @@ uniform mat4 rotation;
 uniform vec3 patchPosition;
 uniform vec2 patchID;
 uniform vec2 patchCount;
+uniform sampler2D noiseTexture;
 
 out vec3 Normal;
 out vec3 fragPos;
@@ -43,7 +44,12 @@ void main()
 
     fragPosObjSpace = aPos;
 
-    float posX = vPos.x;
+    vec2 noiseSample = texture(noiseTexture, vPos.xz * patchID).rg;
+
+    vPos.x += noiseSample.x;
+    vPos.z += noiseSample.y;
+
+    float posX = vPos.x; 
     float posZ = vPos.z;
     float height = vPos.y;
 

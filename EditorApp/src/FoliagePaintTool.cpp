@@ -41,10 +41,10 @@ bool FoliagePaintTool::onEvent(SDL_Event e)
 {
 	if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 	{
-		glm::vec2 offsetPos = glm::vec2(m_currentResult.position.x, m_currentResult.position.z);
-		offsetPos.x += g_activeTerrain->getWidth() * .5f;
-		offsetPos.y += g_activeTerrain->getHeight() * .5f;
-		g_activeTerrain->m_foliageField.paintCircle(offsetPos.x, offsetPos.y, m_brushRadius, m_brushStrength);
+		glm::vec2 brushCenter = glm::vec2(m_currentResult.position.x, m_currentResult.position.z);
+		brushCenter.x += g_activeTerrain->getWidth() * .5f;
+		brushCenter.y += g_activeTerrain->getHeight() * .5f;
+		g_activeTerrain->m_foliageField.paintCircle(brushCenter.x, brushCenter.y, m_brushRadius, m_brushStrength);
 
 		return true;
 	}
