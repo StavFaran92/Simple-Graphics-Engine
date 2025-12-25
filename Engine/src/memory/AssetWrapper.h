@@ -46,6 +46,11 @@ public:
 		Engine::get()->getSubSystem<Assets>()->deleteAsset(info());
 	}
 
+	void makeDirty()
+	{
+		Engine::get()->getSubSystem<Assets>()->makeDirty(uuid);
+	}
+
 	//void setResource(ResourceWrapper<T> newResource)
 	//{
 	//	//Engine::get()->getSubSystem<Assets>()->getAsset(uuid).resource;

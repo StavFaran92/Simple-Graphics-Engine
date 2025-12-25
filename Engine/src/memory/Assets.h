@@ -57,6 +57,8 @@ public:
 
 	void loadAssetsDatabase();
 
+	void saveDirtyAssets();
+
 	UUID getAssetFromPath(const std::string& path) const;
 
 	UUID getAssetFromName(const std::string& name) const;
@@ -70,6 +72,8 @@ public:
 	void updateAsset(const AssetWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc = {});
 
 	void reimportAsset(UUID uuid);
+
+	void makeDirty(UUID uuid);
 
 	AssetWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
 

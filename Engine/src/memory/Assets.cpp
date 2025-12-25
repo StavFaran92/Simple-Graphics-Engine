@@ -88,6 +88,17 @@ void Assets::loadAssetsDatabase()
 	}
 }
 
+void Assets::saveDirtyAssets()
+{
+	for (auto& [_, assetInfo] : m_assets)
+	{
+		if (assetInfo.isDirty)
+		{
+			AssetFactory::getManager(assetInfo.aType)->save(assetInfo.data(), assetInfo);
+		}
+	}
+}
+
 const AssetInfo& Assets::getAsset(UUID uuid) const
 {
 	auto iter = m_assets.find(uuid);
@@ -191,6 +202,13 @@ void Assets::reimportAsset(UUID uuid)
 	AssetInfo aInfo = getAsset(uuid);
 
 	importAssetInner(aInfo);
+}
+
+void Assets::makeDirty(UUID uuid)
+{
+	AssetInfo aInfo = getAsset(uuid);
+	aInfo.isDirty = true;
+	m_assets[uuid] = aInfo;
 }
 
 AssetWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)

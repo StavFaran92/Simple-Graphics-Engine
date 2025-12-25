@@ -37,6 +37,8 @@ struct EngineAPI AssetInfo
 	nlohmann::json importSettings;
 	ResourceWrapper<ResourceBase> resource = ResourceWrapper<ResourceBase>::empty;
 
+	bool isDirty = false;
+
 	~AssetInfo() = default;
 
 	AssetInfo() = default;

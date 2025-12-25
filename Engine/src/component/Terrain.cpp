@@ -27,7 +27,7 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 	if (auto tc = std::dynamic_pointer_cast<Terrain>(c))
 	{
 		entityHandler.addComponent<Terrain>(*tc);
-		tc->buildFoliage();
+		tc->build();
 	}
 }
 
@@ -350,11 +350,15 @@ void Terrain::setPixel(int x, int y, unsigned char value)
 
 void Terrain::build()
 {
-
+	syncHeightmap();
+	buildFoliage();
 }
 
 void Terrain::syncHeightmap()
 {
+	if (m_heightmap.isEmpty())
+		return;
+
 	// If CPU buffer size is not the same as GPU buffer size reallocate
 	if (m_heightDataCPU.size() != m_heightmap.get()->getWidth() * m_heightmap.get()->getHeight())
 	{
@@ -370,6 +374,9 @@ void Terrain::syncHeightmap()
 		m_heightmap.get()->getData().type,
 		m_heightDataCPU.data()
 	);
+
+	m_heightmap.resource()->getData().data = m_heightDataCPU.data();
+	m_heightmap.makeDirty();
 }
 
 RayHit Terrain::raycast(const Ray& ray, float maxDistance)

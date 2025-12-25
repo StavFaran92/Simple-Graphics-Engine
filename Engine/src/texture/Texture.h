@@ -307,6 +307,11 @@ public:
 		return m_data;
 	}
 
+	TextureData& getData()
+	{
+		return m_data;
+	}
+
 	TextureAssetAttributes getTextureAssetAttributes();
 
 	static void extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData);
