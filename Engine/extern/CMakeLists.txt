@@ -1,5 +1,6 @@
 add_subdirectory(tinyfiledialogs)
 add_subdirectory(MikkTSpace)
+add_subdirectory(tinyexr)
 
 target_include_directories(Engine PUBLIC 	
 	assimp/include
@@ -19,6 +20,7 @@ target_include_directories(Engine PUBLIC
 	FileWatch
 	sol2/include
 	lua/include
+	tinyexr
 	MikkTSpace
 )
 
@@ -52,6 +54,7 @@ target_link_libraries(Engine PUBLIC
 	tinyfiledialogs
 	lua54
 	MikkTSpace
+	tinyexr
 )
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR})

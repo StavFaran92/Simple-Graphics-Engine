@@ -25,6 +25,53 @@
 
 #include "memory/AssetLoader.h"
 
+#define TINYEXR_IMPLEMENTATION
+#include "tinyexr.h"
+
+bool SaveEXRFloat(
+	const float* data,
+	int width,
+	int height,
+	const char* filename,
+	std::string& outError)
+{
+	EXRHeader header;
+	InitEXRHeader(&header);
+
+	EXRImage image;
+	InitEXRImage(&image);
+
+	image.num_channels = 1;
+	image.width = width;
+	image.height = height;
+
+	// TinyEXR wants an array of pointers, one per channel.
+	// For 1 channel, just point to our data.
+	float* images[1] = { (float*)data };
+	image.images = (unsigned char**)images;
+
+	header.num_channels = 1;
+	header.channels = new EXRChannelInfo[1];
+	// Set only R channel
+	strcpy(header.channels[0].name, "R");
+
+	header.pixel_types = new int[1] { TINYEXR_PIXELTYPE_FLOAT };
+	header.requested_pixel_types = new int[1] { TINYEXR_PIXELTYPE_FLOAT };
+
+	const char* err = nullptr;
+	int result = SaveEXRImageToFile(&image, &header, filename, &err);
+
+	if (result != TINYEXR_SUCCESS) {
+		if (err) {
+			outError = err;
+			FreeEXRErrorMessage(err);
+		}
+		return false;
+	}
+
+	return true;
+}
+
 namespace {
 	struct TextureManagerRegistration {
 		TextureManagerRegistration() {
@@ -75,7 +122,7 @@ std::string TextureAssetManager::getRecommendedExtension(const AssetInfo& aInfo)
 		if (settings.usage == Texture::TextureSemantic::Heightmap ||
 			settings.usage == Texture::TextureSemantic::Environment)
 		{
-			return ".hdr";
+			return ".exr";
 		}
 		else
 		{
@@ -99,11 +146,18 @@ void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const 
 
 	if (resource.get()->getData().type == Texture::Type::FLOAT)
 	{
-		stbi_write_hdr(fileLocation.c_str(),
+		std::string error;
+
+		SaveEXRFloat((const float*)resource.get()->getData().data,
 			resource.get()->getWidth(),
 			resource.get()->getHeight(),
-			resource.get()->getBitDepth(),
-			(const float *)resource.get()->getData().data);
+			fileLocation.c_str(),
+			error);
+		//stbi_write_hdr(fileLocation.c_str(),
+		//	resource.get()->getWidth(),
+		//	resource.get()->getHeight(),
+		//	resource.get()->getBitDepth(),
+		//	(const float *)resource.get()->getData().data);
 	}
 	else
 	{
@@ -501,9 +555,21 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 		textureData.isHDR = true;
 	}
 
+	std::filesystem::path p(fileLocation);
+	//if(p.extension().string() == ".exr")
+
 	stbi_set_flip_vertically_on_load(textureData.flip);
 
-	if (textureData.isHDR)
+	if (p.extension().string() == ".exr")
+	{
+		textureData.isHDR = true; // todo fix
+		const char* err = NULL;
+		LoadEXR((float **)&textureData.data, &textureData.width, &textureData.height,
+			fileLocation.c_str(), &err);
+
+		textureData.bpp = 1;
+	}
+	else if (textureData.isHDR)
 	{
 		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
 
