@@ -63,12 +63,61 @@ ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
 	return texture;
 }
 
+std::string TextureAssetManager::getRecommendedExtension(const AssetInfo& aInfo)
+{
+
+	Texture::TextureAssetDescriptor settings{};
+
+	if (aInfo.importSettings.is_object() && !aInfo.importSettings.empty())
+	{
+		settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
+
+		if (settings.usage == Texture::TextureSemantic::Heightmap ||
+			settings.usage == Texture::TextureSemantic::Environment)
+		{
+			return ".hdr";
+		}
+		else
+		{
+			return ".png";
+		}
+	}
+
+	return ".N_A";
+
+
+}
+
 void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
 
-	Texture::writeTexture2D(fileLocation, texture.as<Texture>().resource());
+	
+
+	auto& resource = texture.as<Texture>().resource();
+
+	if (resource.get()->getData().type == Texture::Type::FLOAT)
+	{
+		stbi_write_hdr(fileLocation.c_str(),
+			resource.get()->getWidth(),
+			resource.get()->getHeight(),
+			resource.get()->getBitDepth(),
+			(const float *)resource.get()->getData().data);
+	}
+	else
+	{
+		stbi_write_png(fileLocation.c_str(),
+			resource.get()->getWidth(),
+			resource.get()->getHeight(),
+			resource.get()->getBitDepth(),
+			resource.get()->getData().data,
+			resource.get()->getWidth() * resource.get()->getBitDepth());
+	}
+
+
+
+	//Texture::writeTexture2D(fileLocation, texture.as<Texture>().resource());
 }
 
 Texture::Texture()

@@ -26,8 +26,8 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 	(void)scene;
 	if (auto tc = std::dynamic_pointer_cast<Terrain>(c))
 	{
-		entityHandler.addComponent<Terrain>(*tc);
-		tc->build();
+		auto& terrain = entityHandler.addComponent<Terrain>(*tc);
+		terrain.build();
 	}
 }
 
@@ -53,12 +53,13 @@ AssetWrapper<Texture> Terrain::generateHeightmap(int width, int height)
 
 	auto texture = Texture::create2DTextureFromBuffer(tData);
 
-	AssetCreateDescriptor aInfo;
-	aInfo.aType = AssetType::TEXTURE;
-	aInfo.name = "SGE_TERRAIN_HEIGHTMAP";
-	aInfo.isEngineOwned = true;
-	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-	auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo).as<Texture>();
+	Texture::TextureAssetDescriptor desc;
+	desc.aType = AssetType::TEXTURE;
+	desc.name = "SGE_TERRAIN_HEIGHTMAP";
+	desc.isEngineOwned = true;
+	desc.attributes = texture->getTextureAssetAttributes().toMap();
+	desc.usage = Texture::TextureSemantic::Heightmap;
+	auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc).as<Texture>();
 
 	return heightmap;
 }

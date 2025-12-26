@@ -50,7 +50,7 @@ const std::map<AssetType, std::string> g_assetTypeToExt
 	{ AssetType::MESH,			".obj" },
 	{ AssetType::ANIMATION,		".obj" },
 	{ AssetType::SHADER,		".glsl" },
-	{ AssetType::PREFAB,		".asset" },
-	{ AssetType::MATERIAL,		".asset" },
+	{ AssetType::PREFAB,		".prefab" },
+	{ AssetType::MATERIAL,		".mat" },
 	{ AssetType::LUA_SCRIPT,	".lua" },
 };

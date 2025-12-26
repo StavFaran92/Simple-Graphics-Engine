@@ -23,6 +23,7 @@ struct TextureAssetManager : public AssetManager
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
 	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
 	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	std::string getRecommendedExtension(const AssetInfo& aInfo) override;
 };
 
 class EngineAPI Texture : public ResourceBase

@@ -206,7 +206,7 @@ void FoliageField::paintCircle(int cx, int cy, int radius, float value)
 				float v = value * t;
 
 				m_foliageSpreadMap[y * width + x] += v;
-				std::clamp(m_foliageSpreadMap[y * width + x], 0.0f, 1.0f);
+				m_foliageSpreadMap[y * width + x] = std::clamp(m_foliageSpreadMap[y * width + x], 0.0f, 1.0f);
 			}
 		}
 	}

@@ -56,4 +56,5 @@ public:
 	virtual bool copyFiles(const std::string& fileLocation, AssetInfo&) = 0;
 	virtual ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) = 0;
 	virtual void save(const AssetWrapper<ResourceBase>& asset, const AssetInfo& aInfo) {};
+	virtual std::string getRecommendedExtension(const AssetInfo& aInfo) { return getExtensionFromType(aInfo.aType); }; // Default behaviour, can be overriden if needed
 };

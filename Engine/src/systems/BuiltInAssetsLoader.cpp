@@ -58,12 +58,12 @@ void BuiltInAssetsLoader::loadTextures()
 
 		auto texture = Texture::create2DTextureFromBuffer(tData);
 
-		AssetCreateDescriptor aInfo;
-		aInfo.aType = AssetType::TEXTURE;
-		aInfo.name = tData.textureName;
-		aInfo.isEngineOwned = true;
-		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
+		Texture::TextureAssetDescriptor desc;
+		desc.aType = AssetType::TEXTURE;
+		desc.name = tData.textureName;
+		desc.isEngineOwned = true;
+		desc.attributes = texture->getTextureAssetAttributes().toMap();
+		Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
 	}
 
 	{
@@ -85,12 +85,12 @@ void BuiltInAssetsLoader::loadTextures()
 						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
 		auto texture = Texture::create2DTextureFromBuffer(tData);
 
-		AssetCreateDescriptor aInfo;
-		aInfo.aType = AssetType::TEXTURE;
-		aInfo.name = tData.textureName;
-		aInfo.isEngineOwned = true;
-		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
+		Texture::TextureAssetDescriptor desc;
+		desc.aType = AssetType::TEXTURE;
+		desc.name = tData.textureName;
+		desc.isEngineOwned = true;
+		desc.attributes = texture->getTextureAssetAttributes().toMap();
+		Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
 	}
 
 	acquireTexture("SGE_TEXTURE_GRASS", SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");

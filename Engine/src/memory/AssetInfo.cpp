@@ -4,6 +4,8 @@
 #include "memory/Assets.h"
 #include "memory/AssetWrapper.h"
 #include "fileSystem/ScopedPath.h"
+#include "memory/AssetFactory.h"
+#include "memory/Asset.h"
 
 // Serialization (to JSON)
 void to_json(nlohmann::json& j, const AssetInfo& asset)
@@ -126,7 +128,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	}
 	if (ext.empty())
 	{
-		ext = getExtensionFromType(aType);
+		ext = AssetFactory::getManager(aType)->getRecommendedExtension(*this);
 
 		if (ext.empty())
 		{
