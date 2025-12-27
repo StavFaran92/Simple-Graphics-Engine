@@ -95,6 +95,7 @@ void Assets::saveDirtyAssets()
 		if (assetInfo.isDirty)
 		{
 			AssetFactory::getManager(assetInfo.aType)->save(assetInfo.data(), assetInfo);
+			assetInfo.isDirty = false;
 		}
 	}
 }

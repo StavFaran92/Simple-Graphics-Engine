@@ -28,6 +28,96 @@
 #define TINYEXR_IMPLEMENTATION
 #include "tinyexr.h"
 
+#include "tinyexr.h"
+#include <iostream>
+#include <string>
+
+bool LoadSingleChannelEXR(const char* filename, void*& outData, int& width, int& height, std::string& error) {
+	EXRVersion version;
+	if (ParseEXRVersionFromFile(&version, filename) != 0) {
+		error = "Failed to parse EXR version.";
+		return false;
+	}
+
+	EXRHeader header;
+	InitEXRHeader(&header);
+	const char* err = nullptr;
+
+	if (ParseEXRHeaderFromFile(&header, &version, filename, &err) != 0) {
+		error = err ? err : "Failed to parse EXR header.";
+		FreeEXRErrorMessage(err);
+		return false;
+	}
+
+	// Request float output
+	header.requested_pixel_types = new int[header.num_channels];
+	for (int i = 0; i < header.num_channels; i++) {
+		header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT;
+	}
+
+	EXRImage image;
+	InitEXRImage(&image);
+
+	if (LoadEXRImageFromFile(&image, &header, filename, &err) != TINYEXR_SUCCESS) {
+		error = err ? err : "Failed to load EXR image.";
+		FreeEXRErrorMessage(err);
+		FreeEXRHeader(&header);
+		return false;
+	}
+
+	if (image.num_channels != 1) {
+		error = "Expected 1-channel EXR, but got " + std::to_string(image.num_channels);
+		FreeEXRImage(&image);
+		FreeEXRHeader(&header);
+		return false;
+	}
+
+	width = image.width;
+	height = image.height;
+	int pixelCount = width * height;
+
+	float* buffer = new float[pixelCount];
+	std::memcpy(buffer, image.images[0], pixelCount * sizeof(float));
+	outData = static_cast<void*>(buffer);
+
+	FreeEXRImage(&image);
+	FreeEXRHeader(&header);
+	return true;
+}
+
+
+void InspectEXRChannels(const char* filename) {
+	EXRVersion exr_version;
+	if (ParseEXRVersionFromFile(&exr_version, filename) != 0) {
+		std::cerr << "Failed to parse EXR version\n";
+		return;
+	}
+
+	EXRHeader header;
+	InitEXRHeader(&header);
+	const char* err = nullptr;
+
+	if (ParseEXRHeaderFromFile(&header, &exr_version, filename, &err) != 0) {
+		std::cerr << "Failed to parse EXR header: " << (err ? err : "unknown error") << "\n";
+		FreeEXRErrorMessage(err);
+		return;
+	}
+
+	std::cout << "Channels in EXR file: " << filename << "\n";
+	for (int i = 0; i < header.num_channels; ++i) {
+		std::string name = header.channels[i].name;
+		std::string typeStr = "UNKNOWN";
+		int type = header.pixel_types[i];
+		if (type == TINYEXR_PIXELTYPE_HALF) typeStr = "half";
+		else if (type == TINYEXR_PIXELTYPE_FLOAT) typeStr = "float";
+		else if (type == TINYEXR_PIXELTYPE_UINT) typeStr = "uint";
+
+		std::cout << "  - " << name << " (" << typeStr << ")\n";
+	}
+
+	FreeEXRHeader(&header);
+}
+
 bool SaveEXRFloat(
 	const float* data,
 	int width,
@@ -42,34 +132,41 @@ bool SaveEXRFloat(
 	InitEXRImage(&image);
 
 	image.num_channels = 1;
+
+	std::vector<float> images[1];
+	images[0].resize(width * height);
+
+	const float* image_ptr[1];
+	image_ptr[0] = &(data[0]); // R
+
+	image.images = (unsigned char**)image_ptr;
 	image.width = width;
 	image.height = height;
 
-	// TinyEXR wants an array of pointers, one per channel.
-	// For 1 channel, just point to our data.
-	float* images[1] = { (float*)data };
-	image.images = (unsigned char**)images;
-
 	header.num_channels = 1;
-	header.channels = new EXRChannelInfo[1];
-	// Set only R channel
-	strcpy(header.channels[0].name, "R");
+	header.channels = (EXRChannelInfo*)malloc(sizeof(EXRChannelInfo) * header.num_channels);
+	// Must be (A)BGR order, since most of EXR viewers expect this channel order.
+	strncpy(header.channels[0].name, "R", 255); header.channels[0].name[strlen("R")] = '\0';
 
-	header.pixel_types = new int[1] { TINYEXR_PIXELTYPE_FLOAT };
-	header.requested_pixel_types = new int[1] { TINYEXR_PIXELTYPE_FLOAT };
-
-	const char* err = nullptr;
-	int result = SaveEXRImageToFile(&image, &header, filename, &err);
-
-	if (result != TINYEXR_SUCCESS) {
-		if (err) {
-			outError = err;
-			FreeEXRErrorMessage(err);
-		}
-		return false;
+	header.pixel_types = (int*)malloc(sizeof(int) * header.num_channels);
+	header.requested_pixel_types = (int*)malloc(sizeof(int) * header.num_channels);
+	for (int i = 0; i < header.num_channels; i++) {
+		header.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
+		header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of output image to be stored in .EXR
 	}
 
-	return true;
+	const char* err = NULL; // or nullptr in C++11 or later.
+	int ret = SaveEXRImageToFile(&image, &header, filename, &err);
+	if (ret != TINYEXR_SUCCESS) {
+		fprintf(stderr, "Save EXR err: %s\n", err);
+		FreeEXRErrorMessage(err); // free's buffer for an error message
+		return ret;
+	}
+	logInfo("Saved exr file. {}", filename);
+
+	free(header.channels);
+	free(header.pixel_types);
+	free(header.requested_pixel_types);
 }
 
 namespace {
@@ -563,9 +660,14 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	if (p.extension().string() == ".exr")
 	{
 		textureData.isHDR = true; // todo fix
-		const char* err = NULL;
-		LoadEXR((float **)&textureData.data, &textureData.width, &textureData.height,
-			fileLocation.c_str(), &err);
+		std::string err;
+
+		LoadSingleChannelEXR(fileLocation.c_str(), textureData.data, textureData.width, textureData.height, err);
+
+		//LoadEXR((float **)&textureData.data, &textureData.width, &textureData.height,
+		//	fileLocation.c_str(), &err);
+
+		//InspectEXRChannels(fileLocation.c_str());
 
 		textureData.bpp = 1;
 	}
