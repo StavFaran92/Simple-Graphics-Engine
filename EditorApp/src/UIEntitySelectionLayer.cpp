@@ -37,8 +37,6 @@ bool UIEntitySelectionLayer::handleEvent(SDL_Event e)
 						{
 							state.selectEntity(sceneObj.e);
 
-							EditorState::Instance().setActiveEditorTool(EditorTool::Type::TransformTool);
-
 							break;
 						}
 					}

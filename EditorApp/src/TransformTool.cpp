@@ -146,7 +146,7 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 
 bool TransformTool::onEvent(SDL_Event e)
 {
-	if (ImGuizmo::IsUsing())
+	if (ImGuizmo::IsUsing() || ImGuizmo::IsOver())
 	{
 		// Consume input so selection / camera doesn't fire
 		return true;
