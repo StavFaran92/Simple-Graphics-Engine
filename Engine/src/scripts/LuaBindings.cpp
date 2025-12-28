@@ -300,8 +300,7 @@ void bindAssets(sol::state& lua)
         "getID", &Texture::getID,
         "setSlot", &Texture::setSlot,
         "importTexture3D", &Texture::importTexture3D,
-        "import", &Texture::import,
-        "isHDRImage", &Texture::isHDRImage
+        "import", &Texture::import
     );
 
     lua.new_usertype<MeshCollection>("MeshCollection",

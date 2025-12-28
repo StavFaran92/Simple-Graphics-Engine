@@ -158,7 +158,6 @@ public:
 		std::map<int, int> params;
 		bool genMipMap = false;
 		void* data = nullptr;
-		bool isHDR = false;
 		bool flip = false;
 
 		void* facesData[6]{ nullptr }; //only apply to Cubemap
@@ -331,8 +330,6 @@ public:
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);
 
 	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
-
-	static bool isHDRImage(const std::string& filename);
 
 	/**  Destructor */
 	~Texture();

@@ -75,11 +75,15 @@ std::string TextureAssetManager::getRecommendedExtension(const AssetInfo& aInfo)
 		settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
 
 		if (settings.usage == Texture::TextureSemantic::Heightmap ||
-			settings.usage == Texture::TextureSemantic::Environment)
+			settings.usage == Texture::TextureSemantic::Environment ||
+			settings.usage == Texture::TextureSemantic::LUT ||
+			settings.usage == Texture::TextureSemantic::Data)
 		{
 			return ".exr";
 		}
-		else
+		else if (settings.usage == Texture::TextureSemantic::Color ||
+			settings.usage == Texture::TextureSemantic::Normal||
+			settings.usage == Texture::TextureSemantic::Mask)
 		{
 			return ".png";
 		}
@@ -94,23 +98,13 @@ void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const 
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
-
-	
-
 	auto& resource = texture.as<Texture>().resource();
 
 	if (resource.get()->getData().type == Texture::Type::FLOAT)
 	{
-		std::string error;
-
 		EXRLoader::saveSingleChannelEXR(fileLocation, resource.get()->getWidth(),
 			resource.get()->getHeight(),
 			(const float*)resource.get()->getData().data);
-		//stbi_write_hdr(fileLocation.c_str(),
-		//	resource.get()->getWidth(),
-		//	resource.get()->getHeight(),
-		//	resource.get()->getBitDepth(),
-		//	(const float *)resource.get()->getData().data);
 	}
 	else
 	{
@@ -121,10 +115,6 @@ void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const 
 			resource.get()->getData().data,
 			resource.get()->getWidth() * resource.get()->getBitDepth());
 	}
-
-
-
-	//Texture::writeTexture2D(fileLocation, texture.as<Texture>().resource());
 }
 
 Texture::Texture()
@@ -177,11 +167,8 @@ ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int 
 
 ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
 {
-	ResourceWrapper<Texture> texture;
-	//UUID uuid = textureData.textureName.empty() ? UUID::generate_uuid_v4() : textureData.textureName;
-	texture = Factory<Texture>::create();
+	ResourceWrapper<Texture> texture = Factory<Texture>::create();
 	texture.get()->build(textureData);
-
 	return texture;
 }
 
@@ -208,7 +195,6 @@ void Texture::build(const TextureData& textureData)
 
 	m_attributes.flip = textureData.flip;
 	m_attributes.genMipMap = textureData.genMipMap;
-	m_attributes.isHDR = textureData.isHDR;
 	m_attributes.params = textureData.params;
 
 	// generate texture
@@ -503,34 +489,24 @@ ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocatio
 
 void Texture::extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
 {
-	// Determine if the image is HDR
-	if (isHDRImage(fileLocation))
-	{
-		textureData.isHDR = true;
-	}
-
-	std::filesystem::path p(fileLocation);
-	//if(p.extension().string() == ".exr")
-
+	// flip if needed
 	stbi_set_flip_vertically_on_load(textureData.flip);
 
-	if (p.extension().string() == ".exr")
+	std::filesystem::path p(fileLocation);
+	std::string ext = p.extension().string();
+
+	if (ext == ".exr")
 	{
-		textureData.isHDR = true; // todo fix
-		std::string err;
-
 		EXRLoader::loadSingleChannelEXR(fileLocation, textureData.width, textureData.height, textureData.data);
-
-		//LoadEXR((float **)&textureData.data, &textureData.width, &textureData.height,
-		//	fileLocation.c_str(), &err);
+		textureData.type = Texture::Type::FLOAT;
+		textureData.bpp = 1;
 
 		//InspectEXRChannels(fileLocation.c_str());
-
-		textureData.bpp = 1;
 	}
-	else if (textureData.isHDR)
+	else if (stbi_is_hdr(fileLocation.c_str()))
 	{
 		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+		textureData.type = Texture::Type::FLOAT;
 
 		float* pixels = static_cast<float*>(textureData.data);
 
@@ -552,6 +528,7 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	else
 	{
 		textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+		textureData.type = Texture::Type::UNSIGNED_BYTE;
 	}
 
 	// load validation
@@ -564,17 +541,14 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	if (textureData.bpp == 1)
 	{
 		textureData.format = (Texture::Format)GL_RED;
-		//textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
 	}
 	else if (textureData.bpp == 3)
 	{
 		textureData.format = (Texture::Format)GL_RGB;
-		//textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
 	}
 	else if (textureData.bpp == 4)
 	{
 		textureData.format = (Texture::Format)GL_RGBA;
-		//textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
 	}
 	else {
 		logError("Unsupported texture format!");
@@ -583,13 +557,6 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 
 	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
 	textureData.textureName = textureName;
-
-	textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
-}
-
-// Function to determine if the file is HDR based on its extension
-bool Texture::isHDRImage(const std::string& filename) {
-	return stbi_is_hdr(filename.c_str());
 }
 
 //adi is your love of your life
