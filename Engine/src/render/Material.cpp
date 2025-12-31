@@ -81,7 +81,7 @@ void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler>
 {
 	// if texture is empty use dummy texture
 	AssetWrapper<Texture> texture;
-	if (sampler || sampler->texture.isEmpty())
+	if (!sampler || sampler->texture.isEmpty())
 	{
 		texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
 	}
