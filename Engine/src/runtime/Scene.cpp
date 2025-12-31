@@ -536,7 +536,7 @@ void Scene::draw(float deltaTime)
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Volumetrics render pass");
 
 			// Render Volumetrics
-			for (auto&& [entity, volume, shader] : m_registry->get().view<VolumeComponent, ShaderComponent>().each())
+			for (auto&& [entity, volume] : m_registry->get().view<VolumeComponent>().each())
 			{
 				ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 				renderView->swapToAdditionalTarget();
@@ -546,20 +546,22 @@ void Scene::draw(float deltaTime)
 				// TODO assert post process shader
 
 				// bind shader
-				shader.m_customShader.resource()->use();
+				auto& mat = volume.material.resource();
+				mat->use();
+				//shader.m_customShader.resource()->use();
 
 				// read texture from graphics FBO
-				shader.m_customShader.resource()->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
-
-				shader.m_customShader.resource()->setModelMatrix(glm::mat4(1.0));
-				shader.m_customShader.resource()->setViewMatrix(graphics->view);
-				shader.m_customShader.resource()->setProjectionMatrix(graphics->projection);
+				mat->setTexture("MainTexture", renderTargetTexture, 0); //todo check slot
+				mat->setUniformValue("model", glm::mat4(1.0));
+				mat->setUniformValue("view", graphics->view);
+				mat->setUniformValue("projection", graphics->projection);
 
 				auto viewport = renderView->getViewport();
-				shader.m_customShader.resource()->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
+				mat->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
 
-				shader.m_customShader.resource()->setUniformValue("cameraPos", graphics->cameraPos);
-				shader.m_customShader.resource()->setUniformValue("cameraLookAt", primaryCamera.front);
+				mat->setUniformValue("cameraPos", graphics->cameraPos);
+				mat->setUniformValue("cameraLookAt", primaryCamera.front);
+
 
 				// bind mesh
 				auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();

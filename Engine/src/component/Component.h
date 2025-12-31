@@ -142,5 +142,6 @@ struct VolumeComponent : public Component
 	void serialize(Archive& archive) {
 	}
 
-	ResourceWrapper<Shader> shader;
+	AssetWrapper<Material> material;
+	AssetWrapper<MeshCollection> mesh;
 };

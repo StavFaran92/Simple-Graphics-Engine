@@ -30,6 +30,7 @@ enum class MaterialRenderMode : int
 	Skybox,
 	Unlit,
 	UI,
+	Volume,
 	Custom,
 
 	// This must be last
@@ -61,6 +62,7 @@ public:
 	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
 	void setSamplerEnabled(const std::string& name, bool isEnabled);
 
+	void setTexture(const std::string& name, const ResourceWrapper<Texture>& texture, int slot);
 	void setUniformValue(const std::string& name, const Value& v);
 
 	void setName(const std::string& name);

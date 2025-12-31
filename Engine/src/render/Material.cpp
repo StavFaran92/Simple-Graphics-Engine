@@ -203,6 +203,8 @@ ResourceWrapper<Shader> Material::getShaderFromRenderMode(MaterialRenderMode ren
 		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
 	case MaterialRenderMode::Terrain:
 		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);
+	case MaterialRenderMode::Volume:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_VOLUME);
 	}
 
 	return ResourceWrapper<Shader>::empty;
@@ -443,3 +445,5 @@ MaterialRenderMode Material::getMaterialRenderMode() const
 {
 	return m_renderMode;
 }
+
+void Material::setTexture(const std::string& name, const ResourceWrapper<Texture>& texture, int slot)
