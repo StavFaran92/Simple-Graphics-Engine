@@ -27,7 +27,8 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 	if (ImGui::BeginChild("TransformWindow", ImVec2(innerWindowWidth, innerWindowHeight), true, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
 	{
 		m_toolbarActive = ImGui::IsWindowHovered() ||
-			ImGui::IsAnyItemActive();
+			ImGui::IsAnyItemActive() ||
+			ImGui::IsPopupOpen("", ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);;
 
 		// Radio buttons for transformation mode
 		ImGui::RadioButton("Translate", (int*)&currentMode, TRANSLATE);
