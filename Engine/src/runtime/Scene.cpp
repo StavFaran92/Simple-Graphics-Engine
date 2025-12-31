@@ -545,23 +545,20 @@ void Scene::draw(float deltaTime)
 				glDisable(GL_DEPTH_TEST);
 				// TODO assert post process shader
 
-				// bind shader
 				auto& mat = volume.material.resource();
-				mat->use();
-				//shader.m_customShader.resource()->use();
 
-				// read texture from graphics FBO
-				mat->setTexture("MainTexture", renderTargetTexture, 0); //todo check slot
-				mat->setUniformValue("model", glm::mat4(1.0));
-				mat->setUniformValue("view", graphics->view);
-				mat->setUniformValue("projection", graphics->projection);
+				mat->getNonPersistentBlock().setTexture("MainTexture", renderTargetTexture);
+				mat->getNonPersistentBlock().setUniformValue("model", glm::mat4(1.0));
+				mat->getNonPersistentBlock().setUniformValue("view", graphics->view);
+				mat->getNonPersistentBlock().setUniformValue("projection", graphics->projection);
 
 				auto viewport = renderView->getViewport();
-				mat->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
+				mat->getNonPersistentBlock().setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
 
-				mat->setUniformValue("cameraPos", graphics->cameraPos);
-				mat->setUniformValue("cameraLookAt", primaryCamera.front);
+				mat->getNonPersistentBlock().setUniformValue("cameraPos", graphics->cameraPos);
+				mat->getNonPersistentBlock().setUniformValue("cameraLookAt", primaryCamera.front);
 
+				mat->use();
 
 				// bind mesh
 				auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();

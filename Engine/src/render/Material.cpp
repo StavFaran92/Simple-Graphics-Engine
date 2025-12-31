@@ -77,46 +77,75 @@ void MaterialAssetManager::save(const AssetWrapper<ResourceBase>& mat, const Ass
 Material::Material()
 {}
 
+void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ResourceWrapper<Shader>& shader, int slot)
+{
+	// if texture is empty use dummy texture
+	AssetWrapper<Texture> texture;
+	if (sampler || sampler->texture.isEmpty())
+	{
+		texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
+	}
+	else
+	{
+		texture = sampler->texture;
+	}
+
+	texture.get()->setSlot(slot);
+	texture.get()->bind();
+
+	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
+	shader->setUniformValue(name + ".texture", slot);
+
+	shader->setUniformValue(name + ".isActive", sampler->isActive);
+	shader->setUniformValue(name + ".xOffset", sampler ? sampler->xOffset : 0.0f);
+	shader->setUniformValue(name + ".yOffset", sampler ? sampler->yOffset : 0.0f);
+	shader->setUniformValue(name + ".xScale", sampler ? sampler->xScale : 1.0f);
+	shader->setUniformValue(name + ".yScale", sampler ? sampler->yScale : 1.0f);
+	shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->channelMaskR : 1);
+	shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->channelCount > 1 ? sampler->channelMaskG : 0) : 0);
+	shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->channelCount > 2 ? sampler->channelMaskB : 0) : 0);
+	shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->channelCount > 3 ? sampler->channelMaskA : 0) : 0);
+}
+
 void Material::use()
 {
 	ResourceWrapper<Shader> shader = getActiveShader();
 
 	int slot = 0;
-	for (const auto& [name, sampler] : m_samplers)
+
+	// Set persistent samplers
+	for (const auto& [name, sampler] : getPersistentBlock().m_samplers)
 	{
-		// if texture is empty use dummy texture
-		AssetWrapper<Texture> texture;
-		if (!sampler || sampler->texture.isEmpty())
-		{
-			texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
-		}
-		else
-		{
-			texture = sampler->texture;
-		}
-
-		texture.get()->setSlot(slot);
-		texture.get()->bind();
-
-		// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-		shader->setUniformValue(name + ".texture", slot);
-
-		shader->setUniformValue(name + ".isActive", sampler->isActive);
-		shader->setUniformValue(name + ".xOffset", sampler ? sampler->xOffset : 0.0f);
-		shader->setUniformValue(name + ".yOffset", sampler ? sampler->yOffset : 0.0f);
-		shader->setUniformValue(name + ".xScale", sampler ? sampler->xScale : 1.0f);
-		shader->setUniformValue(name + ".yScale", sampler ? sampler->yScale : 1.0f);
-		shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->channelMaskR : 1);
-		shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->channelCount > 1 ? sampler->channelMaskG : 0) : 0);
-		shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->channelCount > 2 ? sampler->channelMaskB : 0) : 0);
-		shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->channelCount > 3 ? sampler->channelMaskA : 0) : 0);
-
+		useSamplerInShader(name, sampler, shader, slot);
 		slot++;
 	}
 
-	for (const auto& [name, property] : m_uniformProperties)
+	// Set Non persistent samplers
+	for (const auto& [name, sampler] : getNonPersistentBlock().m_samplers)
+	{
+		useSamplerInShader(name, sampler, shader, slot);
+		slot++;
+	}
+
+	// Set Non persistent Textures
+	for (const auto& [name, texture] : getNonPersistentBlock().m_textures)
+	{
+		texture.get()->setSlot(slot);
+		texture.get()->bind();
+		shader->setUniformValue(name, slot);
+		slot++;
+	}
+
+	// Set persistent uniforms
+	for (const auto& [name, property] : getPersistentBlock().m_uniformProperties)
 	{
 		shader->setUniformValue(name, property.value);
+	}
+
+	// Set Non persistent uniforms
+	for (const auto& [name, value] : getNonPersistentBlock().m_uniformProperties)
+	{
+		shader->setUniformValue(name, value);
 	}
 }
 
@@ -131,24 +160,17 @@ void Material::release()
 
 std::shared_ptr<TextureSampler> Material::getSampler(const std::string& name)
 {
-	auto it = m_samplers.find(name);
-	if (it == m_samplers.end())
-	{
-		logError("Sampler '{}' not found in Material.", name);
-		throw std::runtime_error("");
-	}
-
-	return it->second;
+	return getPersistentBlock().getSampler(name);
 }
 
 void Material::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
 {
-	m_samplers[name] = sampler;
+	getPersistentBlock().setSampler(name, sampler);
 }
 
 void Material::setSamplerEnabled(const std::string& name, bool isEnabled)
 {
-	m_samplers[name]->isActive = isEnabled;
+	getPersistentBlock().getSampler(name)->isActive = isEnabled;
 }
 
 AssetWrapper<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
@@ -174,9 +196,9 @@ ResourceWrapper<Material> Material::clone(bool isTransient) const
 {
 	auto newMaterial = Material::create(m_renderMode);
 
-	newMaterial->m_samplers = m_samplers;
-	//newMaterial->m_shader = m_shader;
-	newMaterial->m_uniformProperties = m_uniformProperties;
+	newMaterial->m_persistentBlock = m_persistentBlock;
+	newMaterial->m_nonPersistentBlock = m_nonPersistentBlock;
+	newMaterial->m_customShader = m_customShader;
 
 	return newMaterial;
 }
@@ -210,7 +232,7 @@ ResourceWrapper<Shader> Material::getShaderFromRenderMode(MaterialRenderMode ren
 	return ResourceWrapper<Shader>::empty;
 }
 
-bool parseEditablePragmaLine(const std::string& line, Material::EditableUniform& editableUniform) {
+bool parseEditablePragmaLine(const std::string& line, EditableUniform& editableUniform) {
 	// Check if line contains #pragma editable
 	std::regex pragmaRegex(R"(^\s*#pragma\s+editable)");
 
@@ -257,13 +279,14 @@ std::vector<float> parseFloatTuple(const std::string& s) {
 
 void Material::parseUniforms(const std::string& sourceCode)
 {
-	m_uniformProperties.clear();
-	m_samplers.clear();
+	getPersistentBlock().m_uniformProperties.clear();
+	getPersistentBlock().m_samplers.clear();
 
 	std::istringstream stream(sourceCode);
 	std::string line;
 
-	auto& uniformProperties = m_uniformProperties;
+	auto& uniformProperties = getPersistentBlock().m_uniformProperties;
+	auto& samplers = getPersistentBlock().m_samplers;
 
 	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
 	EditableUniform pendingMeta;
@@ -342,7 +365,7 @@ void Material::parseUniforms(const std::string& sourceCode)
 			}
 			else if (type == "PBR_Sampler") 
 			{
-				m_samplers[name] = std::make_shared<TextureSampler>();
+				samplers[name] = std::make_shared<TextureSampler>();
 			}
 
 			
@@ -367,8 +390,8 @@ void Material::parseFromShader(ResourceWrapper<Shader> shader)
 
 void Material::update()
 {
-	auto oldUniforms = m_uniformProperties;
-	auto oldSamplers = m_samplers;
+	auto oldUniforms = getPersistentBlock().m_uniformProperties;
+	auto oldSamplers = getPersistentBlock().m_samplers;
 
 	ResourceWrapper<Shader> shader = getActiveShader();
 
@@ -377,7 +400,7 @@ void Material::update()
 
 	parseFromShader(shader);
 
-	auto& newSamplers = m_samplers;
+	auto& newSamplers = getPersistentBlock().m_samplers;
 	for (const auto [name, sampler] : oldSamplers)
 	{
 		auto iter = newSamplers.find(name);
@@ -387,7 +410,7 @@ void Material::update()
 		}
 	}
 
-	auto& newUniforms = m_uniformProperties;
+	auto& newUniforms = getPersistentBlock().m_uniformProperties;
 	for (const auto [name, value] : oldUniforms)
 	{
 		auto iter = newUniforms.find(name);
@@ -397,7 +420,7 @@ void Material::update()
 		}
 	}
 
-	for (const auto& [name, uniform] : m_uniformProperties)
+	for (const auto& [name, uniform] : getPersistentBlock().m_uniformProperties)
 	{
 		shader->setUniformValue(name, uniform.value);
 	}
@@ -411,7 +434,7 @@ void Material::update()
 
 void Material::setUniformValue(const std::string& name, const Value& v)
 {
-	m_uniformProperties[name].value = v;
+	getPersistentBlock().setUniformValue(name, v);
 }
 
 void Material::setName(const std::string& name)
@@ -422,6 +445,16 @@ void Material::setName(const std::string& name)
 std::string Material::getName() const
 {
 	return m_name;
+}
+
+Material::PersistentBlock& Material::getPersistentBlock()
+{
+	return m_persistentBlock;
+}
+
+Material::NonPersistentBlock& Material::getNonPersistentBlock()
+{
+	return m_nonPersistentBlock;
 }
 
 void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
@@ -445,5 +478,3 @@ MaterialRenderMode Material::getMaterialRenderMode() const
 {
 	return m_renderMode;
 }
-
-void Material::setTexture(const std::string& name, const ResourceWrapper<Texture>& texture, int slot)

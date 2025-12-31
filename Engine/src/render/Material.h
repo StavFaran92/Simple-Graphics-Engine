@@ -42,6 +42,25 @@ struct MaterialImportSettings : public AssetCreateDescriptor
 
 };
 
+struct EditableUniform {
+	std::string uniformName;
+	std::string type;
+	std::string defaultValueRaw;
+	float minValue = std::numeric_limits<float>::lowest();
+	float maxValue = std::numeric_limits<float>::max();
+	Value value;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(uniformName);
+		SERIALIZED_MEMBER(type);
+		SERIALIZED_MEMBER(defaultValueRaw);
+		SERIALIZED_MEMBER(minValue);
+		SERIALIZED_MEMBER(maxValue);
+		SERIALIZED_MEMBER(value);
+	}
+};
+
 struct MaterialAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
@@ -52,6 +71,61 @@ struct MaterialAssetManager : public AssetManager
 class EngineAPI Material : public ResourceBase
 {
 public:
+	struct PersistentBlock
+	{
+	public:
+		void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler) {
+			m_samplers[name] = std::move(sampler);
+		}
+
+		std::shared_ptr<TextureSampler> getSampler(const std::string& name) const {
+			auto it = m_samplers.find(name);
+			return it != m_samplers.end() ? it->second : nullptr;
+		}
+
+		void setUniformValue(const std::string& name, const Value& v) {
+			m_uniformProperties[name].value = v;
+		}
+
+		Value getUniformValue(const std::string& name) const {
+			auto it = m_uniformProperties.find(name);
+			return it != m_uniformProperties.end() ? it->second.value : Value{};
+		}
+
+		template <class Archive>
+		void serialize(Archive& archive) {
+			SERIALIZED_MEMBER(m_samplers);
+			SERIALIZED_MEMBER(m_uniformProperties);
+		}
+
+	private:
+		friend class Material;
+		std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
+		std::map<std::string, EditableUniform> m_uniformProperties;
+	};
+
+	struct NonPersistentBlock
+	{
+	public:
+		void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler) {
+			m_samplers[name] = std::move(sampler);
+		}
+
+		void setUniformValue(const std::string& name, const Value& v) {
+			m_uniformProperties[name] = v;
+		}
+
+		void setTexture(const std::string& name, const ResourceWrapper<Texture>& texture) {
+			m_textures[name] = texture;
+		}
+
+	private:
+		friend class Material;
+		std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
+		std::map<std::string, ResourceWrapper<Texture>> m_textures;
+		std::map<std::string, Value> m_uniformProperties;
+	};
+
 	Material();
 	~Material() = default;
 
@@ -62,11 +136,14 @@ public:
 	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
 	void setSamplerEnabled(const std::string& name, bool isEnabled);
 
-	void setTexture(const std::string& name, const ResourceWrapper<Texture>& texture, int slot);
+	//void setTexture(const std::string& name, const ResourceWrapper<Texture>& texture, int slot);
 	void setUniformValue(const std::string& name, const Value& v);
 
 	void setName(const std::string& name);
 	std::string getName() const;
+
+	PersistentBlock& getPersistentBlock();
+	NonPersistentBlock& getNonPersistentBlock();
 
 	void setCustomShader(AssetWrapper<Shader>& customShader);
 	AssetWrapper<Shader> getCustomShader() const;
@@ -93,8 +170,7 @@ public:
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_name);
 		SERIALIZED_MEMBER(m_renderMode);
-		SERIALIZED_MEMBER(m_samplers);
-		SERIALIZED_MEMBER(m_uniformProperties);
+		SERIALIZED_MEMBER(m_persistentBlock);
 	}
 
 	static AssetWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
@@ -104,33 +180,15 @@ public:
 protected:
 
 public:
-	struct EditableUniform {
-		std::string uniformName;
-		std::string type;
-		std::string defaultValueRaw; 
-		float minValue = std::numeric_limits<float>::lowest();
-		float maxValue = std::numeric_limits<float>::max();
-		Value value;
-
-		template <class Archive>
-		void serialize(Archive& archive) {
-			SERIALIZED_MEMBER(uniformName);
-			SERIALIZED_MEMBER(type);
-			SERIALIZED_MEMBER(defaultValueRaw);
-			SERIALIZED_MEMBER(minValue);
-			SERIALIZED_MEMBER(maxValue);
-			SERIALIZED_MEMBER(value);
-		}
-	};
-
-	// This will only be used by forward renderer, ignored by deffered
 	std::string m_name;
 
-	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
-	std::map<std::string, EditableUniform> m_uniformProperties;
+	//std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
+	//std::map<std::string, EditableUniform> m_uniformProperties;
+
+	PersistentBlock m_persistentBlock;
+	NonPersistentBlock m_nonPersistentBlock;
 
 private:
-	//ResourceWrapper<Shader> m_shader = ResourceWrapper<Shader>::empty;
 	AssetWrapper<Shader> m_customShader;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 
