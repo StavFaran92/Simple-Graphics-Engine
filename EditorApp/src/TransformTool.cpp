@@ -26,6 +26,10 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 
 	if (ImGui::BeginChild("TransformWindow", ImVec2(innerWindowWidth, innerWindowHeight), true, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
 	{
+		m_toolbarActive = ImGui::IsWindowHovered() || 
+			ImGui::IsAnyItemActive() || 
+			ImGui::IsAnyItemHovered();
+
 		// Radio buttons for transformation mode
 		ImGui::RadioButton("Translate", (int*)&currentMode, TRANSLATE);
 		ImGui::SameLine();
@@ -146,7 +150,7 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 
 bool TransformTool::onEvent(SDL_Event e)
 {
-	if (ImGuizmo::IsUsing() || ImGuizmo::IsOver())
+	if (ImGuizmo::IsUsing() || ImGuizmo::IsOver() || m_toolbarActive)
 	{
 		// Consume input so selection / camera doesn't fire
 		return true;

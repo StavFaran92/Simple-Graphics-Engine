@@ -16,4 +16,6 @@ private:
 	ImGuizmo::MODE m_currentGizmoMode = ImGuizmo::LOCAL;
 	bool m_useSnap = false;
 	float m_snapValues[3] = { 1.0f, 1.0f, 1.0f };
+
+	bool m_toolbarActive = false;
 };
