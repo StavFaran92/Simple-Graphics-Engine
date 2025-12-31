@@ -252,7 +252,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	// Custom Textures Array
 	if (ImGui::CollapsingHeader("Samplers"))
 	{
-		for (auto& [name, sampler] : mat.get()->m_samplers)
+		for (auto& [name, sampler] : mat.get()->getPersistentBlock().getSamplers())
 		{
 			ImGui::PushID(name.c_str());
 			ImGui::Text(name.c_str());
@@ -267,7 +267,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	// Display Uniforms and Update Shader
 	if (ImGui::CollapsingHeader("Uniforms"))
 	{
-		for (auto& [name, uniform] : mat.get()->m_uniformProperties)
+		for (auto& [name, uniform] : mat.get()->getPersistentBlock().getUniformsProperties())
 		{
 			ImGui::PushID(name.c_str());
 			bool updated = false; // Track if the value was changed

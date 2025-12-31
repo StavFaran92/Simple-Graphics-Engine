@@ -89,7 +89,7 @@ std::string TextureAssetManager::getRecommendedExtension(const AssetInfo& aInfo)
 		}
 	}
 
-	return ".N_A";
+	return ".png";
 
 
 }

@@ -74,6 +74,15 @@ public:
 	struct PersistentBlock
 	{
 	public:
+		std::map<std::string, std::shared_ptr<TextureSampler>>& getSamplers() {
+			return m_samplers;
+		}
+
+		std::map<std::string, EditableUniform>& getUniformsProperties()
+		{
+			return m_uniformProperties;
+		}
+
 		void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler) {
 			m_samplers[name] = std::move(sampler);
 		}

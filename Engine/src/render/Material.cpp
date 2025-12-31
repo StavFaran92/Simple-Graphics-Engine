@@ -111,6 +111,8 @@ void Material::use()
 {
 	ResourceWrapper<Shader> shader = getActiveShader();
 
+	shader->use();
+
 	int slot = 0;
 
 	// Set persistent samplers
