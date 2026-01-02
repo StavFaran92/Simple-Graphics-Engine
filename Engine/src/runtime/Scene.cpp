@@ -1,54 +1,41 @@
 #include "runtime/Scene.h"
 
-#include "systems/Skybox.h"
-#include "lights/DirectionalLight.h"
-#include "lights/PointLight.h"
 #include "core/Engine.h"
-#include "camera/ICamera.h"
 #include "core/CoroutineSystem.h"
 #include "core/Logger.h"
 #include "runtime/Context.h"
 #include "core/Window.h"
 #include "systems/ObjectPicker.h"
-#include "core/Configurations.h"
 #include "render/Shader.h"
 #include "runtime/Entity.h"
 #include "component/Transformation.h"
 #include "geometry/Mesh.h"
 #include "component/RenderableComponent.h"
-#include "component/Component.h"
 #include "component/WaterBodyComponent.h"
 #include "render/Material.h"
 #include "component/ScriptableEntity.h"
 #include "physics/PhysicsSystem.h"
-#include "geometry/Box.h"
 #include "systems/ShadowSystem.h"
 #include "lights/LightSystem.h"
 #include "systems/TimeManager.h"
 #include "render/UniformBufferObject.h"
 #include "render/DeferredRenderer.h"
 #include "render/Renderer.h"
-#include "core/Random.h"
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
-#include "utils/EquirectangularToCubemapConverter.h"
 
 #include "render/RenderCommand.h"
-#include "glm/ext.hpp"
 #include "render/IBL.h"
 #include "core/Registry.h"
-#include "physics/Physics.h"
 #include "serialize/Archiver.h"
 #include "animation/Animator.h"
 #include "component/Terrain.h"
-#include "geometry/AABB.h"
 #include "geometry/Frustum.h"
 #include "geometry/MeshCollection.h"
 #include "render/Graphics.h"
 #include "utils/DebugHelper.h"
 #include "texture/Cubemap.h"
 #include "render/RenderView.h"
-#include "core/GameLayer.h"
 #include "core/EventSystem.h"
 #include "core/EngineConfig.h"
 #include "geometry/WireframeGrid.h"
@@ -57,12 +44,12 @@
 #include "systems/WaterSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
-#include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/SkyboxComponent.h"
 #include "component/NativeScriptComponent.h"
 #include "component/ImageComponent.h"
 #include "component/PostProcessComponent.h"
+#include "component/VolumeComponent.h"
 #include "scripts/ScriptSystem.h"
 #include "memory/BuiltInAssets.h"
 #include "memory/BuiltInResources.h"
@@ -183,8 +170,6 @@ void Scene::init(Context* context)
 	m_BRDFIntegrationLUT = IBL::generateBRDFIntegrationLUT(this);
 
 	m_skyboxShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SkyboxShader.glsl");
-
-	m_basicBox = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX).resource();
 
 	addRenderView("Game View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 
@@ -506,7 +491,7 @@ void Scene::draw(float deltaTime)
 			{
 				Entity entityhandler{ entity, m_registry.get() };
 				graphics->entity = entityhandler;
-				graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
+				graphics->mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX).get()->getPrimaryMesh().get();
 				graphics->model = transform.getWorldTransformation();
 
 				if (skybox.cubemap.isEmpty()) continue;
@@ -545,10 +530,15 @@ void Scene::draw(float deltaTime)
 				glDisable(GL_DEPTH_TEST);
 				// TODO assert post process shader
 
+				if(volume.material.isEmpty())
+					continue;
+
 				auto& mat = volume.material.resource();
 
 				mat->getNonPersistentBlock().setTexture("MainTexture", renderTargetTexture);
-				mat->getNonPersistentBlock().setUniformValue("model", glm::mat4(1.0));
+
+				Entity entityHandler(entity, &getRegistry());
+				
 				mat->getNonPersistentBlock().setUniformValue("view", graphics->view);
 				mat->getNonPersistentBlock().setUniformValue("projection", graphics->projection);
 
@@ -561,13 +551,28 @@ void Scene::draw(float deltaTime)
 				mat->use();
 
 				// bind mesh
-				auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();
+				ResourceWrapper<MeshCollection> mesh;
+				if (!volume.mesh.isEmpty())
+				{
+					mesh = volume.mesh.resource(); // will not work for hierarchical meshes
+				}
+				else
+				{
+					mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX).resource();
+
+				}
+
+				auto& transform = entityHandler.getComponent<Transformation>();
+				glm::mat4 modelTransform = transform.getWorldTransformation() * mesh.get()->getPrimaryMesh()->getRestTransform();
+				mat->getNonPersistentBlock().setUniformValue("model", modelTransform);
+
+
 				//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
 
 				// in frag shader i need access to mesh extentes & main texture -> set uniforms
 
 				// draw
-				RenderCommand::draw(vao);
+				RenderCommand::draw(mesh->getPrimaryMesh()->getVAO());
 
 				renderView->swapBackToMainTarget();
 				renderView->bind();

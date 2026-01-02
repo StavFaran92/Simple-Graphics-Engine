@@ -111,6 +111,12 @@ void Material::use()
 {
 	ResourceWrapper<Shader> shader = getActiveShader();
 
+	if (shader.isEmpty())
+	{
+		logWarning("Material {} shader is invalid.", m_name);
+		return;
+	}
+
 	shader->use();
 
 	int slot = 0;

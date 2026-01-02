@@ -5,12 +5,7 @@
 #include "core/Core.h"
 
 #include "component/ScriptableEntity.h"
-#include "core/Configurations.h"
 #include "render/RenderView.h"
-#include "geometry/Mesh.h"
-#include <glm/gtc/matrix_transform.hpp>
-#include "physics/Physics.h"
-#include "cereal/types/optional.hpp"
 #include "physics/Colliders.h"
 #include "serialize/CerealHelpers.h"
 #include "geometry/MeshCollection.h"
@@ -132,16 +127,4 @@ struct TestComp : public Component
 	int test2 = 0;
 
 	
-};
-
-struct VolumeComponent : public Component
-{
-	VolumeComponent() = default;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-	}
-
-	AssetWrapper<Material> material;
-	AssetWrapper<MeshCollection> mesh;
 };

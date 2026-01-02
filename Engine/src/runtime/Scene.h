@@ -176,7 +176,7 @@ private:
 	ResourceWrapper<Shader> m_skyboxShader;
 	ResourceWrapper<Shader> m_UIShader;
 
-	ResourceWrapper<MeshCollection> m_basicBox;
+	//ResourceWrapper<MeshCollection> m_basicBox;
 
 	//Entity m_primaryCamera = Entity::EmptyEntity;
 

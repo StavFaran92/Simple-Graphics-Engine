@@ -65,6 +65,7 @@
 #include "component/ImageComponent.h"
 #include "component/PostProcessComponent.h"
 #include "component/WaterBodyComponent.h"
+#include "component/VolumeComponent.h"
 
 #include "runtime/Prefab.h"
 #include "memory/BuiltInAssets.h"

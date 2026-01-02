@@ -116,7 +116,7 @@ float lightMarch(vec3 p0)
 
 float rayMarch(vec3 ro, vec3 rd)
 {
-    float d = 0.;
+    float d = fract(sin(dot(ro.xy + rd.xy, vec2(12.9898, 78.233))) * 43758.5453) * MARCH_SIZE;
     vec4 res = vec4(0.0);
 
     float totalTransmittance = 1.0;

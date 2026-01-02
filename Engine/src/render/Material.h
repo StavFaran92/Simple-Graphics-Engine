@@ -180,6 +180,7 @@ public:
 		SERIALIZED_MEMBER(m_name);
 		SERIALIZED_MEMBER(m_renderMode);
 		SERIALIZED_MEMBER(m_persistentBlock);
+		SERIALIZED_MEMBER(m_customShader);
 	}
 
 	static AssetWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});

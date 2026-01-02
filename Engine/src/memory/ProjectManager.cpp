@@ -1,19 +1,7 @@
 #include "memory/ProjectManager.h"
 
-#include <filesystem>
-#include <fstream>
-#include <unordered_map>
-
-#include "core/Logger.h"
-#include "geometry/Mesh.h"
-#include "serialize/ProjectAssetRegistry.h"
-#include "geometry/MeshSerializer.h"
-#include "texture/Texture.h"
 #include "memory/Assets.h"
 #include "serialize/Archiver.h"
-#include "geometry/ModelImporter.h"
-#include "animation/AnimationLoader.h"
-#include "geometry/MeshCollection.h"
 //#include "TextureSerializer.h"
 #include <nlohmann/json.hpp>
 

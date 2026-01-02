@@ -215,6 +215,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 		"Skybox",
 		"Unlit",
 		"UI",
+		"Volume",
 		"Custom"
 	};
 

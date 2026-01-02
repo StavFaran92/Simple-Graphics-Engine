@@ -8,7 +8,6 @@
 #include "NativeScriptsLoader.h"
 #include "Dialogs.h"
 #include "Widgets.h"
-#include "dialogs/AssetSelectDialog.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -624,6 +623,34 @@ void InspectorWindow::display()
 
 		});
 
+		displayComponent<VolumeComponent>("Volume Component", [](VolumeComponent& volume) {
+
+			std::string meshName = "None";
+			if (!volume.mesh.isEmpty())
+			{
+				meshName = volume.mesh.info().name;
+			}
+
+			addAssetSelectWidget(meshName, AssetType::MESH, [&volume](UUID uuid) {
+				volume.mesh = AssetWrapper<MeshCollection>(uuid);
+				});
+
+			std::string matName = "None";
+			if (!volume.material.isEmpty())
+			{
+				matName = volume.material.info().name;
+				if (matName.empty())
+				{
+					matName = "Material";
+				}
+			}
+
+			addAssetSelectWidget(matName, AssetType::MATERIAL, [&volume](UUID uuid) {
+				volume.material = AssetWrapper<Material>(uuid);
+				});
+
+			});
+
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
 			});
 
@@ -715,6 +742,11 @@ void InspectorWindow::display()
 			if (ImGui::MenuItem("Post Process Effect"))
 			{
 				state.getSelectedEntity().addComponent<PostProcessComponent>();
+			}
+
+			if (ImGui::MenuItem("Volume"))
+			{
+				state.getSelectedEntity().addComponent<VolumeComponent>();
 			}
 
 			//Todo REMOVE
