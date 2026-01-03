@@ -5,7 +5,6 @@
 #include "core/Window.h"
 #include "camera/ICamera.h"
 #include "runtime/Scene.h"
-#include "systems/Skybox.h"
 #include "ui/Input.h"
 #include "core/EventSystem.h"
 #include "geometry/ModelImporter.h"
@@ -14,7 +13,6 @@
 #include "systems/TimeManager.h"
 #include "physics/PhysicsSystem.h"
 #include "core/Random.h"
-#include "systems/ShadowSystem.h"
 #include "render/ShaderLoader.h"
 #include "render/ShaderParser_tntmeijsImpl.h"
 #include "memory/ResourceManager.h"
@@ -23,7 +21,6 @@
 #include "geometry/ShapeFactory.h"
 #include "render/Material.h"
 #include "lights/DirectionalLight.h"
-#include "render/CommonShaders.h"
 #include "systems/BuiltInAssetsLoader.h"
 #include "memory/BuiltInAssets.h"
 #include "systems/ObjectPicker.h"
@@ -38,6 +35,7 @@
 
 #include "systems/FoliageSystem.h"
 #include "systems/WaterSystem.h"
+#include "systems/VolumetricSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/PostProcessComponent.h"
@@ -237,6 +235,12 @@ bool Engine::init(const InitParams& initParams)
     }
 
     auto waterSystem = new WaterSystem();
+    auto volumetricSystem = new VolumetricSystem();
+    if (!volumetricSystem->init())
+    {
+        logError("Volumetric System init failed!");
+        return false;
+    }
 
     if (initParams.loadExistingProject)
     {

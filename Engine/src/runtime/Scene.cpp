@@ -53,6 +53,7 @@
 #include "scripts/ScriptSystem.h"
 #include "memory/BuiltInAssets.h"
 #include "memory/BuiltInResources.h"
+#include "systems/VolumetricSystem.h"
 
 
 struct PlaneGPU {
@@ -523,60 +524,10 @@ void Scene::draw(float deltaTime)
 			// Render Volumetrics
 			for (auto&& [entity, volume] : m_registry->get().view<VolumeComponent>().each())
 			{
-				ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
-				renderView->swapToAdditionalTarget();
-				renderView->bind();
-				RenderCommand::clear();
-				glDisable(GL_DEPTH_TEST);
-				// TODO assert post process shader
-
-				if(volume.material.isEmpty())
-					continue;
-
-				auto& mat = volume.material.resource();
-
-				mat->getNonPersistentBlock().setTexture("MainTexture", renderTargetTexture);
-
 				Entity entityHandler(entity, &getRegistry());
-				
-				mat->getNonPersistentBlock().setUniformValue("view", graphics->view);
-				mat->getNonPersistentBlock().setUniformValue("projection", graphics->projection);
-
-				auto viewport = renderView->getViewport();
-				mat->getNonPersistentBlock().setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
-
-				mat->getNonPersistentBlock().setUniformValue("cameraPos", graphics->cameraPos);
-				mat->getNonPersistentBlock().setUniformValue("cameraLookAt", primaryCamera.front);
-
-				mat->use();
-
-				// bind mesh
-				ResourceWrapper<MeshCollection> mesh;
-				if (!volume.mesh.isEmpty())
-				{
-					mesh = volume.mesh.resource(); // will not work for hierarchical meshes
-				}
-				else
-				{
-					mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX).resource();
-
-				}
-
 				auto& transform = entityHandler.getComponent<Transformation>();
-				glm::mat4 modelTransform = transform.getWorldTransformation() * mesh.get()->getPrimaryMesh()->getRestTransform();
-				mat->getNonPersistentBlock().setUniformValue("model", modelTransform);
-
-
-				//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
-
-				// in frag shader i need access to mesh extentes & main texture -> set uniforms
-
-				// draw
-				RenderCommand::draw(mesh->getPrimaryMesh()->getVAO());
-
-				renderView->swapBackToMainTarget();
-				renderView->bind();
-				glEnable(GL_DEPTH_TEST);
+				glm::mat4 modelTransform = transform.getWorldTransformation();
+				VolumetricSystem::get()->drawVolumetric(volume, modelTransform);
 			}
 
 			glPopDebugGroup();
@@ -696,7 +647,7 @@ void Scene::draw(float deltaTime)
 
 						// 3rd pass
 						ResourceWrapper<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
-						m_highlightRenderView->swapBackToMainTarget(); // todo optimize (i should fetch the secondary texture instead)
+						m_highlightRenderView->swapBackToMainTargetWithCopy(); // todo optimize (i should fetch the secondary texture instead)
 						auto& edgeDetectedTexture = m_highlightRenderView->getRenderTargetTexture(); // todo fix
 						auto width = Engine::get()->getWindow()->getWidth();
 						auto height = Engine::get()->getWindow()->getHeight();
@@ -916,7 +867,7 @@ void Scene::draw(float deltaTime)
 				// draw
 				RenderCommand::draw(vao);
 
-				renderView->swapBackToMainTarget();
+				renderView->swapBackToMainTargetWithCopy();
 				renderView->bind();
 				glEnable(GL_DEPTH_TEST);
 			}

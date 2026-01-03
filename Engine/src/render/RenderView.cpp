@@ -66,7 +66,7 @@ ResourceWrapper<Texture> RenderView::getRenderTargetTexture() const
 
 unsigned int RenderView::getRenderTargetFrameBufferID() const
 {
-        return renderTargets[0].m_renderTargetFBO->getID();
+    return renderTargets[0].m_renderTargetFBO->getID();
 }
 
 void RenderView::setTexture(ResourceWrapper<Texture> texture)
@@ -100,10 +100,15 @@ void RenderView::swapToAdditionalTarget()
 void RenderView::swapBackToMainTarget()
 {
 	m_boundTargetTextureSlot = 0;
+}
+
+void RenderView::swapBackToMainTargetWithCopy()
+{
+	m_boundTargetTextureSlot = 0;
 
 	renderTargets[0].m_renderTargetFBO->bind();
 
-	RenderCommand::clear();
+	//RenderCommand::clear();
 
 	RenderCommand::copyFrameBufferData(renderTargets[1].m_renderTargetFBO->getID(),
 		renderTargets[0].m_renderTargetFBO->getID(),

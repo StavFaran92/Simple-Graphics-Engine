@@ -50,6 +50,7 @@ public:
 
 	void swapToAdditionalTarget();
 	void swapBackToMainTarget();
+	void swapBackToMainTargetWithCopy();
 
 	void setEnabled(bool isEnabled);
 	bool isEnabled() const;

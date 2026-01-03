@@ -152,19 +152,6 @@ mat3 lookAt(vec3 ro, vec3 target) {
     return mat3(r, u, f);
 }
 
-// void frag(inout vec3 color)
-// {
-//     vec2 xy = uv - .5;
-//     xy *= vec2(1, -1); // hack
-//     vec3 ro = vec3(0.0, 0.0, 5.0);
-//     vec3 rd = normalize(vec3(xy, -1));
-
-//     float res = rayMarch(ro, rd);
-//     color = vec3(res);
-
-
-// }
-
 void frag(inout vec3 color)
 {
     vec2 screenPos = gl_FragCoord.xy;
@@ -177,5 +164,9 @@ void frag(inout vec3 color)
     vec3 rd =  normalize(lookAt *vec3(xy, 1));
 
     float res = rayMarch(ro, rd);
-    color = vec3(res);
+    
+    vec3 baseColor = texture(MainTexture, screenUV).rgb;
+    vec3 volumeColor = vec3(1.0); // white cloud/fog light (you can change it)
+
+    color = mix(baseColor, volumeColor, clamp(res, 0.0, 1.0));
 }
