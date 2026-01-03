@@ -145,23 +145,15 @@ float rayMarch(vec3 ro, vec3 rd)
     return lightEnergy;
 }
 
-mat3 lookAt(vec3 ro, vec3 target) {
-    vec3 f = normalize(target - ro);
-    vec3 r = normalize(cross(vec3(0,1,0), f));
-    vec3 u = cross(f, r);
-    return mat3(r, u, f);
-}
-
 void frag(inout vec4 color)
 {
-    vec2 screenPos = gl_FragCoord.xy;
-    vec2 screenUV = screenPos / screenSize;
-    vec2 xy = screenUV - .5;
+    vec2 screenPos = gl_FragCoord.xy; // x in range [0.5 , width − 0.5]
+    vec2 screenUV = screenPos / screenSize; // (0,1)
+    vec2 xy = screenUV - .5; // (-0.5,0.5)
 
-    //color = texture(MainTexture, screenUV.xy).rgb;
-    mat3 lookAt = lookAt(cameraPos, cameraLookAt);
     vec3 ro = cameraPos;
-    vec3 rd =  normalize(lookAt *vec3(xy, 1));
+    mat3 camToWorld = transpose(mat3(view)); //from view-space to world-space
+    vec3 rd = normalize(camToWorld * vec3(xy, -1.0));
 
     float res = rayMarch(ro, rd);
     
