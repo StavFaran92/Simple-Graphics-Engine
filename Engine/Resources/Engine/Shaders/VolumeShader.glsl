@@ -46,6 +46,7 @@ out vec4 FragColor;
 // ----- Uniforms ----- //
 uniform vec3 cameraPos;
 uniform vec3 cameraLookAt;
+uniform float cameraFov;
 
 uniform vec2 screenSize;
 

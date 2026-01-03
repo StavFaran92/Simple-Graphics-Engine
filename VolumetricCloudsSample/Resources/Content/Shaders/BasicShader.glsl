@@ -147,13 +147,27 @@ float rayMarch(vec3 ro, vec3 rd)
 
 void frag(inout vec4 color)
 {
+
+
     vec2 screenPos = gl_FragCoord.xy; // x in range [0.5 , width − 0.5]
     vec2 screenUV = screenPos / screenSize; // (0,1)
+
+
+    vec2 ndc = screenUV * 2.0 - 1.0;   // [-1, 1]
+    ndc.x *= screenSize.x / screenSize.y; // aspect correction
+
+    float tanHalfFov = tan(cameraFov * 0.5);
+    vec3 rayView = normalize(vec3(
+        ndc.x * tanHalfFov,
+        ndc.y * tanHalfFov,
+        -1.0
+    ));
+
     vec2 xy = screenUV - .5; // (-0.5,0.5)
 
     vec3 ro = cameraPos;
     mat3 camToWorld = transpose(mat3(view)); //from view-space to world-space
-    vec3 rd = normalize(camToWorld * vec3(xy, -1.0));
+    vec3 rd = normalize(camToWorld * rayView);
 
     float res = rayMarch(ro, rd);
     

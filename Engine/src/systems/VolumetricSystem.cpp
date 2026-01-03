@@ -91,6 +91,7 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	const Entity& camera = graphics->renderView->getCamera();
 	auto& primaryCamera = camera.getComponent<CameraComponent>();
 	mat.get()->getNonPersistentBlock().setUniformValue("cameraLookAt", primaryCamera.front);
+	mat.get()->getNonPersistentBlock().setUniformValue("cameraFov", primaryCamera.fovyRadians);
 
 	mat.get()->use();
 
