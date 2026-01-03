@@ -49,8 +49,6 @@ uniform vec3 cameraLookAt;
 
 uniform vec2 screenSize;
 
-uniform sampler2D MainTexture;
-
 // ----- Methods ----- //
 
 #ifdef CUSTOM_SHADER
@@ -59,11 +57,11 @@ uniform sampler2D MainTexture;
 
 void main()
 {
-    vec3 color = vec3(0.0, 0.0, 0.0);
+    vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
 #ifdef CUSTOM_SHADER
     frag(color);
 #endif
 
-    FragColor = vec4(color, 1.0);
+    FragColor = color;
 }
