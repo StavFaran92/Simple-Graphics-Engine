@@ -68,7 +68,7 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	//ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 	//renderView->swapToAdditionalTarget();
 	//renderView->bind();
-	//RenderCommand::clear();
+	RenderCommand::clear();
 	glDisable(GL_DEPTH_TEST);
 	// TODO assert post process shader
 
