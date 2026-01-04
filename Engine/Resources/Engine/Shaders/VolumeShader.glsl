@@ -50,6 +50,8 @@ uniform float cameraFov;
 
 uniform vec2 screenSize;
 
+uniform sampler2D uMainTexture;
+
 // ----- Methods ----- //
 
 #ifdef CUSTOM_SHADER

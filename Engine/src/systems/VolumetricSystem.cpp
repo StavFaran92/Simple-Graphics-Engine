@@ -65,6 +65,8 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 
 	m_renderTargetFBO->bind();
 
+	ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+
 	//ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 	//renderView->swapToAdditionalTarget();
 	//renderView->bind();
@@ -93,6 +95,8 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	mat.get()->getNonPersistentBlock().setUniformValue("cameraLookAt", primaryCamera.front);
 	mat.get()->getNonPersistentBlock().setUniformValue("cameraFov", primaryCamera.fovyRadians);
 
+	mat.get()->getNonPersistentBlock().setTexture("uMainTexture", renderTargetTexture);
+
 	mat.get()->use();
 
 	// bind mesh
@@ -115,7 +119,7 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	// Now blend scene with drawn volumetrics
 	m_renderVolumeIntoSceneShader->use();
 
-	ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+	
 	m_renderVolumeIntoSceneShader->setTextureInShader(renderTargetTexture, "uMainTexture", 0);
 	m_renderVolumeIntoSceneShader->setTextureInShader(m_renderTargetTexture, "uVolumeColor", 1);
 

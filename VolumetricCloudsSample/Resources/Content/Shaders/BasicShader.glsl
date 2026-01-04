@@ -114,7 +114,7 @@ float lightMarch(vec3 p0)
     return transmittance;
 }
 
-float rayMarch(vec3 ro, vec3 rd)
+vec4 rayMarch(vec3 ro, vec3 rd)
 {
     float d = fract(sin(dot(ro.xy + rd.xy, vec2(12.9898, 78.233))) * 43758.5453) * MARCH_SIZE;
     vec4 res = vec4(0.0);
@@ -128,21 +128,21 @@ float rayMarch(vec3 ro, vec3 rd)
         float density = sceneSDF(p);
         if(density > 0.0)
         {
-            float transmittance = lightMarch(p);
-            totalTransmittance *= transmittance;
-            float luminance = density;
-            lightEnergy += totalTransmittance * luminance;
+            // float transmittance = lightMarch(p);
+            // totalTransmittance *= transmittance;
+            // float luminance = density;
+            // lightEnergy += totalTransmittance * luminance;
 
             // Directional derivative for fast diffuse lighting
-            // float diffuse = clamp((density - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
-            // vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
-            // vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
-            // color.rgb *= lin * color.a;
-            // res += color * (1.0 - res.a);
+            float diffuse = clamp((density - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
+            vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
+            vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
+            color.rgb *= lin * density;
+            res += color * (1.0 - res.a);
         }
         d += MARCH_SIZE;
     } 
-    return lightEnergy;
+    return res;
 }
 
 void frag(inout vec4 color)
@@ -159,9 +159,11 @@ void frag(inout vec4 color)
     mat3 camToWorld = transpose(mat3(view)); //from view-space to world-space
     vec3 rd = normalize(camToWorld * rayView);
 
-    float res = rayMarch(ro, rd);
+    vec4 res = rayMarch(ro, rd);
     
     vec3 volumeColor = vec3(1.0);
 
-    color = vec4(volumeColor, clamp(res, 0.0, 1.0));
+    vec3 bgColor = texture(uMainTexture, screenUV).rgb;
+
+    color = vec4(bgColor * (1.0 - res.a) + res.rgb, res.a);;
 }
