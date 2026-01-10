@@ -6,22 +6,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-
-#include "core/Logger.h"
 #include "core/Configurations.h"
-#include "core/CacheSystem.h"
 #include "core/Engine.h"
 #include "memory/ResourceWrapper.h"
 #include "memory/Assets.h"
 #include "core/Factory.h"
-#include "runtime/Context.h"
-#include "serialize/ProjectAssetRegistry.h"
 
 #include "texture/Texture.h" 
-
-#include "utils/EquirectangularToCubemapConverter.h"
 
 ResourceWrapper<Texture> Cubemap::createCubemapFromCubemapFiles(const std::vector<std::string>& faces)
 {
@@ -50,13 +41,8 @@ Texture::TextureData Cubemap::extractCubemapDataFromEquirectangularFile(const st
 	cubemapData.format = (Texture::Format)GL_RGB;
 	cubemapData.internalFormat = (Texture::InternalFormat)GL_RGB;
 	cubemapData.type = (Texture::Type)GL_UNSIGNED_BYTE;
-	cubemapData.params = {
-		{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-		{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE},
-	};
+	cubemapData.filter = Texture::TextureFilter::Linear;
+	cubemapData.wrap = Texture::TextureWrap::Clamp;
 
 	cubemapData.genMipMap = false;
 
@@ -124,13 +110,8 @@ ResourceWrapper<Texture> Cubemap::createDefaultCubemap()
 	cubemapData.internalFormat = Texture::InternalFormat::RGB2;
 	cubemapData.format = Texture::Format::RGB;
 	cubemapData.type = Texture::Type::UNSIGNED_BYTE;
-	cubemapData.params = {
-		{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-		{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE},
-	};
+	cubemapData.filter = Texture::TextureFilter::Linear;
+	cubemapData.wrap = Texture::TextureWrap::Clamp;
 	cubemapData.genMipMap = false;
 
 	return createCubemapFromBuffer(cubemapData);
@@ -145,13 +126,8 @@ ResourceWrapper<Texture> Cubemap::createEmptyCubemap(int width, int height, int 
 	cubemapData.internalFormat = (Texture::InternalFormat)internalFormat;
 	cubemapData.format = (Texture::Format)format;
 	cubemapData.type = (Texture::Type)type;
-	cubemapData.params = {
-		{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-		{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE},
-	};
+	cubemapData.filter = Texture::TextureFilter::Linear;
+	cubemapData.wrap = Texture::TextureWrap::Clamp;
 	cubemapData.genMipMap = false;
 
 	return createCubemapFromBuffer(cubemapData);
@@ -166,7 +142,7 @@ ResourceWrapper<Texture> Cubemap::createEmptyCubemap(int width, int height, int 
 	cubemapData.internalFormat = (Texture::InternalFormat)internalFormat;
 	cubemapData.format = (Texture::Format)format;
 	cubemapData.type = (Texture::Type)type;
-	cubemapData.params = params;
+	cubemapData.filter = filter;
 	cubemapData.genMipMap = createMipMaps;
 
 	return createCubemapFromBuffer(cubemapData);

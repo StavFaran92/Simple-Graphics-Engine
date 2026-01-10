@@ -41,7 +41,18 @@ bool ShadowSystem::init()
 	m_fbo.bind();
 
 	// Generate 2D texture
-	m_depthMapTexture = Texture::createTexture(SHADOW_WIDTH, SHADOW_HEIGHT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT);
+	Texture::TextureData textureData;
+	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	textureData.width = SHADOW_WIDTH;
+	textureData.height = SHADOW_HEIGHT;
+	textureData.channels = 1;
+	textureData.internalFormat = (Texture::InternalFormat)GL_DEPTH_COMPONENT;
+	textureData.format = (Texture::Format)GL_DEPTH_COMPONENT;
+	textureData.type = (Texture::Type)GL_FLOAT;
+	textureData.filter = Texture::TextureFilter::Linear;
+	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.data = nullptr;
+	m_depthMapTexture = Texture::createTexture(textureData);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);

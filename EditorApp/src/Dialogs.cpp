@@ -254,13 +254,24 @@ void displayTextureCreatorDialog()
 		{
 			if (uniqueName.isValid())
 			{
-				auto texture = Texture::createTexture(width, height);
+				Texture::TextureData textureData;
+				textureData.target = Texture::TextureTarget::TEXTURE_2D;
+				textureData.width = width;
+				textureData.height = height;
+				textureData.channels = 4;
+				textureData.internalFormat = Texture::InternalFormat::RGBA8;
+				textureData.format = Texture::Format::RGBA;
+				textureData.type = Texture::Type::UNSIGNED_BYTE;
+				textureData.filter = Texture::TextureFilter::Linear;
+				textureData.wrap = Texture::TextureWrap::Clamp;
+				textureData.data = nullptr;
+				auto texture = Texture::createTexture(textureData);
 				
 				AssetCreateDescriptor desc;
 				desc.aType = AssetType::TEXTURE;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-				desc.attributes = texture->getTextureAssetAttributes().toMap();
+				// desc.attributes = texture->getTextureAssetAttributes().toMap(); // TODO: Fix this - getTextureAssetAttributes doesn't exist anymore
 				Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
 
 				ImGui::CloseCurrentPopup();

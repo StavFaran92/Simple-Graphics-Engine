@@ -205,14 +205,18 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 	fbo.bind();
 
 	// Generate 2D LUT
-	auto lut = Texture::createTexture(512, 512, GL_RG16F, GL_RG, GL_FLOAT, 
-		{	
-			{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
-			{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR },
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR } 
-		},
-		true, nullptr);
+	Texture::TextureData textureData;
+	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	textureData.width = 512;
+	textureData.height = 512;
+	textureData.channels = 2;
+	textureData.internalFormat = Texture::InternalFormat::RG16F;
+	textureData.format = (Texture::Format)GL_RG;
+	textureData.type = Texture::Type::FLOAT;
+	textureData.filter = Texture::TextureFilter::Linear;
+	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.data = nullptr;
+	auto lut = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 512, 512 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);

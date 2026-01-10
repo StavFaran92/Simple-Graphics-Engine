@@ -49,12 +49,9 @@ void BuiltInAssetsLoader::loadTextures()
 		tData.internalFormat = Texture::InternalFormat::RGB2;
 		tData.format = Texture::Format::RGB;
 		tData.type = Texture::Type::UNSIGNED_BYTE;
-		tData.isEngineOwned = true;
+		tData.filter = Texture::TextureFilter::Linear;
+		tData.wrap = Texture::TextureWrap::Repeat;
 		tData.textureName = "SGE_TEXTURE_WHITE";
-		tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-						{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-						{GL_TEXTURE_WRAP_S, GL_REPEAT},
-						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
 
 		auto texture = Texture::createTexture(tData);
 
@@ -62,7 +59,7 @@ void BuiltInAssetsLoader::loadTextures()
 		desc.aType = AssetType::TEXTURE;
 		desc.name = tData.textureName;
 		desc.isEngineOwned = true;
-		desc.attributes = texture->getTextureAssetAttributes().toMap();
+		// desc.attributes = texture->getTextureAssetAttributes().toMap(); // TODO: Fix this - getTextureAssetAttributes doesn't exist anymore
 		Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
 	}
 
@@ -77,19 +74,16 @@ void BuiltInAssetsLoader::loadTextures()
 		tData.internalFormat = Texture::InternalFormat::RGB2;
 		tData.format = Texture::Format::RGB;
 		tData.type = Texture::Type::UNSIGNED_BYTE;
-		tData.isEngineOwned = true;
+		tData.filter = Texture::TextureFilter::Linear;
+		tData.wrap = Texture::TextureWrap::Repeat;
 		tData.textureName = "SGE_TEXTURE_BLACK";
-		tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-						{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-						{GL_TEXTURE_WRAP_S, GL_REPEAT},
-						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
 		auto texture = Texture::createTexture(tData);
 
 		Texture::TextureAssetDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.name = tData.textureName;
 		desc.isEngineOwned = true;
-		desc.attributes = texture->getTextureAssetAttributes().toMap();
+		// desc.attributes = texture->getTextureAssetAttributes().toMap(); // TODO: Fix this - getTextureAssetAttributes doesn't exist anymore
 		Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
 	}
 

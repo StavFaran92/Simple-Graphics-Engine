@@ -118,16 +118,18 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	int outputHeight = cubemapTexture.get()->getHeight() * 2;
 
 	// Generate cubemap
-	auto equirectnagular = Texture::createTexture(
-		outputWidth,
-		outputHeight,
-		GL_RGB, GL_RGB, GL_UNSIGNED_BYTE,
-		{
-			{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
-			{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR },
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR }
-		}, true, nullptr);
+	Texture::TextureData textureData;
+	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	textureData.width = outputWidth;
+	textureData.height = outputHeight;
+	textureData.channels = 3;
+	textureData.internalFormat = Texture::InternalFormat::RGB2;
+	textureData.format = Texture::Format::RGB;
+	textureData.type = Texture::Type::UNSIGNED_BYTE;
+	textureData.filter = Texture::TextureFilter::Linear;
+	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.data = nullptr;
+	auto equirectnagular = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ outputWidth, outputHeight };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);

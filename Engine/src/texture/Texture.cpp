@@ -197,7 +197,15 @@ void Texture::build(const TextureData& textureData)
 	bind();
 
 	setTextureParameters(textureData);
-	glTexImage2D(textureData.target, 0, textureData.internalFormat, m_data.width, m_data.height, 0, textureData.format, (int)textureData.type, textureData.data);
+	glTexImage2D(textureData.target, 
+		0, 
+		toGL(textureData.internalFormat), 
+		m_data.width, 
+		m_data.height, 
+		0, 
+		toGL(textureData.format), 
+		toGL(textureData.type), 
+		textureData.data);
 
 	if (textureData.genMipMap)
 	{
