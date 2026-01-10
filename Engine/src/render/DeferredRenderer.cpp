@@ -38,31 +38,31 @@ bool DeferredRenderer::setupGBuffer(int width, int height)
 	m_gBuffer.bind();
 
 	// Generate Texture for Position data
-	m_positionTexture = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_positionTexture = Texture::createTexture(width, height, 3, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
 	m_gBuffer.attachTexture(m_positionTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	// Generate Texture for Normal data
-	m_normalTexture = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_normalTexture = Texture::createTexture(width, height, 3, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
 	m_gBuffer.attachTexture(m_normalTexture.get()->getID(), GL_COLOR_ATTACHMENT1);
 
 	// Generate Texture for Albedo
-	m_albedoTexture = Texture::createEmptyTexture(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_albedoTexture = Texture::createTexture(width, height, 3, Texture::InternalFormat::RGBA, Texture::Format::RGBA, Texture::Type::UNSIGNED_BYTE);
 	m_gBuffer.attachTexture(m_albedoTexture.get()->getID(), GL_COLOR_ATTACHMENT2);
 
 	// Generate Texture for MRA
-	m_MRATexture = Texture::createEmptyTexture(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_MRATexture = Texture::createTexture(width, height, 3, Texture::InternalFormat::RGBA, Texture::Format::RGBA, Texture::Type::UNSIGNED_BYTE);
 	m_gBuffer.attachTexture(m_MRATexture.get()->getID(), GL_COLOR_ATTACHMENT3);
 
 	// Generate Texture for Position ViewSpace data
-	m_positionTextureVS = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_positionTextureVS = Texture::createTexture(width, 3, height, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
 	m_gBuffer.attachTexture(m_positionTextureVS.get()->getID(), GL_COLOR_ATTACHMENT4);
 
 	// Generate Texture for Normal ViewSpace data
-	m_normalTextureVS = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_normalTextureVS = Texture::createTexture(width, 3, height, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
 	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
 
 	// Generate Texture for Tangent data
-	m_TangentTexture = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_TangentTexture = Texture::createTexture(width, 3, height, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
 	m_gBuffer.attachTexture(m_TangentTexture.get()->getID(), GL_COLOR_ATTACHMENT6);
 
 	unsigned int attachments[7] = { 
@@ -123,22 +123,19 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 			});
 	}
 
-	m_ssaoNoiseTexture = Texture::create2DTextureFromBuffer(4, 4,
-		GL_RGBA32F,
-		GL_RGB,
-		GL_FLOAT, {
-		{ GL_TEXTURE_MIN_FILTER,	GL_NEAREST	},
-		{ GL_TEXTURE_MAG_FILTER,	GL_NEAREST	},
-		{ GL_TEXTURE_WRAP_S,		GL_REPEAT	},
-		{ GL_TEXTURE_WRAP_T,		GL_REPEAT   } },
-		true,
+	m_ssaoNoiseTexture = Texture::createTexture(4, 4, 1,
+		Texture::InternalFormat::RGBA32F,
+		Texture::Format::RGB,
+		Texture::Type::FLOAT, 
+		Texture::TextureFilter::Nearest,
+		Texture::TextureWrap::Repeat,
 		&ssaoNoise[0]
 		);
 
 	// Initialize SSAO FBO
 	m_ssaoFBO.bind();
 
-	m_ssaoColorBuffer = Texture::createEmptyTexture(ssaoBufferWidth, ssaoBufferHeight, GL_RED, GL_RED, GL_FLOAT);
+	m_ssaoColorBuffer = Texture::createTexture(ssaoBufferWidth, ssaoBufferHeight, 3, Texture::InternalFormat::R16, Texture::Format::RED, Texture::Type::FLOAT);
 	m_ssaoFBO.attachTexture(m_ssaoColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };
@@ -161,7 +158,7 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 	// Initialize SSAO Blur
 	m_ssaoBlurFBO.bind();
 
-	m_ssaoBlurColorBuffer = Texture::createEmptyTexture(ssaoBufferWidth, ssaoBufferHeight, GL_RED, GL_RED, GL_FLOAT);
+	m_ssaoBlurColorBuffer = Texture::createTexture(ssaoBufferWidth, ssaoBufferHeight, 3, Texture::InternalFormat::R16, Texture::Format::RED, Texture::Type::FLOAT);
 	m_ssaoBlurFBO.attachTexture(m_ssaoBlurColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	// Create RBO and attach to FBO

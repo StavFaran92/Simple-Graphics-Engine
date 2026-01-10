@@ -275,25 +275,25 @@ void bindAssets(sol::state& lua)
     );
 
     lua.new_usertype<Texture>("Texture",
-        "createEmptyTexture", sol::overload(
+        "createTexture", sol::overload(
             [](int width, int height) {
-                return Texture::createEmptyTexture(width, height);
+                return Texture::createTexture(width, height);
             },
             [](int width, int height, int internalFormat, int format, int type) {
-                return Texture::createEmptyTexture(width, height, internalFormat, format, type);
+                return Texture::createTexture(width, height, internalFormat, format, type);
             }
         ),
         "create2DTextureFromBuffer", sol::overload(
             [](int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data) {
-                return Texture::create2DTextureFromBuffer(width, height, internalFormat, format, type, params, isEngineOwned, data);
+                return Texture::createTexture(width, height, internalFormat, format, type, params, isEngineOwned, data);
             },
             [](const Texture::TextureData& textureData) {
-                return Texture::create2DTextureFromBuffer(textureData);
+                return Texture::createTexture(textureData);
             }
         ),
         "getWidth", &Texture::getWidth,
         "getHeight", &Texture::getHeight,
-        "getBitDepth", &Texture::getBitDepth,
+        "getBitDepth", &Texture::getChannels,
         "setData", &Texture::setData,
         "bind", &Texture::bind,
         "unbind", &Texture::unbind,

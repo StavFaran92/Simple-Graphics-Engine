@@ -75,15 +75,6 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	//ModelImporter::ModelInfo import(const std::string& path, ModelImportSettings settings = {});
-
-	/**
-	 * Import a model from a file.
-	 *
-	 * \param path			path to the given file
-	 * \param flipTexture	should flip loaded texture
-	 * \return A poitner to the newly created model
-	 */
 	void loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo);
 
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo);
@@ -97,7 +88,6 @@ private:
 	void processNode(const aiScene* aiScene, aiNode* aiNode);
 	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh);
 	AssetWrapper<Texture> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, AssetWrapper<Texture>>& cachedTextures, const AssetInfo& aInfo);
-	static Texture::TextureType getTextureType(aiTextureType type);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;
 	ModelLoadSession m_currentSession;

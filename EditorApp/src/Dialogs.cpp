@@ -233,12 +233,12 @@ void displayTextureCreatorDialog()
 	static TextureDataWidget textureDataWidget;
 	if (EditorState::Instance().showTextureCreateWindow)
 	{
-		ImGui::OpenPopup("CreateEmptyTexture");
+		ImGui::OpenPopup("createTexture");
 		EditorState::Instance().showTextureCreateWindow = false;
 
 		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewTexture", EditorState::Instance().getWorkingDir().path());
 	}
-	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("createTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		static int width = 512;
 		static int height = 512;
@@ -254,7 +254,7 @@ void displayTextureCreatorDialog()
 		{
 			if (uniqueName.isValid())
 			{
-				auto texture = Texture::createEmptyTexture(width, height);
+				auto texture = Texture::createTexture(width, height);
 				
 				AssetCreateDescriptor desc;
 				desc.aType = AssetType::TEXTURE;

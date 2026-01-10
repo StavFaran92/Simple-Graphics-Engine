@@ -5,27 +5,45 @@
 
 #include "core/Logger.h"
 #include "core/Configurations.h"
-#include "core/CacheSystem.h"
 #include "core/Engine.h"
 #include "memory/ResourceWrapper.h"
 #include "core/Factory.h"
-#include "runtime/Context.h"
-
-#include "utils/EquirectangularToCubemapConverter.h" // todo remove
-
-//#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-//#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
 
 #include "memory/Assets.h"
 
 #include "memory/AssetFactory.h"
 
-#include "memory/AssetLoader.h"
-
 #include "utils/EXRLoader.h"
+
+#include "utils/STBIHelper.h"
+
+GLint TextureWrapToOpenGL(Texture::TextureWrap wrap)
+{
+	switch (wrap)
+	{
+	case Texture::TextureWrap::Repeat: return GL_REPEAT;
+	case Texture::TextureWrap::Clamp:  return GL_CLAMP_TO_EDGE;
+	case Texture::TextureWrap::Mirror: return GL_MIRRORED_REPEAT;
+	default: return GL_CLAMP_TO_EDGE;
+	}
+}
+
+GLint TextureFilterToOpenGL(Texture::TextureFilter filter, bool hasMipmaps, bool isMinFilter)
+{
+	if (filter == Texture::TextureFilter::Nearest)
+	{
+		if (isMinFilter && hasMipmaps)
+			return GL_NEAREST_MIPMAP_NEAREST;
+		else
+			return GL_NEAREST;
+	}
+
+	// Linear
+	if (isMinFilter && hasMipmaps)
+		return GL_LINEAR_MIPMAP_LINEAR;
+	else
+		return GL_LINEAR;
+}
 
 namespace {
 	struct TextureManagerRegistration {
@@ -108,109 +126,82 @@ void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const 
 	}
 	else
 	{
-		stbi_write_png(fileLocation.c_str(),
+		STBIHelper::writeToPNG(fileLocation,
 			resource.get()->getWidth(),
 			resource.get()->getHeight(),
-			resource.get()->getBitDepth(),
+			resource.get()->getChannels(),
 			resource.get()->getData().data,
-			resource.get()->getWidth() * resource.get()->getBitDepth());
+			resource.get()->getWidth() * resource.get()->getChannels());
+
+		
 	}
 }
 
 Texture::Texture()
 	:m_id(0), m_slot(0)
+{}
+
+void Texture::setTextureParameters(const Texture::TextureData& tData)
 {
+	GLenum target = tData.target;
+
+	// Filtering
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, TextureFilterToOpenGL(tData.filter, tData.genMipMap, true));
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, TextureFilterToOpenGL(tData.filter, tData.genMipMap, false));
+
+	// Wrapping - all dimensions default to same wrap mode
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, TextureWrapToOpenGL(tData.wrap));
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, TextureWrapToOpenGL(tData.wrap));
+
+	if (target == TextureTarget::TEXTURE_3D || target == TextureTarget::TEXTURE_CUBE_MAP)
+	{
+		glTexParameteri(target, GL_TEXTURE_WRAP_R, TextureWrapToOpenGL(tData.wrap));
+	}
 }
 
-Texture::Texture(const Texture& other)
-	: m_id(other.m_id), m_slot(other.m_slot), m_data(other.m_data)
-{
-}
-
-ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height)
-{
-	return createEmptyTexture(width, height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE);
-}
-
-ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int internalFormat, int format, int type)
-{
-	TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
-	textureData.width = width;
-	textureData.height = height;
-	textureData.internalFormat = (InternalFormat)internalFormat;
-	textureData.format = (Format)format;
-	textureData.type = (Type)type;
-	textureData.params = {
-		{GL_TEXTURE_MIN_FILTER, GL_LINEAR },
-		{GL_TEXTURE_MAG_FILTER, GL_LINEAR },
-		{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-		{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
-	};
-
-	return create2DTextureFromBuffer(textureData);
-}
-
-ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int internalFormat, int format, int type, std::map<int, int> params)
-{
-	TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
-	textureData.width = width;
-	textureData.height = height;
-	textureData.internalFormat = (InternalFormat)internalFormat;
-	textureData.format = (Format)format;
-	textureData.type = (Type)type;
-	textureData.params = params;
-
-	return create2DTextureFromBuffer(textureData);
-}
-
-ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
+ResourceWrapper<Texture> Texture::createTexture(const TextureData& textureData)
 {
 	ResourceWrapper<Texture> texture = Factory<Texture>::create();
 	texture.get()->build(textureData);
 	return texture;
 }
 
-ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data)
+ResourceWrapper<Texture> Texture::createTexture(int width, int height, int channels, InternalFormat internalFormat, Format format, Type type, TextureFilter filter, TextureWrap wrap, void* data)
 {
 	TextureData textureData;
 	textureData.target = Texture::TextureTarget::TEXTURE_2D;
 	textureData.width = width;
 	textureData.height = height;
-	textureData.bpp = 4;
-	textureData.internalFormat = (InternalFormat)internalFormat;
-	textureData.format = (Format)format;
-	textureData.type = (Type)type;
-	textureData.params = params;
-	textureData.isEngineOwned = isEngineOwned;
+	textureData.channels = channels;
+	textureData.internalFormat = internalFormat;
+	textureData.format = format;
+	textureData.type = type;
+	textureData.filter = filter;
+	textureData.wrap = wrap;
 	textureData.data = data;
 
-	return create2DTextureFromBuffer(textureData);
+	return createTexture(textureData);
+}
+
+ResourceWrapper<Texture> Texture::createTexture(int width, int height, Texture::TextureSemantic usage, void* data)
+{
+	return ResourceWrapper<Texture>();
 }
 
 void Texture::build(const TextureData& textureData)
 {
 	m_data = textureData;
 
-	m_attributes.flip = textureData.flip;
-	m_attributes.genMipMap = textureData.genMipMap;
-	m_attributes.params = textureData.params;
-
 	// generate texture
 	glGenTextures(1, &m_id);
 	bind();
 
-	for (auto& [paramKey, paramValue] : textureData.params)
-	{
-		glTexParameteri(GL_TEXTURE_2D, paramKey, paramValue);
-	}
-
-	glTexImage2D(GL_TEXTURE_2D, 0, textureData.internalFormat, m_data.width, m_data.height, 0, textureData.format, (int)textureData.type, textureData.data);
+	setTextureParameters(textureData);
+	glTexImage2D(textureData.target, 0, textureData.internalFormat, m_data.width, m_data.height, 0, textureData.format, (int)textureData.type, textureData.data);
 
 	if (textureData.genMipMap)
 	{
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glGenerateMipmap(textureData.target);
 	}
 
 	unbind();
@@ -226,9 +217,9 @@ int Texture::getHeight() const
 	return m_data.height;
 }
 
-int Texture::getBitDepth() const
+int Texture::getChannels() const
 {
-	return m_data.bpp;
+	return m_data.channels;
 }
 
 void Texture::setData(int xoffset, int yoffset, int width, int height, const void* data)
@@ -242,31 +233,6 @@ void Texture::generateMipMaps()
 {
 	bind();
 	glGenerateMipmap(m_data.target);
-}
-
-std::string Texture::textureTypeToString(TextureType type)
-{
-	switch (type)
-	{
-		case Texture::TextureType::Diffuse:
-			return Constants::g_textureAlbedo;
-		case Texture::TextureType::Specular:
-			return Constants::g_textureSpecular;
-		case Texture::TextureType::Albedo:
-			return Constants::g_textureAlbedo;
-		case Texture::TextureType::Normal:
-			return Constants::g_textureNormal;
-		case Texture::TextureType::Metallic:
-			return Constants::g_textureMetallic;
-		case Texture::TextureType::Roughness:
-			return Constants::g_textureRoughness;
-		case Texture::TextureType::AmbientOcclusion:
-			return Constants::g_textureAO;
-
-		default:
-			logError("Unsupported texture format");
-			return "";
-	}
 }
 
 void Texture::bind() const
@@ -297,23 +263,6 @@ Texture::~Texture()
 	ClearTexture();
 }
 
-
-
-Texture::TextureAssetAttributes Texture::getTextureAssetAttributes()
-{
-	return m_attributes;;
-}
-
-void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Texture> texture)
-{
-	stbi_write_png(fileLocation.c_str(),
-		texture.get()->getWidth(),
-		texture.get()->getHeight(),
-		texture.get()->getBitDepth(),
-		texture.get()->getData().data,
-		texture.get()->getWidth() * texture.get()->getBitDepth());
-}
-
 AssetWrapper<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
@@ -324,30 +273,6 @@ ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureA
 {
 	desc.aType = AssetType::TEXTURE;
 	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Texture>();
-}
-
-void Texture::addTexture2D(ResourceWrapper<Texture> texture)
-{
-	addTexture2D("Texture_" + std::to_string(texture.getUID()).substr(4), texture);
-}
-
-void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> texture)
-{
-	texture.get()->bind();
-
-	// Allocate memory for the pixels
-	void* pixels = malloc(texture.get()->getWidth() * texture.get()->getHeight() * 3);
-
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-	texture->m_data.data = pixels;
-	texture->m_data.bpp = 3;
-
-	AssetCreateDescriptor aInfo;
-	aInfo.aType = AssetType::TEXTURE;
-	aInfo.name = name;
-	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-	Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
 }
 
 Texture::InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usage)
@@ -378,49 +303,15 @@ Texture::InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usag
 
 void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData)
 {
-	textureData.params = settings.params;
-
-	// if params not specified use default params values
-	if (textureData.params.empty())
-	{
-		if (settings.genMipMap)
-		{
-			textureData.params = {
-				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-			};
-		}
-		else
-		{
-			textureData.params = {
-				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_R, GL_REPEAT},
-				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-			};
-		}
-	}
-
+	textureData.filter = settings.filter;
+	textureData.wrap = settings.wrap;
 	textureData.genMipMap = settings.genMipMap;
 	textureData.flip = settings.flip;
 	textureData.internalFormat = getInternalFormatFromUsage(settings.usage);
-
-
-	//textureData.isTransient = settings.isTransient;
-	
 }
 
-unsigned char* Texture::decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels) 
-{
-	auto buffer = stbi_load_from_memory(rawBuffer, len, outWidth, outHeight, outChannels, 3);
-	return buffer;
-}
-
-ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocation)
-{
+//ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocation)
+//{
 	// TODO fix
 
 	//Texture::TextureData textureData;
@@ -484,13 +375,13 @@ ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocatio
 	//texture.get()->unbind();
 
 	//return texture;
-	return {};
-}
+	//return {};
+//}
 
 void Texture::extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
 {
 	// flip if needed
-	stbi_set_flip_vertically_on_load(textureData.flip);
+	STBIHelper::setFlip(textureData.flip);
 
 	std::filesystem::path p(fileLocation);
 	std::string ext = p.extension().string();
@@ -499,19 +390,19 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	{
 		EXRLoader::loadSingleChannelEXR(fileLocation, textureData.width, textureData.height, textureData.data);
 		textureData.type = Texture::Type::FLOAT;
-		textureData.bpp = 1;
+		textureData.channels = 1;
 
 		//InspectEXRChannels(fileLocation.c_str());
 	}
-	else if (stbi_is_hdr(fileLocation.c_str()))
+	else if (STBIHelper::isHDR(fileLocation.c_str()))
 	{
-		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+		textureData.data = STBIHelper::loadImageFloat(fileLocation, &textureData.width, &textureData.height, &textureData.channels);
 		textureData.type = Texture::Type::FLOAT;
 
 		float* pixels = static_cast<float*>(textureData.data);
 
 		bool detectedOverflowRadianceValues = false;
-		for (int i = 0; i < textureData.width * textureData.height * textureData.bpp; ++i) {
+		for (int i = 0; i < textureData.width * textureData.height * textureData.channels; ++i) {
 			if (!std::isfinite(pixels[i]) || std::abs(pixels[i]) > HALF_MAX)
 			{
 				pixels[i] = std::clamp(pixels[i], -HALF_MAX, HALF_MAX);
@@ -527,7 +418,7 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	}
 	else
 	{
-		textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+		textureData.data = STBIHelper::loadImage(fileLocation, &textureData.width, &textureData.height, &textureData.channels);
 		textureData.type = Texture::Type::UNSIGNED_BYTE;
 	}
 
@@ -538,15 +429,15 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	}
 
 	// Determine format based on bits per pixel (bpp)
-	if (textureData.bpp == 1)
+	if (textureData.channels == 1)
 	{
 		textureData.format = (Texture::Format)GL_RED;
 	}
-	else if (textureData.bpp == 3)
+	else if (textureData.channels == 3)
 	{
 		textureData.format = (Texture::Format)GL_RGB;
 	}
-	else if (textureData.bpp == 4)
+	else if (textureData.channels == 4)
 	{
 		textureData.format = (Texture::Format)GL_RGBA;
 	}

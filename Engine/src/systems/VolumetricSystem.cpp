@@ -26,7 +26,7 @@ bool VolumetricSystem::init()
 
 	m_renderTargetFBO->bind();
 
-	m_renderTargetTexture = Texture::createEmptyTexture(width, height, Texture::InternalFormat::RGBA32F, Texture::Format::RGBA, Texture::Type::FLOAT,
+	m_renderTargetTexture = Texture::createTexture(width, height, Texture::InternalFormat::RGBA32F, Texture::Format::RGBA, Texture::Type::FLOAT,
 		{
 			{GL_TEXTURE_MIN_FILTER, GL_LINEAR },
 			{GL_TEXTURE_MAG_FILTER, GL_LINEAR },

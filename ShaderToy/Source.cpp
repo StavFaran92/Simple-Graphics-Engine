@@ -20,7 +20,7 @@ static Color getPixel(int i, int j)
 //		int height = Engine::get()->getWindow()->getHeight();
 //
 //		auto& image = entity.getComponent<ImageComponent>();
-//		image.image = Texture::createEmptyTexture(width, height);
+//		image.image = Texture::createTexture(width, height);
 //		image.size = glm::vec2(width, height);
 //		image.position = glm::vec2(0, 0);
 //
@@ -57,7 +57,7 @@ public:
 
 		int width = Engine::get()->getWindow()->getWidth();
 		int height = Engine::get()->getWindow()->getHeight();
-		auto projectionTexture = Texture::createEmptyTexture(width, height);
+		auto projectionTexture = Texture::createTexture(width, height);
 
 		auto& shader = Shader::createOverrideShader("RayMarchSample", "../../ShaderToy/Resources/Content/Shaders/VolumetricClouds_v2.glsl", ShaderOverride::Pixel);
 		auto& shaderComponent = projectionEnt.addComponent<ShaderComponent>();

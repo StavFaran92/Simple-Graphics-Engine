@@ -3,24 +3,20 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <algorithm>
 
 #include "core/Logger.h"
 #include <filesystem>
 #include "geometry/MeshBuilder.h"
 #include "memory/ResourceWrapper.h"
 #include "render/Material.h"
-#include "runtime/Entity.h"
 #include "component/Component.h"
 #include "render/Shader.h"
 #include "core/Engine.h"
-#include "core/CacheSystem.h"
-#include "runtime/Scene.h"
 #include "memory/Assets.h"
 #include "utils/AssimpGLMHelpers.h"
 #include "core/Factory.h"
-#include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
+#include "utils/STBIHelper.h"
 
 #include "Utils/MikkTSpaceImpl.h"
 
@@ -630,7 +626,7 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 			const unsigned char* data = reinterpret_cast<unsigned char*>(aiTexture->pcData);
 
 			int channels = 0;
-			pixelData = Texture::decodeCompressedFromMemory(data, size, &width, &height, &channels);
+			pixelData = STBIHelper::decodeCompressedFromMemory(data, size, &width, &height, &channels);
 		}
 		else {
 			// Raw ARGB8888 pixels
@@ -639,41 +635,19 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 			pixelData = reinterpret_cast<unsigned char*>(aiTexture->pcData);
 		}
 
-		Texture::TextureData tData;
-		tData.target = Texture::TextureTarget::TEXTURE_2D;
-		tData.format = Texture::Format::RGB;
-		tData.internalFormat = Texture::InternalFormat::RGB2;
-		tData.isEngineOwned = aInfo.isEngineOwned;
-		tData.genMipMap = false;
-		tData.textureName = textureName;
-		tData.height = height;
-		tData.width = width;
-		tData.type = Texture::Type::UNSIGNED_BYTE;
-		tData.bpp = 3;
-		tData.data = (void*)pixelData;
-
-		tData.params = {
-			{GL_TEXTURE_MIN_FILTER, GL_NEAREST },
-			{GL_TEXTURE_MAG_FILTER, GL_NEAREST },
-			{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-			{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
-		};
-
-		texture = Factory<Texture>::create();
-		texture.get()->build(tData);
+		texture = Texture::createTexture(width, height, Texture::TextureSemantic::Color, pixelData);
 
 		AssetCreateDescriptor textureAssetDesc;
 		textureAssetDesc.aType = AssetType::TEXTURE;
-		textureAssetDesc.name = tData.textureName;
+		textureAssetDesc.name = textureName;
 		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.targetDirectory = aInfo.targetDirectory;
-		textureAssetDesc.attributes = texture->getTextureAssetAttributes().toMap();
 		AssetTexture = Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc).as<Texture>();
 
 		if (!textureName.empty())
 		{
-			cachedTextures.insert({ tData.textureName, AssetTexture });
+			cachedTextures.insert({ textureName, AssetTexture });
 		}
 	}	
 	else
@@ -701,20 +675,4 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 	}
 
 	return AssetTexture;
-}
-
-Texture::TextureType ModelImporter::getTextureType(aiTextureType type)
-{
-	switch (type)
-	{
-	case aiTextureType::aiTextureType_DIFFUSE:
-		return Texture::TextureType::Diffuse;
-	case aiTextureType::aiTextureType_SPECULAR:
-		return Texture::TextureType::Specular;
-	case aiTextureType::aiTextureType_HEIGHT:
-		return Texture::TextureType::Normal;
-	default:
-		logError("Unsupported type: " + type);
-		return Texture::TextureType::None;
-	}
 }

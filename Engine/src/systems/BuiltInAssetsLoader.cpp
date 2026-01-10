@@ -44,7 +44,7 @@ void BuiltInAssetsLoader::loadTextures()
 		tData.target = Texture::TextureTarget::TEXTURE_2D;
 		tData.width = 1;
 		tData.height = 1;
-		tData.bpp = 3;
+		tData.channels = 3;
 		tData.data = whiteColor;
 		tData.internalFormat = Texture::InternalFormat::RGB2;
 		tData.format = Texture::Format::RGB;
@@ -56,7 +56,7 @@ void BuiltInAssetsLoader::loadTextures()
 						{GL_TEXTURE_WRAP_S, GL_REPEAT},
 						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
 
-		auto texture = Texture::create2DTextureFromBuffer(tData);
+		auto texture = Texture::createTexture(tData);
 
 		Texture::TextureAssetDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
@@ -72,7 +72,7 @@ void BuiltInAssetsLoader::loadTextures()
 		tData.target = Texture::TextureTarget::TEXTURE_2D;
 		tData.width = 1;
 		tData.height = 1;
-		tData.bpp = 3;
+		tData.channels = 3;
 		tData.data = blackColor;
 		tData.internalFormat = Texture::InternalFormat::RGB2;
 		tData.format = Texture::Format::RGB;
@@ -83,7 +83,7 @@ void BuiltInAssetsLoader::loadTextures()
 						{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
 						{GL_TEXTURE_WRAP_S, GL_REPEAT},
 						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
-		auto texture = Texture::create2DTextureFromBuffer(tData);
+		auto texture = Texture::createTexture(tData);
 
 		Texture::TextureAssetDescriptor desc;
 		desc.aType = AssetType::TEXTURE;

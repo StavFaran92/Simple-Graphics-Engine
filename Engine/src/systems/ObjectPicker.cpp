@@ -47,7 +47,7 @@ bool ObjectPicker::init()
 	int height = Engine::get()->getWindow()->getHeight();
 
 	// Create a empty texture and attach to FBO
-	m_targetTexture = Texture::createEmptyTexture(width, height, GL_RGB32UI, GL_RGB_INTEGER, GL_UNSIGNED_INT);
+	m_targetTexture = Texture::createTexture(width, height, GL_RGB32UI, GL_RGB_INTEGER, GL_UNSIGNED_INT);
 	m_frameBuffer->attachTexture(m_targetTexture.get()->getID());
 
 	// Create RBO and attach to FBO

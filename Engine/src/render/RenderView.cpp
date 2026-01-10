@@ -13,7 +13,7 @@ RenderTarget::RenderTarget(Viewport viewport)
 
 	m_renderTargetFBO->bind();
 
-	m_renderTargetTexture = Texture::createEmptyTexture(viewport.w, viewport.h, Texture::InternalFormat::RGBA8, Texture::Format::RGB, Texture::Type::UNSIGNED_BYTE, 
+	m_renderTargetTexture = Texture::createTexture(viewport.w, viewport.h, Texture::InternalFormat::RGBA8, Texture::Format::RGB, Texture::Type::UNSIGNED_BYTE, 
 		{ 
 			{GL_TEXTURE_MIN_FILTER, GL_LINEAR },
 			{GL_TEXTURE_MAG_FILTER, GL_LINEAR },

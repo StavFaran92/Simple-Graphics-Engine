@@ -39,25 +39,22 @@ AssetWrapper<Texture> Terrain::generateHeightmap(int width, int height)
 	tData.target = Texture::TextureTarget::TEXTURE_2D;
 	tData.width = width;
 	tData.height = height;
-	tData.bpp = 1;
+	tData.channels = 1;
 	tData.data = m_heightDataCPU.data();
 	tData.internalFormat = Texture::InternalFormat::R32F;
 	tData.format = Texture::Format::RED;
 	tData.type = Texture::Type::FLOAT;
-	tData.isEngineOwned = true;
 	tData.textureName = "SGE_TERRAIN_HEIGHTMAP";
-	tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-					{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-					{GL_TEXTURE_WRAP_S, GL_CLAMP},
-					{GL_TEXTURE_WRAP_T, GL_CLAMP } };
+	tData.filter = Texture::TextureFilter::Linear;
+	tData.wrap = Texture::TextureWrap::Clamp;
 
-	auto texture = Texture::create2DTextureFromBuffer(tData);
+	auto texture = Texture::createTexture(tData);
 
 	Texture::TextureAssetDescriptor desc;
 	desc.aType = AssetType::TEXTURE;
 	desc.name = "SGE_TERRAIN_HEIGHTMAP";
 	desc.isEngineOwned = true;
-	desc.attributes = texture->getTextureAssetAttributes().toMap();
+	//desc.attributes = texture->getTextureAssetAttributes().toMap();
 	desc.usage = Texture::TextureSemantic::Heightmap;
 	auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc).as<Texture>();
 
@@ -371,8 +368,8 @@ void Terrain::syncHeightmap()
 	glGetTexImage(
 		GL_TEXTURE_2D,
 		0,
-		m_heightmap.get()->getData().format,
-		m_heightmap.get()->getData().type,
+		toGL(m_heightmap.get()->getData().format),
+		toGL(m_heightmap.get()->getData().type),
 		m_heightDataCPU.data()
 	);
 

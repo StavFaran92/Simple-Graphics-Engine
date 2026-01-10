@@ -19,7 +19,7 @@
 
 ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture)
 {
-	auto dstTexture = Texture::create2DTextureFromBuffer(srcTexture.get()->getData());
+	auto dstTexture = Texture::createTexture(srcTexture.get()->getData());
 	flipVertical(srcTexture, dstTexture);
 	return dstTexture;
 }
@@ -66,7 +66,7 @@ void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, Resou
 
 ResourceWrapper<Texture> TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTexture)
 {
-	auto dstTexture = Texture::create2DTextureFromBuffer(srcTexture.get()->getData());
+	auto dstTexture = Texture::createTexture(srcTexture.get()->getData());
 	applyGammaCorrection(srcTexture, dstTexture);
 	return dstTexture;
 }

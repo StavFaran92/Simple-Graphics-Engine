@@ -205,7 +205,7 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 	fbo.bind();
 
 	// Generate 2D LUT
-	auto lut = Texture::create2DTextureFromBuffer(512, 512, GL_RG16F, GL_RG, GL_FLOAT, 
+	auto lut = Texture::createTexture(512, 512, GL_RG16F, GL_RG, GL_FLOAT, 
 		{	
 			{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
 			{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },

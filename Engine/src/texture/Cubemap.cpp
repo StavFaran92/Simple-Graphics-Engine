@@ -45,7 +45,7 @@ Texture::TextureData Cubemap::extractCubemapDataFromEquirectangularFile(const st
 	cubemapData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
 
 	int width, height, nrChannels;
-	cubemapData.facesData[0] = stbi_load(fileLocation.c_str(), &cubemapData.width, &cubemapData.height, &cubemapData.bpp, 0);
+	cubemapData.facesData[0] = stbi_load(fileLocation.c_str(), &cubemapData.width, &cubemapData.height, &cubemapData.channels, 0);
 
 	cubemapData.format = (Texture::Format)GL_RGB;
 	cubemapData.internalFormat = (Texture::InternalFormat)GL_RGB;
@@ -180,7 +180,7 @@ Texture::TextureData Cubemap::extractCubemapDataFromCubemapFiles(const std::vect
 	int width, height, nrChannels;
 	for (unsigned int i = 0; i < files.size(); i++)
 	{
-		cubemapData.facesData[i] = stbi_load(files[i].c_str(), &cubemapData.width, &cubemapData.height, &cubemapData.bpp, 0);
+		cubemapData.facesData[i] = stbi_load(files[i].c_str(), &cubemapData.width, &cubemapData.height, &cubemapData.channels, 0);
 	}
 
 	cubemapData.format = (Texture::Format)GL_RGB;
@@ -239,7 +239,7 @@ void Cubemap::saveEquirectangularMap(ResourceWrapper<Texture> equirectangularMap
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
 	equirectangularMap->m_data.data = pixels;
-	equirectangularMap->m_data.bpp = 3;
+	equirectangularMap->m_data.channels = 3;
 
 	AssetCreateDescriptor aInfo;
 	aInfo.aType = AssetType::TEXTURE;

@@ -118,7 +118,7 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	int outputHeight = cubemapTexture.get()->getHeight() * 2;
 
 	// Generate cubemap
-	auto equirectnagular = Texture::create2DTextureFromBuffer(
+	auto equirectnagular = Texture::createTexture(
 		outputWidth,
 		outputHeight,
 		GL_RGB, GL_RGB, GL_UNSIGNED_BYTE,
