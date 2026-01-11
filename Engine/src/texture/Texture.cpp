@@ -143,19 +143,19 @@ Texture::Texture()
 
 void Texture::setTextureParameters(const Texture::TextureData& tData)
 {
-	GLenum target = tData.target;
+	GLenum targetGL = toGL(tData.target);
 
 	// Filtering
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, TextureFilterToOpenGL(tData.filter, tData.genMipMap, true));
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, TextureFilterToOpenGL(tData.filter, tData.genMipMap, false));
+	glTexParameteri(targetGL, GL_TEXTURE_MIN_FILTER, TextureFilterToOpenGL(tData.filter, tData.genMipMap, true));
+	glTexParameteri(targetGL, GL_TEXTURE_MAG_FILTER, TextureFilterToOpenGL(tData.filter, tData.genMipMap, false));
 
 	// Wrapping - all dimensions default to same wrap mode
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, TextureWrapToOpenGL(tData.wrap));
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, TextureWrapToOpenGL(tData.wrap));
+	glTexParameteri(targetGL, GL_TEXTURE_WRAP_S, TextureWrapToOpenGL(tData.wrap));
+	glTexParameteri(targetGL, GL_TEXTURE_WRAP_T, TextureWrapToOpenGL(tData.wrap));
 
-	if (target == TextureTarget::TEXTURE_3D || target == TextureTarget::TEXTURE_CUBE_MAP)
+	if (tData.target == TextureTarget::TEXTURE_3D || tData.target == TextureTarget::TEXTURE_CUBE_MAP)
 	{
-		glTexParameteri(target, GL_TEXTURE_WRAP_R, TextureWrapToOpenGL(tData.wrap));
+		glTexParameteri(targetGL, GL_TEXTURE_WRAP_R, TextureWrapToOpenGL(tData.wrap));
 	}
 }
 
@@ -200,7 +200,7 @@ void Texture::build(const TextureData& textureData)
 
 	if (textureData.target == Texture::TextureTarget::TEXTURE_2D)
 	{
-		glTexImage2D(textureData.target,
+		glTexImage2D(toGL(textureData.target),
 			0,
 			toGL(textureData.internalFormat),
 			m_data.width,
@@ -232,7 +232,7 @@ void Texture::build(const TextureData& textureData)
 
 	if (textureData.genMipMap)
 	{
-		glGenerateMipmap(textureData.target);
+		glGenerateMipmap(toGL(textureData.target));
 	}
 
 	unbind();
@@ -263,19 +263,19 @@ void Texture::setData(int xoffset, int yoffset, int width, int height, const voi
 void Texture::generateMipMaps()
 {
 	bind();
-	glGenerateMipmap(m_data.target);
+	glGenerateMipmap(toGL(m_data.target));
 }
 
 void Texture::bind() const
 {
 	glActiveTexture(GL_TEXTURE0 + m_slot);
-	glBindTexture(m_data.target, m_id);
+	glBindTexture(toGL(m_data.target), m_id);
 }
 
 void Texture::unbind() const
 {
 	glActiveTexture(GL_TEXTURE0 + m_slot);
-	glBindTexture(m_data.target, 0);
+	glBindTexture(toGL(m_data.target), 0);
 }
 
 unsigned int Texture::getID() const
@@ -311,7 +311,7 @@ Texture::InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usag
 	switch (usage)
 	{
 	case Texture::TextureSemantic::Color:
-		return Texture::InternalFormat::RGB2;
+		return Texture::InternalFormat::RGB;
 
 	case Texture::TextureSemantic::Normal:
 		return Texture::InternalFormat::RGB16F;
@@ -329,7 +329,7 @@ Texture::InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usag
 		return Texture::InternalFormat::RGB16F;
 	}
 
-	return Texture::InternalFormat::RGB2;
+	return Texture::InternalFormat::RGB;
 }
 
 void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData)

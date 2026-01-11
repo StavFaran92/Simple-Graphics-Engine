@@ -166,7 +166,7 @@ void Scene::init(Context* context)
 	defaultCubemapData.width = 1;
 	defaultCubemapData.height = 1;
 	defaultCubemapData.channels = 3;
-	defaultCubemapData.internalFormat = Texture::InternalFormat::RGB2;
+	defaultCubemapData.internalFormat = Texture::InternalFormat::RGB;
 	defaultCubemapData.format = Texture::Format::RGB;
 	defaultCubemapData.type = Texture::Type::UNSIGNED_BYTE;
 	defaultCubemapData.filter = Texture::TextureFilter::Linear;
@@ -185,7 +185,7 @@ void Scene::init(Context* context)
 	defaultCubemapData2.width = 1;
 	defaultCubemapData2.height = 1;
 	defaultCubemapData2.channels = 3;
-	defaultCubemapData2.internalFormat = Texture::InternalFormat::RGB2;
+	defaultCubemapData2.internalFormat = Texture::InternalFormat::RGB;
 	defaultCubemapData2.format = Texture::Format::RGB;
 	defaultCubemapData2.type = Texture::Type::UNSIGNED_BYTE;
 	defaultCubemapData2.filter = Texture::TextureFilter::Linear;

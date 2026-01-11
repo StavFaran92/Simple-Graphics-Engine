@@ -2,15 +2,12 @@
 
 #include <iostream>
 #include <string>
-#include <map>
 
 #include "core/Core.h"
 #include "memory/ResourceWrapper.h"
 #include "memory/Asset.h"
 
 using json = nlohmann::json;
-
-
 
 struct AssetInfo;
 
@@ -82,7 +79,7 @@ public:
 		RGBA16F = 0x881A,
 		RGB16F = 0x881B,
 
-		RGB2 = 0x1907, // TODO fix
+		RGB = 0x1907,
 		RGBA = 0x1908
 	};
 
@@ -105,7 +102,7 @@ public:
 		FLOAT = 0x1406
 	};
 
-	enum TextureTarget : int
+	enum class TextureTarget : int
 	{
 		TEXTURE_2D = 0x0DE1,
 		TEXTURE_3D = 0x806F,
@@ -118,7 +115,7 @@ public:
 		int width = 0;
 		int height = 0;
 		int channels = 0;
-		InternalFormat internalFormat = Texture::InternalFormat::RGB2;
+		InternalFormat internalFormat = Texture::InternalFormat::RGB;
 		Format format = Texture::Format::RGB;
 		TextureTarget target = Texture::TextureTarget::TEXTURE_2D;
 		Type type = Texture::Type::UNSIGNED_BYTE;
@@ -155,55 +152,6 @@ public:
 		);
 	};
 
-	
-
-	//struct TextureAssetAttributes
-	//{
-	//	bool genMipMap = false;
-	//	bool flip = false;
-	//	bool isHDR = false;
-	//	std::map<int, int> params;
-
-	//	// Serialize all members into map<string, string>
-	//	std::map<std::string, std::string> toMap() const
-	//	{
-	//		std::map<std::string, std::string> out;
-	//		out["gen_mip_map"] = genMipMap ? "true" : "false";
-	//		out["flip"] = flip ? "true" : "false";
-	//		out["is_hdr"] = isHDR ? "true" : "false";
-
-	//		for (const auto& [key, value] : params)
-	//		{
-	//			out["param_" + std::to_string(key)] = std::to_string(value);
-	//		}
-
-	//		return out;
-	//	}
-
-	//	TextureAssetAttributes()
-	//	{
-	//	}
-
-	//	// Deserialize from map<string, string>
-	//	TextureAssetAttributes(const std::map<std::string, std::string>& in)
-	//	{
-	//		genMipMap = in.at("gen_mip_map") == "true";
-	//		flip = in.at("flip") == "true";
-	//		isHDR = in.at("is_hdr") == "true";
-
-	//		params.clear();
-	//		for (const auto& [key, value] : in)
-	//		{
-	//			if (key.rfind("param_", 0) == 0)  // key starts with "param_"
-	//			{
-	//				int paramKey = std::stoi(key.substr(6));
-	//				int paramValue = std::stoi(value);
-	//				params[paramKey] = paramValue;
-	//			}
-	//		}
-	//	}
-	//};
-
 	Texture();
 
 	static ResourceWrapper<Texture> createTexture(const TextureData& textureData);
@@ -239,8 +187,6 @@ public:
 
 	TextureData& getData() { return m_data; }
 
-	//TextureAssetAttributes getTextureAssetAttributes();
-
 	static AssetWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
 	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureAssetDescriptor = {});
 
@@ -258,25 +204,14 @@ private:
 
 	static void extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData);
 
-
-
 private:
 	uint32_t m_id = 0;
 	int m_slot = 0;
 	
 	TextureData m_data;
-	//TextureAssetAttributes m_attributes;
 };
 
 template<typename T>
 GLenum toGL(T arg) {
 	return static_cast<GLenum>(arg);
 }
-
-//GLenum toGL(Texture::InternalFormat format) {
-//	return static_cast<GLenum>(format);
-//}
-//
-//GLenum toGL(Texture::Type type) {
-//	return static_cast<GLenum>(type);
-//}

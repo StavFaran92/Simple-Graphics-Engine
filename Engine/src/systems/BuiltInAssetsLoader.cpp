@@ -45,7 +45,7 @@ void BuiltInAssetsLoader::loadTextures()
 		tData.height = 1;
 		tData.channels = 3;
 		tData.data = whiteColor;
-		tData.internalFormat = Texture::InternalFormat::RGB2;
+		tData.internalFormat = Texture::InternalFormat::RGB;
 		tData.format = Texture::Format::RGB;
 		tData.type = Texture::Type::UNSIGNED_BYTE;
 		tData.filter = Texture::TextureFilter::Linear;
@@ -70,7 +70,7 @@ void BuiltInAssetsLoader::loadTextures()
 		tData.height = 1;
 		tData.channels = 3;
 		tData.data = blackColor;
-		tData.internalFormat = Texture::InternalFormat::RGB2;
+		tData.internalFormat = Texture::InternalFormat::RGB;
 		tData.format = Texture::Format::RGB;
 		tData.type = Texture::Type::UNSIGNED_BYTE;
 		tData.filter = Texture::TextureFilter::Linear;

@@ -120,7 +120,7 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	textureData.width = outputWidth;
 	textureData.height = outputHeight;
 	textureData.channels = 3;
-	textureData.internalFormat = Texture::InternalFormat::RGB2;
+	textureData.internalFormat = Texture::InternalFormat::RGB;
 	textureData.format = Texture::Format::RGB;
 	textureData.type = Texture::Type::UNSIGNED_BYTE;
 	textureData.filter = Texture::TextureFilter::Linear;
