@@ -150,7 +150,8 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 
 bool TransformTool::onEvent(SDL_Event e)
 {
-	if (ImGuizmo::IsUsing() || ImGuizmo::IsOver() || m_toolbarActive)
+	if ((e.type == SDL_MOUSEBUTTONDOWN && static_cast<MouseButton>(e.button.button) == MOUSE_BUTTON_LEFT) && 
+		(ImGuizmo::IsUsing() || ImGuizmo::IsOver() || m_toolbarActive))
 	{
 		// Consume input so selection / camera doesn't fire
 		return true;
