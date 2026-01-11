@@ -618,6 +618,7 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 
 		int width = 0;
 		int height = 0;
+		int channels = 0;
 		unsigned char* pixelData = nullptr;
 		if (aiTexture->mHeight == 0)
 		{
@@ -625,7 +626,7 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 			size_t size = aiTexture->mWidth;
 			const unsigned char* data = reinterpret_cast<unsigned char*>(aiTexture->pcData);
 
-			int channels = 0;
+			
 			pixelData = STBIHelper::decodeCompressedFromMemory(data, size, &width, &height, &channels);
 		}
 		else {

@@ -185,7 +185,65 @@ ResourceWrapper<Texture> Texture::createTexture(int width, int height, int chann
 
 ResourceWrapper<Texture> Texture::createTexture(int width, int height, Texture::TextureSemantic usage, void* data)
 {
-	return ResourceWrapper<Texture>();
+	InternalFormat internalFormat = getInternalFormatFromUsage(usage);
+	Format format = Format::RGBA;
+	Type type = Type::UNSIGNED_BYTE;
+	TextureFilter filter = TextureFilter::Linear;
+	TextureWrap wrap = TextureWrap::Clamp;
+	int channels = 3;
+
+	switch (usage)
+	{
+	case TextureSemantic::Color:
+		format = Format::RGB;
+		type = Type::UNSIGNED_BYTE;
+		channels = 3;
+		break;
+
+	case TextureSemantic::Normal:
+		format = Format::RGB;
+		type = Type::UNSIGNED_BYTE;
+		channels = 3;
+		break;
+
+	case TextureSemantic::Mask:
+		format = Format::RED;
+		type = Type::UNSIGNED_BYTE;
+		channels = 1;
+		break;
+
+	case TextureSemantic::Heightmap:
+		format = Format::RED;
+		type = Type::FLOAT;
+		channels = 1;
+		break;
+
+	case TextureSemantic::Data:
+		format = Format::RGBA;
+		type = Type::FLOAT;
+		channels = 4;
+		break;
+
+	case TextureSemantic::Environment:
+		format = Format::RGB;
+		type = Type::FLOAT;
+		channels = 3;
+		break;
+
+	case TextureSemantic::LUT:
+		format = Format::RGB;
+		type = Type::UNSIGNED_BYTE;
+		channels = 3;
+		break;
+
+	default:
+		format = Format::RGBA;
+		type = Type::UNSIGNED_BYTE;
+		channels = 3;
+		break;
+	}
+
+	return Texture::createTexture(width, height, channels, internalFormat, format, type, filter, wrap, data);
 }
 
 void Texture::build(const TextureData& textureData)
@@ -306,7 +364,7 @@ ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureA
 	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Texture>();
 }
 
-Texture::InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usage)
+Texture::InternalFormat Texture::getInternalFormatFromUsage(Texture::TextureSemantic usage)
 {
 	switch (usage)
 	{

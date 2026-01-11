@@ -204,6 +204,8 @@ private:
 
 	static void extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData);
 
+	static InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usage);
+
 private:
 	uint32_t m_id = 0;
 	int m_slot = 0;
