@@ -54,15 +54,15 @@ bool DeferredRenderer::setupGBuffer(int width, int height)
 	m_gBuffer.attachTexture(m_MRATexture.get()->getID(), GL_COLOR_ATTACHMENT3);
 
 	// Generate Texture for Position ViewSpace data
-	m_positionTextureVS = Texture::createTexture(width, 3, height, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
+	m_positionTextureVS = Texture::createTexture(width, height, 3, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
 	m_gBuffer.attachTexture(m_positionTextureVS.get()->getID(), GL_COLOR_ATTACHMENT4);
 
 	// Generate Texture for Normal ViewSpace data
-	m_normalTextureVS = Texture::createTexture(width, 3, height, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
+	m_normalTextureVS = Texture::createTexture(width, height, 3, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
 	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
 
 	// Generate Texture for Tangent data
-	m_TangentTexture = Texture::createTexture(width, 3, height, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
+	m_TangentTexture = Texture::createTexture(width, height, 3, Texture::InternalFormat::RGBA16F, Texture::Format::RGBA, Texture::Type::FLOAT);
 	m_gBuffer.attachTexture(m_TangentTexture.get()->getID(), GL_COLOR_ATTACHMENT6);
 
 	unsigned int attachments[7] = { 
