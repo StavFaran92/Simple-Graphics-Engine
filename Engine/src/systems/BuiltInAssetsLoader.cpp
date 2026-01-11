@@ -1,7 +1,6 @@
 #include "systems/BuiltInAssetsLoader.h"
 
 #include "memory/Assets.h"
-#include "texture/Cubemap.h"
 #include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
 #include "core/CacheSystem.h"

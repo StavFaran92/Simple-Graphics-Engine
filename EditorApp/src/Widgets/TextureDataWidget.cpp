@@ -19,11 +19,7 @@ void TextureDataWidget::draw()
 	// --- Filter type ---
 	static const char* filterModes[] = {
 		"Nearest",
-		"Linear",
-		"Nearest Mip Nearest",
-		"Linear Mip Nearest",
-		"Nearest Mip Linear",
-		"Linear Mip Linear"
+		"Linear"
 	};
 
 	ImGui::Text("Filter Mode");
@@ -36,9 +32,8 @@ void TextureDataWidget::draw()
 	// --- Wrap mode (the one you meant: repeat / clamp-to-edge / clamp-to-border / mirrored-repeat) ---
 	static const char* wrapModes[] = {
 		"Repeat",
-		"Clamp to Edge",
-		"Clamp to Border",
-		"Mirrored Repeat"
+		"Clamp",
+		"Mirror"
 	};
 
 	ImGui::Text("Wrap Mode");

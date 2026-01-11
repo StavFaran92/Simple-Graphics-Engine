@@ -5,25 +5,16 @@
 #include "render/RenderBufferObject.h"
 #include "memory/ResourceWrapper.h"
 #include "render/Shader.h"
-#include "geometry/ShapeFactory.h"
 
 #include "GL/glew.h"
 #include "glm/ext.hpp"
 #include "core/Logger.h"
 
 #include "render/RenderCommand.h"
-#include "runtime/Entity.h"
 #include "component/Component.h"
 #include "geometry/MeshCollection.h"
-#include "runtime/Context.h"
-#include "texture/Cubemap.h"
-#include "texture/TextureTransformer.h"
-#include "component/MeshRendererComponent.h"
-#include "component/ObjectComponent.h"
-#include "component/RenderableComponent.h"
 #include "memory/BuiltInAssets.h"
 
-#include "core/Engine.h"
 
 
 ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(ResourceWrapper<Texture> equirectangularTexture)
@@ -38,13 +29,19 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 	fbo.bind();
 
 	// Generate cubemap
-	auto cubemap = Cubemap::createEmptyCubemap(512, 512, GL_RGB16F, GL_RGB, GL_FLOAT, {
-		{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-		{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE},
-		}, true);
+	Texture::TextureData textureData;
+	textureData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
+	textureData.width = 512;
+	textureData.height = 512;
+	textureData.channels = 3;
+	textureData.internalFormat = Texture::InternalFormat::RGB16F;
+	textureData.format = Texture::Format::RGB;
+	textureData.type = Texture::Type::FLOAT;
+	textureData.filter = Texture::TextureFilter::Linear;
+	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.genMipMap = true;
+	textureData.data = nullptr;
+	auto cubemap = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 512, 512 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);

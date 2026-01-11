@@ -18,7 +18,6 @@
 #include "geometry/Mesh.h"
 #include "geometry/MeshCollection.h"
 #include "runtime/Context.h"
-#include "texture/Cubemap.h"
 #include "component/RenderableComponent.h"
 #include "component/ObjectComponent.h"
 
@@ -36,7 +35,19 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 	fbo.bind();
 
 	// Generate cubemap
-	auto irradianceMap = Cubemap::createEmptyCubemap(32, 32, GL_RGB16F, GL_RGB, GL_FLOAT);
+	Texture::TextureData textureData;
+	textureData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
+	textureData.width = 32;
+	textureData.height = 32;
+	textureData.channels = 3;
+	textureData.internalFormat = Texture::InternalFormat::RGB16F;
+	textureData.format = Texture::Format::RGB;
+	textureData.type = Texture::Type::FLOAT;
+	textureData.filter = Texture::TextureFilter::Linear;
+	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.genMipMap = false;
+	textureData.data = nullptr;
+	auto irradianceMap = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 32, 32 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
@@ -111,13 +122,19 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 	fbo.bind();
 
 	// Generate cubemap
-	auto prefilterEnvMap = Cubemap::createEmptyCubemap(128, 128, GL_RGB16F, GL_RGB, GL_FLOAT, {
-		{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR },
-		{ GL_TEXTURE_MAG_FILTER, GL_LINEAR },
-		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
-		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
-		{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE }
-	}, true);
+	Texture::TextureData textureData2;
+	textureData2.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
+	textureData2.width = 128;
+	textureData2.height = 128;
+	textureData2.channels = 3;
+	textureData2.internalFormat = Texture::InternalFormat::RGB16F;
+	textureData2.format = Texture::Format::RGB;
+	textureData2.type = Texture::Type::FLOAT;
+	textureData2.filter = Texture::TextureFilter::Linear;
+	textureData2.wrap = Texture::TextureWrap::Clamp;
+	textureData2.genMipMap = true;
+	textureData2.data = nullptr;
+	auto prefilterEnvMap = Texture::createTexture(textureData2);
 
 	RenderBufferObject rbo{ 128, 128 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);

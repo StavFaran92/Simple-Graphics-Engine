@@ -268,14 +268,15 @@ private:
 	//TextureAssetAttributes m_attributes;
 };
 
-GLenum toGL(Texture::Format format) {
-	return static_cast<GLenum>(format);
+template<typename T>
+GLenum toGL(T arg) {
+	return static_cast<GLenum>(arg);
 }
 
-GLenum toGL(Texture::InternalFormat format) {
-	return static_cast<GLenum>(format);
-}
-
-GLenum toGL(Texture::Type type) {
-	return static_cast<GLenum>(type);
-}
+//GLenum toGL(Texture::InternalFormat format) {
+//	return static_cast<GLenum>(format);
+//}
+//
+//GLenum toGL(Texture::Type type) {
+//	return static_cast<GLenum>(type);
+//}

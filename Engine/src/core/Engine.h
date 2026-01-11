@@ -37,7 +37,6 @@ class MeshCollection;
 class ProjectManager;
 class Material;
 class Texture;
-class Cubemap;
 class CommonShaders;
 class CommonTextures;
 class ObjectPicker;

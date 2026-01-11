@@ -197,15 +197,38 @@ void Texture::build(const TextureData& textureData)
 	bind();
 
 	setTextureParameters(textureData);
-	glTexImage2D(textureData.target, 
-		0, 
-		toGL(textureData.internalFormat), 
-		m_data.width, 
-		m_data.height, 
-		0, 
-		toGL(textureData.format), 
-		toGL(textureData.type), 
-		textureData.data);
+
+	if (textureData.target == Texture::TextureTarget::TEXTURE_2D)
+	{
+		glTexImage2D(textureData.target,
+			0,
+			toGL(textureData.internalFormat),
+			m_data.width,
+			m_data.height,
+			0,
+			toGL(textureData.format),
+			toGL(textureData.type),
+			textureData.data);
+	}
+	else if (textureData.target == Texture::TextureTarget::TEXTURE_CUBE_MAP)
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+				0, 
+				toGL(textureData.internalFormat), 
+				m_data.width, 
+				m_data.height, 0, 
+				toGL(textureData.format),
+				toGL(textureData.type),
+				textureData.facesData[i]);
+		}
+	}
+	else
+	{
+		logError("Unsupported texture format.");
+		return;
+	}
 
 	if (textureData.genMipMap)
 	{

@@ -274,34 +274,34 @@ void bindAssets(sol::state& lua)
         "updateAsset", &LuaScript::updateAsset
     );
 
-    lua.new_usertype<Texture>("Texture",
-        "createTexture", sol::overload(
-            [](int width, int height) {
-                return Texture::createTexture(width, height);
-            },
-            [](int width, int height, int internalFormat, int format, int type) {
-                return Texture::createTexture(width, height, internalFormat, format, type);
-            }
-        ),
-        "create2DTextureFromBuffer", sol::overload(
-            [](int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data) {
-                return Texture::createTexture(width, height, internalFormat, format, type, params, isEngineOwned, data);
-            },
-            [](const Texture::TextureData& textureData) {
-                return Texture::createTexture(textureData);
-            }
-        ),
-        "getWidth", &Texture::getWidth,
-        "getHeight", &Texture::getHeight,
-        "getBitDepth", &Texture::getChannels,
-        "setData", &Texture::setData,
-        "bind", &Texture::bind,
-        "unbind", &Texture::unbind,
-        "getID", &Texture::getID,
-        "setSlot", &Texture::setSlot,
-        "importTexture3D", &Texture::importTexture3D,
-        "import", &Texture::import
-    );
+    // TODO fix
+    //lua.new_usertype<Texture>("Texture",
+    //    "createTexture", sol::overload(
+    //        [](int width, int height) {
+    //            return Texture::createTexture(width, height);
+    //        },
+    //        [](int width, int height, int internalFormat, int format, int type) {
+    //            return Texture::createTexture(width, height, internalFormat, format, type);
+    //        }
+    //    ),
+    //    "create2DTextureFromBuffer", sol::overload(
+    //        [](int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data) {
+    //            return Texture::createTexture(width, height, internalFormat, format, type, params, isEngineOwned, data);
+    //        },
+    //        [](const Texture::TextureData& textureData) {
+    //            return Texture::createTexture(textureData);
+    //        }
+    //    ),
+    //    "getWidth", &Texture::getWidth,
+    //    "getHeight", &Texture::getHeight,
+    //    "getBitDepth", &Texture::getChannels,
+    //    "setData", &Texture::setData,
+    //    "bind", &Texture::bind,
+    //    "unbind", &Texture::unbind,
+    //    "getID", &Texture::getID,
+    //    "setSlot", &Texture::setSlot,
+    //    "import", &Texture::import
+    //);
 
     lua.new_usertype<MeshCollection>("MeshCollection",
         "addMesh", &MeshCollection::addMesh,
