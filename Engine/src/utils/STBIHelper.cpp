@@ -8,7 +8,7 @@
 
 unsigned char* STBIHelper::decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels)
 {
-	auto buffer = stbi_load_from_memory(rawBuffer, len, outWidth, outHeight, outChannels, 3);
+	auto buffer = stbi_load_from_memory(rawBuffer, len, outWidth, outHeight, outChannels, 0);
 	return buffer;
 }
 

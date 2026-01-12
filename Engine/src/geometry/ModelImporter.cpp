@@ -636,7 +636,25 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 			pixelData = reinterpret_cast<unsigned char*>(aiTexture->pcData);
 		}
 
-		texture = Texture::createTexture(width, height, Texture::TextureSemantic::Color, pixelData);
+		Texture::TextureSemantic usage = Texture::TextureSemantic::Color;
+		if (type == aiTextureType_DIFFUSE || type == aiTextureType_DIFFUSE_ROUGHNESS || type == aiTextureType_METALNESS || type == aiTextureType_AMBIENT_OCCLUSION) // todo fix
+		{
+			usage = Texture::TextureSemantic::Color;
+		}
+		else if (type == aiTextureType_NORMALS)
+		{
+			usage = Texture::TextureSemantic::Normal;
+		}
+
+		texture = Texture::createTexture(width,
+			height,
+			channels,
+			Texture::getInternalFormatFromUsage(usage),
+			Texture::getFormatFromChannels(channels),
+			Texture::Type::UNSIGNED_BYTE,
+			Texture::TextureFilter::Linear,
+			Texture::TextureWrap::Repeat,
+			pixelData);
 
 		AssetCreateDescriptor textureAssetDesc;
 		textureAssetDesc.aType = AssetType::TEXTURE;

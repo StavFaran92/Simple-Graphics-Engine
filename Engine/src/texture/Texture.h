@@ -120,7 +120,7 @@ public:
 		TextureTarget target = Texture::TextureTarget::TEXTURE_2D;
 		Type type = Texture::Type::UNSIGNED_BYTE;
 		TextureFilter filter = TextureFilter::Linear;
-		TextureWrap wrap = TextureWrap::Clamp;
+		TextureWrap wrap = TextureWrap::Repeat;
 		bool genMipMap = false;
 		bool flip = false;
 
@@ -135,7 +135,7 @@ public:
 		bool saveOnDisk = true;
 		TextureSemantic usage = TextureSemantic::Color;
 		TextureFilter filter = TextureFilter::Linear;
-		TextureWrap wrap = TextureWrap::Clamp;
+		TextureWrap wrap = TextureWrap::Repeat;
 
 		json fillParams() const override
 		{
@@ -190,6 +190,10 @@ public:
 	static AssetWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
 	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureAssetDescriptor = {});
 
+	static Texture::Format getFormatFromChannels(int channels);
+
+	static InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usage);
+
 	~Texture();
 private:
 	friend class TextureAssetManager;
@@ -204,7 +208,7 @@ private:
 
 	static void extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData);
 
-	static InternalFormat getInternalFormatFromUsage(Texture::TextureSemantic usage);
+	
 
 private:
 	uint32_t m_id = 0;

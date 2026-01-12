@@ -195,7 +195,7 @@ ResourceWrapper<Texture> Texture::createTexture(int width, int height, Texture::
 	switch (usage)
 	{
 	case TextureSemantic::Color:
-		format = Format::RGB;
+		format = Format::RGBA;
 		type = Type::UNSIGNED_BYTE;
 		channels = 3;
 		break;
@@ -364,12 +364,23 @@ ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureA
 	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Texture>();
 }
 
+Texture::Format Texture::getFormatFromChannels(int channels)
+{
+	if (channels == 1) return Texture::Format::RED;
+	else if (channels == 3) return Texture::Format::RGB;
+	else if (channels == 4) return Texture::Format::RGBA;
+	else {
+		logError("Unsupported texture format!");
+		return Texture::Format::RGB;
+	}
+}
+
 Texture::InternalFormat Texture::getInternalFormatFromUsage(Texture::TextureSemantic usage)
 {
 	switch (usage)
 	{
 	case Texture::TextureSemantic::Color:
-		return Texture::InternalFormat::RGB;
+		return Texture::InternalFormat::RGBA;
 
 	case Texture::TextureSemantic::Normal:
 		return Texture::InternalFormat::RGB16F;
@@ -398,6 +409,8 @@ void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& setti
 	textureData.flip = settings.flip;
 	textureData.internalFormat = getInternalFormatFromUsage(settings.usage);
 }
+
+
 
 //ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocation)
 //{
@@ -517,23 +530,7 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 		logError("Failed to load file: {}", fileLocation);
 	}
 
-	// Determine format based on bits per pixel (bpp)
-	if (textureData.channels == 1)
-	{
-		textureData.format = (Texture::Format)GL_RED;
-	}
-	else if (textureData.channels == 3)
-	{
-		textureData.format = (Texture::Format)GL_RGB;
-	}
-	else if (textureData.channels == 4)
-	{
-		textureData.format = (Texture::Format)GL_RGBA;
-	}
-	else {
-		logError("Unsupported texture format!");
-		return;
-	}
+	textureData.format = getFormatFromChannels(textureData.channels);
 
 	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
 	textureData.textureName = textureName;
