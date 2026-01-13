@@ -124,6 +124,8 @@ public:
 		bool genMipMap = false;
 		bool flip = false;
 
+		int depth = 0; // Only apply to texture3D
+
 		void* data = nullptr;
 		void* facesData[6]{ nullptr }; //only apply to Cubemap
 	};

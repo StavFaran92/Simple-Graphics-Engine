@@ -17,6 +17,8 @@
 
 #include "utils/STBIHelper.h"
 
+#include "utils/TextureUtils.h"
+
 GLint TextureWrapToOpenGL(Texture::TextureWrap wrap)
 {
 	switch (wrap)
@@ -258,6 +260,20 @@ void Texture::build(const TextureData& textureData)
 
 	if (textureData.target == Texture::TextureTarget::TEXTURE_2D)
 	{
+		const void* data = textureData.data;
+		std::vector<uint8_t> blankData;
+
+		if (!data)
+		{
+			blankData = TextureUtils::createBlankTextureBuffer2D(
+				m_data.width,
+				m_data.height,
+				textureData.format,
+				textureData.type);
+
+			data = blankData.data();
+		}
+
 		glTexImage2D(toGL(textureData.target),
 			0,
 			toGL(textureData.internalFormat),
@@ -266,7 +282,7 @@ void Texture::build(const TextureData& textureData)
 			0,
 			toGL(textureData.format),
 			toGL(textureData.type),
-			textureData.data);
+			data);
 	}
 	else if (textureData.target == Texture::TextureTarget::TEXTURE_CUBE_MAP)
 	{
@@ -282,8 +298,35 @@ void Texture::build(const TextureData& textureData)
 				textureData.facesData[i]);
 		}
 	}
-	else
+	else if (textureData.target == Texture::TextureTarget::TEXTURE_3D)
 	{
+		const void* data = textureData.data;
+		std::vector<uint8_t> blankData;
+
+		if (!data)
+		{
+			blankData = TextureUtils::createBlankTextureBuffer3D(
+				m_data.width,
+				m_data.height,
+				m_data.depth,
+				textureData.format,
+				textureData.type);
+
+			data = blankData.data();
+		}
+
+		glTexImage3D(toGL(textureData.target), 
+			0, 
+			toGL(textureData.internalFormat),
+			m_data.width,
+			m_data.height, 
+			m_data.depth,
+			0, 
+			toGL(textureData.format),
+			toGL(textureData.type),
+			data);
+	}
+	else {
 		logError("Unsupported texture format.");
 		return;
 	}
@@ -292,8 +335,6 @@ void Texture::build(const TextureData& textureData)
 	{
 		glGenerateMipmap(toGL(textureData.target));
 	}
-
-	unbind();
 }
 
 int Texture::getWidth() const
