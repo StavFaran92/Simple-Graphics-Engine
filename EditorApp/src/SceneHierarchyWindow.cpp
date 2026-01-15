@@ -308,6 +308,13 @@ void SceneHierarchyWindow::display()
 				state.selectEntity(sceneObjects[0].e);
 			}
 
+			if (ImGui::MenuItem("Clouds"))
+			{
+				Entity e = VolumetricCloudsSystem::createVolumetricClouds();
+				updateScene();
+				state.selectEntity(sceneObjects[0].e);
+			}
+
 			ImGui::EndMenu(); // End the submenu
 		}
 

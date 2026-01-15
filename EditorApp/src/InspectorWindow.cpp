@@ -623,6 +623,10 @@ void InspectorWindow::display()
 
 		});
 
+		displayComponent<VolumetricCloudsComponent>("Volumetric Clouds Component", [](VolumetricCloudsComponent& clouds) {
+
+			});
+
 		displayComponent<VolumeComponent>("Volume Component", [](VolumeComponent& volume) {
 
 			std::string meshName = "None";
