@@ -228,7 +228,7 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 	textureData.height = 512;
 	textureData.channels = 2;
 	textureData.internalFormat = Texture::InternalFormat::RG16F;
-	textureData.format = (Texture::Format)GL_RG;
+	textureData.format = Texture::Format::RG;
 	textureData.type = Texture::Type::FLOAT;
 	textureData.filter = Texture::TextureFilter::Linear;
 	textureData.wrap = Texture::TextureWrap::Clamp;

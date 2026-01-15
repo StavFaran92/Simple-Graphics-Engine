@@ -29,10 +29,35 @@ bool STBIHelper::isHDR(const std::string& filename)
 
 void* STBIHelper::loadImageFloat(const std::string& filename, int* x, int* y, int* comp)
 {
-	return stbi_loadf(filename.c_str(), x, y, comp, 0);
+	float* data = stbi_loadf(filename.c_str(), x, y, comp, 0);
+	if (!data)
+		return nullptr;
+
+	size_t count = static_cast<size_t>(*x)
+		* static_cast<size_t>(*y)
+		* static_cast<size_t>(*comp);
+
+	float* buffer = new float[count];
+	std::memcpy(buffer, data, count * sizeof(float));
+
+	stbi_image_free(data);
+	return buffer;
 }
 
-void* STBIHelper::loadImage(const std::string& filename, int* x, int* y, int* comp)
+void* STBIHelper::loadImage(const std::string& filename,
+	int* x, int* y, int* comp)
 {
-	return stbi_load(filename.c_str(), x, y, comp, 0);
+	unsigned char* data = stbi_load(filename.c_str(), x, y, comp, 0);
+	if (!data)
+		return nullptr;
+
+	size_t count = static_cast<size_t>(*x)
+		* static_cast<size_t>(*y)
+		* static_cast<size_t>(*comp);
+
+	unsigned char* buffer = new unsigned char[count];
+	std::memcpy(buffer, data, count * sizeof(unsigned char));
+
+	stbi_image_free(data);
+	return buffer;
 }

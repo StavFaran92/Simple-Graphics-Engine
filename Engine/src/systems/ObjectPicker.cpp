@@ -52,9 +52,9 @@ bool ObjectPicker::init()
 	textureData.width = width;
 	textureData.height = height;
 	textureData.channels = 3;
-	textureData.internalFormat = (Texture::InternalFormat)GL_RGB32UI;
+	textureData.internalFormat = Texture::InternalFormat::RG32UI;
 	textureData.format = (Texture::Format)GL_RGB_INTEGER;
-	textureData.type = (Texture::Type)GL_UNSIGNED_INT;
+	textureData.type = Texture::Type::UNSIGNED_INT;
 	textureData.filter = Texture::TextureFilter::Nearest;
 	textureData.wrap = Texture::TextureWrap::Clamp;
 	textureData.data = nullptr;

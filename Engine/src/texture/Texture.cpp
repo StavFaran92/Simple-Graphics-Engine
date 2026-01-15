@@ -78,6 +78,8 @@ ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
 	Texture::extractTextureDataFromSettings(settings, textureData);
 	Texture::extractTextureDataFromFile(filepath, textureData);
 
+	assert(textureData.data);
+
 	// Create texture resource
 	ResourceWrapper<Texture> texture = Factory<Texture>::create();
 	texture->build(textureData);
@@ -161,9 +163,54 @@ void Texture::setTextureParameters(const Texture::TextureData& tData)
 	}
 }
 
-ResourceWrapper<Texture> Texture::createTexture(const TextureData& textureData)
+void Texture::fillTextureBufferIfNeeded(TextureData& tData)
+{
+	if (!tData.data)
+	{
+		if (tData.target == Texture::TextureTarget::TEXTURE_2D)
+		{
+			tData.data = TextureUtils::createBlankTextureBuffer2D(
+				tData.width,
+				tData.height,
+				tData.format,
+				tData.type);
+		}
+		else if (tData.target == Texture::TextureTarget::TEXTURE_3D)
+		{
+			tData.data = TextureUtils::createBlankTextureBuffer3D(
+				tData.width,
+				tData.height,
+				tData.depth,
+				tData.format,
+				tData.type);
+		}
+		else if (tData.target == Texture::TextureTarget::TEXTURE_CUBE_MAP)
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				tData.facesData[i] = TextureUtils::createBlankTextureBuffer2D(
+					tData.width,
+					tData.height,
+					tData.format,
+					tData.type);
+			}
+		}
+		else 
+		{
+			logError("Texture target not supported.");
+			return;
+		}
+	}
+}
+
+ResourceWrapper<Texture> Texture::createTexture(TextureData& textureData)
 {
 	ResourceWrapper<Texture> texture = Factory<Texture>::create();
+
+	if (textureData.fillEmpty)
+	{
+		fillTextureBufferIfNeeded(textureData);
+	}
 	texture.get()->build(textureData);
 	return texture;
 }
@@ -260,20 +307,7 @@ void Texture::build(const TextureData& textureData)
 
 	if (textureData.target == Texture::TextureTarget::TEXTURE_2D)
 	{
-		const void* data = textureData.data;
-		std::vector<uint8_t> blankData;
-
-		if (!data)
-		{
-			blankData = TextureUtils::createBlankTextureBuffer2D(
-				m_data.width,
-				m_data.height,
-				textureData.format,
-				textureData.type);
-
-			data = blankData.data();
-		}
-
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTexImage2D(toGL(textureData.target),
 			0,
 			toGL(textureData.internalFormat),
@@ -282,7 +316,7 @@ void Texture::build(const TextureData& textureData)
 			0,
 			toGL(textureData.format),
 			toGL(textureData.type),
-			data);
+			textureData.data);
 	}
 	else if (textureData.target == Texture::TextureTarget::TEXTURE_CUBE_MAP)
 	{
@@ -300,21 +334,6 @@ void Texture::build(const TextureData& textureData)
 	}
 	else if (textureData.target == Texture::TextureTarget::TEXTURE_3D)
 	{
-		const void* data = textureData.data;
-		std::vector<uint8_t> blankData;
-
-		if (!data)
-		{
-			blankData = TextureUtils::createBlankTextureBuffer3D(
-				m_data.width,
-				m_data.height,
-				m_data.depth,
-				textureData.format,
-				textureData.type);
-
-			data = blankData.data();
-		}
-
 		glTexImage3D(toGL(textureData.target), 
 			0, 
 			toGL(textureData.internalFormat),
@@ -324,7 +343,7 @@ void Texture::build(const TextureData& textureData)
 			0, 
 			toGL(textureData.format),
 			toGL(textureData.type),
-			data);
+			textureData.data);
 	}
 	else {
 		logError("Unsupported texture format.");
@@ -385,7 +404,14 @@ unsigned int Texture::getID() const
 void Texture::ClearTexture()
 {
 	glDeleteTextures(1, &m_id);
-	//free(m_data.data);
+
+	if (m_data.data)
+		delete[] m_data.data;
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (m_data.facesData[i]) delete[] m_data.facesData[i];
+	}
 }
 
 Texture::~Texture()

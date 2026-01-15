@@ -48,6 +48,7 @@ public:
 
 	enum class InternalFormat : int
 	{
+		DEPTH_COMPONENT = 0x1902,
 		COMPRESSED_RED = 0x8225,
 		COMPRESSED_RG = 0x8226,
 		RG = 0x8227,
@@ -84,12 +85,14 @@ public:
 	};
 
 	enum class Format : int {
+		DEPTH_COMPONENT = 0x1902,
 		RED = 0x1903,
 		GREEN = 0x1904,
 		BLUE = 0x1905,
 		ALPHA = 0x1906,
 		RGB = 0x1907,
-		RGBA = 0x1908
+		RGBA = 0x1908,
+		RG = 0x8227,
 	};
 
 	enum class Type : int {
@@ -123,6 +126,7 @@ public:
 		TextureWrap wrap = TextureWrap::Repeat;
 		bool genMipMap = false;
 		bool flip = false;
+		bool fillEmpty = false;
 
 		int depth = 0; // Only apply to texture3D
 
@@ -156,7 +160,7 @@ public:
 
 	Texture();
 
-	static ResourceWrapper<Texture> createTexture(const TextureData& textureData);
+	static ResourceWrapper<Texture> createTexture(TextureData& textureData);
 
 	static ResourceWrapper<Texture> createTexture(int width, 
 													int height, 
@@ -205,6 +209,8 @@ private:
 	void ClearTexture();
 
 	void setTextureParameters(const TextureData& tData);
+
+	static void fillTextureBufferIfNeeded(TextureData& tData);
 	
 	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
 

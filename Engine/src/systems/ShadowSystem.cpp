@@ -46,9 +46,9 @@ bool ShadowSystem::init()
 	textureData.width = SHADOW_WIDTH;
 	textureData.height = SHADOW_HEIGHT;
 	textureData.channels = 1;
-	textureData.internalFormat = (Texture::InternalFormat)GL_DEPTH_COMPONENT;
-	textureData.format = (Texture::Format)GL_DEPTH_COMPONENT;
-	textureData.type = (Texture::Type)GL_FLOAT;
+	textureData.internalFormat = Texture::InternalFormat::DEPTH_COMPONENT;
+	textureData.format = Texture::Format::DEPTH_COMPONENT;
+	textureData.type = Texture::Type::FLOAT;
 	textureData.filter = Texture::TextureFilter::Linear;
 	textureData.wrap = Texture::TextureWrap::Clamp;
 	textureData.data = nullptr;

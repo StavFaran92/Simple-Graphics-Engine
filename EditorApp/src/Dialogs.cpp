@@ -265,6 +265,7 @@ void displayTextureCreatorDialog()
 				textureData.filter = Texture::TextureFilter::Linear;
 				textureData.wrap = Texture::TextureWrap::Clamp;
 				textureData.data = nullptr;
+				textureData.fillEmpty = true;
 				auto texture = Texture::createTexture(textureData);
 				
 				AssetCreateDescriptor desc;
