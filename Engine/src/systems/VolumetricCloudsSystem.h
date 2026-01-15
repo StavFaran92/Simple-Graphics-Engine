@@ -14,5 +14,5 @@ public:
 
 	//static void drawWaterBody(const WaterBodyComponent& waterBody);
 
-	void prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds);
+	static void prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds);
 };

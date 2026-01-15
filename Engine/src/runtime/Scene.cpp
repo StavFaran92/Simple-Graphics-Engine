@@ -41,6 +41,7 @@
 
 #include "systems/FoliageSystem.h"
 #include "systems/WaterSystem.h"
+#include "systems/VolumetricCloudsSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/ObjectComponent.h"
@@ -49,6 +50,7 @@
 #include "component/ImageComponent.h"
 #include "component/PostProcessComponent.h"
 #include "component/VolumeComponent.h"
+#include "component/VolumetricCloudsComponent.h"
 #include "scripts/ScriptSystem.h"
 #include "memory/BuiltInAssets.h"
 #include "memory/BuiltInResources.h"
@@ -360,6 +362,11 @@ void Scene::draw(float deltaTime)
 		for (auto&& [entity, waterBody, transform] : m_registry->get().view<WaterBodyComponent, Transformation>().each())
 		{
 			Engine::get()->getSubSystem<WaterSystem>()->prepareWaterBodyForRender(waterBody);
+		}
+
+		for (auto&& [entity, clouds, transform] : m_registry->get().view<VolumetricCloudsComponent, Transformation>().each())
+		{
+			VolumetricCloudsSystem::prepareVolumetricCloudsForRender(clouds);
 		}
 
 		// PRE Render Phase

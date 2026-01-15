@@ -34,6 +34,7 @@ struct EngineAPI VolumetricCloudsComponent : public Component
 
 	glm::vec3 colorA{ 0.023497, 0.451692, 1.0 };
 	glm::vec3 colorB{ 0.0, 0.05938, 0.135417 };
+	float marchSize = 0.08;
 };
 
 REGISTER_COMPONENT(VolumetricCloudsComponent)

@@ -624,7 +624,7 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<VolumetricCloudsComponent>("Volumetric Clouds Component", [](VolumetricCloudsComponent& clouds) {
-
+			ImGui::DragFloat("March size", &clouds.marchSize, 0.001f, 0.01f, 1.0f);
 			});
 
 		displayComponent<VolumeComponent>("Volume Component", [](VolumeComponent& volume) {

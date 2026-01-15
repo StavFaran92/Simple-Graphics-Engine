@@ -2,7 +2,9 @@
 
 #define MAX_STEPS 100
 #define MAX_LIGHT_STEPS 6
-const float MARCH_SIZE = 0.08;
+
+#pragma editable(default=0.08)
+uniform float MARCH_SIZE;
 
 vec3 sunDirection = vec3(0, 1, 0);
 

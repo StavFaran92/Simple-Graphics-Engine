@@ -52,7 +52,8 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 
 void VolumetricCloudsSystem::prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds)
 {
-	//auto& materialResource = waterBody.getMaterial().resource();
+	auto& materialResource = clouds.getMaterial().resource();
+	materialResource->setUniformValue("MARCH_SIZE", clouds.marchSize);
 	//materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal);
 
 	//materialResource->setUniformValue("uWave1Speed", waterBody.wave1Speed);
