@@ -19,7 +19,8 @@
 
 ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture)
 {
-	auto dstTexture = Texture::createTexture(srcTexture.get()->getData());
+	auto dstTexture = srcTexture->clone();
+	//auto dstTexture = Texture::createTexture(srcTexture.get()->getData());
 	flipVertical(srcTexture, dstTexture);
 	return dstTexture;
 }
@@ -66,7 +67,7 @@ void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, Resou
 
 ResourceWrapper<Texture> TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTexture)
 {
-	auto dstTexture = Texture::createTexture(srcTexture.get()->getData());
+	auto dstTexture = srcTexture->clone();
 	applyGammaCorrection(srcTexture, dstTexture);
 	return dstTexture;
 }

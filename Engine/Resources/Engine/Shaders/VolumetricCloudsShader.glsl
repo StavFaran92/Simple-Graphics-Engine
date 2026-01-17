@@ -143,7 +143,6 @@ vec4 rayMarch(vec3 ro, vec3 rd)
             res += color * (1.0 - res.a);
         }
         d += MARCH_SIZE;
-        if(density > 1.0) break;
 
     } 
     return res;

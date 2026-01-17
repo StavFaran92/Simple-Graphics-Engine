@@ -406,11 +406,11 @@ void Texture::ClearTexture()
 	glDeleteTextures(1, &m_id);
 
 	if (m_data.data)
-		delete[] m_data.data;
+		free(m_data.data);
 
 	for (int i = 0; i < 6; i++)
 	{
-		if (m_data.facesData[i]) delete[] m_data.facesData[i];
+		if (m_data.facesData[i]) free(m_data.facesData[i]);
 	}
 }
 
@@ -429,6 +429,51 @@ ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureA
 {
 	desc.aType = AssetType::TEXTURE;
 	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Texture>();
+}
+
+ResourceWrapper<Texture> Texture::clone() const
+{
+	TextureData newTextureData(m_data);
+
+	const uint32_t bpp = TextureUtils::channelCount(m_data.format) * TextureUtils::bytesPerChannel(m_data.type);
+	const size_t size = static_cast<size_t>(m_data.width) * m_data.height * bpp;
+
+	// Calculate buffer size
+	const size_t bufferSize = size;
+
+	// Allocate new buffer
+	newTextureData.data = std::malloc(bufferSize);
+	if (!newTextureData.data)
+	{
+		logError("Texture clone: allocation failed.");
+		return ResourceWrapper<Texture>::empty;
+	}
+
+	// Copy raw pixel data
+	std::memcpy(newTextureData.data, m_data.data, bufferSize);
+
+	//if (m_data.target == Texture::TextureTarget::TEXTURE_2D)
+	//{
+	//	newTextureData.data = TextureUtils::createBlankTextureBuffer2D(m_data.width, m_data.height, m_data.format, m_data.type);
+	//}
+	//else if (m_data.target == Texture::TextureTarget::TEXTURE_3D)
+	//{
+	//	newTextureData.data = TextureUtils::createBlankTextureBuffer3D(m_data.width, m_data.height, m_data.depth, m_data.format, m_data.type);
+	//}
+	//else
+	//{
+	//	logError("Not yet implemented.");
+	//	return ResourceWrapper<Texture>::empty;
+	//}
+
+	ResourceWrapper<Texture> clonedTexture = Texture::createTexture(newTextureData);
+
+	if (clonedTexture.isEmpty())
+	{
+		logWarning("Texture clone failed.");
+	}
+
+	return clonedTexture;
 }
 
 Texture::Format Texture::getFormatFromChannels(int channels)

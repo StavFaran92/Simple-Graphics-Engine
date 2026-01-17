@@ -174,6 +174,12 @@ public:
 
 	static ResourceWrapper<Texture> createTexture(int width, int height, Texture::TextureSemantic usage, void* data = nullptr);
 
+	static AssetWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
+
+	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureAssetDescriptor = {});
+
+	ResourceWrapper<Texture> clone() const; 
+
 	int getWidth() const;
 	int getHeight() const;
 	int getChannels() const;
@@ -192,9 +198,6 @@ public:
 	const TextureData& getData() const { return m_data; }
 
 	TextureData& getData() { return m_data; }
-
-	static AssetWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
-	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureAssetDescriptor = {});
 
 	static Texture::Format getFormatFromChannels(int channels);
 

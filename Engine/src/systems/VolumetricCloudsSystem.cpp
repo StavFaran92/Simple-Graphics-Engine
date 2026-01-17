@@ -33,7 +33,7 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	shaderDesc.origFilePath = SGE_ROOT_DIR "Resources/Engine/Shaders/VolumetricCloudsShader.glsl";
 	shaderDesc.name = "VolumetricCloudsShader";
 	shaderDesc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::Volume);
-	shaderDesc.isEngineOwned = true;
+	shaderDesc.isEngineOwned = false;
 	auto& shaderAsset = Engine::get()->getSubSystem<Assets>()->createAsset(shader, shaderDesc).as<Shader>();
 
 	auto& material = Material::create(MaterialRenderMode::Custom);
