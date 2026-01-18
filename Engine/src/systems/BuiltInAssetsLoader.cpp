@@ -37,7 +37,7 @@ void addAsAsset(const std::string& name, const ResourceWrapper<MeshCollection>& 
 void BuiltInAssetsLoader::loadTextures()
 {
 	{
-		unsigned char* whiteColor = new unsigned char[3] { 255, 255, 255 }; // todo rethink this
+		static unsigned char* whiteColor = new unsigned char[3] { 255, 255, 255 }; // todo rethink this
 
 		Texture::TextureData tData;
 		tData.target = Texture::TextureTarget::TEXTURE_2D;
@@ -63,7 +63,7 @@ void BuiltInAssetsLoader::loadTextures()
 	}
 
 	{
-		unsigned char* blackColor = new unsigned char[3] { 0, 0, 0};
+		static unsigned char* blackColor = new unsigned char[3] { 0, 0, 0};
 		Texture::TextureData tData;
 		tData.target = Texture::TextureTarget::TEXTURE_2D;
 		tData.width = 1;

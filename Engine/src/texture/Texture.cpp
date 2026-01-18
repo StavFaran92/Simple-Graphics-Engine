@@ -203,23 +203,13 @@ void Texture::fillTextureBufferIfNeeded(TextureData& tData)
 	}
 }
 
-void Texture::copyBufferIntoInternalBuffer(TextureData& tData)
+void Texture::copyBufferIntoInternalBuffer(void*& data, size_t bufferSize)
 {
-	if (!tData.data)
+	if (!data)
 	{
 		logError("Texture data is null.");
 		return;
 	}
-
-	const uint32_t bytesPerPixel =
-		TextureUtils::channelCount(tData.format) *
-		TextureUtils::bytesPerChannel(tData.type);
-
-	const size_t bufferSize =
-		static_cast<size_t>(tData.width) *
-		static_cast<size_t>(tData.height) *
-		static_cast<size_t>(std::max(1, tData.depth)) *
-		bytesPerPixel;
 
 	void* newBuffer = std::malloc(bufferSize);
 	if (!newBuffer)
@@ -229,19 +219,36 @@ void Texture::copyBufferIntoInternalBuffer(TextureData& tData)
 	}
 
 	// COPY FROM OLD -> NEW
-	std::memcpy(newBuffer, tData.data, bufferSize);
+	std::memcpy(newBuffer, data, bufferSize);
 
 	// Redirect pointer
-	tData.data = newBuffer;
+	data = newBuffer;
 }
 
 ResourceWrapper<Texture> Texture::createTexture(TextureData& textureData)
 {
 	ResourceWrapper<Texture> texture = Factory<Texture>::create();
 
+	const uint32_t bytesPerPixel =
+		TextureUtils::channelCount(textureData.format) *
+		TextureUtils::bytesPerChannel(textureData.type);
+
+	const size_t bufferSize =
+		static_cast<size_t>(textureData.width) *
+		static_cast<size_t>(textureData.height) *
+		static_cast<size_t>(std::max(1, textureData.depth)) *
+		bytesPerPixel;
+
 	if (textureData.data)
 	{
-		copyBufferIntoInternalBuffer(textureData);
+		copyBufferIntoInternalBuffer(textureData.data, bufferSize);
+	}
+	if (textureData.facesData[0])
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			copyBufferIntoInternalBuffer(textureData.facesData[i], bufferSize);
+		}
 	}
 	else if (textureData.fillEmpty)
 	{
@@ -446,7 +453,8 @@ void Texture::ClearTexture()
 
 	for (int i = 0; i < 6; i++)
 	{
-		if (m_data.facesData[i]) free(m_data.facesData[i]);
+		if (m_data.facesData[i]) 
+			free(m_data.facesData[i]);
 	}
 }
 

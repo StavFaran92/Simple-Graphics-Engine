@@ -215,7 +215,7 @@ private:
 
 	static void fillTextureBufferIfNeeded(TextureData& tData);
 
-	static void copyBufferIntoInternalBuffer(TextureData& tData);
+	static void copyBufferIntoInternalBuffer(void*& data, size_t bufferSize);
 	
 	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
 
