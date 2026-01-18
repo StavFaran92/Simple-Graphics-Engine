@@ -174,10 +174,9 @@ void Scene::init(Context* context)
 	defaultCubemapData.filter = Texture::TextureFilter::Linear;
 	defaultCubemapData.wrap = Texture::TextureWrap::Clamp;
 	defaultCubemapData.genMipMap = false;
-	static unsigned char FULL_WHITE[3] = { 255, 255, 255 };
 	for (int i = 0; i < 6; i++)
 	{
-		defaultCubemapData.facesData[i] = FULL_WHITE;
+		defaultCubemapData.facesData[i] = new unsigned char[3] {255, 255, 255};
 	}
 	m_irradianceMap = Texture::createTexture(defaultCubemapData);
 
@@ -195,7 +194,7 @@ void Scene::init(Context* context)
 	defaultCubemapData2.genMipMap = false;
 	for (int i = 0; i < 6; i++)
 	{
-		defaultCubemapData2.facesData[i] = FULL_WHITE;
+		defaultCubemapData2.facesData[i] = new unsigned char[3] {255, 255, 255};
 	}
 	m_prefilterEnvMap = Texture::createTexture(defaultCubemapData2);
 
