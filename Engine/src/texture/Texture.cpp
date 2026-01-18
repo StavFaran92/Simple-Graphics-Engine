@@ -203,11 +203,47 @@ void Texture::fillTextureBufferIfNeeded(TextureData& tData)
 	}
 }
 
+void Texture::copyBufferIntoInternalBuffer(TextureData& tData)
+{
+	if (!tData.data)
+	{
+		logError("Texture data is null.");
+		return;
+	}
+
+	const uint32_t bytesPerPixel =
+		TextureUtils::channelCount(tData.format) *
+		TextureUtils::bytesPerChannel(tData.type);
+
+	const size_t bufferSize =
+		static_cast<size_t>(tData.width) *
+		static_cast<size_t>(tData.height) *
+		static_cast<size_t>(std::max(1, tData.depth)) *
+		bytesPerPixel;
+
+	void* newBuffer = std::malloc(bufferSize);
+	if (!newBuffer)
+	{
+		logError("Texture buffer allocation failed.");
+		return;
+	}
+
+	// COPY FROM OLD -> NEW
+	std::memcpy(newBuffer, tData.data, bufferSize);
+
+	// Redirect pointer
+	tData.data = newBuffer;
+}
+
 ResourceWrapper<Texture> Texture::createTexture(TextureData& textureData)
 {
 	ResourceWrapper<Texture> texture = Factory<Texture>::create();
 
-	if (textureData.fillEmpty)
+	if (textureData.data)
+	{
+		copyBufferIntoInternalBuffer(textureData);
+	}
+	else if (textureData.fillEmpty)
 	{
 		fillTextureBufferIfNeeded(textureData);
 	}
@@ -433,6 +469,12 @@ ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureA
 
 ResourceWrapper<Texture> Texture::clone() const
 {
+	if (m_data.target == Texture::TextureTarget::TEXTURE_3D)
+	{
+		logError("Clone is not supported for 3D textures");
+		return ResourceWrapper<Texture>::empty;
+	}
+
 	TextureData newTextureData(m_data);
 
 	const uint32_t bpp = TextureUtils::channelCount(m_data.format) * TextureUtils::bytesPerChannel(m_data.type);
@@ -451,20 +493,6 @@ ResourceWrapper<Texture> Texture::clone() const
 
 	// Copy raw pixel data
 	std::memcpy(newTextureData.data, m_data.data, bufferSize);
-
-	//if (m_data.target == Texture::TextureTarget::TEXTURE_2D)
-	//{
-	//	newTextureData.data = TextureUtils::createBlankTextureBuffer2D(m_data.width, m_data.height, m_data.format, m_data.type);
-	//}
-	//else if (m_data.target == Texture::TextureTarget::TEXTURE_3D)
-	//{
-	//	newTextureData.data = TextureUtils::createBlankTextureBuffer3D(m_data.width, m_data.height, m_data.depth, m_data.format, m_data.type);
-	//}
-	//else
-	//{
-	//	logError("Not yet implemented.");
-	//	return ResourceWrapper<Texture>::empty;
-	//}
 
 	ResourceWrapper<Texture> clonedTexture = Texture::createTexture(newTextureData);
 

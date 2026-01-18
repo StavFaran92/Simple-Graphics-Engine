@@ -214,6 +214,8 @@ private:
 	void setTextureParameters(const TextureData& tData);
 
 	static void fillTextureBufferIfNeeded(TextureData& tData);
+
+	static void copyBufferIntoInternalBuffer(TextureData& tData);
 	
 	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
 
