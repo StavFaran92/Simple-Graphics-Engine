@@ -324,8 +324,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 		// We set the viewport to half the screen size to improve the SSAO performance
 		RenderCommand::setViewport(0, 0, width / 2.f, height / 2.f);
 
-		m_ssaoPassShader->setUniformValue("screenWidth", width / 2.f);
-		m_ssaoPassShader->setUniformValue("screenHeight", height / 2.f);
+		m_ssaoPassShader->setUniformValue("screenWidth", (int)(width / 2.f));
+		m_ssaoPassShader->setUniformValue("screenHeight", (int)(height / 2.f));
 
 		for (unsigned int i = 0; i < 64; ++i)
 		{
