@@ -116,15 +116,15 @@ float lightMarch(vec3 p0)
     return transmittance;
 }
 
-vec4 rayMarch(vec3 ro, vec3 rd)
+vec4 rayMarch(vec3 ro, vec3 rd, int sampleCount)
 {
-    float d = fract(sin(dot(ro.xy + rd.xy, vec2(12.9898, 78.233))) * 43758.5453) * MARCH_SIZE;
+    float d = 0.0;//fract(sin(dot(ro.xy + rd.xy, vec2(12.9898, 78.233))) * 43758.5453) * MARCH_SIZE;
     vec4 res = vec4(0.0);
 
     float totalTransmittance = 1.0;
     float lightEnergy = 0.0;
 
-    for(int i=0; i<MAX_STEPS; i++)
+    for(int i=0; i<sampleCount; i++)
     {
         vec3 p = ro + rd * d;
         float density = sceneSDF(p);
@@ -202,9 +202,12 @@ void frag(inout vec4 color)
         float hitT = max(tEnter, 0.0); // clamp if origin is inside box
         vec3 hitPos = ro + hitT * rd;
 
-        res = rayMarch(hitPos, rd);
+        float marchLength = tExit - hitT;
+        int sampleCount = min(int(marchLength / MARCH_SIZE), MAX_STEPS);
+
+        res = rayMarch(hitPos, rd, sampleCount);
     }
-    
+
     vec3 volumeColor = vec3(1.0);
 
     vec3 bgColor = texture(uMainTexture, screenUV).rgb;
