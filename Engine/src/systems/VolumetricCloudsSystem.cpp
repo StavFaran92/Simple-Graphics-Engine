@@ -54,6 +54,24 @@ void VolumetricCloudsSystem::prepareVolumetricCloudsForRender(VolumetricCloudsCo
 {
 	auto& materialResource = clouds.getMaterial().resource();
 	materialResource->setUniformValue("MARCH_SIZE", clouds.marchSize);
+
+
+	VolumeComponent& volumeComponent = clouds.entity.getComponentInChildren<VolumeComponent>();
+	auto& mesh = volumeComponent.mesh.get()->getPrimaryMesh();
+
+	auto& transform = clouds.entity.getComponent<Transformation>();
+	glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
+
+	AABB& aabb = mesh->getAABB();
+	aabb.transform(modelTransform);
+
+	materialResource->setUniformValue("u_aabbMin", aabb.getMin());
+	materialResource->setUniformValue("u_aabbMax", aabb.getMax());
+
+	//if (!aabb.isOnFrustum(*graphics->frustum))
+	//{
+	//	return false;
+	//}
 	//materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal);
 
 	//materialResource->setUniformValue("uWave1Speed", waterBody.wave1Speed);

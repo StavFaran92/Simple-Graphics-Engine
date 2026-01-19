@@ -148,6 +148,38 @@ vec4 rayMarch(vec3 ro, vec3 rd)
     return res;
 }
 
+bool rayAABB(
+    vec3 ro,        // ray origin
+    vec3 rd,        // ray direction (can be normalized or not)
+    vec3 boxMin,    // AABB min
+    vec3 boxMax,    // AABB max
+    out float t0,   // entry distance
+    out float t1    // exit distance
+)
+{
+    vec3 invDir = 1.0 / max(abs(rd), vec3(1e-8)) * sign(rd);
+
+    vec3 tMin = (boxMin - ro) * invDir;
+    vec3 tMax = (boxMax - ro) * invDir;
+
+    vec3 tEnter = min(tMin, tMax);
+    vec3 tExit  = max(tMin, tMax);
+
+    t0 = max(max(tEnter.x, tEnter.y), tEnter.z);
+    t1 = min(min(tExit.x,  tExit.y),  tExit.z);
+
+    // no intersection
+    if (t0 > t1)
+        return false;
+
+    // box is completely behind the ray
+    if (t1 < 0.0)
+        return false;
+
+    return true;
+}
+
+
 void frag(inout vec4 color)
 {
     vec2 screenPos = gl_FragCoord.xy; // x in range [0.5 , width − 0.5]
@@ -162,7 +194,16 @@ void frag(inout vec4 color)
     mat3 camToWorld = transpose(mat3(view)); //from view-space to world-space
     vec3 rd = normalize(camToWorld * rayView);
 
-    vec4 res = rayMarch(ro, rd);
+    float tEnter, tExit;
+    vec4 res = vec4(0.0);
+
+    if (rayAABB(ro, rd, u_aabbMin, u_aabbMax, tEnter, tExit))
+    {
+        float hitT = max(tEnter, 0.0); // clamp if origin is inside box
+        vec3 hitPos = ro + hitT * rd;
+
+        res = rayMarch(hitPos, rd);
+    }
     
     vec3 volumeColor = vec3(1.0);
 

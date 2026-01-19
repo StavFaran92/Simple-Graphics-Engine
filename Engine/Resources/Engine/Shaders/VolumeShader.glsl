@@ -50,6 +50,9 @@ uniform float cameraFov;
 
 uniform vec2 screenSize;
 
+uniform vec3 u_aabbMin;
+uniform vec3 u_aabbMax;
+
 uniform sampler2D uMainTexture;
 
 // ----- Methods ----- //
