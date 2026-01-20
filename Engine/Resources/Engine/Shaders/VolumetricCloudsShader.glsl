@@ -180,5 +180,6 @@ void frag(inout vec4 color)
     }
 
     vec3 bgColor = texture(uMainTexture, screenUV).rgb;
-    color = vec4(bgColor * (1.0 - res.a) + res.rgb, res.a);
+    //color = vec4(bgColor * (1.0 - res.a) + res.rgb, res.a);
+    color = vec4(res.rgb, 1.0);
 }

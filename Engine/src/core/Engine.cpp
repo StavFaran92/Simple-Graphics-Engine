@@ -35,6 +35,7 @@
 
 #include "systems/FoliageSystem.h"
 #include "systems/WaterSystem.h"
+#include "systems/VolumetricCloudsSystem.h"
 #include "systems/VolumetricSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
@@ -241,6 +242,7 @@ bool Engine::init(const InitParams& initParams)
         logError("Volumetric System init failed!");
         return false;
     }
+    auto volumetricCloudsSystem = new VolumetricCloudsSystem();
 
     if (initParams.loadExistingProject)
     {

@@ -3,6 +3,8 @@
 #include "core/Core.h"
 #include "runtime/Entity.h"
 #include "systems/SubSystem.h"
+#include "texture/Texture.h"
+#include "memory/ResourceWrapper.h"
 
 struct VolumetricCloudsComponent;
 
@@ -14,8 +16,8 @@ public:
 
 	//static void drawWaterBody(const WaterBodyComponent& waterBody);
 
-	static void prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds);
+	void prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds);
 
 private:
-	static ResourceWrapper<Texture> m_noiseTexture;
+	ResourceWrapper<Texture> m_noiseTexture;
 };

@@ -366,7 +366,7 @@ void Scene::draw(float deltaTime)
 
 		for (auto&& [entity, clouds, transform] : m_registry->get().view<VolumetricCloudsComponent, Transformation>().each())
 		{
-			VolumetricCloudsSystem::prepareVolumetricCloudsForRender(clouds);
+			Engine::get()->getSubSystem <VolumetricCloudsSystem>()->prepareVolumetricCloudsForRender(clouds);
 		}
 
 		// PRE Render Phase

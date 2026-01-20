@@ -15,7 +15,7 @@ VolumetricCloudsSystem::VolumetricCloudsSystem()
 {
 	Engine::get()->registerSubSystem<VolumetricCloudsSystem>(this);
 
-	m_noiseTexture = Texture::load("C:\Users\user\Downloads\download.png");
+	m_noiseTexture = Texture::load("C:/Users/Stav/Downloads/cloud_noise.png");
 }
 
 Entity VolumetricCloudsSystem::createVolumetricClouds()
@@ -70,7 +70,7 @@ void VolumetricCloudsSystem::prepareVolumetricCloudsForRender(VolumetricCloudsCo
 	materialResource->setUniformValue("u_aabbMin", aabb.getMin());
 	materialResource->setUniformValue("u_aabbMax", aabb.getMax());
 
-	materialResource->setSampler("uWaterNormalSampler", m_noiseTexture);
+	materialResource->getNonPersistentBlock().setTexture("iChannel0", m_noiseTexture);
 
 	//if (!aabb.isOnFrustum(*graphics->frustum))
 	//{
