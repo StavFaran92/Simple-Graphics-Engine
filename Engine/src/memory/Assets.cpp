@@ -212,6 +212,71 @@ void Assets::makeDirty(UUID uuid)
 	m_assets[uuid] = aInfo;
 }
 
+std::vector<AssetInfo> Assets::getAssetDependancies(UUID uuid) const
+{
+	std::vector<AssetInfo> results;
+
+	AssetInfo aInfo = getAsset(uuid);
+	for (UUID depedantAssetUUID : aInfo.assetsDependancies)
+	{
+		results.push_back(getAsset(depedantAssetUUID));
+	}
+	return results;
+}
+
+void Assets::addAssetDependency(UUID asset, UUID dependency)
+{
+	if (asset != dependency)
+	{
+		logError("Asset cannot depend on itself");
+		return;
+	}
+
+	if (!hasAsset(asset))
+	{
+		logError("Could not find asset {}", asset);
+		return;
+	}
+
+	if (!hasAsset(dependency))
+	{
+		logError("Could not find asset {}", dependency);
+		return;
+	}
+
+	AssetInfo aInfo = getAsset(asset);
+	aInfo.assetsDependancies.push_back(dependency);
+	m_assets[asset] = aInfo;
+}
+
+void Assets::removeAssetDependency(UUID asset, UUID dependency)
+{
+	if (asset != dependency)
+	{
+		logError("Asset cannot depend on itself");
+		return;
+	}
+
+	if (!hasAsset(asset))
+	{
+		logError("Could not find asset {}", asset);
+		return;
+	}
+
+	if (!hasAsset(dependency))
+	{
+		logError("Could not find asset {}", dependency);
+		return;
+	}
+
+	AssetInfo aInfo = getAsset(asset);
+	aInfo.assetsDependancies.erase(
+		std::remove(aInfo.assetsDependancies.begin(), aInfo.assetsDependancies.end(), dependency),
+		aInfo.assetsDependancies.end()
+	);
+	m_assets[asset] = aInfo;
+}
+
 AssetWrapper<ResourceBase> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
 {
 	desc.origFilePath = fileLocation;

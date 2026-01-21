@@ -35,6 +35,7 @@ struct EngineAPI AssetInfo
 	bool isTransient = false;
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	nlohmann::json importSettings;
+	std::vector<UUID> assetsDependancies;
 	ResourceWrapper<ResourceBase> resource = ResourceWrapper<ResourceBase>::empty;
 
 	bool isDirty = false;

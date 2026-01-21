@@ -75,6 +75,12 @@ public:
 
 	void makeDirty(UUID uuid);
 
+	std::vector<AssetInfo> getAssetDependancies(UUID uuid) const;
+
+	void addAssetDependency(UUID asset, UUID dependency);
+
+	void removeAssetDependency(UUID asset, UUID dependency);
+
 	AssetWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
 	AssetWrapper<ResourceBase> createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc);
