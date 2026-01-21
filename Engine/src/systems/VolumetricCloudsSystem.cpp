@@ -15,7 +15,11 @@ VolumetricCloudsSystem::VolumetricCloudsSystem()
 {
 	Engine::get()->registerSubSystem<VolumetricCloudsSystem>(this);
 
-	m_noiseTexture = Texture::load("C:/Users/Stav/Downloads/cloud_noise.png");
+	Texture::TextureAssetDescriptor desc;
+	desc.filter = Texture::TextureFilter::Linear;
+	desc.wrap = Texture::TextureWrap::Mirror;
+	desc.genMipMap = true;
+	m_noiseTexture = Texture::load("C:/Users/user/Downloads/cloud_noise.png", desc);
 }
 
 Entity VolumetricCloudsSystem::createVolumetricClouds()
