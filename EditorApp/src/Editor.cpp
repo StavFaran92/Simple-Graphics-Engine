@@ -38,6 +38,7 @@
 #include "Dialogs/LuaScriptImportDialog.h"
 #include "Dialogs/FolderCreateDialog.h"
 #include "Dialogs/AssetSelectDialog.h"
+#include "Dialogs/SceneCreateDialog.h"
 
 #include "ImguiHandler.h"
 #include "GUIMenu.h"
@@ -94,6 +95,7 @@ static AnimationImportDialog animationImportDialog;
 static TextureImportDialog textureImportDialog;
 static LuaScriptImportDialog luaScriptImportDialog;
 static FolderCreateDialog folderCreateDialog;
+static SceneCreateDialog sceneCreateDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -417,6 +419,11 @@ class GUI_Helper : public GuiMenu {
 
 						if (ImGui::MenuItem("Lua Script")) {
 							EditorState::Instance().showLuaScriptCreateWindow = true;
+
+						}
+
+						if (ImGui::MenuItem("Scene")) {
+							sceneCreateDialog.activate();
 
 						}
 						ImGui::EndMenu();

@@ -35,6 +35,7 @@ public:
     bool isMouseInSceneView = false;
     bool showTextureDisplayWindow = false;
     bool showLuaScriptCreateWindow = false;
+    bool showSceneCreateWindow = false;
     bool showSettingsWindow = false;
     bool showTextureImportWindow = false;
     bool showModelImportWindow = false;

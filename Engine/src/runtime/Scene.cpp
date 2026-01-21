@@ -55,7 +55,77 @@
 #include "memory/BuiltInAssets.h"
 #include "memory/BuiltInResources.h"
 #include "systems/VolumetricSystem.h"
+#include "core/Factory.h"
 
+namespace {
+	struct SceneManagerRegistration {
+		SceneManagerRegistration() {
+			AssetFactory::registerManager(AssetType::SCENE, std::make_shared<SceneAssetManager>());
+		}
+	} _sceneManagerRegistration;
+}
+
+bool SceneAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+{
+	return false;
+}
+
+ResourceWrapper<ResourceBase> SceneAssetManager::load(AssetInfo& aInfo)
+{
+	std::ifstream is(aInfo.fullFilePath);
+	cereal::JSONInputArchive iarchive(is);
+	ResourceWrapper<Scene> scene = Factory<Scene>::create();
+
+	try
+	{
+		SerializedScene serializedScene;
+		iarchive(serializedScene);
+		Archiver::deserializeScene(serializedScene, *scene.get());
+		return scene;
+
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Deserialization Error occured: {}", e.what());
+	}
+
+	return ResourceWrapper<ResourceBase>::empty;
+}
+
+void SceneAssetManager::save(const AssetWrapper<ResourceBase>& scene, const AssetInfo& aInfo)
+{
+	
+	auto projectDir = Engine::get()->getProjectDirectory();
+	std::ofstream os(aInfo.fullFilePath);
+	cereal::JSONOutputArchive oarchive(os);
+
+	try
+	{
+		SerializedScene serializedScene = Archiver::serializeScene(scene.as<Scene>().get());
+		oarchive(serializedScene);
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Serialization Error occured: {}", e.what());
+	}
+}
+
+AssetWrapper<Scene> Scene::import(const std::string& fileLocation, SceneImportSettings desc)
+{
+	desc.aType = AssetType::SCENE;
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Scene>();
+}
+
+ResourceWrapper<Scene> Scene::create()
+{
+	auto scene = Factory<Scene>::create(Engine::get()->getContext());
+	return scene;
+}
+
+void Scene::updateAsset(const AssetWrapper<Scene>& scene, AssetUpdateDescriptor desc)
+{
+	Engine::get()->getSubSystem<Assets>()->updateAsset(scene, desc);
+}
 
 struct PlaneGPU {
 	glm::vec3 normal;
@@ -1058,26 +1128,10 @@ void Scene::close()
 	clear();
 }
 
-//bool Scene::isSelected(uint32_t id) const
-//{
-//	if (!m_isObjectSelectionEnabled)
-//	{
-//		logWarning("Object selection isn't enabled for this scene.");
-//		return false;
-//	}
-//
-//	return m_objectSelection->isObjectSelected(id);
-//}
-
 void Scene::addCoroutine(const std::function<bool(float)>& coroutine)
 {
 	m_coroutineManager->addCoroutine(coroutine);
 }
-
-//void Scene::removeCoroutine(std::function<bool(float)>* coroutine)
-//{
-//	m_coroutineManager->removeCoroutine(coroutine);
-//}
 
 Entity Scene::getEntityByName(const std::string& name) const
 {

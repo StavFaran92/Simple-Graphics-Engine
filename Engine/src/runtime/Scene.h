@@ -55,7 +55,23 @@ namespace physx {
 }
 template<typename T> class ObjectHandler;
 
-class EngineAPI Scene
+struct SceneAssetManager : public AssetManager
+{
+	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
+	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
+	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+};
+
+struct SceneImportSettings : public AssetCreateDescriptor
+{
+
+};
+
+struct SceneCreateDescriptor : public AssetCreateDescriptor
+{
+};
+
+class EngineAPI Scene : public ResourceBase
 {
 public:
 	enum class RenderPhase
@@ -71,10 +87,15 @@ public:
 	using RenderCallback = std::function<void()>;
 public:
 	// -------------------- Methods -------------------- //
+	Scene() = default;
 	Scene(Context* context);
 
+	static AssetWrapper<Scene> import(const std::string& fileLocation, SceneImportSettings settings = {});
+	static ResourceWrapper<Scene> create();
+	static void updateAsset(const AssetWrapper<Scene>& scene, AssetUpdateDescriptor desc);
+	//static ResourceWrapper<Scene> load(const std::string& fileLocation, SceneCreateDescriptor = {});
+
 	void addCoroutine(const std::function<bool(float)>& coroutine);
-	void removeCoroutine(std::function<bool(float)> coroutine);
 
 	uint32_t getID() const { return m_id; }
 

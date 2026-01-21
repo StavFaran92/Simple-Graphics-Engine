@@ -19,7 +19,7 @@ VolumetricCloudsSystem::VolumetricCloudsSystem()
 	desc.filter = Texture::TextureFilter::Linear;
 	desc.wrap = Texture::TextureWrap::Mirror;
 	desc.genMipMap = true;
-	m_noiseTexture = Texture::load("C:/Users/user/Downloads/cloud_noise.png", desc);
+	m_noiseTexture = Texture::load(SGE_ROOT_DIR "Resources/Engine/Textures/cloud_noise.png", desc);
 }
 
 Entity VolumetricCloudsSystem::createVolumetricClouds()
