@@ -1,7 +1,6 @@
 #pragma once
 
 #include "memory/ResourceWrapper.h"
-#include "core/Core.h"
 #include "memory/AssetInfo.h"
 
 template<typename T>
