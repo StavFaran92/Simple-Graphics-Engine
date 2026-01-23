@@ -85,7 +85,7 @@ void Assets::loadAssetsDatabase()
 
 	for (auto& assetInfo : assets)
 	{
-		assetInfo.resource = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
+		assetInfo.data().m_resource = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
 }
@@ -173,7 +173,7 @@ bool Assets::importAssetInner(AssetRecord& aInfo)
 
 
 	// Add Asset
-	aInfo.resource = resource;
+	aInfo.data().m_resource = resource;
 	addAsset(aInfo);
 
 	return true;
@@ -311,7 +311,7 @@ AssetHandle<Asset> Assets::createAsset(const ResourceWrapper<Resource>& resource
 {
 	// Add asset info
 	AssetRecord aInfo(desc);
-	aInfo.resource = resource;
+	aInfo.data().m_resource = resource;
 	addAsset(aInfo);
 
 	// Create asset

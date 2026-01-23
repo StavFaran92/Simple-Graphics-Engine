@@ -102,7 +102,7 @@ private:
 	UUID uuid = EMPTY_UUID;
 
 	// Used mainly for debug
-	ResourceWrapper<T> m_resource = ResourceWrapper<T>::empty;
+	ResourceWrapper<Resource> m_resource = ResourceWrapper<Resource>::empty;
 private:
 	template<typename T>friend class Factory;
 	friend class Assets;

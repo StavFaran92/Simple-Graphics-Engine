@@ -10,6 +10,7 @@
 
 struct AssetCreateDescriptor;
 struct AssetUpdateDescriptor;
+class Asset;
 
 
 template<typename T>
@@ -35,8 +36,7 @@ struct EngineAPI AssetRecord
 	bool isTransient = false;
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	nlohmann::json importSettings;
-	std::vector<UUID> assetsDependancies;
-	std::shared_ptr<Asset> data;
+	std::shared_ptr<Asset> asset;
 
 	bool isDirty = false;
 
