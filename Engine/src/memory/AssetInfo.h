@@ -36,7 +36,7 @@ struct EngineAPI AssetInfo
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	nlohmann::json importSettings;
 	std::vector<UUID> assetsDependancies;
-	ResourceWrapper<ResourceBase> resource = ResourceWrapper<ResourceBase>::empty;
+	ResourceWrapper<Resource> resource = ResourceWrapper<Resource>::empty;
 
 	bool isDirty = false;
 
@@ -46,7 +46,7 @@ struct EngineAPI AssetInfo
 
 	AssetInfo(const AssetCreateDescriptor& assetDesc);
 
-	AssetWrapper<ResourceBase> data() const;
+	AssetWrapper<Resource> data() const;
 	void update(const AssetUpdateDescriptor& desc);
 	void establishFilepath();
 };

@@ -200,7 +200,7 @@ void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
 	establishFilepath();
 }
 
-AssetWrapper<ResourceBase> AssetInfo::data() const
+AssetWrapper<Resource> AssetInfo::data() const
 {
-	return AssetWrapper<ResourceBase>(uuid);
+	return AssetWrapper<Resource>(uuid);
 }

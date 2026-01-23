@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/Engine.h"
 #include "memory/ResourceWrapper.h"
 #include "memory/AssetInfo.h"
 #include "core/Core.h"
@@ -8,11 +7,9 @@
 #include "systems/SubSystem.h"
 #include "fileSystem/ScopedPath.h"
 
-#include <unordered_set>
-
-#include <filesystem>
-
 #include <nlohmann/json.hpp>
+
+class Asset;
 
 struct EngineAPI AssetCreateDescriptor
 {
@@ -49,45 +46,47 @@ public:
 
 	std::string getAlias(UUID uid) const;
 
-	void addAsset(AssetInfo& aInfo);
+	std::vector<Asset> getAllAssetsOfType(AssetType aType) const;
 
-	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
-
-	std::vector<AssetInfo> getAllAssets() const;
+	std::vector<Asset> getAllAssets() const;
 
 	void loadAssetsDatabase();
 
 	void saveDirtyAssets();
 
-	UUID getAssetFromPath(const std::string& path) const;
+	Asset getAssetFromPath(const std::string& path) const;
 
-	UUID getAssetFromName(const std::string& name) const;
+	Asset getAssetFromName(const std::string& name) const;
 
-	const AssetInfo& getAsset(UUID uuid) const;
+	Asset getAsset(UUID uuid) const;
+
+	const AssetInfo& getInfo(UUID uuid) const;
 
 	bool hasAsset(UUID uuid) const;
 
-	void deleteAsset(const AssetInfo& aInfo);
+	void deleteAsset(Asset asset);
 
-	void updateAsset(const AssetWrapper<ResourceBase>& asset, const AssetUpdateDescriptor& uDesc = {});
+	void updateAsset(Asset asset, const AssetUpdateDescriptor& uDesc = {});
 
 	void reimportAsset(UUID uuid);
 
 	void makeDirty(UUID uuid);
 
-	std::vector<AssetInfo> getAssetDependancies(UUID uuid) const;
+	std::vector<Asset> getAssetDependancies(UUID uuid) const;
 
-	void addAssetDependency(UUID asset, UUID dependency);
+	//void addAssetDependency(UUID asset, UUID dependency);
 
-	void removeAssetDependency(UUID asset, UUID dependency);
+	//void removeAssetDependency(UUID asset, UUID dependency);
 
-	AssetWrapper<ResourceBase> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
+	Asset importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
-	AssetWrapper<ResourceBase> createAsset(const ResourceWrapper<ResourceBase>& asset, AssetCreateDescriptor& desc);
+	Asset createAsset(const ResourceWrapper<Resource>& asset, AssetCreateDescriptor& desc);
 
-	ResourceWrapper<ResourceBase> loadResource(const std::string& fileLocation, AssetCreateDescriptor& desc);
+	ResourceWrapper<Resource> loadResource(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
 private:
+	void addAsset(AssetInfo& aInfo);
+
 	void updateRegistry(const AssetInfo& aInfo);
 
 	bool importAssetInner(AssetInfo& aInfo);

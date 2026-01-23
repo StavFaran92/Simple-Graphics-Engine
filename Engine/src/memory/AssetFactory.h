@@ -7,7 +7,7 @@ class AssetManager;
 class AssetFactory
 {
 public:
-	using LoadFn = std::function<AssetWrapper<ResourceBase>(AssetInfo&)>;
+	using LoadFn = std::function<AssetWrapper<Resource>(AssetInfo&)>;
 
 	// Register a manager instance for a specific asset type.
 	static void registerManager(AssetType aType, std::shared_ptr<AssetManager> manager);

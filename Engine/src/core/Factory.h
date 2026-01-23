@@ -15,9 +15,9 @@ public:
     static ResourceWrapper<T> create(Args&&... args)
     {
         T* asset = new T(args...);
-        ResourceID id = ResourceBase::getNewResourceID();
+        ResourceID id = Resource::getNewResourceID();
         Engine::get()->getMemoryPool().add(id, asset);
-        ResourceWrapper<T> res = ResourceBase::createNewResource<T>(id);
+        ResourceWrapper<T> res = Resource::createNewResource<T>(id);
         return res;
     }
 

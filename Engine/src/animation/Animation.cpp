@@ -19,12 +19,12 @@ bool AnimationAssetManager::copyFiles(const std::string& fileLocation, AssetInfo
 	return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
 }
 
-ResourceWrapper<ResourceBase> AnimationAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> AnimationAssetManager::load(AssetInfo& aInfo)
 {
 	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 }
 
-void AnimationAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+void AnimationAssetManager::save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo)
 {
 	throw new std::runtime_error("Not yet implemented!");
 }

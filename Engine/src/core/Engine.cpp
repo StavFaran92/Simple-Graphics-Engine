@@ -143,7 +143,7 @@ bool Engine::init(const InitParams& initParams)
     gameEventLayer->setEnabled(false);
     m_eventSystem->pushLayer(gameEventLayer);
 
-    m_memoryPool = std::make_shared<MemoryPool<ResourceBase>>();
+    m_memoryPool = std::make_shared<MemoryPool<Resource>>();
 
     m_projectManager = std::make_shared<ProjectManager>();
 
@@ -479,7 +479,7 @@ const EngineConfig& Engine::getConfig() const
     return *m_engineConfig.get();
 }
 
-MemoryPool<ResourceBase>& Engine::getMemoryPool() const
+MemoryPool<Resource>& Engine::getMemoryPool() const
 {
     return *m_memoryPool.get();
 }

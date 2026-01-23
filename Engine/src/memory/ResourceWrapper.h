@@ -154,7 +154,7 @@ private:
 	}
 protected:
 	ResourceID id = emptyID;
-	mutable ResourceBase* m_cache = nullptr;
+	mutable Resource* m_cache = nullptr;
 };
 
 template<typename T>

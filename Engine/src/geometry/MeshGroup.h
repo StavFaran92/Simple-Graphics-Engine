@@ -8,20 +8,24 @@
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
-struct MeshCollectionAssetManager : public AssetManager
+// Asset IO Manager
+struct MeshGroupAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
 	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
 	std::map<int, AssetWrapper<Material>> getLoadedMaterials();
-	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
+	void save(Asset meshGroup, const AssetInfo& aInfo) override;
 
 private:
 	ModelImporter::ModelInfo m_lastLoadedModelInfo;
 };
 
-class EngineAPI MeshCollection : public Resource
+// Resource
+class EngineAPI MeshGroup : public Resource
 {
 public:
+	static ResourceWrapper<MeshGroup> load(const std::string& fileLocation, ModelImportSettings aDesc = {});
+
 	void addMesh(const std::shared_ptr<Mesh>& mesh);
 
 	std::shared_ptr<Mesh> getPrimaryMesh() const;
@@ -37,16 +41,25 @@ public:
 	int getBoneID(const std::string& boneName) const;
 
 	int getMaterialCount() const;
-
-	static AssetWrapper<MeshCollection> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
-	static ResourceWrapper<MeshCollection> load(const std::string& fileLocation, ModelImportSettings aDesc = {});
-
-	static std::map<int, AssetWrapper<Material>> getLastLoadedMaterials();
-	
-
 private:
 	std::vector<std::shared_ptr<Mesh>> m_meshes;
 	std::vector<glm::mat4> m_bonesOffsets;
 	std::unordered_map<std::string, unsigned int> m_bonesNameToIDMap;
 	std::set<int> m_materialSlots{};
+};
+
+// Asset
+class EngineAPI MeshGroupAsset : public Asset
+{
+public:
+	using Asset::Asset;
+
+	MeshGroupAsset(const Asset& asset);
+
+	static MeshGroupAsset import(const std::string& fileLocation, ModelImportSettings aDesc = {});
+
+	static std::map<int, AssetWrapper<Material>> getLastLoadedMaterials();
+
+	ResourceWrapper<MeshGroup> resource() const;
+	ResourceWrapper<MeshGroup> resource();
 };

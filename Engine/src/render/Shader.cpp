@@ -41,7 +41,7 @@ bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& a
 	return std::filesystem::copy_file(fileLocation, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> ShaderAssetManager::load(AssetInfo& aInfo)
 {
 	ShaderOverride shaderOverride = ShaderOverride::None;
 	if (!aInfo.importSettings.is_null())
@@ -66,7 +66,7 @@ ResourceWrapper<ResourceBase> ShaderAssetManager::load(AssetInfo& aInfo)
 	return shader;
 }
 
-void ShaderAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+void ShaderAssetManager::save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo)
 {
 	std::filesystem::copy_file(aInfo.origFilePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }

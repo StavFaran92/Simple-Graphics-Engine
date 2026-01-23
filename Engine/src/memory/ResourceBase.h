@@ -3,11 +3,11 @@
 template<typename T>
 class ResourceWrapper;
 
-class ResourceBase
+class Resource
 {
 public:
-	ResourceBase() = default;
-	virtual ~ResourceBase() = default;
+	Resource() = default;
+	virtual ~Resource() = default;
 
 	template<typename T>
 	static ResourceWrapper<T> createNewResource(ResourceID id)

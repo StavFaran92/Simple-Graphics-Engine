@@ -64,11 +64,11 @@ struct EditableUniform {
 struct MaterialAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
+	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
 };
 
-class EngineAPI Material : public ResourceBase
+class EngineAPI Material : public Resource
 {
 public:
 	struct PersistentBlock

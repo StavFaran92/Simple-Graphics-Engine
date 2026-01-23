@@ -50,5 +50,5 @@ public:
 	void loadAllResources();
 
 private:
-	std::unordered_map<std::string, ResourceWrapper<ResourceBase>> m_resources;
+	std::unordered_map<std::string, ResourceWrapper<Resource>> m_resources;
 };

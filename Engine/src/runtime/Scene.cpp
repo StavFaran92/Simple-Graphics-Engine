@@ -70,7 +70,7 @@ bool SceneAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aI
 	return false;
 }
 
-ResourceWrapper<ResourceBase> SceneAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> SceneAssetManager::load(AssetInfo& aInfo)
 {
 	std::ifstream is(aInfo.fullFilePath);
 	cereal::JSONInputArchive iarchive(is);
@@ -89,10 +89,10 @@ ResourceWrapper<ResourceBase> SceneAssetManager::load(AssetInfo& aInfo)
 		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	return ResourceWrapper<ResourceBase>::empty;
+	return ResourceWrapper<Resource>::empty;
 }
 
-void SceneAssetManager::save(const AssetWrapper<ResourceBase>& scene, const AssetInfo& aInfo)
+void SceneAssetManager::save(const AssetWrapper<Resource>& scene, const AssetInfo& aInfo)
 {
 	
 	auto projectDir = Engine::get()->getProjectDirectory();

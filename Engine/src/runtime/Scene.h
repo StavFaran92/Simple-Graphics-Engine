@@ -58,8 +58,8 @@ template<typename T> class ObjectHandler;
 struct SceneAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
+	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
 };
 
 struct SceneImportSettings : public AssetCreateDescriptor
@@ -71,7 +71,7 @@ struct SceneCreateDescriptor : public AssetCreateDescriptor
 {
 };
 
-class EngineAPI Scene : public ResourceBase
+class EngineAPI Scene : public Resource
 {
 public:
 	enum class RenderPhase

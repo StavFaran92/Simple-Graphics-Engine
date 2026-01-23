@@ -14,12 +14,12 @@ struct AssetInfo;
 struct TextureAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
+	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
 	std::string getRecommendedExtension(const AssetInfo& aInfo) override;
 };
 
-class EngineAPI Texture : public ResourceBase
+class EngineAPI Texture : public Resource
 {
 public:
 	enum class TextureSemantic : int 

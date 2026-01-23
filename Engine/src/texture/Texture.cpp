@@ -62,7 +62,7 @@ bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& 
 	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> TextureAssetManager::load(AssetInfo& aInfo)
 {
 	std::string filepath = aInfo.fullFilePath;
 
@@ -116,7 +116,7 @@ std::string TextureAssetManager::getRecommendedExtension(const AssetInfo& aInfo)
 
 }
 
-void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const AssetInfo& aInfo)
+void TextureAssetManager::save(const AssetWrapper<Resource>& texture, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;

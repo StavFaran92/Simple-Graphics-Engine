@@ -47,7 +47,7 @@ class Shader;
 class EventLayerStack;
 class BuiltInMeshes;
 class BuiltInMaterials;
-class ResourceBase;
+class Resource;
 class SubSystem;
 class DeferredRenderer;
 class Renderer;
@@ -98,7 +98,7 @@ public:
     const InitParams& getInitParams() const;
     EventLayerStack* getEventLayerStack() const;
     const EngineConfig& getConfig() const;
-    MemoryPool<ResourceBase>& getMemoryPool() const;
+    MemoryPool<Resource>& getMemoryPool() const;
     DeferredRenderer& getDeferredRenderer() const;
     Renderer& getForwardRenderer() const;
     void addGUILayer(const std::shared_ptr<GUILayer>& GUILayer);
@@ -185,7 +185,7 @@ protected:
     std::shared_ptr<ResourceManager> m_resourceManager;
     std::shared_ptr<ProjectManager> m_projectManager;
     std::shared_ptr<EngineConfig> m_engineConfig;
-    std::shared_ptr<MemoryPool<ResourceBase>> m_memoryPool;
+    std::shared_ptr<MemoryPool<Resource>> m_memoryPool;
     std::shared_ptr<DeferredRenderer> m_deferredRenderer;
     std::shared_ptr<Renderer> m_forwardRenderer;
 

@@ -26,7 +26,7 @@ bool PrefabAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& a
 	return false;
 }
 
-ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> PrefabAssetManager::load(AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ifstream is(projectDir + aInfo.relativefilePath);
@@ -48,7 +48,7 @@ ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
 	return ResourceWrapper<Prefab>::empty;
 }
 
-void PrefabAssetManager::save(const AssetWrapper<ResourceBase>& prefab, const AssetInfo& aInfo)
+void PrefabAssetManager::save(const AssetWrapper<Resource>& prefab, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);

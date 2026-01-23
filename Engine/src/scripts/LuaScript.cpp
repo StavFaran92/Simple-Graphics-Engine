@@ -18,7 +18,7 @@ bool LuaScriptAssetManager::copyFiles(const std::string& fileLocation, AssetInfo
 	return std::filesystem::copy_file(fileLocation, savedFilePath);
 }
 
-ResourceWrapper<ResourceBase> LuaScriptAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> LuaScriptAssetManager::load(AssetInfo& aInfo)
 {
 	ResourceWrapper<LuaScript> luaScript = Factory<LuaScript>::create();
 	luaScript->filepath = aInfo.relativefilePath;
@@ -33,10 +33,10 @@ ResourceWrapper<ResourceBase> LuaScriptAssetManager::load(AssetInfo& aInfo)
 		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	return ResourceWrapper<ResourceBase>::empty;
+	return ResourceWrapper<Resource>::empty;
 }
 
-void LuaScriptAssetManager::save(const AssetWrapper<ResourceBase>& script, const AssetInfo& aInfo)
+void LuaScriptAssetManager::save(const AssetWrapper<Resource>& script, const AssetInfo& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;

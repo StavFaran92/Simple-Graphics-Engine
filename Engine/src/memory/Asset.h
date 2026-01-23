@@ -4,37 +4,72 @@
 
 #include "Assets.h"
 #include "AssetFactory.h"
-#include "memory/AssetWrapper.h"
 
-#include <nlohmann/json.hpp>
+class Asset
+{
+public:
+	static Asset empty;
 
-using json = nlohmann::json;
-using namespace nlohmann::literals;
+	Asset() = default;
 
-//struct BaseAssetParameters
-//{
-//	std::string name;
-//	UUID customUUID;
-//	std::string targetDirectory;
-//	bool isTransient = false;
-//
-//	void fillAssetInfo(AssetInfo& aInfo) const
-//	{
-//		if (!name.empty())
-//		{
-//			aInfo.name = name;
-//		}
-//
-//		aInfo.assetDirectory = targetDirectory;
-//
-//		aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
-//
-//		aInfo.importSettings = fillParams();
-//	}
-//	virtual json fillParams() const { return {}; };
-//
-//	virtual ~BaseAssetParameters() = default;
-//};
+	Asset(UUID uuid) : uuid(uuid)
+	{
+		m_resource = resourceInner();
+	};
+
+	Asset(const Asset& other) : Asset(other.uuid)
+	{
+	};
+
+	ResourceWrapper<Resource> resourceInner() const
+	{
+		return info().resource;
+	}
+
+	void erase()
+	{
+		Engine::get()->getSubSystem<Assets>()->deleteAsset(*this);
+	}
+
+	void makeDirty()
+	{
+		Engine::get()->getSubSystem<Assets>()->makeDirty(uuid);
+	}
+
+	UUID getUID() const
+	{
+		return uuid;
+	}
+
+	bool isEmpty() const
+	{
+		return resourceInner().isEmpty();
+	}
+
+	const AssetInfo& info() const
+	{
+		return Engine::get()->getSubSystem<Assets>()->getInfo(uuid);
+	}
+
+	void reimportAsset()
+	{
+		Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
+	}
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(uuid);
+	}
+
+private:
+	UUID uuid = EMPTY_UUID;
+
+	// Used mainly for debug
+	ResourceWrapper<Resource> m_resource = ResourceWrapper<Resource>::empty;
+private:
+	template<typename T>friend class Factory;
+	friend class Assets;
+};
 
 template<AssetType T>
 class AssetFnRegister
@@ -54,7 +89,7 @@ AssetFnRegister<T> AssetFnRegister<T>::staticRegister;
 class AssetManager {
 public:
 	virtual bool copyFiles(const std::string& fileLocation, AssetInfo&) = 0;
-	virtual ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) = 0;
-	virtual void save(const AssetWrapper<ResourceBase>& asset, const AssetInfo& aInfo) {};
+	virtual ResourceWrapper<Resource> load(AssetInfo& aInfo) = 0;
+	virtual void save(Asset asset, const AssetInfo& aInfo) {};
 	virtual std::string getRecommendedExtension(const AssetInfo& aInfo) { return getExtensionFromType(aInfo.aType); }; // Default behaviour, can be overriden if needed
 };

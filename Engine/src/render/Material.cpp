@@ -35,7 +35,7 @@ bool MaterialAssetManager::copyFiles(const std::string& fileLocation, AssetInfo&
 	return false;
 }
 
-ResourceWrapper<ResourceBase> MaterialAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> MaterialAssetManager::load(AssetInfo& aInfo)
 {
 	std::ifstream is(aInfo.fullFilePath);
 	cereal::JSONInputArchive iarchive(is);
@@ -53,10 +53,10 @@ ResourceWrapper<ResourceBase> MaterialAssetManager::load(AssetInfo& aInfo)
 		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	return ResourceWrapper<ResourceBase>::empty;
+	return ResourceWrapper<Resource>::empty;
 }
 
-void MaterialAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+void MaterialAssetManager::save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(aInfo.fullFilePath);

@@ -21,7 +21,7 @@ bool MeshCollectionAssetManager::copyFiles(const std::string& fileLocation, Asse
 	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
 }
 
-ResourceWrapper<ResourceBase> MeshCollectionAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> MeshCollectionAssetManager::load(AssetInfo& aInfo)
 {
 	ResourceWrapper<MeshCollection> mesh = Factory<MeshCollection>::create();
 	ModelImporter::ModelInfo mInfo;
@@ -37,7 +37,7 @@ std::map<int, AssetWrapper<Material>> MeshCollectionAssetManager::getLoadedMater
 	return Engine::get()->getSubSystem<ModelImporter>()->getLastImportedMaterial().materials;
 }
 
-void MeshCollectionAssetManager::save(const AssetWrapper<ResourceBase>& mesh, const AssetInfo& aInfo)
+void MeshCollectionAssetManager::save(const AssetWrapper<Resource>& mesh, const AssetInfo& aInfo)
 {
 	MeshExporter::exportMesh(aInfo, mesh.as<MeshCollection>().resource());
 }

@@ -53,11 +53,11 @@ struct ShaderAssetDescriptor : public AssetCreateDescriptor
 struct ShaderAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
+	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
 };
 
-class EngineAPI Shader : public ResourceBase, std::enable_shared_from_this<Shader>
+class EngineAPI Shader : public Resource, std::enable_shared_from_this<Shader>
 {
 public:
 	inline static const std::string ATTRIB_SHADER_OVERRIDE = "shader_override";
