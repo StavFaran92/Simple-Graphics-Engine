@@ -7,7 +7,7 @@ class PostProcessComponent : public Component
 {
 public:
 
-	AssetWrapper<Shader> shader;
+	AssetHandle<Shader> shader;
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 	{

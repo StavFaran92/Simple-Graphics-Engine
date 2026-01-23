@@ -1,43 +1,45 @@
 #pragma once
 
 #include "memory/ResourceWrapper.h"
-#include "memory/AssetInfo.h"
+#include "memory/AssetRecord.h"
 
 template<typename T>
-class AssetWrapper
+class AssetHandle
 { 
 public:
-	static AssetWrapper<T> empty;
+	using ResourceType = typename T::ResourceType;
 
-	AssetWrapper() = default;
+	static AssetHandle<T> empty;
 
-	AssetWrapper(UUID uuid) : uuid(uuid)
+	AssetHandle() = default;
+
+	AssetHandle(UUID uuid) : uuid(uuid)
 	{
 		m_resource = resource();
 	};
 
 	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
-	AssetWrapper<U> as() const
+	AssetHandle<U> as() const
 	{
-		return AssetWrapper<U>(uuid);
+		return AssetHandle<U>(uuid);
 	}
 
 	// Upcast (texture -> asset)
 	template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
-	AssetWrapper(const AssetWrapper<U>& other)
+	AssetHandle(const AssetHandle<U>& other)
 	{
 		uuid = other.getUID();
 		m_resource = resource();
 	}
 
-	const ResourceWrapper<T> resource() const
+	const ResourceWrapper<ResourceType> resource() const
 	{
-		return info().resource.as<T>();
+		return info().data().as<T>().resource();
 	}
 
-	ResourceWrapper<T> resource()
+	ResourceWrapper<ResourceType> resource()
 	{
-		return info().resource.as<T>();
+		return info().data().as<T>().resource();
 	}
 
 	void erase()
@@ -76,7 +78,7 @@ public:
 		return resource().isEmpty();
 	}
 
-	const AssetInfo& info() const
+	const AssetRecord& info() const
 	{
 		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 	}
@@ -105,11 +107,11 @@ private:
 	template<typename T>friend class Factory;
 	friend class Assets;
 
-	//static AssetWrapper<T> promoteToAsset(const ResourceWrapper<T>& resource)
+	//static AssetHandle<T> promoteToAsset(const ResourceWrapper<T>& resource)
 	//{
-	//	return AssetWrapper<T>(resource.getUID());
+	//	return AssetHandle<T>(resource.getUID());
 	//}
 };
 
 template<typename T>
-inline AssetWrapper<T> AssetWrapper<T>::empty;
+inline AssetHandle<T> AssetHandle<T>::empty;

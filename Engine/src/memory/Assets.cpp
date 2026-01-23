@@ -21,7 +21,7 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
-void Assets::addAsset(AssetInfo& aInfo)
+void Assets::addAsset(AssetRecord& aInfo)
 {
 	if (aInfo.aType == AssetType::NONE)
 	{
@@ -47,31 +47,31 @@ void Assets::addAsset(AssetInfo& aInfo)
 	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
 }
 
-std::vector<Asset> Assets::getAllAssetsOfType(AssetType aType) const
+std::vector<AssetHandle<Asset>> Assets::getAllAssetsOfType(AssetType aType) const
 {
 	if (aType == AssetType::NONE)
 	{
 		logError("Invalid asset type specified!");
 		return {};
 	}
-	std::vector<Asset> result;
+	std::vector<AssetHandle<Asset>> result;
 	for (const auto& [uuid, info] :m_assets)
 	{
 		if (info.aType == aType)
 		{
-			Asset asset = getAsset(uuid);
+			AssetHandle<Asset> asset = getAsset(uuid);
 			result.push_back(asset);
 		}
 	}
 	return result;
 }
 
-std::vector<Asset> Assets::getAllAssets() const
+std::vector<AssetHandle<Asset>> Assets::getAllAssets() const
 {
-	std::vector<Asset> result;
+	std::vector<AssetHandle<Asset>> result;
 	for (const auto& [uuid, info] : m_assets)
 	{
-		Asset asset = getAsset(uuid);
+		AssetHandle<Asset> asset = getAsset(uuid);
 		result.push_back(asset);
 	}
 	return result;
@@ -81,7 +81,7 @@ void Assets::loadAssetsDatabase()
 {
 	auto par = Engine::get()->getContext()->getProjectAssetRegistry();
 
-	std::vector<AssetInfo> assets = par->getAllAssets();
+	std::vector<AssetRecord> assets = par->getAllAssets();
 
 	for (auto& assetInfo : assets)
 	{
@@ -96,25 +96,25 @@ void Assets::saveDirtyAssets()
 	{
 		if (assetInfo.isDirty)
 		{
-			Asset asset = getAsset(uuid);
+			AssetHandle<Asset> asset = getAsset(uuid);
 			AssetFactory::getManager(assetInfo.aType)->save(asset, assetInfo);
 			assetInfo.isDirty = false;
 		}
 	}
 }
 
-Asset Assets::getAsset(UUID uuid) const
+AssetHandle<Asset> Assets::getAsset(UUID uuid) const
 {
 	auto iter = m_assets.find(uuid);
 	if (iter != m_assets.end())
 	{
-		return Asset(uuid);
+		return AssetHandle<Asset>(uuid);
 	}
 	logWarning("Could not locate asset: {}", uuid);
 	return {};
 }
 
-const AssetInfo& Assets::getInfo(UUID uuid) const
+const AssetRecord& Assets::getInfo(UUID uuid) const
 {
 	auto iter = m_assets.find(uuid);
 	if (iter != m_assets.end())
@@ -135,7 +135,7 @@ bool Assets::hasAsset(UUID uuid) const
 	return false;
 }
 
-void Assets::updateRegistry(const AssetInfo& aInfo)
+void Assets::updateRegistry(const AssetRecord& aInfo)
 {
 	if (!aInfo.name.empty())
 	{
@@ -145,7 +145,7 @@ void Assets::updateRegistry(const AssetInfo& aInfo)
 	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
 }
 
-bool Assets::importAssetInner(AssetInfo& aInfo)
+bool Assets::importAssetInner(AssetRecord& aInfo)
 {
 	std::string fileLocation = aInfo.origFilePath;
 
@@ -190,19 +190,19 @@ std::string Assets::getAlias(UUID uid) const
 
 }
 
-Asset Assets::getAssetFromPath(const std::string& path) const
+AssetHandle<Asset> Assets::getAssetFromPath(const std::string& path) const
 {
 	return Engine::get()->getMemoryManagementSystem()->getUUIDFromPath(path);
 }
 
-Asset Assets::getAssetFromName(const std::string& name) const
+AssetHandle<Asset> Assets::getAssetFromName(const std::string& name) const
 {
 	return Engine::get()->getMemoryManagementSystem()->getUUIDFromName(name);
 }
 
-void Assets::updateAsset(Asset asset, const AssetUpdateDescriptor& uDesc)
+void Assets::updateAsset(AssetHandle<Asset> asset, const AssetUpdateDescriptor& uDesc)
 {
-	AssetInfo aInfo = getAsset(asset.getUID()).info();
+	AssetRecord aInfo = getAsset(asset.getUID()).info();
 	aInfo.update(uDesc);
 
 	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo); // todo check for non engine generated 
@@ -215,29 +215,29 @@ void Assets::updateAsset(Asset asset, const AssetUpdateDescriptor& uDesc)
 
 void Assets::reimportAsset(UUID uuid)
 {
-	AssetInfo aInfo = getAsset(uuid).info();
+	AssetRecord aInfo = getAsset(uuid).info();
 
 	importAssetInner(aInfo);
 }
 
 void Assets::makeDirty(UUID uuid)
 {
-	AssetInfo aInfo = getAsset(uuid).info();
+	AssetRecord aInfo = getAsset(uuid).info();
 	aInfo.isDirty = true;
 	m_assets[uuid] = aInfo;
 }
 
-std::vector<Asset> Assets::getAssetDependancies(UUID uuid) const
-{
-	std::vector<Asset> results;
-
-	AssetInfo aInfo = getAsset(uuid).info();
-	for (UUID depedantAssetUUID : aInfo.assetsDependancies)
-	{
-		results.push_back(getAsset(depedantAssetUUID));
-	}
-	return results;
-}
+//std::vector<AssetHandle<Asset>> Assets::getAssetDependancies(UUID uuid) const
+//{
+//	std::vector<Asset> results;
+//
+//	AssetRecord aInfo = getAsset(uuid).info();
+//	for (UUID depedantAssetUUID : aInfo.assetsDependancies)
+//	{
+//		results.push_back(getAsset(depedantAssetUUID));
+//	}
+//	return results;
+//}
 
 //void Assets::addAssetDependency(UUID asset, UUID dependency)
 //{
@@ -292,30 +292,30 @@ std::vector<Asset> Assets::getAssetDependancies(UUID uuid) const
 //	m_assets[asset] = aInfo;
 //}
 
-Asset Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
+AssetHandle<Asset> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
 {
 	desc.origFilePath = fileLocation;
-	AssetInfo aInfo(desc);
+	AssetRecord aInfo(desc);
 
 	if (!importAssetInner(aInfo))
 	{
-		return Asset::empty;
+		return AssetHandle<Asset>::empty;
 	}
 
-	Asset asset(aInfo.uuid);
+	AssetHandle<Asset> asset(aInfo.uuid);
 
 	return asset;
 }
 
-Asset Assets::createAsset(const ResourceWrapper<Resource>& resource, AssetCreateDescriptor& desc)
+AssetHandle<Asset> Assets::createAsset(const ResourceWrapper<Resource>& resource, AssetCreateDescriptor& desc)
 {
 	// Add asset info
-	AssetInfo aInfo(desc);
+	AssetRecord aInfo(desc);
 	aInfo.resource = resource;
 	addAsset(aInfo);
 
 	// Create asset
-	Asset asset(aInfo.uuid);
+	AssetHandle<Asset> asset(aInfo.uuid);
 
 	// Save asset
 	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
@@ -329,7 +329,7 @@ ResourceWrapper<Resource> Assets::loadResource(const std::string& fileLocation, 
 	desc.origFilePath = fileLocation;
 	desc.isTransient = true;
 
-	AssetInfo aInfo(desc);
+	AssetRecord aInfo(desc);
 
 	// Validate input
 	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -349,9 +349,9 @@ ResourceWrapper<Resource> Assets::loadResource(const std::string& fileLocation, 
 	return resource;
 }
 
-void Assets::deleteAsset(Asset asset)
+void Assets::deleteAsset(AssetHandle<Asset> asset)
 {
-	AssetInfo aInfo = asset.info();
+	AssetRecord aInfo = asset.info();
 	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.relativefilePath);
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
 	m_assets.erase(aInfo.uuid);

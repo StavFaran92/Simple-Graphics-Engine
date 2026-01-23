@@ -8,18 +8,18 @@
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
-struct MeshCollectionAssetManager : public AssetManager
+struct MeshGroupAssetManager : public AssetManager
 {
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
-	std::map<int, AssetWrapper<Material>> getLoadedMaterials();
-	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
+	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
+	std::map<int, AssetHandle<Material>> getLoadedMaterials();
+	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
 
 private:
 	ModelImporter::ModelInfo m_lastLoadedModelInfo;
 };
 
-class EngineAPI MeshCollection : public Resource
+class EngineAPI MeshGroup : public Resource
 {
 public:
 	void addMesh(const std::shared_ptr<Mesh>& mesh);
@@ -38,10 +38,10 @@ public:
 
 	int getMaterialCount() const;
 
-	static AssetWrapper<MeshCollection> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
-	static ResourceWrapper<MeshCollection> load(const std::string& fileLocation, ModelImportSettings aDesc = {});
+	static AssetHandle<MeshGroup> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
+	static ResourceWrapper<MeshGroup> load(const std::string& fileLocation, ModelImportSettings aDesc = {});
 
-	static std::map<int, AssetWrapper<Material>> getLastLoadedMaterials();
+	static std::map<int, AssetHandle<Material>> getLastLoadedMaterials();
 	
 
 private:

@@ -154,7 +154,7 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetRecord& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
 	std::string modelName = std::filesystem::path(aInfo.relativefilePath).filename().stem().string();
 
@@ -212,7 +212,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 				}
 
 				// Load material asset
-				AssetWrapper<Material> material(uuid);
+				AssetHandle<Material> material(uuid);
 				modelInfo.materials[matIndex] = material.resource();
 
 				logTrace("Assigned material index {} -> UUID {}", matIndex, uuid);
@@ -221,7 +221,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetIn
 	}
 }
 
-void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromFile(const AssetRecord& aInfo, ModelImporter::ModelInfo& modelInfo)
 {
 	std::string filepath = aInfo.fullFilePath;
 
@@ -260,7 +260,7 @@ void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::Mod
 	loadModelFromAssimpScene(scene, aInfo, modelInfo);
 }
 
-bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	std::string finalFilePath = fileLocation;
 
@@ -310,7 +310,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 	m_lastImportedMaterials = LastImportedMaterials();
 
-	std::unordered_map<std::string, AssetWrapper<Texture>> cachedTextures;
+	std::unordered_map<std::string, AssetHandle<Texture>> cachedTextures;
 
 	// Import materials and textures
 	if (scene->HasMaterials())
@@ -387,13 +387,13 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
-			AssetWrapper<Material> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo).as<Material>();
+			AssetHandle<Material> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo).as<Material>();
 			m_lastImportedMaterials.materials[i] = materialAsset;
 			aInfo.attributes[materialID] = materialAsset.getUID();
 		}
 	}
 
-	ResourceWrapper<MeshCollection> mesh = Factory<MeshCollection>::create();
+	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
 
 	return true;
 }
@@ -585,22 +585,22 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 
 
 
-AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
+AssetHandle<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 	aiMaterial* mat, 
 	aiTextureType type, 
 	const std::string& dir, 
 	std::unordered_map<std::string, 
-	AssetWrapper<Texture>>& cachedTextures,
-	const AssetInfo& aInfo)
+	AssetHandle<Texture>>& cachedTextures,
+	const AssetRecord& aInfo)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
 	{
-		return AssetWrapper<Texture>::empty;
+		return AssetHandle<Texture>::empty;
 	}
 
 	ResourceWrapper<Texture> texture;
-	AssetWrapper<Texture> AssetTexture;
+	AssetHandle<Texture> AssetTexture;
 	const aiTexture* aiTexture = scene->GetEmbeddedTexture(str.C_Str());
 	if(aiTexture)
 	{
@@ -674,7 +674,7 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 		std::string path = findTexture(str, dir);
 		if (path.empty())
 		{
-			return AssetWrapper<Texture>::empty;
+			return AssetHandle<Texture>::empty;
 		}
 
 		if (cachedTextures.find(path) != cachedTextures.end())

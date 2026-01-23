@@ -12,7 +12,7 @@
 #include "component/Component.h"
 #include "render/RenderCommand.h"
 #include <GL/glew.h>
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "component/MeshRendererComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"

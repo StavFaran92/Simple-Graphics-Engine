@@ -14,17 +14,17 @@ namespace {
 	} _animationManagerRegistration;
 }
 
-bool AnimationAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool AnimationAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
 }
 
-ResourceWrapper<Resource> AnimationAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> AnimationAssetManager::load(AssetRecord& aInfo)
 {
 	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
 }
 
-void AnimationAssetManager::save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo)
+void AnimationAssetManager::save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo)
 {
 	throw new std::runtime_error("Not yet implemented!");
 }
@@ -110,7 +110,7 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-AssetWrapper<Animation> Animation::import(const std::string& fileLocation, AnimationImportSettings desc)
+AssetHandle<Animation> Animation::import(const std::string& fileLocation, AnimationImportSettings desc)
 {
 	desc.aType = AssetType::ANIMATION;
 	desc.origFilePath = fileLocation;

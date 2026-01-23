@@ -12,7 +12,7 @@ struct EngineAPI WaterBodyComponent : public Component
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
 
-	AssetWrapper<Material> getMaterial();
+	AssetHandle<Material> getMaterial();
 
 	template <class Archive>
 	void serialize(Archive& archive) {

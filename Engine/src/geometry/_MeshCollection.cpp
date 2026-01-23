@@ -1,9 +1,12 @@
 #include "geometry/MeshGroup.h"
 
 #include "geometry/ModelImporter.h"
+#include "memory/AssetLoader.h"
 
 #include "geometry/MeshExporter.h"
 #include "core/Factory.h"
+
+#include <filesystem>
 
 namespace {
 	struct MeshManagerRegistration {
@@ -24,12 +27,19 @@ ResourceWrapper<Resource> MeshGroupAssetManager::load(AssetRecord& aInfo)
 	ModelImporter::ModelInfo mInfo;
 	mInfo.mesh = mesh;
 	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
+	m_lastLoadedModelInfo = mInfo;
 	return mesh;
 }
 
-void MeshGroupAssetManager::save(AssetHandle<Asset> mesh, const AssetRecord& aInfo)
+std::map<int, AssetHandle<Material>> MeshGroupAssetManager::getLoadedMaterials()
 {
-	MeshExporter::exportMesh(MeshGroupAsset(mesh));
+	//return m_lastLoadedModelInfo.materials;
+	return Engine::get()->getSubSystem<ModelImporter>()->getLastImportedMaterial().materials;
+}
+
+void MeshGroupAssetManager::save(const AssetHandle<Resource>& mesh, const AssetRecord& aInfo)
+{
+	MeshExporter::exportMesh(aInfo, mesh.as<MeshGroup>().resource());
 }
 
 void MeshGroup::addMesh(const std::shared_ptr<Mesh>& mesh)
@@ -92,20 +102,11 @@ int MeshGroup::getMaterialCount() const
 	return m_materialSlots.size();
 }
 
-MeshGroupAsset::MeshGroupAsset(const Asset& asset) : Asset(asset)
-{
-}
-
-MeshGroupAsset MeshGroupAsset::import(const std::string& fileLocation, ModelImportSettings desc)
+AssetHandle<MeshGroup> MeshGroup::import(const std::string& fileLocation, ModelImportSettings desc)
 {
 	desc.aType = AssetType::MESH;
 	desc.isCompositeAsset = true;
-	return MeshGroupAsset(Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).getUID());
-}
-
-ResourceWrapper<MeshGroup> MeshGroupAsset::resource() const
-{
-	return resourceInner().as<MeshGroup>();
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MeshGroup>();
 }
 
 ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, ModelImportSettings aDesc)
@@ -113,6 +114,11 @@ ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, Mode
 	aDesc.aType = AssetType::MESH;
 	aDesc.origFilePath = fileLocation;
 	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, aDesc).as<MeshGroup>();
+}
+
+std::map<int, AssetHandle<Material>> MeshGroup::getLastLoadedMaterials()
+{
+	return Engine::get()->getSubSystem<ModelImporter>()->getLastImportedMaterial().materials;
 }
 
 

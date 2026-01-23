@@ -14,7 +14,7 @@
 #include "render/RenderCommand.h"
 #include "runtime/Context.h"
 #include "animation/Animator.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "render/Graphics.h"
 #include "core/System.h"
 #include "geometry/ShapeFactory.h"
@@ -192,7 +192,7 @@ bool DeferredRenderer::init()
 
 	// Generate screen quad
 	UUID quadUUID = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD);
-	m_quad = Engine::get()->getSubSystem<Assets>()->getAsset(quadUUID).resource.as<MeshCollection>();
+	m_quad = Engine::get()->getSubSystem<Assets>()->getAsset(quadUUID).resource.as<MeshGroup>();
 
 	return true;
 }

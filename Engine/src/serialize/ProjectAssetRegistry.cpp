@@ -88,7 +88,7 @@ void ProjectAssetRegistry::save()
 	sync();
 }
 
-void ProjectAssetRegistry::addAssetRegistry(const AssetInfo& asset)
+void ProjectAssetRegistry::addAssetRegistry(const AssetRecord& asset)
 {
 	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
 	json j;
@@ -97,7 +97,7 @@ void ProjectAssetRegistry::addAssetRegistry(const AssetInfo& asset)
 	sync();
 }
 
-void ProjectAssetRegistry::updateAssetRegistry(const AssetInfo& asset)
+void ProjectAssetRegistry::updateAssetRegistry(const AssetRecord& asset)
 {
 	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
 	for (auto& aReg : m_assetRegistry[assetTypeName])
@@ -114,7 +114,7 @@ void ProjectAssetRegistry::updateAssetRegistry(const AssetInfo& asset)
 	addAssetRegistry(asset);
 }
 
-void ProjectAssetRegistry::removeAssetRegistry(const AssetInfo& asset)
+void ProjectAssetRegistry::removeAssetRegistry(const AssetRecord& asset)
 {
 	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
 	for (int i=0; i< m_assetRegistry[assetTypeName].size(); i++)
@@ -142,19 +142,19 @@ void ProjectAssetRegistry::removeAssetRegistry(const AssetInfo& asset)
 //	sync();
 //}
 
-std::vector<AssetInfo> ProjectAssetRegistry::getAllAssetsOfType(AssetType aType) const
+std::vector<AssetRecord> ProjectAssetRegistry::getAllAssetsOfType(AssetType aType) const
 {
 	std::string aTypeStr = getAssetTypeAsStr(aType);
 	if (!m_assetRegistry.contains(aTypeStr))
 	{
 		return {};
 	}
-	return m_assetRegistry[aTypeStr].get<const std::vector<AssetInfo>>();
+	return m_assetRegistry[aTypeStr].get<const std::vector<AssetRecord>>();
 }
 
-std::vector<AssetInfo> ProjectAssetRegistry::getAllAssets() const
+std::vector<AssetRecord> ProjectAssetRegistry::getAllAssets() const
 {
-	std::vector<AssetInfo> result;
+	std::vector<AssetRecord> result;
 
 	for (auto& [key, value] : m_assetRegistry.items())
 	{
@@ -166,7 +166,7 @@ std::vector<AssetInfo> ProjectAssetRegistry::getAllAssets() const
 		if (value.is_array())
 		{
 			try {
-				auto assetsVec = value.get<std::vector<AssetInfo>>();
+				auto assetsVec = value.get<std::vector<AssetRecord>>();
 				result.insert(result.end(), assetsVec.begin(), assetsVec.end());
 			}
 			catch (const nlohmann::json::exception& e) {

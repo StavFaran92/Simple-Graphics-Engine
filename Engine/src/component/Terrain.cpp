@@ -31,7 +31,7 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 	}
 }
 
-AssetWrapper<Texture> Terrain::generateHeightmap(int width, int height)
+AssetHandle<Texture> Terrain::generateHeightmap(int width, int height)
 {
 	m_heightDataCPU = std::vector<float>(width * height, 0.0f);
 
@@ -63,7 +63,7 @@ AssetWrapper<Texture> Terrain::generateHeightmap(int width, int height)
 
 Terrain Terrain::createTerrainComponent(int width, int height)
 {
-	auto& meshCollection = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
+	auto& meshCollection = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
 
 	Terrain terrain;
 	terrain.m_heightmap = terrain.generateHeightmap(width, height);
@@ -87,7 +87,7 @@ Terrain Terrain::createTerrainComponent(int width, int height)
 	return terrain; // todo fix
 }
 
-ResourceWrapper<MeshCollection> Terrain::getMesh() const
+ResourceWrapper<MeshGroup> Terrain::getMesh() const
 {
 	return m_mesh.resource();
 }
@@ -97,7 +97,7 @@ float Terrain::getScale() const
 	return m_scale;
 }
 
-void Terrain::setHeightmap(AssetWrapper<Texture> heightmap)
+void Terrain::setHeightmap(AssetHandle<Texture> heightmap)
 {
 	m_heightmap = heightmap;
 
@@ -119,7 +119,7 @@ int Terrain::getHeight() const
 	return m_height;
 }
 
-void Terrain::setTexture(int index, AssetWrapper<Texture> texture)
+void Terrain::setTexture(int index, AssetHandle<Texture> texture)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
@@ -163,12 +163,12 @@ void Terrain::setTextureBlend(int index, float val)
 	m_textureBlends[index].blend = val;
 }
 
-AssetWrapper<Texture>& Terrain::getTexture(int index)
+AssetHandle<Texture>& Terrain::getTexture(int index)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
 		logWarning("Invalid texture index specified: " + std::to_string(index));
-		return AssetWrapper<Texture>::empty;
+		return AssetHandle<Texture>::empty;
 	}
 
 	return m_textureBlends.at(index).texture;

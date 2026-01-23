@@ -37,5 +37,5 @@ protected:
 	bool m_wireFrameMode = false;
 
 	//ResourceWrapper<Shader> m_pbrShader = nullptr;
-	ResourceWrapper<MeshCollection> m_quad = nullptr;
+	ResourceWrapper<MeshGroup> m_quad = nullptr;
 };

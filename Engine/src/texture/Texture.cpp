@@ -55,14 +55,14 @@ namespace {
 	} _textureManagerRegistration;
 }
 
-bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-ResourceWrapper<Resource> TextureAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> TextureAssetManager::load(AssetRecord& aInfo)
 {
 	std::string filepath = aInfo.fullFilePath;
 
@@ -87,7 +87,7 @@ ResourceWrapper<Resource> TextureAssetManager::load(AssetInfo& aInfo)
 	return texture;
 }
 
-std::string TextureAssetManager::getRecommendedExtension(const AssetInfo& aInfo)
+std::string TextureAssetManager::getRecommendedExtension(const AssetRecord& aInfo)
 {
 
 	Texture::TextureAssetDescriptor settings{};
@@ -116,7 +116,7 @@ std::string TextureAssetManager::getRecommendedExtension(const AssetInfo& aInfo)
 
 }
 
-void TextureAssetManager::save(const AssetWrapper<Resource>& texture, const AssetInfo& aInfo)
+void TextureAssetManager::save(const AssetHandle<Resource>& texture, const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
@@ -463,7 +463,7 @@ Texture::~Texture()
 	ClearTexture();
 }
 
-AssetWrapper<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
+AssetHandle<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Texture>();

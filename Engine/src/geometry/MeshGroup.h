@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-
 #include "core/Core.h"
 #include "geometry/Mesh.h"
 #include "memory/ResourceWrapper.h"
@@ -11,13 +10,9 @@
 // Asset IO Manager
 struct MeshGroupAssetManager : public AssetManager
 {
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
-	std::map<int, AssetWrapper<Material>> getLoadedMaterials();
-	void save(Asset meshGroup, const AssetInfo& aInfo) override;
-
-private:
-	ModelImporter::ModelInfo m_lastLoadedModelInfo;
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
+	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
+	void save(AssetHandle<Asset> meshGroup, const AssetRecord& aInfo) override;
 };
 
 // Resource
@@ -51,6 +46,7 @@ private:
 // Asset
 class EngineAPI MeshGroupAsset : public Asset
 {
+	using ResourceType = MeshGroup;
 public:
 	using Asset::Asset;
 
@@ -58,8 +54,6 @@ public:
 
 	static MeshGroupAsset import(const std::string& fileLocation, ModelImportSettings aDesc = {});
 
-	static std::map<int, AssetWrapper<Material>> getLastLoadedMaterials();
-
-	ResourceWrapper<MeshGroup> resource() const;
-	ResourceWrapper<MeshGroup> resource();
+	ResourceWrapper<ResourceType> resource() const;
+	ResourceWrapper<ResourceType> resource();
 };

@@ -21,12 +21,12 @@ namespace {
 	} _PrefabManagerRegistration;
 }
 
-bool PrefabAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool PrefabAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return false;
 }
 
-ResourceWrapper<Resource> PrefabAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> PrefabAssetManager::load(AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ifstream is(projectDir + aInfo.relativefilePath);
@@ -48,7 +48,7 @@ ResourceWrapper<Resource> PrefabAssetManager::load(AssetInfo& aInfo)
 	return ResourceWrapper<Prefab>::empty;
 }
 
-void PrefabAssetManager::save(const AssetWrapper<Resource>& prefab, const AssetInfo& aInfo)
+void PrefabAssetManager::save(const AssetHandle<Resource>& prefab, const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
@@ -64,14 +64,14 @@ void PrefabAssetManager::save(const AssetWrapper<Resource>& prefab, const AssetI
 	}
 }
 
-AssetWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabImportSettings desc)
+AssetHandle<Prefab> Prefab::import(const std::string& fileLocation, PrefabImportSettings desc)
 {
 	desc.aType = AssetType::PREFAB;
 	desc.origFilePath = fileLocation;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Prefab>();
 }
 
-void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo)
+void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetRecord aInfo)
 {
 	//Engine::get()->getSubSystem<Assets>()->updateAsset<Prefab>(prefab, aInfo); 
 }

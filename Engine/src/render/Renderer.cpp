@@ -17,7 +17,7 @@
 #include "component/Transformation.h"
 #include "render/Material.h"
 #include "render/CommonShaders.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "render/Graphics.h"
 #include "render/RenderView.h"
 #include "render/ScreenQuad.h"
@@ -35,7 +35,7 @@ bool Renderer::init()
 {
 	//m_pbrShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBRShader.glsl");
 
-    m_quad = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_QUAD).resource();
+    m_quad = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_QUAD).resource();
 
     return true;
 }
@@ -293,7 +293,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
  //       if (shaderComponent.shaderOverride == ShaderOverride::PBR)
  //       {
  //           // Bind mesh
- //           ResourceWrapper<MeshCollection> meshCollecton;
+ //           ResourceWrapper<MeshGroup> meshCollecton;
 
  //           if (shaderComponent.projection == ShaderComponent::DefaultProjection)
  //           {
@@ -392,7 +392,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
  //           }
 
  //           // Bind mesh
- //           ResourceWrapper<MeshCollection> meshCollecton;
+ //           ResourceWrapper<MeshGroup> meshCollecton;
 
  //           if (shaderComponent.projection == ShaderComponent::DefaultProjection)
  //           {

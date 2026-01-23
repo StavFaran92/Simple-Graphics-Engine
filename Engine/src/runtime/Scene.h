@@ -57,9 +57,9 @@ template<typename T> class ObjectHandler;
 
 struct SceneAssetManager : public AssetManager
 {
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
+	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
+	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
 };
 
 struct SceneImportSettings : public AssetCreateDescriptor
@@ -90,9 +90,9 @@ public:
 	Scene() = default;
 	Scene(Context* context);
 
-	static AssetWrapper<Scene> import(const std::string& fileLocation, SceneImportSettings settings = {});
+	static AssetHandle<Scene> import(const std::string& fileLocation, SceneImportSettings settings = {});
 	static ResourceWrapper<Scene> create();
-	static void updateAsset(const AssetWrapper<Scene>& scene, AssetUpdateDescriptor desc);
+	static void updateAsset(const AssetHandle<Scene>& scene, AssetUpdateDescriptor desc);
 	//static ResourceWrapper<Scene> load(const std::string& fileLocation, SceneCreateDescriptor = {});
 
 	void addCoroutine(const std::function<bool(float)>& coroutine);
@@ -197,7 +197,7 @@ private:
 	ResourceWrapper<Shader> m_skyboxShader;
 	ResourceWrapper<Shader> m_UIShader;
 
-	//ResourceWrapper<MeshCollection> m_basicBox;
+	//ResourceWrapper<MeshGroup> m_basicBox;
 
 	//Entity m_primaryCamera = Entity::EmptyEntity;
 

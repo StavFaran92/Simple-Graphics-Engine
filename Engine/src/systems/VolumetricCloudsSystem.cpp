@@ -51,7 +51,7 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	auto& materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialDesc).as<Material>();
 
 	cloudVolumeComponent.material = materialAsset;
-	cloudVolumeComponent.mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
+	cloudVolumeComponent.mesh = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_BOX);
 
 	return volumetricCloudsEntity;
 }

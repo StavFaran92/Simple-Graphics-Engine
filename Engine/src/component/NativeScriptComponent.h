@@ -2,6 +2,7 @@
 
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
+#include "component/ScriptableEntity.h"
 
 struct EngineAPI NativeScriptComponent : public Component
 {

@@ -2,11 +2,11 @@
 
 #include "core/Core.h"
 
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 
 class EngineAPI Quad 
 {
 public:
-	static void createMesh(ResourceWrapper<MeshCollection>&);
+	static void createMesh(ResourceWrapper<MeshGroup>&);
 };
 

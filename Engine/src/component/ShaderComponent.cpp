@@ -9,7 +9,7 @@ ShaderComponent::ShaderComponent()
 	renderViewProjection = std::make_shared<RenderView>(Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
 };
 
-void ShaderComponent::setProjectionTexture(AssetWrapper<Texture> texture)
+void ShaderComponent::setProjectionTexture(AssetHandle<Texture> texture)
 {
 	renderViewProjection->bind();
 	renderViewProjection->setTexture(texture.resource());
@@ -64,7 +64,7 @@ void ShaderComponent::parseUniforms(const std::string& sourceCode)
 	}
 }
 
-void ShaderComponent::parseFromShader(AssetWrapper<Shader> shader)
+void ShaderComponent::parseFromShader(AssetHandle<Shader> shader)
 {
 	m_customShader = shader;
 

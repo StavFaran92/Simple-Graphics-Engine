@@ -30,12 +30,12 @@ namespace {
 	} _materialManagerRegistration;
 }
 
-bool MaterialAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool MaterialAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return false;
 }
 
-ResourceWrapper<Resource> MaterialAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> MaterialAssetManager::load(AssetRecord& aInfo)
 {
 	std::ifstream is(aInfo.fullFilePath);
 	cereal::JSONInputArchive iarchive(is);
@@ -56,7 +56,7 @@ ResourceWrapper<Resource> MaterialAssetManager::load(AssetInfo& aInfo)
 	return ResourceWrapper<Resource>::empty;
 }
 
-void MaterialAssetManager::save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo)
+void MaterialAssetManager::save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(aInfo.fullFilePath);
@@ -80,7 +80,7 @@ Material::Material()
 void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ResourceWrapper<Shader>& shader, int slot)
 {
 	// if texture is empty use dummy texture
-	AssetWrapper<Texture> texture;
+	AssetHandle<Texture> texture;
 	if (!sampler || sampler->texture.isEmpty())
 	{
 		texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
@@ -181,7 +181,7 @@ void Material::setSamplerEnabled(const std::string& name, bool isEnabled)
 	getPersistentBlock().getSampler(name)->isActive = isEnabled;
 }
 
-AssetWrapper<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
+AssetHandle<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
 {
 	desc.aType = AssetType::MATERIAL;
 	desc.origFilePath = fileLocation;
@@ -195,7 +195,7 @@ ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
 	return mat;
 }
 
-void Material::updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc)
+void Material::updateAsset(const AssetHandle<Material>& material, AssetUpdateDescriptor desc)
 {
 	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
 }
@@ -471,13 +471,13 @@ void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
 	update();
 }
 
-void Material::setCustomShader(AssetWrapper<Shader>& customShader)
+void Material::setCustomShader(AssetHandle<Shader>& customShader)
 {
 	m_customShader = customShader;
 	update();
 }
 
-AssetWrapper<Shader> Material::getCustomShader() const
+AssetHandle<Shader> Material::getCustomShader() const
 {
 	return m_customShader;
 }

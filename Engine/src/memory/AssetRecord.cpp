@@ -1,14 +1,14 @@
-#include "memory/AssetInfo.h"
+#include "memory/AssetRecord.h"
 
 #include "core/Engine.h"
 #include "memory/Assets.h"
-#include "memory/AssetWrapper.h"
+#include "memory/AssetHandle.h"
 #include "fileSystem/ScopedPath.h"
 #include "memory/AssetFactory.h"
 #include "memory/Asset.h"
 
 // Serialization (to JSON)
-void to_json(nlohmann::json& j, const AssetInfo& asset)
+void to_json(nlohmann::json& j, const AssetRecord& asset)
 {
 	j = nlohmann::json{
 		{"uuid", asset.uuid}, // Assuming UUID has a valid to_json
@@ -28,7 +28,7 @@ void to_json(nlohmann::json& j, const AssetInfo& asset)
 }
 
 // Deserialization (from JSON)
-void from_json(const nlohmann::json& j, AssetInfo& asset)
+void from_json(const nlohmann::json& j, AssetRecord& asset)
 {
 	j.at("uuid").get_to(asset.uuid); // Assuming UUID has a valid from_json
 	j.at("origFilePath").get_to(asset.origFilePath);
@@ -47,7 +47,7 @@ void from_json(const nlohmann::json& j, AssetInfo& asset)
 	asset.establishFilepath();
 }
 
-void AssetInfo::establishFilepath()
+void AssetRecord::establishFilepath()
 {
 	if (!isTransient)
 	{
@@ -60,7 +60,7 @@ void AssetInfo::establishFilepath()
 	}
 }
 
-AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
+AssetRecord::AssetRecord(const AssetCreateDescriptor& assetDesc)
 {
 	importSettings = assetDesc.fillParams();
 
@@ -159,7 +159,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	establishFilepath();
 }
 
-void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
+void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 {
 	if (!uDesc.assetDirectory.empty())
 	{
@@ -200,7 +200,7 @@ void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
 	establishFilepath();
 }
 
-AssetWrapper<Resource> AssetInfo::data() const
+AssetHandle<Asset> AssetRecord::data() const
 {
-	return AssetWrapper<Resource>(uuid);
+	return AssetHandle<Asset>(uuid);
 }

@@ -30,7 +30,7 @@ public:
 
 private:
     template<class T>friend class ResourceWrapper;
-    template<class T>friend class AssetWrapper;
+    template<class T>friend class AssetHandle;
 
     T* get(ResourceID id)
     {

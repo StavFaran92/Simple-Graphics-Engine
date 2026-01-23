@@ -63,9 +63,9 @@ struct EditableUniform {
 
 struct MaterialAssetManager : public AssetManager
 {
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
+	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
+	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
 };
 
 class EngineAPI Material : public Resource
@@ -154,8 +154,8 @@ public:
 	PersistentBlock& getPersistentBlock();
 	NonPersistentBlock& getNonPersistentBlock();
 
-	void setCustomShader(AssetWrapper<Shader>& customShader);
-	AssetWrapper<Shader> getCustomShader() const;
+	void setCustomShader(AssetHandle<Shader>& customShader);
+	AssetHandle<Shader> getCustomShader() const;
 
 	void setMaterialRenderMode(MaterialRenderMode renderMode);
 	MaterialRenderMode getMaterialRenderMode() const;
@@ -170,7 +170,7 @@ private:
 
 	void parseFromShader(ResourceWrapper<Shader> shader);
 
-	void setProjectionTexture(AssetWrapper<Texture> texture);
+	void setProjectionTexture(AssetHandle<Texture> texture);
 
 	static ResourceWrapper<Shader> getShaderFromRenderMode(MaterialRenderMode renderMode);
 public:
@@ -183,9 +183,9 @@ public:
 		SERIALIZED_MEMBER(m_customShader);
 	}
 
-	static AssetWrapper<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
+	static AssetHandle<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
 	static ResourceWrapper<Material> create(MaterialRenderMode renderMode);
-	static void updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc);
+	static void updateAsset(const AssetHandle<Material>& material, AssetUpdateDescriptor desc);
 
 protected:
 
@@ -199,11 +199,11 @@ public:
 	NonPersistentBlock m_nonPersistentBlock;
 
 private:
-	AssetWrapper<Shader> m_customShader;
+	AssetHandle<Shader> m_customShader;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 
 	//ProjectionType projection = ProjectionType::DefaultProjection;
-	//AssetWrapper<Texture> projectionTexture;
+	//AssetHandle<Texture> projectionTexture;
 	//std::shared_ptr<RenderView> renderViewProjection;
 
 };

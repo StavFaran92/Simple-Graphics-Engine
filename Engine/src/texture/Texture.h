@@ -9,14 +9,14 @@
 
 using json = nlohmann::json;
 
-struct AssetInfo;
+struct AssetRecord;
 
 struct TextureAssetManager : public AssetManager
 {
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
-	std::string getRecommendedExtension(const AssetInfo& aInfo) override;
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
+	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
+	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
+	std::string getRecommendedExtension(const AssetRecord& aInfo) override;
 };
 
 class EngineAPI Texture : public Resource
@@ -174,7 +174,7 @@ public:
 
 	static ResourceWrapper<Texture> createTexture(int width, int height, Texture::TextureSemantic usage, void* data = nullptr);
 
-	static AssetWrapper<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
+	static AssetHandle<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
 
 	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureAssetDescriptor = {});
 

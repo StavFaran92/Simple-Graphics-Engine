@@ -4,7 +4,7 @@
 
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/AssetWrapper.h"
+#include "memory/AssetHandle.h"
 #include "runtime/Entity.h"
 #include "core/Window.h"
 #include "core/Configurations.h"
@@ -44,7 +44,7 @@ private:
 	ResourceWrapper<Texture> m_MRATexture = nullptr;
 	ResourceWrapper<Texture> m_TangentTexture = nullptr;
 	
-	ResourceWrapper<MeshCollection> m_quad;
+	ResourceWrapper<MeshGroup> m_quad;
 	ResourceWrapper<Shader> m_screenShader;
 
 	// SSAO

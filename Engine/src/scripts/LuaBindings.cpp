@@ -6,7 +6,7 @@
 #include "component/Terrain.h"
 #include "component/Transformation.h"
 #include "geometry/Mesh.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "lights/DirectionalLight.h"
 #include "lights/PointLight.h"
 #include "render/Material.h"
@@ -95,7 +95,7 @@ void bindComponents(sol::state& lua)
     lua.new_usertype<Animator>("Animator",
         "playAnimation", sol::overload(
             [](Animator& self, const std::string& name) { self.playAnimation(name); },
-            [](Animator& self, AssetWrapper<Animation> animation) { self.playAnimation(animation); }
+            [](Animator& self, AssetHandle<Animation> animation) { self.playAnimation(animation); }
         ),
         "setPlaybackSpeed", &Animator::setPlaybackSpeed,
         "addAnimation", &Animator::addAnimation,
@@ -303,16 +303,16 @@ void bindAssets(sol::state& lua)
     //    "import", &Texture::import
     //);
 
-    lua.new_usertype<MeshCollection>("MeshCollection",
-        "addMesh", &MeshCollection::addMesh,
-        "getPrimaryMesh", &MeshCollection::getPrimaryMesh,
-        "getMeshes", &MeshCollection::getMeshes,
-        "getNumOfVertices", &MeshCollection::getNumOfVertices,
-        "addBonesInfo", &MeshCollection::addBonesInfo,
-        "getBoneOffsets", &MeshCollection::getBoneOffsets,
-        "getBoneID", &MeshCollection::getBoneID,
-        "import", &MeshCollection::import,
-        "getLastLoadedMaterials", &MeshCollection::getLastLoadedMaterials
+    lua.new_usertype<MeshGroup>("MeshGroup",
+        "addMesh", &MeshGroup::addMesh,
+        "getPrimaryMesh", &MeshGroup::getPrimaryMesh,
+        "getMeshes", &MeshGroup::getMeshes,
+        "getNumOfVertices", &MeshGroup::getNumOfVertices,
+        "addBonesInfo", &MeshGroup::addBonesInfo,
+        "getBoneOffsets", &MeshGroup::getBoneOffsets,
+        "getBoneID", &MeshGroup::getBoneID,
+        "import", &MeshGroup::import,
+        "getLastLoadedMaterials", &MeshGroup::getLastLoadedMaterials
     );
 }
 

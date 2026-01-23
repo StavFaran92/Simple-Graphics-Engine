@@ -27,7 +27,7 @@ bool FoliageSystem::init()
 
 	ModelImportSettings settings;
 	settings.isEngineOwned = true;
-	m_grassBlade = MeshCollection::load(SGE_ROOT_DIR "Resources/Engine/Meshes/grass_blade_v3.fbx", settings);
+	m_grassBlade = MeshGroup::load(SGE_ROOT_DIR "Resources/Engine/Meshes/grass_blade_v3.fbx", settings);
 
 	glGenBuffers(1, &m_frustumUBO);
 

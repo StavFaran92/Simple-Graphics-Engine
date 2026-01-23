@@ -36,12 +36,12 @@ namespace {
 	} _shaderManagerRegistration;
 }
 
-bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return std::filesystem::copy_file(fileLocation, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-ResourceWrapper<Resource> ShaderAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> ShaderAssetManager::load(AssetRecord& aInfo)
 {
 	ShaderOverride shaderOverride = ShaderOverride::None;
 	if (!aInfo.importSettings.is_null())
@@ -66,7 +66,7 @@ ResourceWrapper<Resource> ShaderAssetManager::load(AssetInfo& aInfo)
 	return shader;
 }
 
-void ShaderAssetManager::save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo)
+void ShaderAssetManager::save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo)
 {
 	std::filesystem::copy_file(aInfo.origFilePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
@@ -543,7 +543,7 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& filepath
 	return shader;
 }
 
-AssetWrapper<Shader> Shader::import(const std::string& fileLocation, ShaderAssetDescriptor desc)
+AssetHandle<Shader> Shader::import(const std::string& fileLocation, ShaderAssetDescriptor desc)
 {
 	desc.aType = AssetType::SHADER;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Shader>();

@@ -2,7 +2,7 @@
 
 #include "memory/BuiltInAssets.h"
 
-MeshRendererComponent::MeshRendererComponent(AssetWrapper<MeshCollection> mesh)
+MeshRendererComponent::MeshRendererComponent(AssetHandle<MeshGroup> mesh)
 	: mesh(mesh)
 {
 	int materialCount = mesh.get()->getMaterialCount();
@@ -12,13 +12,13 @@ MeshRendererComponent::MeshRendererComponent(AssetWrapper<MeshCollection> mesh)
 	}
 }
 
-AssetWrapper<Material> MeshRendererComponent::getMaterialBySlot(int slot) const
+AssetHandle<Material> MeshRendererComponent::getMaterialBySlot(int slot) const
 {
 	auto iter = m_material.find(slot);
 	if (iter == m_material.end())
 	{
 		logWarning("Could not find material in slot {}", std::to_string(slot));
-		return AssetWrapper<Material>::empty;
+		return AssetHandle<Material>::empty;
 	}
 	return iter->second;
 }

@@ -15,12 +15,12 @@ void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entity
 	}
 }
 
-SkyboxComponent::SkyboxComponent(AssetWrapper<Texture> skyboxImage)
+SkyboxComponent::SkyboxComponent(AssetHandle<Texture> skyboxImage)
 {
 	setSkybox(skyboxImage);
 }
 
-void SkyboxComponent::setSkybox(AssetWrapper<Texture> image)
+void SkyboxComponent::setSkybox(AssetHandle<Texture> image)
 {
 	originalImage = image;
 }

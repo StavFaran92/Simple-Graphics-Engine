@@ -79,6 +79,11 @@ public:
 		return get();
 	}
 
+	T* operator->() const
+	{
+		return get();
+	}
+
 	inline T* get() const
 	{
 		return static_cast<T*>(Engine::get()->getMemoryPool().get(id));

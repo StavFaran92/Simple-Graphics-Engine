@@ -25,7 +25,7 @@ AssetManager* AssetFactory::getManager(AssetType aType)
     return it->second.get();
 }
 
-bool AssetFactory::loadAsset(AssetInfo& aInfo)
+bool AssetFactory::loadAsset(AssetRecord& aInfo)
 {
 	auto iter = getLoadFunctionRegistry().find(aInfo.aType);
 	if (iter == getLoadFunctionRegistry().end())

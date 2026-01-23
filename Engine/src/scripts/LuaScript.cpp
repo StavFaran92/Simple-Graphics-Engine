@@ -11,14 +11,14 @@ namespace {
 	} _luaScriptManagerRegistration;
 }
 
-bool LuaScriptAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool LuaScriptAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath);
 }
 
-ResourceWrapper<Resource> LuaScriptAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> LuaScriptAssetManager::load(AssetRecord& aInfo)
 {
 	ResourceWrapper<LuaScript> luaScript = Factory<LuaScript>::create();
 	luaScript->filepath = aInfo.relativefilePath;
@@ -36,7 +36,7 @@ ResourceWrapper<Resource> LuaScriptAssetManager::load(AssetInfo& aInfo)
 	return ResourceWrapper<Resource>::empty;
 }
 
-void LuaScriptAssetManager::save(const AssetWrapper<Resource>& script, const AssetInfo& aInfo)
+void LuaScriptAssetManager::save(const AssetHandle<Resource>& script, const AssetRecord& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
@@ -44,7 +44,7 @@ void LuaScriptAssetManager::save(const AssetWrapper<Resource>& script, const Ass
 	script.as<LuaScript>().resource()->filepath = savedFilePath.generic_string();
 }
 
-AssetWrapper<LuaScript> LuaScript::import(const std::string& fileLocation, LuaScriptImportSettings desc)
+AssetHandle<LuaScript> LuaScript::import(const std::string& fileLocation, LuaScriptImportSettings desc)
 {
 	desc.aType = AssetType::LUA_SCRIPT;
 	desc.origFilePath = fileLocation;
@@ -67,7 +67,7 @@ ResourceWrapper<LuaScript> LuaScript::create()
 	return script;
 }
 
-void LuaScript::updateAsset(const AssetWrapper<LuaScript>& script, AssetUpdateDescriptor desc)
+void LuaScript::updateAsset(const AssetHandle<LuaScript>& script, AssetUpdateDescriptor desc)
 {
 	Engine::get()->getSubSystem<Assets>()->updateAsset(script, desc);
 }

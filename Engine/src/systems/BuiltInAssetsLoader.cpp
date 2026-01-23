@@ -25,7 +25,7 @@ void acquireTexture(const std::string& name, const std::string& path)
 	Texture::import(path, aDesc);
 }
 
-void addAsAsset(const std::string& name, const ResourceWrapper<MeshCollection>& meshCollection)
+void addAsAsset(const std::string& name, const ResourceWrapper<MeshGroup>& meshCollection)
 {
 	AssetCreateDescriptor aInfo;
 	aInfo.aType = AssetType::MESH;
@@ -114,27 +114,27 @@ void BuiltInAssetsLoader::loadMeshes()
 {
 	{
 		// Create box
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
 		Box::createMesh(meshCollection);
 		addAsAsset("SGE_MESH_BOX", meshCollection);
 	}
 
 	{
 		// Create Quad
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
 		Quad::createMesh(meshCollection);
 		addAsAsset("SGE_MESH_QUAD", meshCollection);
 	}
 
 	{
 		// Create sphere
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
 		Sphere::createMesh(meshCollection, 1, 36, 36);
 		addAsAsset("SGE_MESH_SPHERE", meshCollection);
 	}
 
 	{
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
 		Grid::generateGrid(meshCollection, 10, 10);
 		addAsAsset("SGE_MESH_GRID", meshCollection);
 	}
@@ -144,7 +144,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		aInfo.aType = AssetType::MESH;
 		aInfo.name = "SGE_MESH_CAMERA";
 		aInfo.isEngineOwned = true;
-		MeshCollection::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
+		MeshGroup::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
 	}
 }
 

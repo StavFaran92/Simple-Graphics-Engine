@@ -31,7 +31,7 @@
 #include "animation/Animator.h"
 #include "component/Terrain.h"
 #include "geometry/Frustum.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "render/Graphics.h"
 #include "utils/DebugHelper.h"
 #include "render/RenderView.h"
@@ -65,12 +65,12 @@ namespace {
 	} _sceneManagerRegistration;
 }
 
-bool SceneAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool SceneAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return false;
 }
 
-ResourceWrapper<Resource> SceneAssetManager::load(AssetInfo& aInfo)
+ResourceWrapper<Resource> SceneAssetManager::load(AssetRecord& aInfo)
 {
 	std::ifstream is(aInfo.fullFilePath);
 	cereal::JSONInputArchive iarchive(is);
@@ -92,7 +92,7 @@ ResourceWrapper<Resource> SceneAssetManager::load(AssetInfo& aInfo)
 	return ResourceWrapper<Resource>::empty;
 }
 
-void SceneAssetManager::save(const AssetWrapper<Resource>& scene, const AssetInfo& aInfo)
+void SceneAssetManager::save(const AssetHandle<Resource>& scene, const AssetRecord& aInfo)
 {
 	
 	auto projectDir = Engine::get()->getProjectDirectory();
@@ -110,7 +110,7 @@ void SceneAssetManager::save(const AssetWrapper<Resource>& scene, const AssetInf
 	}
 }
 
-AssetWrapper<Scene> Scene::import(const std::string& fileLocation, SceneImportSettings desc)
+AssetHandle<Scene> Scene::import(const std::string& fileLocation, SceneImportSettings desc)
 {
 	desc.aType = AssetType::SCENE;
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Scene>();
@@ -122,7 +122,7 @@ ResourceWrapper<Scene> Scene::create()
 	return scene;
 }
 
-void Scene::updateAsset(const AssetWrapper<Scene>& scene, AssetUpdateDescriptor desc)
+void Scene::updateAsset(const AssetHandle<Scene>& scene, AssetUpdateDescriptor desc)
 {
 	Engine::get()->getSubSystem<Assets>()->updateAsset(scene, desc);
 }
@@ -599,7 +599,7 @@ void Scene::draw(float deltaTime)
 			{
 				Entity entityhandler{ entity, m_registry.get() };
 				graphics->entity = entityhandler;
-				graphics->mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX).get()->getPrimaryMesh().get();
+				graphics->mesh = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_BOX).get()->getPrimaryMesh().get();
 				graphics->model = transform.getWorldTransformation();
 
 				if (skybox.cubemap.isEmpty()) continue;
@@ -668,7 +668,7 @@ void Scene::draw(float deltaTime)
 				if ((entity_id)entity == selectedObject)
 				{
 					Entity e(entity, &getRegistry());
-					ResourceWrapper<MeshCollection> mesh;
+					ResourceWrapper<MeshGroup> mesh;
 					auto meshRenderer = e.tryGetComponent<MeshRendererComponent>();
 					if (meshRenderer)
 					{

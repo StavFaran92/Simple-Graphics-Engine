@@ -16,7 +16,7 @@
 #include "component/Component.h"
 #include "component/MeshRendererComponent.h"
 #include "geometry/Mesh.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "runtime/Context.h"
 #include "component/RenderableComponent.h"
 #include "component/ObjectComponent.h"

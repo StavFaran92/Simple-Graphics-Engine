@@ -13,11 +13,11 @@ struct AssetUpdateDescriptor;
 
 
 template<typename T>
-class AssetWrapper;
+class AssetHandle;
 
 using json = nlohmann::json;
 
-struct EngineAPI AssetInfo
+struct EngineAPI AssetRecord
 {
 	bool isValid = false;
 	std::string relativefilePath;
@@ -36,21 +36,21 @@ struct EngineAPI AssetInfo
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	nlohmann::json importSettings;
 	std::vector<UUID> assetsDependancies;
-	ResourceWrapper<Resource> resource = ResourceWrapper<Resource>::empty;
+	std::shared_ptr<Asset> data;
 
 	bool isDirty = false;
 
-	~AssetInfo() = default;
+	~AssetRecord() = default;
 
-	AssetInfo() = default;
+	AssetRecord() = default;
 
-	AssetInfo(const AssetCreateDescriptor& assetDesc);
+	AssetRecord(const AssetCreateDescriptor& assetDesc);
 
-	AssetWrapper<Resource> data() const;
+	AssetHandle<Asset> data() const;
 	void update(const AssetUpdateDescriptor& desc);
 	void establishFilepath();
 };
 
 // Serialization (to JSON)
-void to_json(nlohmann::json& j, const AssetInfo& asset);
-void from_json(const nlohmann::json& j, AssetInfo& asset);
+void to_json(nlohmann::json& j, const AssetRecord& asset);
+void from_json(const nlohmann::json& j, AssetRecord& asset);

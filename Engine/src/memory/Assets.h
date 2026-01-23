@@ -1,7 +1,7 @@
 #pragma once
 
 #include "memory/ResourceWrapper.h"
-#include "memory/AssetInfo.h"
+#include "memory/AssetRecord.h"
 #include "core/Core.h"
 #include "core/Configurations.h"
 #include "systems/SubSystem.h"
@@ -46,50 +46,50 @@ public:
 
 	std::string getAlias(UUID uid) const;
 
-	std::vector<Asset> getAllAssetsOfType(AssetType aType) const;
+	std::vector<AssetHandle<Asset>> getAllAssetsOfType(AssetType aType) const;
 
-	std::vector<Asset> getAllAssets() const;
+	std::vector<AssetHandle<Asset>> getAllAssets() const;
 
 	void loadAssetsDatabase();
 
 	void saveDirtyAssets();
 
-	Asset getAssetFromPath(const std::string& path) const;
+	AssetHandle<Asset> getAssetFromPath(const std::string& path) const;
 
-	Asset getAssetFromName(const std::string& name) const;
+	AssetHandle<Asset> getAssetFromName(const std::string& name) const;
 
-	Asset getAsset(UUID uuid) const;
+	AssetHandle<Asset> getAsset(UUID uuid) const;
 
-	const AssetInfo& getInfo(UUID uuid) const;
+	const AssetRecord& getInfo(UUID uuid) const;
 
 	bool hasAsset(UUID uuid) const;
 
-	void deleteAsset(Asset asset);
+	void deleteAsset(AssetHandle<Asset> asset);
 
-	void updateAsset(Asset asset, const AssetUpdateDescriptor& uDesc = {});
+	void updateAsset(AssetHandle<Asset> asset, const AssetUpdateDescriptor& uDesc = {});
 
 	void reimportAsset(UUID uuid);
 
 	void makeDirty(UUID uuid);
 
-	std::vector<Asset> getAssetDependancies(UUID uuid) const;
+	//std::vector<Asset> getAssetDependancies(UUID uuid) const;
 
 	//void addAssetDependency(UUID asset, UUID dependency);
 
 	//void removeAssetDependency(UUID asset, UUID dependency);
 
-	Asset importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
+	AssetHandle<Asset> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
-	Asset createAsset(const ResourceWrapper<Resource>& asset, AssetCreateDescriptor& desc);
+	AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset, AssetCreateDescriptor& desc);
 
 	ResourceWrapper<Resource> loadResource(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
 private:
-	void addAsset(AssetInfo& aInfo);
+	void addAsset(AssetRecord& aInfo);
 
-	void updateRegistry(const AssetInfo& aInfo);
+	void updateRegistry(const AssetRecord& aInfo);
 
-	bool importAssetInner(AssetInfo& aInfo);
+	bool importAssetInner(AssetRecord& aInfo);
 private:
-	std::unordered_map<UUID, AssetInfo> m_assets;
+	std::unordered_map<UUID, AssetRecord> m_assets;
 };

@@ -24,9 +24,9 @@ struct MeshNodeData
 
 struct AnimationAssetManager : public AssetManager
 {
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<Resource> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<Resource>& mat, const AssetInfo& aInfo) override;
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
+	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
+	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
 };
 
 class EngineAPI Animation : public Resource
@@ -41,7 +41,7 @@ public:
 	static bool preprocess(const std::string& path);
 	//static void load(UUID uid, const std::string& path);
 
-	static AssetWrapper<Animation> import(const std::string& fileLocation, AnimationImportSettings settings = {});
+	static AssetHandle<Animation> import(const std::string& fileLocation, AnimationImportSettings settings = {});
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);	
 
