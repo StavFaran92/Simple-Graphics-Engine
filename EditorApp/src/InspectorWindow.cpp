@@ -708,7 +708,7 @@ void InspectorWindow::display()
 
 			if (ImGui::MenuItem("Image"))
 			{
-				auto& img = state.getSelectedEntity().addComponent<ImageComponent>(BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE));
+				auto& img = state.getSelectedEntity().addComponent<ImageComponent>(BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE));
 				img.size = { 50, 50 };
 			}
 

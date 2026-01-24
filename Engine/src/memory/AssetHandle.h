@@ -46,7 +46,7 @@ public:
 
 	void erase()
 	{
-		Engine::get()->getSubSystem<Assets>()->deleteAsset(info());
+		Engine::get()->getSubSystem<Assets>()->deleteAsset(*this);
 	}
 
 	void makeDirty()
@@ -66,7 +66,7 @@ public:
 
 	const AssetRecord& info() const
 	{
-		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid).info();
+		return Engine::get()->getSubSystem<Assets>()->getInfo(uuid);
 	}
 
 	void reimportAsset()

@@ -142,7 +142,7 @@ void ShadowSystem::renderToDepthMap()
 		if (animator)
 		{
 			std::vector<glm::mat4> finalBoneMatrices;
-			animator->getFinalBoneMatrices(meshCollection.get(), finalBoneMatrices);
+			animator->getFinalBoneMatrices(meshCollection.resource().get(), finalBoneMatrices);
 			for (int i = 0; i < finalBoneMatrices.size(); ++i)
 			{
 				m_simpleDepthShader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
@@ -156,7 +156,7 @@ void ShadowSystem::renderToDepthMap()
 		}
 
 		
-		for (auto& mesh : mesh.mesh.get()->getMeshes())
+		for (auto& mesh : mesh.mesh.resource()->getMeshes())
 		{
 			graphics->mesh = mesh.get();
 

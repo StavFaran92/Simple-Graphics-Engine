@@ -191,8 +191,7 @@ bool DeferredRenderer::init()
 	setupSSAO(width, height);
 
 	// Generate screen quad
-	UUID quadUUID = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD);
-	m_quad = Engine::get()->getSubSystem<Assets>()->getAsset(quadUUID).resource.as<MeshGroup>();
+	m_quad = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD).as<MeshGroupAsset>().resource();
 
 	return true;
 }
@@ -260,7 +259,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 		prepareEntityForRender(entityHandler);
 
-		for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
 			{

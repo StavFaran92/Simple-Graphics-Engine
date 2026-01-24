@@ -35,7 +35,7 @@ bool Renderer::init()
 {
 	//m_pbrShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBRShader.glsl");
 
-    m_quad = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_QUAD).resource();
+    m_quad = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_QUAD).resource();
 
     return true;
 }
@@ -62,7 +62,7 @@ void Renderer::renderScene(Scene* scene)
 
         prepareEntityForRender(entityHandler);
 
-        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -102,7 +102,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
 
         auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
 
-        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
         {            
             float distance = glm::dot(transform.getWorldPosition(), camForward);
 
@@ -130,7 +130,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
 
         graphics->entity = entityHandler;
         graphics->shader->use();
-        for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.get()->getMeshes())
+        for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.resource()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -199,7 +199,7 @@ void Renderer::renderDebugData(Scene* scene)
         std::string name = entityHandler.getComponent<ObjectComponent>().name;
         logTrace("About to display debug data for {}", name);
 
-        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -237,7 +237,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
         std::string name = entityHandler.getComponent<ObjectComponent>().name;
         logTrace("About to render '{}' using Custom Shader pass", name);
 
-        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))

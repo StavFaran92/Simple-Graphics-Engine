@@ -19,6 +19,7 @@ HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
 class Scene;
 class Mesh;
 class Entity;
+class Transformation;
 
 
 
@@ -75,36 +76,36 @@ struct EngineAPI TagComponent : public Component
         std::string tag;
 };
 
-//struct EngineAPI InstanceBatch : public Component
-//{
-//public:
-//	InstanceBatch();
-//
-//	InstanceBatch(const std::vector< std::shared_ptr<Transformation>>& transformations, ResourceWrapper<Mesh> mesh);
-//	
-//
-//	void addTransformation(const std::shared_ptr<Transformation>& transformation);
-//
-//	const std::vector<glm::mat4> getMatrices() const;
-//	std::vector<std::shared_ptr<Transformation>>& getTransformations();
-//	
-//	size_t getCount() const
-//	{
-//		return transformations.size();
-//	}
-//
-//	void build();
-//
-//	std::vector<std::shared_ptr<Transformation>> transformations;
-//	ResourceWrapper<Mesh> mesh;
-//	unsigned int m_id = 0;
-//	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
-//private:
-//	
-//
-//private:
-//
-//};
+struct EngineAPI InstanceBatch : public Component
+{
+public:
+	InstanceBatch();
+
+	InstanceBatch(const std::vector< std::shared_ptr<Transformation>>& transformations, ResourceWrapper<Mesh> mesh);
+	
+
+	void addTransformation(const std::shared_ptr<Transformation>& transformation);
+
+	const std::vector<glm::mat4> getMatrices() const;
+	std::vector<std::shared_ptr<Transformation>>& getTransformations();
+	
+	size_t getCount() const
+	{
+		return transformations.size();
+	}
+
+	void build();
+
+	std::vector<std::shared_ptr<Transformation>> transformations;
+	ResourceWrapper<Mesh> mesh;
+	unsigned int m_id = 0;
+	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+private:
+	
+
+private:
+
+};
 
 struct TestComp : public Component
 {

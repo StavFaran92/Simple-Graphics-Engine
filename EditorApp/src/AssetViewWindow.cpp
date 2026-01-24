@@ -153,7 +153,7 @@ void AssetViewWindow::display()
 				ImGui::BeginGroup();
 				{
 
-					const AssetInfo& aInfo = assets->getAsset(uuid);
+					const AssetRecord& aInfo = assets->getInfo(uuid);
 
 					int iconID = 0;
 					switch (aInfo.aType) {
@@ -221,7 +221,7 @@ void AssetViewWindow::display()
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-					const AssetInfo& aInfo = assets->getAsset(uuid);
+					const AssetRecord& aInfo = assets->getInfo(uuid);
 					ImGui::TextUnformatted(aInfo.name.c_str());
 					ImGui::Separator();
 					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
@@ -251,7 +251,7 @@ void AssetViewWindow::display()
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-					const AssetInfo& aInfo = assets->getAsset(uuid);
+					const AssetRecord& aInfo = assets->getInfo(uuid);
 
 					if (aInfo.aType == AssetType::MATERIAL)
 					{
@@ -320,11 +320,11 @@ void AssetViewWindow::display()
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-					const AssetInfo& aInfo = assets->getAsset(uuid);
+					const AssetRecord& aInfo = assets->getInfo(uuid);
 
 					if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
 					{
-						AssetWrapper<Prefab> prefab = aInfo.data().as<Prefab>();
+						AssetHandle<PrefabAsset> prefab = assets->getAsset(uuid).as<PrefabAsset>();
 						if (prefab.isEmpty())
 						{
 							logWarning("Failed to cast asset to prefab asset.");

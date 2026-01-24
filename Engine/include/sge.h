@@ -8,6 +8,7 @@
 #endif
 
 //sge
+#include "core/ApplicationConstants.h"
 #include "runtime/Context.h"
 #include "core/Window.h"
 #include "geometry/Mesh.h"

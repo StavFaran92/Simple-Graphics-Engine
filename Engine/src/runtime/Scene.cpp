@@ -101,7 +101,7 @@ void SceneAssetManager::save(AssetHandle<Asset> scene, const AssetRecord& aInfo)
 
 	try
 	{
-		SerializedScene serializedScene = Archiver::serializeScene(scene.as<Scene>().get());
+		SerializedScene serializedScene = Archiver::serializeScene(scene.as<SceneAsset>().resource().get());
 		oarchive(serializedScene);
 	}
 	catch (const cereal::Exception& e)
@@ -588,7 +588,7 @@ void Scene::draw(float deltaTime)
 			{
 				Entity entityhandler{ entity, m_registry.get() };
 				graphics->entity = entityhandler;
-				graphics->mesh = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_BOX).get()->getPrimaryMesh().get();
+				graphics->mesh = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh().get();
 				graphics->model = transform.getWorldTransformation();
 
 				if (skybox.cubemap.isEmpty()) continue;

@@ -518,7 +518,7 @@ std::string Engine::getProjectDirectory() const
 
 ResourceWrapper<Material> Engine::getDefaultMaterial() const
 {
-    return BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT).resource();
+    return BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
 }
 
 void Engine::reloadEngineConfig()
@@ -579,7 +579,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.getComponent<Transformation>().setLocalPosition({10,10,10});
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
-    mainCamera.addComponent<MeshRendererComponent>(BuiltInAssets::getByName<MeshGroup>(SGE_MESH_CAMERA));
+    mainCamera.addComponent<MeshRendererComponent>(BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_CAMERA));
     mainCamera.addComponent<RenderableComponent>();
 
     m_context->getActiveScene()->setGameCamera(mainCamera);
@@ -597,7 +597,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     desc.origFilePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
     desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::PostProcess);
     auto FXAAShaderAsset = getSubSystem<Assets>()->createAsset(FXAAShader, desc);
-    postProcess.shader = FXAAShaderAsset.as<Shader>();
+    postProcess.shader = FXAAShaderAsset.as<ShaderAsset>();
 
     if (initParams.templateScene)
     {

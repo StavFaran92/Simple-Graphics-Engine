@@ -113,7 +113,7 @@ int ObjectPicker::pickObject(int x, int y, Entity camera)
 		m_pickingShader->setUniformValue("objectIndex", (unsigned int)entityhandler.handlerID());
 		
 
-		for (auto& mesh : meshComponent.mesh.get()->getMeshes())
+		for (auto& mesh : meshComponent.mesh.resource()->getMeshes())
 		{
 			m_pickingShader->setUniformValue("model", transform.getWorldTransformation() * mesh->getRestTransform());
 			auto vao = mesh->getVAO();

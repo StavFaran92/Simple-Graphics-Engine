@@ -215,7 +215,7 @@ void bindAssets(sol::state& lua)
     lua.new_usertype<Animation>("Animation",
         "getDuration", &Animation::getDuration,
         "getTicksPerSecond", &Animation::getTicksPerSecond,
-        "import", &Animation::import
+        "import", &AnimationAsset::import
     );
 
 
@@ -241,7 +241,7 @@ void bindAssets(sol::state& lua)
         "recompile", &Shader::recompile,
         "getSourceCode", &Shader::getSourceCode,
         "createOverrideShader", &Shader::createOverrideShader,
-        "import", &Shader::import
+        "import", &ShaderAsset::import
     );
 
     lua.new_usertype<ResourceWrapper<Prefab>>("Prefab",
@@ -264,14 +264,14 @@ void bindAssets(sol::state& lua)
             return Prefab::create(e); // returns ResourceWrapper<Prefab>
         },
         "import", [](const std::string& path) {
-            return Prefab::import(path, {}); // returns ResourceWrapper<Prefab>
+            return PrefabAsset::import(path, {}); // returns ResourceWrapper<Prefab>
         }
     );
 
     lua.new_usertype<LuaScript>("LuaScript",
-        "import", &LuaScript::import,
+        "import", &LuaScriptAsset::import,
         "create", &LuaScript::create,
-        "updateAsset", &LuaScript::updateAsset
+        "updateAsset", &LuaScriptAsset::update
     );
 
     // TODO fix
@@ -311,8 +311,7 @@ void bindAssets(sol::state& lua)
         "addBonesInfo", &MeshGroup::addBonesInfo,
         "getBoneOffsets", &MeshGroup::getBoneOffsets,
         "getBoneID", &MeshGroup::getBoneID,
-        "import", &MeshGroup::import,
-        "getLastLoadedMaterials", &MeshGroup::getLastLoadedMaterials
+        "import", &MeshGroupAsset::import
     );
 }
 

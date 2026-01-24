@@ -78,7 +78,7 @@ void AssetSelectDialog::headerContent()
 		const std::vector<AssetInfo>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
 		if (selectedAssetIndex != -1)
 		{
-			ResourceWrapper<Texture> displayTexture = assetList.at(selectedAssetIndex).resource.as<Texture>();
+			ResourceWrapper<Texture> displayTexture = assetList.at(selectedAssetIndex).as<TextureAsset>().resource();
 			ImVec2 imageSize(150, 150);
 			ImGui::Image(reinterpret_cast<ImTextureID>(displayTexture.get()->getID()), imageSize, ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
 		}
