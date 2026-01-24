@@ -18,7 +18,7 @@ void focusOnEntity(Entity e, Entity cameraEntity)
 	auto targetMesh = e.tryGetComponent<MeshRendererComponent>();
 	if (targetMesh)
 	{
-		auto& targetAABB = targetMesh->mesh.get()->getPrimaryMesh()->getAABB();
+		auto& targetAABB = targetMesh->mesh.resource()->getPrimaryMesh()->getAABB();
 
 		// set destination to location + forward
 		targetLocation = targetTransform.getWorldPosition() - front * 5.f + targetAABB.extents() * .5f;

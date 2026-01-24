@@ -37,7 +37,7 @@ bool TextureImportDialog::acceptContent()
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		desc.usage = textureDataWidget.m_semantic;
-		Texture::import(filepath.m_filepath, desc);
+		TextureAsset::import(filepath.m_filepath, desc);
 
 		return true;
 	}

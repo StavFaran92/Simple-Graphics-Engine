@@ -63,12 +63,12 @@ public:
 
     std::function<void(UUID uuid)> assetTextureSelectCB;
     std::function<void(Entity e)> entitySelectCB;
-    AssetWrapper<Texture> selectedAssetTexture;
+    AssetHandle<TextureAsset> selectedAssetTexture;
 
     std::shared_ptr<TextureSampler> selectedSampler;
     std::shared_ptr<TextureSampler> previousSampler;
 
-    AssetWrapper<Material> selectedMaterialForEdit;
+    AssetHandle<MaterialAsset> selectedMaterialForEdit;
 
     struct Rect2D {
         glm::vec2 min;

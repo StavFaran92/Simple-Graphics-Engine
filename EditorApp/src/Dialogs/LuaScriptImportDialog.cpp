@@ -33,7 +33,7 @@ bool LuaScriptImportDialog::acceptContent()
 		LuaScriptImportSettings desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		LuaScript::import(filepath.m_filepath, desc);
+		LuaScriptAsset::import(filepath.m_filepath, desc);
 
 		return true;
 	}

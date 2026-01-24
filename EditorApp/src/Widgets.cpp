@@ -6,12 +6,12 @@
 #include "tinyfiledialogs.h"
 #include "dialogs/AssetSelectDialog.h"
 
-void addTextureEditWidget(AssetWrapper<Texture> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
+void addTextureEditWidget(AssetHandle<TextureAsset> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
 	int texID = 0;
 	if (!texture.isEmpty())
 	{
-		texID = texture.get()->getID();
+		texID = texture.resource()->getID();
 	}
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
@@ -30,7 +30,7 @@ void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, 
 	int texID = 0;
 	if (!sampler->texture.isEmpty())
 	{
-		texID = sampler->texture.get()->getID();
+		texID = sampler->texture.resource()->getID();
 	}
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
@@ -52,7 +52,7 @@ void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, 
 
 		ImGui::Text("Texture");
 		addTextureEditWidget(EditorState::Instance().selectedSampler->texture, ImVec2{ 150, 150 }, [=](UUID uuid) {
-			EditorState::Instance().selectedSampler->texture = AssetWrapper<Texture>(uuid);
+			EditorState::Instance().selectedSampler->texture = AssetHandle<TextureAsset>(uuid);
 			});
 
 		ImGui::Spacing();
@@ -246,7 +246,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 		}
 
 		addAssetSelectWidget(shaderName, AssetType::SHADER, [mat](UUID uuid) {
-			mat.get()->setCustomShader(AssetWrapper<Shader>(uuid));
+			mat.get()->setCustomShader(AssetHandle<ShaderAsset>(uuid));
 		});
 	}
 

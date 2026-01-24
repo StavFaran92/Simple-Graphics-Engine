@@ -14,7 +14,7 @@ void AssetSelectDialog::appearContent()
 
 void AssetSelectDialog::drawContent()
 {
-	const std::vector<AssetInfo>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
+	const std::vector<AssetRecord>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
 
 	for (int i = 0; i < assetList.size(); i++)
 	{
@@ -58,7 +58,7 @@ void AssetSelectDialog::drawContent()
 
 bool AssetSelectDialog::acceptContent()
 {
-	const std::vector<AssetInfo>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
+	const std::vector<AssetRecord>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
 	if (selectedAssetIndex >= 0 && selectedAssetIndex < assetList.size())
 	{
 		onAccpetCB(assetList[selectedAssetIndex].uuid);
@@ -75,7 +75,7 @@ void AssetSelectDialog::headerContent()
 {
 	if (assetType == AssetType::TEXTURE)
 	{
-		const std::vector<AssetInfo>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
+		const std::vector<AssetRecord>& assetList = Engine::get()->getSubSystem<Assets>()->getAllAssetsOfType(assetType);
 		if (selectedAssetIndex != -1)
 		{
 			ResourceWrapper<Texture> displayTexture = assetList.at(selectedAssetIndex).as<TextureAsset>().resource();

@@ -36,11 +36,11 @@ bool ModelImportDialog::acceptContent()
 		ModelImportSettings desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		auto mesh = MeshCollection::import(filepath.m_filepath, desc);
+		auto mesh = MeshGroupAsset::import(filepath.m_filepath, desc);
 
 		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
 
-		auto& materials = MeshCollection::getLastLoadedMaterials();
+		auto& materials = MeshGroup::getLastLoadedMaterials();
 
 		for (auto& [idx, m] : materials)
 		{

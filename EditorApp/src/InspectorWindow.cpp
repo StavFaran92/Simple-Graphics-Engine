@@ -177,7 +177,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uuid) {
-				meshComponent.mesh = AssetWrapper<MeshCollection>(uuid);
+				meshComponent.mesh = AssetHandle<MeshGroup>(uuid);
 			});
 
 			if (ImGui::CollapsingHeader("Materials"))
@@ -198,7 +198,7 @@ void InspectorWindow::display()
 					}
 
 					addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uuid) {
-						mat = AssetWrapper<Material>(uuid);
+						mat = AssetHandle<MaterialAsset>(uuid);
 					});
 
 					++index;
@@ -324,7 +324,7 @@ void InspectorWindow::display()
 
 		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
 			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](UUID uuid) {
-				skybox.setSkybox(AssetWrapper<Texture>(uuid));
+				skybox.setSkybox(AssetHandle<TextureAsset>(uuid));
 			});
 
 			// Compile Button
@@ -336,7 +336,7 @@ void InspectorWindow::display()
 
 		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
 			addTextureEditWidget(image.image, { 50, 50 }, [&](UUID uuid) {
-				image.image = AssetWrapper<Texture>(uuid);
+				image.image = AssetHandle<TextureAsset>(uuid);
 				});
 			ImGui::DragFloat("posX", &image.position.x);
 			ImGui::DragFloat("posY", &image.position.y);
@@ -403,7 +403,7 @@ void InspectorWindow::display()
 					}
 
 					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uuid) {
-						animator.addAnimation(name, AssetWrapper<Animation>(uuid));
+						animator.addAnimation(name, AssetHandle<Animation>(uuid));
 					});
 
 
@@ -426,7 +426,7 @@ void InspectorWindow::display()
 			if (ImGui::Button("+")) {
 				int animationsCount = animations.size();
 				std::string newAnimationName = "New Animation_" + std::to_string(animationsCount);
-				animator.addAnimation(newAnimationName, AssetWrapper<Animation>::empty);
+				animator.addAnimation(newAnimationName, AssetHandle<Animation>::empty);
 				eState.animationRenameBuffers.push_back(newAnimationName);
 			}
 		});
@@ -452,7 +452,7 @@ void InspectorWindow::display()
 					ImGui::DragFloat("scale", &terrain.m_scale);
 
 					addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
-						terrain.setHeightmap(AssetWrapper<Texture>(uuid));
+						terrain.setHeightmap(AssetHandle<TextureAsset>(uuid));
 						});
 
 					// Check if rebuild is needed
@@ -491,7 +491,7 @@ void InspectorWindow::display()
 						}
 
 						addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uuid) {
-							terrain.m_material = AssetWrapper<Material>(uuid);
+							terrain.m_material = AssetHandle<MaterialAsset>(uuid);
 							});
 					}
 
@@ -578,7 +578,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uuid) {
-				script.script = AssetWrapper<LuaScript>(uuid);
+				script.script = AssetHandle<LuaScript>(uuid);
 			});
 		});
 
@@ -590,7 +590,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(shaderName, AssetType::SHADER, [&postProcessComponent](UUID uuid) {
-				postProcessComponent.shader = AssetWrapper<Shader>(uuid);
+				postProcessComponent.shader = AssetHandle<Shader>(uuid);
 			});
 				
 			if (!postProcessComponent.shader.isEmpty())
@@ -636,7 +636,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&volume](UUID uuid) {
-				volume.mesh = AssetWrapper<MeshCollection>(uuid);
+				volume.mesh = AssetHandle<MeshGroup>(uuid);
 				});
 
 			std::string matName = "None";
@@ -650,7 +650,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(matName, AssetType::MATERIAL, [&volume](UUID uuid) {
-				volume.material = AssetWrapper<Material>(uuid);
+				volume.material = AssetHandle<MaterialAsset>(uuid);
 				});
 
 			});
