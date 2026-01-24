@@ -14,7 +14,7 @@ public:
 		return m_resource;
 	}
 
-private:
+protected:
 	ResourceWrapper<Resource> m_resource;
 };
 

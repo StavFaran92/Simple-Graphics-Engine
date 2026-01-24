@@ -48,12 +48,5 @@ class EngineAPI MeshGroupAsset : public Asset
 {
 	using ResourceType = MeshGroup;
 public:
-	using Asset::Asset;
-
-	MeshGroupAsset(const Asset& asset);
-
-	static MeshGroupAsset import(const std::string& fileLocation, ModelImportSettings aDesc = {});
-
-	ResourceWrapper<ResourceType> resource() const;
-	ResourceWrapper<ResourceType> resource();
+	static AssetHandle<MeshGroupAsset> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
 };

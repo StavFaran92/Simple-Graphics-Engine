@@ -34,12 +34,12 @@ public:
 
 	const ResourceWrapper<ResourceType> resource() const
 	{
-		return info().data().as<T>().resource();
+		return info().data().as<T>().resourceInner().as<ResourceType>();
 	}
 
 	ResourceWrapper<ResourceType> resource()
 	{
-		return info().data().as<T>().resource();
+		return info().data().as<T>().resourceInner().as<ResourceType>();
 	}
 
 	void erase()

@@ -29,7 +29,7 @@ ResourceWrapper<Resource> MeshGroupAssetManager::load(AssetRecord& aInfo)
 
 void MeshGroupAssetManager::save(AssetHandle<Asset> mesh, const AssetRecord& aInfo)
 {
-	MeshExporter::exportMesh(MeshGroupAsset(mesh));
+	MeshExporter::exportMesh(mesh.as<MeshGroupAsset>());
 }
 
 void MeshGroup::addMesh(const std::shared_ptr<Mesh>& mesh)
@@ -92,21 +92,21 @@ int MeshGroup::getMaterialCount() const
 	return m_materialSlots.size();
 }
 
-MeshGroupAsset::MeshGroupAsset(const Asset& asset) : Asset(asset)
-{
-}
+//MeshGroupAsset::MeshGroupAsset(const Asset& asset) : Asset(asset)
+//{
+//}
 
-MeshGroupAsset MeshGroupAsset::import(const std::string& fileLocation, ModelImportSettings desc)
+AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocation, ModelImportSettings desc)
 {
 	desc.aType = AssetType::MESH;
 	desc.isCompositeAsset = true;
-	return MeshGroupAsset(Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).getUID());
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MeshGroupAsset>();
 }
 
-ResourceWrapper<MeshGroup> MeshGroupAsset::resource() const
-{
-	return resourceInner().as<MeshGroup>();
-}
+//ResourceWrapper<MeshGroup> MeshGroupAsset::resource() const
+//{
+//	return resourceInner().as<MeshGroup>();
+//}
 
 ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, ModelImportSettings aDesc)
 {
