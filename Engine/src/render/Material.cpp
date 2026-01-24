@@ -459,13 +459,13 @@ void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
 	update();
 }
 
-void Material::setCustomShader(AssetHandle<Shader>& customShader)
+void Material::setCustomShader(AssetHandle<ShaderAsset>& customShader)
 {
 	m_customShader = customShader;
 	update();
 }
 
-AssetHandle<Shader> Material::getCustomShader() const
+AssetHandle<ShaderAsset> Material::getCustomShader() const
 {
 	return m_customShader;
 }

@@ -95,7 +95,7 @@ void bindComponents(sol::state& lua)
     lua.new_usertype<Animator>("Animator",
         "playAnimation", sol::overload(
             [](Animator& self, const std::string& name) { self.playAnimation(name); },
-            [](Animator& self, AssetHandle<Animation> animation) { self.playAnimation(animation); }
+            [](Animator& self, AssetHandle<AnimationAsset> animation) { self.playAnimation(animation); }
         ),
         "setPlaybackSpeed", &Animator::setPlaybackSpeed,
         "addAnimation", &Animator::addAnimation,

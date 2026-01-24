@@ -46,7 +46,7 @@ private:
 // Asset
 class EngineAPI MeshGroupAsset : public Asset
 {
-	using ResourceType = MeshGroup;
 public:
+	using ResourceType = MeshGroup;
 	static AssetHandle<MeshGroupAsset> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
 };

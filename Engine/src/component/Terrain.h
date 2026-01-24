@@ -10,6 +10,7 @@
 #include "component/FoliageField.h"
 
 #include "utils/Math3D.h"
+#include "texture/Texture.h"
 
 class Entity;
 
@@ -102,7 +103,7 @@ private:
 	AssetHandle<TextureAsset> m_heightmap;
 	std::vector<float> m_heightDataCPU;
 
-	AssetHandle<MeshGroup> m_mesh;
+	AssetHandle<MeshGroupAsset> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
 
 	

@@ -102,7 +102,7 @@ int MeshGroup::getMaterialCount() const
 	return m_materialSlots.size();
 }
 
-AssetHandle<MeshGroup> MeshGroup::import(const std::string& fileLocation, ModelImportSettings desc)
+AssetHandle<MeshGroupAsset> MeshGroup::import(const std::string& fileLocation, ModelImportSettings desc)
 {
 	desc.aType = AssetType::MESH;
 	desc.isCompositeAsset = true;

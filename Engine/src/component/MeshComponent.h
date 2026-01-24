@@ -5,7 +5,7 @@
 //
 //struct EngineAPI MeshRendererComponent : public Component
 //{
-//	MeshRendererComponent(const AssetHandle<MeshGroup>& mesh) : mesh(mesh) {};
+//	MeshRendererComponent(const AssetHandle<MeshGroupAsset>& mesh) : mesh(mesh) {};
 //	MeshRendererComponent() = default;
 //
 //	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene&)
@@ -21,7 +21,7 @@
 //	}
 //
 //	float materialSlot = 0; // todo this will be used (probably as a list) to support multi material models
-//	AssetHandle<MeshGroup> mesh = AssetHandle<MeshGroup>::empty;
+//	AssetHandle<MeshGroupAsset> mesh = AssetHandle<MeshGroupAsset>::empty;
 //	
 //};
 //

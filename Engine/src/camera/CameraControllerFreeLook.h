@@ -5,6 +5,7 @@
 #include "camera/ICameraController.h"
 #include "component/CameraComponent.h"
 #include "core/Subscriber.h"
+#include "component/Transformation.h"
 
 #include "ui/KeyCodes.h"
 

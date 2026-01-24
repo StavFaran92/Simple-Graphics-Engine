@@ -3,12 +3,13 @@
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
 #include "memory/AssetHandle.h"
+#include "render/Shader.h"
 
 class PostProcessComponent : public Component
 {
 public:
 
-	AssetHandle<Shader> shader;
+	AssetHandle<ShaderAsset> shader;
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 	{

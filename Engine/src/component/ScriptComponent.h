@@ -6,17 +6,15 @@
 #include "component/ComponentSerializer.h"
 #include "scripts/LuaScript.h"
 
-#include <string>
-
 class EngineAPI ScriptComponent : public Component
 {
 public:
 	ScriptComponent() = default;
-	ScriptComponent(const AssetHandle<LuaScript>& script);
+	ScriptComponent(const AssetHandle<LuaScriptAsset>& script);
 	void loadScript();
 
 	bool isValid() const;
-	AssetHandle<LuaScript>& getScript();
+	AssetHandle<LuaScriptAsset>& getScript();
 
 	//std::string filepath;
 
@@ -29,7 +27,7 @@ public:
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
 
 
-	AssetHandle<LuaScript> script;
+	AssetHandle<LuaScriptAsset> script;
 	Entity entity;
 
 

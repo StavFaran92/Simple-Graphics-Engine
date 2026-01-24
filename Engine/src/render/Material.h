@@ -156,8 +156,8 @@ public:
 	PersistentBlock& getPersistentBlock();
 	NonPersistentBlock& getNonPersistentBlock();
 
-	void setCustomShader(AssetHandle<Shader>& customShader);
-	AssetHandle<Shader> getCustomShader() const;
+	void setCustomShader(AssetHandle<ShaderAsset>& customShader);
+	AssetHandle<ShaderAsset> getCustomShader() const;
 
 	void setMaterialRenderMode(MaterialRenderMode renderMode);
 	MaterialRenderMode getMaterialRenderMode() const;
@@ -201,7 +201,7 @@ public:
 	NonPersistentBlock m_nonPersistentBlock;
 
 private:
-	AssetHandle<Shader> m_customShader;
+	AssetHandle<ShaderAsset> m_customShader;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 
 	//ProjectionType projection = ProjectionType::DefaultProjection;
@@ -213,8 +213,8 @@ private:
 // Asset
 class EngineAPI MaterialAsset : public Asset
 {
-	using ResourceType = Material;
 public:
+	using ResourceType = Material;
 	static AssetHandle<MaterialAsset> import(const std::string& fileLocation, MaterialImportSettings desc = {});
 	static void update(const AssetHandle<MaterialAsset>& material, AssetUpdateDescriptor desc);
 };

@@ -21,7 +21,6 @@ class EngineAPI LuaScript : public Resource
 {
 public:
 	static ResourceWrapper<LuaScript> create();
-	static void updateAsset(const AssetHandle<LuaScript>& script, AssetUpdateDescriptor desc);
 
 	std::string filepath;
 };
@@ -29,8 +28,8 @@ public:
 // Asset
 class EngineAPI LuaScriptAsset : public Asset
 {
-	using ResourceType = LuaScript;
 public:
+	using ResourceType = LuaScript;
 	static AssetHandle<LuaScriptAsset> import(const std::string& fileLocation, LuaScriptImportSettings aDesc = {});
 	static void update(const AssetHandle<LuaScriptAsset>& script, AssetUpdateDescriptor desc);
 };

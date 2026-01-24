@@ -17,7 +17,7 @@ public:
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene&);
 
 	AssetHandle<Material> material;
-	AssetHandle<MeshGroup> mesh;
+	AssetHandle<MeshGroupAsset> mesh;
 };
 
 REGISTER_COMPONENT(VolumeComponent)

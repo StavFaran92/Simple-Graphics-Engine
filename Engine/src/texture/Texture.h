@@ -238,7 +238,7 @@ GLenum toGL(T arg) {
 // Asset
 class EngineAPI TextureAsset : public Asset
 {
-	using ResourceType = Texture;
 public:
+	using ResourceType = Texture;
 	static AssetHandle<TextureAsset> import(const std::string& fileLocation, Texture::TextureAssetDescriptor = {});
 };

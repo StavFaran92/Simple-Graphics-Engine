@@ -3,6 +3,9 @@
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
 #include "memory/AssetHandle.h"
+#include "render/Shader.h"
+#include "render/RenderView.h"
+#include "texture/Texture.h"
 
 struct EngineAPI ShaderComponent : public Component
 {
@@ -25,7 +28,7 @@ struct EngineAPI ShaderComponent : public Component
 
 	void parseUniforms(const std::string& sourceCode);
 
-	void parseFromShader(AssetHandle<Shader> shader);
+	void parseFromShader(AssetHandle<ShaderAsset> shader);
 
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
@@ -50,7 +53,7 @@ struct EngineAPI ShaderComponent : public Component
 	}
 
 	// This will only be used by forward renderer, ignored by deffered
-	AssetHandle<Shader> m_customShader;
+	AssetHandle<ShaderAsset> m_customShader;
 
 	std::map<std::string, AssetHandle<TextureAsset>> customTextures;
 

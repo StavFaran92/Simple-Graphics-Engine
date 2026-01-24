@@ -38,7 +38,7 @@ public:
 
 	int getMaterialCount() const;
 
-	static AssetHandle<MeshGroup> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
+	static AssetHandle<MeshGroupAsset> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
 	static ResourceWrapper<MeshGroup> load(const std::string& fileLocation, ModelImportSettings aDesc = {});
 
 	static std::map<int, AssetHandle<Material>> getLastLoadedMaterials();

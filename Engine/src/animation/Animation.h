@@ -56,7 +56,7 @@ private:
 // Asset
 class EngineAPI AnimationAsset : public Asset
 {
-	using ResourceType = Animation;
 public:
+	using ResourceType = Animation;
 	static AssetHandle<AnimationAsset> import(const std::string& fileLocation, AnimationImportSettings settings = {});
 };

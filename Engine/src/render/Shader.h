@@ -164,7 +164,7 @@ protected:
 // Asset
 class EngineAPI ShaderAsset : public Asset
 {
-	using ResourceType = Shader;
 public:
+	using ResourceType = Shader;
 	static AssetHandle<ShaderAsset> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 };

@@ -2,6 +2,7 @@
 
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
+#include "texture/Texture.h"
 
 struct EngineAPI SkyboxComponent : public Component
 {
