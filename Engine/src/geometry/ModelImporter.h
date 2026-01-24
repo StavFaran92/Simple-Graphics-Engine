@@ -87,7 +87,7 @@ private:
 	void loadModelFromAssimpScene(const aiScene* scene, const AssetRecord& aInfo, ModelImporter::ModelInfo& modelInfo);
 	void processNode(const aiScene* aiScene, aiNode* aiNode);
 	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh);
-	AssetHandle<Texture> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, AssetHandle<Texture>>& cachedTextures, const AssetRecord& aInfo);
+	AssetHandle<TextureAsset> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, AssetHandle<TextureAsset>>& cachedTextures, const AssetRecord& aInfo);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;
 	ModelLoadSession m_currentSession;

@@ -31,7 +31,7 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 	}
 }
 
-AssetHandle<Texture> Terrain::generateHeightmap(int width, int height)
+AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 {
 	m_heightDataCPU = std::vector<float>(width * height, 0.0f);
 
@@ -97,7 +97,7 @@ float Terrain::getScale() const
 	return m_scale;
 }
 
-void Terrain::setHeightmap(AssetHandle<Texture> heightmap)
+void Terrain::setHeightmap(AssetHandle<TextureAsset> heightmap)
 {
 	m_heightmap = heightmap;
 
@@ -119,7 +119,7 @@ int Terrain::getHeight() const
 	return m_height;
 }
 
-void Terrain::setTexture(int index, AssetHandle<Texture> texture)
+void Terrain::setTexture(int index, AssetHandle<TextureAsset> texture)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
@@ -163,12 +163,12 @@ void Terrain::setTextureBlend(int index, float val)
 	m_textureBlends[index].blend = val;
 }
 
-AssetHandle<Texture>& Terrain::getTexture(int index)
+AssetHandle<TextureAsset>& Terrain::getTexture(int index)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
 		logWarning("Invalid texture index specified: " + std::to_string(index));
-		return AssetHandle<Texture>::empty;
+		return AssetHandle<TextureAsset>::empty;
 	}
 
 	return m_textureBlends.at(index).texture;

@@ -1,11 +1,8 @@
 #pragma once
 
-#include <stdio.h>
 #include <string>
-#include <stdexcept>
 #include <unordered_map>
 #include <memory>
-#include <queue>
 #include <variant>
 #include "memory/Asset.h"
 
@@ -50,20 +47,26 @@ struct ShaderAssetDescriptor : public AssetCreateDescriptor
 	);
 };
 
+// Asset IO Manager
 struct ShaderAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
+	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
 };
 
+// Resource
 class EngineAPI Shader : public Resource, std::enable_shared_from_this<Shader>
 {
 public:
 	inline static const std::string ATTRIB_SHADER_OVERRIDE = "shader_override";
 public:
+	static ResourceWrapper<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
+
+	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 
 	void use();
+
 	void release() const;
 
 	inline unsigned int getID() const;
@@ -75,9 +78,13 @@ public:
 	int getUniformBlockLocation(const std::string& name);
 
 	void setModelMatrix(glm::mat4 model);
+
 	void setViewMatrix(glm::mat4 view);
+
 	void setProjectionMatrix(glm::mat4 projection);
+
 	void setTime(float time);
+
 	void init();
 
 	void bindUniformBlockToBindPoint(const std::string& uniformBlockName, int bindPointIndex);
@@ -86,22 +93,16 @@ public:
 
 	bool build();
 
-	//void parseUniforms();
-
 	ShaderOverride getShaderOverride() const { return shaderOverride; };
-
-	//const std::unordered_map<std::string, int>& getAvailableUniforms() const
 
 	bool recompile();
 
 	const std::string& getSourceCode() const;
+
 	const ShadersInfo& getShadersInfo() const;
 
-	static AssetHandle<Shader> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
-	static ResourceWrapper<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
-	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
-
 	static ShaderOverride getShaderOverrideFromStr(const std::string& shaderOverride);
+
 	static std::string getShaderOverrideAsStr(ShaderOverride shaderOverride);
 
 	virtual ~Shader();
@@ -118,10 +119,6 @@ public:
 	Shader(const std::string& glslFilePath);
 
 protected:
-	
-
-
-
 	void clear();
 	virtual void BuildShaders(const ShadersInfo& shader);
 	uint32_t AddShader(const std::string& shaderCode, unsigned int shaderType);
@@ -158,11 +155,16 @@ protected:
 	ShaderOverride shaderOverride;
 	bool m_isShaderOverride = false;
 
-	//std::unordered_map<std::string, Value> m_uniformProperties;
-	//std::unordered_map<std::string, Resource<Texture>> m_textures;
-
 	std::string m_sourceCode;
 	std::string origSourceCode;
 
 	ShadersInfo m_shadersInfo;
+};
+
+// Asset
+class EngineAPI ShaderAsset : public Asset
+{
+	using ResourceType = Shader;
+public:
+	static AssetHandle<ShaderAsset> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
 };

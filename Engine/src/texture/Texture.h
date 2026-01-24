@@ -11,14 +11,16 @@ using json = nlohmann::json;
 
 struct AssetRecord;
 
+// Asset IO Manager
 struct TextureAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
+	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
 	std::string getRecommendedExtension(const AssetRecord& aInfo) override;
 };
 
+// Resource
 class EngineAPI Texture : public Resource
 {
 public:
@@ -174,8 +176,6 @@ public:
 
 	static ResourceWrapper<Texture> createTexture(int width, int height, Texture::TextureSemantic usage, void* data = nullptr);
 
-	static AssetHandle<Texture> import(const std::string& fileLocation, TextureAssetDescriptor = {});
-
 	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureAssetDescriptor = {});
 
 	ResourceWrapper<Texture> clone() const; 
@@ -234,3 +234,11 @@ template<typename T>
 GLenum toGL(T arg) {
 	return static_cast<GLenum>(arg);
 }
+
+// Asset
+class EngineAPI TextureAsset : public Asset
+{
+	using ResourceType = Texture;
+public:
+	static AssetHandle<TextureAsset> import(const std::string& fileLocation, Texture::TextureAssetDescriptor = {});
+};

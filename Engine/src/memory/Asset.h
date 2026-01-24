@@ -3,12 +3,13 @@
 #include <string>
 
 #include "memory/AssetHandle.h"
-#include "Assets.h"
 #include "AssetFactory.h"
 
 class Asset
 {
 public:
+	using ResourceType = Resource;
+
 	ResourceWrapper<Resource> resourceInner() const
 	{
 		return m_resource;

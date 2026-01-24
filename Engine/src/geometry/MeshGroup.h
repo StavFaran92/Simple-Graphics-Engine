@@ -12,7 +12,7 @@ struct MeshGroupAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(AssetHandle<Asset> meshGroup, const AssetRecord& aInfo) override;
+	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
 };
 
 // Resource

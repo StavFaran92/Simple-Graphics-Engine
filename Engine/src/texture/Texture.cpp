@@ -116,11 +116,11 @@ std::string TextureAssetManager::getRecommendedExtension(const AssetRecord& aInf
 
 }
 
-void TextureAssetManager::save(const AssetHandle<Resource>& texture, const AssetRecord& aInfo)
+void TextureAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
-	auto& resource = texture.as<Texture>().resource();
+	auto& resource = asset.as<TextureAsset>().resource();
 
 	if (resource.get()->getData().type == Texture::Type::FLOAT)
 	{
@@ -463,12 +463,6 @@ Texture::~Texture()
 	ClearTexture();
 }
 
-AssetHandle<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
-{
-	desc.aType = AssetType::TEXTURE;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Texture>();
-}
-
 ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureAssetDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
@@ -682,6 +676,12 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 
 	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
 	textureData.textureName = textureName;
+}
+
+AssetHandle<TextureAsset> TextureAsset::import(const std::string& fileLocation, Texture::TextureAssetDescriptor desc)
+{
+	desc.aType = AssetType::TEXTURE;
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<TextureAsset>();
 }
 
 //adi is your love of your life

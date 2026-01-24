@@ -48,7 +48,7 @@ ResourceWrapper<Resource> PrefabAssetManager::load(AssetRecord& aInfo)
 	return ResourceWrapper<Prefab>::empty;
 }
 
-void PrefabAssetManager::save(const AssetHandle<Resource>& prefab, const AssetRecord& aInfo)
+void PrefabAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
@@ -56,19 +56,12 @@ void PrefabAssetManager::save(const AssetHandle<Resource>& prefab, const AssetRe
 
 	try
 	{
-		oarchive(*prefab.as<Prefab>().resource().get());
+		oarchive(*asset.as<PrefabAsset>().resource().get());
 	}
 	catch (const cereal::Exception& e)
 	{
 		logError("Serialization Error occured: {}", e.what());
 	}
-}
-
-AssetHandle<Prefab> Prefab::import(const std::string& fileLocation, PrefabImportSettings desc)
-{
-	desc.aType = AssetType::PREFAB;
-	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Prefab>();
 }
 
 void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetRecord aInfo)
@@ -182,4 +175,9 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	return root;
 }
 
-
+AssetHandle<PrefabAsset> PrefabAsset::import(const std::string& fileLocation, PrefabImportSettings desc)
+{
+	desc.aType = AssetType::PREFAB;
+	desc.origFilePath = fileLocation;
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<PrefabAsset>();
+}

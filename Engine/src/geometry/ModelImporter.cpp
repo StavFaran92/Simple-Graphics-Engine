@@ -310,7 +310,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 
 	m_lastImportedMaterials = LastImportedMaterials();
 
-	std::unordered_map<std::string, AssetHandle<Texture>> cachedTextures;
+	std::unordered_map<std::string, AssetHandle<TextureAsset>> cachedTextures;
 
 	// Import materials and textures
 	if (scene->HasMaterials())
@@ -585,22 +585,22 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 
 
 
-AssetHandle<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
+AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 	aiMaterial* mat, 
 	aiTextureType type, 
 	const std::string& dir, 
 	std::unordered_map<std::string, 
-	AssetHandle<Texture>>& cachedTextures,
+	AssetHandle<TextureAsset>>& cachedTextures,
 	const AssetRecord& aInfo)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
 	{
-		return AssetHandle<Texture>::empty;
+		return AssetHandle<TextureAsset>::empty;
 	}
 
 	ResourceWrapper<Texture> texture;
-	AssetHandle<Texture> AssetTexture;
+	AssetHandle<TextureAsset> AssetTexture;
 	const aiTexture* aiTexture = scene->GetEmbeddedTexture(str.C_Str());
 	if(aiTexture)
 	{
@@ -674,7 +674,7 @@ AssetHandle<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 		std::string path = findTexture(str, dir);
 		if (path.empty())
 		{
-			return AssetHandle<Texture>::empty;
+			return AssetHandle<TextureAsset>::empty;
 		}
 
 		if (cachedTextures.find(path) != cachedTextures.end())

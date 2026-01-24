@@ -6,6 +6,8 @@
 template<typename T>
 class AssetHandle
 { 
+	static_assert(std::is_base_of_v<Asset, T>,
+		"AssetHandle<T>: T must derive from Asset");
 public:
 	using ResourceType = typename T::ResourceType;
 

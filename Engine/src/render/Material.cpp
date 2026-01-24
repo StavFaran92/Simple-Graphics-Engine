@@ -56,7 +56,7 @@ ResourceWrapper<Resource> MaterialAssetManager::load(AssetRecord& aInfo)
 	return ResourceWrapper<Resource>::empty;
 }
 
-void MaterialAssetManager::save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo)
+void MaterialAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(aInfo.fullFilePath);
@@ -64,7 +64,7 @@ void MaterialAssetManager::save(const AssetHandle<Resource>& mat, const AssetRec
 
 	try
 	{
-		oarchive(*mat.as<Material>().resource().get());
+		oarchive(*asset.as<MaterialAsset>().resource().get());
 	}
 	catch (const cereal::Exception& e)
 	{
@@ -80,7 +80,7 @@ Material::Material()
 void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ResourceWrapper<Shader>& shader, int slot)
 {
 	// if texture is empty use dummy texture
-	AssetHandle<Texture> texture;
+	AssetHandle<TextureAsset> texture;
 	if (!sampler || sampler->texture.isEmpty())
 	{
 		texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
@@ -181,23 +181,11 @@ void Material::setSamplerEnabled(const std::string& name, bool isEnabled)
 	getPersistentBlock().getSampler(name)->isActive = isEnabled;
 }
 
-AssetHandle<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
-{
-	desc.aType = AssetType::MATERIAL;
-	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Material>();
-}
-
 ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
 {
 	auto mat = Factory<Material>::create();
 	mat->setMaterialRenderMode(renderMode);
 	return mat;
-}
-
-void Material::updateAsset(const AssetHandle<Material>& material, AssetUpdateDescriptor desc)
-{
-	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
 }
 
 ResourceWrapper<Material> Material::clone(bool isTransient) const
@@ -485,4 +473,16 @@ AssetHandle<Shader> Material::getCustomShader() const
 MaterialRenderMode Material::getMaterialRenderMode() const
 {
 	return m_renderMode;
+}
+
+AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation, MaterialImportSettings desc)
+{
+	desc.aType = AssetType::MATERIAL;
+	desc.origFilePath = fileLocation;
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MaterialAsset>();
+}
+
+void MaterialAsset::update(const AssetHandle<MaterialAsset>& material, AssetUpdateDescriptor desc)
+{
+	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
 }

@@ -61,13 +61,15 @@ struct EditableUniform {
 	}
 };
 
+// Asset IO Manager
 struct MaterialAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
+	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
 };
 
+//Resource
 class EngineAPI Material : public Resource
 {
 public:
@@ -170,7 +172,7 @@ private:
 
 	void parseFromShader(ResourceWrapper<Shader> shader);
 
-	void setProjectionTexture(AssetHandle<Texture> texture);
+	void setProjectionTexture(AssetHandle<TextureAsset> texture);
 
 	static ResourceWrapper<Shader> getShaderFromRenderMode(MaterialRenderMode renderMode);
 public:
@@ -183,9 +185,9 @@ public:
 		SERIALIZED_MEMBER(m_customShader);
 	}
 
-	static AssetHandle<Material> import(const std::string& fileLocation, MaterialImportSettings settings = {});
+	
 	static ResourceWrapper<Material> create(MaterialRenderMode renderMode);
-	static void updateAsset(const AssetHandle<Material>& material, AssetUpdateDescriptor desc);
+	//static void updateAsset(const AssetHandle<Material>& material, AssetUpdateDescriptor desc);
 
 protected:
 
@@ -203,7 +205,16 @@ private:
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 
 	//ProjectionType projection = ProjectionType::DefaultProjection;
-	//AssetHandle<Texture> projectionTexture;
+	//AssetHandle<TextureAsset> projectionTexture;
 	//std::shared_ptr<RenderView> renderViewProjection;
 
+};
+
+// Asset
+class EngineAPI MaterialAsset : public Asset
+{
+	using ResourceType = Material;
+public:
+	static AssetHandle<MaterialAsset> import(const std::string& fileLocation, MaterialImportSettings desc = {});
+	static void update(const AssetHandle<MaterialAsset>& material, AssetUpdateDescriptor desc);
 };

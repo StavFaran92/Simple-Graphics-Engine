@@ -2,6 +2,7 @@
 
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
+#include "memory/AssetHandle.h"
 
 class PostProcessComponent : public Component
 {

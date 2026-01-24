@@ -9,7 +9,7 @@ class EngineAPI TextureSampler
 public:
 	TextureSampler(int channelCount = 3);
 
-	AssetHandle<Texture> texture;
+	AssetHandle<TextureAsset> texture;
 
 	enum Color {
 		None = 0,

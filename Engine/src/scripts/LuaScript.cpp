@@ -1,7 +1,6 @@
 #include "scripts/LuaScript.h"
 
 #include "core/Factory.h"
-#include <fstream>
 
 namespace {
 	struct LuaScriptManagerRegistration {
@@ -36,19 +35,12 @@ ResourceWrapper<Resource> LuaScriptAssetManager::load(AssetRecord& aInfo)
 	return ResourceWrapper<Resource>::empty;
 }
 
-void LuaScriptAssetManager::save(const AssetHandle<Resource>& script, const AssetRecord& aInfo)
+void LuaScriptAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
-	std::filesystem::copy_file(script.as<LuaScript>().resource()->filepath, savedFilePath);
-	script.as<LuaScript>().resource()->filepath = savedFilePath.generic_string();
-}
-
-AssetHandle<LuaScript> LuaScript::import(const std::string& fileLocation, LuaScriptImportSettings desc)
-{
-	desc.aType = AssetType::LUA_SCRIPT;
-	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<LuaScript>();
+	std::filesystem::copy_file(asset.as<LuaScriptAsset>().resource()->filepath, savedFilePath);
+	asset.as<LuaScriptAsset>().resource()->filepath = savedFilePath.generic_string();
 }
 
 ResourceWrapper<LuaScript> LuaScript::create()
@@ -67,7 +59,14 @@ ResourceWrapper<LuaScript> LuaScript::create()
 	return script;
 }
 
-void LuaScript::updateAsset(const AssetHandle<LuaScript>& script, AssetUpdateDescriptor desc)
+AssetHandle<LuaScriptAsset> LuaScriptAsset::import(const std::string& fileLocation, LuaScriptImportSettings desc)
+{
+	desc.aType = AssetType::LUA_SCRIPT;
+	desc.origFilePath = fileLocation;
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<LuaScriptAsset>();
+}
+
+void LuaScriptAsset::update(const AssetHandle<LuaScriptAsset>& script, AssetUpdateDescriptor desc)
 {
 	Engine::get()->getSubSystem<Assets>()->updateAsset(script, desc);
 }

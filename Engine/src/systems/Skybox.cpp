@@ -33,7 +33,7 @@ Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
     
 }
 
-Entity Skybox::createSkyboxHelper(AssetHandle<Texture> cubemap, AssetHandle<Texture> equirectangularMap, Entity& entity, Scene* scene)
+Entity Skybox::createSkyboxHelper(AssetHandle<TextureAsset> cubemap, AssetHandle<TextureAsset> equirectangularMap, Entity& entity, Scene* scene)
 {
     if (!scene)
     {

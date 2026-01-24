@@ -14,12 +14,12 @@ struct EngineAPI ShaderComponent : public Component
 
 	ShaderComponent();
 
-	void addTexture(const std::string& name, AssetHandle<Texture> texture)
+	void addTexture(const std::string& name, AssetHandle<TextureAsset> texture)
 	{
 		customTextures[name] = texture;
 	}
 
-	void setProjectionTexture(AssetHandle<Texture> texture);
+	void setProjectionTexture(AssetHandle<TextureAsset> texture);
 
 	void update();
 
@@ -52,10 +52,10 @@ struct EngineAPI ShaderComponent : public Component
 	// This will only be used by forward renderer, ignored by deffered
 	AssetHandle<Shader> m_customShader;
 
-	std::map<std::string, AssetHandle<Texture>> customTextures;
+	std::map<std::string, AssetHandle<TextureAsset>> customTextures;
 
 	ProjectionType projection = ProjectionType::DefaultProjection;
-	AssetHandle<Texture> projectionTexture;
+	AssetHandle<TextureAsset> projectionTexture;
 	std::shared_ptr<RenderView> renderViewProjection;
 
 	std::unordered_map<std::string, Value> m_uniformProperties;
