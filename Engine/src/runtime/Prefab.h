@@ -39,7 +39,7 @@ private:
 // Asset
 class EngineAPI PrefabAsset : public Asset
 {
-	using ResourceType = Prefab;
 public:
+	using ResourceType = Prefab;
 	static AssetHandle<PrefabAsset> import(const std::string& fileLocation, PrefabImportSettings aDesc = {});
 };

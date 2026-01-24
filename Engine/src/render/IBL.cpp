@@ -84,7 +84,7 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 	auto box = ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getRegistry());
 	box.RemoveComponent<RenderableComponent>();
 	box.RemoveComponent<ObjectComponent>();
-	auto vao = box.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = box.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -168,7 +168,7 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 	auto box = ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getRegistry());
 	box.RemoveComponent<RenderableComponent>();
 	box.RemoveComponent<ObjectComponent>();
-	auto vao = box.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = box.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -255,7 +255,7 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 	quad.RemoveComponent<RenderableComponent>();
 	quad.RemoveComponent<ObjectComponent>();
 
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -53,7 +53,7 @@ public:
 
 	struct LastImportedMaterials
 	{
-		std::map<int, AssetHandle<Material>> materials;
+		std::map<int, AssetHandle<MaterialAsset>> materials;
 	};
 
 	

@@ -57,7 +57,7 @@ void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, Resou
 	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
 	quad.RemoveComponent<RenderableComponent>();
 	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	RenderCommand::clear();
 
@@ -104,7 +104,7 @@ void TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTextur
 	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
 	quad.RemoveComponent<RenderableComponent>();
 	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	RenderCommand::clear();
 

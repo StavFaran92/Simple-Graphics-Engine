@@ -22,7 +22,7 @@ void acquireTexture(const std::string& name, const std::string& path)
 	Texture::TextureAssetDescriptor aDesc;
 	aDesc.isEngineOwned = true;
 	aDesc.name = name;
-	Texture::import(path, aDesc);
+	TextureAsset::import(path, aDesc);
 }
 
 void addAsAsset(const std::string& name, const ResourceWrapper<MeshGroup>& meshCollection)
@@ -144,7 +144,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		aInfo.aType = AssetType::MESH;
 		aInfo.name = "SGE_MESH_CAMERA";
 		aInfo.isEngineOwned = true;
-		MeshGroup::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
+		MeshGroupAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
 	}
 }
 

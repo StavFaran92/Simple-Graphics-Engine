@@ -4,6 +4,7 @@
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
 #include "serialize/CerealHelpers.h"
+#include "render/Material.h"
 
 struct EngineAPI VolumetricCloudsComponent : public Component
 {
@@ -12,7 +13,7 @@ struct EngineAPI VolumetricCloudsComponent : public Component
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
 
-	AssetHandle<Material> getMaterial();
+	AssetHandle<MaterialAsset> getMaterial();
 
 	template <class Archive>
 	void serialize(Archive& archive) {

@@ -40,7 +40,7 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	shaderDesc.name = "VolumetricCloudsShader";
 	shaderDesc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::Volume);
 	shaderDesc.isEngineOwned = false;
-	auto& shaderAsset = Engine::get()->getSubSystem<Assets>()->createAsset(shader, shaderDesc).as<Shader>();
+	auto& shaderAsset = Engine::get()->getSubSystem<Assets>()->createAsset(shader, shaderDesc).as<ShaderAsset>();
 
 	auto& material = Material::create(MaterialRenderMode::Custom);
 	material->setCustomShader(shaderAsset);
@@ -48,10 +48,10 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	materialDesc.aType = AssetType::MATERIAL;
 	materialDesc.name = "cloudsMaterial";
 	materialDesc.isEngineOwned = true;
-	auto& materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialDesc).as<Material>();
+	auto& materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialDesc).as<MaterialAsset>();
 
 	cloudVolumeComponent.material = materialAsset;
-	cloudVolumeComponent.mesh = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_BOX);
+	cloudVolumeComponent.mesh = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX);
 
 	return volumetricCloudsEntity;
 }
@@ -63,7 +63,7 @@ void VolumetricCloudsSystem::prepareVolumetricCloudsForRender(VolumetricCloudsCo
 
 
 	VolumeComponent& volumeComponent = clouds.entity.getComponentInChildren<VolumeComponent>();
-	auto& mesh = volumeComponent.mesh.get()->getPrimaryMesh();
+	auto& mesh = volumeComponent.mesh.resource()->getPrimaryMesh();
 
 	auto& transform = clouds.entity.getComponent<Transformation>();
 	glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();

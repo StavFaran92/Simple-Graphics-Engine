@@ -55,11 +55,12 @@ namespace physx {
 }
 template<typename T> class ObjectHandler;
 
+// Asset IO Manager
 struct SceneAssetManager : public AssetManager
 {
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(const AssetHandle<Resource>& mat, const AssetRecord& aInfo) override;
+	void save(AssetHandle<Asset> scene, const AssetRecord& aInfo) override;
 };
 
 struct SceneImportSettings : public AssetCreateDescriptor
@@ -71,6 +72,7 @@ struct SceneCreateDescriptor : public AssetCreateDescriptor
 {
 };
 
+// Resource
 class EngineAPI Scene : public Resource
 {
 public:
@@ -90,10 +92,7 @@ public:
 	Scene() = default;
 	Scene(Context* context);
 
-	static AssetHandle<Scene> import(const std::string& fileLocation, SceneImportSettings settings = {});
 	static ResourceWrapper<Scene> create();
-	static void updateAsset(const AssetHandle<Scene>& scene, AssetUpdateDescriptor desc);
-	//static ResourceWrapper<Scene> load(const std::string& fileLocation, SceneCreateDescriptor = {});
 
 	void addCoroutine(const std::function<bool(float)>& coroutine);
 
@@ -219,4 +218,14 @@ private:
 
 	ResourceWrapper<Shader> m_sampleComputeShader;
 	
+};
+
+// Asset
+class EngineAPI SceneAsset : public Asset
+{
+public:
+	using ResourceType = Scene;
+	static AssetHandle<SceneAsset> import(const std::string& fileLocation, SceneImportSettings aDesc = {});
+
+	static void update(const AssetHandle<SceneAsset>& scene, AssetUpdateDescriptor desc);
 };

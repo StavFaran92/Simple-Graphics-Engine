@@ -56,14 +56,14 @@ AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 	desc.isEngineOwned = true;
 	//desc.attributes = texture->getTextureAssetAttributes().toMap();
 	desc.usage = Texture::TextureSemantic::Heightmap;
-	auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc).as<Texture>();
+	auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc).as<TextureAsset>();
 
 	return heightmap;
 }
 
 Terrain Terrain::createTerrainComponent(int width, int height)
 {
-	auto& meshCollection = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
+	auto& meshCollection = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
 
 	Terrain terrain;
 	terrain.m_heightmap = terrain.generateHeightmap(width, height);
@@ -77,13 +77,13 @@ Terrain Terrain::createTerrainComponent(int width, int height)
 	for (int i = 0; i < MAX_TEXTURE_COUNT; i++)
 	{
 		TextureBlend blend;
-		blend.texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
+		blend.texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE);
 		blend.blend = i * .2f + .2f;
 		terrain.m_textureBlends.push_back(blend);
 	}
 
 
-	terrain.m_material = BuiltInAssets::getByName<Material>(SGE_MATERIAL_TERRAIN_DEFAULT);
+	terrain.m_material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_TERRAIN_DEFAULT);
 	return terrain; // todo fix
 }
 
@@ -357,19 +357,21 @@ void Terrain::syncHeightmap()
 	if (m_heightmap.isEmpty())
 		return;
 
+	auto res = m_heightmap.resource();
+
 	// If CPU buffer size is not the same as GPU buffer size reallocate
-	if (m_heightDataCPU.size() != m_heightmap.get()->getWidth() * m_heightmap.get()->getHeight())
+	if (m_heightDataCPU.size() != res->getWidth() * res->getHeight())
 	{
-		m_heightDataCPU = std::vector<float>(m_heightmap.get()->getWidth() * m_heightmap.get()->getHeight(), 0.0f);
+		m_heightDataCPU = std::vector<float>(res->getWidth() * res->getHeight(), 0.0f);
 	}
 
-	m_heightmap.get()->bind();
+	res->bind();
 
 	glGetTexImage(
 		GL_TEXTURE_2D,
 		0,
-		toGL(m_heightmap.get()->getData().format),
-		toGL(m_heightmap.get()->getData().type),
+		toGL(res->getData().format),
+		toGL(res->getData().type),
 		m_heightDataCPU.data()
 	);
 

@@ -17,6 +17,7 @@
 #include "core/Factory.h"
 #include <GL/glew.h>
 #include "utils/STBIHelper.h"
+#include "geometry/MeshGroup.h"
 
 #include "Utils/MikkTSpaceImpl.h"
 
@@ -212,7 +213,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetRe
 				}
 
 				// Load material asset
-				AssetHandle<Material> material(uuid);
+				AssetHandle<MaterialAsset> material(uuid);
 				modelInfo.materials[matIndex] = material.resource();
 
 				logTrace("Assigned material index {} -> UUID {}", matIndex, uuid);
@@ -387,7 +388,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
-			AssetHandle<Material> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo).as<Material>();
+			AssetHandle<MaterialAsset> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo).as<MaterialAsset>();
 			m_lastImportedMaterials.materials[i] = materialAsset;
 			aInfo.attributes[materialID] = materialAsset.getUID();
 		}
@@ -662,7 +663,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.targetDirectory = aInfo.targetDirectory;
-		AssetTexture = Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc).as<Texture>();
+		AssetTexture = Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc).as<TextureAsset>();
 
 		if (!textureName.empty())
 		{
@@ -688,7 +689,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		tSettings.isEngineOwned = aInfo.isEngineOwned;
 
 		tSettings.usage = Texture::TextureSemantic::Color; // todo fix
-		AssetTexture = Texture::import(path, tSettings);
+		AssetTexture = TextureAsset::import(path, tSettings);
 
 		cachedTextures.insert({ path, AssetTexture });
 	}

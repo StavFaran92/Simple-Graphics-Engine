@@ -3,6 +3,7 @@
 #include "core/Core.h"
 #include "runtime/Entity.h"
 #include "memory/AssetHandle.h"
+#include "texture/Texture.h"
 
 class TextureHandler;
 class Scene;

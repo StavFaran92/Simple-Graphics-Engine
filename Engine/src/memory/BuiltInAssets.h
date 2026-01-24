@@ -43,14 +43,12 @@ public:
 	template<typename T>
 	static AssetHandle<T> getByName(const std::string& name)
 	{
-		UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromName(name);
-		return get<T>(uuid);
+		return Engine::get()->getSubSystem<Assets>()->getAssetFromName(name).as<T>();
 	}
 
 	template<typename T>
 	static AssetHandle<T> getByPath(const std::string& path)
 	{
-		UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(path);
-		return get<T>(uuid);
+		return Engine::get()->getSubSystem<Assets>()->getAssetFromPath(path).as<T>();
 	}
 };

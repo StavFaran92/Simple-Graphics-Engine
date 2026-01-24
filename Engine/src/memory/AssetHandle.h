@@ -36,12 +36,12 @@ public:
 
 	const ResourceWrapper<ResourceType> resource() const
 	{
-		return info().data().as<T>().resourceInner().as<ResourceType>();
+		return info().data().as<T>()->resourceInner().as<ResourceType>();
 	}
 
 	ResourceWrapper<ResourceType> resource()
 	{
-		return info().data().as<T>().resourceInner().as<ResourceType>();
+		return info().data().as<T>()->resourceInner().as<ResourceType>();
 	}
 
 	void erase()
@@ -53,22 +53,6 @@ public:
 	{
 		Engine::get()->getSubSystem<Assets>()->makeDirty(uuid);
 	}
-
-	//void setResource(ResourceWrapper<T> newResource)
-	//{
-	//	//Engine::get()->getSubSystem<Assets>()->getAsset(uuid).resource;
-	//	//res = newResource;
-
-	//	//AssetInfo aInfo = getAsset(asset.getUID());
-	//	//aInfo.update(uDesc);
-
-	//	//AssetFactory::getManager(aInfo.aType)->save(asset, aInfo); // todo check for non engine generated 
-	//	//updateRegistry(aInfo);
-
-	//	//m_assets[aInfo.uuid] = aInfo;
-
-	//	//logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
-	//}
 
 	UUID getUID() const
 	{
@@ -82,7 +66,7 @@ public:
 
 	const AssetRecord& info() const
 	{
-		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
+		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid).info();
 	}
 
 	void reimportAsset()
@@ -90,9 +74,19 @@ public:
 		Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
 	}
 
+	T* operator->()
+	{
+		return get();
+	}
+
+	T* operator->() const
+	{
+		return get();
+	}
+
 	inline T* get() const
 	{
-		return resource().get();
+		return static_cast<T*>(info().asset.get());
 	}
 
 	template <class Archive>

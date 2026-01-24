@@ -2,6 +2,8 @@
 
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
+#include "render/Material.h"
+#include "geometry/MeshGroup.h"
 
 class EngineAPI VolumeComponent : public Component
 {
@@ -16,7 +18,7 @@ public:
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene&);
 
-	AssetHandle<Material> material;
+	AssetHandle<MaterialAsset> material;
 	AssetHandle<MeshGroupAsset> mesh;
 };
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <vector>
 
 #include "core/Core.h"
@@ -11,6 +10,8 @@
 
 #include "utils/Math3D.h"
 #include "texture/Texture.h"
+#include "render/Material.h"
+#include "geometry/MeshGroup.h"
 
 class Entity;
 
@@ -90,7 +91,7 @@ public:
 
 	std::vector<TextureBlend> m_textureBlends {  };
 
-	AssetHandle<Material> m_material;
+	AssetHandle<MaterialAsset> m_material;
 
 	FoliageField m_foliageField;
 

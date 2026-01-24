@@ -57,7 +57,7 @@ void ShaderComponent::parseUniforms(const std::string& sourceCode)
 			uniformProperties[name] = glm::mat4(1.0f);
 		}
 		else if (type == "sampler2D") {
-			customTextures[name] = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
+			customTextures[name] = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE);
 		}
 
 		searchStart = match.suffix().first;

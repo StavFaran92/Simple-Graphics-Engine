@@ -15,6 +15,7 @@
 #include "component/Terrain.h"
 #include <glm/ext.hpp>
 #include "memory/BuiltInResources.h"
+#include "core/ApplicationConstants.h"
 
 FoliageSystem::FoliageSystem()
 {

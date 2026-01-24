@@ -92,7 +92,7 @@ ResourceWrapper<Resource> SceneAssetManager::load(AssetRecord& aInfo)
 	return ResourceWrapper<Resource>::empty;
 }
 
-void SceneAssetManager::save(const AssetHandle<Resource>& scene, const AssetRecord& aInfo)
+void SceneAssetManager::save(AssetHandle<Asset> scene, const AssetRecord& aInfo)
 {
 	
 	auto projectDir = Engine::get()->getProjectDirectory();
@@ -110,21 +110,10 @@ void SceneAssetManager::save(const AssetHandle<Resource>& scene, const AssetReco
 	}
 }
 
-AssetHandle<Scene> Scene::import(const std::string& fileLocation, SceneImportSettings desc)
-{
-	desc.aType = AssetType::SCENE;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Scene>();
-}
-
 ResourceWrapper<Scene> Scene::create()
 {
 	auto scene = Factory<Scene>::create(Engine::get()->getContext());
 	return scene;
-}
-
-void Scene::updateAsset(const AssetHandle<Scene>& scene, AssetUpdateDescriptor desc)
-{
-	Engine::get()->getSubSystem<Assets>()->updateAsset(scene, desc);
 }
 
 struct PlaneGPU {
@@ -155,7 +144,7 @@ void Scene::displayWireframeMesh(Entity e)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-	for (auto& mesh : e.tryGetComponent<MeshRendererComponent>()->mesh.get()->getMeshes())
+	for (auto& mesh : e.tryGetComponent<MeshRendererComponent>()->mesh.resource()->getMeshes())
 	{
 		graphics->entity = e;
 		graphics->shader = m_tempOutlineShader;
@@ -551,7 +540,7 @@ void Scene::draw(float deltaTime)
 				terrainShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 8);
 				terrainShader->setTextureInShader(heightmap, "heightMap", 9);
 
-				terrain.m_material.get()->use();
+				terrain.m_material.resource()->use();
 
 				//int textureCount = terrain.getTextureCount();
 				//m_terrainShader->setUniformValue("textureCount", textureCount);
@@ -743,7 +732,7 @@ void Scene::draw(float deltaTime)
 						m_highlightEdgeDetectionShader->setUniformValue("uTexelSize", texelSize);
 						m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
 
-						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -768,7 +757,7 @@ void Scene::draw(float deltaTime)
 
 						graphics->renderView->bind();
 
-						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -853,14 +842,14 @@ void Scene::draw(float deltaTime)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		m_UIShader->use();
 		m_UIShader->setProjectionMatrix(m_defaultUIProjection);
-		auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+		auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 		for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
 		{
 			Entity entityhandler{ entity, m_registry.get() };
 			graphics->entity = entityhandler;
-			image.image.get()->bind();
-			image.image.get()->setSlot(0);
+			image.image.resource()->bind();
+			image.image.resource()->setSlot(0);
 
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, glm::vec3(image.position, 0.0f));
@@ -967,7 +956,7 @@ void Scene::draw(float deltaTime)
 				//shader->setUniformValue("cameraLookAt", primaryCamera.front);
 
 				// bind mesh
-				auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO(); 
+				auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 				// in frag shader i need access to mesh extentes & main texture -> set uniforms
 
@@ -1320,4 +1309,15 @@ std::shared_ptr<RenderView> Scene::getRenderView(const std::string& name) const
 bool Scene::isSimulationActive() const
 {
 	return m_isSimulationActive;
+}
+
+AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, SceneImportSettings desc)
+{
+	desc.aType = AssetType::SCENE;
+	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<SceneAsset>();
+}
+
+void SceneAsset::update(const AssetHandle<SceneAsset>& scene, AssetUpdateDescriptor desc)
+{
+	Engine::get()->getSubSystem<Assets>()->updateAsset(scene, desc);
 }

@@ -36,7 +36,7 @@ bool IRenderer::prepareMeshForRender(Mesh* mesh, const Entity& entityHandler)
 
 	if (graphics->material.isEmpty())
 	{
-		graphics->material = BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT).resource();
+		graphics->material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
 	}
 
 	return true;
@@ -61,7 +61,7 @@ bool IRenderer::prepareEntityForRender(const Entity& entityHandler)
 		auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
 
 		std::vector<glm::mat4> finalBoneMatrices;
-		animator->getFinalBoneMatrices(meshRenderer.mesh.get(), finalBoneMatrices);
+		animator->getFinalBoneMatrices(meshRenderer.mesh.resource().get(), finalBoneMatrices);
 		for (int i = 0; i < finalBoneMatrices.size(); ++i)
 		{
 			graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);

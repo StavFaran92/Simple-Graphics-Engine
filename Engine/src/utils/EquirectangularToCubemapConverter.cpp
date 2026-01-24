@@ -77,8 +77,8 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 	equirectangularTexture.get()->bind();
 	
 
-	auto box = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_BOX);
-	auto vao = box.get()->getPrimaryMesh()->getVAO();
+	auto box = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX);
+	auto vao = box.resource()->getPrimaryMesh()->getVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -148,8 +148,8 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	cubemapTexture.get()->setSlot(0);
 	cubemapTexture.get()->bind();
 
-	auto quad = BuiltInAssets::getByName<MeshGroup>(SGE_MESH_QUAD);
-	auto vao = quad.get()->getPrimaryMesh()->getVAO();
+	auto quad = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_QUAD);
+	auto vao = quad.resource()->getPrimaryMesh()->getVAO();
 
 	// render to quad
 	// attach cubemap face to fbo

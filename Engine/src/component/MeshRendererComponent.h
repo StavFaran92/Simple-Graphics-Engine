@@ -9,17 +9,17 @@ struct EngineAPI MeshRendererComponent : public Component
 	MeshRendererComponent(AssetHandle<MeshGroupAsset> mesh);
 	MeshRendererComponent() = default;
 
-	void addMaterial(const AssetHandle<Material>& mat)
+	void addMaterial(const AssetHandle<MaterialAsset>& mat)
 	{
 		m_material[count++] = mat;
 	}
 
-	void setMaterial(int index, const AssetHandle<Material>& mat)
+	void setMaterial(int index, const AssetHandle<MaterialAsset>& mat)
 	{
 		m_material[index] = mat;
 	}
 
-	AssetHandle<Material> getMaterialBySlot(int slot) const;
+	AssetHandle<MaterialAsset> getMaterialBySlot(int slot) const;
 
 	ResourceWrapper<Material> at(int index)
 	{
@@ -48,7 +48,7 @@ struct EngineAPI MeshRendererComponent : public Component
 	AssetHandle<MeshGroupAsset> mesh = AssetHandle<MeshGroupAsset>::empty;
 
 	int count = 0;
-	std::unordered_map<int, AssetHandle<Material>> m_material;
+	std::unordered_map<int, AssetHandle<MaterialAsset>> m_material;
 
 	enum class RenderTechnique : int
 	{

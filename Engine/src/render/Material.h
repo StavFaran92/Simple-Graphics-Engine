@@ -187,7 +187,7 @@ public:
 
 	
 	static ResourceWrapper<Material> create(MaterialRenderMode renderMode);
-	//static void updateAsset(const AssetHandle<Material>& material, AssetUpdateDescriptor desc);
+	//static void updateAsset(const AssetHandle<MaterialAsset>& material, AssetUpdateDescriptor desc);
 
 protected:
 
