@@ -86,8 +86,6 @@ public:
 
 	AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset, AssetCreateDescriptor& desc);
 
-	ResourceWrapper<Resource> loadResource(const std::string& fileLocation, AssetCreateDescriptor& desc);
-
 private:
 	void addAsset(AssetRecord& aInfo);
 

@@ -1,166 +1,103 @@
 #pragma once
 
-#include "core/Engine.h"
-#include "memory/MemoryPool.h"
-#include "memory/ResourceManager.h"
+#include <memory>
+#include <type_traits>
+
 #include "core/Configurations.h"
+#include "memory/ResourceBase.h"
 
 template<typename T>
 class ResourceWrapper
 {
 public:
-	static ResourceWrapper<T> empty;
-	static const ResourceID emptyID = 0;
+    static ResourceWrapper<T> empty;
+    static constexpr ResourceID emptyID = 0;
 
-	void init()
-	{
-		if (id != 0)
-		{
-			Engine::get()->getResourceManager()->incRef(id);
-			m_cache = Engine::get()->getMemoryPool().get(id);
-		}
-	}
+    ResourceWrapper() = default;
+    ResourceWrapper(std::nullptr_t) {}
 
-	ResourceWrapper() : id(emptyID) {};
+    template<typename T, typename... Args>
+    static ResourceWrapper<T> createResource(ResourceID id, Args&&... args)
+    {
+        static_assert(std::is_base_of_v<Resource, T>);
 
-	ResourceWrapper(std::nullptr_t) : id(emptyID) {};
+        auto resource = std::make_shared<T>(std::forward<Args>(args)...);
+        return ResourceWrapper<T>(resource, id);
+    }
 
-	explicit ResourceWrapper(ResourceID id) : id(id)
-	{
-		init();
-	};
+    // Copy ctor
+    ResourceWrapper(const ResourceWrapper&) = default;
 
-	// Copy constructor
-	ResourceWrapper(const ResourceWrapper<T>& other) 
-	{
-		id = other.id;
-		init();
-	};
+    // Copy assign
+    ResourceWrapper& operator=(const ResourceWrapper&) = default;
 
-	// Copy assignemnt operator
-	ResourceWrapper<T>& operator=(const ResourceWrapper<T>& other)
-	{
-		if (id == other.id) 
-			return *this;
+    // Move ctor
+    ResourceWrapper(ResourceWrapper&&) noexcept = default;
 
-		clean();
+    // Move assign
+    ResourceWrapper& operator=(ResourceWrapper&&) noexcept = default;
 
-		id = other.id;
-		init();
+    ~ResourceWrapper() = default;
 
-		return *this;
-	};
+    // Access
+    T* operator->()
+    {
+        return get();
+    }
 
-	// Move constructor
-	ResourceWrapper(ResourceWrapper<T>&& other)
-	{
-		id = other.id;
-		m_cache = other.m_cache;
+    const T* operator->() const
+    {
+        return get();
+    }
 
-		other.id = emptyID;
-		other.m_cache = nullptr;
-	};
+    T* get() const
+    {
+        return m_resource
+            ? static_cast<T*>(m_resource.get())
+            : nullptr;
+    }
 
-	// Move Assignment operator
-	ResourceWrapper<T>& operator=(ResourceWrapper<T>&& other) noexcept
-	{
-		clean();
-		id = other.id;
-		m_cache = other.m_cache;
+    bool isEmpty() const
+    {
+        return !m_resource;
+    }
 
-		other.id = emptyID;
-		other.m_cache = nullptr;
+    ResourceID getUID() const
+    {
+        return m_id;
+    }
 
-		return *this;
-	};
+    explicit operator bool() const
+    {
+        return !isEmpty();
+    }
 
-	T* operator->()
-	{
-		return get();
-	}
+    // Upcast (Derived -> Base)
+    template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
+    ResourceWrapper(const ResourceWrapper<U>& other)
+        : m_resource(other.m_resource), m_id(other.m_id)
+    {
+    }
 
-	T* operator->() const
-	{
-		return get();
-	}
-
-	inline T* get() const
-	{
-		return static_cast<T*>(Engine::get()->getMemoryPool().get(id));
-	}
-
-	// TODO reenforce
-
-	//const T* operator->() const
-	//{
-	//	return get();
-	//}
-
-	//T* operator->()
-	//{
-	//	return get();
-	//}
-
-	//const T* get() const
-	//{
-	//	return static_cast<T*>(Engine::get()->getMemoryPool().get(uuid));
-	//}
-
-	//const T* get() const
-	//{
-	//	return static_cast<T*>(Engine::get()->getMemoryPool().get(uuid));
-	//}
-
-	inline ResourceID getUID() const 
-	{ 
-		return id; 
-	}
-
-	bool isEmpty() const
-	{
-		return id == emptyID;
-	}
-
-	~ResourceWrapper<T>() // destructor
-	{
-		if(id != emptyID)
-			clean();
-	}
-
-	// Upcast (texture -> asset)
-	template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
-	ResourceWrapper(const ResourceWrapper<U>& other) 
-	{
-		id = other.getUID();
-		init();
-	}
-
-	// Downcast (Asset -> Texture)
-	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
-	ResourceWrapper<U> as() const
-	{
-		return ResourceWrapper<U>(id);
-	}
+    // Downcast (Base -> Derived)
+    template<typename U>
+    ResourceWrapper<U> as() const
+    {
+        return ResourceWrapper<U>(m_resource, m_id);
+    }
 
 private:
-	template<typename T>friend class Factory;
+    // Construct from shared_ptr
+    explicit ResourceWrapper(std::shared_ptr<Resource> resource, ResourceID id)
+        : m_resource(std::move(resource)), m_id(id)
+    {
+    }
 
-	void clean()
-	{
-		if (Engine::get()->getResourceManager()->decRef(id) == 0)
-		{
-			if (id != emptyID)
-			{
-				Engine::get()->getMemoryPool().erase(id);
-			}
+    template<typename U> friend class ResourceWrapper;
 
-			id = emptyID;
-		}
-	}
-protected:
-	ResourceID id = emptyID;
-	mutable Resource* m_cache = nullptr;
+    std::shared_ptr<Resource> m_resource;
+    ResourceID m_id = emptyID;
 };
 
 template<typename T>
-inline ResourceWrapper<T> ResourceWrapper<T>::empty;
+ResourceWrapper<T> ResourceWrapper<T>::empty{};

@@ -353,32 +353,6 @@ AssetHandle<Asset> Assets::createAsset(const ResourceWrapper<Resource>& resource
 	return asset;
 }
 
-// TODO maybe remove this to a resource loader? doesnt really belong here...
-ResourceWrapper<Resource> Assets::loadResource(const std::string& fileLocation, AssetCreateDescriptor& desc)
-{
-	desc.origFilePath = fileLocation;
-	desc.isTransient = true;
-
-	AssetRecord aInfo(desc);
-
-	// Validate input
-	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
-	{
-		logError("Invalid asset path specified.");
-		return ResourceWrapper<Resource>::empty;
-	}
-
-	// Load
-	ResourceWrapper<Resource> resource = AssetFactory::getManager(aInfo.aType)->load(aInfo);
-	if (resource.isEmpty() || !resource.get())
-	{
-		logError("Failed to load file {}", fileLocation);
-		return ResourceWrapper<Resource>::empty;
-	}
-
-	return resource;
-}
-
 void Assets::deleteAsset(AssetHandle<Asset> asset)
 {
 	AssetRecord aInfo = asset.info();

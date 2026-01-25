@@ -1,5 +1,7 @@
 #include "memory/ResourceManager.h"
 
+#include "core/Logger.h"
+
 std::string ResourceManager::getRootDir() const
 {
 	return m_rootResourceDir;
@@ -10,22 +12,22 @@ void ResourceManager::setRootDir(const std::string& rootDir)
 	m_rootResourceDir = rootDir;
 }
 
-int ResourceManager::getRefCount(ResourceID id) const
+ResourceWrapper<Resource> ResourceManager::loadResource(const std::string& fileLocation, ResourceLoadDescriptor& desc)
 {
-    auto iter = m_resourceRefCount.find(id);
-    if (iter != m_resourceRefCount.end())
-    {
-        return iter->second;
-    }
-    return 0;
-}
+	// Validate input
+	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+	{
+		logError("Invalid asset path specified.");
+		return ResourceWrapper<Resource>::empty;
+	}
 
-int ResourceManager::incRef(ResourceID id)
-{
-    return ++m_resourceRefCount[id];
-}
+	// Load
+	ResourceWrapper<Resource> resource = AssetFactory::getManager(desc.aType)->load(desc);
+	if (resource.isEmpty() || !resource.get())
+	{
+		logError("Failed to load file {}", fileLocation);
+		return ResourceWrapper<Resource>::empty;
+	}
 
-int ResourceManager::decRef(ResourceID id)
-{
-    return --m_resourceRefCount[id];
+	return resource;
 }
