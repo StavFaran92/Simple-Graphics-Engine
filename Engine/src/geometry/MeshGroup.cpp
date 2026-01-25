@@ -6,32 +6,32 @@
 #include "core/Factory.h"
 #include "core/Engine.h"
 
-namespace {
-	struct MeshManagerRegistration {
-		MeshManagerRegistration() {
-			AssetFactory::registerManager(AssetType::MESH, std::make_shared<MeshGroupAssetManager>());
-		}
-	} _meshManagerRegistration;
-}
-
-bool MeshGroupAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
-}
-
-ResourceWrapper<Resource> MeshGroupAssetManager::load(AssetRecord& aInfo)
-{
-	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
-	ModelImporter::ModelInfo mInfo;
-	mInfo.mesh = mesh;
-	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
-	return mesh;
-}
-
-void MeshGroupAssetManager::save(AssetHandle<Asset> mesh, const AssetRecord& aInfo)
-{
-	MeshExporter::exportMesh(mesh.as<MeshGroupAsset>());
-}
+//namespace {
+//	struct MeshManagerRegistration {
+//		MeshManagerRegistration() {
+//			AssetFactory::registerManager(AssetType::MESH, std::make_shared<MeshGroupAssetManager>());
+//		}
+//	} _meshManagerRegistration;
+//}
+//
+//bool MeshGroupAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+//{
+//	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
+//}
+//
+//ResourceWrapper<Resource> MeshGroupAssetManager::load(AssetRecord& aInfo)
+//{
+//	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
+//	ModelImporter::ModelInfo mInfo;
+//	mInfo.mesh = mesh;
+//	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
+//	return mesh;
+//}
+//
+//void MeshGroupAssetManager::save(AssetHandle<Asset> mesh, const AssetRecord& aInfo)
+//{
+//	MeshExporter::exportMesh(mesh.as<MeshGroupAsset>());
+//}
 
 void MeshGroup::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
@@ -115,6 +115,11 @@ bool MeshGroupAsset::copyFiles(const std::string& fileLocation, AssetRecord& aIn
 	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
 }
 
+void MeshGroupAsset::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
+{
+	MeshExporter::exportMesh(asset.as<MeshGroupAsset>());
+}
+
 //ResourceWrapper<MeshGroup> MeshGroupAsset::resource() const
 //{
 //	return resourceInner().as<MeshGroup>();
@@ -125,6 +130,12 @@ ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, Mode
 	aDesc.aType = AssetType::MESH;
 	aDesc.origFilePath = fileLocation;
 	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, aDesc).as<MeshGroup>();
+
+	//ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
+	//ModelImporter::ModelInfo mInfo;
+	//mInfo.mesh = mesh;
+	//Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
+	//return mesh;
 }
 
 

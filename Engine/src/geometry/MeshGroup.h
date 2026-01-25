@@ -8,12 +8,12 @@
 #include "geometry/ModelImporter.h"
 
 // Asset IO Manager
-struct MeshGroupAssetManager : public AssetManager
-{
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
-	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
-};
+//struct MeshGroupAssetManager : public AssetManager
+//{
+//	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
+//	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
+//	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
+//};
 
 // Resource
 class EngineAPI MeshGroup : public Resource
@@ -55,7 +55,10 @@ public:
 
 	const std::vector<AssetHandle<MaterialAsset>>& getImportedMaterials() const;
 
+	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
+protected:
 	bool copyFiles(const std::string& fileLocation, AssetRecord&) override;
+
 
 private:
 	std::vector<AssetHandle<MaterialAsset>> m_importedMaterials;
