@@ -87,6 +87,7 @@ public:
 	//AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset, AssetCreateDescriptor& desc);
 
 	void addAsset(AssetRecord& aInfo);
+	void updateAsset(AssetRecord& aInfo);
 private:
 
 	void updateRegistry(const AssetRecord& aInfo);

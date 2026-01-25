@@ -212,8 +212,3 @@ void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 
 	establishFilepath();
 }
-
-const Asset* AssetRecord::getAsset() const
-{
-	return asset.get();
-}

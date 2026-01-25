@@ -57,3 +57,34 @@ void Asset::reimportAsset()
 	AssetRecord aInfo = Engine::get()->getSubSystem<Assets>()->getAsset(m_uuid).info();
 	importAssetInner(aInfo);
 }
+
+AssetHandle<Asset> Asset::createAsset(const ResourceWrapper<Resource>& resource)
+{
+	// Add asset info
+	AssetRecord aInfo(m_createDesc);
+	aInfo.asset = this;
+	aInfo.parse();
+	aInfo.resourceID = resource.getUID();
+
+	// Store for later use
+	m_uuid = aInfo.uuid;
+
+	AssetHandle<Asset> asset(aInfo.uuid);
+
+	// Save asset
+	save(asset, aInfo);
+
+	return asset;
+}
+
+
+void Asset::updateAsset(const AssetHandle<Asset>& asset, const AssetUpdateDescriptor& uDesc)
+{
+	AssetRecord aInfo = Engine::get()->getSubSystem<Assets>()->getAsset(m_uuid).info();
+	aInfo.update(uDesc);
+
+	// Save asset
+	save(asset, aInfo);
+
+	Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
+}

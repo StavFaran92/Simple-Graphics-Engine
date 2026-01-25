@@ -118,15 +118,11 @@ void MeshGroupAsset::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
 
 ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, ModelImportSettings aDesc)
 {
-	aDesc.aType = AssetType::MESH;
-	aDesc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, aDesc).as<MeshGroup>();
-
-	//ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
-	//ModelImporter::ModelInfo mInfo;
-	//mInfo.mesh = mesh;
-	//Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
-	//return mesh;
+	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
+	ModelImporter::ModelInfo mInfo;
+	mInfo.mesh = mesh;
+	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
+	return mesh;
 }
 
 

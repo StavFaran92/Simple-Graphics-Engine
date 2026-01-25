@@ -16,7 +16,7 @@ public:
 
 	AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset);
 
-	void updateAsset(AssetHandle<Asset> asset);
+	void updateAsset(const AssetHandle<Asset>& asset, const AssetUpdateDescriptor& uDesc);
 
 	void reimportAsset();
 

@@ -7,14 +7,6 @@
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
-// Asset IO Manager
-//struct MeshGroupAssetManager : public AssetManager
-//{
-//	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
-//	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-//	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
-//};
-
 // Resource
 class EngineAPI MeshGroup : public Resource
 {

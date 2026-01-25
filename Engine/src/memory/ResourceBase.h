@@ -9,6 +9,8 @@ public:
 	Resource() = default;
 	virtual ~Resource() = default;
 
+	//ResourceWrapper<Resource> loadResource(const std::string& fileLocation);
+
 	template<typename T>
 	static ResourceWrapper<T> createNewResource(ResourceID id)
 	{

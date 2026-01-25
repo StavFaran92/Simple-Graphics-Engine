@@ -29,11 +29,9 @@ struct EngineAPI AssetRecord
 	nlohmann::json importSettings;
 	Asset* asset = nullptr;
 	ResourceID resourceID = 0;
-
 	bool isDirty = false;
 
 	bool m_isParsed = false;
-
 
 	~AssetRecord() = default;
 
@@ -45,7 +43,6 @@ struct EngineAPI AssetRecord
 
 	bool isParsed() const;
 
-	const Asset* getAsset() const;
 	void update(const AssetUpdateDescriptor& desc);
 	void establishFilepath();
 };
