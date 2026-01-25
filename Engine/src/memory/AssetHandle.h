@@ -75,7 +75,7 @@ public:
 
 	void reimportAsset()
 	{
-		Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
+		get()->reimportAsset();
 	}
 
 	T* operator->()

@@ -44,7 +44,16 @@ AssetHandle<Asset> Asset::importAsset(const std::string& fileLocation)
 		return AssetHandle<Asset>::empty;
 	}
 
+	// Store for later use
+	m_uuid = aInfo.uuid;
+
 	AssetHandle<Asset> asset(aInfo.uuid);
 
 	return asset;
+}
+
+void Asset::reimportAsset()
+{
+	AssetRecord aInfo = Engine::get()->getSubSystem<Assets>()->getAsset(m_uuid).info();
+	importAssetInner(aInfo);
 }

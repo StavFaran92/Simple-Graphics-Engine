@@ -30,6 +30,8 @@ protected:
 protected:
 	AssetCreateDescriptor* m_createDesc = nullptr;
 
+	UUID m_uuid = EMPTY_UUID;
+
 	//ResourceWrapper<Resource> resourceInner() const
 	//{
 	//	return m_resource;

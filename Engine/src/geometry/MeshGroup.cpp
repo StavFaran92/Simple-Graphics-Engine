@@ -93,10 +93,6 @@ int MeshGroup::getMaterialCount() const
 	return m_materialSlots.size();
 }
 
-//MeshGroupAsset::MeshGroupAsset(const Asset& asset) : Asset(asset)
-//{
-//}
-
 AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocation, ModelImportSettings desc)
 {
 	desc.aType = AssetType::MESH;
@@ -119,11 +115,6 @@ void MeshGroupAsset::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
 {
 	MeshExporter::exportMesh(asset.as<MeshGroupAsset>());
 }
-
-//ResourceWrapper<MeshGroup> MeshGroupAsset::resource() const
-//{
-//	return resourceInner().as<MeshGroup>();
-//}
 
 ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, ModelImportSettings aDesc)
 {
