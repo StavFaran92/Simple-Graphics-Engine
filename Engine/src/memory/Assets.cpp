@@ -113,7 +113,9 @@ void Assets::loadAssetsDatabase()
 
 	for (auto& assetInfo : assets)
 	{
-		assetInfo.data().m_resource = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
+		//auto& resource = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
+		//ResourceID id = resource.getUID();
+		//assetInfo.resourceID = id;
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
 }
@@ -192,16 +194,16 @@ bool Assets::importAssetInner(AssetRecord& aInfo)
 	}
 
 	// Load
-	ResourceWrapper<Resource> resource = AssetFactory::getManager(aInfo.aType)->load(aInfo);
-	if (resource.isEmpty() || !resource.get())
-	{
-		logError("Failed to load file {}", fileLocation);
-		return false;
-	}
+	//ResourceWrapper<Resource> resource = AssetFactory::getManager(aInfo.aType)->load(aInfo);
+	//if (resource.isEmpty() || !resource.get())
+	//{
+	//	logError("Failed to load file {}", fileLocation);
+	//	return false;
+	//}
 
 
-	// Add Asset
-	aInfo.data().m_resource = resource;
+	//// Add Asset
+	//aInfo.data().m_resource = resource;
 	addAsset(aInfo);
 
 	return true;
@@ -339,7 +341,7 @@ AssetHandle<Asset> Assets::createAsset(const ResourceWrapper<Resource>& resource
 {
 	// Add asset info
 	AssetRecord aInfo(desc);
-	aInfo.data().m_resource = resource;
+	aInfo.resourceID = resource.getUID();
 	addAsset(aInfo);
 
 	// Create asset

@@ -18,8 +18,14 @@ public:
 
     int decRef(ResourceID uuid);
 
+    //ResourceWrapper<Resource> getResource(ResourceID) const;
+
+
+
 private:
 	std::string m_rootResourceDir;
 
     std::unordered_map<ResourceID, int> m_resourceRefCount;
+
+    //std::unordered_map<ResourceID, ResourceWrapper<Resource>> m_resources;
 };

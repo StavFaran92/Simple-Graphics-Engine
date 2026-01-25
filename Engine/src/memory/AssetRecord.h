@@ -37,6 +37,7 @@ struct EngineAPI AssetRecord
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	nlohmann::json importSettings;
 	std::shared_ptr<Asset> asset;
+	ResourceID resourceID = 0;
 
 	bool isDirty = false;
 

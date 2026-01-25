@@ -10,13 +10,13 @@ class Asset
 public:
 	using ResourceType = Resource;
 
-	ResourceWrapper<Resource> resourceInner() const
-	{
-		return m_resource;
-	}
+	//ResourceWrapper<Resource> resourceInner() const
+	//{
+	//	return m_resource;
+	//}
 
-protected:
-	ResourceWrapper<Resource> m_resource;
+//public: // TODO fix this, I will move resource out of asset into resource manager
+	//ResourceWrapper<Resource> m_resource;
 };
 
 template<AssetType T>

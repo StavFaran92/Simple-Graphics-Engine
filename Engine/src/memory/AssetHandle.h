@@ -36,12 +36,12 @@ public:
 
 	const ResourceWrapper<ResourceType> resource() const
 	{
-		return get()->resourceInner().as<ResourceType>();
+		return ResourceWrapper<ResourceType>(info().resourceID);
 	}
 
 	ResourceWrapper<ResourceType> resource()
 	{
-		return get()->resourceInner().as<ResourceType>();
+		return ResourceWrapper<ResourceType>(info().resourceID);
 	}
 
 	void erase()
