@@ -103,6 +103,11 @@ AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocati
 	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MeshGroupAsset>();
 }
 
+const std::vector<AssetHandle<MaterialAsset>>& MeshGroupAsset::getImportedMaterials() const
+{
+	return m_importedMaterials;
+}
+
 //ResourceWrapper<MeshGroup> MeshGroupAsset::resource() const
 //{
 //	return resourceInner().as<MeshGroup>();

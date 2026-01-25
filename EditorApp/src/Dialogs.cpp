@@ -170,18 +170,19 @@ void displayTextureSelectDialog()
 
 		static int selectedTextureIndex = -1;
 
-		auto& textureList = assets->getAllAssetsOfType(AssetType::TEXTURE);
+		const auto& textureRecordList = assets->getAllRecordsOfType(AssetType::TEXTURE);
 
-		if (selectedTextureIndex != -1)
+		if (selectedTextureIndex != -1 && selectedTextureIndex < textureRecordList.size())
 		{
-			ResourceWrapper<Texture> displayTexture = textureList.at(selectedTextureIndex).as<TextureAsset>().resource();
+			AssetHandle<TextureAsset> textureHandle = AssetHandle<TextureAsset>(textureRecordList.at(selectedTextureIndex)->uuid);
+			ResourceWrapper<Texture> displayTexture = textureHandle.resource();
 			ImVec2 imageSize(150, 150);
 			ImGui::Image(reinterpret_cast<ImTextureID>(displayTexture.get()->getID()), imageSize, ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
 		}
 
 		ImGui::Separator();
 
-		for (int i = 0; i < textureList.size(); i++)
+		for (int i = 0; i < textureRecordList.size(); i++)
 		{
 			bool isSelected = (selectedTextureIndex == i);
 			if (isSelected)
@@ -193,7 +194,7 @@ void displayTextureSelectDialog()
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
 			}
 
-			if (ImGui::Selectable(textureList[i].name.c_str(), false, ImGuiSelectableFlags_DontClosePopups))
+			if (ImGui::Selectable(textureRecordList[i]->name.c_str(), false, ImGuiSelectableFlags_DontClosePopups))
 			{
 				selectedTextureIndex = i;
 			}
@@ -204,9 +205,9 @@ void displayTextureSelectDialog()
 		ImGui::Separator();
 
 		if (ImGui::Button("OK")) {
-			if (selectedTextureIndex >= 0 && selectedTextureIndex < textureList.size())
+			if (selectedTextureIndex >= 0 && selectedTextureIndex < textureRecordList.size())
 			{
-				EditorState::Instance().assetTextureSelectCB(textureList[selectedTextureIndex].uuid);
+				EditorState::Instance().assetTextureSelectCB(textureRecordList[selectedTextureIndex]->uuid);
 
 			}
 			ImGui::CloseCurrentPopup();
@@ -480,7 +481,7 @@ void displayMaterialEditDialog()
 	{
 		ImGui::OpenPopup("Edit Material");
 		
-		previousMaterial = EditorState::Instance().selectedMaterialForEdit.get()->clone(true);
+		previousMaterial = EditorState::Instance().selectedMaterialForEdit.resource()->clone(true);
 		EditorState::Instance().showMaterialEditWindow = false;
 	}
 	if (ImGui::BeginPopupModal("Edit Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))

@@ -40,13 +40,14 @@ bool ModelImportDialog::acceptContent()
 
 		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
 
-		auto& materials = MeshGroup::getLastLoadedMaterials();
+		auto& materials = mesh->getImportedMaterials();
 
-		for (auto& [idx, m] : materials)
-		{
-			meshRenderer.setMaterial(idx, m);
+		// TODO fix
+		//for (auto& [idx, m] : materials)
+		//{
+		//	meshRenderer.setMaterial(idx, m);
 
-		}
+		//}
 
 		ResourceWrapper<Prefab> prefab = Prefab::create(entity);
 

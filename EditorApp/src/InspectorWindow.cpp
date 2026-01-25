@@ -160,7 +160,7 @@ void InspectorWindow::display()
 			BEGIN_IMGUI_TABLE("Mesh");
 
 			addTableRow("Vertices count:", [&](std::string id) {
-				rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()));
+				rightAlignedText(std::to_string((int)meshComponent.mesh.resource()->getNumOfVertices()));
 			});
 
 			END_IMGUI_TABLE();
@@ -177,7 +177,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uuid) {
-				meshComponent.mesh = AssetHandle<MeshGroup>(uuid);
+				meshComponent.mesh = AssetHandle<MeshGroupAsset>(uuid);
 			});
 
 			if (ImGui::CollapsingHeader("Materials"))
@@ -403,7 +403,7 @@ void InspectorWindow::display()
 					}
 
 					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uuid) {
-						animator.addAnimation(name, AssetHandle<Animation>(uuid));
+						animator.addAnimation(name, AssetHandle<AnimationAsset>(uuid));
 					});
 
 
@@ -426,7 +426,7 @@ void InspectorWindow::display()
 			if (ImGui::Button("+")) {
 				int animationsCount = animations.size();
 				std::string newAnimationName = "New Animation_" + std::to_string(animationsCount);
-				animator.addAnimation(newAnimationName, AssetHandle<Animation>::empty);
+				animator.addAnimation(newAnimationName, AssetHandle<AnimationAsset>::empty);
 				eState.animationRenameBuffers.push_back(newAnimationName);
 			}
 		});
@@ -578,7 +578,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uuid) {
-				script.script = AssetHandle<LuaScript>(uuid);
+				script.script = AssetHandle<LuaScriptAsset>(uuid);
 			});
 		});
 
@@ -590,7 +590,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(shaderName, AssetType::SHADER, [&postProcessComponent](UUID uuid) {
-				postProcessComponent.shader = AssetHandle<Shader>(uuid);
+				postProcessComponent.shader = AssetHandle<ShaderAsset>(uuid);
 			});
 				
 			if (!postProcessComponent.shader.isEmpty())
@@ -636,7 +636,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&volume](UUID uuid) {
-				volume.mesh = AssetHandle<MeshGroup>(uuid);
+				volume.mesh = AssetHandle<MeshGroupAsset>(uuid);
 				});
 
 			std::string matName = "None";

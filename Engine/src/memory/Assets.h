@@ -48,7 +48,11 @@ public:
 
 	std::vector<AssetHandle<Asset>> getAllAssetsOfType(AssetType aType) const;
 
+	std::vector<const AssetRecord*> getAllRecordsOfType(AssetType aType) const;
+
 	std::vector<AssetHandle<Asset>> getAllAssets() const;
+
+	std::vector<const AssetRecord*> getAllRecords() const;
 
 	void loadAssetsDatabase();
 

@@ -66,6 +66,21 @@ std::vector<AssetHandle<Asset>> Assets::getAllAssetsOfType(AssetType aType) cons
 	return result;
 }
 
+std::vector<const AssetRecord*> Assets::getAllRecordsOfType(AssetType aType) const
+{
+	std::vector<const AssetRecord*> records;
+
+	const auto& handles = getAllAssetsOfType(aType);
+	records.reserve(handles.size());
+
+	for (const AssetHandle<Asset>& handle : handles)
+	{
+		records.push_back(&getInfo(handle.getUID()));
+	}
+
+	return records;
+}
+
 std::vector<AssetHandle<Asset>> Assets::getAllAssets() const
 {
 	std::vector<AssetHandle<Asset>> result;
@@ -75,6 +90,19 @@ std::vector<AssetHandle<Asset>> Assets::getAllAssets() const
 		result.push_back(asset);
 	}
 	return result;
+}
+
+std::vector<const AssetRecord*> Assets::getAllRecords() const
+{
+	std::vector<const AssetRecord*> records;
+	records.reserve(m_assets.size());
+
+	for (const auto& [id, record] : m_assets)
+	{
+		records.push_back(&record);
+	}
+
+	return records;
 }
 
 void Assets::loadAssetsDatabase()

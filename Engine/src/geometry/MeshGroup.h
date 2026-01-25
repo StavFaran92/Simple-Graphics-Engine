@@ -49,4 +49,9 @@ class EngineAPI MeshGroupAsset : public Asset
 public:
 	using ResourceType = MeshGroup;
 	static AssetHandle<MeshGroupAsset> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
+
+	const std::vector<AssetHandle<MaterialAsset>>& getImportedMaterials() const;
+
+private:
+	std::vector<AssetHandle<MaterialAsset>> m_importedMaterials;
 };
