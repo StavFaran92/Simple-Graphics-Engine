@@ -70,9 +70,9 @@ public:
 
 	void deleteAsset(AssetHandle<Asset> asset);
 
-	void updateAsset(AssetHandle<Asset> asset, const AssetUpdateDescriptor& uDesc = {});
+	//void updateAsset(AssetHandle<Asset> asset, const AssetUpdateDescriptor& uDesc = {});
 
-	void reimportAsset(UUID uuid);
+	//void reimportAsset(UUID uuid);
 
 	void makeDirty(UUID uuid);
 
@@ -82,12 +82,12 @@ public:
 
 	//void removeAssetDependency(UUID asset, UUID dependency);
 
-	AssetHandle<Asset> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
+	//AssetHandle<Asset> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
 
-	AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset, AssetCreateDescriptor& desc);
+	//AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset, AssetCreateDescriptor& desc);
 
-private:
 	void addAsset(AssetRecord& aInfo);
+private:
 
 	void updateRegistry(const AssetRecord& aInfo);
 

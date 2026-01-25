@@ -36,8 +36,9 @@ public:
 
 	const ResourceWrapper<ResourceType> resource() const
 	{
-		return ResourceManager::get()->createOrGetCached(info().resourceID, []() {
-			
+		return ResourceManager::get()->createOrGetCached(info().resourceID, [this]() {
+
+			return ResourceType::load();
 		}); // TODO - this should be used here
 		//return ResourceWrapper<ResourceType>(info().resourceID);
 	}
