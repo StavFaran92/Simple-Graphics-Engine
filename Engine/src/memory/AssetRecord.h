@@ -46,7 +46,7 @@ struct EngineAPI AssetRecord
 
 	AssetRecord(const AssetCreateDescriptor& assetDesc);
 
-	AssetHandle<Asset> data() const;
+	const Asset* getAsset() const;
 	void update(const AssetUpdateDescriptor& desc);
 	void establishFilepath();
 };

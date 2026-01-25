@@ -200,7 +200,7 @@ void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 	establishFilepath();
 }
 
-AssetHandle<Asset> AssetRecord::data() const
+const Asset* AssetRecord::getAsset() const
 {
-	return AssetHandle<Asset>(uuid);
+	return asset.get();
 }
