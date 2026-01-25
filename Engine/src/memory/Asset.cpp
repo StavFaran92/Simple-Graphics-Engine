@@ -69,11 +69,10 @@ AssetHandle<Asset> Asset::createAsset(const ResourceWrapper<Resource>& resource)
 	// Store for later use
 	m_uuid = aInfo.uuid;
 
-	AssetHandle<Asset> asset(aInfo.uuid);
-
 	// Save asset
-	save(asset, aInfo);
+	save(aInfo);
 
+	AssetHandle<Asset> asset(aInfo.uuid);
 	return asset;
 }
 
@@ -84,7 +83,7 @@ void Asset::updateAsset(const AssetHandle<Asset>& asset, const AssetUpdateDescri
 	aInfo.update(uDesc);
 
 	// Save asset
-	save(asset, aInfo);
+	save(aInfo);
 
 	Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
 }

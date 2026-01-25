@@ -70,29 +70,14 @@ public:
 
 	void deleteAsset(AssetHandle<Asset> asset);
 
-	//void updateAsset(AssetHandle<Asset> asset, const AssetUpdateDescriptor& uDesc = {});
-
-	//void reimportAsset(UUID uuid);
-
 	void makeDirty(UUID uuid);
 
-	//std::vector<Asset> getAssetDependancies(UUID uuid) const;
-
-	//void addAssetDependency(UUID asset, UUID dependency);
-
-	//void removeAssetDependency(UUID asset, UUID dependency);
-
-	//AssetHandle<Asset> importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc);
-
-	//AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset, AssetCreateDescriptor& desc);
-
 	void addAsset(AssetRecord& aInfo);
+
 	void updateAsset(AssetRecord& aInfo);
 private:
 
 	void updateRegistry(const AssetRecord& aInfo);
-
-	bool importAssetInner(AssetRecord& aInfo);
 private:
 	std::unordered_map<UUID, AssetRecord> m_assets;
 };
