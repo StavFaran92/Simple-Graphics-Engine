@@ -4,6 +4,7 @@
 
 #include "geometry/MeshExporter.h"
 #include "core/Factory.h"
+#include "core/Engine.h"
 
 namespace {
 	struct MeshManagerRegistration {
@@ -100,13 +101,18 @@ AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocati
 {
 	desc.aType = AssetType::MESH;
 	desc.isCompositeAsset = true;
-	MeshGroupAsset asset(desc);
-	return asset.importAsset(fileLocation).as<MeshGroupAsset>();
+	MeshGroupAsset* asset = new MeshGroupAsset(&desc);
+	return asset->importAsset(fileLocation).as<MeshGroupAsset>();
 }
 
 const std::vector<AssetHandle<MaterialAsset>>& MeshGroupAsset::getImportedMaterials() const
 {
 	return m_importedMaterials;
+}
+
+bool MeshGroupAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+{
+	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
 }
 
 //ResourceWrapper<MeshGroup> MeshGroupAsset::resource() const

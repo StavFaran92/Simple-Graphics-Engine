@@ -48,9 +48,14 @@ class EngineAPI MeshGroupAsset : public Asset
 {
 public:
 	using ResourceType = MeshGroup;
+
+	using Asset::Asset;
+
 	static AssetHandle<MeshGroupAsset> import(const std::string& fileLocation, ModelImportSettings aDesc = {});
 
 	const std::vector<AssetHandle<MaterialAsset>>& getImportedMaterials() const;
+
+	bool copyFiles(const std::string& fileLocation, AssetRecord&) override;
 
 private:
 	std::vector<AssetHandle<MaterialAsset>> m_importedMaterials;

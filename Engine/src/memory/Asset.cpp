@@ -4,9 +4,14 @@
 #include "memory/Assets.h"
 #include "core/Engine.h"
 
+Asset::Asset(AssetCreateDescriptor* desc)
+{
+	*m_createDesc = *desc;
+}
+
 bool Asset::importAssetInner(AssetRecord& aInfo)
 {
-	std::string fileLocation = aInfo.origFilePath;
+	std::string fileLocation = aInfo.createDescriptor->origFilePath;
 
 	// Validate input
 	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -29,8 +34,10 @@ bool Asset::importAssetInner(AssetRecord& aInfo)
 
 AssetHandle<Asset> Asset::importAsset(const std::string& fileLocation)
 {
-	desc.origFilePath = fileLocation;
-	AssetRecord aInfo(desc);
+	AssetRecord aInfo(m_createDesc);
+	aInfo.createDescriptor->origFilePath = fileLocation;
+	aInfo.asset = this;
+	aInfo.parse();
 
 	if (!importAssetInner(aInfo))
 	{

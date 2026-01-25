@@ -10,6 +10,8 @@ class Asset
 public:
 	using ResourceType = Resource;
 
+	Asset(AssetCreateDescriptor* desc);
+
 	AssetHandle<Asset> importAsset(const std::string& fileLocation);
 
 	AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset);
@@ -22,6 +24,9 @@ protected:
 	virtual bool copyFiles(const std::string& fileLocation, AssetRecord&) = 0;
 
 	bool importAssetInner(AssetRecord& aInfo);
+
+protected:
+	AssetCreateDescriptor* m_createDesc = nullptr;
 
 	//ResourceWrapper<Resource> resourceInner() const
 	//{

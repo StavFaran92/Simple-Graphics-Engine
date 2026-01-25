@@ -12,7 +12,6 @@ struct AssetCreateDescriptor;
 struct AssetUpdateDescriptor;
 class Asset;
 
-
 template<typename T>
 class AssetHandle;
 
@@ -20,32 +19,31 @@ using json = nlohmann::json;
 
 struct EngineAPI AssetRecord
 {
+	AssetCreateDescriptor* createDescriptor = nullptr;
 	bool isValid = false;
 	std::string relativefilePath;
 	std::string fullFilePath;
 	std::string fileName;
 	std::string ext;
 	UUID uuid = EMPTY_UUID;
-	std::string origFilePath;
-	std::string assetDirectory;
-	ScopedPath targetDirectory;
-	AssetType aType = AssetType::NONE;
-	std::map<std::string, std::string> attributes;
-	std::string name;
-	bool isEngineOwned = false;
-	bool isTransient = false;
-	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	nlohmann::json importSettings;
-	std::shared_ptr<Asset> asset;
+	Asset* asset = nullptr;
 	ResourceID resourceID = 0;
 
 	bool isDirty = false;
+
+	bool m_isParsed = false;
+
 
 	~AssetRecord() = default;
 
 	AssetRecord() = default;
 
-	AssetRecord(const AssetCreateDescriptor& assetDesc);
+	AssetRecord(AssetCreateDescriptor* assetDesc);
+
+	void parse();
+
+	bool isParsed() const;
 
 	const Asset* getAsset() const;
 	void update(const AssetUpdateDescriptor& desc);
