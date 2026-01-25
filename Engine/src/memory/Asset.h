@@ -10,6 +10,19 @@ class Asset
 public:
 	using ResourceType = Resource;
 
+	static AssetHandle<Asset> importAsset(const std::string& fileLocation);
+
+	static AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset);
+
+	static void updateAsset(AssetHandle<Asset> asset);
+
+	static void reimportAsset();
+
+protected:
+	virtual bool copyFiles(const std::string& fileLocation, AssetRecord&) = 0;
+
+	static bool importAssetInner(AssetRecord& aInfo);
+
 	//ResourceWrapper<Resource> resourceInner() const
 	//{
 	//	return m_resource;

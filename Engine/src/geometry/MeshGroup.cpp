@@ -100,7 +100,8 @@ AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocati
 {
 	desc.aType = AssetType::MESH;
 	desc.isCompositeAsset = true;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MeshGroupAsset>();
+	MeshGroupAsset asset(desc);
+	return asset.importAsset(fileLocation).as<MeshGroupAsset>();
 }
 
 const std::vector<AssetHandle<MaterialAsset>>& MeshGroupAsset::getImportedMaterials() const
