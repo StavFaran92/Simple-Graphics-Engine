@@ -121,9 +121,6 @@ void Assets::loadAssetsDatabase()
 
 	for (auto& assetInfo : assets)
 	{
-		//auto& resource = AssetFactory::getManager(assetInfo.aType)->load(assetInfo);
-		//ResourceID id = resource.getUID();
-		//assetInfo.resourceID = id;
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
 }
@@ -135,7 +132,7 @@ void Assets::saveDirtyAssets()
 		if (assetInfo.isDirty)
 		{
 			AssetHandle<Asset> asset = getAsset(uuid);
-			AssetFactory::getManager(assetInfo.createDescriptor->aType)->save(asset, assetInfo);
+			asset->save(asset.info());
 			assetInfo.isDirty = false;
 		}
 	}
@@ -227,18 +224,18 @@ AssetHandle<Asset> Assets::getAssetFromName(const std::string& name) const
 	return Engine::get()->getMemoryManagementSystem()->getUUIDFromName(name);
 }
 
-void Assets::updateAsset(AssetHandle<Asset> asset, const AssetUpdateDescriptor& uDesc)
-{
-	AssetRecord aInfo = getAsset(asset.getUID()).info();
-	aInfo.update(uDesc);
-
-	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo); // todo check for non engine generated 
-	updateRegistry(aInfo);
-
-	m_assets[aInfo.uuid] = aInfo;
-
-	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
-}
+//void Assets::updateAsset(AssetHandle<Asset> asset, const AssetUpdateDescriptor& uDesc)
+//{
+//	AssetRecord aInfo = getAsset(asset.getUID()).info();
+//	aInfo.update(uDesc);
+//
+//	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo); // todo check for non engine generated 
+//	updateRegistry(aInfo);
+//
+//	m_assets[aInfo.uuid] = aInfo;
+//
+//	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
+//}
 
 //void Assets::reimportAsset(UUID uuid)
 //{

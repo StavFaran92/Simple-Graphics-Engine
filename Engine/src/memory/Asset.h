@@ -20,10 +20,10 @@ public:
 
 	void reimportAsset();
 
+	virtual void save(const AssetRecord& aInfo) = 0;
 protected:
 	virtual bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) = 0;
 
-	virtual void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) = 0;
 
 	bool importAssetInner(AssetRecord& aInfo);
 

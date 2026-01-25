@@ -47,7 +47,7 @@ public:
 
 	const std::vector<AssetHandle<MaterialAsset>>& getImportedMaterials() const;
 
-	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
+	void save(const AssetRecord& aInfo) override;
 protected:
 	bool copyFiles(const std::string& fileLocation, AssetRecord&) override;
 

@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <filesystem>
+#include "core/Logger.h"
 
 void MeshExporter::exportMesh(const std::string& name, const std::string& targetDir, const aiScene* scene)
 {

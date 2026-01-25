@@ -111,9 +111,9 @@ bool MeshGroupAsset::copyFiles(const std::string& fileLocation, AssetRecord& aIn
 	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
 }
 
-void MeshGroupAsset::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
+void MeshGroupAsset::save(const AssetRecord& aInfo)
 {
-	MeshExporter::exportMesh(asset.as<MeshGroupAsset>());
+	MeshExporter::exportMesh(AssetHandle<MeshGroupAsset>(m_uuid));
 }
 
 ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, ModelImportSettings aDesc)
