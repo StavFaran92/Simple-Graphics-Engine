@@ -8,18 +8,16 @@
 struct PrefabImportSettings : public AssetCreateDescriptor
 {};
 
-// Asset IO Manager
-struct PrefabAssetManager : public AssetManager
-{
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
-	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
-};
-
 // Resource
 class EngineAPI Prefab : public Resource
 {
 public:
+	struct LoadDescriptor : public ResourceLoadDescriptor
+	{
+		std::string filepath;
+	};
+
+	static ResourceWrapper<Prefab> load(const std::string& fileLocation, LoadDescriptor desc = {});
 	static ResourceWrapper<Prefab> create(const Entity& e);
 	static void save(const ResourceWrapper<Prefab>& prefab, AssetRecord aInfo);
 
@@ -41,5 +39,13 @@ class EngineAPI PrefabAsset : public Asset
 {
 public:
 	using ResourceType = Prefab;
+
+	using Asset::Asset;
+
 	static AssetHandle<PrefabAsset> import(const std::string& fileLocation, PrefabImportSettings aDesc = {});
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

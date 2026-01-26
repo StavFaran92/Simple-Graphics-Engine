@@ -11,15 +11,6 @@ using json = nlohmann::json;
 
 struct AssetRecord;
 
-// Asset IO Manager
-struct TextureAssetManager : public AssetManager
-{
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
-	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
-	std::string getRecommendedExtension(const AssetRecord& aInfo) override;
-};
-
 // Resource
 class EngineAPI Texture : public Resource
 {
@@ -136,7 +127,9 @@ public:
 		void* facesData[6]{ nullptr }; //only apply to Cubemap
 	};
 
-	struct TextureAssetDescriptor : public AssetCreateDescriptor
+	Texture();
+
+	struct LoadDescriptor : public ResourceLoadDescriptor
 	{
 		bool genMipMap = false;
 		bool flip = false;
@@ -145,12 +138,12 @@ public:
 		TextureFilter filter = TextureFilter::Linear;
 		TextureWrap wrap = TextureWrap::Repeat;
 
-		json fillParams() const override
+		nlohmann::json fillParams() const override
 		{
 			return *this;
 		}
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(TextureAssetDescriptor,
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoadDescriptor,
 			genMipMap,
 			flip,
 			saveOnDisk,
@@ -159,8 +152,6 @@ public:
 			wrap
 		);
 	};
-
-	Texture();
 
 	static ResourceWrapper<Texture> createTexture(TextureData& textureData);
 
@@ -176,7 +167,7 @@ public:
 
 	static ResourceWrapper<Texture> createTexture(int width, int height, Texture::TextureSemantic usage, void* data = nullptr);
 
-	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureAssetDescriptor = {});
+	static ResourceWrapper<Texture> load(const std::string& fileLocation, LoadDescriptor desc = {});
 
 	ResourceWrapper<Texture> clone() const; 
 
@@ -205,8 +196,6 @@ public:
 
 	~Texture();
 private:
-	friend class TextureAssetManager;
-
 	void build(const TextureData& textureData);
 
 	void ClearTexture();
@@ -219,7 +208,7 @@ private:
 	
 	static void extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData);
 
-	static void extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData);
+	static void extractTextureDataFromSettings(const LoadDescriptor& settings, Texture::TextureData& textureData);
 
 	
 
@@ -240,5 +229,16 @@ class EngineAPI TextureAsset : public Asset
 {
 public:
 	using ResourceType = Texture;
-	static AssetHandle<TextureAsset> import(const std::string& fileLocation, Texture::TextureAssetDescriptor = {});
+
+	using Asset::Asset;
+
+	static AssetHandle<TextureAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
+
+	static AssetHandle<TextureAsset> create(const ResourceWrapper<Texture>& texture, AssetCreateDescriptor desc = {});
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
+	std::string getRecommendedExtension(const AssetRecord& aInfo) override;
 };

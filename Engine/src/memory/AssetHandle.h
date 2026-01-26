@@ -39,14 +39,14 @@ public:
 	const ResourceWrapper<ResourceType> resource() const
 	{
 		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
-			return ResourceType::load(get()->m_createDesc->origFilePath, get()->m_createDesc->resourceDescriptor);
+			return ResourceType::load(get()->getDescriptor().origFilePath, get()->getDescriptor().resourceDescriptor);
 		});
 	}
 
 	ResourceWrapper<ResourceType> resource()
 	{
 		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
-			return ResourceType::load(get()->m_createDesc->origFilePath, get()->m_createDesc->resourceDescriptor);
+			return ResourceType::load(get()->getDescriptor().origFilePath, get()->getDescriptor().resourceDescriptor);
 		});
 
 		//return ResourceWrapper<ResourceType>(info().resourceID);

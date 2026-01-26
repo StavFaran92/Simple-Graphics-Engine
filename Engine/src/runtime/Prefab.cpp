@@ -12,24 +12,17 @@
 #include "memory/AssetLoader.h"
 #include "core/Factory.h"
 #include "component/ObjectComponent.h"
+#include "core/Engine.h"
 
-namespace {
-	struct PrefabManagerRegistration {
-		PrefabManagerRegistration() {
-			AssetFactory::registerManager(AssetType::PREFAB, std::make_shared<PrefabAssetManager>());
-		}
-	} _PrefabManagerRegistration;
-}
-
-bool PrefabAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, LoadDescriptor desc)
 {
-	return false;
-}
-
-ResourceWrapper<Resource> PrefabAssetManager::load(AssetRecord& aInfo)
-{
-	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ifstream is(projectDir + aInfo.relativefilePath);
+	std::string filepath = desc.filepath.empty() ? fileLocation : desc.filepath;
+	if (!desc.filepath.empty() && !std::filesystem::path(desc.filepath).is_absolute())
+	{
+		auto projectDir = Engine::get()->getProjectDirectory();
+		filepath = projectDir + filepath;
+	}
+	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
 
 	ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
@@ -48,7 +41,12 @@ ResourceWrapper<Resource> PrefabAssetManager::load(AssetRecord& aInfo)
 	return ResourceWrapper<Prefab>::empty;
 }
 
-void PrefabAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
+bool PrefabAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+{
+	return false;
+}
+
+void PrefabAsset::save(const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
@@ -56,7 +54,7 @@ void PrefabAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo
 
 	try
 	{
-		oarchive(*asset.as<PrefabAsset>().resource().get());
+		oarchive(*AssetHandle<PrefabAsset>(m_uuid).resource().get());
 	}
 	catch (const cereal::Exception& e)
 	{
@@ -179,5 +177,6 @@ AssetHandle<PrefabAsset> PrefabAsset::import(const std::string& fileLocation, Pr
 {
 	desc.aType = AssetType::PREFAB;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<PrefabAsset>();
+	PrefabAsset* asset = new PrefabAsset(desc);
+	return asset->importAsset(fileLocation).as<PrefabAsset>();
 }

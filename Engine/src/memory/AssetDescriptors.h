@@ -11,6 +11,13 @@
 
 using json = nlohmann::json;
 
+struct ResourceLoadDescriptor
+{
+	virtual ~ResourceLoadDescriptor() = default;
+
+	virtual nlohmann::json fillParams() const { return {}; }
+};
+
 struct AssetCreateDescriptor
 {
 	std::string origFilePath;

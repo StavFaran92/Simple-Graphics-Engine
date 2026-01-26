@@ -22,41 +22,12 @@
 
 #include <filesystem>
 
-namespace {
-	struct MaterialManagerRegistration {
-		MaterialManagerRegistration() {
-			AssetFactory::registerManager(AssetType::MATERIAL, std::make_shared<MaterialAssetManager>());
-		}
-	} _materialManagerRegistration;
-}
-
-bool MaterialAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+bool MaterialAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return false;
 }
 
-ResourceWrapper<Resource> MaterialAssetManager::load(AssetRecord& aInfo)
-{
-	std::ifstream is(aInfo.fullFilePath);
-	cereal::JSONInputArchive iarchive(is);
-	ResourceWrapper<Material> material = Factory<Material>::create();
-
-	try
-	{
-		iarchive(*material.get());
-		material->setMaterialRenderMode(material->getMaterialRenderMode());
-		return material;
-
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Deserialization Error occured: {}", e.what());
-	}
-
-	return ResourceWrapper<Resource>::empty;
-}
-
-void MaterialAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
+void MaterialAsset::save(const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(aInfo.fullFilePath);
@@ -64,7 +35,7 @@ void MaterialAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aIn
 
 	try
 	{
-		oarchive(*asset.as<MaterialAsset>().resource().get());
+		oarchive(*AssetHandle<MaterialAsset>(m_uuid).resource().get());
 	}
 	catch (const cereal::Exception& e)
 	{
@@ -479,10 +450,38 @@ AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation
 {
 	desc.aType = AssetType::MATERIAL;
 	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<MaterialAsset>();
+	MaterialAsset* asset = new MaterialAsset(desc);
+	return asset->importAsset(fileLocation).as<MaterialAsset>();
 }
 
 void MaterialAsset::update(const AssetHandle<MaterialAsset>& material, AssetUpdateDescriptor desc)
 {
 	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
+}
+
+ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDescriptor desc)
+{
+	std::string filepath = desc.filepath.empty() ? fileLocation : desc.filepath;
+	if (!desc.filepath.empty() && !std::filesystem::path(desc.filepath).is_absolute())
+	{
+		auto projectDir = Engine::get()->getProjectDirectory();
+		filepath = projectDir + filepath;
+	}
+	std::ifstream is(filepath);
+	cereal::JSONInputArchive iarchive(is);
+	ResourceWrapper<Material> material = Factory<Material>::create();
+
+	try
+	{
+		iarchive(*material.get());
+		material->setMaterialRenderMode(material->getMaterialRenderMode());
+		return material;
+
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Deserialization Error occured: {}", e.what());
+	}
+
+	return ResourceWrapper<Material>::empty;
 }

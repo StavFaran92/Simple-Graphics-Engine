@@ -55,14 +55,6 @@ namespace physx {
 }
 template<typename T> class ObjectHandler;
 
-// Asset IO Manager
-struct SceneAssetManager : public AssetManager
-{
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
-	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(AssetHandle<Asset> scene, const AssetRecord& aInfo) override;
-};
-
 struct SceneImportSettings : public AssetCreateDescriptor
 {
 
@@ -76,6 +68,11 @@ struct SceneCreateDescriptor : public AssetCreateDescriptor
 class EngineAPI Scene : public Resource
 {
 public:
+	struct LoadDescriptor : public ResourceLoadDescriptor
+	{
+		std::string filepath;
+	};
+
 	enum class RenderPhase
 	{
 		PRE_RENDER_BEGIN,
@@ -92,6 +89,7 @@ public:
 	Scene() = default;
 	Scene(Context* context);
 
+	static ResourceWrapper<Scene> load(const std::string& fileLocation, LoadDescriptor desc = {});
 	static ResourceWrapper<Scene> create();
 
 	void addCoroutine(const std::function<bool(float)>& coroutine);
@@ -225,7 +223,15 @@ class EngineAPI SceneAsset : public Asset
 {
 public:
 	using ResourceType = Scene;
+
+	using Asset::Asset;
+
 	static AssetHandle<SceneAsset> import(const std::string& fileLocation, SceneImportSettings aDesc = {});
 
 	static void update(const AssetHandle<SceneAsset>& scene, AssetUpdateDescriptor desc);
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

@@ -28,45 +28,12 @@ const  std::map<ShaderOverride, std::string> shaderOverrideToString
 	{ ShaderOverride::PostProcess,		"PostProcess" },
 };
 
-namespace {
-	struct ShaderManagerRegistration {
-		ShaderManagerRegistration() {
-			AssetFactory::registerManager(AssetType::SHADER, std::make_shared<ShaderAssetManager>());
-		}
-	} _shaderManagerRegistration;
-}
-
-bool ShaderAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+bool ShaderAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return std::filesystem::copy_file(fileLocation, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-ResourceWrapper<Resource> ShaderAssetManager::load(AssetRecord& aInfo)
-{
-	ShaderOverride shaderOverride = ShaderOverride::None;
-	if (!aInfo.importSettings.is_null())
-	{
-		ShaderAssetDescriptor params = aInfo.importSettings.get<ShaderAssetDescriptor>();
-		shaderOverride = params.shaderOverride;
-	}
-	else if (aInfo.attributes.find(Shader::ATTRIB_SHADER_OVERRIDE) != aInfo.attributes.end())
-	{
-		shaderOverride = Shader::getShaderOverrideFromStr(aInfo.attributes.at(Shader::ATTRIB_SHADER_OVERRIDE));
-	}
-	
-
-	std::string filepath = Engine::get()->getProjectDirectory() + aInfo.relativefilePath;
-
-	ResourceWrapper<Shader> shader = Factory<Shader>::create();
-	shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
-	shader->shaderOverride = shaderOverride;
-	shader->m_glslFilePath = aInfo.origFilePath; // TODO fix, this should be path but causes issues with shader inclusion
-	shader->recompile();
-
-	return shader;
-}
-
-void ShaderAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
+void ShaderAsset::save(const AssetRecord& aInfo)
 {
 	std::filesystem::copy_file(aInfo.origFilePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
@@ -543,10 +510,19 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& filepath
 	return shader;
 }
 
-ResourceWrapper<Shader> Shader::load(const std::string& fileLocation, ShaderAssetDescriptor desc)
+ResourceWrapper<Shader> Shader::load(const std::string& fileLocation, LoadDescriptor desc)
 {
-	desc.aType = AssetType::SHADER;
-	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Shader>();
+	ShaderOverride shaderOverride = desc.settings.shaderOverride;
+
+	std::string filepath = fileLocation;
+
+	ResourceWrapper<Shader> shader = Factory<Shader>::create();
+	shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
+	shader->shaderOverride = shaderOverride;
+	shader->m_glslFilePath = filepath;
+	shader->recompile();
+
+	return shader;
 }
 
 //Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)
@@ -667,5 +643,6 @@ Shader::~Shader() {
 AssetHandle<ShaderAsset> ShaderAsset::import(const std::string& fileLocation, ShaderAssetDescriptor desc)
 {
 	desc.aType = AssetType::SHADER;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<ShaderAsset>();
+	ShaderAsset* asset = new ShaderAsset(desc);
+	return asset->importAsset(fileLocation).as<ShaderAsset>();
 }

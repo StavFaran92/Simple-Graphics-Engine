@@ -33,37 +33,30 @@ template<typename> class AssetTraits;
 
 using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned int, glm::mat3, glm::mat4>;
 
-struct ShaderAssetDescriptor : public AssetCreateDescriptor
-{
-	ShaderOverride shaderOverride = ShaderOverride::None;
-
-	json fillParams() const override
-	{
-		return *this;
-	}
-
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(ShaderAssetDescriptor,
-		shaderOverride
-	);
-};
-
-// Asset IO Manager
-struct ShaderAssetManager : public AssetManager
-{
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
-	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
-};
-
 // Resource
 class EngineAPI Shader : public Resource, std::enable_shared_from_this<Shader>
 {
 public:
 	inline static const std::string ATTRIB_SHADER_OVERRIDE = "shader_override";
+
+	struct LoadDescriptor : public ResourceLoadDescriptor
+	{
+		ShaderOverride shaderOverride = ShaderOverride::None;
+
+		json fillParams() const override
+		{
+			return *this;
+		}
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoadDescriptor,
+			shaderOverride
+		);
+	};
+
 public:
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
 
-	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
+	static ResourceWrapper<Shader> load(const std::string& fileLocation, LoadDescriptor desc = {});
 
 	void use();
 
@@ -138,7 +131,6 @@ private:
 	void setMat4(const std::string& name, const glm::mat4& v);
 
 	friend class CustomShaderBuilder;
-	friend class ShaderAssetManager;
 
 protected:
 	unsigned int m_id;
@@ -166,5 +158,13 @@ class EngineAPI ShaderAsset : public Asset
 {
 public:
 	using ResourceType = Shader;
-	static AssetHandle<ShaderAsset> import(const std::string& fileLocation, ShaderAssetDescriptor desc = {});
+
+	using Asset::Asset;
+
+	static AssetHandle<ShaderAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

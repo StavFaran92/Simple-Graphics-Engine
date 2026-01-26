@@ -50,13 +50,17 @@ AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 
 	auto texture = Texture::createTexture(tData);
 
-	Texture::TextureAssetDescriptor desc;
+	AssetCreateDescriptor desc;
 	desc.aType = AssetType::TEXTURE;
 	desc.name = "SGE_TERRAIN_HEIGHTMAP";
 	desc.isEngineOwned = true;
 	//desc.attributes = texture->getTextureAssetAttributes().toMap();
-	desc.usage = Texture::TextureSemantic::Heightmap;
-	auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc).as<TextureAsset>();
+	Texture::LoadDescriptor* resourceDesc = new Texture::LoadDescriptor();
+	resourceDesc->usage = Texture::TextureSemantic::Heightmap;
+
+	desc.resourceDescriptor = resourceDesc;
+	auto heightmap = TextureAsset::create(texture, desc);
+	//auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc).as<TextureAsset>();
 
 	return heightmap;
 }

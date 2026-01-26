@@ -37,11 +37,6 @@ enum class MaterialRenderMode : int
 	None,
 };
 
-struct MaterialImportSettings : public AssetCreateDescriptor
-{
-
-};
-
 struct EditableUniform {
 	std::string uniformName;
 	std::string type;
@@ -59,14 +54,6 @@ struct EditableUniform {
 		SERIALIZED_MEMBER(maxValue);
 		SERIALIZED_MEMBER(value);
 	}
-};
-
-// Asset IO Manager
-struct MaterialAssetManager : public AssetManager
-{
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
-	ResourceWrapper<Resource> load(AssetRecord& aInfo) override;
-	void save(AssetHandle<Asset> asset, const AssetRecord& aInfo) override;
 };
 
 //Resource
@@ -139,6 +126,13 @@ public:
 
 	Material();
 	~Material() = default;
+
+	struct LoadDescriptor : public ResourceLoadDescriptor
+	{
+		std::string filepath;
+	};
+
+	static ResourceWrapper<Material> load(const std::string& fileLocation, LoadDescriptor desc = {});
 
 	void use();
 	void release();
@@ -215,6 +209,14 @@ class EngineAPI MaterialAsset : public Asset
 {
 public:
 	using ResourceType = Material;
-	static AssetHandle<MaterialAsset> import(const std::string& fileLocation, MaterialImportSettings desc = {});
+
+	using Asset::Asset;
+
+	static AssetHandle<MaterialAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
 	static void update(const AssetHandle<MaterialAsset>& material, AssetUpdateDescriptor desc);
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

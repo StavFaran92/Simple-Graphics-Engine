@@ -5,6 +5,7 @@
 
 #include "core/Configurations.h"
 #include "systems/SubSystem.h"
+#include "core/Logger.h"
 
 #include "memory/ResourceWrapper.h"
 

@@ -47,47 +47,14 @@ GLint TextureFilterToOpenGL(Texture::TextureFilter filter, bool hasMipmaps, bool
 		return GL_LINEAR;
 }
 
-namespace {
-	struct TextureManagerRegistration {
-		TextureManagerRegistration() {
-			AssetFactory::registerManager(AssetType::TEXTURE, std::make_shared<TextureAssetManager>());
-		}
-	} _textureManagerRegistration;
-}
-
-bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+bool TextureAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-ResourceWrapper<Resource> TextureAssetManager::load(AssetRecord& aInfo)
-{
-	std::string filepath = aInfo.fullFilePath;
-
-	Texture::TextureData textureData;
-
-	// extract texture build data
-	Texture::TextureAssetDescriptor settings{};
-
-	if (aInfo.importSettings.is_object() && !aInfo.importSettings.empty())
-	{
-		settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
-	}
-	Texture::extractTextureDataFromSettings(settings, textureData);
-	Texture::extractTextureDataFromFile(filepath, textureData);
-
-	assert(textureData.data);
-
-	// Create texture resource
-	ResourceWrapper<Texture> texture = Factory<Texture>::create();
-	texture->build(textureData);
-
-	return texture;
-}
-
-std::string TextureAssetManager::getRecommendedExtension(const AssetRecord& aInfo)
+std::string TextureAsset::getRecommendedExtension(const AssetRecord& aInfo)
 {
 
 	Texture::TextureAssetDescriptor settings{};
@@ -116,11 +83,11 @@ std::string TextureAssetManager::getRecommendedExtension(const AssetRecord& aInf
 
 }
 
-void TextureAssetManager::save(AssetHandle<Asset> asset, const AssetRecord& aInfo)
+void TextureAsset::save(const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
-	auto& resource = asset.as<TextureAsset>().resource();
+	auto resource = AssetHandle<TextureAsset>(m_uuid).resource();
 
 	if (resource.get()->getData().type == Texture::Type::FLOAT)
 	{
@@ -463,10 +430,23 @@ Texture::~Texture()
 	ClearTexture();
 }
 
-ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureAssetDescriptor desc)
+ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, LoadDescriptor desc)
 {
-	desc.aType = AssetType::TEXTURE;
-	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Texture>();
+	std::string filepath = fileLocation;
+
+	Texture::TextureData textureData;
+
+	// extract texture build data
+	Texture::extractTextureDataFromSettings(desc.settings, textureData);
+	Texture::extractTextureDataFromFile(filepath, textureData);
+
+	assert(textureData.data);
+
+	// Create texture resource
+	ResourceWrapper<Texture> texture = Factory<Texture>::create();
+	texture->build(textureData);
+
+	return texture;
 }
 
 ResourceWrapper<Texture> Texture::clone() const
@@ -681,7 +661,8 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 AssetHandle<TextureAsset> TextureAsset::import(const std::string& fileLocation, Texture::TextureAssetDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<TextureAsset>();
+	TextureAsset* asset = new TextureAsset(desc);
+	return asset->importAsset(fileLocation).as<TextureAsset>();
 }
 
 //adi is your love of your life

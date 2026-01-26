@@ -4,14 +4,14 @@
 #include "memory/Assets.h"
 #include "core/Engine.h"
 
-Asset::Asset(AssetCreateDescriptor* desc)
+Asset::Asset(const AssetCreateDescriptor& desc)
+	:m_createDesc (desc)
 {
-	*m_createDesc = *desc;
 }
 
 bool Asset::importAssetInner(AssetRecord& aInfo)
 {
-	std::string fileLocation = aInfo.createDescriptor->origFilePath;
+	std::string fileLocation = aInfo.createDescriptor.origFilePath;
 
 	// Validate input
 	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -35,7 +35,7 @@ bool Asset::importAssetInner(AssetRecord& aInfo)
 AssetHandle<Asset> Asset::importAsset(const std::string& fileLocation)
 {
 	AssetRecord aInfo(m_createDesc);
-	aInfo.createDescriptor->origFilePath = fileLocation;
+	aInfo.createDescriptor.origFilePath = fileLocation;
 	aInfo.asset = this;
 	aInfo.parse();
 
@@ -56,6 +56,16 @@ void Asset::reimportAsset()
 {
 	AssetRecord aInfo = Engine::get()->getSubSystem<Assets>()->getAsset(m_uuid).info();
 	importAssetInner(aInfo);
+}
+
+const AssetCreateDescriptor& Asset::getDescriptor() const
+{
+	return m_createDesc;
+}
+
+UUID Asset::getUUID() const
+{
+	return m_uuid;
 }
 
 AssetHandle<Asset> Asset::createAsset(const ResourceWrapper<Resource>& resource)

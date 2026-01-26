@@ -1,5 +1,9 @@
 #include "runtime/Scene.h"
 
+#include <filesystem>
+#include <fstream>
+#include <cereal/archives/json.hpp>
+
 #include "core/Engine.h"
 #include "core/CoroutineSystem.h"
 #include "core/Logger.h"
@@ -57,22 +61,38 @@
 #include "systems/VolumetricSystem.h"
 #include "core/Factory.h"
 
-namespace {
-	struct SceneManagerRegistration {
-		SceneManagerRegistration() {
-			AssetFactory::registerManager(AssetType::SCENE, std::make_shared<SceneAssetManager>());
-		}
-	} _sceneManagerRegistration;
-}
-
-bool SceneAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+bool SceneAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return false;
 }
 
-ResourceWrapper<Resource> SceneAssetManager::load(AssetRecord& aInfo)
+void SceneAsset::save(const AssetRecord& aInfo)
 {
-	std::ifstream is(aInfo.fullFilePath);
+	
+	auto projectDir = Engine::get()->getProjectDirectory();
+	std::ofstream os(aInfo.fullFilePath);
+	cereal::JSONOutputArchive oarchive(os);
+
+	try
+	{
+		SerializedScene serializedScene = Archiver::serializeScene(AssetHandle<SceneAsset>(m_uuid).resource().get());
+		oarchive(serializedScene);
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Serialization Error occured: {}", e.what());
+	}
+}
+
+ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, LoadDescriptor desc)
+{
+	std::string filepath = desc.filepath.empty() ? fileLocation : desc.filepath;
+	if (!desc.filepath.empty() && !std::filesystem::path(desc.filepath).is_absolute())
+	{
+		auto projectDir = Engine::get()->getProjectDirectory();
+		filepath = projectDir + filepath;
+	}
+	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
 	ResourceWrapper<Scene> scene = Factory<Scene>::create();
 
@@ -89,25 +109,7 @@ ResourceWrapper<Resource> SceneAssetManager::load(AssetRecord& aInfo)
 		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	return ResourceWrapper<Resource>::empty;
-}
-
-void SceneAssetManager::save(AssetHandle<Asset> scene, const AssetRecord& aInfo)
-{
-	
-	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ofstream os(aInfo.fullFilePath);
-	cereal::JSONOutputArchive oarchive(os);
-
-	try
-	{
-		SerializedScene serializedScene = Archiver::serializeScene(scene.as<SceneAsset>().resource().get());
-		oarchive(serializedScene);
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Serialization Error occured: {}", e.what());
-	}
+	return ResourceWrapper<Scene>::empty;
 }
 
 ResourceWrapper<Scene> Scene::create()
@@ -1314,7 +1316,9 @@ bool Scene::isSimulationActive() const
 AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, SceneImportSettings desc)
 {
 	desc.aType = AssetType::SCENE;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<SceneAsset>();
+	desc.origFilePath = fileLocation;
+	SceneAsset* asset = new SceneAsset(desc);
+	return asset->importAsset(fileLocation).as<SceneAsset>();
 }
 
 void SceneAsset::update(const AssetHandle<SceneAsset>& scene, AssetUpdateDescriptor desc)

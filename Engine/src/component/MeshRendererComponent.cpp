@@ -1,6 +1,7 @@
 #include "MeshRendererComponent.h"
 
 #include "memory/BuiltInAssets.h"
+#include "core/Logger.h"
 
 MeshRendererComponent::MeshRendererComponent(AssetHandle<MeshGroupAsset> mesh)
 	: mesh(mesh)
