@@ -70,7 +70,7 @@ AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocati
 {
 	desc.aType = AssetType::MESH;
 	desc.isCompositeAsset = true;
-	MeshGroupAsset* asset = new MeshGroupAsset(&desc);
+	MeshGroupAsset* asset = new MeshGroupAsset(desc);
 	return asset->importAsset(fileLocation).as<MeshGroupAsset>();
 }
 

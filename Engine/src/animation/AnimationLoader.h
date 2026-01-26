@@ -14,11 +14,6 @@
 
 #include "systems/SubSystem.h"
 
-struct AnimationImportSettings : public AssetCreateDescriptor
-{
-
-};
-
 class Animation;
 
 class EngineAPI AnimationLoader : public SubSystem

@@ -10,7 +10,7 @@ class Asset
 public:
 	using ResourceType = Resource;
 
-	Asset(AssetCreateDescriptor* desc);
+	Asset(AssetCreateDescriptor& desc);
 
 	AssetHandle<Asset> importAsset(const std::string& fileLocation);
 
