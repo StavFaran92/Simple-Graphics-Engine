@@ -437,7 +437,7 @@ ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, LoadDesc
 	Texture::TextureData textureData;
 
 	// extract texture build data
-	Texture::extractTextureDataFromSettings(desc.settings, textureData);
+	Texture::extractTextureDataFromSettings(desc, textureData);
 	Texture::extractTextureDataFromFile(filepath, textureData);
 
 	assert(textureData.data);
@@ -523,7 +523,7 @@ Texture::InternalFormat Texture::getInternalFormatFromUsage(Texture::TextureSema
 	return Texture::InternalFormat::RGB;
 }
 
-void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData)
+void Texture::extractTextureDataFromSettings(const Texture::LoadDescriptor& settings, Texture::TextureData& textureData)
 {
 	textureData.filter = settings.filter;
 	textureData.wrap = settings.wrap;
@@ -658,7 +658,7 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	textureData.textureName = textureName;
 }
 
-AssetHandle<TextureAsset> TextureAsset::import(const std::string& fileLocation, Texture::TextureAssetDescriptor desc)
+AssetHandle<TextureAsset> TextureAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
 	TextureAsset* asset = new TextureAsset(desc);
