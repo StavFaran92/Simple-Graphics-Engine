@@ -1,43 +1,11 @@
 #pragma once
 
-#include "memory/ResourceWrapper.h"
 #include "memory/AssetRecord.h"
 #include "core/Core.h"
 #include "core/Configurations.h"
 #include "systems/SubSystem.h"
-#include "fileSystem/ScopedPath.h"
-
-#include <nlohmann/json.hpp>
 
 class Asset;
-
-struct EngineAPI AssetCreateDescriptor
-{
-public:
-	virtual ~AssetCreateDescriptor() = default;
-
-	std::string origFilePath;
-	std::string assetDirectory;
-	AssetType aType = AssetType::NONE;
-	std::map<std::string, std::string> attributes;
-	std::string name;
-	bool isEngineOwned = false;
-	bool isTransient = false;
-	bool isCompositeAsset = false; // this asset is composed of multiple external files 
-	ScopedPath targetDirectory;
-
-	virtual nlohmann::json fillParams() const { return {}; }
-	
-	//timestamp
-	//size
-};
-
-struct EngineAPI AssetUpdateDescriptor
-{
-	std::string assetDirectory;
-	std::map<std::string, std::string> attributes;
-	std::string name;
-};
 
 class EngineAPI Assets : public SubSystem
 {

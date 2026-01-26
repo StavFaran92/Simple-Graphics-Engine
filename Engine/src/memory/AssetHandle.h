@@ -2,6 +2,8 @@
 
 #include "memory/ResourceWrapper.h"
 #include "memory/AssetRecord.h"
+#include "core/Engine.h"
+#include "memory/ResourceManager.h"
 
 template<typename T>
 class AssetHandle
@@ -36,16 +38,18 @@ public:
 
 	const ResourceWrapper<ResourceType> resource() const
 	{
-		return ResourceManager::get()->createOrGetCached(info().resourceID, [this]() {
-
-			return ResourceType::load();
-		}); // TODO - this should be used here
-		//return ResourceWrapper<ResourceType>(info().resourceID);
+		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
+			return ResourceType::load(get()->m_createDesc->origFilePath, get()->m_createDesc->resourceDescriptor);
+		});
 	}
 
 	ResourceWrapper<ResourceType> resource()
 	{
-		return ResourceWrapper<ResourceType>(info().resourceID);
+		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
+			return ResourceType::load(get()->m_createDesc->origFilePath, get()->m_createDesc->resourceDescriptor);
+		});
+
+		//return ResourceWrapper<ResourceType>(info().resourceID);
 	}
 
 	void erase()

@@ -4,22 +4,16 @@
 #include "core/Core.h"
 #include "memory/UUID.h"
 #include "core/Configurations.h"
-#include "memory/ResourceBase.h"
-#include "memory/ResourceWrapper.h"
-#include "fileSystem/ScopedPath.h"
+#include "AssetDescriptors.h"
 
-struct AssetCreateDescriptor;
-struct AssetUpdateDescriptor;
 class Asset;
 
 template<typename T>
 class AssetHandle;
 
-using json = nlohmann::json;
-
 struct EngineAPI AssetRecord
 {
-	AssetCreateDescriptor* createDescriptor = nullptr;
+	AssetCreateDescriptor createDescriptor;
 	bool isValid = false;
 	std::string relativefilePath;
 	std::string fullFilePath;
@@ -37,7 +31,7 @@ struct EngineAPI AssetRecord
 
 	AssetRecord() = default;
 
-	AssetRecord(AssetCreateDescriptor* assetDesc);
+	AssetRecord(AssetCreateDescriptor& assetDesc);
 
 	void parse();
 

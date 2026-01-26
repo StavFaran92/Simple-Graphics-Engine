@@ -3,6 +3,11 @@
 template<typename T>
 class ResourceWrapper;
 
+struct ResourceLoadDescriptor
+{
+	virtual ~ResourceLoadDescriptor() = default;
+};
+
 class Resource
 {
 public:

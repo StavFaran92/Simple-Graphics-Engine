@@ -23,6 +23,10 @@ public:
 
     ResourceWrapper<Resource> loadResource(const std::string& fileLocation, ResourceLoadDescriptor& desc);
 
+    ResourceWrapper<Resource> createOrGetCached(ResourceID id, const std::function<ResourceWrapper<Resource>(void)>& creationCallback);
+
+
+
 
 
 private:

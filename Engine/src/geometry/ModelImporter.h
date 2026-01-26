@@ -30,11 +30,6 @@ namespace Assimp
 	class Importer;
 }
 
-struct ModelImportSettings : public AssetCreateDescriptor
-{
-	
-};
-
 class EngineAPI ModelImporter : public SubSystem
 {
 public:
@@ -75,7 +70,7 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	void loadModelFromFile(const AssetRecord& aInfo, ModelImporter::ModelInfo& modelInfo);
+	void loadModelFromFile(const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
 
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo);
 

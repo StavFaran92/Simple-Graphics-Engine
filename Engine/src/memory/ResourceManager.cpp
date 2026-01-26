@@ -12,22 +12,27 @@ void ResourceManager::setRootDir(const std::string& rootDir)
 	m_rootResourceDir = rootDir;
 }
 
-ResourceWrapper<Resource> ResourceManager::loadResource(const std::string& fileLocation, ResourceLoadDescriptor& desc)
+//ResourceWrapper<Resource> ResourceManager::loadResource(const std::string& fileLocation, ResourceLoadDescriptor& desc)
+//{
+//	// Validate input
+//	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+//	{
+//		logError("Invalid asset path specified.");
+//		return ResourceWrapper<Resource>::empty;
+//	}
+//
+//	// Load
+//	ResourceWrapper<Resource> resource = AssetFactory::getManager(desc.aType)->load(desc);
+//	if (resource.isEmpty() || !resource.get())
+//	{
+//		logError("Failed to load file {}", fileLocation);
+//		return ResourceWrapper<Resource>::empty;
+//	}
+//
+//	return resource;
+//}
+
+ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, const std::function<ResourceWrapper<Resource>(void)>& creationCallback)
 {
-	// Validate input
-	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
-	{
-		logError("Invalid asset path specified.");
-		return ResourceWrapper<Resource>::empty;
-	}
-
-	// Load
-	ResourceWrapper<Resource> resource = AssetFactory::getManager(desc.aType)->load(desc);
-	if (resource.isEmpty() || !resource.get())
-	{
-		logError("Failed to load file {}", fileLocation);
-		return ResourceWrapper<Resource>::empty;
-	}
-
-	return resource;
+	return ResourceWrapper<Resource>();
 }

@@ -50,20 +50,20 @@ void from_json(const nlohmann::json& j, AssetRecord& asset)
 
 void AssetRecord::establishFilepath()
 {
-	if (!createDescriptor->isTransient)
+	if (!createDescriptor.isTransient)
 	{
 		fullFilePath = Engine::get()->getProjectDirectory() + "/" + relativefilePath;
 		std::filesystem::create_directories(std::filesystem::path(fullFilePath).parent_path());
 	}
 	else
 	{
-		fullFilePath = createDescriptor->origFilePath;
+		fullFilePath = createDescriptor.origFilePath;
 	}
 }
 
-AssetRecord::AssetRecord(AssetCreateDescriptor* assetDesc)
+AssetRecord::AssetRecord(AssetCreateDescriptor& assetDesc)
 {
-	*createDescriptor = *assetDesc;
+	createDescriptor = assetDesc;
 }
 
 void AssetRecord::parse()
@@ -81,34 +81,34 @@ void AssetRecord::parse()
 	//targetDirectory = createDescriptor.targetDirectory;
 
 	// TODO this is a temporary fix to not break all the engine assets, it prevents me from using nested folder in the engine folder and should be fixed.
-	if (createDescriptor->isEngineOwned)
+	if (createDescriptor.isEngineOwned)
 	{
-		createDescriptor->targetDirectory = ScopedPath::EnginePath(createDescriptor->targetDirectory.relative());
+		createDescriptor.targetDirectory = ScopedPath::EnginePath(createDescriptor.targetDirectory.relative());
 	}
 
-	if (createDescriptor->targetDirectory.type() == ScopedPath::Type::None)
+	if (createDescriptor.targetDirectory.type() == ScopedPath::Type::None)
 	{
-		createDescriptor->targetDirectory = ScopedPath::ContentPath("");
+		createDescriptor.targetDirectory = ScopedPath::ContentPath("");
 	}
 
-	if (createDescriptor->aType == AssetType::NONE)
+	if (createDescriptor.aType == AssetType::NONE)
 	{
 		logError("Asset type cannot be NONE.");
 		return;
 	}
 
 	// Extract name
-	if (!createDescriptor->origFilePath.empty())
+	if (!createDescriptor.origFilePath.empty())
 	{
-		auto& path = std::filesystem::path(createDescriptor->origFilePath);
+		auto& path = std::filesystem::path(createDescriptor.origFilePath);
 
 		// Extract Name
-		if (createDescriptor->name.empty())
+		if (createDescriptor.name.empty())
 		{
-			createDescriptor->name = path.filename().stem().string();
+			createDescriptor.name = path.filename().stem().string();
 		}
 	}
-	else if (createDescriptor->isTransient)
+	else if (createDescriptor.isTransient)
 	{
 		logError("Cannot create a transient resource without original file path specified.");
 		return;
@@ -117,15 +117,15 @@ void AssetRecord::parse()
 	// Generate UUID
 	uuid = UUID::generate_uuid_v4();
 
-	if (createDescriptor->name.empty())
+	if (createDescriptor.name.empty())
 	{
-		createDescriptor->name = uuid;
+		createDescriptor.name = uuid;
 	}
 
 	// Extract Extension
-	if (!createDescriptor->origFilePath.empty())
+	if (!createDescriptor.origFilePath.empty())
 	{
-		auto& path = std::filesystem::path(createDescriptor->origFilePath);
+		auto& path = std::filesystem::path(createDescriptor.origFilePath);
 
 		if (path.has_extension())
 		{
@@ -134,7 +134,7 @@ void AssetRecord::parse()
 	}
 	if (ext.empty())
 	{
-		ext = AssetFactory::getManager(createDescriptor->aType)->getRecommendedExtension(*this);
+		ext = AssetFactory::getManager(createDescriptor.aType)->getRecommendedExtension(*this);
 
 		if (ext.empty())
 		{
@@ -143,19 +143,19 @@ void AssetRecord::parse()
 		}
 	}
 
-	fileName = createDescriptor->name + ext;
+	fileName = createDescriptor.name + ext;
 
 	relativefilePath = "";
-	relativefilePath += createDescriptor->targetDirectory.scoped().generic_string();
+	relativefilePath += createDescriptor.targetDirectory.scoped().generic_string();
 
-	if (createDescriptor->isCompositeAsset)
+	if (createDescriptor.isCompositeAsset)
 	{
-		createDescriptor->assetDirectory = createDescriptor->name;
+		createDescriptor.assetDirectory = createDescriptor.name;
 	}
 
-	if (!createDescriptor->assetDirectory.empty())
+	if (!createDescriptor.assetDirectory.empty())
 	{
-		relativefilePath += "/" + createDescriptor->assetDirectory + "/";
+		relativefilePath += "/" + createDescriptor.assetDirectory + "/";
 	}
 
 	relativefilePath += "/" + fileName;
@@ -176,23 +176,23 @@ void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 {
 	if (!uDesc.assetDirectory.empty())
 	{
-		createDescriptor->assetDirectory = uDesc.assetDirectory;
+		createDescriptor.assetDirectory = uDesc.assetDirectory;
 	}
 
 	if (!uDesc.name.empty())
 	{
-		createDescriptor->name = uDesc.name;
+		createDescriptor.name = uDesc.name;
 	}
 
 	for (const auto& attrib : uDesc.attributes)
 	{
-		createDescriptor->attributes[attrib.first] = attrib.second;
+		createDescriptor.attributes[attrib.first] = attrib.second;
 	}
 
-	fileName = createDescriptor->name + ext;
+	fileName = createDescriptor.name + ext;
 
 	relativefilePath = "";
-	if (createDescriptor->isEngineOwned)
+	if (createDescriptor.isEngineOwned)
 	{
 		relativefilePath += "Engine/";
 	}
@@ -201,9 +201,9 @@ void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 		relativefilePath += "Content/";
 	}
 
-	if (!createDescriptor->assetDirectory.empty())
+	if (!createDescriptor.assetDirectory.empty())
 	{
-		relativefilePath += createDescriptor->assetDirectory + "/";
+		relativefilePath += createDescriptor.assetDirectory + "/";
 	}
 
 	relativefilePath += "/" + fileName;

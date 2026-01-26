@@ -6,33 +6,6 @@
 #include "core/Factory.h"
 #include "core/Engine.h"
 
-//namespace {
-//	struct MeshManagerRegistration {
-//		MeshManagerRegistration() {
-//			AssetFactory::registerManager(AssetType::MESH, std::make_shared<MeshGroupAssetManager>());
-//		}
-//	} _meshManagerRegistration;
-//}
-//
-//bool MeshGroupAssetManager::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-//{
-//	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
-//}
-//
-//ResourceWrapper<Resource> MeshGroupAssetManager::load(AssetRecord& aInfo)
-//{
-//	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
-//	ModelImporter::ModelInfo mInfo;
-//	mInfo.mesh = mesh;
-//	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
-//	return mesh;
-//}
-//
-//void MeshGroupAssetManager::save(AssetHandle<Asset> mesh, const AssetRecord& aInfo)
-//{
-//	MeshExporter::exportMesh(mesh.as<MeshGroupAsset>());
-//}
-
 void MeshGroup::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
 	m_materialSlots.insert(mesh->getMaterialIndex());
@@ -93,7 +66,7 @@ int MeshGroup::getMaterialCount() const
 	return m_materialSlots.size();
 }
 
-AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocation, ModelImportSettings desc)
+AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::MESH;
 	desc.isCompositeAsset = true;
@@ -116,12 +89,12 @@ void MeshGroupAsset::save(const AssetRecord& aInfo)
 	MeshExporter::exportMesh(AssetHandle<MeshGroupAsset>(m_uuid));
 }
 
-ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, ModelImportSettings aDesc)
+ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, MeshGroup::LoadDescriptor desc)
 {
 	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
 	ModelImporter::ModelInfo mInfo;
 	mInfo.mesh = mesh;
-	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(aInfo, mInfo);
+	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(desc, mInfo);
 	return mesh;
 }
 

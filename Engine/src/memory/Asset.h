@@ -24,7 +24,7 @@ public:
 protected:
 	virtual bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) = 0;
 
-	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.createDescriptor->aType); };
+	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.createDescriptor.aType); };
 
 	bool importAssetInner(AssetRecord& aInfo);
 

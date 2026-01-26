@@ -222,7 +222,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetRe
 	}
 }
 
-void ModelImporter::loadModelFromFile(const AssetRecord& aInfo, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
 {
 	std::string filepath = aInfo.fullFilePath;
 
