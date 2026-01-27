@@ -449,7 +449,7 @@ MaterialRenderMode Material::getMaterialRenderMode() const
 AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::MATERIAL;
-	desc.origFilePath = fileLocation;
+	desc.sourcePath = fileLocation;
 	MaterialAsset* asset = new MaterialAsset(desc);
 	return asset->importAsset(fileLocation).as<MaterialAsset>();
 }
@@ -461,12 +461,15 @@ void MaterialAsset::update(const AssetHandle<MaterialAsset>& material, AssetUpda
 
 ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDescriptor desc)
 {
-	std::string filepath = desc.filepath.empty() ? fileLocation : desc.filepath;
-	if (!desc.filepath.empty() && !std::filesystem::path(desc.filepath).is_absolute())
-	{
-		auto projectDir = Engine::get()->getProjectDirectory();
-		filepath = projectDir + filepath;
-	}
+	desc.sourcePath = fileLocation;
+	return load(desc);
+}
+
+ResourceWrapper<Material> Material::load(LoadDescriptor desc)
+{
+	std::string filepath = desc.sourcePath;
+	auto projectDir = Engine::get()->getProjectDirectory();
+	filepath = projectDir + filepath;
 	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
 	ResourceWrapper<Material> material = Factory<Material>::create();

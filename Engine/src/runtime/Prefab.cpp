@@ -16,12 +16,15 @@
 
 ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, LoadDescriptor desc)
 {
-	std::string filepath = desc.filepath.empty() ? fileLocation : desc.filepath;
-	if (!desc.filepath.empty() && !std::filesystem::path(desc.filepath).is_absolute())
-	{
-		auto projectDir = Engine::get()->getProjectDirectory();
-		filepath = projectDir + filepath;
-	}
+	desc.sourcePath = fileLocation;
+	return load(desc);
+}
+
+ResourceWrapper<Prefab> Prefab::load(LoadDescriptor desc)
+{
+	std::string filepath = desc.sourcePath;
+	auto projectDir = Engine::get()->getProjectDirectory();
+	filepath = projectDir + filepath;
 	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
 
@@ -176,7 +179,7 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 AssetHandle<PrefabAsset> PrefabAsset::import(const std::string& fileLocation, PrefabImportSettings desc)
 {
 	desc.aType = AssetType::PREFAB;
-	desc.origFilePath = fileLocation;
+	desc.sourcePath = fileLocation;
 	PrefabAsset* asset = new PrefabAsset(desc);
 	return asset->importAsset(fileLocation).as<PrefabAsset>();
 }

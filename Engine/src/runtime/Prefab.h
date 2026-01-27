@@ -22,7 +22,6 @@ public:
 	static ResourceWrapper<Prefab> load(const std::string& fileLocation, LoadDescriptor desc = {});
 	static ResourceWrapper<Prefab> load(LoadDescriptor desc);
 	static ResourceWrapper<Prefab> create(const Entity& e);
-	static void save(const ResourceWrapper<Prefab>& prefab, AssetRecord aInfo);
 
 	Entity Instansiate(glm::vec3 position = glm::vec3{ 0.0f });
 

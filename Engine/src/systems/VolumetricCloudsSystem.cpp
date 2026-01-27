@@ -15,7 +15,7 @@ VolumetricCloudsSystem::VolumetricCloudsSystem()
 {
 	Engine::get()->registerSubSystem<VolumetricCloudsSystem>(this);
 
-	Texture::TextureAssetDescriptor desc;
+	TextureLoadDescriptor desc;
 	desc.filter = TextureFilter::Linear;
 	desc.wrap = TextureWrap::Mirror;
 	desc.genMipMap = true;
@@ -34,13 +34,15 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	
 
 	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/VolumetricCloudsShader.glsl", ShaderOverride::Volume);
-	AssetCreateDescriptor shaderDesc;
-	shaderDesc.aType = AssetType::SHADER;
-	shaderDesc.origFilePath = SGE_ROOT_DIR "Resources/Engine/Shaders/VolumetricCloudsShader.glsl";
-	shaderDesc.name = "VolumetricCloudsShader";
-	shaderDesc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::Volume);
-	shaderDesc.isEngineOwned = false;
-	auto& shaderAsset = Engine::get()->getSubSystem<Assets>()->createAsset(shader, shaderDesc).as<ShaderAsset>();
+	AssetCreateDescriptor shaderAssetDesc;
+	shaderAssetDesc.aType = AssetType::SHADER;
+	shaderAssetDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/VolumetricCloudsShader.glsl";
+	shaderAssetDesc.name = "VolumetricCloudsShader";
+	ShaderLoadDescriptor* shaderDesc = new ShaderLoadDescriptor();
+	shaderDesc->shaderOverride = ShaderOverride::Volume;
+	shaderAssetDesc.resourceDescriptor = shaderDesc;
+	shaderAssetDesc.isEngineOwned = false;
+	auto shaderAsset = ShaderAsset::create(shader, shaderAssetDesc);
 
 	auto& material = Material::create(MaterialRenderMode::Custom);
 	material->setCustomShader(shaderAsset);

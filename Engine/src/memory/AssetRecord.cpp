@@ -45,7 +45,7 @@ void AssetRecord::establishFilepath()
 	}
 	else
 	{
-		fullFilePath = createDescriptor.origFilePath;
+		fullFilePath = createDescriptor.sourcePath;
 	}
 }
 
@@ -86,9 +86,9 @@ void AssetRecord::parse()
 	}
 
 	// Extract name
-	if (!createDescriptor.origFilePath.empty())
+	if (!createDescriptor.sourcePath.empty())
 	{
-		auto& path = std::filesystem::path(createDescriptor.origFilePath);
+		auto& path = std::filesystem::path(createDescriptor.sourcePath);
 
 		// Extract Name
 		if (createDescriptor.name.empty())
@@ -98,7 +98,7 @@ void AssetRecord::parse()
 	}
 	else if (createDescriptor.isTransient)
 	{
-		logError("Cannot create a transient resource without original file path specified.");
+		logError("Cannot create a transient asset without original file path specified.");
 		return;
 	}
 
@@ -111,9 +111,9 @@ void AssetRecord::parse()
 	}
 
 	// Extract Extension
-	if (!createDescriptor.origFilePath.empty())
+	if (!createDescriptor.sourcePath.empty())
 	{
-		auto& path = std::filesystem::path(createDescriptor.origFilePath);
+		auto& path = std::filesystem::path(createDescriptor.sourcePath);
 
 		if (path.has_extension())
 		{
@@ -174,7 +174,7 @@ void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 
 	for (const auto& attrib : uDesc.attributes)
 	{
-		createDescriptor.attributes[attrib.first] = attrib.second;
+		createDescriptor.engineAttributes[attrib.first] = attrib.second;
 	}
 
 	fileName = createDescriptor.name + ext;

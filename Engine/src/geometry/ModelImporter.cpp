@@ -211,9 +211,9 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter
 	}
 }
 
-void ModelImporter::loadModelFromFile(const std::string& fileLocation, const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string filepath = fileLocation;
+	std::string filepath = resourceDesc.sourcePath;
 
 	if (!std::filesystem::exists(filepath))
 	{

@@ -25,12 +25,14 @@ struct ResourceLoadDescriptor
 struct AssetCreateDescriptor
 {
 	std::string name;
+	std::string sourcePath;
 	AssetType aType = AssetType::NONE;
 	std::map<std::string, std::string> engineAttributes;
 	bool isEngineOwned = false;
 	bool isTransient = false;
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	ScopedPath targetDirectory;
+	std::string assetDirectory; // todo consider remove
 
 	ResourceLoadDescriptor* resourceDescriptor = nullptr;
 

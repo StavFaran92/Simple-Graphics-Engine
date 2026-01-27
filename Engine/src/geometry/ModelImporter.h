@@ -73,7 +73,7 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	void loadModelFromFile(const std::string& fileLocation, const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
+	void loadModelFromFile(const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
 
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo);
 
