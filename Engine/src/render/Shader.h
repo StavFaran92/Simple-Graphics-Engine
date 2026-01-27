@@ -41,6 +41,10 @@ public:
 
 	struct LoadDescriptor : public ResourceLoadDescriptor
 	{
+		ResourceWrapper<Resource> loadResource() override {
+			return Shader::load(*this);
+		}
+
 		ShaderOverride shaderOverride = ShaderOverride::None;
 
 		json fillParams() const override
@@ -57,6 +61,8 @@ public:
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
 
 	static ResourceWrapper<Shader> load(const std::string& fileLocation, LoadDescriptor desc = {});
+
+	static ResourceWrapper<Shader> load(LoadDescriptor desc = {});
 
 	void use();
 

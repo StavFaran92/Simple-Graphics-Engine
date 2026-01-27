@@ -21,7 +21,7 @@ public:
 	};
 
 	static ResourceWrapper<MeshGroup> load(LoadDescriptor& desc);
-	static ResourceWrapper<MeshGroup> load(const std::string& fileLocation, LoadDescriptor& desc = {});
+	static ResourceWrapper<MeshGroup> load(const std::string& fileLocation, LoadDescriptor desc = {});
 
 	void addMesh(const std::shared_ptr<Mesh>& mesh);
 

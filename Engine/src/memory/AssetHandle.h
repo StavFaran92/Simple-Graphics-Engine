@@ -39,14 +39,14 @@ public:
 	const ResourceWrapper<ResourceType> resource() const
 	{
 		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
-			return get()->getDescriptor()->loadResouce();
+			return get()->getDescriptor().loadResouce();
 		}).as<ResourceType>();
 	}
 
 	ResourceWrapper<ResourceType> resource()
 	{
 		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
-			return get()->getDescriptor()->loadResouce();
+			return get()->getDescriptor().loadResouce();
 			}).as<ResourceType>();
 
 		//return ResourceWrapper<ResourceType>(info().resourceID);

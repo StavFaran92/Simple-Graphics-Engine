@@ -55,22 +55,15 @@ namespace physx {
 }
 template<typename T> class ObjectHandler;
 
-struct SceneImportSettings : public AssetCreateDescriptor
-{
-
-};
-
-struct SceneCreateDescriptor : public AssetCreateDescriptor
-{
-};
-
 // Resource
 class EngineAPI Scene : public Resource
 {
 public:
 	struct LoadDescriptor : public ResourceLoadDescriptor
 	{
-		std::string filepath;
+		ResourceWrapper<Resource> loadResource() override {
+			return Scene::load(*this);
+		}
 	};
 
 	enum class RenderPhase
@@ -90,6 +83,7 @@ public:
 	Scene(Context* context);
 
 	static ResourceWrapper<Scene> load(const std::string& fileLocation, LoadDescriptor desc = {});
+	static ResourceWrapper<Scene> load(LoadDescriptor desc);
 	static ResourceWrapper<Scene> create();
 
 	void addCoroutine(const std::function<bool(float)>& coroutine);

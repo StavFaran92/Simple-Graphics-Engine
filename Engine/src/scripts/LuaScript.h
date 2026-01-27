@@ -9,9 +9,13 @@ class EngineAPI LuaScript : public Resource
 public:
 	struct LoadDescriptor : public ResourceLoadDescriptor
 	{
+		ResourceWrapper<Resource> loadResource() override {
+			return LuaScript::load(*this);
+		}
 	};
 
 	static ResourceWrapper<LuaScript> load(const std::string& fileLocation, LoadDescriptor desc = {});
+	static ResourceWrapper<LuaScript> load(LoadDescriptor desc);
 
 	static ResourceWrapper<LuaScript> create();
 
