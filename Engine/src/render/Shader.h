@@ -24,6 +24,22 @@ enum class ShaderOverride : int
 	PostProcess
 };
 
+struct ShaderLoadDescriptor : public ResourceLoadDescriptor
+{
+	ResourceWrapper<Resource> loadResource() override;
+
+	ShaderOverride shaderOverride = ShaderOverride::None;
+
+	json fillParams() const override
+	{
+		return *this;
+	}
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(ShaderLoadDescriptor,
+		shaderOverride
+	);
+};
+
 extern EngineAPI const std::map<ShaderOverride, std::string> shaderOverrideToString;
 
 struct ShadersInfo;
@@ -39,30 +55,12 @@ class EngineAPI Shader : public Resource, std::enable_shared_from_this<Shader>
 public:
 	inline static const std::string ATTRIB_SHADER_OVERRIDE = "shader_override";
 
-	struct LoadDescriptor : public ResourceLoadDescriptor
-	{
-		ResourceWrapper<Resource> loadResource() override {
-			return Shader::load(*this);
-		}
-
-		ShaderOverride shaderOverride = ShaderOverride::None;
-
-		json fillParams() const override
-		{
-			return *this;
-		}
-
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoadDescriptor,
-			shaderOverride
-		);
-	};
-
 public:
 	static ResourceWrapper<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
 
-	static ResourceWrapper<Shader> load(const std::string& fileLocation, LoadDescriptor desc = {});
+	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderLoadDescriptor desc = {});
 
-	static ResourceWrapper<Shader> load(LoadDescriptor desc = {});
+	static ResourceWrapper<Shader> load(ShaderLoadDescriptor desc);
 
 	void use();
 

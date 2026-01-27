@@ -20,15 +20,14 @@ struct ResourceLoadDescriptor
 	virtual nlohmann::json fillParams() const { return {}; }
 
 	std::string origFilepath;
+	std::string origFileDir;
 };
 
 struct AssetCreateDescriptor
 {
-	std::string origFilePath;
-	std::string assetDirectory;
-	AssetType aType = AssetType::NONE;
-	std::map<std::string, std::string> attributes;
 	std::string name;
+	AssetType aType = AssetType::NONE;
+	std::map<std::string, std::string> engineAttributes;
 	bool isEngineOwned = false;
 	bool isTransient = false;
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
@@ -37,13 +36,13 @@ struct AssetCreateDescriptor
 	ResourceLoadDescriptor* resourceDescriptor = nullptr;
 
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetCreateDescriptor,
-		origFilePath,
-		assetDirectory,
-		aType,
-		attributes,
 		name,
+		aType,
+		engineAttributes,
+		isEngineOwned,
 		isTransient,
-		isCompositeAsset
+		isCompositeAsset,
+		resourceDescriptor->fillParams()
 		);
 
 	//virtual nlohmann::json fillParams() const { return {}; }

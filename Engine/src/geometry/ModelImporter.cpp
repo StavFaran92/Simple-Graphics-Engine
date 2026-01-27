@@ -179,7 +179,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetRe
 
 			//PrintMaterialProperties(aMaterial);
 
-			for (const auto& [key, value] : aInfo.attributes)
+			for (const auto& [key, value] : aInfo.createDescriptor.attributes)
 			{
 				// Look for _MAT_ in the attribute key
 				const std::string tag = "_MAT_";
