@@ -39,15 +39,15 @@ public:
 	const ResourceWrapper<ResourceType> resource() const
 	{
 		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
-			return ResourceType::load(get()->getDescriptor().origFilePath, get()->getDescriptor().resourceDescriptor);
-		});
+			return get()->getDescriptor()->loadResouce();
+		}).as<ResourceType>();
 	}
 
 	ResourceWrapper<ResourceType> resource()
 	{
 		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
-			return ResourceType::load(get()->getDescriptor().origFilePath, get()->getDescriptor().resourceDescriptor);
-		});
+			return get()->getDescriptor()->loadResouce();
+			}).as<ResourceType>();
 
 		//return ResourceWrapper<ResourceType>(info().resourceID);
 	}
@@ -94,7 +94,7 @@ public:
 
 	inline T* get() const
 	{
-		return static_cast<T*>(info().asset.get());
+		return static_cast<T*>(info().asset);
 	}
 
 	template <class Archive>

@@ -1,6 +1,7 @@
 #include "AssetFactory.h"
 
 #include "memory/Asset.h"
+#include "core/Logger.h"
 
 std::map<AssetType, std::shared_ptr<AssetManager>>& AssetFactory::getManagerRegistry()
 {
@@ -27,7 +28,7 @@ AssetManager* AssetFactory::getManager(AssetType aType)
 
 bool AssetFactory::loadAsset(AssetRecord& aInfo)
 {
-	auto iter = getLoadFunctionRegistry().find(aInfo.aType);
+	auto iter = getLoadFunctionRegistry().find(aInfo.createDescriptor.aType);
 	if (iter == getLoadFunctionRegistry().end())
 	{
 		logError("Invalid asset type in regsitry, did you forget to register your load function?");

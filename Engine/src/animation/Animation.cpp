@@ -7,7 +7,7 @@ Animation::Animation()
 {
 }
 
-ResourceWrapper<Animation> Animation::load(const std::string& fileLocation, LoadDescriptor desc)
+ResourceWrapper<Animation> Animation::load(const std::string& fileLocation, LoadDescriptor& desc)
 {
 	return Engine::get()->getSubSystem<AnimationLoader>()->load(desc);
 }

@@ -15,7 +15,11 @@ struct ResourceLoadDescriptor
 {
 	virtual ~ResourceLoadDescriptor() = default;
 
+	virtual ResourceWrapper<Resource> loadResource() = 0;
+
 	virtual nlohmann::json fillParams() const { return {}; }
+
+	std::string origFilepath;
 };
 
 struct AssetCreateDescriptor
