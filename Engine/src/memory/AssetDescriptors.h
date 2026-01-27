@@ -19,8 +19,7 @@ struct ResourceLoadDescriptor
 
 	virtual nlohmann::json fillParams() const { return {}; }
 
-	std::string origFilepath;
-	std::string origFileDir;
+	std::string sourcePath;
 };
 
 struct AssetCreateDescriptor
@@ -41,8 +40,7 @@ struct AssetCreateDescriptor
 		engineAttributes,
 		isEngineOwned,
 		isTransient,
-		isCompositeAsset,
-		resourceDescriptor->fillParams()
+		isCompositeAsset
 		);
 
 	//virtual nlohmann::json fillParams() const { return {}; }

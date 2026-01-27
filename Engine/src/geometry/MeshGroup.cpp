@@ -102,7 +102,7 @@ ResourceWrapper<MeshGroup> MeshGroup::load(MeshGroupLoadDescriptor desc)
 
 ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, MeshGroupLoadDescriptor desc)
 {
-	desc.origFilepath = fileLocation;
+	desc.sourcePath = fileLocation;
 	return load(desc);
 }
 

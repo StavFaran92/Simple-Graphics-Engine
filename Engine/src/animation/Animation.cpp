@@ -9,7 +9,7 @@ Animation::Animation()
 
 ResourceWrapper<Animation> Animation::load(const std::string& fileLocation, AnimationLoadDescriptor desc)
 {
-	desc.origFilepath = fileLocation;
+	desc.sourcePath = fileLocation;
 	return Engine::get()->getSubSystem<AnimationLoader>()->load(desc);
 }
 

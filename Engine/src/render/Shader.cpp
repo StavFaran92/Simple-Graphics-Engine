@@ -647,6 +647,14 @@ AssetHandle<ShaderAsset> ShaderAsset::import(const std::string& fileLocation, As
 	return asset->importAsset(fileLocation).as<ShaderAsset>();
 }
 
-ResourceWrapper<Resource> ShaderLoadDescriptor::loadResource() {
+AssetHandle<ShaderAsset> ShaderAsset::create(const ResourceWrapper<Shader>& shader, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::SHADER;
+	ShaderAsset* asset = new ShaderAsset(desc);
+	return asset->createAsset(shader).as<ShaderAsset>();
+}
+
+ResourceWrapper<Resource> ShaderLoadDescriptor::loadResource() 
+{
 	return Shader::load(*this);
 }

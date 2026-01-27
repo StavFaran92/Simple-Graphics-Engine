@@ -167,7 +167,11 @@ public:
 
 	static AssetHandle<ShaderAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
 
+	static AssetHandle<ShaderAsset> create(const ResourceWrapper<Shader>& shader, AssetCreateDescriptor desc = {});
+
 	void save(const AssetRecord& aInfo) override;
+
+	
 
 protected:
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;

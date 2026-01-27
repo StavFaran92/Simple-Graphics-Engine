@@ -596,11 +596,13 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     desc.isEngineOwned = true;
 
     ShaderLoadDescriptor* shaderDesc = new ShaderLoadDescriptor();
-    shaderDesc->origFilepath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
-    desc.origFilePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
-    desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::PostProcess);
-    auto FXAAShaderAsset = getSubSystem<Assets>()->createAsset(FXAAShader, desc);
-    postProcess.shader = FXAAShaderAsset.as<ShaderAsset>();
+    shaderDesc->sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
+    shaderDesc->shaderOverride = ShaderOverride::PostProcess;
+
+    desc.resourceDescriptor = shaderDesc;
+    auto FXAAShaderAsset = ShaderAsset::create(FXAAShader, desc);
+
+    postProcess.shader = FXAAShaderAsset;
 
     if (initParams.templateScene)
     {

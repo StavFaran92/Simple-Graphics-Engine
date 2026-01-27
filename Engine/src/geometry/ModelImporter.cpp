@@ -155,19 +155,8 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetRecord& aInfo, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string modelName = std::filesystem::path(aInfo.relativefilePath).filename().stem().string();
-
-	// create new model session
-	ModelImporter::ModelLoadSession session;
-	session.filepath = aInfo.relativefilePath;
-	session.fileDir = std::filesystem::path(aInfo.relativefilePath).parent_path().string();
-	session.name = modelName;
-	session.mesh = modelInfo.mesh;
-
-	m_currentSession = session;
-
 	// extract mesh from root node
 	processNode(scene, scene->mRootNode);
 
@@ -179,7 +168,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetRe
 
 			//PrintMaterialProperties(aMaterial);
 
-			for (const auto& [key, value] : aInfo.createDescriptor.attributes)
+			for (const auto& [key, value] : aInfo.createDescriptor.engineAttributes)
 			{
 				// Look for _MAT_ in the attribute key
 				const std::string tag = "_MAT_";
@@ -222,9 +211,9 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetRe
 	}
 }
 
-void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromFile(const std::string& fileLocation, const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string filepath = aInfo.fullFilePath;
+	std::string filepath = fileLocation;
 
 	if (!std::filesystem::exists(filepath))
 	{
@@ -258,7 +247,18 @@ void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDes
 
 	m_lastLoadedSceneName = filepath;
 
-	loadModelFromAssimpScene(scene, aInfo, modelInfo);
+	std::string modelName = std::filesystem::path(filepath).filename().stem().string();
+
+	// create new model session
+	ModelImporter::ModelLoadSession session;
+	session.filepath = filepath;
+	session.fileDir = std::filesystem::path(filepath).parent_path().string();
+	session.name = modelName;
+	session.mesh = modelInfo.mesh;
+
+	m_currentSession = session;
+
+	loadModelFromAssimpScene(scene, modelInfo);
 }
 
 bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
@@ -330,7 +330,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
 			material->setName(materialName);
 
-			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures, aInfo);
+			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures);
 			if (!diffuse.isEmpty())
 			{
 				auto diffuseSampler = std::make_shared<TextureSampler>(3);
@@ -339,7 +339,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, true);
 			}
 
-			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures, aInfo);
+			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures);
 			if (!normal.isEmpty())
 			{
 				auto normalSampler = std::make_shared<TextureSampler>(3);
@@ -348,7 +348,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, true);
 			}
 
-			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, fileDir, cachedTextures, aInfo);
+			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures);
 			if (!roughness.isEmpty())
 			{
 				auto roughnessSampler = std::make_shared<TextureSampler>(1);
@@ -359,7 +359,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 			}
 
 			// Metallic map
-			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, fileDir, cachedTextures, aInfo);
+			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, cachedTextures);
 			if (!metallic.isEmpty())
 			{
 				auto metallicSampler = std::make_shared<TextureSampler>(1);
@@ -370,7 +370,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 			}
 
 			// Ambient Occlusion map
-			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, fileDir, cachedTextures, aInfo);
+			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, cachedTextures);
 			if (!ao.isEmpty())
 			{
 				auto aoSampler = std::make_shared<TextureSampler>(1);
@@ -589,10 +589,8 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 	aiMaterial* mat, 
 	aiTextureType type, 
-	const std::string& dir, 
 	std::unordered_map<std::string, 
-	AssetHandle<TextureAsset>>& cachedTextures,
-	const AssetRecord& aInfo)
+	AssetHandle<TextureAsset>>& cachedTextures)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)

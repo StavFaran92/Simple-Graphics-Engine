@@ -76,7 +76,7 @@ void readAnimationBones(const aiAnimation* animation, std::unordered_map<std::st
 
 ResourceWrapper<Animation> AnimationLoader::load(const AnimationLoadDescriptor& aInfo)
 {
-    std::string filepath = Engine::get()->getProjectDirectory() + aInfo.origFilepath;
+    std::string filepath = Engine::get()->getProjectDirectory() + aInfo.sourcePath;
 
     const aiScene* scene = m_importer.ReadFile(filepath, aiProcess_Triangulate);
 

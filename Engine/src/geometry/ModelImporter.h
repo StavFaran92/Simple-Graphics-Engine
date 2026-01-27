@@ -59,6 +59,8 @@ public:
 		ResourceWrapper<MeshGroup> mesh;
 		std::map<int, ResourceWrapper<Material>> materials;
 		std::vector<ResourceWrapper<Texture>> textures;
+
+		std::map<std::string, std::string> materialInfo;
 	};
 
 	/** Constructor */
@@ -71,7 +73,7 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	void loadModelFromFile(const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
+	void loadModelFromFile(const std::string& fileLocation, const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
 
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo);
 
@@ -80,10 +82,10 @@ public:
 private:
 	friend class Engine;
 
-	void loadModelFromAssimpScene(const aiScene* scene, const AssetRecord& aInfo, ModelImporter::ModelInfo& modelInfo);
+	void loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelInfo& modelInfo);
 	void processNode(const aiScene* aiScene, aiNode* aiNode);
 	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh);
-	AssetHandle<TextureAsset> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, const std::string& dir, std::unordered_map<std::string, AssetHandle<TextureAsset>>& cachedTextures, const AssetRecord& aInfo);
+	AssetHandle<TextureAsset> copyAiMaterialTexture(const aiScene* scene, aiMaterial* mat, aiTextureType type, std::unordered_map<std::string, AssetHandle<TextureAsset>>& cachedTextures);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;
 	ModelLoadSession m_currentSession;
