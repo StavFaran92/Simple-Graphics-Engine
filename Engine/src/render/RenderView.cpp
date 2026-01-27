@@ -5,6 +5,7 @@
 #include "render/RenderCommand.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
+#include "core/Logger.h"
 
 RenderTarget::RenderTarget(Viewport viewport)
 {

@@ -15,15 +15,14 @@
 #include "systems/SubSystem.h"
 
 class Animation;
+struct AnimationLoadDescriptor;
 
 class EngineAPI AnimationLoader : public SubSystem
 {
 public:
 	AnimationLoader();
 
-	ResourceWrapper<Animation> load(const AssetRecord& aInfo);
-
-	bool copyFileToResourceFolder(const std::string& fileLocation, const AssetRecord&);
+	ResourceWrapper<Animation> load(const AnimationLoadDescriptor& aInfo);
 
 
 private:

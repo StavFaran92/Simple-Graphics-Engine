@@ -13,6 +13,7 @@ class Transformation;
 class Shader;
 class Mesh;
 class Scene;
+class MeshGroup;
 
 
 class Renderer : public IRenderer

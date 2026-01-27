@@ -9,6 +9,7 @@
 #include "core/Configurations.h"
 #include <glm/glm.hpp>
 #include "component/PhysicsComponent.h"
+#include "render/Shader.h"
 
 class PhysicsSystem
 {

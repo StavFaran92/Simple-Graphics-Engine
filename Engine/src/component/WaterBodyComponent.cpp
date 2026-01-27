@@ -2,6 +2,7 @@
 
 #include "Transformation.h"
 #include "MeshRendererComponent.h"
+#include "core/Logger.h"
 
 WaterBodyComponent::WaterBodyComponent(Entity entity)
 	: entity(entity)

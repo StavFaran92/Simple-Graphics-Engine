@@ -1,6 +1,7 @@
 #pragma once
 
 class Scene;
+class Texture;
 
 #include "memory/ResourceWrapper.h"
 

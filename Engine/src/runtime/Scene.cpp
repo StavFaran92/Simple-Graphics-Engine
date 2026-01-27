@@ -1313,7 +1313,7 @@ bool Scene::isSimulationActive() const
 	return m_isSimulationActive;
 }
 
-AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, SceneImportSettings desc)
+AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::SCENE;
 	desc.origFilePath = fileLocation;

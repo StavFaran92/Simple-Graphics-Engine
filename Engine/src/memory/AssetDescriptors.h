@@ -36,6 +36,16 @@ struct AssetCreateDescriptor
 
 	ResourceLoadDescriptor* resourceDescriptor = nullptr;
 
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetCreateDescriptor,
+		origFilePath,
+		assetDirectory,
+		aType,
+		attributes,
+		name,
+		isTransient,
+		isCompositeAsset
+		);
+
 	//virtual nlohmann::json fillParams() const { return {}; }
 
 	//timestamp

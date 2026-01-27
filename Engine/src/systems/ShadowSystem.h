@@ -9,7 +9,7 @@
 
 class Shader;
 class Scene;
-class TextureHandler;
+class Texture;
 class Context;
 
 class EngineAPI ShadowSystem

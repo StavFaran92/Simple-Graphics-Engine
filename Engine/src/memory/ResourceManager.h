@@ -21,7 +21,7 @@ public:
 
     ResourceWrapper<Resource> getResource(ResourceID) const;
 
-    ResourceWrapper<Resource> loadResource(const std::string& fileLocation, ResourceLoadDescriptor& desc);
+    //ResourceWrapper<Resource> loadResource(const std::string& fileLocation, ResourceLoadDescriptor& desc);
 
     ResourceWrapper<Resource> createOrGetCached(ResourceID id, const std::function<ResourceWrapper<Resource>(void)>& creationCallback);
 

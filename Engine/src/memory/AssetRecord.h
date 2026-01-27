@@ -39,6 +39,16 @@ struct EngineAPI AssetRecord
 
 	void update(const AssetUpdateDescriptor& desc);
 	void establishFilepath();
+
+	//NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRecord,
+	//	createDescriptor,
+	//	uuid,
+	//	isValid,
+	//	relativefilePath,
+	//	fileName,
+	//	ext,
+	//	importSettings,
+	//);
 };
 
 // Serialization (to JSON)

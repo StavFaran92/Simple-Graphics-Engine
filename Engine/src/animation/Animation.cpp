@@ -9,6 +9,7 @@ Animation::Animation()
 
 ResourceWrapper<Animation> Animation::load(const std::string& fileLocation, AnimationLoadDescriptor desc)
 {
+	desc.origFilepath = fileLocation;
 	return Engine::get()->getSubSystem<AnimationLoader>()->load(desc);
 }
 
@@ -103,7 +104,8 @@ void AnimationAsset::save(const AssetRecord& aInfo)
 
 bool AnimationAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
-	return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
+	const std::string savedFilePath = aInfo.fullFilePath;
+	return std::filesystem::copy_file(fileLocation, savedFilePath);
 }
 
 ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource() {

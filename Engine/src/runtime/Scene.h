@@ -220,7 +220,7 @@ public:
 
 	using Asset::Asset;
 
-	static AssetHandle<SceneAsset> import(const std::string& fileLocation, SceneImportSettings aDesc = {});
+	static AssetHandle<SceneAsset> import(const std::string& fileLocation, AssetCreateDescriptor aDesc = {});
 
 	static void update(const AssetHandle<SceneAsset>& scene, AssetUpdateDescriptor desc);
 
