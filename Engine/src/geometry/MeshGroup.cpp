@@ -89,7 +89,7 @@ void MeshGroupAsset::save(const AssetRecord& aInfo)
 	MeshExporter::exportMesh(AssetHandle<MeshGroupAsset>(m_uuid));
 }
 
-ResourceWrapper<MeshGroup> MeshGroup::load(MeshGroup::LoadDescriptor& desc)
+ResourceWrapper<MeshGroup> MeshGroup::load(MeshGroupLoadDescriptor desc)
 {
 	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
 	ModelImporter::ModelInfo mInfo;
@@ -100,10 +100,13 @@ ResourceWrapper<MeshGroup> MeshGroup::load(MeshGroup::LoadDescriptor& desc)
 
 
 
-ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, MeshGroup::LoadDescriptor& desc)
+ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, MeshGroupLoadDescriptor desc)
 {
 	desc.origFilepath = fileLocation;
 	return load(desc);
 }
 
 
+ResourceWrapper<Resource> MeshGroupLoadDescriptor::loadResource() {
+	return MeshGroup::load(*this);
+}

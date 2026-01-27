@@ -446,7 +446,7 @@ MaterialRenderMode Material::getMaterialRenderMode() const
 	return m_renderMode;
 }
 
-AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation, MaterialImportSettings desc)
+AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::MATERIAL;
 	desc.origFilePath = fileLocation;

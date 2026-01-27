@@ -8,6 +8,7 @@
 #include "memory/Asset.h"
 
 class Bone;
+struct AnimationLoadDescriptor;
 
 struct MeshNodeData
 {
@@ -18,22 +19,22 @@ struct MeshNodeData
 	std::vector<MeshNodeData> children;
 };
 
+struct AnimationLoadDescriptor : public ResourceLoadDescriptor
+{
+	ResourceWrapper<Resource> loadResource() override;
+};
+
 // Resource
 class EngineAPI Animation : public Resource
 {
 public:
-	struct LoadDescriptor : public ResourceLoadDescriptor
-	{
-		ResourceWrapper<Resource> loadResource() override {
-			return Animation::load(*this);
-		}
-	};
+	
 
-	static ResourceWrapper<Animation> load(LoadDescriptor& desc);
+	static ResourceWrapper<Animation> load(AnimationLoadDescriptor desc);
+
+	static ResourceWrapper<Animation> load(const std::string& fileLocation, AnimationLoadDescriptor desc = {});
 
 	Animation();
-
-	static ResourceWrapper<Animation> load(const std::string& fileLocation, LoadDescriptor desc = {});
 
 	void calculateFinalBoneMatrices(float currentTime, std::unordered_map<std::string, glm::mat4>& outFinalBoneMatrices);
 

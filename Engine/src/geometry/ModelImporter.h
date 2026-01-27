@@ -22,6 +22,7 @@ enum aiTextureType;
 class Engine;
 class TextureHandler;
 class MeshGroup;
+class MeshGroupLoadDescriptor;
 class Scene;
 template<typename T>class ResourceWrapper;
 

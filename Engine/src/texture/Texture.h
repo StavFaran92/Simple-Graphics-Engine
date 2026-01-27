@@ -172,6 +172,7 @@ public:
 	static ResourceWrapper<Texture> createTexture(int width, int height, Texture::TextureSemantic usage, void* data = nullptr);
 
 	static ResourceWrapper<Texture> load(const std::string& fileLocation, LoadDescriptor desc = {});
+
 	static ResourceWrapper<Texture> load(LoadDescriptor desc);
 
 	ResourceWrapper<Texture> clone() const; 
