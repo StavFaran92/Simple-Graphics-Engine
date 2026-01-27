@@ -55,7 +55,7 @@ AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 	desc.name = "SGE_TERRAIN_HEIGHTMAP";
 	desc.isEngineOwned = true;
 	//desc.attributes = texture->getTextureAssetAttributes().toMap();
-	Texture::LoadDescriptor* resourceDesc = new Texture::LoadDescriptor();
+	TextureLoadDescriptor* resourceDesc = new TextureLoadDescriptor();
 	resourceDesc->usage = TextureSemantic::Heightmap;
 
 	desc.resourceDescriptor = resourceDesc;

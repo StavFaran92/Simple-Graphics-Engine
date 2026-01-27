@@ -14,11 +14,14 @@ public:
     template<typename... Args>
     static ResourceWrapper<T> create(Args&&... args)
     {
-        T* asset = new T(args...);
         ResourceID id = Resource::getNewResourceID();
-        Engine::get()->getMemoryPool().add(id, asset);
-        ResourceWrapper<T> res = Resource::createNewResource<T>(id);
-        return res;
+        return ResourceWrapper<T>::createResource(id, args...);
+
+        //T* asset = new T(args...);
+        //ResourceID id = Resource::getNewResourceID();
+        //Engine::get()->getMemoryPool().add(id, asset);
+        //ResourceWrapper<T> res = Resource::createNewResource<T>(id);
+        //return res;
     }
 
 };

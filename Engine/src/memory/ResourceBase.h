@@ -11,11 +11,11 @@ public:
 
 	//ResourceWrapper<Resource> loadResource(const std::string& fileLocation);
 
-	template<typename T>
-	static ResourceWrapper<T> createNewResource(ResourceID id)
-	{
-		return ResourceWrapper<T>(id);
-	}
+	//template<typename T>
+	//static ResourceWrapper<T> createNewResource(ResourceID id)
+	//{
+	//	return ResourceWrapper<T>(id);
+	//}
 
 	static ResourceID getNewResourceID()
 	{

@@ -16,7 +16,7 @@ public:
     ResourceWrapper() = default;
     ResourceWrapper(std::nullptr_t) {}
 
-    template<typename T, typename... Args>
+    template<typename... Args>
     static ResourceWrapper<T> createResource(ResourceID id, Args&&... args)
     {
         static_assert(std::is_base_of_v<Resource, T>);
