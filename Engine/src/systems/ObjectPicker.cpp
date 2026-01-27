@@ -47,16 +47,16 @@ bool ObjectPicker::init()
 	int height = Engine::get()->getWindow()->getHeight();
 
 	// Create a empty texture and attach to FBO
-	Texture::TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
 	textureData.width = width;
 	textureData.height = height;
 	textureData.channels = 3;
-	textureData.internalFormat = Texture::InternalFormat::RG32UI;
-	textureData.format = (Texture::Format)GL_RGB_INTEGER;
-	textureData.type = Texture::Type::UNSIGNED_INT;
-	textureData.filter = Texture::TextureFilter::Nearest;
-	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.internalFormat = TextureInternalFormat::RG32UI;
+	textureData.format = (TextureFormat)GL_RGB_INTEGER;
+	textureData.type = TextureType::UNSIGNED_INT;
+	textureData.filter = TextureFilter::Nearest;
+	textureData.wrap = TextureWrap::Clamp;
 	textureData.data = nullptr;
 	m_targetTexture = Texture::createTexture(textureData);
 	m_frameBuffer->attachTexture(m_targetTexture.get()->getID());

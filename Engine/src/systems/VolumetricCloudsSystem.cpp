@@ -16,8 +16,8 @@ VolumetricCloudsSystem::VolumetricCloudsSystem()
 	Engine::get()->registerSubSystem<VolumetricCloudsSystem>(this);
 
 	Texture::TextureAssetDescriptor desc;
-	desc.filter = Texture::TextureFilter::Linear;
-	desc.wrap = Texture::TextureWrap::Mirror;
+	desc.filter = TextureFilter::Linear;
+	desc.wrap = TextureWrap::Mirror;
 	desc.genMipMap = true;
 	m_noiseTexture = Texture::load(SGE_ROOT_DIR "Resources/Engine/Textures/cloud_noise.png", desc);
 }

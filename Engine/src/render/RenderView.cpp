@@ -14,16 +14,16 @@ RenderTarget::RenderTarget(Viewport viewport)
 
 	m_renderTargetFBO->bind();
 
-	Texture::TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
 	textureData.width = viewport.w;
 	textureData.height = viewport.h;
 	textureData.channels = 3;
-	textureData.internalFormat = Texture::InternalFormat::RGBA8;
-	textureData.format = Texture::Format::RGB;
-	textureData.type = Texture::Type::UNSIGNED_BYTE;
-	textureData.filter = Texture::TextureFilter::Linear;
-	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.internalFormat = TextureInternalFormat::RGBA8;
+	textureData.format = TextureFormat::RGB;
+	textureData.type = TextureType::UNSIGNED_BYTE;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
 	textureData.data = nullptr;
 
 	m_renderTargetTexture = Texture::createTexture(textureData);

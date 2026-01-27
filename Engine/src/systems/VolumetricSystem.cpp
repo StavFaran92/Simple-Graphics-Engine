@@ -26,16 +26,16 @@ bool VolumetricSystem::init()
 
 	m_renderTargetFBO->bind();
 
-	Texture::TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
 	textureData.width = width;
 	textureData.height = height;
 	textureData.channels = 4;
-	textureData.internalFormat = Texture::InternalFormat::RGBA32F;
-	textureData.format = Texture::Format::RGBA;
-	textureData.type = Texture::Type::FLOAT;
-	textureData.filter = Texture::TextureFilter::Linear;
-	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.internalFormat = TextureInternalFormat::RGBA32F;
+	textureData.format = TextureFormat::RGBA;
+	textureData.type = TextureType::FLOAT;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
 	textureData.data = nullptr;
 	m_renderTargetTexture = Texture::createTexture(textureData);
 	m_renderTargetFBO->attachTexture(m_renderTargetTexture.get()->getID(), GL_COLOR_ATTACHMENT0);

@@ -66,15 +66,15 @@ bool FoliageSystem::init()
 
 	{
 		Texture::TextureAssetDescriptor noiseSettings;
-		noiseSettings.filter = Texture::TextureFilter::Linear;
-		noiseSettings.wrap = Texture::TextureWrap::Mirror;
+		noiseSettings.filter = TextureFilter::Linear;
+		noiseSettings.wrap = TextureWrap::Mirror;
 		windNoise = Texture::load(SGE_ROOT_DIR "Resources/Engine/Textures/wind_noise.png", noiseSettings);
 	}
 
 	{
 		Texture::TextureAssetDescriptor noiseSettings;
-		noiseSettings.filter = Texture::TextureFilter::Linear;
-		noiseSettings.wrap = Texture::TextureWrap::Mirror;
+		noiseSettings.filter = TextureFilter::Linear;
+		noiseSettings.wrap = TextureWrap::Mirror;
 		noiseTexture = Texture::load(SGE_ROOT_DIR "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
 	}
 

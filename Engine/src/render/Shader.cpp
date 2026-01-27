@@ -512,7 +512,7 @@ ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& filepath
 
 ResourceWrapper<Shader> Shader::load(const std::string& fileLocation, LoadDescriptor desc)
 {
-	ShaderOverride shaderOverride = desc.settings.shaderOverride;
+	ShaderOverride shaderOverride = desc.shaderOverride;
 
 	std::string filepath = fileLocation;
 
@@ -640,7 +640,7 @@ Shader::~Shader() {
 	//clear();
 }
 
-AssetHandle<ShaderAsset> ShaderAsset::import(const std::string& fileLocation, ShaderAssetDescriptor desc)
+AssetHandle<ShaderAsset> ShaderAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::SHADER;
 	ShaderAsset* asset = new ShaderAsset(desc);

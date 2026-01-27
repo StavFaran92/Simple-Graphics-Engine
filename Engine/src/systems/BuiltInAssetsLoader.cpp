@@ -39,17 +39,17 @@ void BuiltInAssetsLoader::loadTextures()
 	{
 		static unsigned char* whiteColor = new unsigned char[3] { 255, 255, 255 }; // todo rethink this
 
-		Texture::TextureData tData;
-		tData.target = Texture::TextureTarget::TEXTURE_2D;
+		TextureData tData;
+		tData.target = TextureTarget::TEXTURE_2D;
 		tData.width = 1;
 		tData.height = 1;
 		tData.channels = 3;
 		tData.data = whiteColor;
-		tData.internalFormat = Texture::InternalFormat::RGB;
-		tData.format = Texture::Format::RGB;
-		tData.type = Texture::Type::UNSIGNED_BYTE;
-		tData.filter = Texture::TextureFilter::Linear;
-		tData.wrap = Texture::TextureWrap::Repeat;
+		tData.internalFormat = TextureInternalFormat::RGB;
+		tData.format = TextureFormat::RGB;
+		tData.type = TextureType::UNSIGNED_BYTE;
+		tData.filter = TextureFilter::Linear;
+		tData.wrap = TextureWrap::Repeat;
 		tData.textureName = "SGE_TEXTURE_WHITE";
 
 		auto texture = Texture::createTexture(tData);
@@ -64,17 +64,17 @@ void BuiltInAssetsLoader::loadTextures()
 
 	{
 		static unsigned char* blackColor = new unsigned char[3] { 0, 0, 0};
-		Texture::TextureData tData;
-		tData.target = Texture::TextureTarget::TEXTURE_2D;
+		TextureData tData;
+		tData.target = TextureTarget::TEXTURE_2D;
 		tData.width = 1;
 		tData.height = 1;
 		tData.channels = 3;
 		tData.data = blackColor;
-		tData.internalFormat = Texture::InternalFormat::RGB;
-		tData.format = Texture::Format::RGB;
-		tData.type = Texture::Type::UNSIGNED_BYTE;
-		tData.filter = Texture::TextureFilter::Linear;
-		tData.wrap = Texture::TextureWrap::Repeat;
+		tData.internalFormat = TextureInternalFormat::RGB;
+		tData.format = TextureFormat::RGB;
+		tData.type = TextureType::UNSIGNED_BYTE;
+		tData.filter = TextureFilter::Linear;
+		tData.wrap = TextureWrap::Repeat;
 		tData.textureName = "SGE_TEXTURE_BLACK";
 		auto texture = Texture::createTexture(tData);
 

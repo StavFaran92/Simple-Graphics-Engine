@@ -1,20 +1,20 @@
 #include "TextureUtils.h"
 
-uint32_t TextureUtils::bytesPerChannel(Texture::Type type)
+uint32_t TextureUtils::bytesPerChannel(TextureType type)
 {
 	switch (type)
 	{
-	case Texture::Type::BYTE:
-	case Texture::Type::UNSIGNED_BYTE:
+	case TextureType::BYTE:
+	case TextureType::UNSIGNED_BYTE:
 		return 1;
 
-	case Texture::Type::SHORT:
-	case Texture::Type::UNSIGNED_SHORT:
+	case TextureType::SHORT:
+	case TextureType::UNSIGNED_SHORT:
 		return 2;
 
-	case Texture::Type::INT:
-	case Texture::Type::UNSIGNED_INT:
-	case Texture::Type::FLOAT:
+	case TextureType::INT:
+	case TextureType::UNSIGNED_INT:
+	case TextureType::FLOAT:
 		return 4;
 
 	default:
@@ -23,24 +23,24 @@ uint32_t TextureUtils::bytesPerChannel(Texture::Type type)
 	}
 }
 
-uint32_t TextureUtils::channelCount(Texture::Format format)
+uint32_t TextureUtils::channelCount(TextureFormat format)
 {
 	switch (format)
 	{
-	case Texture::Format::RED:
-	case Texture::Format::GREEN:
-	case Texture::Format::BLUE:
-	case Texture::Format::ALPHA:
-	case Texture::Format::DEPTH_COMPONENT:
+	case TextureFormat::RED:
+	case TextureFormat::GREEN:
+	case TextureFormat::BLUE:
+	case TextureFormat::ALPHA:
+	case TextureFormat::DEPTH_COMPONENT:
 		return 1;
 
-	case Texture::Format::RG:
+	case TextureFormat::RG:
 		return 2;
 
-	case Texture::Format::RGB:
+	case TextureFormat::RGB:
 		return 3;
 
-	case Texture::Format::RGBA:
+	case TextureFormat::RGBA:
 		return 4;
 
 	default:
@@ -51,8 +51,8 @@ uint32_t TextureUtils::channelCount(Texture::Format format)
 
 void* TextureUtils::createBlankTextureBuffer2D(uint32_t width,
 	uint32_t height,
-	Texture::Format format,
-	Texture::Type type)
+	TextureFormat format,
+	TextureType type)
 {
 	const uint32_t bpp = channelCount(format) * bytesPerChannel(type);
 	const size_t size = static_cast<size_t>(width) * height * bpp;
@@ -64,8 +64,8 @@ void* TextureUtils::createBlankTextureBuffer2D(uint32_t width,
 void* TextureUtils::createBlankTextureBuffer3D(uint32_t width,
 	uint32_t height,
 	uint32_t depth,
-	Texture::Format format,
-	Texture::Type type)
+	TextureFormat format,
+	TextureType type)
 {
 	const uint32_t bpp = channelCount(format) * bytesPerChannel(type);
 	const size_t size = static_cast<size_t>(width) * height * depth * bpp;

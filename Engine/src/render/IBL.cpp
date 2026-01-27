@@ -35,16 +35,16 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 	fbo.bind();
 
 	// Generate cubemap
-	Texture::TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_CUBE_MAP;
 	textureData.width = 32;
 	textureData.height = 32;
 	textureData.channels = 3;
-	textureData.internalFormat = Texture::InternalFormat::RGB16F;
-	textureData.format = Texture::Format::RGB;
-	textureData.type = Texture::Type::FLOAT;
-	textureData.filter = Texture::TextureFilter::Linear;
-	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.internalFormat = TextureInternalFormat::RGB16F;
+	textureData.format = TextureFormat::RGB;
+	textureData.type = TextureType::FLOAT;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
 	textureData.genMipMap = false;
 	textureData.data = nullptr;
 	auto irradianceMap = Texture::createTexture(textureData);
@@ -122,16 +122,16 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 	fbo.bind();
 
 	// Generate cubemap
-	Texture::TextureData textureData2;
-	textureData2.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
+	TextureData textureData2;
+	textureData2.target = TextureTarget::TEXTURE_CUBE_MAP;
 	textureData2.width = 128;
 	textureData2.height = 128;
 	textureData2.channels = 3;
-	textureData2.internalFormat = Texture::InternalFormat::RGB16F;
-	textureData2.format = Texture::Format::RGB;
-	textureData2.type = Texture::Type::FLOAT;
-	textureData2.filter = Texture::TextureFilter::Linear;
-	textureData2.wrap = Texture::TextureWrap::Clamp;
+	textureData2.internalFormat = TextureInternalFormat::RGB16F;
+	textureData2.format = TextureFormat::RGB;
+	textureData2.type = TextureType::FLOAT;
+	textureData2.filter = TextureFilter::Linear;
+	textureData2.wrap = TextureWrap::Clamp;
 	textureData2.genMipMap = true;
 	textureData2.data = nullptr;
 	auto prefilterEnvMap = Texture::createTexture(textureData2);
@@ -222,16 +222,16 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 	fbo.bind();
 
 	// Generate 2D LUT
-	Texture::TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
 	textureData.width = 512;
 	textureData.height = 512;
 	textureData.channels = 2;
-	textureData.internalFormat = Texture::InternalFormat::RG16F;
-	textureData.format = Texture::Format::RG;
-	textureData.type = Texture::Type::FLOAT;
-	textureData.filter = Texture::TextureFilter::Linear;
-	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.internalFormat = TextureInternalFormat::RG16F;
+	textureData.format = TextureFormat::RG;
+	textureData.type = TextureType::FLOAT;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
 	textureData.data = nullptr;
 	auto lut = Texture::createTexture(textureData);
 

@@ -14,14 +14,14 @@ void FoliageField::build(int newW, int newH)
 	width = newW;
 	height = newH;
 
-	//Texture::TextureData tData;
+	//TextureData tData;
 	//tData.bpp = 1;
 	//tData.width = width;
 	//tData.height = height;
 	//tData.format = Texture::Format::RED;
 	//tData.internalFormat = Texture::InternalFormat::R8;
 	//tData.type = Texture::Type::UNSIGNED_BYTE;
-	//tData.target = Texture::TextureTarget::TEXTURE_2D;
+	//tData.target = TextureTarget::TEXTURE_2D;
 
 	//std::vector<float> data(height * width, 0.f);
 	//tData.data = data.data();

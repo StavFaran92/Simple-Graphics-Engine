@@ -224,16 +224,16 @@ void Scene::init(Context* context)
 	m_uboTime->attachToBindPoint(0);
 
 	// Create irradiance map using created cubemap
-	Texture::TextureData defaultCubemapData;
-	defaultCubemapData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
+	TextureData defaultCubemapData;
+	defaultCubemapData.target = TextureTarget::TEXTURE_CUBE_MAP;
 	defaultCubemapData.width = 1;
 	defaultCubemapData.height = 1;
 	defaultCubemapData.channels = 3;
-	defaultCubemapData.internalFormat = Texture::InternalFormat::RGB;
-	defaultCubemapData.format = Texture::Format::RGB;
-	defaultCubemapData.type = Texture::Type::UNSIGNED_BYTE;
-	defaultCubemapData.filter = Texture::TextureFilter::Linear;
-	defaultCubemapData.wrap = Texture::TextureWrap::Clamp;
+	defaultCubemapData.internalFormat = TextureInternalFormat::RGB;
+	defaultCubemapData.format = TextureFormat::RGB;
+	defaultCubemapData.type = TextureType::UNSIGNED_BYTE;
+	defaultCubemapData.filter = TextureFilter::Linear;
+	defaultCubemapData.wrap = TextureWrap::Clamp;
 	defaultCubemapData.genMipMap = false;
 	static unsigned char FULL_WHITE[3] = { 255, 255, 255 };
 	for (int i = 0; i < 6; i++)
@@ -243,16 +243,16 @@ void Scene::init(Context* context)
 	m_irradianceMap = Texture::createTexture(defaultCubemapData);
 
 	// Create prefilter env map using created cubemap
-	Texture::TextureData defaultCubemapData2;
-	defaultCubemapData2.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
+	TextureData defaultCubemapData2;
+	defaultCubemapData2.target = TextureTarget::TEXTURE_CUBE_MAP;
 	defaultCubemapData2.width = 1;
 	defaultCubemapData2.height = 1;
 	defaultCubemapData2.channels = 3;
-	defaultCubemapData2.internalFormat = Texture::InternalFormat::RGB;
-	defaultCubemapData2.format = Texture::Format::RGB;
-	defaultCubemapData2.type = Texture::Type::UNSIGNED_BYTE;
-	defaultCubemapData2.filter = Texture::TextureFilter::Linear;
-	defaultCubemapData2.wrap = Texture::TextureWrap::Clamp;
+	defaultCubemapData2.internalFormat = TextureInternalFormat::RGB;
+	defaultCubemapData2.format = TextureFormat::RGB;
+	defaultCubemapData2.type = TextureType::UNSIGNED_BYTE;
+	defaultCubemapData2.filter = TextureFilter::Linear;
+	defaultCubemapData2.wrap = TextureWrap::Clamp;
 	defaultCubemapData2.genMipMap = false;
 	for (int i = 0; i < 6; i++)
 	{

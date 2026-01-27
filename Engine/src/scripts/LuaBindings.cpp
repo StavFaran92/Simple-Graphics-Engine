@@ -288,7 +288,7 @@ void bindAssets(sol::state& lua)
     //        [](int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data) {
     //            return Texture::createTexture(width, height, internalFormat, format, type, params, isEngineOwned, data);
     //        },
-    //        [](const Texture::TextureData& textureData) {
+    //        [](const TextureData& textureData) {
     //            return Texture::createTexture(textureData);
     //        }
     //    ),

@@ -35,18 +35,18 @@ AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 {
 	m_heightDataCPU = std::vector<float>(width * height, 0.0f);
 
-	Texture::TextureData tData;
-	tData.target = Texture::TextureTarget::TEXTURE_2D;
+	TextureData tData;
+	tData.target = TextureTarget::TEXTURE_2D;
 	tData.width = width;
 	tData.height = height;
 	tData.channels = 1;
 	tData.data = m_heightDataCPU.data();
-	tData.internalFormat = Texture::InternalFormat::R32F;
-	tData.format = Texture::Format::RED;
-	tData.type = Texture::Type::FLOAT;
+	tData.internalFormat = TextureInternalFormat::R32F;
+	tData.format = TextureFormat::RED;
+	tData.type = TextureType::FLOAT;
 	tData.textureName = "SGE_TERRAIN_HEIGHTMAP";
-	tData.filter = Texture::TextureFilter::Linear;
-	tData.wrap = Texture::TextureWrap::Clamp;
+	tData.filter = TextureFilter::Linear;
+	tData.wrap = TextureWrap::Clamp;
 
 	auto texture = Texture::createTexture(tData);
 
@@ -56,7 +56,7 @@ AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 	desc.isEngineOwned = true;
 	//desc.attributes = texture->getTextureAssetAttributes().toMap();
 	Texture::LoadDescriptor* resourceDesc = new Texture::LoadDescriptor();
-	resourceDesc->usage = Texture::TextureSemantic::Heightmap;
+	resourceDesc->usage = TextureSemantic::Heightmap;
 
 	desc.resourceDescriptor = resourceDesc;
 	auto heightmap = TextureAsset::create(texture, desc);

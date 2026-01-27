@@ -255,16 +255,16 @@ void displayTextureCreatorDialog()
 		{
 			if (uniqueName.isValid())
 			{
-				Texture::TextureData textureData;
-				textureData.target = Texture::TextureTarget::TEXTURE_2D;
+				TextureData textureData;
+				textureData.target = TextureTarget::TEXTURE_2D;
 				textureData.width = width;
 				textureData.height = height;
 				textureData.channels = 4;
-				textureData.internalFormat = Texture::InternalFormat::RGBA8;
-				textureData.format = Texture::Format::RGBA;
-				textureData.type = Texture::Type::UNSIGNED_BYTE;
-				textureData.filter = Texture::TextureFilter::Linear;
-				textureData.wrap = Texture::TextureWrap::Clamp;
+				textureData.internalFormat = TextureInternalFormat::RGBA8;
+				textureData.format = TextureFormat::RGBA;
+				textureData.type = TextureType::UNSIGNED_BYTE;
+				textureData.filter = TextureFilter::Linear;
+				textureData.wrap = TextureWrap::Clamp;
 				textureData.data = nullptr;
 				textureData.fillEmpty = true;
 				auto texture = Texture::createTexture(textureData);

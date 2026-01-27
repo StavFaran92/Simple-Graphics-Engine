@@ -29,16 +29,16 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 	fbo.bind();
 
 	// Generate cubemap
-	Texture::TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_CUBE_MAP;
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_CUBE_MAP;
 	textureData.width = 512;
 	textureData.height = 512;
 	textureData.channels = 3;
-	textureData.internalFormat = Texture::InternalFormat::RGB16F;
-	textureData.format = Texture::Format::RGB;
-	textureData.type = Texture::Type::FLOAT;
-	textureData.filter = Texture::TextureFilter::Linear;
-	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.internalFormat = TextureInternalFormat::RGB16F;
+	textureData.format = TextureFormat::RGB;
+	textureData.type = TextureType::FLOAT;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
 	textureData.genMipMap = true;
 	textureData.data = nullptr;
 	auto cubemap = Texture::createTexture(textureData);
@@ -115,16 +115,16 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	int outputHeight = cubemapTexture.get()->getHeight() * 2;
 
 	// Generate cubemap
-	Texture::TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
 	textureData.width = outputWidth;
 	textureData.height = outputHeight;
 	textureData.channels = 3;
-	textureData.internalFormat = Texture::InternalFormat::RGB;
-	textureData.format = Texture::Format::RGB;
-	textureData.type = Texture::Type::UNSIGNED_BYTE;
-	textureData.filter = Texture::TextureFilter::Linear;
-	textureData.wrap = Texture::TextureWrap::Clamp;
+	textureData.internalFormat = TextureInternalFormat::RGB;
+	textureData.format = TextureFormat::RGB;
+	textureData.type = TextureType::UNSIGNED_BYTE;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
 	textureData.data = nullptr;
 	auto equirectnagular = Texture::createTexture(textureData);
 

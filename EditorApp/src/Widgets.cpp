@@ -328,9 +328,9 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	//ImGui::DragFloat("Roughness", &mat.get()->roughnessFactor, 0.01f, 0.0f, 1.0f);
 	//ImGui::DragFloat("Opacity", &mat.get()->opacityFactor, 0.01f, 0.0f, 1.0f);
 
-	//addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Albedo", TextureType::Albedo);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Normal", TextureType::Normal);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", TextureType::Metallic);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", TextureType::Roughness);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", TextureType::AmbientOcclusion);
 }

@@ -637,14 +637,14 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 			pixelData = reinterpret_cast<unsigned char*>(aiTexture->pcData);
 		}
 
-		Texture::TextureSemantic usage = Texture::TextureSemantic::Color;
+		TextureSemantic usage = TextureSemantic::Color;
 		if (type == aiTextureType_DIFFUSE || type == aiTextureType_DIFFUSE_ROUGHNESS || type == aiTextureType_METALNESS || type == aiTextureType_AMBIENT_OCCLUSION) // todo fix
 		{
-			usage = Texture::TextureSemantic::Color;
+			usage = TextureSemantic::Color;
 		}
 		else if (type == aiTextureType_NORMALS)
 		{
-			usage = Texture::TextureSemantic::Normal;
+			usage = TextureSemantic::Normal;
 		}
 
 		texture = Texture::createTexture(width,
@@ -652,9 +652,9 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 			channels,
 			Texture::getInternalFormatFromUsage(usage),
 			Texture::getFormatFromChannels(channels),
-			Texture::Type::UNSIGNED_BYTE,
-			Texture::TextureFilter::Linear,
-			Texture::TextureWrap::Repeat,
+			TextureType::UNSIGNED_BYTE,
+			TextureFilter::Linear,
+			TextureWrap::Repeat,
 			pixelData);
 
 		AssetCreateDescriptor textureAssetDesc;
@@ -688,7 +688,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		tSettings.assetDirectory = aInfo.assetDirectory;
 		tSettings.isEngineOwned = aInfo.isEngineOwned;
 
-		tSettings.usage = Texture::TextureSemantic::Color; // todo fix
+		tSettings.usage = TextureSemantic::Color; // todo fix
 		AssetTexture = TextureAsset::import(path, tSettings);
 
 		cachedTextures.insert({ path, AssetTexture });
