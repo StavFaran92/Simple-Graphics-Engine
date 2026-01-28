@@ -244,35 +244,36 @@ void bindAssets(sol::state& lua)
         "import", &ShaderAsset::import
     );
 
-    lua.new_usertype<ResourceWrapper<Prefab>>("Prefab",
-        sol::factories(
-            [](int value) {
-                // your custom UUID creation from int
-                return ResourceWrapper<Prefab>(UUID(value));
-            }
-        ),
-        // Instance methods
-        "save", [](ResourceWrapper<Prefab>& self) {
-            self->save(self, {});
-        },
-        "instansiate", [](ResourceWrapper<Prefab>& self, glm::vec3 position) {
-            self->Instansiate(position);
-        },
+    // todo fix
+    //lua.new_usertype<ResourceWrapper<Prefab>>("Prefab",
+    //    sol::factories(
+    //        [](int value) {
+    //            // your custom UUID creation from int
+    //            return ResourceWrapper<Prefab>(UUID(value));
+    //        }
+    //    ),
+    //    // Instance methods
+    //    "save", [](ResourceWrapper<Prefab>& self) {
+    //        self->save(self, {});
+    //    },
+    //    "instansiate", [](ResourceWrapper<Prefab>& self, glm::vec3 position) {
+    //        self->Instansiate(position);
+    //    },
 
-        // Static methods wrapped as lambdas inside new_usertype
-        "create", [](const Entity& e) {
-            return Prefab::create(e); // returns ResourceWrapper<Prefab>
-        },
-        "import", [](const std::string& path) {
-            return PrefabAsset::import(path, {}); // returns ResourceWrapper<Prefab>
-        }
-    );
+    //    // Static methods wrapped as lambdas inside new_usertype
+    //    "create", [](const Entity& e) {
+    //        return Prefab::create(e); // returns ResourceWrapper<Prefab>
+    //    },
+    //    "import", [](const std::string& path) {
+    //        return PrefabAsset::import(path, {}); // returns ResourceWrapper<Prefab>
+    //    }
+    //);
 
-    lua.new_usertype<LuaScript>("LuaScript",
-        "import", &LuaScriptAsset::import,
-        "create", &LuaScript::create,
-        "updateAsset", &LuaScriptAsset::update
-    );
+    //lua.new_usertype<LuaScript>("LuaScript",
+    //    "import", &LuaScriptAsset::import,
+    //    "create", &LuaScript::create,
+    //    "updateAsset", &LuaScriptAsset::update
+    //);
 
     // TODO fix
     //lua.new_usertype<Texture>("Texture",
@@ -490,9 +491,7 @@ void bindAll(sol::state& lua)
         "getAssetFromPath", &Assets::getAssetFromPath,
         "getAsset", &Assets::getAsset,
         "hasAsset", &Assets::hasAsset,
-        "updateAsset", &Assets::updateAsset,
-        "importAsset", &Assets::importAsset,
-        "createAsset", &Assets::createAsset
+        "updateAsset", &Assets::updateAsset
     );
 
     lua.new_usertype<Window>("Window",

@@ -60,8 +60,6 @@ public:
 
 	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderLoadDescriptor desc = {});
 
-	static ResourceWrapper<Shader> load(ShaderLoadDescriptor desc);
-
 	void use();
 
 	void release() const;

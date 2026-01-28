@@ -28,10 +28,6 @@ struct AnimationLoadDescriptor : public ResourceLoadDescriptor
 class EngineAPI Animation : public Resource
 {
 public:
-	
-
-	static ResourceWrapper<Animation> load(AnimationLoadDescriptor desc);
-
 	static ResourceWrapper<Animation> load(const std::string& fileLocation, AnimationLoadDescriptor desc = {});
 
 	Animation();

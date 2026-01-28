@@ -454,14 +454,16 @@ AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation
 	return asset->importAsset(fileLocation).as<MaterialAsset>();
 }
 
+AssetHandle<MaterialAsset> MaterialAsset::create(const ResourceWrapper<Material>& mat, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::MATERIAL;
+	MaterialAsset* asset = new MaterialAsset(desc);
+	return asset->createAsset(mat).as<MaterialAsset>();
+}
+
 ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;
-	return load(desc);
-}
-
-ResourceWrapper<Material> Material::load(LoadDescriptor desc)
-{
 	std::string filepath = desc.sourcePath;
 	auto projectDir = Engine::get()->getProjectDirectory();
 	filepath = projectDir + filepath;

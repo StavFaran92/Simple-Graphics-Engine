@@ -171,8 +171,6 @@ public:
 
 	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureLoadDescriptor desc = {});
 
-	static ResourceWrapper<Texture> load(TextureLoadDescriptor desc);
-
 	ResourceWrapper<Texture> clone() const; 
 
 	int getWidth() const;

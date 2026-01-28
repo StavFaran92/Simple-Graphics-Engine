@@ -656,5 +656,5 @@ AssetHandle<ShaderAsset> ShaderAsset::create(const ResourceWrapper<Shader>& shad
 
 ResourceWrapper<Resource> ShaderLoadDescriptor::loadResource() 
 {
-	return Shader::load(*this);
+	return Shader::load(sourcePath, *this);
 }

@@ -17,11 +17,6 @@
 ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, LoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;
-	return load(desc);
-}
-
-ResourceWrapper<Prefab> Prefab::load(LoadDescriptor desc)
-{
 	std::string filepath = desc.sourcePath;
 	auto projectDir = Engine::get()->getProjectDirectory();
 	filepath = projectDir + filepath;

@@ -15,12 +15,11 @@ public:
 	struct LoadDescriptor : public ResourceLoadDescriptor
 	{
 		ResourceWrapper<Resource> loadResource() override {
-			return Prefab::load(*this);
+			return Prefab::load(sourcePath, *this);
 		}
 	};
 
 	static ResourceWrapper<Prefab> load(const std::string& fileLocation, LoadDescriptor desc = {});
-	static ResourceWrapper<Prefab> load(LoadDescriptor desc);
 	static ResourceWrapper<Prefab> create(const Entity& e);
 
 	Entity Instansiate(glm::vec3 position = glm::vec3{ 0.0f });

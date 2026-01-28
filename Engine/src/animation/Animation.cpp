@@ -109,5 +109,5 @@ bool AnimationAsset::copyFiles(const std::string& fileLocation, AssetRecord& aIn
 }
 
 ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource() {
-	return Animation::load(*this);
+	return Animation::load(sourcePath, *this);
 }

@@ -16,8 +16,6 @@ struct MeshGroupLoadDescriptor : public ResourceLoadDescriptor
 class EngineAPI MeshGroup : public Resource
 {
 public:
-	static ResourceWrapper<MeshGroup> load(MeshGroupLoadDescriptor desc);
-
 	static ResourceWrapper<MeshGroup> load(const std::string& fileLocation, MeshGroupLoadDescriptor desc = {});
 
 	void addMesh(const std::shared_ptr<Mesh>& mesh);

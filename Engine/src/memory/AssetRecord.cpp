@@ -122,7 +122,8 @@ void AssetRecord::parse()
 	}
 	if (ext.empty())
 	{
-		ext = AssetFactory::getManager(createDescriptor.aType)->getRecommendedExtension(*this);
+		//ext = AssetFactory::getManager(createDescriptor.aType)->getRecommendedExtension(*this);
+		ext = getExtensionFromType(createDescriptor.aType); // todo fix
 
 		if (ext.empty())
 		{

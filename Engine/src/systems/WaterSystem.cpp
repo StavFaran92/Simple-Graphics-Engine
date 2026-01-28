@@ -34,7 +34,6 @@ Entity WaterSystem::createPool()
 	shaderDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl";
 	shaderDesc.name = "WaterShader";
 	
-	shaderDesc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::PBR);
 	shaderDesc.isEngineOwned = true;
 	auto& shaderAsset = ShaderAsset::create(shader, shaderDesc);
 

@@ -74,6 +74,13 @@ AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocati
 	return asset->importAsset(fileLocation).as<MeshGroupAsset>();
 }
 
+AssetHandle<MeshGroupAsset> MeshGroupAsset::create(const ResourceWrapper<MeshGroup>& mesh, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::MESH;
+	MeshGroupAsset* asset = new MeshGroupAsset(desc);
+	return asset->createAsset(mesh).as<MeshGroupAsset>();
+}
+
 const std::vector<AssetHandle<MaterialAsset>>& MeshGroupAsset::getImportedMaterials() const
 {
 	return m_importedMaterials;
@@ -89,8 +96,9 @@ void MeshGroupAsset::save(const AssetRecord& aInfo)
 	MeshExporter::exportMesh(AssetHandle<MeshGroupAsset>(m_uuid));
 }
 
-ResourceWrapper<MeshGroup> MeshGroup::load(MeshGroupLoadDescriptor desc)
+ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, MeshGroupLoadDescriptor desc)
 {
+	desc.sourcePath = fileLocation;
 	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
 	ModelImporter::ModelInfo mInfo;
 	mInfo.mesh = mesh;
@@ -99,14 +107,6 @@ ResourceWrapper<MeshGroup> MeshGroup::load(MeshGroupLoadDescriptor desc)
 }
 
 
-
-ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, MeshGroupLoadDescriptor desc)
-{
-	desc.sourcePath = fileLocation;
-	return load(desc);
-}
-
-
 ResourceWrapper<Resource> MeshGroupLoadDescriptor::loadResource() {
-	return MeshGroup::load(*this);
+	return MeshGroup::load(sourcePath, *this);
 }

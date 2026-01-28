@@ -130,13 +130,11 @@ public:
 	struct LoadDescriptor : public ResourceLoadDescriptor
 	{
 		ResourceWrapper<Resource> loadResource() override {
-			return Material::load(*this);
+			return Material::load(sourcePath, *this);
 		}
 	};
 
 	static ResourceWrapper<Material> load(const std::string& fileLocation, LoadDescriptor desc = {});
-
-	static ResourceWrapper<Material> load(LoadDescriptor desc);
 
 	void use();
 	void release();
