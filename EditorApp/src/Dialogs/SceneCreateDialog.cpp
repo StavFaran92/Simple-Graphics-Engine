@@ -28,7 +28,7 @@ bool SceneCreateDialog::acceptContent()
 		desc.aType = AssetType::SCENE;
 		desc.name = m_uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		Engine::get()->getSubSystem<Assets>()->createAsset(m_tempScene, desc);
+		SceneAsset::create(m_tempScene, desc);
 		return true;
 	}
 	return false;

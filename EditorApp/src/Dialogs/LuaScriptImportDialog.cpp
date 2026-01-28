@@ -30,7 +30,7 @@ bool LuaScriptImportDialog::acceptContent()
 {
 	if (uniqueName.isValid())
 	{
-		LuaScriptImportSettings desc;
+		AssetCreateDescriptor desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		LuaScriptAsset::import(filepath.m_filepath, desc);
