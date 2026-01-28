@@ -65,11 +65,6 @@ void PrefabAsset::save(const AssetRecord& aInfo)
 	}
 }
 
-void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetRecord aInfo)
-{
-	//Engine::get()->getSubSystem<Assets>()->updateAsset<Prefab>(prefab, aInfo); 
-}
-
 void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)
 {
 	prefab->m_serializedPrefab.push_back(Archiver::serializeEntity(e));

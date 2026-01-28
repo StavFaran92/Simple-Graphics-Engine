@@ -217,6 +217,7 @@ public:
 	using Asset::Asset;
 
 	static AssetHandle<MaterialAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
+	static AssetHandle<MaterialAsset> create(const ResourceWrapper<Material>& mat, AssetCreateDescriptor desc = {});
 	static void update(const AssetHandle<MaterialAsset>& material, AssetUpdateDescriptor desc);
 
 	void save(const AssetRecord& aInfo) override;

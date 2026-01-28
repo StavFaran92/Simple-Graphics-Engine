@@ -23,7 +23,7 @@ Entity WaterSystem::createPool()
 	waterBodyNestedImpl.setParent(waterBodyEntity);
 
 	// TODO use grid instead
-	ModelImportSettings meshDesc;
+	AssetCreateDescriptor meshDesc;
 	meshDesc.isEngineOwned = true;
 	AssetHandle<MeshGroupAsset> mesh = MeshGroupAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx", meshDesc);
 	auto& meshRendererComponent = waterBodyNestedImpl.addComponent<MeshRendererComponent>(mesh);
@@ -31,11 +31,12 @@ Entity WaterSystem::createPool()
 	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
 	AssetCreateDescriptor shaderDesc;
 	shaderDesc.aType = AssetType::SHADER;
-	shaderDesc.origFilePath = SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl";
+	shaderDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl";
 	shaderDesc.name = "WaterShader";
+	
 	shaderDesc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::PBR);
 	shaderDesc.isEngineOwned = true;
-	auto& shaderAsset = Engine::get()->getSubSystem<Assets>()->createAsset(shader, shaderDesc).as<ShaderAsset>();
+	auto& shaderAsset = ShaderAsset::create(shader, shaderDesc);
 
 	auto& material = Material::create(MaterialRenderMode::Custom);
 	material->setCustomShader(shaderAsset);
@@ -43,7 +44,7 @@ Entity WaterSystem::createPool()
 	materialDesc.aType = AssetType::MATERIAL;
 	materialDesc.name = "WaterMaterial";
 	materialDesc.isEngineOwned = true;
-	auto& materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialDesc).as<MaterialAsset>();
+	auto materialAsset = MaterialAsset::create(material, materialDesc);
 
 	meshRendererComponent.setMaterial(0, materialAsset);
 

@@ -44,7 +44,7 @@ ResourceWrapper<LuaScript> LuaScript::create()
 AssetHandle<LuaScriptAsset> LuaScriptAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::LUA_SCRIPT;
-	desc.origFilePath = fileLocation;
+	desc.sourcePath = fileLocation;
 	LuaScriptAsset* asset = new LuaScriptAsset(desc);
 	return asset->importAsset(fileLocation).as<LuaScriptAsset>();
 }

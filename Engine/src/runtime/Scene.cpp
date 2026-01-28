@@ -86,12 +86,9 @@ void SceneAsset::save(const AssetRecord& aInfo)
 
 ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, LoadDescriptor desc)
 {
-	std::string filepath = desc.filepath.empty() ? fileLocation : desc.filepath;
-	if (!desc.filepath.empty() && !std::filesystem::path(desc.filepath).is_absolute())
-	{
-		auto projectDir = Engine::get()->getProjectDirectory();
-		filepath = projectDir + filepath;
-	}
+	std::string filepath = desc.sourcePath;
+	auto projectDir = Engine::get()->getProjectDirectory();
+	filepath = projectDir + filepath;
 	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
 	ResourceWrapper<Scene> scene = Factory<Scene>::create();
@@ -1316,7 +1313,7 @@ bool Scene::isSimulationActive() const
 AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::SCENE;
-	desc.origFilePath = fileLocation;
+	desc.sourcePath = fileLocation;
 	SceneAsset* asset = new SceneAsset(desc);
 	return asset->importAsset(fileLocation).as<SceneAsset>();
 }

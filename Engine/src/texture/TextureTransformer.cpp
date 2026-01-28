@@ -16,6 +16,7 @@
 #include "component/MeshRendererComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
+#include "core/Logger.h"
 
 ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture)
 {

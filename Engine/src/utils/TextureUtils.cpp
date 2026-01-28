@@ -1,5 +1,7 @@
 #include "TextureUtils.h"
 
+#include "core/Logger.h"
+
 uint32_t TextureUtils::bytesPerChannel(TextureType type)
 {
 	switch (type)

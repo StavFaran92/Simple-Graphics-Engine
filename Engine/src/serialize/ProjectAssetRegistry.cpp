@@ -90,7 +90,7 @@ void ProjectAssetRegistry::save()
 
 void ProjectAssetRegistry::addAssetRegistry(const AssetRecord& asset)
 {
-	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
+	std::string assetTypeName = getAssetTypeAsStr(asset.createDescriptor.aType);
 	json j;
 	to_json(j, asset);
 	m_assetRegistry[assetTypeName].push_back(j);
@@ -99,7 +99,7 @@ void ProjectAssetRegistry::addAssetRegistry(const AssetRecord& asset)
 
 void ProjectAssetRegistry::updateAssetRegistry(const AssetRecord& asset)
 {
-	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
+	std::string assetTypeName = getAssetTypeAsStr(asset.createDescriptor.aType);
 	for (auto& aReg : m_assetRegistry[assetTypeName])
 	{
 		std::string uuid = aReg.at("uuid").get<UUID>();
@@ -116,7 +116,7 @@ void ProjectAssetRegistry::updateAssetRegistry(const AssetRecord& asset)
 
 void ProjectAssetRegistry::removeAssetRegistry(const AssetRecord& asset)
 {
-	std::string assetTypeName = getAssetTypeAsStr(asset.aType);
+	std::string assetTypeName = getAssetTypeAsStr(asset.createDescriptor.aType);
 	for (int i=0; i< m_assetRegistry[assetTypeName].size(); i++)
 	{
 		auto aReg = m_assetRegistry[assetTypeName][i];

@@ -19,7 +19,7 @@
 
 void acquireTexture(const std::string& name, const std::string& path)
 {
-	Texture::TextureAssetDescriptor aDesc;
+	AssetCreateDescriptor aDesc;
 	aDesc.isEngineOwned = true;
 	aDesc.name = name;
 	TextureAsset::import(path, aDesc);
@@ -28,10 +28,9 @@ void acquireTexture(const std::string& name, const std::string& path)
 void addAsAsset(const std::string& name, const ResourceWrapper<MeshGroup>& meshCollection)
 {
 	AssetCreateDescriptor aInfo;
-	aInfo.aType = AssetType::MESH;
 	aInfo.name = name;
 	aInfo.isEngineOwned = true;
-	Engine::get()->getSubSystem<Assets>()->createAsset(meshCollection, aInfo);
+	MeshGroupAsset::create(meshCollection, aInfo);
 }
 
 void BuiltInAssetsLoader::loadTextures()
@@ -54,12 +53,11 @@ void BuiltInAssetsLoader::loadTextures()
 
 		auto texture = Texture::createTexture(tData);
 
-		Texture::TextureAssetDescriptor desc;
+		AssetCreateDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.name = tData.textureName;
 		desc.isEngineOwned = true;
-		// desc.attributes = texture->getTextureAssetAttributes().toMap(); // TODO: Fix this - getTextureAssetAttributes doesn't exist anymore
-		Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
+		TextureAsset::create(texture, desc);
 	}
 
 	{
@@ -78,12 +76,11 @@ void BuiltInAssetsLoader::loadTextures()
 		tData.textureName = "SGE_TEXTURE_BLACK";
 		auto texture = Texture::createTexture(tData);
 
-		Texture::TextureAssetDescriptor desc;
+		AssetCreateDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.name = tData.textureName;
 		desc.isEngineOwned = true;
-		// desc.attributes = texture->getTextureAssetAttributes().toMap(); // TODO: Fix this - getTextureAssetAttributes doesn't exist anymore
-		Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
+		TextureAsset::create(texture, desc);
 	}
 
 	acquireTexture("SGE_TEXTURE_GRASS", SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
@@ -97,16 +94,15 @@ void BuiltInAssetsLoader::loadMaterials()
 		aDesc.name = SGE_MATERIAL_DEFAULT;
 		aDesc.aType = AssetType::MATERIAL;
 		ResourceWrapper<Material> material = Material::create(MaterialRenderMode::Opaque);
-		Engine::get()->getSubSystem<Assets>()->createAsset(material, aDesc);
+		MaterialAsset::create(material, aDesc);
 	}
 
 	{
 		AssetCreateDescriptor aDesc;
 		aDesc.isEngineOwned = true;
 		aDesc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
-		aDesc.aType = AssetType::MATERIAL;
 		ResourceWrapper<Material> material = Material::create(MaterialRenderMode::Terrain);
-		Engine::get()->getSubSystem<Assets>()->createAsset(material, aDesc);
+		MaterialAsset::create(material, aDesc);
 	}
 }
 
@@ -140,7 +136,7 @@ void BuiltInAssetsLoader::loadMeshes()
 	}
 
 	{
-		ModelImportSettings aInfo;
+		AssetCreateDescriptor aInfo;
 		aInfo.aType = AssetType::MESH;
 		aInfo.name = "SGE_MESH_CAMERA";
 		aInfo.isEngineOwned = true;
