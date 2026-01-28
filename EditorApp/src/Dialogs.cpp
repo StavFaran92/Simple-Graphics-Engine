@@ -273,8 +273,8 @@ void displayTextureCreatorDialog()
 				desc.aType = AssetType::TEXTURE;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
+				TextureAsset::create(texture, desc);
 				// desc.attributes = texture->getTextureAssetAttributes().toMap(); // TODO: Fix this - getTextureAssetAttributes doesn't exist anymore
-				Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -340,11 +340,10 @@ void displayShaderCreatorDialog()
 
 			AssetCreateDescriptor desc;
 			desc.name = uniqueName.name;
-			desc.origFilePath = filepath.m_filepath;
+			desc.sourcePath = filepath.m_filepath;
 			desc.aType = AssetType::SHADER;
 			desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-			desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(shaderOverrideType);
-			Engine::get()->getSubSystem<Assets>()->createAsset(shader, desc);
+			ShaderAsset::create(shader, desc);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -383,7 +382,7 @@ void displayLuaScriptCreatorDialog()
 				desc.aType = AssetType::LUA_SCRIPT;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-				Engine::get()->getSubSystem<Assets>()->createAsset(script, desc);
+				LuaScriptAsset::create(script, desc);
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -495,7 +494,7 @@ void displayMaterialEditDialog()
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
 			//Material::updateAsset(mat, {});
-			Engine::get()->getSubSystem<Assets>()->updateAsset(mat);
+			mat->updateAsset({});
 			ImGui::CloseCurrentPopup();
 		}
 

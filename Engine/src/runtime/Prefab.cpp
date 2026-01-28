@@ -173,3 +173,8 @@ AssetHandle<PrefabAsset> PrefabAsset::import(const std::string& fileLocation, Pr
 	PrefabAsset* asset = new PrefabAsset(desc);
 	return asset->importAsset(fileLocation).as<PrefabAsset>();
 }
+
+AssetHandle<PrefabAsset> PrefabAsset::create(const ResourceWrapper<Prefab>& prefab, AssetCreateDescriptor desc)
+{
+	return AssetHandle<PrefabAsset>();
+}

@@ -35,7 +35,7 @@ bool ShaderAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 
 void ShaderAsset::save(const AssetRecord& aInfo)
 {
-	std::filesystem::copy_file(aInfo.createDescriptor.sourcePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
+	std::filesystem::copy_file(aInfo.sourcePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
 uint32_t Shader::s_activeShader = 0;

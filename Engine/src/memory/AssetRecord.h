@@ -13,19 +13,24 @@ class AssetHandle;
 
 struct EngineAPI AssetRecord
 {
-	AssetCreateDescriptor createDescriptor;
-	bool isValid = false;
+	std::string name;
+	UUID uuid = EMPTY_UUID;
+	std::string sourcePath;
+	AssetType aType = AssetType::NONE;
+	std::map<std::string, std::string> engineAttributes;
+	bool isEngineOwned = false;
+	bool isTransient = false;
+	bool isCompositeAsset = false; // this asset is composed of multiple external files 
+	ScopedPath targetDirectory;
+	std::string assetDirectory; // todo consider remove
 	std::string relativefilePath;
 	std::string fullFilePath;
 	std::string fileName;
 	std::string ext;
-	UUID uuid = EMPTY_UUID;
 	nlohmann::json importSettings;
 	Asset* asset = nullptr;
 	ResourceID resourceID = 0;
-	bool isDirty = false;
 
-	bool m_isParsed = false;
 
 	~AssetRecord() = default;
 
@@ -34,8 +39,10 @@ struct EngineAPI AssetRecord
 	AssetRecord(AssetCreateDescriptor& assetDesc);
 
 	void parse();
-
 	bool isParsed() const;
+
+	void makeDirty();
+	bool isDirty() const;
 
 	void update(const AssetUpdateDescriptor& desc);
 	void establishFilepath();
@@ -49,6 +56,11 @@ struct EngineAPI AssetRecord
 	//	ext,
 	//	importSettings,
 	//);
+private:
+	friend class Assets;
+
+	bool m_isDirty = false;
+	bool m_isParsed = false;
 };
 
 // Serialization (to JSON)

@@ -11,7 +11,7 @@ Asset::Asset(const AssetCreateDescriptor& desc)
 
 bool Asset::importAssetInner(AssetRecord& aInfo)
 {
-	std::string fileLocation = aInfo.createDescriptor.resourceDescriptor->sourcePath;
+	std::string fileLocation = aInfo.sourcePath;
 
 	// Validate input
 	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
@@ -35,7 +35,7 @@ bool Asset::importAssetInner(AssetRecord& aInfo)
 AssetHandle<Asset> Asset::importAsset(const std::string& fileLocation)
 {
 	AssetRecord aInfo(m_createDesc);
-	aInfo.createDescriptor.resourceDescriptor->sourcePath = fileLocation;
+	aInfo.sourcePath = fileLocation;
 	aInfo.asset = this;
 	aInfo.parse();
 

@@ -384,9 +384,9 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 			
 
 			AssetCreateDescriptor materialAssetInfo;
-			materialAssetInfo.isEngineOwned = aInfo.createDescriptor.isEngineOwned;
-			materialAssetInfo.assetDirectory = aInfo.createDescriptor.assetDirectory;
-			materialAssetInfo.targetDirectory = aInfo.createDescriptor.targetDirectory;
+			materialAssetInfo.isEngineOwned = aInfo.isEngineOwned;
+			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
+			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
 			m_lastImportedMaterials.materials[i] = MaterialAsset::create(material, materialAssetInfo);
@@ -658,9 +658,9 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		AssetCreateDescriptor textureAssetDesc;
 		textureAssetDesc.aType = AssetType::TEXTURE;
 		textureAssetDesc.name = textureName;
-		textureAssetDesc.isEngineOwned = aInfo.createDescriptor.isEngineOwned;
-		textureAssetDesc.assetDirectory = aInfo.createDescriptor.assetDirectory;
-		textureAssetDesc.targetDirectory = aInfo.createDescriptor.targetDirectory;
+		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
+		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
+		textureAssetDesc.targetDirectory = aInfo.targetDirectory;
 		TextureAsset::create(texture, textureAssetDesc);
 
 		if (!textureName.empty())
@@ -670,7 +670,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 	}	
 	else
 	{
-		std::string path = findTexture(str, aInfo.createDescriptor.assetDirectory); // todo fix
+		std::string path = findTexture(str, aInfo.assetDirectory); // todo fix
 		if (path.empty())
 		{
 			return AssetHandle<TextureAsset>::empty;
@@ -683,8 +683,8 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		}
 
 		AssetCreateDescriptor tSettings;
-		tSettings.assetDirectory = aInfo.createDescriptor.assetDirectory;
-		tSettings.isEngineOwned = aInfo.createDescriptor.isEngineOwned;
+		tSettings.assetDirectory = aInfo.assetDirectory;
+		tSettings.isEngineOwned = aInfo.isEngineOwned;
 		TextureLoadDescriptor* textureDesc = new TextureLoadDescriptor();
 		textureDesc->usage = TextureSemantic::Color;
 

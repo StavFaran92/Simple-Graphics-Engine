@@ -230,10 +230,10 @@ void AssetViewWindow::display()
 					ImGui::Text("UUID: %s", aInfo.uuid.str().c_str());
 					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);
 
-					if (aInfo.attributes.size() > 0)
+					if (aInfo.engineAttributes.size() > 0)
 					{
 						ImGui::LabelText("##Attributes:", "Attributes:");
-						for (const auto& [attribName, attribVal] : aInfo.attributes)
+						for (const auto& [attribName, attribVal] : aInfo.engineAttributes)
 						{
 							ImGui::Text("%s: %s", attribName.c_str(), attribVal.c_str());
 
@@ -278,7 +278,7 @@ void AssetViewWindow::display()
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
-					Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
+					Engine::get()->getSubSystem<Assets>()->getAsset(uuid).reimportAsset();
 				}
 
 				if (ImGui::Selectable("Rename"))

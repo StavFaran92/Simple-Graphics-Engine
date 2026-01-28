@@ -28,7 +28,7 @@ AssetManager* AssetFactory::getManager(AssetType aType)
 
 bool AssetFactory::loadAsset(AssetRecord& aInfo)
 {
-	auto iter = getLoadFunctionRegistry().find(aInfo.createDescriptor.aType);
+	auto iter = getLoadFunctionRegistry().find(aInfo.aType);
 	if (iter == getLoadFunctionRegistry().end())
 	{
 		logError("Invalid asset type in regsitry, did you forget to register your load function?");

@@ -23,7 +23,7 @@ Assets::Assets()
 
 void Assets::addAsset(AssetRecord& aInfo)
 {
-	if (aInfo.createDescriptor.aType == AssetType::NONE)
+	if (aInfo.aType == AssetType::NONE)
 	{
 		logError("Invalid asset type specified!");
 		return;
@@ -41,10 +41,9 @@ void Assets::addAsset(AssetRecord& aInfo)
 
 	updateRegistry(aInfo);
 
-	aInfo.isValid = true;
 	m_assets[aInfo.uuid] = aInfo;
 
-	logInfo("Successfully Added asset: '" + aInfo.createDescriptor.name + "'.");
+	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
 }
 
 void Assets::updateAsset(AssetRecord& aInfo)
@@ -52,7 +51,7 @@ void Assets::updateAsset(AssetRecord& aInfo)
 	updateRegistry(aInfo);
 	m_assets[aInfo.uuid] = aInfo;
 
-	logInfo("Successfully Updated asset: '" + aInfo.createDescriptor.name + "'.");
+	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 }
 
 std::vector<AssetHandle<Asset>> Assets::getAllAssetsOfType(AssetType aType) const
@@ -65,7 +64,7 @@ std::vector<AssetHandle<Asset>> Assets::getAllAssetsOfType(AssetType aType) cons
 	std::vector<AssetHandle<Asset>> result;
 	for (const auto& [uuid, info] :m_assets)
 	{
-		if (info.createDescriptor.aType == aType)
+		if (info.aType == aType)
 		{
 			AssetHandle<Asset> asset = getAsset(uuid);
 			result.push_back(asset);
@@ -129,11 +128,11 @@ void Assets::saveDirtyAssets()
 {
 	for (auto& [uuid, assetInfo] : m_assets)
 	{
-		if (assetInfo.isDirty)
+		if (assetInfo.isDirty())
 		{
 			AssetHandle<Asset> asset = getAsset(uuid);
 			asset->save(asset.info());
-			assetInfo.isDirty = false;
+			assetInfo.m_isDirty = false;
 		}
 	}
 }
@@ -172,9 +171,9 @@ bool Assets::hasAsset(UUID uuid) const
 
 void Assets::updateRegistry(const AssetRecord& aInfo)
 {
-	if (!aInfo.createDescriptor.name.empty())
+	if (!aInfo.name.empty())
 	{
-		Engine::get()->getMemoryManagementSystem()->addNameReference(aInfo.createDescriptor.name, aInfo.uuid);
+		Engine::get()->getMemoryManagementSystem()->addNameReference(aInfo.name, aInfo.uuid);
 	}
 	Engine::get()->getMemoryManagementSystem()->addPathReference(aInfo.relativefilePath, aInfo.uuid); //TODO maybe use some naming convention here?
 	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
@@ -208,7 +207,7 @@ std::string Assets::getAlias(UUID uid) const
 	auto iter = m_assets.find(uid);
 	if (iter != m_assets.end())
 	{
-		return iter->second.createDescriptor.name;
+		return iter->second.name;
 	}
 	return "N/A";
 
@@ -247,7 +246,7 @@ AssetHandle<Asset> Assets::getAssetFromName(const std::string& name) const
 void Assets::makeDirty(UUID uuid)
 {
 	AssetRecord aInfo = getAsset(uuid).info();
-	aInfo.isDirty = true;
+	aInfo.makeDirty();
 	m_assets[uuid] = aInfo;
 }
 
