@@ -31,7 +31,6 @@ public:
 	using Asset::Asset;
 
 	static AssetHandle<LuaScriptAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-	static void update(const AssetHandle<LuaScriptAsset>& script, AssetUpdateDescriptor desc);
 
 	void save(const AssetRecord& aInfo) override;
 

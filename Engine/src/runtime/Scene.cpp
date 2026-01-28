@@ -1317,8 +1317,3 @@ AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, Asse
 	SceneAsset* asset = new SceneAsset(desc);
 	return asset->importAsset(fileLocation).as<SceneAsset>();
 }
-
-void SceneAsset::update(const AssetHandle<SceneAsset>& scene, AssetUpdateDescriptor desc)
-{
-	Engine::get()->getSubSystem<Assets>()->updateAsset(scene, desc);
-}

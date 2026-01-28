@@ -454,11 +454,6 @@ AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation
 	return asset->importAsset(fileLocation).as<MaterialAsset>();
 }
 
-void MaterialAsset::update(const AssetHandle<MaterialAsset>& material, AssetUpdateDescriptor desc)
-{
-	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
-}
-
 ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;

@@ -48,8 +48,3 @@ AssetHandle<LuaScriptAsset> LuaScriptAsset::import(const std::string& fileLocati
 	LuaScriptAsset* asset = new LuaScriptAsset(desc);
 	return asset->importAsset(fileLocation).as<LuaScriptAsset>();
 }
-
-void LuaScriptAsset::update(const AssetHandle<LuaScriptAsset>& script, AssetUpdateDescriptor desc)
-{
-	Engine::get()->getSubSystem<Assets>()->updateAsset(script, desc);
-}

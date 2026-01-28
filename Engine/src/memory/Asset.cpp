@@ -87,7 +87,7 @@ AssetHandle<Asset> Asset::createAsset(const ResourceWrapper<Resource>& resource)
 }
 
 
-void Asset::updateAsset(const AssetHandle<Asset>& asset, const AssetUpdateDescriptor& uDesc)
+void Asset::updateAsset(const AssetUpdateDescriptor& uDesc)
 {
 	AssetRecord aInfo = Engine::get()->getSubSystem<Assets>()->getAsset(m_uuid).info();
 	aInfo.update(uDesc);
