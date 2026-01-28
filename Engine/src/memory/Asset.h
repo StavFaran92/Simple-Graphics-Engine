@@ -5,7 +5,7 @@
 #include "memory/AssetHandle.h"
 #include "AssetFactory.h"
 
-class Asset
+class EngineAPI Asset
 {
 public:
 	using ResourceType = Resource;

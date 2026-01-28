@@ -123,7 +123,7 @@ struct TextureData
 	void* facesData[6]{ nullptr }; //only apply to Cubemap
 };
 
-struct TextureLoadDescriptor : public ResourceLoadDescriptor
+struct EngineAPI TextureLoadDescriptor : public ResourceLoadDescriptor
 {
 	ResourceWrapper<Resource> loadResource() override;
 

@@ -48,13 +48,13 @@ void AssetRecord::establishFilepath()
 AssetRecord::AssetRecord(AssetCreateDescriptor& assetDesc)
 {
 	name = assetDesc.name;
-	//std::string sourcePath;
-	//AssetType aType = AssetType::NONE;
-	//std::map<std::string, std::string> engineAttributes;
-	//bool isEngineOwned = false;
-	//bool isTransient = false;
-	//bool isCompositeAsset = false; // this asset is composed of multiple external files 
-	//ScopedPath targetDirectory;
+	aType = assetDesc.aType;
+	sourcePath = assetDesc.sourcePath;
+	engineAttributes = assetDesc.engineAttributes;
+	isEngineOwned = assetDesc.isEngineOwned;
+	isTransient = assetDesc.isTransient;
+	isCompositeAsset = assetDesc.isCompositeAsset;
+	targetDirectory = assetDesc.targetDirectory;
 }
 
 void AssetRecord::parse()
