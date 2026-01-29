@@ -32,5 +32,5 @@ public:
 private:
 	std::string m_rootResourceDir;
 
-    std::unordered_map<ResourceID, ResourceWrapper<Resource>> m_resources;
+    std::unordered_map<ResourceID, ResourceWrapper<Resource>> m_resourceCache; // todo - should be weak ref
 };

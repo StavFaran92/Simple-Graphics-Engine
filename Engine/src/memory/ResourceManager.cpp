@@ -2,6 +2,8 @@
 
 #include "core/Logger.h"
 
+std::mutex cacheMutex;
+
 std::string ResourceManager::getRootDir() const
 {
 	return m_rootResourceDir;
@@ -34,5 +36,34 @@ void ResourceManager::setRootDir(const std::string& rootDir)
 
 ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, const std::function<ResourceWrapper<Resource>(void)>& creationCallback)
 {
-	return ResourceWrapper<Resource>();
+    {
+        std::scoped_lock lock(cacheMutex);
+
+        auto it = m_resourceCache.find(id);
+        if (it != m_resourceCache.end())
+        {
+            if (auto existing = it->second)
+            {
+                return existing;
+            }
+        }
+    }
+
+    // Create outside the lock (important)
+    ResourceWrapper<Resource> created = creationCallback();
+
+    {
+        std::scoped_lock lock(cacheMutex);
+
+        // Another thread might have beaten us to it
+        auto& slot = m_resourceCache[id];
+        if (auto existing = slot)
+        {
+            return existing;
+        }
+
+        slot = created;
+    }
+
+    return created;
 }
