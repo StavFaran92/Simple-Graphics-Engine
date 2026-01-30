@@ -25,6 +25,21 @@ public:
 
     ResourceWrapper<Resource> createOrGetCached(ResourceID id, const std::function<ResourceWrapper<Resource>(void)>& creationCallback);
 
+    template<typename T, typename... Args>
+    ResourceWrapper<T> create(ResourceID id, Args&&... args)
+    {
+        static_assert(std::is_base_of_v<Resource, T>);
+
+        auto obj = std::make_shared<T>(std::forward<Args>(args)...);
+        auto& resource = ResourceWrapper<T>(obj, id);
+
+        m_resourceCache[id] = resource;
+
+        return resource;
+    }
+
+
+
 
 
 

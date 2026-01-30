@@ -15,7 +15,7 @@ public:
     static ResourceWrapper<T> create(Args&&... args)
     {
         ResourceID id = Resource::getNewResourceID();
-        return ResourceWrapper<T>::createResource(id, args...);
+        return Engine::get()->getResourceManager()->create<T>(id, args...);
 
         //T* asset = new T(args...);
         //ResourceID id = Resource::getNewResourceID();

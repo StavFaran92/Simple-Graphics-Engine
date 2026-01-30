@@ -76,6 +76,8 @@ AssetHandle<Asset> Asset::createAsset(const ResourceWrapper<Resource>& resource)
 	aInfo.parse();
 	aInfo.resourceID = resource.getUID();
 
+	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
+
 	// Store for later use
 	m_uuid = aInfo.uuid;
 

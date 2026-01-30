@@ -94,6 +94,7 @@ private:
     }
 
     template<typename U> friend class ResourceWrapper;
+    friend class ResourceManager;
 
     std::shared_ptr<Resource> m_resource;
     ResourceID m_id = emptyID;
