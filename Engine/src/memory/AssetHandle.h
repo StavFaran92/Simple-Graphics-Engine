@@ -40,7 +40,13 @@ public:
 	{
 		const AssetRecord& record = info();
 		return Engine::get()->getResourceManager()->createOrGetCached(record.resourceID, [this, &record]() {
-			ResourceWrapper<Resource> resource = get()->getDescriptor().resourceDescriptor->loadResource();
+			const Asset* asset = get();
+			const AssetCreateDescriptor& createDesc = asset->getDescriptor();
+			ResourceLoadDescriptor* loadDesc = createDesc.resourceDescriptor;
+
+			loadDesc->sourcePath = record.sourcePath;
+
+			ResourceWrapper<Resource> resource = loadDesc->loadResource();
 			AssetRecord newRecord = record;
 			newRecord.resourceID = resource.getUID();
 			Engine::get()->getSubSystem<Assets>()->updateAsset(newRecord);
