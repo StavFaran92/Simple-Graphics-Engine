@@ -19,7 +19,7 @@ public:
 
 	AssetHandle(UUID uuid) : uuid(uuid)
 	{
-		m_resource = resource();
+		//m_resource = resource();
 	};
 
 	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
@@ -33,23 +33,19 @@ public:
 	AssetHandle(const AssetHandle<U>& other)
 	{
 		uuid = other.getUID();
-		m_resource = resource();
+		//m_resource = resource();
 	}
 
-	const ResourceWrapper<ResourceType> resource() const
+	ResourceWrapper<ResourceType> resource() const
 	{
-		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
-			return get()->getDescriptor().resourceDescriptor->loadResource();
+		const AssetRecord& record = info();
+		return Engine::get()->getResourceManager()->createOrGetCached(record.resourceID, [this, &record]() {
+			ResourceWrapper<Resource> resource = get()->getDescriptor().resourceDescriptor->loadResource();
+			AssetRecord newRecord = record;
+			newRecord.resourceID = resource.getUID();
+			Engine::get()->getSubSystem<Assets>()->updateAsset(newRecord);
+			return resource;
 		}).as<ResourceType>();
-	}
-
-	ResourceWrapper<ResourceType> resource()
-	{
-		return Engine::get()->getResourceManager()->createOrGetCached(info().resourceID, [this]() {
-			return get()->getDescriptor().resourceDescriptor->loadResource();
-			}).as<ResourceType>();
-
-		//return ResourceWrapper<ResourceType>(info().resourceID);
 	}
 
 	void erase()
@@ -69,7 +65,7 @@ public:
 
 	bool isEmpty() const
 	{
-		return resource().isEmpty();
+		return info().resourceID == 0;
 	}
 
 	const AssetRecord& info() const
@@ -106,7 +102,7 @@ private:
 	UUID uuid = EMPTY_UUID;
 
 	// Used mainly for debug
-	ResourceWrapper<Resource> m_resource = ResourceWrapper<Resource>::empty;
+	//ResourceWrapper<Resource> m_resource = ResourceWrapper<Resource>::empty;
 private:
 	template<typename T>friend class Factory;
 	friend class Assets;
