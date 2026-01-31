@@ -75,6 +75,7 @@ enum class TextureInternalFormat : int
 
 enum class TextureFormat : int {
 	DEPTH_COMPONENT = 0x1902,
+	RGB_INTEGER = 0x8D98,
 	RED = 0x1903,
 	GREEN = 0x1904,
 	BLUE = 0x1905,

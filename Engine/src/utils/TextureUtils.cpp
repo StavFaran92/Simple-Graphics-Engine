@@ -40,6 +40,7 @@ uint32_t TextureUtils::channelCount(TextureFormat format)
 		return 2;
 
 	case TextureFormat::RGB:
+	case TextureFormat::RGB_INTEGER:
 		return 3;
 
 	case TextureFormat::RGBA:
