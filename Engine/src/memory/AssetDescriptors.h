@@ -45,6 +45,15 @@ struct AssetCreateDescriptor
 		isCompositeAsset
 		);
 
+	template<typename T, typename... Args>
+	T* makeResourceDescriptor(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<ResourceLoadDescriptor, T>);
+		T* obj = new T(std::forward<Args>(args)...);
+		resourceDescriptor = obj;
+		return obj;
+	}
+
 	//virtual nlohmann::json fillParams() const { return {}; }
 
 	//timestamp

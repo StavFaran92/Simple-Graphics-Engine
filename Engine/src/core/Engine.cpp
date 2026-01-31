@@ -594,9 +594,9 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     desc.aType = AssetType::SHADER;
     desc.name = "FXAAShader";
     desc.isEngineOwned = true;
+    desc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
 
-    ShaderLoadDescriptor* shaderDesc = new ShaderLoadDescriptor();
-    shaderDesc->sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
+    ShaderLoadDescriptor* shaderDesc = desc.makeResourceDescriptor<ShaderLoadDescriptor>();
     shaderDesc->shaderOverride = ShaderOverride::PostProcess;
 
     desc.resourceDescriptor = shaderDesc;

@@ -70,6 +70,10 @@ AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocati
 {
 	desc.aType = AssetType::MESH;
 	desc.isCompositeAsset = true;
+	if (!desc.resourceDescriptor)
+	{
+		desc.makeResourceDescriptor<MeshGroupLoadDescriptor>();
+	}
 	MeshGroupAsset* asset = new MeshGroupAsset(desc);
 	return asset->importAsset(fileLocation).as<MeshGroupAsset>();
 }
