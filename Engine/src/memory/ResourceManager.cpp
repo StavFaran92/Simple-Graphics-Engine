@@ -42,9 +42,10 @@ ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, cons
         auto it = m_resourceCache.find(id);
         if (it != m_resourceCache.end())
         {
-            if (auto existing = it->second)
+            auto existing = it->second;
+            if (existing.isValid())
             {
-                return existing;
+                return existing.lock();
             }
         }
     }
@@ -57,9 +58,11 @@ ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, cons
 
         // Another thread might have beaten us to it
         auto& slot = m_resourceCache[created.getUID()];
-        if (auto existing = slot)
+
+        auto existing = slot;
+        if (existing.isValid())
         {
-            return existing;
+            return existing.lock();
         }
 
         slot = created;

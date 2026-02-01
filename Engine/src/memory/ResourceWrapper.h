@@ -86,6 +86,7 @@ private:
 
     template<typename U> friend class ResourceWrapper;
     friend class ResourceManager;
+    template<typename U> friend class ResourceView;
 
     std::shared_ptr<Resource> m_resource;
     ResourceID m_id = emptyID;

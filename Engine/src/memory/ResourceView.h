@@ -8,21 +8,27 @@ template<typename T>
 class ResourceView {
 public:
     ResourceView() = default;
-    ResourceView(const std::shared_ptr<T>& ptr)
-        : m_weak(ptr) {
+    ResourceView(const ResourceWrapper<T>& ptr)
+        : m_weak(ptr.m_resource) {
     }
 
-    bool isValid() const noexcept {
+    bool isValid() const noexcept 
+    {
         return !m_weak.expired();
     }
 
-    ResourceWrapper<T> lock() const {
+    ResourceWrapper<T> lock() const 
+    {
         if(!isValid()) return ResourceWrapper<T>::empty;
 
         std::shared_ptr<T> sptr = m_weak.lock();
-        
+        if (!sptr)
+            return ResourceWrapper<T>::empty;
+
+        return ResourceWrapper<T>(sptr, id);
     }
 
 private:
     std::weak_ptr<T> m_weak;
+    ResourceID id = 0;
 };
