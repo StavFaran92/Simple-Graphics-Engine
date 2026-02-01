@@ -11,13 +11,19 @@
 
 using json = nlohmann::json;
 
+using CreateFunc = std::function<ResourceWrapper<Resource>()>;
+
 struct ResourceLoadDescriptor
 {
+	
+
 	virtual ~ResourceLoadDescriptor() = default;
 
-	virtual ResourceWrapper<Resource> loadResource() = 0;
+	//virtual ResourceWrapper<Resource> loadResource() = 0;
 
 	virtual nlohmann::json fillParams() const { return {}; }
+
+	CreateFunc createFunc;
 
 	std::string sourcePath;
 };
@@ -33,6 +39,7 @@ struct AssetCreateDescriptor
 	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	ScopedPath targetDirectory;
 	std::string assetDirectory; // todo consider remove
+	CreateFunc createFunc;
 
 	ResourceLoadDescriptor* resourceDescriptor = nullptr;
 

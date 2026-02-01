@@ -26,7 +26,7 @@ enum class ShaderOverride : int
 
 struct ShaderLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
+	ShaderLoadDescriptor();
 
 	ShaderOverride shaderOverride = ShaderOverride::None;
 

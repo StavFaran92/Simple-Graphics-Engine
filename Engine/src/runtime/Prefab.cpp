@@ -1,6 +1,12 @@
 #include "Prefab.h"
 
 #include <fstream>
+#include <functional>
+
+PrefabLoadDescriptor::PrefabLoadDescriptor()
+{
+	createFunc = std::bind(&Prefab::load, sourcePath, *this);
+}
 #include <filesystem>
 
 #include <cereal/types/polymorphic.hpp>
@@ -14,7 +20,7 @@
 #include "component/ObjectComponent.h"
 #include "core/Engine.h"
 
-ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, LoadDescriptor desc)
+ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;

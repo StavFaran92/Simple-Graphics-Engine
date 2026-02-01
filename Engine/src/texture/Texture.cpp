@@ -2,6 +2,12 @@
 #include "core/ApplicationConstants.h"
 
 #include <GL/glew.h>
+#include <functional>
+
+TextureLoadDescriptor::TextureLoadDescriptor()
+{
+	createFunc = std::bind(&Texture::load, sourcePath, *this);
+}
 
 #include "core/Logger.h"
 #include "core/Configurations.h"
@@ -674,10 +680,6 @@ AssetHandle<TextureAsset> TextureAsset::create(const ResourceWrapper<Texture>& t
 	desc.aType = AssetType::TEXTURE;
 	TextureAsset* asset = new TextureAsset(desc);
 	return asset->createAsset(texture).as<TextureAsset>();
-}
-
-ResourceWrapper<Resource> TextureLoadDescriptor::loadResource() {
-	return Texture::load(sourcePath, *this);
 }
 
 

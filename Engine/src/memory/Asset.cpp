@@ -68,13 +68,12 @@ UUID Asset::getUUID() const
 	return m_uuid;
 }
 
-AssetHandle<Asset> Asset::createAsset(const ResourceWrapper<Resource>& resource)
+AssetHandle<Asset> Asset::createAsset()
 {
 	// Add asset info
 	AssetRecord aInfo(m_createDesc);
 	aInfo.asset = this;
 	aInfo.parse();
-	aInfo.resourceID = resource.getUID();
 
 	Engine::get()->getSubSystem<Assets>()->addAsset(aInfo);
 

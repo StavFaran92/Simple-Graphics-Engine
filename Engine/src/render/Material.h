@@ -56,6 +56,12 @@ struct EditableUniform {
 	}
 };
 
+
+struct MaterialLoadDescriptor : public ResourceLoadDescriptor
+{
+	MaterialLoadDescriptor();
+};
+
 //Resource
 class EngineAPI Material : public Resource
 {
@@ -127,14 +133,8 @@ public:
 	Material();
 	~Material() = default;
 
-	struct LoadDescriptor : public ResourceLoadDescriptor
-	{
-		ResourceWrapper<Resource> loadResource() override {
-			return Material::load(sourcePath, *this);
-		}
-	};
 
-	static ResourceWrapper<Material> load(const std::string& fileLocation, LoadDescriptor desc = {});
+	static ResourceWrapper<Material> load(const std::string& fileLocation, MaterialLoadDescriptor desc = {});
 
 	void use();
 	void release();

@@ -3,6 +3,13 @@
 #include "animation/Bone.h"
 #include "animation/AnimationLoader.h"
 
+#include <functional>
+
+AnimationLoadDescriptor::AnimationLoadDescriptor()
+{
+	createFunc = std::bind(&Animation::load, sourcePath, *this);
+}
+
 Animation::Animation()
 {
 }
@@ -106,8 +113,4 @@ bool AnimationAsset::copyFiles(const std::string& fileLocation, AssetRecord& aIn
 {
 	const std::string savedFilePath = aInfo.fullFilePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath);
-}
-
-ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource() {
-	return Animation::load(sourcePath, *this);
 }

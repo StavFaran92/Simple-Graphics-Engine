@@ -1,6 +1,12 @@
 #include "runtime/Scene.h"
 
 #include <filesystem>
+#include <functional>
+
+SceneLoadDescriptor::SceneLoadDescriptor()
+{
+	createFunc = std::bind(&Scene::load, sourcePath, *this);
+}
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
@@ -84,7 +90,7 @@ void SceneAsset::save(const AssetRecord& aInfo)
 	}
 }
 
-ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, LoadDescriptor desc)
+ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc)
 {
 	std::string filepath = desc.sourcePath;
 	auto projectDir = Engine::get()->getProjectDirectory();

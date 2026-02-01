@@ -1,6 +1,12 @@
 #include "render/Material.h"
 
 #include "core/Logger.h"
+#include <functional>
+
+MaterialLoadDescriptor::MaterialLoadDescriptor()
+{
+	createFunc = std::bind(&Material::load, sourcePath, *this);
+}
 #include <GL\glew.h>
 
 #include "core/Engine.h"
@@ -461,7 +467,7 @@ AssetHandle<MaterialAsset> MaterialAsset::create(const ResourceWrapper<Material>
 	return asset->createAsset(mat).as<MaterialAsset>();
 }
 
-ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDescriptor desc)
+ResourceWrapper<Material> Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;

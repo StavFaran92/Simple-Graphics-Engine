@@ -1,6 +1,12 @@
 #include "render/Shader.h"
 
 #include <regex>
+#include <functional>
+
+ShaderLoadDescriptor::ShaderLoadDescriptor()
+{
+	createFunc = std::bind(&Shader::load, sourcePath, *this);
+}
 
 #include "glm/glm.hpp"
 #include <glm/gtc/type_ptr.hpp>
@@ -652,9 +658,4 @@ AssetHandle<ShaderAsset> ShaderAsset::create(const ResourceWrapper<Shader>& shad
 	desc.aType = AssetType::SHADER;
 	ShaderAsset* asset = new ShaderAsset(desc);
 	return asset->createAsset(shader).as<ShaderAsset>();
-}
-
-ResourceWrapper<Resource> ShaderLoadDescriptor::loadResource() 
-{
-	return Shader::load(sourcePath, *this);
 }

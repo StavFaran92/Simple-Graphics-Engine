@@ -9,7 +9,7 @@
 
 struct MeshGroupLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
+	MeshGroupLoadDescriptor();
 };
 
 // Resource
@@ -49,7 +49,7 @@ public:
 	using Asset::Asset;
 
 	static AssetHandle<MeshGroupAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-	static AssetHandle<MeshGroupAsset> create(const ResourceWrapper<MeshGroup>& mesh, AssetCreateDescriptor desc = {});
+	static AssetHandle<MeshGroupAsset> create(AssetCreateDescriptor desc);
 
 	const std::vector<AssetHandle<MaterialAsset>>& getImportedMaterials() const;
 

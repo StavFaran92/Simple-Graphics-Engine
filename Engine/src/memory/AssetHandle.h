@@ -48,7 +48,7 @@ public:
 
 			loadDesc->sourcePath = record.sourcePath;
 
-			ResourceWrapper<Resource> resource = loadDesc->loadResource();
+			ResourceWrapper<Resource> resource = loadDesc->createFunc();
 			AssetRecord newRecord = record;
 			newRecord.resourceID = resource.getUID();
 			Engine::get()->getSubSystem<Assets>()->updateAsset(newRecord);

@@ -25,11 +25,12 @@ void acquireTexture(const std::string& name, const std::string& path)
 	TextureAsset::import(path, aDesc);
 }
 
-void addAsAsset(const std::string& name, const ResourceWrapper<MeshGroup>& meshCollection)
+void addAsAsset(const std::string& name, const std::function<ResourceWrapper<Resource>(void)>& cb)
 {
 	AssetCreateDescriptor aInfo;
 	aInfo.name = name;
 	aInfo.isEngineOwned = true;
+	aInfo.createFunc = cb;
 	MeshGroupAsset::create(meshCollection, aInfo);
 }
 
@@ -110,29 +111,41 @@ void BuiltInAssetsLoader::loadMeshes()
 {
 	{
 		// Create box
-		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
-		Box::createMesh(meshCollection);
-		addAsAsset("SGE_MESH_BOX", meshCollection);
+		
+		addAsAsset("SGE_MESH_BOX", []() {
+			ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
+			Box::createMesh(meshCollection);
+			return meshCollection;
+ 		});
 	}
 
 	{
 		// Create Quad
-		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
-		Quad::createMesh(meshCollection);
-		addAsAsset("SGE_MESH_QUAD", meshCollection);
+
+		addAsAsset("SGE_MESH_QUAD", []() {
+			ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
+			Quad::createMesh(meshCollection);
+			return meshCollection;
+		});
 	}
 
 	{
 		// Create sphere
-		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
-		Sphere::createMesh(meshCollection, 1, 36, 36);
-		addAsAsset("SGE_MESH_SPHERE", meshCollection);
+		
+		addAsAsset("SGE_MESH_SPHERE", []() {
+			ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
+			Sphere::createMesh(meshCollection, 1, 36, 36);
+			return meshCollection;
+			});
 	}
 
 	{
-		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
-		Grid::generateGrid(meshCollection, 10, 10);
-		addAsAsset("SGE_MESH_GRID", meshCollection);
+		
+		addAsAsset("SGE_MESH_GRID", []() {
+			ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
+			Grid::generateGrid(meshCollection, 10, 10);
+			return meshCollection;
+		});
 	}
 
 	{

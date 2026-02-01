@@ -1,6 +1,12 @@
 #include "scripts/LuaScript.h"
 
 #include "core/Factory.h"
+#include <functional>
+
+LuaScriptLoadDescriptor::LuaScriptLoadDescriptor()
+{
+	createFunc = std::bind(&LuaScript::load, sourcePath, *this);
+}
 
 bool LuaScriptAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
@@ -18,7 +24,7 @@ void LuaScriptAsset::save(const AssetRecord& aInfo)
 	resource->filepath = savedFilePath.generic_string();
 }
 
-ResourceWrapper<LuaScript> LuaScript::load(const std::string& fileLocation, LoadDescriptor desc)
+ResourceWrapper<LuaScript> LuaScript::load(const std::string& fileLocation, LuaScriptLoadDescriptor desc)
 {
 	ResourceWrapper<LuaScript> luaScript = Factory<LuaScript>::create();
 	luaScript->filepath = fileLocation;

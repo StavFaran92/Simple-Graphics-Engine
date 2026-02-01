@@ -8,18 +8,18 @@
 struct PrefabImportSettings : public AssetCreateDescriptor
 {};
 
+struct PrefabLoadDescriptor : public ResourceLoadDescriptor
+{
+	PrefabLoadDescriptor();
+};
+
 // Resource
 class EngineAPI Prefab : public Resource
 {
 public:
-	struct LoadDescriptor : public ResourceLoadDescriptor
-	{
-		ResourceWrapper<Resource> loadResource() override {
-			return Prefab::load(sourcePath, *this);
-		}
-	};
+	
 
-	static ResourceWrapper<Prefab> load(const std::string& fileLocation, LoadDescriptor desc = {});
+	static ResourceWrapper<Prefab> load(const std::string& fileLocation, PrefabLoadDescriptor desc = {});
 	static ResourceWrapper<Prefab> create(const Entity& e);
 
 	Entity Instansiate(glm::vec3 position = glm::vec3{ 0.0f });

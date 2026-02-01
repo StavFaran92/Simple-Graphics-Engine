@@ -14,7 +14,7 @@ public:
 
 	AssetHandle<Asset> importAsset(const std::string& fileLocation);
 
-	AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset);
+	AssetHandle<Asset> createAsset();
 
 	void updateAsset(const AssetUpdateDescriptor& uDesc);
 

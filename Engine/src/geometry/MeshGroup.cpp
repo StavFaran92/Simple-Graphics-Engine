@@ -6,6 +6,13 @@
 #include "core/Factory.h"
 #include "core/Engine.h"
 
+#include <functional>
+
+MeshGroupLoadDescriptor::MeshGroupLoadDescriptor()
+{
+	createFunc = std::bind(&MeshGroup::load, sourcePath, *this);
+}
+
 void MeshGroup::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
 	m_materialSlots.insert(mesh->getMaterialIndex());
@@ -78,12 +85,13 @@ AssetHandle<MeshGroupAsset> MeshGroupAsset::import(const std::string& fileLocati
 	return asset->importAsset(fileLocation).as<MeshGroupAsset>();
 }
 
-AssetHandle<MeshGroupAsset> MeshGroupAsset::create(const ResourceWrapper<MeshGroup>& mesh, AssetCreateDescriptor desc)
+AssetHandle<MeshGroupAsset> MeshGroupAsset::create(AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::MESH;
 	MeshGroupAsset* asset = new MeshGroupAsset(desc);
-	return asset->createAsset(mesh).as<MeshGroupAsset>();
+	return asset->createAsset().as<MeshGroupAsset>();
 }
+
 
 const std::vector<AssetHandle<MaterialAsset>>& MeshGroupAsset::getImportedMaterials() const
 {
@@ -108,9 +116,4 @@ ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, Mesh
 	mInfo.mesh = mesh;
 	Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(desc, mInfo);
 	return mesh;
-}
-
-
-ResourceWrapper<Resource> MeshGroupLoadDescriptor::loadResource() {
-	return MeshGroup::load(sourcePath, *this);
 }
