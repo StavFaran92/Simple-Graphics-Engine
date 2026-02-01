@@ -661,6 +661,10 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 AssetHandle<TextureAsset> TextureAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
+	if (!desc.resourceDescriptor)
+	{
+		desc.makeResourceDescriptor<TextureLoadDescriptor>();
+	}
 	TextureAsset* asset = new TextureAsset(desc);
 	return asset->importAsset(fileLocation).as<TextureAsset>();
 }
