@@ -56,7 +56,7 @@ ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, cons
         std::scoped_lock lock(cacheMutex);
 
         // Another thread might have beaten us to it
-        auto& slot = m_resourceCache[id];
+        auto& slot = m_resourceCache[created.getUID()];
         if (auto existing = slot)
         {
             return existing;

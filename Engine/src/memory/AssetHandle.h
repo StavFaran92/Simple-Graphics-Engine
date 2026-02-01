@@ -71,7 +71,7 @@ public:
 
 	bool isEmpty() const
 	{
-		return info().resourceID == 0;
+		return uuid == EMPTY_UUID;
 	}
 
 	const AssetRecord& info() const

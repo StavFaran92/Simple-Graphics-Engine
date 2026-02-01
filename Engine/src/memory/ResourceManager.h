@@ -5,6 +5,7 @@
 
 #include "core/Configurations.h"
 #include "memory/ResourceWrapper.h"
+#include "core/Logger.h"
 
 class EngineAPI ResourceManager
 {
@@ -32,6 +33,8 @@ public:
 
         auto obj = std::make_shared<T>(std::forward<Args>(args)...);
         auto& resource = ResourceWrapper<T>(obj, id);
+
+        logDebug("Create new resource: {}", id);
 
         m_resourceCache[id] = resource;
 
