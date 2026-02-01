@@ -38,6 +38,8 @@ public:
 
 	ResourceWrapper<ResourceType> resource() const
 	{
+		if (isEmpty()) return ResourceWrapper<ResourceType>::empty;
+
 		const AssetRecord& record = info();
 		return Engine::get()->getResourceManager()->createOrGetCached(record.resourceID, [this, &record]() {
 			const Asset* asset = get();

@@ -16,15 +16,6 @@ public:
     ResourceWrapper() = default;
     ResourceWrapper(std::nullptr_t) {}
 
-    template<typename... Args>
-    static ResourceWrapper<T> createResource(ResourceID id, Args&&... args)
-    {
-        static_assert(std::is_base_of_v<Resource, T>);
-
-        auto resource = std::make_shared<T>(std::forward<Args>(args)...);
-        return ResourceWrapper<T>(resource, id);
-    }
-
     // Copy ctor
     ResourceWrapper(const ResourceWrapper&) = default;
 
