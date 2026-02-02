@@ -165,7 +165,7 @@ public:
 
 	static AssetHandle<ShaderAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
 
-	static AssetHandle<ShaderAsset> create(const ResourceWrapper<Shader>& shader, AssetCreateDescriptor desc = {});
+	static AssetHandle<ShaderAsset> create(AssetCreateDescriptor desc);
 
 	void save(const AssetRecord& aInfo) override;
 

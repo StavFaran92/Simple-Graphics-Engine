@@ -220,7 +220,7 @@ public:
 	using Asset::Asset;
 
 	static AssetHandle<SceneAsset> import(const std::string& fileLocation, AssetCreateDescriptor aDesc = {});
-	static AssetHandle<SceneAsset> create(const ResourceWrapper<Scene>& scene, AssetCreateDescriptor aDesc = {});
+	static AssetHandle<SceneAsset> create(AssetCreateDescriptor aDesc);
 
 	void save(const AssetRecord& aInfo) override;
 

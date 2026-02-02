@@ -675,11 +675,11 @@ AssetHandle<TextureAsset> TextureAsset::import(const std::string& fileLocation, 
 	return asset->importAsset(fileLocation).as<TextureAsset>();
 }
 
-AssetHandle<TextureAsset> TextureAsset::create(const ResourceWrapper<Texture>& texture, AssetCreateDescriptor desc)
+AssetHandle<TextureAsset> TextureAsset::create(AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::TEXTURE;
 	TextureAsset* asset = new TextureAsset(desc);
-	return asset->createAsset(texture).as<TextureAsset>();
+	return asset->createAsset().as<TextureAsset>();
 }
 
 

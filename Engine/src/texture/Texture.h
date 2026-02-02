@@ -237,7 +237,7 @@ public:
 
 	static AssetHandle<TextureAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
 
-	static AssetHandle<TextureAsset> create(const ResourceWrapper<Texture>& texture, AssetCreateDescriptor desc = {});
+	static AssetHandle<TextureAsset> create(AssetCreateDescriptor desc);
 
 	void save(const AssetRecord& aInfo) override;
 

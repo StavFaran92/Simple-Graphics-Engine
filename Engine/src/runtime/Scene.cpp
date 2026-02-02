@@ -1324,9 +1324,9 @@ AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, Asse
 	return asset->importAsset(fileLocation).as<SceneAsset>();
 }
 
-AssetHandle<SceneAsset> SceneAsset::create(const ResourceWrapper<Scene>& scene, AssetCreateDescriptor desc)
+AssetHandle<SceneAsset> SceneAsset::create(AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::SCENE;
 	SceneAsset* asset = new SceneAsset(desc);
-	return asset->createAsset(scene).as<SceneAsset>();
+	return asset->createAsset().as<SceneAsset>();
 }

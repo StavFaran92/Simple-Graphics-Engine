@@ -460,11 +460,11 @@ AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation
 	return asset->importAsset(fileLocation).as<MaterialAsset>();
 }
 
-AssetHandle<MaterialAsset> MaterialAsset::create(const ResourceWrapper<Material>& mat, AssetCreateDescriptor desc)
+AssetHandle<MaterialAsset> MaterialAsset::create(AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::MATERIAL;
 	MaterialAsset* asset = new MaterialAsset(desc);
-	return asset->createAsset(mat).as<MaterialAsset>();
+	return asset->createAsset().as<MaterialAsset>();
 }
 
 ResourceWrapper<Material> Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)

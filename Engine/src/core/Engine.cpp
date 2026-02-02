@@ -588,8 +588,6 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     auto eFXAA = startupScene->createEntity("FXAA");
     auto& postProcess = eFXAA.addComponent<PostProcessComponent>();
 
-
-    auto FXAAShader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl", ShaderOverride::PostProcess);
     AssetCreateDescriptor desc;
     desc.aType = AssetType::SHADER;
     desc.name = "FXAAShader";
@@ -599,8 +597,12 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     ShaderLoadDescriptor* shaderDesc = desc.makeResourceDescriptor<ShaderLoadDescriptor>();
     shaderDesc->shaderOverride = ShaderOverride::PostProcess;
 
+    desc.createFunc = []() ->ResourceWrapper<Resource> {
+        return Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl", ShaderOverride::PostProcess);
+    };
+
     desc.resourceDescriptor = shaderDesc;
-    auto FXAAShaderAsset = ShaderAsset::create(FXAAShader, desc);
+    auto FXAAShaderAsset = ShaderAsset::create(desc);
 
     postProcess.shader = FXAAShaderAsset;
 

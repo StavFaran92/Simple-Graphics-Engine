@@ -32,8 +32,6 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 
 	auto& cloudVolumeComponent = cloudVolumeEntity.addComponent<VolumeComponent>();
 	
-
-	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/VolumetricCloudsShader.glsl", ShaderOverride::Volume);
 	AssetCreateDescriptor shaderAssetDesc;
 	shaderAssetDesc.aType = AssetType::SHADER;
 	shaderAssetDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/VolumetricCloudsShader.glsl";
@@ -42,7 +40,10 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	shaderDesc->shaderOverride = ShaderOverride::Volume;
 	shaderAssetDesc.resourceDescriptor = shaderDesc;
 	shaderAssetDesc.isEngineOwned = false;
-	auto shaderAsset = ShaderAsset::create(shader, shaderAssetDesc);
+	shaderAssetDesc.createFunc = []() ->ResourceWrapper<Resource> {
+		return Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/VolumetricCloudsShader.glsl", ShaderOverride::Volume);
+		};
+	auto shaderAsset = ShaderAsset::create(shaderAssetDesc);
 
 	auto& material = Material::create(MaterialRenderMode::Custom);
 	material->setCustomShader(shaderAsset);
