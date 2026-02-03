@@ -410,44 +410,34 @@ void Material::setUniformValue(const std::string& name, const Value& v)
 	getPersistentBlock().setUniformValue(name, v);
 }
 
-void Material::setName(const std::string& name)
+void MaterialAsset::setName(const std::string& name)
 {
 	m_name = name;
 }
 
-std::string Material::getName() const
+std::string MaterialAsset::getName() const
 {
 	return m_name;
 }
 
-Material::PersistentBlock& Material::getPersistentBlock()
-{
-	return m_persistentBlock;
-}
-
-Material::NonPersistentBlock& Material::getNonPersistentBlock()
-{
-	return m_nonPersistentBlock;
-}
-
-void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
+void MaterialAsset::setMaterialRenderMode(MaterialRenderMode renderMode)
 {
 	m_renderMode = renderMode;
 	update();
 }
 
-void Material::setCustomShader(AssetHandle<ShaderAsset>& customShader)
+void MaterialAsset::setCustomShader(AssetHandle<ShaderAsset>& customShader)
 {
 	m_customShader = customShader;
 	update();
 }
 
-AssetHandle<ShaderAsset> Material::getCustomShader() const
+AssetHandle<ShaderAsset> MaterialAsset::getCustomShader() const
 {
 	return m_customShader;
 }
 
-MaterialRenderMode Material::getMaterialRenderMode() const
+MaterialRenderMode MaterialAsset::getMaterialRenderMode() const
 {
 	return m_renderMode;
 }
