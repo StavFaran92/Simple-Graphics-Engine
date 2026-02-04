@@ -33,6 +33,18 @@ bool MaterialAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 	return false;
 }
 
+void MaterialAsset::fillData(ResourceLoadDescriptor& loadDesc) const
+{
+	auto& mat = static_cast<MaterialLoadDescriptor&>(loadDesc);
+	mat.data.name = m_name;
+	mat.data.samplers = m_samplers;
+	mat.data.shader = m_customShader.resource();
+	for (auto& [name, uniform] : m_uniformProperties)
+	{
+		mat.data.uniformProperties[name] = uniform.value;
+	}
+}
+
 void MaterialAsset::save(const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
@@ -86,11 +98,11 @@ void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler>
 
 void Material::use()
 {
-	ResourceWrapper<Shader> shader = getActiveShader();
+	ResourceWrapper<Shader> shader = m_data.shader;
 
 	if (shader.isEmpty())
 	{
-		logWarning("Material {} shader is invalid.", m_name);
+		logWarning("Material {} shader is invalid.", m_data.name);
 		return;
 	}
 
@@ -98,22 +110,15 @@ void Material::use()
 
 	int slot = 0;
 
-	// Set persistent samplers
-	for (const auto& [name, sampler] : getPersistentBlock().m_samplers)
+	// Set samplers
+	for (const auto& [name, sampler] : m_data.samplers)
 	{
 		useSamplerInShader(name, sampler, shader, slot);
 		slot++;
 	}
 
-	// Set Non persistent samplers
-	for (const auto& [name, sampler] : getNonPersistentBlock().m_samplers)
-	{
-		useSamplerInShader(name, sampler, shader, slot);
-		slot++;
-	}
-
-	// Set Non persistent Textures
-	for (const auto& [name, texture] : getNonPersistentBlock().m_textures)
+	// Set Textures
+	for (const auto& [name, texture] : m_data.textures)
 	{
 		texture.get()->setSlot(slot);
 		texture.get()->bind();
@@ -121,14 +126,8 @@ void Material::use()
 		slot++;
 	}
 
-	// Set persistent uniforms
-	for (const auto& [name, property] : getPersistentBlock().m_uniformProperties)
-	{
-		shader->setUniformValue(name, property.value);
-	}
-
-	// Set Non persistent uniforms
-	for (const auto& [name, value] : getNonPersistentBlock().m_uniformProperties)
+	// Set uniforms
+	for (const auto& [name, value] : m_data.uniformProperties)
 	{
 		shader->setUniformValue(name, value);
 	}
@@ -145,38 +144,38 @@ void Material::release()
 
 std::shared_ptr<TextureSampler> Material::getSampler(const std::string& name)
 {
-	return getPersistentBlock().getSampler(name);
+	return getSampler(name);
 }
 
 void Material::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
 {
-	getPersistentBlock().setSampler(name, sampler);
+	setSampler(name, sampler);
 }
 
 void Material::setSamplerEnabled(const std::string& name, bool isEnabled)
 {
-	getPersistentBlock().getSampler(name)->isActive = isEnabled;
+	getSampler(name)->isActive = isEnabled;
 }
 
-ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
+ResourceWrapper<Material> Material::create(MaterialData data)
 {
 	auto mat = Factory<Material>::create();
-	mat->setMaterialRenderMode(renderMode);
+	mat->m_data = data;
 	return mat;
 }
 
-ResourceWrapper<Material> Material::clone(bool isTransient) const
-{
-	auto newMaterial = Material::create(m_renderMode);
+//ResourceWrapper<Material> Material::clone(bool isTransient) const
+//{
+//	auto newMaterial = Material::create(m_renderMode);
+//
+//	newMaterial->m_persistentBlock = m_persistentBlock;
+//	newMaterial->m_nonPersistentBlock = m_nonPersistentBlock;
+//	newMaterial->m_customShader = m_customShader;
+//
+//	return newMaterial;
+//}
 
-	newMaterial->m_persistentBlock = m_persistentBlock;
-	newMaterial->m_nonPersistentBlock = m_nonPersistentBlock;
-	newMaterial->m_customShader = m_customShader;
-
-	return newMaterial;
-}
-
-ResourceWrapper<Shader> Material::getActiveShader() const
+ResourceWrapper<Shader> MaterialAsset::getActiveShader() const
 {
 	if (m_renderMode != MaterialRenderMode::Custom)
 	{
@@ -188,7 +187,7 @@ ResourceWrapper<Shader> Material::getActiveShader() const
 	}
 }
 
-ResourceWrapper<Shader> Material::getShaderFromRenderMode(MaterialRenderMode renderMode)
+ResourceWrapper<Shader> MaterialAsset::getShaderFromRenderMode(MaterialRenderMode renderMode)
 {
 	switch(renderMode)
 	{
@@ -250,16 +249,16 @@ std::vector<float> parseFloatTuple(const std::string& s) {
 	return values;
 }
 
-void Material::parseUniforms(const std::string& sourceCode)
+void MaterialAsset::parseUniforms(const std::string& sourceCode)
 {
-	getPersistentBlock().m_uniformProperties.clear();
-	getPersistentBlock().m_samplers.clear();
+	m_uniformProperties.clear();
+	m_samplers.clear();
 
 	std::istringstream stream(sourceCode);
 	std::string line;
 
-	auto& uniformProperties = getPersistentBlock().m_uniformProperties;
-	auto& samplers = getPersistentBlock().m_samplers;
+	auto& uniformProperties = m_uniformProperties;
+	auto& samplers = m_samplers;
 
 	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
 	EditableUniform pendingMeta;
@@ -347,7 +346,7 @@ void Material::parseUniforms(const std::string& sourceCode)
 	}
 }
 
-void Material::parseFromShader(ResourceWrapper<Shader> shader)
+void MaterialAsset::parseFromShader(ResourceWrapper<Shader> shader)
 {
 	std::string sourceCode;
 	ShadersInfo sInfo = shader->getShadersInfo();
@@ -361,10 +360,10 @@ void Material::parseFromShader(ResourceWrapper<Shader> shader)
 	parseUniforms(sourceCode);
 }
 
-void Material::update()
+void MaterialAsset::update()
 {
-	auto oldUniforms = getPersistentBlock().m_uniformProperties;
-	auto oldSamplers = getPersistentBlock().m_samplers;
+	auto oldUniforms = m_uniformProperties;
+	auto oldSamplers = m_samplers;
 
 	ResourceWrapper<Shader> shader = getActiveShader();
 
@@ -373,7 +372,7 @@ void Material::update()
 
 	parseFromShader(shader);
 
-	auto& newSamplers = getPersistentBlock().m_samplers;
+	auto& newSamplers = m_samplers;
 	for (const auto [name, sampler] : oldSamplers)
 	{
 		auto iter = newSamplers.find(name);
@@ -383,7 +382,7 @@ void Material::update()
 		}
 	}
 
-	auto& newUniforms = getPersistentBlock().m_uniformProperties;
+	auto& newUniforms = m_uniformProperties;
 	for (const auto [name, value] : oldUniforms)
 	{
 		auto iter = newUniforms.find(name);
@@ -393,7 +392,7 @@ void Material::update()
 		}
 	}
 
-	for (const auto& [name, uniform] : getPersistentBlock().m_uniformProperties)
+	for (const auto& [name, uniform] : m_uniformProperties)
 	{
 		shader->setUniformValue(name, uniform.value);
 	}
@@ -407,17 +406,7 @@ void Material::update()
 
 void Material::setUniformValue(const std::string& name, const Value& v)
 {
-	getPersistentBlock().setUniformValue(name, v);
-}
-
-void MaterialAsset::setName(const std::string& name)
-{
-	m_name = name;
-}
-
-std::string MaterialAsset::getName() const
-{
-	return m_name;
+	m_data.uniformProperties[name] = v;
 }
 
 void MaterialAsset::setMaterialRenderMode(MaterialRenderMode renderMode)
@@ -470,7 +459,6 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, Materi
 	try
 	{
 		iarchive(*material.get());
-		material->setMaterialRenderMode(material->getMaterialRenderMode());
 		return material;
 
 	}

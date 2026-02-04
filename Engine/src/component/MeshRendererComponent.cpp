@@ -3,7 +3,7 @@
 #include "memory/BuiltInAssets.h"
 #include "core/Logger.h"
 
-MeshRendererComponent::MeshRendererComponent(AssetHandle<MeshGroupAsset> mesh)
+MeshRendererComponent::MeshRendererComponent(AssetHandle<ModelAsset> mesh)
 	: mesh(mesh)
 {
 	int materialCount = mesh.resource()->getMaterialCount();

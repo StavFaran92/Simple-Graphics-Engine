@@ -7,16 +7,16 @@
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
-struct MeshGroupLoadDescriptor : public ResourceLoadDescriptor
+struct ModeLoadDescriptor : public ResourceLoadDescriptor
 {
-	MeshGroupLoadDescriptor();
+	ModeLoadDescriptor();
 };
 
 // Resource
-class EngineAPI MeshGroup : public Resource
+class EngineAPI Model : public Resource
 {
 public:
-	static ResourceWrapper<MeshGroup> load(const std::string& fileLocation, MeshGroupLoadDescriptor desc = {});
+	static ResourceWrapper<Model> load(const std::string& fileLocation, ModeLoadDescriptor desc = {});
 
 	void addMesh(const std::shared_ptr<Mesh>& mesh);
 
@@ -41,15 +41,15 @@ private:
 };
 
 // Asset
-class EngineAPI MeshGroupAsset : public Asset
+class EngineAPI ModelAsset : public Asset
 {
 public:
-	using ResourceType = MeshGroup;
+	using ResourceType = Model;
 
 	using Asset::Asset;
 
-	static AssetHandle<MeshGroupAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-	static AssetHandle<MeshGroupAsset> create(AssetCreateDescriptor desc);
+	static AssetHandle<ModelAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
+	static AssetHandle<ModelAsset> create(AssetCreateDescriptor desc);
 
 	const std::vector<AssetHandle<MaterialAsset>>& getImportedMaterials() const;
 

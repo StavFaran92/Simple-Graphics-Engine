@@ -3,7 +3,7 @@
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
 #include "render/Material.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 class EngineAPI VolumeComponent : public Component
 {
@@ -19,7 +19,7 @@ public:
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene&);
 
 	AssetHandle<MaterialAsset> material;
-	AssetHandle<MeshGroupAsset> mesh;
+	AssetHandle<ModelAsset> mesh;
 };
 
 REGISTER_COMPONENT(VolumeComponent)

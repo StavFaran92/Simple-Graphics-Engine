@@ -2,11 +2,11 @@
 
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 struct EngineAPI MeshRendererComponent : public Component
 {
-	MeshRendererComponent(AssetHandle<MeshGroupAsset> mesh);
+	MeshRendererComponent(AssetHandle<ModelAsset> mesh);
 	MeshRendererComponent() = default;
 
 	void addMaterial(const AssetHandle<MaterialAsset>& mat)
@@ -45,7 +45,7 @@ struct EngineAPI MeshRendererComponent : public Component
 
 	}
 
-	AssetHandle<MeshGroupAsset> mesh = AssetHandle<MeshGroupAsset>::empty;
+	AssetHandle<ModelAsset> mesh = AssetHandle<ModelAsset>::empty;
 
 	int count = 0;
 	std::unordered_map<int, AssetHandle<MaterialAsset>> m_material;

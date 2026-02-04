@@ -110,11 +110,11 @@ void BuiltInAssetsLoader::loadMeshes()
 		aInfo.name = "SGE_MESH_BOX";
 		aInfo.isEngineOwned = true;
 		aInfo.createFunc = []() ->ResourceWrapper<Resource> {
-			ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
+			ResourceWrapper<Model> meshCollection = Factory<Model>::create();
 			Box::createMesh(meshCollection);
 			return meshCollection;
 			};
-		MeshGroupAsset::create(aInfo);
+		ModelAsset::create(aInfo);
 	}
 
 	{
@@ -122,12 +122,12 @@ void BuiltInAssetsLoader::loadMeshes()
 		aInfo.name = "SGE_MESH_QUAD";
 		aInfo.isEngineOwned = true;
 		aInfo.createFunc = []() -> ResourceWrapper<Resource> {
-			ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
+			ResourceWrapper<Model> meshCollection = Factory<Model>::create();
 			Quad::createMesh(meshCollection);
 			return meshCollection;
 			};
 
-		MeshGroupAsset::create(aInfo);
+		ModelAsset::create(aInfo);
 	}
 
 	{
@@ -135,12 +135,12 @@ void BuiltInAssetsLoader::loadMeshes()
 		aInfo.name = "SGE_MESH_SPHERE";
 		aInfo.isEngineOwned = true;
 		aInfo.createFunc = []() -> ResourceWrapper<Resource> {
-			ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
+			ResourceWrapper<Model> meshCollection = Factory<Model>::create();
 			Sphere::createMesh(meshCollection, 1, 36, 36);
 			return meshCollection;
 			};
 
-		MeshGroupAsset::create(aInfo);
+		ModelAsset::create(aInfo);
 	}
 
 	{
@@ -148,12 +148,12 @@ void BuiltInAssetsLoader::loadMeshes()
 		aInfo.name = "SGE_MESH_GRID";
 		aInfo.isEngineOwned = true;
 		aInfo.createFunc = []() -> ResourceWrapper<Resource> {
-			ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
+			ResourceWrapper<Model> meshCollection = Factory<Model>::create();
 			Grid::generateGrid(meshCollection, 10, 10);
 			return meshCollection;
 			};
 
-		MeshGroupAsset::create(aInfo);
+		ModelAsset::create(aInfo);
 	}
 
 	{
@@ -161,8 +161,8 @@ void BuiltInAssetsLoader::loadMeshes()
 		aInfo.aType = AssetType::MESH;
 		aInfo.name = "SGE_MESH_CAMERA";
 		aInfo.isEngineOwned = true;
-		MeshGroupLoadDescriptor* resourceDesc = aInfo.makeResourceDescriptor<MeshGroupLoadDescriptor>();
-		MeshGroupAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
+		ModeLoadDescriptor* resourceDesc = aInfo.makeResourceDescriptor<ModeLoadDescriptor>();
+		ModelAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
 	}
 }
 

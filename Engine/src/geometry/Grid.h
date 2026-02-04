@@ -1,11 +1,11 @@
 #pragma once
 
 #include "memory/ResourceWrapper.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 
 class Grid
 {
 public:
-	static void generateGrid(ResourceWrapper<MeshGroup>& meshCollection,int x, int y);
+	static void generateGrid(ResourceWrapper<Model>& meshCollection,int x, int y);
 };

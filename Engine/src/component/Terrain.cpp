@@ -67,7 +67,7 @@ AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 
 Terrain Terrain::createTerrainComponent(int width, int height)
 {
-	auto& meshCollection = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
+	auto& meshCollection = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
 
 	Terrain terrain;
 	terrain.m_heightmap = terrain.generateHeightmap(width, height);
@@ -91,7 +91,7 @@ Terrain Terrain::createTerrainComponent(int width, int height)
 	return terrain; // todo fix
 }
 
-ResourceWrapper<MeshGroup> Terrain::getMesh() const
+ResourceWrapper<Model> Terrain::getMesh() const
 {
 	return m_mesh.resource();
 }

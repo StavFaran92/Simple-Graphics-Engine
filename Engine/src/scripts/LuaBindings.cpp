@@ -6,7 +6,7 @@
 #include "component/Terrain.h"
 #include "component/Transformation.h"
 #include "geometry/Mesh.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "lights/DirectionalLight.h"
 #include "lights/PointLight.h"
 #include "render/Material.h"
@@ -304,15 +304,15 @@ void bindAssets(sol::state& lua)
     //    "import", &Texture::import
     //);
 
-    lua.new_usertype<MeshGroup>("MeshGroup",
-        "addMesh", &MeshGroup::addMesh,
-        "getPrimaryMesh", &MeshGroup::getPrimaryMesh,
-        "getMeshes", &MeshGroup::getMeshes,
-        "getNumOfVertices", &MeshGroup::getNumOfVertices,
-        "addBonesInfo", &MeshGroup::addBonesInfo,
-        "getBoneOffsets", &MeshGroup::getBoneOffsets,
-        "getBoneID", &MeshGroup::getBoneID,
-        "import", &MeshGroupAsset::import
+    lua.new_usertype<Model>("MeshGroup",
+        "addMesh", &Model::addMesh,
+        "getPrimaryMesh", &Model::getPrimaryMesh,
+        "getMeshes", &Model::getMeshes,
+        "getNumOfVertices", &Model::getNumOfVertices,
+        "addBonesInfo", &Model::addBonesInfo,
+        "getBoneOffsets", &Model::getBoneOffsets,
+        "getBoneID", &Model::getBoneID,
+        "import", &ModelAsset::import
     );
 }
 

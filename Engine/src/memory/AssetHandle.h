@@ -46,6 +46,7 @@ public:
 			const AssetCreateDescriptor& createDesc = asset->getDescriptor();
 			ResourceLoadDescriptor* loadDesc = createDesc.resourceDescriptor;
 
+			asset->fillData(*loadDesc);
 			loadDesc->sourcePath = record.sourcePath;
 
 			ResourceWrapper<Resource> resource = loadDesc->createFunc();

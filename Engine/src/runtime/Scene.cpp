@@ -41,7 +41,7 @@ SceneLoadDescriptor::SceneLoadDescriptor()
 #include "animation/Animator.h"
 #include "component/Terrain.h"
 #include "geometry/Frustum.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "render/Graphics.h"
 #include "utils/DebugHelper.h"
 #include "render/RenderView.h"
@@ -593,7 +593,7 @@ void Scene::draw(float deltaTime)
 			{
 				Entity entityhandler{ entity, m_registry.get() };
 				graphics->entity = entityhandler;
-				graphics->mesh = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh().get();
+				graphics->mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh().get();
 				graphics->model = transform.getWorldTransformation();
 
 				if (skybox.cubemap.isEmpty()) continue;
@@ -662,7 +662,7 @@ void Scene::draw(float deltaTime)
 				if ((entity_id)entity == selectedObject)
 				{
 					Entity e(entity, &getRegistry());
-					ResourceWrapper<MeshGroup> mesh;
+					ResourceWrapper<Model> mesh;
 					auto meshRenderer = e.tryGetComponent<MeshRendererComponent>();
 					if (meshRenderer)
 					{

@@ -46,7 +46,7 @@ aiScene* generateScene(const std::vector<float>& vertices, const std::vector<uns
 	return scene;
 }
 
-void Grid::generateGrid(ResourceWrapper<MeshGroup>& meshCollection, int x, int y)
+void Grid::generateGrid(ResourceWrapper<Model>& meshCollection, int x, int y)
 {
 	int xRez = x;
 	int yRez = y;

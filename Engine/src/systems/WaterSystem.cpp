@@ -25,7 +25,7 @@ Entity WaterSystem::createPool()
 	// TODO use grid instead
 	AssetCreateDescriptor meshDesc;
 	meshDesc.isEngineOwned = true;
-	AssetHandle<MeshGroupAsset> mesh = MeshGroupAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx", meshDesc);
+	AssetHandle<ModelAsset> mesh = ModelAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx", meshDesc);
 	auto& meshRendererComponent = waterBodyNestedImpl.addComponent<MeshRendererComponent>(mesh);
 
 	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);

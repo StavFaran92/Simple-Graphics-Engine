@@ -19,7 +19,7 @@
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"
 #include "component/Transformation.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/SkyboxComponent.h"

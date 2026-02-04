@@ -21,8 +21,8 @@ struct aiMaterial;
 enum aiTextureType;
 class Engine;
 class TextureHandler;
-class MeshGroup;
-class MeshGroupLoadDescriptor;
+class Model;
+class ModeLoadDescriptor;
 class Scene;
 template<typename T>class ResourceWrapper;
 
@@ -44,7 +44,7 @@ public:
 		Entity root;
 		std::unordered_map<std::string, unsigned int> boneNameToIDMap;
 		unsigned int boneCount = 0;
-		ResourceWrapper<MeshGroup> mesh;
+		ResourceWrapper<Model> mesh;
 	};
 
 	struct LastImportedMaterials
@@ -56,7 +56,7 @@ public:
 
 	struct ModelInfo
 	{
-		ResourceWrapper<MeshGroup> mesh;
+		ResourceWrapper<Model> mesh;
 		std::map<int, ResourceWrapper<Material>> materials;
 		std::vector<ResourceWrapper<Texture>> textures;
 
@@ -73,7 +73,7 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	void loadModelFromFile(const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
+	void loadModelFromFile(const ModeLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
 
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo);
 

@@ -19,7 +19,7 @@ static const unsigned int indices[] = {
 	1, 0, 3    // second triangle
 };
 
-void Quad::createMesh(ResourceWrapper<MeshGroup>& meshCollection)
+void Quad::createMesh(ResourceWrapper<Model>& meshCollection)
 {
 	//ModelImporter::ModelImportSettings settings;
 	//settings.name = "SGE_QUAD_MESH";

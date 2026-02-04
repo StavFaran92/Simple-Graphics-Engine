@@ -32,6 +32,8 @@ protected:
 
 	bool importAssetInner(AssetRecord& aInfo);
 
+	virtual void fillData(ResourceLoadDescriptor& loadDesc) const {};
+
 protected:
 	AssetCreateDescriptor m_createDesc;
 

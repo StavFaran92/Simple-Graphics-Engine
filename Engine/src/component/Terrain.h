@@ -11,7 +11,7 @@
 #include "utils/Math3D.h"
 #include "texture/Texture.h"
 #include "render/Material.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 class Entity;
 
@@ -37,7 +37,7 @@ public:
 
 	static Entity createTerrain(int width, int height);
 
-	ResourceWrapper<MeshGroup> getMesh() const;
+	ResourceWrapper<Model> getMesh() const;
 
 	void setHeightmap(AssetHandle<TextureAsset> heightmap);
 	ResourceWrapper<Texture> getHeightmap() const;
@@ -104,7 +104,7 @@ private:
 	AssetHandle<TextureAsset> m_heightmap;
 	std::vector<float> m_heightDataCPU;
 
-	AssetHandle<MeshGroupAsset> m_mesh;
+	AssetHandle<ModelAsset> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
 
 	

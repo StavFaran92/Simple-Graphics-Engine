@@ -36,7 +36,7 @@ bool ModelImportDialog::acceptContent()
 		AssetCreateDescriptor desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		auto mesh = MeshGroupAsset::import(filepath.m_filepath, desc);
+		auto mesh = ModelAsset::import(filepath.m_filepath, desc);
 
 		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
 

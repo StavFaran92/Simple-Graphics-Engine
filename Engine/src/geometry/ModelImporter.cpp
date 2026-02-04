@@ -17,7 +17,7 @@
 #include "core/Factory.h"
 #include <GL/glew.h>
 #include "utils/STBIHelper.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 #include "Utils/MikkTSpaceImpl.h"
 
@@ -212,7 +212,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter
 	//}
 }
 
-void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromFile(const ModeLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
 {
 	std::string filepath = resourceDesc.sourcePath;
 
@@ -393,7 +393,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 		}
 	}
 
-	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
+	ResourceWrapper<Model> mesh = Factory<Model>::create();
 
 	return true;
 }

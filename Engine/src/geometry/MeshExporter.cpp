@@ -22,7 +22,7 @@ void MeshExporter::exportMesh(const std::string& name, const std::string& target
 	exporter.Export(scene, "collada", savedFilePath);
 }
 
-void MeshExporter::exportMesh(const AssetHandle<MeshGroupAsset>& meshGroup)
+void MeshExporter::exportMesh(const AssetHandle<ModelAsset>& meshGroup)
 {
     const AssetRecord& aInfo = meshGroup.info();
     auto& projectDir = Engine::get()->getProjectDirectory();

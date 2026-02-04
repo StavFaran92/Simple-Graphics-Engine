@@ -1,7 +1,7 @@
 #pragma once
 
 #include "memory/ResourceWrapper.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "component/FoliageField.h"
 #include "systems/SubSystem.h"
 
@@ -21,7 +21,7 @@ public:
 	void drawFoliage(Terrain& terrain);
 
 private:
-	ResourceWrapper<MeshGroup> m_grassBlade;
+	ResourceWrapper<Model> m_grassBlade;
 	int count = 0;
 	ResourceWrapper<Shader> m_foliageQuadShader;
 

@@ -17,7 +17,7 @@
 #include "component/Transformation.h"
 #include "render/Material.h"
 #include "render/CommonShaders.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "render/Graphics.h"
 #include "render/RenderView.h"
 #include "render/ScreenQuad.h"
@@ -35,7 +35,7 @@ bool Renderer::init()
 {
 	//m_pbrShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBRShader.glsl");
 
-    m_quad = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_QUAD).resource();
+    m_quad = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource();
 
     return true;
 }

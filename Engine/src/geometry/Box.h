@@ -3,11 +3,11 @@
 #include "core/Core.h"
 #include "memory/ResourceWrapper.h"
 
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 class EngineAPI Box
 {
 public:
-	static void createMesh(ResourceWrapper<MeshGroup>& meshCollection);
+	static void createMesh(ResourceWrapper<Model>& meshCollection);
 };
 

@@ -15,7 +15,7 @@
 #include "runtime/Context.h"
 #include "texture/Texture.h"
 #include "animation/Animator.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "render/Graphics.h"
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"

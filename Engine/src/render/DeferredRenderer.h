@@ -44,7 +44,7 @@ private:
 	ResourceWrapper<Texture> m_MRATexture = nullptr;
 	ResourceWrapper<Texture> m_TangentTexture = nullptr;
 	
-	ResourceWrapper<MeshGroup> m_quad;
+	ResourceWrapper<Model> m_quad;
 	ResourceWrapper<Shader> m_screenShader;
 
 	// SSAO

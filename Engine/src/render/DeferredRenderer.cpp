@@ -14,7 +14,7 @@
 #include "render/RenderCommand.h"
 #include "runtime/Context.h"
 #include "animation/Animator.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "render/Graphics.h"
 #include "core/System.h"
 #include "geometry/ShapeFactory.h"
@@ -191,7 +191,7 @@ bool DeferredRenderer::init()
 	setupSSAO(width, height);
 
 	// Generate screen quad
-	m_quad = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD).as<MeshGroupAsset>().resource();
+	m_quad = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD).as<ModelAsset>().resource();
 
 	return true;
 }
