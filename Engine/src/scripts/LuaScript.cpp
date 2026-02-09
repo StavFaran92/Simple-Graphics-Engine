@@ -8,21 +8,21 @@ LuaScriptLoadDescriptor::LuaScriptLoadDescriptor()
 	createFunc = std::bind(&LuaScript::load, sourcePath, *this);
 }
 
-bool LuaScriptAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
-	return std::filesystem::copy_file(fileLocation, savedFilePath);
-}
-
-void LuaScriptAsset::save(const AssetRecord& aInfo)
-{
-	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
-	auto resource = AssetHandle<LuaScriptAsset>(m_uuid).resource();
-	std::filesystem::copy_file(resource->filepath, savedFilePath);
-	resource->filepath = savedFilePath.generic_string();
-}
+//bool LuaScriptAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+//{
+//	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
+//	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
+//	return std::filesystem::copy_file(fileLocation, savedFilePath);
+//}
+//
+//void LuaScriptAsset::save(const AssetRecord& aInfo)
+//{
+//	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
+//	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
+//	auto resource = AssetHandle<LuaScriptAsset>(m_uuid).resource();
+//	std::filesystem::copy_file(resource->filepath, savedFilePath);
+//	resource->filepath = savedFilePath.generic_string();
+//}
 
 ResourceWrapper<LuaScript> LuaScript::load(const std::string& fileLocation, LuaScriptLoadDescriptor desc)
 {
@@ -45,17 +45,4 @@ ResourceWrapper<LuaScript> LuaScript::create()
 	script->filepath = temp.generic_string();
 
 	return script;
-}
-
-AssetHandle<LuaScriptAsset> LuaScriptAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::LUA_SCRIPT;
-	desc.sourcePath = fileLocation;
-	LuaScriptAsset* asset = new LuaScriptAsset(desc);
-	return asset->importAsset(fileLocation).as<LuaScriptAsset>();
-}
-
-AssetHandle<LuaScriptAsset> LuaScriptAsset::create(const ResourceWrapper<LuaScript>& script, AssetCreateDescriptor desc)
-{
-	return AssetHandle<LuaScriptAsset>();
 }

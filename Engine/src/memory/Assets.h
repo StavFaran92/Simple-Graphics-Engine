@@ -40,11 +40,13 @@ public:
 
 	void makeDirty(UUID uuid);
 
-	void addAsset(AssetRecord& aInfo);
+	void updateAsset(const AssetHandle<Asset>& asset, const AssetUpdateDescriptor& aInfo);
 
-	void updateAsset(AssetRecord& aInfo);
+	AssetHandle<Asset> importAsset(AssetType aType, const std::string& fileLocation, AssetCreateDescriptor desc);
+
+	AssetHandle<Asset> promoteToAsset(ResourceWrapper<Resource> resource, AssetCreateDescriptor desc);
 private:
-
+	void addAsset(AssetRecord& aInfo);
 	void updateRegistry(const AssetRecord& aInfo);
 private:
 	std::unordered_map<UUID, AssetRecord> m_assets;

@@ -12,6 +12,7 @@
 #include "render/ShaderBuilder.h"
 #include "memory/AssetFactory.h"
 #include "systems/UniqueNameManager.h"
+#include "memory/AssetManager.h"
 
 #include <filesystem>
 
@@ -52,6 +53,73 @@ void Assets::updateAsset(AssetRecord& aInfo)
 	m_assets[aInfo.uuid] = aInfo;
 
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
+}
+
+AssetHandle<Asset> Assets::importAsset(AssetType aType, const std::string& fileLocation, AssetCreateDescriptor desc)
+{
+	// TODO validation
+
+	AssetRecord aInfo(desc);
+	aInfo.sourcePath = fileLocation;
+	aInfo.aType = aType;
+	aInfo.parse();
+
+	// Validate input
+	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
+	{
+		logError("Invalid asset path specified.");
+		return false;
+	}
+
+	// Copy + Paste
+	if (!AssetFactory::getManager(aType)->copyFiles(fileLocation, aInfo))
+	{
+		logError("Failed to copy file from {} to resource folder", fileLocation);
+		return false;
+	}
+
+	// Create Asset
+	Asset* asset = AssetFactory::getManager(aType)->createAsset(desc);
+	if (!asset)
+	{
+		logError("Failed to Create Asset of type {}", aType);
+		return false;
+	}
+	
+	aInfo.asset = asset;
+
+	addAsset(aInfo);
+
+	return AssetHandle<Asset>(aInfo.uuid);
+}
+
+AssetHandle<Asset> Assets::promoteToAsset(ResourceWrapper<Resource> resource, AssetCreateDescriptor desc)
+{
+	// TODO validation
+
+	AssetRecord aInfo(desc);
+	aInfo.aType = desc.aType; // todo fix
+	aInfo.parse();
+
+	if (!AssetFactory::getManager(desc.aType)->saveToFile(resource, aInfo))
+	{
+		logError("Failed to save resource {} to file", resource.getUID());
+		return false;
+	}
+
+	// Create Asset
+	Asset* asset = AssetFactory::getManager(desc.aType)->createAsset(desc);
+	if (!asset)
+	{
+		logError("Failed to Create Asset of type {}", desc.aType);
+		return false;
+	}
+
+	aInfo.asset = asset;
+
+	addAsset(aInfo);
+
+	return AssetHandle<Asset>(aInfo.uuid);
 }
 
 std::vector<AssetHandle<Asset>> Assets::getAllAssetsOfType(AssetType aType) const
@@ -345,6 +413,12 @@ void Assets::makeDirty(UUID uuid)
 //
 //	return asset;
 //}
+
+void Assets::updateAsset(const AssetHandle<Asset>& asset, const AssetUpdateDescriptor& uDesc)
+{
+	AssetRecord aInfo = asset.info();
+	aInfo.update(uDesc);
+}
 
 void Assets::deleteAsset(AssetHandle<Asset> asset)
 {

@@ -25,20 +25,3 @@ AssetManager* AssetFactory::getManager(AssetType aType)
     }
     return it->second.get();
 }
-
-bool AssetFactory::loadAsset(AssetRecord& aInfo)
-{
-	auto iter = getLoadFunctionRegistry().find(aInfo.aType);
-	if (iter == getLoadFunctionRegistry().end())
-	{
-		logError("Invalid asset type in regsitry, did you forget to register your load function?");
-		return false;
-	}
-
-	return true;
-}
-
-void AssetFactory::registerLoadFunc(AssetType aType, const LoadFn& fn)
-{
-	getLoadFunctionRegistry()[aType] = fn;
-}

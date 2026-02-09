@@ -12,27 +12,15 @@ public:
 
 	Asset(const AssetCreateDescriptor& desc);
 
-	AssetHandle<Asset> importAsset(const std::string& fileLocation);
-
-	AssetHandle<Asset> createAsset();
-
-	void updateAsset(const AssetUpdateDescriptor& uDesc);
-
-	void reimportAsset();
-
-	virtual void save(const AssetRecord& aInfo) = 0;
-
 	const AssetCreateDescriptor& getDescriptor() const;
 
 	UUID getUUID() const;
-protected:
-	virtual bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) = 0;
-
-	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };
-
-	bool importAssetInner(AssetRecord& aInfo);
 
 	virtual void fillData(ResourceLoadDescriptor& loadDesc) const {};
+protected:
+	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };
+
+	
 
 protected:
 	AssetCreateDescriptor m_createDesc;

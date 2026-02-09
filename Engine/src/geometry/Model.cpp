@@ -73,39 +73,9 @@ int Model::getMaterialCount() const
 	return m_materialSlots.size();
 }
 
-AssetHandle<ModelAsset> ModelAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::MESH;
-	desc.isCompositeAsset = true;
-	if (!desc.resourceDescriptor)
-	{
-		desc.makeResourceDescriptor<ModeLoadDescriptor>();
-	}
-	ModelAsset* asset = new ModelAsset(desc);
-	return asset->importAsset(fileLocation).as<ModelAsset>();
-}
-
-AssetHandle<ModelAsset> ModelAsset::create(AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::MESH;
-	ModelAsset* asset = new ModelAsset(desc);
-	return asset->createAsset().as<ModelAsset>();
-}
-
-
 const std::vector<AssetHandle<MaterialAsset>>& ModelAsset::getImportedMaterials() const
 {
 	return m_importedMaterials;
-}
-
-bool ModelAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	return Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
-}
-
-void ModelAsset::save(const AssetRecord& aInfo)
-{
-	MeshExporter::exportMesh(AssetHandle<ModelAsset>(m_uuid));
 }
 
 ResourceWrapper<Model> Model::load(const std::string& fileLocation, ModeLoadDescriptor desc)

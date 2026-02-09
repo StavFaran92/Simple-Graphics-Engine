@@ -49,10 +49,16 @@ public:
 			asset->fillData(*loadDesc);
 			loadDesc->sourcePath = record.sourcePath;
 
+			// if specified we override the default behaviour
+			if (createDesc.createFunc)
+			{
+				loadDesc->createFunc = createDesc.createFunc;
+			}
+
 			ResourceWrapper<Resource> resource = loadDesc->createFunc();
 			AssetRecord newRecord = record;
 			newRecord.resourceID = resource.getUID();
-			Engine::get()->getSubSystem<Assets>()->updateAsset(newRecord);
+			Engine::get()->getSubSystem<Assets>()->updateAsset(*this, newRecord);
 			return resource;
 		}).as<ResourceType>();
 	}

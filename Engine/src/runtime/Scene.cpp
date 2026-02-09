@@ -67,28 +67,23 @@ SceneLoadDescriptor::SceneLoadDescriptor()
 #include "systems/VolumetricSystem.h"
 #include "core/Factory.h"
 
-bool SceneAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	return false;
-}
-
-void SceneAsset::save(const AssetRecord& aInfo)
-{
-	
-	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ofstream os(aInfo.fullFilePath);
-	cereal::JSONOutputArchive oarchive(os);
-
-	try
-	{
-		SerializedScene serializedScene = Archiver::serializeScene(AssetHandle<SceneAsset>(m_uuid).resource().get());
-		oarchive(serializedScene);
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Serialization Error occured: {}", e.what());
-	}
-}
+//void SceneAsset::save(const AssetRecord& aInfo)
+//{
+//	
+//	auto projectDir = Engine::get()->getProjectDirectory();
+//	std::ofstream os(aInfo.fullFilePath);
+//	cereal::JSONOutputArchive oarchive(os);
+//
+//	try
+//	{
+//		SerializedScene serializedScene = Archiver::serializeScene(AssetHandle<SceneAsset>(m_uuid).resource().get());
+//		oarchive(serializedScene);
+//	}
+//	catch (const cereal::Exception& e)
+//	{
+//		logError("Serialization Error occured: {}", e.what());
+//	}
+//}
 
 ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc)
 {
@@ -1314,19 +1309,4 @@ std::shared_ptr<RenderView> Scene::getRenderView(const std::string& name) const
 bool Scene::isSimulationActive() const
 {
 	return m_isSimulationActive;
-}
-
-AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::SCENE;
-	desc.sourcePath = fileLocation;
-	SceneAsset* asset = new SceneAsset(desc);
-	return asset->importAsset(fileLocation).as<SceneAsset>();
-}
-
-AssetHandle<SceneAsset> SceneAsset::create(AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::SCENE;
-	SceneAsset* asset = new SceneAsset(desc);
-	return asset->createAsset().as<SceneAsset>();
 }

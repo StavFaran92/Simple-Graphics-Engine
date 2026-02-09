@@ -83,21 +83,20 @@ void BuiltInAssetsLoader::loadMaterials()
 		aDesc.isEngineOwned = true;
 		aDesc.name = SGE_MATERIAL_DEFAULT;
 		aDesc.aType = AssetType::MATERIAL;
-		aDesc.createFunc = []() ->ResourceWrapper<Resource> {
-			return Material::create(MaterialRenderMode::Opaque);
-		};
+		//aDesc.makeResourceDescriptor<MaterialLoadDescriptor>()->createFunc = []() ->ResourceWrapper<Resource> {
+		//	return Material::create(MaterialRenderMode::Opaque);
+		//};
 		
-		MaterialAsset::create(aDesc);
+		auto material = MaterialAsset::create(aDesc);
+		material->setMaterialRenderMode(MaterialRenderMode::Opaque);
 	}
 
 	{
 		AssetCreateDescriptor aDesc;
 		aDesc.isEngineOwned = true;
 		aDesc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
-		aDesc.createFunc = []() ->ResourceWrapper<Resource> {
-			return Material::create(MaterialRenderMode::Terrain);
-			};
-		MaterialAsset::create(aDesc);
+		auto material = MaterialAsset::create(aDesc);
+		material->setMaterialRenderMode(MaterialRenderMode::Terrain);
 	}
 }
 

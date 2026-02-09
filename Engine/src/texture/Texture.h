@@ -235,13 +235,6 @@ public:
 
 	using Asset::Asset;
 
-	static AssetHandle<TextureAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-
-	static AssetHandle<TextureAsset> create(AssetCreateDescriptor desc);
-
-	void save(const AssetRecord& aInfo) override;
-
 protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 	std::string getRecommendedExtension(const AssetRecord& aInfo) override;
 };

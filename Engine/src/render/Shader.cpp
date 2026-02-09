@@ -34,16 +34,6 @@ const  std::map<ShaderOverride, std::string> shaderOverrideToString
 	{ ShaderOverride::PostProcess,		"PostProcess" },
 };
 
-bool ShaderAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	return std::filesystem::copy_file(fileLocation, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
-}
-
-void ShaderAsset::save(const AssetRecord& aInfo)
-{
-	std::filesystem::copy_file(aInfo.sourcePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
-}
-
 uint32_t Shader::s_activeShader = 0;
 
 Shader::Shader()
@@ -644,18 +634,4 @@ Shader::~Shader() {
 	logInfo(__FUNCTION__);
 	// TODO fix, this is currently a gpu memory leak
 	//clear();
-}
-
-AssetHandle<ShaderAsset> ShaderAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::SHADER;
-	ShaderAsset* asset = new ShaderAsset(desc);
-	return asset->importAsset(fileLocation).as<ShaderAsset>();
-}
-
-AssetHandle<ShaderAsset> ShaderAsset::create(AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::SHADER;
-	ShaderAsset* asset = new ShaderAsset(desc);
-	return asset->createAsset().as<ShaderAsset>();
 }

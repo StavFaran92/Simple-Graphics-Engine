@@ -162,15 +162,4 @@ public:
 	using ResourceType = Shader;
 
 	using Asset::Asset;
-
-	static AssetHandle<ShaderAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-
-	static AssetHandle<ShaderAsset> create(AssetCreateDescriptor desc);
-
-	void save(const AssetRecord& aInfo) override;
-
-	
-
-protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

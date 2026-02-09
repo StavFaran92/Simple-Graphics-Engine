@@ -71,6 +71,7 @@ struct MaterialLoadDescriptor : public ResourceLoadDescriptor
 {
 	MaterialLoadDescriptor();
 
+	MaterialRenderMode renderMode;
 	MaterialData data;
 };
 
@@ -107,11 +108,6 @@ public:
 
 	using Asset::Asset;
 
-	static AssetHandle<MaterialAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-	static AssetHandle<MaterialAsset> create(AssetCreateDescriptor desc);
-
-	void save(const AssetRecord& aInfo) override;
-
 	void setMaterialRenderMode(MaterialRenderMode renderMode);
 	MaterialRenderMode getMaterialRenderMode() const;
 
@@ -147,7 +143,5 @@ private:
 	std::map<std::string, EditableUniform> m_uniformProperties;
 
 protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
-
 	void fillData(ResourceLoadDescriptor& loadDesc) const override;
 };

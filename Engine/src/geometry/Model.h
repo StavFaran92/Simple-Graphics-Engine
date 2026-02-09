@@ -48,14 +48,9 @@ public:
 
 	using Asset::Asset;
 
-	static AssetHandle<ModelAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-	static AssetHandle<ModelAsset> create(AssetCreateDescriptor desc);
-
 	const std::vector<AssetHandle<MaterialAsset>>& getImportedMaterials() const;
 
-	void save(const AssetRecord& aInfo) override;
 protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord&) override;
 
 
 private:

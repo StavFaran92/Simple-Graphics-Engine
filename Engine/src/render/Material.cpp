@@ -28,11 +28,6 @@ MaterialLoadDescriptor::MaterialLoadDescriptor()
 
 #include <filesystem>
 
-bool MaterialAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	return false;
-}
-
 void MaterialAsset::fillData(ResourceLoadDescriptor& loadDesc) const
 {
 	auto& mat = static_cast<MaterialLoadDescriptor&>(loadDesc);
@@ -42,22 +37,6 @@ void MaterialAsset::fillData(ResourceLoadDescriptor& loadDesc) const
 	for (auto& [name, uniform] : m_uniformProperties)
 	{
 		mat.data.uniformProperties[name] = uniform.value;
-	}
-}
-
-void MaterialAsset::save(const AssetRecord& aInfo)
-{
-	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ofstream os(aInfo.fullFilePath);
-	cereal::JSONOutputArchive oarchive(os);
-
-	try
-	{
-		oarchive(*AssetHandle<MaterialAsset>(m_uuid).resource().get());
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Serialization Error occured: {}", e.what());
 	}
 }
 
@@ -429,21 +408,6 @@ AssetHandle<ShaderAsset> MaterialAsset::getCustomShader() const
 MaterialRenderMode MaterialAsset::getMaterialRenderMode() const
 {
 	return m_renderMode;
-}
-
-AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::MATERIAL;
-	desc.sourcePath = fileLocation;
-	MaterialAsset* asset = new MaterialAsset(desc);
-	return asset->importAsset(fileLocation).as<MaterialAsset>();
-}
-
-AssetHandle<MaterialAsset> MaterialAsset::create(AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::MATERIAL;
-	MaterialAsset* asset = new MaterialAsset(desc);
-	return asset->createAsset().as<MaterialAsset>();
 }
 
 ResourceWrapper<Material> Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)
