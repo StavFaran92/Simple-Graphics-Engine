@@ -50,9 +50,7 @@ public:
 			loadDesc->sourcePath = record.sourcePath;
 
 			ResourceWrapper<Resource> resource = loadDesc->loadResource();
-			AssetRecord newRecord = record;
-			newRecord.resourceID = resource.getUID();
-			Engine::get()->getSubSystem<Assets>()->updateAsset(*this, newRecord);
+			Engine::get()->getSubSystem<Assets>()->setResourceID(*this, resource.getUID());
 			return resource;
 		}).as<ResourceType>();
 	}

@@ -45,6 +45,9 @@ public:
 	AssetHandle<Asset> importAsset(AssetType aType, const std::string& fileLocation, AssetCreateDescriptor desc);
 
 	AssetHandle<Asset> promoteToAsset(ResourceWrapper<Resource> resource, AssetCreateDescriptor desc);
+
+	// This is a temporary solution to alter the resource id in the asset DB - todo consider a more robust solution.
+	void setResourceID(const AssetHandle<Asset>& asset, ResourceID resID);
 private:
 	void addAsset(AssetRecord& aInfo);
 	void updateRegistry(const AssetRecord& aInfo);

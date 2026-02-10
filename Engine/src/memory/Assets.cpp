@@ -22,6 +22,13 @@ Assets::Assets()
 	Engine::get()->registerSubSystem<Assets>(this);
 }
 
+void Assets::setResourceID(const AssetHandle<Asset>& asset, ResourceID resID)
+{
+	AssetRecord aInfo = asset.info();
+	aInfo.resourceID = resID;
+	m_assets[aInfo.uuid] = aInfo;
+}
+
 void Assets::addAsset(AssetRecord& aInfo)
 {
 	if (aInfo.aType == AssetType::NONE)
