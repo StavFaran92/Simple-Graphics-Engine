@@ -383,6 +383,11 @@ void Material::setUniformValue(const std::string& name, const Value& v)
 	m_data.uniformProperties[name] = v;
 }
 
+const MaterialData& Material::getData() const
+{
+	return m_data;
+}
+
 void MaterialAsset::setMaterialRenderMode(MaterialRenderMode renderMode)
 {
 	m_renderMode = renderMode;

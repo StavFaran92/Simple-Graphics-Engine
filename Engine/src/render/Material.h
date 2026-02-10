@@ -41,7 +41,7 @@ struct MaterialData
 {
 	std::string name;
 	ResourceWrapper<Shader> shader;
-	//MaterialRenderMode m_renderMode = MaterialRenderMode::None;
+	MaterialRenderMode renderMode = MaterialRenderMode::None;
 	std::map<std::string, std::shared_ptr<TextureSampler>> samplers;
 	std::map<std::string, ResourceWrapper<Texture>> textures;
 	std::map<std::string, Value> uniformProperties;
@@ -95,6 +95,8 @@ public:
 	void setSamplerEnabled(const std::string& name, bool isEnabled);
 
 	void setUniformValue(const std::string& name, const Value& v);
+
+	const MaterialData& getData() const;
 
 private:
 	MaterialData m_data;

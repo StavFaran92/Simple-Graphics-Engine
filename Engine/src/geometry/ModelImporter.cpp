@@ -21,7 +21,7 @@
 
 #include "Utils/MikkTSpaceImpl.h"
 
-void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Material>& mat)
+void extractAiMaterialProperties(const aiMaterial* aiMat, MaterialData& matData)
 {
 	if (!aiMat)
 	{
@@ -34,8 +34,8 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Materi
 	{
 		if (opacityFactor < 1.f)
 		{
-			mat->setMaterialRenderMode(MaterialRenderMode::Transparent);
-			mat->setUniformValue(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
+			matData.renderMode = MaterialRenderMode::Transparent;
+			matData.uniformProperties[SHADER_PROPERTY_PBR_OPACITY_FACTOR] = opacityFactor;
 		}
 
 	}
@@ -43,19 +43,19 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Materi
 	aiColor3D diffuseColor;
 	if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
 	{
-		mat->setUniformValue(SHADER_PROPERTY_PBR_COLOR_DIFFUSE, glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b));
+		matData.uniformProperties[SHADER_PROPERTY_PBR_COLOR_DIFFUSE] = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
 	}
 
 	ai_real rounghnessFactor;
 	if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, rounghnessFactor) == aiReturn_SUCCESS)
 	{
-		mat->setUniformValue(SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR, rounghnessFactor);
+		matData.uniformProperties[SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR] = rounghnessFactor;
 	}
 
 	ai_real metallicFactor;
 	if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallicFactor) == aiReturn_SUCCESS)
 	{
-		mat->setUniformValue(SHADER_PROPERTY_PBR_METALLIC_FACTOR, metallicFactor);
+		matData.uniformProperties[SHADER_PROPERTY_PBR_METALLIC_FACTOR] = metallicFactor;
 	}
 
 
@@ -321,23 +321,20 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 		{
 			auto& aMaterial = scene->mMaterials[i];
 			std::string materialName = std::string(aMaterial->GetName().C_Str());
-			//std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 
-			// get uuid using tex name from association map
-			auto& material = Material::create(MaterialRenderMode::Opaque);
+			MaterialData materialData;
+			materialData.name = materialName;
+			materialData.renderMode = MaterialRenderMode::Opaque;
 
-			extractAiMaterialProperties(aMaterial, material);
-			
-			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
-			material->setName(materialName);
+			extractAiMaterialProperties(aMaterial, materialData);
 
 			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures, aInfo);
 			if (!diffuse.isEmpty())
 			{
 				auto diffuseSampler = std::make_shared<TextureSampler>(3);
 				diffuseSampler->texture = diffuse;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, diffuseSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, true);
+				diffuseSampler->isActive = true;
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_ALBEDO] = diffuseSampler;
 			}
 
 			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures, aInfo);
@@ -345,8 +342,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 			{
 				auto normalSampler = std::make_shared<TextureSampler>(3);
 				normalSampler->texture = normal;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, normalSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, true);
+				normalSampler->isActive = true;
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_NORMAL] = normalSampler;
 			}
 
 			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures, aInfo);
@@ -355,8 +352,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 				auto roughnessSampler = std::make_shared<TextureSampler>(1);
 				roughnessSampler->texture = roughness;
 				roughnessSampler->channelMaskR = TextureSampler::Color::G;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, roughnessSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, true);
+				roughnessSampler->isActive = true;
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS] = roughnessSampler;
 			}
 
 			// Metallic map
@@ -366,8 +363,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 				auto metallicSampler = std::make_shared<TextureSampler>(1);
 				metallicSampler->texture = metallic;
 				metallicSampler->channelMaskR = TextureSampler::Color::B;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, metallicSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, true);
+				metallicSampler->isActive = true;
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_METALLIC] = metallicSampler;
 			}
 
 			// Ambient Occlusion map
@@ -377,11 +374,11 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 				auto aoSampler = std::make_shared<TextureSampler>(1);
 				aoSampler->texture = ao;
 				aoSampler->channelMaskR = TextureSampler::Color::R;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_AO, aoSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_AO, true);
+				aoSampler->isActive = true;
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_AO] = aoSampler;
 			}
 
-			
+			ResourceWrapper<Material> materialResource = Material::create(materialData);
 
 			AssetCreateDescriptor materialAssetInfo;
 			materialAssetInfo.isEngineOwned = aInfo.isEngineOwned;
@@ -389,7 +386,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
-			m_lastImportedMaterials.materials[i] = MaterialAsset::create(material, materialAssetInfo);
+			m_lastImportedMaterials.materials[i] = Engine::get()->getSubSystem<Assets>()->promoteToAsset(materialResource, materialAssetInfo).as<MaterialAsset>();
 		}
 	}
 
@@ -661,7 +658,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.targetDirectory = aInfo.targetDirectory;
-		TextureAsset::create(texture, textureAssetDesc);
+		Engine::get()->getSubSystem<Assets>()->promoteToAsset(texture, textureAssetDesc);
 
 		if (!textureName.empty())
 		{
@@ -689,8 +686,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		textureDesc->usage = TextureSemantic::Color;
 
 		tSettings.resourceDescriptor = textureDesc;
-
-		AssetTexture = TextureAsset::import(path, tSettings);
+		Engine::get()->getSubSystem<Assets>()->importAsset(AssetType::TEXTURE, path, tSettings);
 
 		cachedTextures.insert({ path, AssetTexture });
 	}

@@ -267,12 +267,12 @@ void DeferredRenderer::renderScene(Scene* scene)
 			}
 
 			// Only render Opaque objects
-			if (graphics->material->getMaterialRenderMode() != MaterialRenderMode::Opaque)
+			if (graphics->material->getData().renderMode != MaterialRenderMode::Opaque)
 			{
 				continue;
 			}
 
-			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
+			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getData().name + "'";
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
 
 			// draw model
