@@ -4,9 +4,9 @@
 #include <GL/glew.h>
 #include <functional>
 
-TextureLoadDescriptor::TextureLoadDescriptor()
+ResourceWrapper<Resource> TextureLoadDescriptor::loadResource()
 {
-	createFunc = std::bind(&Texture::load, sourcePath, *this);
+	return Texture::load(sourcePath, *this);
 }
 
 #include "core/Logger.h"

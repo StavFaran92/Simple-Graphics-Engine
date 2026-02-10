@@ -5,7 +5,7 @@
 
 struct LuaScriptLoadDescriptor : public ResourceLoadDescriptor
 {
-	LuaScriptLoadDescriptor();
+	ResourceWrapper<Resource> loadResource() override;
 };
 
 // Resource

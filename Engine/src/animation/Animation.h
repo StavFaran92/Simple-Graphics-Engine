@@ -21,7 +21,7 @@ struct MeshNodeData
 
 struct AnimationLoadDescriptor : public ResourceLoadDescriptor
 {
-	AnimationLoadDescriptor();
+	ResourceWrapper<Resource> loadResource() override;
 };
 
 // Resource

@@ -69,7 +69,7 @@ struct EditableUniform {
 
 struct MaterialLoadDescriptor : public ResourceLoadDescriptor
 {
-	MaterialLoadDescriptor();
+	ResourceWrapper<Resource> loadResource() override;
 
 	MaterialRenderMode renderMode;
 	MaterialData data;

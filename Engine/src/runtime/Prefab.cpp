@@ -3,9 +3,9 @@
 #include <fstream>
 #include <functional>
 
-PrefabLoadDescriptor::PrefabLoadDescriptor()
+ResourceWrapper<Resource> PrefabLoadDescriptor::loadResource()
 {
-	createFunc = std::bind(&Prefab::load, sourcePath, *this);
+	return Prefab::load(sourcePath, *this);
 }
 #include <filesystem>
 
@@ -45,26 +45,26 @@ ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoad
 	return ResourceWrapper<Prefab>::empty;
 }
 
-bool PrefabAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	return false;
-}
-
-void PrefabAsset::save(const AssetRecord& aInfo)
-{
-	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
-	cereal::JSONOutputArchive oarchive(os);
-
-	try
-	{
-		oarchive(*AssetHandle<PrefabAsset>(m_uuid).resource().get());
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Serialization Error occured: {}", e.what());
-	}
-}
+//bool PrefabAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+//{
+//	return false;
+//}
+//
+//void PrefabAsset::save(const AssetRecord& aInfo)
+//{
+//	auto projectDir = Engine::get()->getProjectDirectory();
+//	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
+//	cereal::JSONOutputArchive oarchive(os);
+//
+//	try
+//	{
+//		oarchive(*AssetHandle<PrefabAsset>(m_uuid).resource().get());
+//	}
+//	catch (const cereal::Exception& e)
+//	{
+//		logError("Serialization Error occured: {}", e.what());
+//	}
+//}
 
 void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)
 {
@@ -170,17 +170,4 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	root.getComponent<Transformation>().setLocalPosition(position);
 	
 	return root;
-}
-
-AssetHandle<PrefabAsset> PrefabAsset::import(const std::string& fileLocation, PrefabImportSettings desc)
-{
-	desc.aType = AssetType::PREFAB;
-	desc.sourcePath = fileLocation;
-	PrefabAsset* asset = new PrefabAsset(desc);
-	return asset->importAsset(fileLocation).as<PrefabAsset>();
-}
-
-AssetHandle<PrefabAsset> PrefabAsset::create(const ResourceWrapper<Prefab>& prefab, AssetCreateDescriptor desc)
-{
-	return AssetHandle<PrefabAsset>();
 }

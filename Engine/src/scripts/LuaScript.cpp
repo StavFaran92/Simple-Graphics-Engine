@@ -3,9 +3,9 @@
 #include "core/Factory.h"
 #include <functional>
 
-LuaScriptLoadDescriptor::LuaScriptLoadDescriptor()
+ResourceWrapper<Resource> LuaScriptLoadDescriptor::loadResource()
 {
-	createFunc = std::bind(&LuaScript::load, sourcePath, *this);
+	return LuaScript::load(sourcePath, *this);
 }
 
 //bool LuaScriptAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)

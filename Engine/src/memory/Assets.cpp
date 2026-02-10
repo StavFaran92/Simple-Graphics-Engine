@@ -47,14 +47,6 @@ void Assets::addAsset(AssetRecord& aInfo)
 	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
 }
 
-void Assets::updateAsset(AssetRecord& aInfo)
-{
-	updateRegistry(aInfo);
-	m_assets[aInfo.uuid] = aInfo;
-
-	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
-}
-
 AssetHandle<Asset> Assets::importAsset(AssetType aType, const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	// TODO validation
@@ -418,6 +410,11 @@ void Assets::updateAsset(const AssetHandle<Asset>& asset, const AssetUpdateDescr
 {
 	AssetRecord aInfo = asset.info();
 	aInfo.update(uDesc);
+
+	updateRegistry(aInfo);
+	m_assets[aInfo.uuid] = aInfo;
+
+	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 }
 
 void Assets::deleteAsset(AssetHandle<Asset> asset)

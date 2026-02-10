@@ -8,9 +8,9 @@
 
 #include <functional>
 
-ModeLoadDescriptor::ModeLoadDescriptor()
+ResourceWrapper<Resource> ModeLoadDescriptor::loadResource()
 {
-	createFunc = std::bind(&Model::load, sourcePath, *this);
+	return Model::load(sourcePath, *this);
 }
 
 void Model::addMesh(const std::shared_ptr<Mesh>& mesh)

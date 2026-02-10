@@ -126,7 +126,7 @@ struct TextureData
 
 struct EngineAPI TextureLoadDescriptor : public ResourceLoadDescriptor
 {
-	TextureLoadDescriptor();
+	ResourceWrapper<Resource> loadResource() override;
 
 	bool genMipMap = false;
 	bool flip = false;

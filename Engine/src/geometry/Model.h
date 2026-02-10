@@ -9,7 +9,7 @@
 
 struct ModeLoadDescriptor : public ResourceLoadDescriptor
 {
-	ModeLoadDescriptor();
+	ResourceWrapper<Resource> loadResource() override;
 };
 
 // Resource

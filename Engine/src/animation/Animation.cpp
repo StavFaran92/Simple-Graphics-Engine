@@ -5,9 +5,9 @@
 
 #include <functional>
 
-AnimationLoadDescriptor::AnimationLoadDescriptor()
+ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource()
 {
-	createFunc = std::bind(&Animation::load, sourcePath, *this);
+	return Animation::load(sourcePath, *this);
 }
 
 Animation::Animation()

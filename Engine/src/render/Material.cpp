@@ -2,11 +2,6 @@
 
 #include "core/Logger.h"
 #include <functional>
-
-MaterialLoadDescriptor::MaterialLoadDescriptor()
-{
-	createFunc = std::bind(&Material::load, sourcePath, *this);
-}
 #include <GL\glew.h>
 
 #include "core/Engine.h"
@@ -432,4 +427,9 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, Materi
 	}
 
 	return ResourceWrapper<Material>::empty;
+}
+
+ResourceWrapper<Resource> MaterialLoadDescriptor::loadResource()
+{
+	return Material::load(sourcePath);
 }

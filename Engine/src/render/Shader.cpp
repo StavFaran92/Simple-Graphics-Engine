@@ -3,9 +3,9 @@
 #include <regex>
 #include <functional>
 
-ShaderLoadDescriptor::ShaderLoadDescriptor()
+ResourceWrapper<Resource> ShaderLoadDescriptor::loadResource()
 {
-	createFunc = std::bind(&Shader::load, sourcePath, *this);
+	return Shader::load(sourcePath, *this);
 }
 
 #include "glm/glm.hpp"

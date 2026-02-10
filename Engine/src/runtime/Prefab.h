@@ -10,7 +10,7 @@ struct PrefabImportSettings : public AssetCreateDescriptor
 
 struct PrefabLoadDescriptor : public ResourceLoadDescriptor
 {
-	PrefabLoadDescriptor();
+	ResourceWrapper<Resource> loadResource() override;
 };
 
 // Resource
@@ -41,14 +41,5 @@ class EngineAPI PrefabAsset : public Asset
 public:
 	using ResourceType = Prefab;
 
-	using Asset::Asset;
-
-	static AssetHandle<PrefabAsset> import(const std::string& fileLocation, PrefabImportSettings aDesc = {});
-
-	static AssetHandle<PrefabAsset> create(const ResourceWrapper<Prefab>& prefab, AssetCreateDescriptor desc = {});
-
-	void save(const AssetRecord& aInfo) override;
-
 protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

@@ -3,9 +3,9 @@
 #include <filesystem>
 #include <functional>
 
-SceneLoadDescriptor::SceneLoadDescriptor()
+ResourceWrapper<Resource> SceneLoadDescriptor::loadResource()
 {
-	createFunc = std::bind(&Scene::load, sourcePath, *this);
+	return Scene::load(sourcePath, *this);
 }
 #include <fstream>
 #include <cereal/archives/json.hpp>

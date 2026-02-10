@@ -57,7 +57,7 @@ template<typename T> class ObjectHandler;
 
 struct SceneLoadDescriptor : public ResourceLoadDescriptor
 {
-	SceneLoadDescriptor();
+	ResourceWrapper<Resource> loadResource() override;
 };
 
 // Resource
