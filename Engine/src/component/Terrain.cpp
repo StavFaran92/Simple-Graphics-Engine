@@ -12,21 +12,12 @@
 
 #include "memory/BuiltInAssets.h"
 
-
 #include "GL/glew.h"
 
-Entity Terrain::createTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap)
+Entity Terrain::createTerrain(int width, int height)
 {
 	auto terrainEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
-
-	auto& terrainComponent = generateTerrain(width, height, scale, heightMap);
-	terrainComponent.m_textureCount = 1;
-
-	auto& grassTexture = BuiltInAssets::getByName<Texture>("SGE_TEXTURE_GRASS");
-	terrainComponent.setTexture(0, grassTexture);
-
-	terrainEntity.addComponent<Terrain>(terrainComponent);
-
+	terrainEntity.addComponent<Terrain>(Terrain::createTerrainComponent(width, height));
 	return terrainEntity;
 }
 
@@ -35,48 +26,72 @@ void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler,
 	(void)scene;
 	if (auto tc = std::dynamic_pointer_cast<Terrain>(c))
 	{
-		entityHandler.addComponent<Terrain>(*tc);
+		auto& terrain = entityHandler.addComponent<Terrain>(*tc);
+		terrain.build();
 	}
 }
 
-Terrain Terrain::generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath)
+AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 {
-	// Ensure height sampling does not wrap at borders so terrain edges use edge heights
-	Texture::TextureAssetDescriptor settings;
-	settings.params[GL_TEXTURE_WRAP_S] = GL_CLAMP_TO_EDGE;
-	settings.params[GL_TEXTURE_WRAP_T] = GL_CLAMP_TO_EDGE;
-	settings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
-	settings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-	auto heightMap = Texture::import(heightMapFilepath, settings);
+	m_heightDataCPU = std::vector<float>(width * height, 0.0f);
 
-	return generateTerrain(width, height, scale, heightMap);
+	TextureData tData;
+	tData.target = TextureTarget::TEXTURE_2D;
+	tData.width = width;
+	tData.height = height;
+	tData.channels = 1;
+	tData.data = m_heightDataCPU.data();
+	tData.internalFormat = TextureInternalFormat::R32F;
+	tData.format = TextureFormat::RED;
+	tData.type = TextureType::FLOAT;
+	tData.textureName = "SGE_TERRAIN_HEIGHTMAP";
+	tData.filter = TextureFilter::Linear;
+	tData.wrap = TextureWrap::Clamp;
+
+	auto texture = Texture::createTexture(tData);
+
+	AssetCreateDescriptor desc;
+	desc.aType = AssetType::TEXTURE;
+	desc.name = "SGE_TERRAIN_HEIGHTMAP";
+	desc.isEngineOwned = true;
+	//desc.attributes = texture->getTextureAssetAttributes().toMap();
+	TextureLoadDescriptor* resourceDesc = new TextureLoadDescriptor();
+	resourceDesc->usage = TextureSemantic::Heightmap;
+
+	desc.resourceDescriptor = resourceDesc;
+	auto heightmap = TextureAsset::create(texture, desc);
+	//auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc).as<TextureAsset>();
+
+	return heightmap;
 }
 
-Terrain Terrain::generateTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap)
+Terrain Terrain::createTerrainComponent(int width, int height)
 {
-	auto& meshCollection = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
+	auto& meshCollection = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);
 
 	Terrain terrain;
-	terrain.m_heightmap = heightMap;
-	terrain.m_scale = scale;
+	terrain.m_heightmap = terrain.generateHeightmap(width, height);
+	terrain.m_scale = 1;
 	terrain.m_width = width;
 	terrain.m_height = height;
 	terrain.m_mesh = meshCollection;
 
+	terrain.m_textureCount = 1;
+
 	for (int i = 0; i < MAX_TEXTURE_COUNT; i++)
 	{
 		TextureBlend blend;
-		blend.texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
+		blend.texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE);
 		blend.blend = i * .2f + .2f;
 		terrain.m_textureBlends.push_back(blend);
 	}
 
 
-	terrain.m_material = BuiltInAssets::getByName<Material>(SGE_MATERIAL_TERRAIN_DEFAULT);
+	terrain.m_material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_TERRAIN_DEFAULT);
 	return terrain; // todo fix
 }
 
-ResourceWrapper<MeshCollection> Terrain::getMesh() const
+ResourceWrapper<MeshGroup> Terrain::getMesh() const
 {
 	return m_mesh.resource();
 }
@@ -84,6 +99,13 @@ ResourceWrapper<MeshCollection> Terrain::getMesh() const
 float Terrain::getScale() const
 {
 	return m_scale;
+}
+
+void Terrain::setHeightmap(AssetHandle<TextureAsset> heightmap)
+{
+	m_heightmap = heightmap;
+
+	build();
 }
 
 ResourceWrapper<Texture> Terrain::getHeightmap() const
@@ -101,7 +123,7 @@ int Terrain::getHeight() const
 	return m_height;
 }
 
-void Terrain::setTexture(int index, AssetWrapper<Texture> texture)
+void Terrain::setTexture(int index, AssetHandle<TextureAsset> texture)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
@@ -145,12 +167,12 @@ void Terrain::setTextureBlend(int index, float val)
 	m_textureBlends[index].blend = val;
 }
 
-AssetWrapper<Texture>& Terrain::getTexture(int index)
+AssetHandle<TextureAsset>& Terrain::getTexture(int index)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
 		logWarning("Invalid texture index specified: " + std::to_string(index));
-		return AssetWrapper<Texture>::empty;
+		return AssetHandle<TextureAsset>::empty;
 	}
 
 	return m_textureBlends.at(index).texture;
@@ -185,13 +207,12 @@ int Terrain::getTextureCount() const
 }
 
 std::array<float, 4> getCornersSafe(
-	const unsigned char* pixels,
+	const std::vector<float>& pixels,
 	int floorX, int floorY,
-	int stride, int bpp,
-	int width, int height
+	int stride, int width, int height
 ) {
 	auto getIndex = [&](int x, int y) -> int {
-		return (y * stride + x) * bpp;
+		return (y * stride + x);
 		};
 
 	int indexP0 = getIndex(floorX, floorY);
@@ -199,7 +220,7 @@ std::array<float, 4> getCornersSafe(
 	int indexP2 = getIndex(floorX, floorY + 1);
 	int indexP3 = getIndex(floorX + 1, floorY + 1);
 
-	int totalBytes = width * height * bpp;
+	int totalBytes = width * height;
 
 	auto safe = [&](int idx) -> float {
 		if (idx >= 0 && idx < totalBytes) {
@@ -225,7 +246,7 @@ std::array<float, 4> getCornersSafe(
 	};
 }
 
-float Terrain::getHeightAtPoint(float x, float y) const
+bool Terrain::getHeightAtPoint(float x, float y, float& outHeight) const
 {
 	
 	// offset to match heightmap
@@ -233,7 +254,7 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	y += m_height / 2.f;
 
 	if (x < 0 || x >= m_width || y < 0 || y >= m_height) {
-		return 0.0f;
+		return false;
 	}
 
 	// Convert from world space to heightmap space
@@ -247,7 +268,7 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	float flippedY = normalizedY;// m_heightmap.get()->getHeight() - 1 - normalizedY;
 
 	// Access heightmap data
-	unsigned char* pixels = static_cast<unsigned char*>(m_heightmap.resource().get()->getData().data);
+	//unsigned char* pixels = static_cast<unsigned char*>(m_heightmap.resource().get()->getData().data);
 	int stride = m_heightmap.resource().get()->getWidth();
 
 	// Compute floor values
@@ -271,10 +292,9 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	//     P2  |_______\|  P3
 
 	auto [P0, P1, P2, P3] = getCornersSafe(
-		pixels,
+		m_heightDataCPU,
 		floorX, floorY,
 		stride,
-		m_heightmap.resource().get()->getBitDepth(),
 		m_heightmap.resource().get()->getWidth(),
 		m_heightmap.resource().get()->getHeight()
 	);
@@ -295,7 +315,158 @@ float Terrain::getHeightAtPoint(float x, float y) const
 	}
 
 	// sum results
-	float height = (P0 + lerpX + lerpY) / 255.f * m_scale;
+	float height = (P0 + lerpX + lerpY) * m_scale;
 
-	return height;
+	outHeight = height;
+
+	return true;
+}
+
+void Terrain::buildFoliage()
+{
+	m_foliageField.build(m_width, m_height);
+}
+
+AABB Terrain::getAABB() const
+{
+	return AABB::createFromCenterExtents(glm::vec3(0.f), glm::vec3(m_width, m_scale, m_height)); // todo return member
+}
+
+void Terrain::resize(int newW, int newH)
+{
+	m_width = newW;
+	m_height = newH;
+
+	m_heightmap.erase();
+
+	m_heightmap = generateHeightmap(newW, newH);
+
+	if(m_foliageField.isActive)
+		m_foliageField.resize(newW, newH);
+}
+
+void Terrain::setPixel(int x, int y, unsigned char value)
+{
+
+}
+
+void Terrain::build()
+{
+	syncHeightmap();
+	buildFoliage();
+}
+
+void Terrain::syncHeightmap()
+{
+	if (m_heightmap.isEmpty())
+		return;
+
+	auto res = m_heightmap.resource();
+
+	// If CPU buffer size is not the same as GPU buffer size reallocate
+	if (m_heightDataCPU.size() != res->getWidth() * res->getHeight())
+	{
+		m_heightDataCPU = std::vector<float>(res->getWidth() * res->getHeight(), 0.0f);
+	}
+
+	res->bind();
+
+	glGetTexImage(
+		GL_TEXTURE_2D,
+		0,
+		toGL(res->getData().format),
+		toGL(res->getData().type),
+		m_heightDataCPU.data()
+	);
+
+	m_heightmap.resource()->getData().data = m_heightDataCPU.data();
+	m_heightmap.makeDirty();
+}
+
+RayHit Terrain::raycast(const Ray& ray, float maxDistance)
+{
+	RayHit result;
+
+	if (ray.direction.y >= 0.0f)
+		return result;
+
+	float dirXZ = glm::length(glm::vec2(ray.direction.x, ray.direction.z));
+	if (dirXZ < 1e-5f)
+		return result;
+
+	AABB bounds = getAABB();
+
+	float tStart, tEnd;
+	if (!Math3D::RayIntersectXZBounds(ray, bounds, tStart, tEnd))
+		return result;
+
+	tStart = std::max(tStart, 0.0f);
+	tEnd = std::min(tEnd, maxDistance);
+
+	constexpr float STEP_XZ = 0.5f;
+	float stepT = STEP_XZ / dirXZ;
+
+	float t = tStart;
+	float prevDiff = 0.0f;
+	bool first = true;
+
+	while (t <= tEnd) {
+		glm::vec3 p = ray.origin + ray.direction * t;
+
+		float h;
+		if (!getHeightAtPoint(p.x, p.z, h)) {
+			t += stepT;
+			first = true;
+			continue;
+		}
+
+		float diff = p.y - h;
+
+		if (!first && prevDiff > 0.0f && diff <= 0.0f) {
+			// refine hit
+			float t0 = t - stepT;
+			float t1 = t;
+
+			for (int i = 0; i < 5; ++i) {
+				float tm = 0.5f * (t0 + t1);
+				glm::vec3 pm = ray.origin + ray.direction * tm;
+
+				float hm;
+				getHeightAtPoint(pm.x, pm.z, hm);
+
+				if (pm.y > hm)
+					t0 = tm;
+				else
+					t1 = tm;
+			}
+
+			float tHit = 0.5f * (t0 + t1);
+
+			result.hit = true;
+			result.t = tHit;
+			result.position = ray.origin + ray.direction * tHit;
+
+			// normal
+			const float eps = 0.1f;
+			float hL, hR, hD, hU;
+			getHeightAtPoint(result.position.x - eps, result.position.z, hL);
+			getHeightAtPoint(result.position.x + eps, result.position.z, hR);
+			getHeightAtPoint(result.position.x, result.position.z - eps, hD);
+			getHeightAtPoint(result.position.x, result.position.z + eps, hU);
+
+			result.normal = glm::normalize(glm::vec3(
+				hL - hR,
+				2.0f * eps,
+				hD - hU
+			));
+
+			return result;
+		}
+
+		prevDiff = diff;
+		first = false;
+		t += stepT;
+	}
+
+	return result;
 }

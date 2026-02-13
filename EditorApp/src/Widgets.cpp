@@ -6,12 +6,12 @@
 #include "tinyfiledialogs.h"
 #include "dialogs/AssetSelectDialog.h"
 
-void addTextureEditWidget(AssetWrapper<Texture> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
+void addTextureEditWidget(AssetHandle<TextureAsset> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
 	int texID = 0;
 	if (!texture.isEmpty())
 	{
-		texID = texture.get()->getID();
+		texID = texture.resource()->getID();
 	}
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
@@ -30,7 +30,7 @@ void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, 
 	int texID = 0;
 	if (!sampler->texture.isEmpty())
 	{
-		texID = sampler->texture.get()->getID();
+		texID = sampler->texture.resource()->getID();
 	}
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
@@ -52,7 +52,7 @@ void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, 
 
 		ImGui::Text("Texture");
 		addTextureEditWidget(EditorState::Instance().selectedSampler->texture, ImVec2{ 150, 150 }, [=](UUID uuid) {
-			EditorState::Instance().selectedSampler->texture = AssetWrapper<Texture>(uuid);
+			EditorState::Instance().selectedSampler->texture = AssetHandle<TextureAsset>(uuid);
 			});
 
 		ImGui::Spacing();
@@ -215,6 +215,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 		"Skybox",
 		"Unlit",
 		"UI",
+		"Volume",
 		"Custom"
 	};
 
@@ -239,20 +240,20 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	if (currentMode == MaterialRenderMode::Custom)
 	{
 		std::string shaderName = "None";
-		if (!mat.get()->m_shader.isEmpty())
+		if (!mat.get()->getCustomShader().isEmpty())
 		{
-			shaderName = mat.get()->m_shader.info().name;
+			shaderName = mat.get()->getCustomShader().info().name;
 		}
 
 		addAssetSelectWidget(shaderName, AssetType::SHADER, [mat](UUID uuid) {
-			mat.get()->m_shader = AssetWrapper<Shader>(uuid);
+			mat.get()->setCustomShader(AssetHandle<ShaderAsset>(uuid));
 		});
 	}
 
 	// Custom Textures Array
 	if (ImGui::CollapsingHeader("Samplers"))
 	{
-		for (auto& [name, sampler] : mat.get()->m_samplers)
+		for (auto& [name, sampler] : mat.get()->getPersistentBlock().getSamplers())
 		{
 			ImGui::PushID(name.c_str());
 			ImGui::Text(name.c_str());
@@ -267,7 +268,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	// Display Uniforms and Update Shader
 	if (ImGui::CollapsingHeader("Uniforms"))
 	{
-		for (auto& [name, uniform] : mat.get()->m_uniformProperties)
+		for (auto& [name, uniform] : mat.get()->getPersistentBlock().getUniformsProperties())
 		{
 			ImGui::PushID(name.c_str());
 			bool updated = false; // Track if the value was changed
@@ -327,9 +328,9 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	//ImGui::DragFloat("Roughness", &mat.get()->roughnessFactor, 0.01f, 0.0f, 1.0f);
 	//ImGui::DragFloat("Opacity", &mat.get()->opacityFactor, 0.01f, 0.0f, 1.0f);
 
-	//addSamplerEditWidget(mat, { 40, 40 }, "Albedo", Texture::TextureType::Albedo);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Normal", Texture::TextureType::Normal);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", Texture::TextureType::Metallic);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", Texture::TextureType::Roughness);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", Texture::TextureType::AmbientOcclusion);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Albedo", TextureType::Albedo);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Normal", TextureType::Normal);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", TextureType::Metallic);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", TextureType::Roughness);
+	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", TextureType::AmbientOcclusion);
 }

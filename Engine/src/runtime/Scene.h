@@ -55,9 +55,17 @@ namespace physx {
 }
 template<typename T> class ObjectHandler;
 
-class EngineAPI Scene
+// Resource
+class EngineAPI Scene : public Resource
 {
 public:
+	struct LoadDescriptor : public ResourceLoadDescriptor
+	{
+		ResourceWrapper<Resource> loadResource() override {
+			return Scene::load(*this);
+		}
+	};
+
 	enum class RenderPhase
 	{
 		PRE_RENDER_BEGIN,
@@ -71,10 +79,14 @@ public:
 	using RenderCallback = std::function<void()>;
 public:
 	// -------------------- Methods -------------------- //
+	Scene() = default;
 	Scene(Context* context);
 
+	static ResourceWrapper<Scene> load(const std::string& fileLocation, LoadDescriptor desc = {});
+	static ResourceWrapper<Scene> load(LoadDescriptor desc);
+	static ResourceWrapper<Scene> create();
+
 	void addCoroutine(const std::function<bool(float)>& coroutine);
-	void removeCoroutine(std::function<bool(float)> coroutine);
 
 	uint32_t getID() const { return m_id; }
 
@@ -175,9 +187,8 @@ private:
 	ResourceWrapper<Texture> m_BRDFIntegrationLUT;
 	ResourceWrapper<Shader> m_skyboxShader;
 	ResourceWrapper<Shader> m_UIShader;
-	AssetWrapper<Shader> m_terrainShader;
 
-	ResourceWrapper<MeshCollection> m_basicBox;
+	//ResourceWrapper<MeshGroup> m_basicBox;
 
 	//Entity m_primaryCamera = Entity::EmptyEntity;
 
@@ -199,4 +210,21 @@ private:
 
 	ResourceWrapper<Shader> m_sampleComputeShader;
 	
+};
+
+// Asset
+class EngineAPI SceneAsset : public Asset
+{
+public:
+	using ResourceType = Scene;
+
+	using Asset::Asset;
+
+	static AssetHandle<SceneAsset> import(const std::string& fileLocation, AssetCreateDescriptor aDesc = {});
+	static AssetHandle<SceneAsset> create(const ResourceWrapper<Scene>& scene, AssetCreateDescriptor aDesc = {});
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

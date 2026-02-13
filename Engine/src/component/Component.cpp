@@ -1,16 +1,9 @@
 #include "component/Component.h"
 
-#include "core/Engine.h"
-#include "runtime/Context.h"
-#include "render/Material.h"
 #include "component/Transformation.h"
-
-#include "utils/EquirectangularToCubemapConverter.h"
 #include "runtime/Scene.h"
-#include "render/IBL.h"
 #include <GL/glew.h>
 #include "render/VertexArrayObject.h"
-#include "component/ComponentSerializer.h"
 
 void InstanceBatch::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
 {

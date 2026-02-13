@@ -13,19 +13,20 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 norm;
 layout (location = 2) in vec2 tex;
 
-struct PatchInstance {
-    vec4 offsetInPatch;
-};
-
 layout(std430, binding = 0) buffer PatchInstanceData {
     vec4 instanceData[];
 };
 
 uniform sampler2D windNoise;
+uniform sampler2D foliageHeightMap;
 uniform mat4 scale;
 uniform float time;
+uniform float heightScale ;
 uniform mat4 rotation;
 uniform vec3 patchPosition;
+uniform vec2 patchID;
+uniform vec2 patchCount;
+uniform sampler2D noiseTexture;
 
 out vec3 Normal;
 out vec3 fragPos;
@@ -36,9 +37,19 @@ void main()
 { 
     vec4 vPos = instanceData[gl_InstanceID];
     vPos += vec4(patchPosition, 0.0);
+
+    vec2 patchUV = patchID / patchCount;
+    float heightSample = texture(foliageHeightMap, patchUV.yx).r; // I am not sure why but the id is transposed, so i need to flip the xy
+    vPos.y += heightSample * heightScale;
+
     fragPosObjSpace = aPos;
 
-    float posX = vPos.x;
+    vec2 noiseSample = texture(noiseTexture, vPos.xz * patchID).rg;
+
+    vPos.x += noiseSample.x;
+    vPos.z += noiseSample.y;
+
+    float posX = vPos.x; 
     float posZ = vPos.z;
     float height = vPos.y;
 

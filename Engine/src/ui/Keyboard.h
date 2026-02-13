@@ -25,7 +25,7 @@ public:
 		bool repeat = false;
 		KeyCode keysym = SCANCODE_UNKNOWN;
 	};
-	using KeyCallback = std::function<void(KeyEvent s)>;
+	using KeyCallback = std::function<bool(KeyEvent s)>;
 
 	Keyboard();
 	int getKeyState(KeyCode code) const;

@@ -21,6 +21,17 @@ struct EngineAPI AABB : public Volume
 
 	glm::vec3 center() const;
 	glm::vec3 extents() const;
+
+	float minX() const { return min.x; }
+	float minY() const { return min.y; }
+	float minZ() const { return min.z; }
+
+	float maxX() const { return max.x; }
+	float maxY() const { return max.y; }
+	float maxZ() const { return max.z; }
+
+	glm::vec3 getMin() const { return min; }
+	glm::vec3 getMax() const { return max; }
 	
 private:
 	glm::vec3 min{};

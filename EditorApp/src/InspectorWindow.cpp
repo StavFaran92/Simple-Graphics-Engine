@@ -8,9 +8,11 @@
 #include "NativeScriptsLoader.h"
 #include "Dialogs.h"
 #include "Widgets.h"
-#include "dialogs/AssetSelectDialog.h"
 
-AssetSelectDialog assetSelectDialog;
+bool g_testRay = false;
+Terrain* g_activeTerrain = 0;
+
+extern Entity g_editorCamera;
 
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
@@ -158,7 +160,7 @@ void InspectorWindow::display()
 			BEGIN_IMGUI_TABLE("Mesh");
 
 			addTableRow("Vertices count:", [&](std::string id) {
-				rightAlignedText(std::to_string((int)meshComponent.mesh.get()->getNumOfVertices()));
+				rightAlignedText(std::to_string((int)meshComponent.mesh.resource()->getNumOfVertices()));
 			});
 
 			END_IMGUI_TABLE();
@@ -175,7 +177,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uuid) {
-				meshComponent.mesh = AssetWrapper<MeshCollection>(uuid);
+				meshComponent.mesh = AssetHandle<MeshGroupAsset>(uuid);
 			});
 
 			if (ImGui::CollapsingHeader("Materials"))
@@ -196,7 +198,7 @@ void InspectorWindow::display()
 					}
 
 					addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uuid) {
-						mat = AssetWrapper<Material>(uuid);
+						mat = AssetHandle<MaterialAsset>(uuid);
 					});
 
 					++index;
@@ -322,7 +324,7 @@ void InspectorWindow::display()
 
 		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
 			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](UUID uuid) {
-				skybox.setSkybox(AssetWrapper<Texture>(uuid));
+				skybox.setSkybox(AssetHandle<TextureAsset>(uuid));
 			});
 
 			// Compile Button
@@ -334,7 +336,7 @@ void InspectorWindow::display()
 
 		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
 			addTextureEditWidget(image.image, { 50, 50 }, [&](UUID uuid) {
-				image.image = AssetWrapper<Texture>(uuid);
+				image.image = AssetHandle<TextureAsset>(uuid);
 				});
 			ImGui::DragFloat("posX", &image.position.x);
 			ImGui::DragFloat("posY", &image.position.y);
@@ -401,7 +403,7 @@ void InspectorWindow::display()
 					}
 
 					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uuid) {
-						animator.addAnimation(name, AssetWrapper<Animation>(uuid));
+						animator.addAnimation(name, AssetHandle<AnimationAsset>(uuid));
 					});
 
 
@@ -424,182 +426,149 @@ void InspectorWindow::display()
 			if (ImGui::Button("+")) {
 				int animationsCount = animations.size();
 				std::string newAnimationName = "New Animation_" + std::to_string(animationsCount);
-				animator.addAnimation(newAnimationName, AssetWrapper<Animation>::empty);
+				animator.addAnimation(newAnimationName, AssetHandle<AnimationAsset>::empty);
 				eState.animationRenameBuffers.push_back(newAnimationName);
 			}
 		});
 
 		displayComponent<Terrain>("Terrain", [](Terrain& terrain) {
 
-			addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
-				terrain = Terrain::generateTerrain(terrain.m_width, terrain.m_height, terrain.m_scale, AssetWrapper<Texture>(uuid));
-				});
-
-			ImGui::DragInt("height", &terrain.m_height);
-			ImGui::DragInt("width", &terrain.m_width);
-			ImGui::DragInt("scale", &terrain.m_scale);
-
-			ImGui::Separator();
-			
-			if (ImGui::CollapsingHeader("Materials"))
+			if (ImGui::BeginTabBar("TerrainTabs"))
 			{
-				std::string matName = "None";
-				if (!terrain.m_material.isEmpty())
+				if (ImGui::BeginTabItem("Layers"))
 				{
-					matName = terrain.m_material.info().name;
+					
+
+					
+
+					static int* newWidth = 0;
+					newWidth = &state.getCurrentEntityState().terrinTempWidth;
+					static int* newHeight = 0;
+					newHeight = &state.getCurrentEntityState().terrinTempHeight;
+
+					// UI
+					ImGui::DragInt("Width", newWidth, 1, 1, 8192);
+					ImGui::DragInt("Height", newHeight, 1, 1, 8192);
+					ImGui::DragFloat("scale", &terrain.m_scale);
+
+					addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
+						terrain.setHeightmap(AssetHandle<TextureAsset>(uuid));
+						});
+
+					// Check if rebuild is needed
+					bool needsRebuild =
+						*newWidth != terrain.getWidth() ||
+						*newHeight != terrain.getHeight();
+
+					// Warning text
+					if (needsRebuild)
+					{
+						ImGui::TextColored(
+							ImVec4(1.0f, 0.2f, 0.2f, 1.0f),
+							"Terrain must be rebuilt"
+						);
+					}
+
+
+
+					// Build button
+					ImGui::BeginDisabled(!needsRebuild);
+					if (ImGui::Button("Build"))
+					{
+						terrain.resize(*newWidth, *newHeight);
+					}
+					ImGui::EndDisabled();
+
+
+					ImGui::Separator();
+
+					if (ImGui::CollapsingHeader("Materials"))
+					{
+						std::string matName = "None";
+						if (!terrain.m_material.isEmpty())
+						{
+							matName = terrain.m_material.info().name;
+						}
+
+						addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uuid) {
+							terrain.m_material = AssetHandle<MaterialAsset>(uuid);
+							});
+					}
+
+					bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainDeformer;
+
+					if (isActive)
+					{
+						ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+					}
+
+					if (ImGui::Button("Terrain Deformer"))
+					{
+						g_activeTerrain = &terrain;
+						EditorState::Instance().setActiveEditorTool(isActive ? EditorTool::Type::None : EditorTool::Type::TerrainDeformer);
+					}
+
+					if (isActive)
+					{
+						ImGui::PopStyleColor();
+					}
+
+					ImGui::EndTabItem();
 				}
 
-				addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uuid) {
-					terrain.m_material = AssetWrapper<Material>(uuid);
-					});
+				if (ImGui::BeginTabItem("Foliage"))
+				{
+					if (!terrain.m_foliageField.isActive)
+					{
+						if (ImGui::Button("build"))
+						{
+							terrain.buildFoliage();
+						}
+					}
+					else
+					{
+						ImGui::ColorEdit3("Bottom Color", (float*)&terrain.m_foliageField.colorA);
+						ImGui::ColorEdit3("Top Color", (float*)&terrain.m_foliageField.colorB);
+						ImGui::DragFloat("Density", &terrain.m_foliageField.globalDensity, 0.01f, 0.0f, 1.0f);
+
+
+
+						bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::FoliagePainter;
+
+						if (isActive)
+						{
+							ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+						}
+
+						if (ImGui::Button("Foliage Painter"))
+						{
+							g_activeTerrain = &terrain;
+							EditorState::Instance().setActiveEditorTool(
+								isActive ? EditorTool::Type::None : EditorTool::Type::FoliagePainter
+							);
+						}
+
+						if (isActive)
+						{
+							ImGui::PopStyleColor();
+						}
+					}
+
+
+
+					//if (ImGui::Button("test"))
+					//{
+					//	g_activeTerrain = &terrain;
+					//	EditorState::Instance().setActiveEditorTool(EditorTool::Type::FoliagePainter);
+
+					//}
+
+					ImGui::EndTabItem();
+				}
+
+				ImGui::EndTabBar();
 			}
 		});
-
-		//displayComponent<ShaderComponent>("Shader Component", [](ShaderComponent& shaderComponent) {
-		//	//auto& state = g_states[selectedEntity.handlerID()];
-
-		//	if (ImGui::Button("Select Shader"))
-		//	{
-		//		EditorState::Instance().showShaderSelector = true;
-		//	}
-
-		//	UUID selectedShaderUID;
-		//	displaySelectShaderDialog(selectedShaderUID);
-
-		//	if (!selectedShaderUID.empty())
-		//	{
-		//		shaderComponent.setShader(AssetWrapper<Shader>(selectedShaderUID));
-		//	}
-
-		//	if (!shaderComponent.m_customShader.isEmpty())
-		//	{
-		//		auto name = Engine::get()->getSubSystem<Assets>()->getAlias(shaderComponent.m_customShader.getUID());
-		//		ImGui::Text(name.c_str());
-		//	}
-		//	
-		//	// Compile Button
-		//	if (ImGui::Button("recompile"))
-		//	{
-		//		shaderComponent.m_customShader.resource()->recompile();
-		//		shaderComponent.update();
-		//	}
-
-		//	ImGui::Separator();
-
-		//	// Projection Type Drop-down
-		//	const char* projectionTypes[] = { "Default", "Texture2D" };
-		//	ImGui::Combo("Projection Type", (int*)&shaderComponent.projection, projectionTypes, IM_ARRAYSIZE(projectionTypes));
-
-		//	if (shaderComponent.projection == ShaderComponent::ProjectionType::Texture2D)
-		//	{
-		//		// Projection Texture
-		//		ImGui::Text("Projection Texture:");
-		//		addTextureEditWidget(shaderComponent.projectionTexture, { 100,100}, [&](UUID uuid) {
-		//			shaderComponent.setProjectionTexture(AssetWrapper<Texture>(uuid));
-		//		});
-		//	}
-
-		//	// Custom Textures Array
-		//	if (ImGui::CollapsingHeader("Textures"))
-		//	{
-		//		for (auto& [name, texture] : shaderComponent.customTextures)
-		//		{
-		//			ImGui::PushID(name.c_str());
-		//			ImGui::Text(name.c_str());
-		//			addTextureEditWidget(texture, { 100,100 }, [&](UUID uuid) {
-		//				texture = AssetWrapper<Texture>(uuid);
-		//				});
-		//			ImGui::PopID();
-		//		}
-		//		
-		//	}
-
-		//	// Display Uniforms and Update Shader
-		//	if (ImGui::CollapsingHeader("Uniforms"))
-		//	{
-		//		for (auto& [name, value] : shaderComponent.m_uniformProperties)
-		//		{
-		//			ImGui::PushID(name.c_str());
-		//			bool updated = false; // Track if the value was changed
-		//			std::visit([&](auto& v)
-		//				{
-		//					using T = std::decay_t<decltype(v)>;
-		//					ImGui::Text("%s:", name.c_str());
-
-		//					if constexpr (std::is_same_v<T, float>)
-		//					{
-		//						updated = ImGui::DragFloat(("##" + name).c_str(), &v, 0.1f);
-		//					}
-		//					else if constexpr (std::is_same_v<T, glm::vec2>)
-		//					{
-		//						updated = ImGui::DragFloat2(("##" + name).c_str(), &v[0], 0.1f);
-		//					}
-		//					else if constexpr (std::is_same_v<T, glm::vec3>)
-		//					{
-		//						updated = ImGui::DragFloat3(("##" + name).c_str(), &v[0], 0.1f);
-		//					}
-		//					else if constexpr (std::is_same_v<T, glm::vec4>)
-		//					{
-		//						updated = ImGui::DragFloat4(("##" + name).c_str(), &v[0], 0.1f);
-		//					}
-		//					else if constexpr (std::is_same_v<T, int>)
-		//					{
-		//						updated = ImGui::InputInt(("##" + name).c_str(), &v);
-		//					}
-		//					else if constexpr (std::is_same_v<T, unsigned int>)
-		//					{
-		//						updated = ImGui::InputScalar(("##" + name).c_str(), ImGuiDataType_U32, &v);
-		//					}
-		//					else if constexpr (std::is_same_v<T, glm::mat3>)
-		//					{
-		//						for (int i = 0; i < 3; ++i)
-		//							updated |= ImGui::DragFloat3((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
-		//					}
-		//					else if constexpr (std::is_same_v<T, glm::mat4>)
-		//					{
-		//						for (int i = 0; i < 4; ++i)
-		//							updated |= ImGui::DragFloat4((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
-		//					}
-		//				}, value);
-
-		//			// If the value changed, update the shader
-		//			if (updated)
-		//			{
-		//				shaderComponent.m_customShader.resource()->setUniformValue(name, value);
-		//			}
-
-		//			ImGui::PopID();
-		//		}
-		//	}
-		//});
-
-		displayComponent<FoliageComponent>("Foliage Component", [](FoliageComponent& foliage) {
-			// Compile Button
-			addTextureEditWidget(foliage.m_foliageSpreadMap, { 100,100 }, [&](UUID uuid) {
-				foliage.m_foliageSpreadMap = AssetWrapper<Texture>(uuid);
-				});
-
-			ImGui::ColorEdit3("Bottom Color", (float*)&foliage.colorA);
-			ImGui::ColorEdit3("Top Color", (float*)&foliage.colorB);
-			ImGui::DragFloat("Density", &foliage.globalDensity, 0.01f, 0.0f, 1.0f);
-			ImGui::DragFloat("Width", &foliage.width, 0.01f, 1.0f);
-			ImGui::DragFloat("Height", &foliage.height, 0.01f, 1.0f);
-			ImGui::DragInt("Patch Width", &foliage.patchWidth);
-			ImGui::DragInt("Patch Height", &foliage.patchHeight);
-			//ImGui::DragInt("Pixel Per Patch", &foliage.pixelPerPatch);
-
-			if (ImGui::Button("Select Terrain"))
-			{
-				logError("Not yet implemented.");
-			}
-
-			//displayEntitySelectDialog();
-
-			if (ImGui::Button("build"))
-			{
-				foliage.build();
-			}
-			});
 
 		displayComponent<ScriptComponent>("Lua Script Component", [](ScriptComponent& script) {
 			std::string scriptName = "None";
@@ -609,7 +578,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uuid) {
-				script.script = AssetWrapper<LuaScript>(uuid);
+				script.script = AssetHandle<LuaScriptAsset>(uuid);
 			});
 		});
 
@@ -621,7 +590,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(shaderName, AssetType::SHADER, [&postProcessComponent](UUID uuid) {
-				postProcessComponent.shader = AssetWrapper<Shader>(uuid);
+				postProcessComponent.shader = AssetHandle<ShaderAsset>(uuid);
 			});
 				
 			if (!postProcessComponent.shader.isEmpty())
@@ -653,6 +622,38 @@ void InspectorWindow::display()
 			ImGui::DragFloat("Opacity", &waterBody.opacity, 0.01f, 0.0f, 1.0f);
 
 		});
+
+		displayComponent<VolumetricCloudsComponent>("Volumetric Clouds Component", [](VolumetricCloudsComponent& clouds) {
+			ImGui::DragFloat("March size", &clouds.marchSize, 0.001f, 0.01f, 1.0f);
+			});
+
+		displayComponent<VolumeComponent>("Volume Component", [](VolumeComponent& volume) {
+
+			std::string meshName = "None";
+			if (!volume.mesh.isEmpty())
+			{
+				meshName = volume.mesh.info().name;
+			}
+
+			addAssetSelectWidget(meshName, AssetType::MESH, [&volume](UUID uuid) {
+				volume.mesh = AssetHandle<MeshGroupAsset>(uuid);
+				});
+
+			std::string matName = "None";
+			if (!volume.material.isEmpty())
+			{
+				matName = volume.material.info().name;
+				if (matName.empty())
+				{
+					matName = "Material";
+				}
+			}
+
+			addAssetSelectWidget(matName, AssetType::MATERIAL, [&volume](UUID uuid) {
+				volume.material = AssetHandle<MaterialAsset>(uuid);
+				});
+
+			});
 
 		displayComponent<TestComp>("Test Component", [](TestComp& testComp) {
 			});
@@ -707,7 +708,7 @@ void InspectorWindow::display()
 
 			if (ImGui::MenuItem("Image"))
 			{
-				auto& img = state.getSelectedEntity().addComponent<ImageComponent>(BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE));
+				auto& img = state.getSelectedEntity().addComponent<ImageComponent>(BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE));
 				img.size = { 50, 50 };
 			}
 
@@ -731,10 +732,10 @@ void InspectorWindow::display()
 				auto& shader = state.getSelectedEntity().addComponent<ShaderComponent>();
 			}
 
-			if (ImGui::MenuItem("Foliage"))
-			{
-				auto& foliage = state.getSelectedEntity().addComponent<FoliageComponent>();
-			}
+			//if (ImGui::MenuItem("Foliage"))
+			//{
+			//	auto& foliage = state.getSelectedEntity().addComponent<FoliageComponent>();
+			//}
 
 			if (ImGui::MenuItem("Lua Script"))
 			{
@@ -745,6 +746,11 @@ void InspectorWindow::display()
 			if (ImGui::MenuItem("Post Process Effect"))
 			{
 				state.getSelectedEntity().addComponent<PostProcessComponent>();
+			}
+
+			if (ImGui::MenuItem("Volume"))
+			{
+				state.getSelectedEntity().addComponent<VolumeComponent>();
 			}
 
 			//Todo REMOVE

@@ -5,8 +5,8 @@
 
 class MemoryManager
 {
-    MemoryPool<ResourceBase>& getMemoryPool() { return m_memoryPool; }
+    MemoryPool<Resource>& getMemoryPool() { return m_memoryPool; }
 
 private:
-    MemoryPool<ResourceBase> m_memoryPool;
+    MemoryPool<Resource> m_memoryPool;
 };

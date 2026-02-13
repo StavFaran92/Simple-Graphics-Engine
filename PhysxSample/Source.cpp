@@ -135,12 +135,12 @@ public:
 		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
 		Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
 
-		Skybox::CreateSkyboxFromCubemap({ SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/right.jpg",
-		SGE_ROOT_DIR +"Resources/Engine/Textures/Skybox/left.jpg",
-		SGE_ROOT_DIR +"Resources/Engine/Textures/Skybox/top.jpg",
-		SGE_ROOT_DIR +"Resources/Engine/Textures/Skybox/bottom.jpg",
-		SGE_ROOT_DIR +"Resources/Engine/Textures/Skybox/front.jpg",
-		SGE_ROOT_DIR +"Resources/Engine/Textures/Skybox/back.jpg" }, Engine::get()->getContext()->getActiveScene().get());
+		Skybox::CreateSkyboxFromCubemap({ SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/right.jpg",
+		SGE_ROOT_DIR"Resources/Engine/Textures/Skybox/left.jpg",
+		SGE_ROOT_DIR"Resources/Engine/Textures/Skybox/top.jpg",
+		SGE_ROOT_DIR"Resources/Engine/Textures/Skybox/bottom.jpg",
+		SGE_ROOT_DIR"Resources/Engine/Textures/Skybox/front.jpg",
+		SGE_ROOT_DIR"Resources/Engine/Textures/Skybox/back.jpg" }, Engine::get()->getContext()->getActiveScene().get());
 
 		//auto camera = Engine::get()->getContext()->getActiveScene()->getActiveCamera();
 		//camera->lookAt(0, 5, 0);

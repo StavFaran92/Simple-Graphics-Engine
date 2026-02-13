@@ -5,13 +5,10 @@
 #include <string>
 #include <unordered_map>
 #include "glm/glm.hpp"
-#include "memory/UUID.h"
 #include "memory/Asset.h"
-#include "animation/AnimationLoader.h"
-
-#include <filesystem>
 
 class Bone;
+struct AnimationLoadDescriptor;
 
 struct MeshNodeData
 {
@@ -22,26 +19,28 @@ struct MeshNodeData
 	std::vector<MeshNodeData> children;
 };
 
-struct AnimationAssetManager : public AssetManager
+struct AnimationLoadDescriptor : public ResourceLoadDescriptor
 {
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
+	ResourceWrapper<Resource> loadResource() override;
 };
 
-class EngineAPI Animation : public ResourceBase
+// Resource
+class EngineAPI Animation : public Resource
 {
 public:
+	static ResourceWrapper<Animation> load(const std::string& fileLocation, AnimationLoadDescriptor desc = {});
+
 	Animation();
+
 	void calculateFinalBoneMatrices(float currentTime, std::unordered_map<std::string, glm::mat4>& outFinalBoneMatrices);
+
 	float getDuration() const;
+
 	float getTicksPerSecond() const;
+
 	void build(const std::string& name, float duration, float ticksPerSecond, MeshNodeData& rootNode, std::unordered_map<std::string, std::shared_ptr<Bone>>& bones);
 
-	static bool preprocess(const std::string& path);
-	//static void load(UUID uid, const std::string& path);
-
-	static AssetWrapper<Animation> import(const std::string& fileLocation, AnimationImportSettings settings = {});
+	static bool preprocess(const std::string& path);	
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);	
 
@@ -51,4 +50,20 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Bone>> m_bones;
 	float m_duration = 0;
 	float m_ticksPerSecond = 0;
+};
+
+// Asset
+class EngineAPI AnimationAsset : public Asset
+{
+public:
+	using ResourceType = Animation;
+
+	using Asset::Asset;
+
+	static AssetHandle<AnimationAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

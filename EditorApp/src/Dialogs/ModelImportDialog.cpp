@@ -33,28 +33,28 @@ bool ModelImportDialog::acceptContent()
 		auto entity = Engine::get()->getContext()->getActiveScene()->createEntity(uniqueName.name);
 		entity.addComponent<RenderableComponent>();
 
-		ModelImportSettings desc;
+		AssetCreateDescriptor desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		auto mesh = MeshCollection::import(filepath.m_filepath, desc);
+		auto mesh = MeshGroupAsset::import(filepath.m_filepath, desc);
 
 		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
 
-		auto& materials = MeshCollection::getLastLoadedMaterials();
+		auto& materials = mesh->getImportedMaterials();
 
-		for (auto& [idx, m] : materials)
-		{
-			meshRenderer.setMaterial(idx, m);
+		// TODO fix
+		//for (auto& [idx, m] : materials)
+		//{
+		//	meshRenderer.setMaterial(idx, m);
 
-		}
+		//}
 
 		ResourceWrapper<Prefab> prefab = Prefab::create(entity);
 
 		AssetCreateDescriptor aInfo;
 		aInfo.name = uniqueName.name + "_PREFAB";
-		aInfo.aType = AssetType::PREFAB;
 		aInfo.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
+		PrefabAsset::create(prefab, aInfo);
 
 		entity.remove();
 

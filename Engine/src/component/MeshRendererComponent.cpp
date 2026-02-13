@@ -1,24 +1,25 @@
 #include "MeshRendererComponent.h"
 
 #include "memory/BuiltInAssets.h"
+#include "core/Logger.h"
 
-MeshRendererComponent::MeshRendererComponent(AssetWrapper<MeshCollection> mesh)
+MeshRendererComponent::MeshRendererComponent(AssetHandle<MeshGroupAsset> mesh)
 	: mesh(mesh)
 {
-	int materialCount = mesh.get()->getMaterialCount();
+	int materialCount = mesh.resource()->getMaterialCount();
 	for (int i = 0; i < materialCount; i++)
 	{
-		addMaterial(BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT));
+		addMaterial(BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT));
 	}
 }
 
-AssetWrapper<Material> MeshRendererComponent::getMaterialBySlot(int slot) const
+AssetHandle<MaterialAsset> MeshRendererComponent::getMaterialBySlot(int slot) const
 {
 	auto iter = m_material.find(slot);
 	if (iter == m_material.end())
 	{
 		logWarning("Could not find material in slot {}", std::to_string(slot));
-		return AssetWrapper<Material>::empty;
+		return AssetHandle<MaterialAsset>::empty;
 	}
 	return iter->second;
 }

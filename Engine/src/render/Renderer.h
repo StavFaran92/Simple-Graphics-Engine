@@ -13,6 +13,7 @@ class Transformation;
 class Shader;
 class Mesh;
 class Scene;
+class MeshGroup;
 
 
 class Renderer : public IRenderer
@@ -37,5 +38,5 @@ protected:
 	bool m_wireFrameMode = false;
 
 	//ResourceWrapper<Shader> m_pbrShader = nullptr;
-	ResourceWrapper<MeshCollection> m_quad = nullptr;
+	ResourceWrapper<MeshGroup> m_quad = nullptr;
 };

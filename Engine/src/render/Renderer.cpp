@@ -17,7 +17,7 @@
 #include "component/Transformation.h"
 #include "render/Material.h"
 #include "render/CommonShaders.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "render/Graphics.h"
 #include "render/RenderView.h"
 #include "render/ScreenQuad.h"
@@ -29,12 +29,13 @@
 #include "component/ObjectComponent.h"
 #include "component/ShaderComponent.h"
 #include "memory/BuiltInAssets.h"
+#include "memory/BuiltInResources.h"
 
 bool Renderer::init()
 {
-	//m_pbrShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl");
+	//m_pbrShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBRShader.glsl");
 
-    m_quad = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_QUAD).resource();
+    m_quad = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_QUAD).resource();
 
     return true;
 }
@@ -61,7 +62,7 @@ void Renderer::renderScene(Scene* scene)
 
         prepareEntityForRender(entityHandler);
 
-        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -71,7 +72,7 @@ void Renderer::renderScene(Scene* scene)
 
             // draw model
                 
-            graphics->shader = graphics->material->m_shader.resource();
+            graphics->shader = graphics->material->getActiveShader();
             graphics->shader->use();
             setUniforms();
 
@@ -101,7 +102,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
 
         auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
 
-        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
         {            
             float distance = glm::dot(transform.getWorldPosition(), camForward);
 
@@ -115,7 +116,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
         }
     }
 
-    graphics->shader = BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR).resource();
+    graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
     auto iter = transparentEntities.rbegin();
     while (iter != transparentEntities.rend())
     {
@@ -129,7 +130,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
 
         graphics->entity = entityHandler;
         graphics->shader->use();
-        for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.get()->getMeshes())
+        for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.resource()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -168,7 +169,7 @@ void Renderer::setUniforms()
 
     auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-    graphics->shader = graphics->material->m_shader.resource();
+    graphics->shader = graphics->material->getActiveShader();
 
     graphics->shader->setModelMatrix(graphics->model);
     graphics->shader->setViewMatrix(graphics->view);
@@ -198,7 +199,7 @@ void Renderer::renderDebugData(Scene* scene)
         std::string name = entityHandler.getComponent<ObjectComponent>().name;
         logTrace("About to display debug data for {}", name);
 
-        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -206,7 +207,7 @@ void Renderer::renderDebugData(Scene* scene)
                 continue;
             }
 
-            graphics->shader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEBUG_DATA).resource();
+            graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEBUG_DATA);
             graphics->shader->use();
 
             graphics->shader->setModelMatrix(graphics->model);
@@ -236,7 +237,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
         std::string name = entityHandler.getComponent<ObjectComponent>().name;
         logTrace("About to render '{}' using Custom Shader pass", name);
 
-        for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+        for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
         {
 
             if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -255,7 +256,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
             // draw model
 
-            graphics->shader = graphics->material->m_shader.resource();
+            graphics->shader = graphics->material->getActiveShader();
             graphics->shader->use();
             glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
             graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
@@ -292,7 +293,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
  //       if (shaderComponent.shaderOverride == ShaderOverride::PBR)
  //       {
  //           // Bind mesh
- //           ResourceWrapper<MeshCollection> meshCollecton;
+ //           ResourceWrapper<MeshGroup> meshCollecton;
 
  //           if (shaderComponent.projection == ShaderComponent::DefaultProjection)
  //           {
@@ -391,7 +392,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
  //           }
 
  //           // Bind mesh
- //           ResourceWrapper<MeshCollection> meshCollecton;
+ //           ResourceWrapper<MeshGroup> meshCollecton;
 
  //           if (shaderComponent.projection == ShaderComponent::DefaultProjection)
  //           {

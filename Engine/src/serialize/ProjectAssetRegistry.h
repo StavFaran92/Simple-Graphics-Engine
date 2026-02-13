@@ -8,7 +8,7 @@
 #include "memory/ResourceWrapper.h"
 #include "texture/Texture.h"
 
-struct AssetInfo;
+struct AssetRecord;
 
 class ProjectAssetRegistry
 {
@@ -22,9 +22,9 @@ public:
 	void load(); //????
 	void save();
 	//void addTexture(Resource<Texture> texture);
-	void addAssetRegistry(const AssetInfo& asset);
-	void updateAssetRegistry(const AssetInfo& asset);
-	void removeAssetRegistry(const AssetInfo& asset);
+	void addAssetRegistry(const AssetRecord& asset);
+	void updateAssetRegistry(const AssetRecord& asset);
+	void removeAssetRegistry(const AssetRecord& asset);
 
 	//void addAssociation(std::string name, UUID uuid);
 	//void removeAssociation(std::string name);
@@ -35,8 +35,8 @@ public:
 	void syncPaths(const std::unordered_map<std::string, UUID>& pathsReferences);
 	void syncNames(const std::unordered_map<std::string, UUID>& namesReferences);
 
-	std::vector<AssetInfo> getAllAssetsOfType(AssetType aType) const;
-	std::vector<AssetInfo> getAllAssets() const;
+	std::vector<AssetRecord> getAllAssetsOfType(AssetType aType) const;
+	std::vector<AssetRecord> getAllAssets() const;
 
 
 private:

@@ -8,19 +8,19 @@
 struct PrefabImportSettings : public AssetCreateDescriptor
 {};
 
-struct PrefabAssetManager : public AssetManager
-{
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo) override;
-};
-
-class EngineAPI Prefab : public ResourceBase
+// Resource
+class EngineAPI Prefab : public Resource
 {
 public:
-	static AssetWrapper<Prefab> import(const std::string& fileLocation, PrefabImportSettings desc);
+	struct LoadDescriptor : public ResourceLoadDescriptor
+	{
+		ResourceWrapper<Resource> loadResource() override {
+			return Prefab::load(sourcePath, *this);
+		}
+	};
+
+	static ResourceWrapper<Prefab> load(const std::string& fileLocation, LoadDescriptor desc = {});
 	static ResourceWrapper<Prefab> create(const Entity& e);
-	static void save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo);
 
 	Entity Instansiate(glm::vec3 position = glm::vec3{ 0.0f });
 
@@ -33,4 +33,22 @@ private:
 	static void extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab);
 private:
 	std::vector<SerializedEntity> m_serializedPrefab;
+};
+
+// Asset
+class EngineAPI PrefabAsset : public Asset
+{
+public:
+	using ResourceType = Prefab;
+
+	using Asset::Asset;
+
+	static AssetHandle<PrefabAsset> import(const std::string& fileLocation, PrefabImportSettings aDesc = {});
+
+	static AssetHandle<PrefabAsset> create(const ResourceWrapper<Prefab>& prefab, AssetCreateDescriptor desc = {});
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

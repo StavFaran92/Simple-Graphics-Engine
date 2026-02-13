@@ -3,6 +3,7 @@
 #include "component/Transformation.h"
 #include "component/ObjectComponent.h"
 #include <iostream>
+#include "core/Logger.h"
 
 Entity Entity::EmptyEntity{};
 

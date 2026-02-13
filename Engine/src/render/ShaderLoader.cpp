@@ -2,6 +2,7 @@
 #include "utils/Utils.h"
 #include "core/Logger.h"
 #include <map>
+#include <sstream>
 
 enum class ShaderType
 {

@@ -9,13 +9,13 @@
 
 using EventHandler = uint64_t;
 
-using Callback = std::function<void(SDL_Event e)>;
+using Callback = std::function<bool(SDL_Event e)>;
 
 struct EventCallback
 {
-	EventCallback(EventHandler handler, std::function<void(SDL_Event e)> func) : handler(handler), func(func) {};
+	EventCallback(EventHandler handler, Callback func) : handler(handler), func(func) {};
 
-	std::function<void(SDL_Event e)> func;
+	std::function<bool(SDL_Event e)> func;
 	EventHandler handler;
 };
 
@@ -27,7 +27,24 @@ public:
 	{
 	};
 
-	virtual bool handleEvent(SDL_Event e) = 0;
+	virtual bool handleEvent(SDL_Event e)
+	{
+		if (!m_isEnabled)
+			return false;
+
+		bool isHandled = false;
+
+		auto iter = m_listeners.find((SDL_EventType)e.type);
+		if (iter != m_listeners.end())
+		{
+			for (auto& ec : iter->second)
+			{
+				isHandled |= ec.func(e);
+			}
+		}
+
+		return isHandled;
+	}
 
 	virtual void subscribe(EventHandler handler, SDL_EventType eventType, const Callback& ec)
 	{

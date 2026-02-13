@@ -2,7 +2,10 @@
 
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
-#include "memory/AssetWrapper.h"
+#include "memory/AssetHandle.h"
+#include "render/Shader.h"
+#include "render/RenderView.h"
+#include "texture/Texture.h"
 
 struct EngineAPI ShaderComponent : public Component
 {
@@ -14,18 +17,18 @@ struct EngineAPI ShaderComponent : public Component
 
 	ShaderComponent();
 
-	void addTexture(const std::string& name, AssetWrapper<Texture> texture)
+	void addTexture(const std::string& name, AssetHandle<TextureAsset> texture)
 	{
 		customTextures[name] = texture;
 	}
 
-	void setProjectionTexture(AssetWrapper<Texture> texture);
+	void setProjectionTexture(AssetHandle<TextureAsset> texture);
 
 	void update();
 
 	void parseUniforms(const std::string& sourceCode);
 
-	void setShader(AssetWrapper<Shader> shader);
+	void parseFromShader(AssetHandle<ShaderAsset> shader);
 
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
@@ -50,12 +53,12 @@ struct EngineAPI ShaderComponent : public Component
 	}
 
 	// This will only be used by forward renderer, ignored by deffered
-	AssetWrapper<Shader> m_customShader;
+	AssetHandle<ShaderAsset> m_customShader;
 
-	std::map<std::string, AssetWrapper<Texture>> customTextures;
+	std::map<std::string, AssetHandle<TextureAsset>> customTextures;
 
 	ProjectionType projection = ProjectionType::DefaultProjection;
-	AssetWrapper<Texture> projectionTexture;
+	AssetHandle<TextureAsset> projectionTexture;
 	std::shared_ptr<RenderView> renderViewProjection;
 
 	std::unordered_map<std::string, Value> m_uniformProperties;

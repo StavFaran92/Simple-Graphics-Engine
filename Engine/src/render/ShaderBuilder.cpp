@@ -175,11 +175,11 @@ ShaderComponent CustomShaderBuilder::build()
 	//std::string shaderPath;
 	//if (m_shaderOverride == ShaderOverride::PBR)
 	//{
-	//	shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl";
+	//	shaderPath = SGE_ROOT_DIR "Resources/Engine/Shaders/PBRShader.glsl";
 	//}
 	//else if (m_shaderOverride == ShaderOverride::Pixel)
 	//{
-	//	shaderPath = SGE_ROOT_DIR + "Resources/Engine/Shaders/PixelShader.glsl";
+	//	shaderPath = SGE_ROOT_DIR "Resources/Engine/Shaders/PixelShader.glsl";
 	//}
 
 	//if (!customShaders.vertexCode.empty() || !customShaders.fragmentCode.empty())

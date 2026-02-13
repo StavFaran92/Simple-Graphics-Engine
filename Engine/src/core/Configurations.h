@@ -102,6 +102,7 @@ enum AssetType : int
 	PREFAB,
 	MATERIAL,
 	LUA_SCRIPT,
+	SCENE,
 
 	TOTAL_ASSET_TYPE_COUNT
 };

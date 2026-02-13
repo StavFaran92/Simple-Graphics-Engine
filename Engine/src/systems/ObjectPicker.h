@@ -9,7 +9,7 @@
 
 class FrameBufferObject;
 class RenderBufferObject;
-class TextureHandler;
+class Texture;
 class Context;
 class Shader;
 

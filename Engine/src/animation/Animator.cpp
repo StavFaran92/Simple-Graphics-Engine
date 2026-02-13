@@ -2,10 +2,10 @@
 #include "animation/Animator.h"
 
 #include "animation/Animation.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "runtime/Scene.h"
 
-Animator::Animator(AssetWrapper<Animation> animation)
+Animator::Animator(AssetHandle<AnimationAsset> animation)
 	: m_currentAnimation(animation)
 {
 
@@ -22,7 +22,7 @@ void Animator::update(float dt)
 	}
 }
 
-void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
+void Animator::getFinalBoneMatrices(const MeshGroup* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
 {
 	if (m_currentAnimation.resource().isEmpty())
 		return;
@@ -44,7 +44,7 @@ void Animator::getFinalBoneMatrices(const MeshCollection* meshCollection, std::v
 	}
 }
 
-void Animator::playAnimation(AssetWrapper<Animation> animation)
+void Animator::playAnimation(AssetHandle<AnimationAsset> animation)
 {
 	// TODO remove maybe, there is a bug here due to name not being set
 	m_currentAnimation = animation;
@@ -56,7 +56,7 @@ void Animator::setPlaybackSpeed(float playbackSpeed)
 	m_playbackSpeed = playbackSpeed;
 }
 
-void Animator::addAnimation(const std::string& name, AssetWrapper<Animation> animation)
+void Animator::addAnimation(const std::string& name, AssetHandle<AnimationAsset> animation)
 {
 	m_animations[name] = animation;
 }
@@ -72,7 +72,7 @@ void Animator::removeAnimation(const std::string& name)
 
 void Animator::playAnimation(const std::string& name)
 {
-	AssetWrapper<Animation>& anim = getAnimation(name);
+	AssetHandle<AnimationAsset>& anim = getAnimation(name);
 	if (!anim.resource().isEmpty())
 	{
 		playAnimation(anim);
@@ -80,19 +80,19 @@ void Animator::playAnimation(const std::string& name)
 	}
 }
 
-AssetWrapper<Animation> Animator::getAnimation(const std::string& name)
+AssetHandle<AnimationAsset> Animator::getAnimation(const std::string& name)
 {
 	auto iter = m_animations.find(name);
 	if (iter == m_animations.end())
 	{
 		logWarning("Could not find animation: {}", name);
-		return AssetWrapper<Animation>::empty;
+		return AssetHandle<AnimationAsset>::empty;
 	}
 
 	return iter->second;
 }
 
-const std::map<std::string, AssetWrapper<Animation>>& Animator::getAllAnimations() const
+const std::map<std::string, AssetHandle<AnimationAsset>>& Animator::getAllAnimations() const
 {
 	return m_animations;
 }

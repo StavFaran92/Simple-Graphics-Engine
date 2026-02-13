@@ -6,7 +6,7 @@
 #include "component/Terrain.h"
 #include "component/Transformation.h"
 #include "geometry/Mesh.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "lights/DirectionalLight.h"
 #include "lights/PointLight.h"
 #include "render/Material.h"
@@ -45,10 +45,6 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
 
     { "Terrain", [](Entity& e, sol::this_state lua) -> sol::object {
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<Terrain>()));
-    } },
-
-    { "Foliage", [](Entity& e, sol::this_state lua) -> sol::object {
-        return sol::object(lua, sol::in_place, std::ref(e.getComponent<FoliageComponent>()));
     } },
 
     { "Skybox", [](Entity& e, sol::this_state lua) -> sol::object {
@@ -99,7 +95,7 @@ void bindComponents(sol::state& lua)
     lua.new_usertype<Animator>("Animator",
         "playAnimation", sol::overload(
             [](Animator& self, const std::string& name) { self.playAnimation(name); },
-            [](Animator& self, AssetWrapper<Animation> animation) { self.playAnimation(animation); }
+            [](Animator& self, AssetHandle<AnimationAsset> animation) { self.playAnimation(animation); }
         ),
         "setPlaybackSpeed", &Animator::setPlaybackSpeed,
         "addAnimation", &Animator::addAnimation,
@@ -113,7 +109,7 @@ void bindComponents(sol::state& lua)
         "createTerrain", &Terrain::createTerrain,
         "getMesh", &Terrain::getMesh,
         "getHeightmap", &Terrain::getHeightmap,
-        "getHeightAtPoint", &Terrain::getHeightAtPoint,
+        //"getHeightAtPoint", &Terrain::getHeightAtPoint,
         "getScale", &Terrain::getScale,
         "getWidth", &Terrain::getWidth,
         "getHeight", &Terrain::getHeight,
@@ -219,7 +215,7 @@ void bindAssets(sol::state& lua)
     lua.new_usertype<Animation>("Animation",
         "getDuration", &Animation::getDuration,
         "getTicksPerSecond", &Animation::getTicksPerSecond,
-        "import", &Animation::import
+        "import", &AnimationAsset::import
     );
 
 
@@ -245,79 +241,78 @@ void bindAssets(sol::state& lua)
         "recompile", &Shader::recompile,
         "getSourceCode", &Shader::getSourceCode,
         "createOverrideShader", &Shader::createOverrideShader,
-        "import", &Shader::import
+        "import", &ShaderAsset::import
     );
 
-    lua.new_usertype<ResourceWrapper<Prefab>>("Prefab",
-        sol::factories(
-            [](int value) {
-                // your custom UUID creation from int
-                return ResourceWrapper<Prefab>(UUID(value));
-            }
-        ),
-        // Instance methods
-        "save", [](ResourceWrapper<Prefab>& self) {
-            self->save(self, {});
-        },
-        "instansiate", [](ResourceWrapper<Prefab>& self, glm::vec3 position) {
-            self->Instansiate(position);
-        },
+    // todo fix
+    //lua.new_usertype<ResourceWrapper<Prefab>>("Prefab",
+    //    sol::factories(
+    //        [](int value) {
+    //            // your custom UUID creation from int
+    //            return ResourceWrapper<Prefab>(UUID(value));
+    //        }
+    //    ),
+    //    // Instance methods
+    //    "save", [](ResourceWrapper<Prefab>& self) {
+    //        self->save(self, {});
+    //    },
+    //    "instansiate", [](ResourceWrapper<Prefab>& self, glm::vec3 position) {
+    //        self->Instansiate(position);
+    //    },
 
-        // Static methods wrapped as lambdas inside new_usertype
-        "create", [](const Entity& e) {
-            return Prefab::create(e); // returns ResourceWrapper<Prefab>
-        },
-        "import", [](const std::string& path) {
-            return Prefab::import(path, {}); // returns ResourceWrapper<Prefab>
-        }
-    );
+    //    // Static methods wrapped as lambdas inside new_usertype
+    //    "create", [](const Entity& e) {
+    //        return Prefab::create(e); // returns ResourceWrapper<Prefab>
+    //    },
+    //    "import", [](const std::string& path) {
+    //        return PrefabAsset::import(path, {}); // returns ResourceWrapper<Prefab>
+    //    }
+    //);
 
-    lua.new_usertype<LuaScript>("LuaScript",
-        "import", &LuaScript::import,
-        "create", &LuaScript::create,
-        "updateAsset", &LuaScript::updateAsset
-    );
+    //lua.new_usertype<LuaScript>("LuaScript",
+    //    "import", &LuaScriptAsset::import,
+    //    "create", &LuaScript::create,
+    //    "updateAsset", &LuaScriptAsset::update
+    //);
 
-    lua.new_usertype<Texture>("Texture",
-        "createEmptyTexture", sol::overload(
-            [](int width, int height) {
-                return Texture::createEmptyTexture(width, height);
-            },
-            [](int width, int height, int internalFormat, int format, int type) {
-                return Texture::createEmptyTexture(width, height, internalFormat, format, type);
-            }
-        ),
-        "create2DTextureFromBuffer", sol::overload(
-            [](int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data) {
-                return Texture::create2DTextureFromBuffer(width, height, internalFormat, format, type, params, isEngineOwned, data);
-            },
-            [](const Texture::TextureData& textureData) {
-                return Texture::create2DTextureFromBuffer(textureData);
-            }
-        ),
-        "getWidth", &Texture::getWidth,
-        "getHeight", &Texture::getHeight,
-        "getBitDepth", &Texture::getBitDepth,
-        "setData", &Texture::setData,
-        "bind", &Texture::bind,
-        "unbind", &Texture::unbind,
-        "getID", &Texture::getID,
-        "setSlot", &Texture::setSlot,
-        "importTexture3D", &Texture::importTexture3D,
-        "import", &Texture::import,
-        "isHDRImage", &Texture::isHDRImage
-    );
+    // TODO fix
+    //lua.new_usertype<Texture>("Texture",
+    //    "createTexture", sol::overload(
+    //        [](int width, int height) {
+    //            return Texture::createTexture(width, height);
+    //        },
+    //        [](int width, int height, int internalFormat, int format, int type) {
+    //            return Texture::createTexture(width, height, internalFormat, format, type);
+    //        }
+    //    ),
+    //    "create2DTextureFromBuffer", sol::overload(
+    //        [](int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data) {
+    //            return Texture::createTexture(width, height, internalFormat, format, type, params, isEngineOwned, data);
+    //        },
+    //        [](const TextureData& textureData) {
+    //            return Texture::createTexture(textureData);
+    //        }
+    //    ),
+    //    "getWidth", &Texture::getWidth,
+    //    "getHeight", &Texture::getHeight,
+    //    "getBitDepth", &Texture::getChannels,
+    //    "setData", &Texture::setData,
+    //    "bind", &Texture::bind,
+    //    "unbind", &Texture::unbind,
+    //    "getID", &Texture::getID,
+    //    "setSlot", &Texture::setSlot,
+    //    "import", &Texture::import
+    //);
 
-    lua.new_usertype<MeshCollection>("MeshCollection",
-        "addMesh", &MeshCollection::addMesh,
-        "getPrimaryMesh", &MeshCollection::getPrimaryMesh,
-        "getMeshes", &MeshCollection::getMeshes,
-        "getNumOfVertices", &MeshCollection::getNumOfVertices,
-        "addBonesInfo", &MeshCollection::addBonesInfo,
-        "getBoneOffsets", &MeshCollection::getBoneOffsets,
-        "getBoneID", &MeshCollection::getBoneID,
-        "import", &MeshCollection::import,
-        "getLastLoadedMaterials", &MeshCollection::getLastLoadedMaterials
+    lua.new_usertype<MeshGroup>("MeshGroup",
+        "addMesh", &MeshGroup::addMesh,
+        "getPrimaryMesh", &MeshGroup::getPrimaryMesh,
+        "getMeshes", &MeshGroup::getMeshes,
+        "getNumOfVertices", &MeshGroup::getNumOfVertices,
+        "addBonesInfo", &MeshGroup::addBonesInfo,
+        "getBoneOffsets", &MeshGroup::getBoneOffsets,
+        "getBoneID", &MeshGroup::getBoneID,
+        "import", &MeshGroupAsset::import
     );
 }
 
@@ -496,9 +491,7 @@ void bindAll(sol::state& lua)
         "getAssetFromPath", &Assets::getAssetFromPath,
         "getAsset", &Assets::getAsset,
         "hasAsset", &Assets::hasAsset,
-        "updateAsset", &Assets::updateAsset,
-        "importAsset", &Assets::importAsset,
-        "createAsset", &Assets::createAsset
+        "updateAsset", &Assets::updateAsset
     );
 
     lua.new_usertype<Window>("Window",

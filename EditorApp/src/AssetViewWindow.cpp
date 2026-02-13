@@ -147,13 +147,13 @@ void AssetViewWindow::display()
 
 				
 				std::string relativeFilePath = (cwd.path().scoped() / filename).generic_string();
-				UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
+				UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
 				if (!assets->hasAsset(uuid)) continue;
 
 				ImGui::BeginGroup();
 				{
 
-					const AssetInfo& aInfo = assets->getAsset(uuid);
+					const AssetRecord& aInfo = assets->getInfo(uuid);
 
 					int iconID = 0;
 					switch (aInfo.aType) {
@@ -220,8 +220,8 @@ void AssetViewWindow::display()
 				if (!fMetadata.isDirectory)
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
-					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-					const AssetInfo& aInfo = assets->getAsset(uuid);
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
+					const AssetRecord& aInfo = assets->getInfo(uuid);
 					ImGui::TextUnformatted(aInfo.name.c_str());
 					ImGui::Separator();
 					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
@@ -230,10 +230,10 @@ void AssetViewWindow::display()
 					ImGui::Text("UUID: %s", aInfo.uuid.str().c_str());
 					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);
 
-					if (aInfo.attributes.size() > 0)
+					if (aInfo.engineAttributes.size() > 0)
 					{
 						ImGui::LabelText("##Attributes:", "Attributes:");
-						for (const auto& [attribName, attribVal] : aInfo.attributes)
+						for (const auto& [attribName, attribVal] : aInfo.engineAttributes)
 						{
 							ImGui::Text("%s: %s", attribName.c_str(), attribVal.c_str());
 
@@ -250,12 +250,12 @@ void AssetViewWindow::display()
 				if (ImGui::Selectable("Edit"))
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
-					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-					const AssetInfo& aInfo = assets->getAsset(uuid);
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
+					const AssetRecord& aInfo = assets->getInfo(uuid);
 
 					if (aInfo.aType == AssetType::MATERIAL)
 					{
-						AssetWrapper<Material> mat = AssetWrapper<Material>(uuid);
+						AssetHandle<MaterialAsset> mat = AssetHandle<MaterialAsset>(uuid);
 						if (mat.isEmpty())
 						{
 							logError("Asset cast to material failed.");
@@ -277,8 +277,8 @@ void AssetViewWindow::display()
 				if (ImGui::Selectable("Reimport"))
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
-					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-					Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
+					Engine::get()->getSubSystem<Assets>()->getAsset(uuid).reimportAsset();
 				}
 
 				if (ImGui::Selectable("Rename"))
@@ -291,9 +291,9 @@ void AssetViewWindow::display()
 					if (!fMetadata.isDirectory)
 					{
 						std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
-						UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-						auto asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
-						std::string path = asset.relativefilePath;
+						UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
+						auto& asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
+						std::string path = asset.info().relativefilePath;
 						Engine::get()->getSubSystem<Assets>()->deleteAsset(asset);
 						std::filesystem::remove(Engine::get()->getProjectDirectory() + "/" + path);
 					}
@@ -319,12 +319,12 @@ void AssetViewWindow::display()
 				if (!fMetadata.isDirectory)
 				{
 					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
-					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath);
-					const AssetInfo& aInfo = assets->getAsset(uuid);
+					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
+					const AssetRecord& aInfo = assets->getInfo(uuid);
 
 					if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
 					{
-						AssetWrapper<Prefab> prefab = aInfo.data().as<Prefab>();
+						AssetHandle<PrefabAsset> prefab = assets->getAsset(uuid).as<PrefabAsset>();
 						if (prefab.isEmpty())
 						{
 							logWarning("Failed to cast asset to prefab asset.");

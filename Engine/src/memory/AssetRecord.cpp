@@ -1,51 +1,38 @@
-#include "memory/AssetInfo.h"
+#include "memory/AssetRecord.h"
 
 #include "core/Engine.h"
 #include "memory/Assets.h"
-#include "memory/AssetWrapper.h"
+#include "memory/AssetHandle.h"
 #include "fileSystem/ScopedPath.h"
+#include "memory/AssetFactory.h"
+#include "memory/Asset.h"
+#include "core/Logger.h"
 
 // Serialization (to JSON)
-void to_json(nlohmann::json& j, const AssetInfo& asset)
+void to_json(nlohmann::json& j, const AssetRecord& asset)
 {
 	j = nlohmann::json{
-		{"uuid", asset.uuid}, // Assuming UUID has a valid to_json
-		{"origFilePath", asset.origFilePath},
+		{"uuid", asset.uuid},
 		{"relativefilePath", asset.relativefilePath},
-		{"type", asset.aType}, // Assuming AssetType supports JSON conversion
-		{"isValid", asset.isValid},
-		{"attributes", asset.attributes},
 		{"importSettings", asset.importSettings},
-		{"name", asset.name},
-		{"isEngineOwned", asset.isEngineOwned},
 		{"filename", asset.fileName},
-		{"ext", asset.ext},
-		{"assetDirectory", asset.assetDirectory},
-		{"isCompositeAsset", asset.isCompositeAsset},
+		{"ext", asset.ext}
 	};
 }
 
 // Deserialization (from JSON)
-void from_json(const nlohmann::json& j, AssetInfo& asset)
+void from_json(const nlohmann::json& j, AssetRecord& asset)
 {
-	j.at("uuid").get_to(asset.uuid); // Assuming UUID has a valid from_json
-	j.at("origFilePath").get_to(asset.origFilePath);
+	j.at("uuid").get_to(asset.uuid); 
 	j.at("relativefilePath").get_to(asset.relativefilePath);
-	j.at("type").get_to(asset.aType); // Assuming AssetType supports JSON conversion
-	j.at("isValid").get_to(asset.isValid);
-	j.at("attributes").get_to(asset.attributes);
 	j.at("importSettings").get_to(asset.importSettings);
-	j.at("name").get_to(asset.name);
-	j.at("isEngineOwned").get_to(asset.isEngineOwned);
 	j.at("filename").get_to(asset.fileName);
 	j.at("ext").get_to(asset.ext);
-	j.at("assetDirectory").get_to(asset.assetDirectory);
-	j.at("isCompositeAsset").get_to(asset.isCompositeAsset);
 
 	asset.establishFilepath();
 }
 
-void AssetInfo::establishFilepath()
+void AssetRecord::establishFilepath()
 {
 	if (!isTransient)
 	{
@@ -54,30 +41,42 @@ void AssetInfo::establishFilepath()
 	}
 	else
 	{
-		fullFilePath = origFilePath;
+		fullFilePath = sourcePath;
 	}
 }
 
-AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
+AssetRecord::AssetRecord(AssetCreateDescriptor& assetDesc)
 {
-	importSettings = assetDesc.fillParams();
-
 	name = assetDesc.name;
 	aType = assetDesc.aType;
-	origFilePath = assetDesc.origFilePath;
-	assetDirectory = assetDesc.assetDirectory;
-	attributes = assetDesc.attributes;
+	sourcePath = assetDesc.sourcePath;
+	engineAttributes = assetDesc.engineAttributes;
 	isEngineOwned = assetDesc.isEngineOwned;
 	isTransient = assetDesc.isTransient;
 	isCompositeAsset = assetDesc.isCompositeAsset;
 	targetDirectory = assetDesc.targetDirectory;
+}
+
+void AssetRecord::parse()
+{
+	//importSettings = createDescriptor.fillParams();
+
+	//name = createDescriptor.name;
+	//aType = createDescriptor.aType;
+	//origFilePath = createDescriptor.origFilePath;
+	//assetDirectory = createDescriptor.assetDirectory;
+	//attributes = createDescriptor.attributes;
+	//isEngineOwned = createDescriptor.isEngineOwned;
+	//isTransient = createDescriptor.isTransient;
+	//isCompositeAsset = createDescriptor.isCompositeAsset;
+	//targetDirectory = createDescriptor.targetDirectory;
 
 	// TODO this is a temporary fix to not break all the engine assets, it prevents me from using nested folder in the engine folder and should be fixed.
 	if (isEngineOwned)
 	{
-		targetDirectory = ScopedPath::EnginePath(assetDesc.targetDirectory.relative());
+		targetDirectory = ScopedPath::EnginePath(targetDirectory.relative());
 	}
-	
+
 	if (targetDirectory.type() == ScopedPath::Type::None)
 	{
 		targetDirectory = ScopedPath::ContentPath("");
@@ -90,9 +89,9 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	}
 
 	// Extract name
-	if (!origFilePath.empty())
+	if (!sourcePath.empty())
 	{
-		auto& path = std::filesystem::path(origFilePath);
+		auto& path = std::filesystem::path(sourcePath);
 
 		// Extract Name
 		if (name.empty())
@@ -102,7 +101,7 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	}
 	else if (isTransient)
 	{
-		logError("Cannot create a transient resource without original file path specified.");
+		logError("Cannot create a transient asset without original file path specified.");
 		return;
 	}
 
@@ -115,9 +114,9 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	}
 
 	// Extract Extension
-	if (!origFilePath.empty())
+	if (!sourcePath.empty())
 	{
-		auto& path = std::filesystem::path(origFilePath);
+		auto& path = std::filesystem::path(sourcePath);
 
 		if (path.has_extension())
 		{
@@ -126,7 +125,8 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	}
 	if (ext.empty())
 	{
-		ext = getExtensionFromType(aType);
+		//ext = AssetFactory::getManager(createDescriptor.aType)->getRecommendedExtension(*this);
+		ext = getExtensionFromType(aType); // todo fix
 
 		if (ext.empty())
 		{
@@ -155,9 +155,26 @@ AssetInfo::AssetInfo(const AssetCreateDescriptor& assetDesc)
 	relativefilePath = std::filesystem::path(relativefilePath).lexically_normal().generic_string();
 
 	establishFilepath();
+
+	m_isParsed = true;
 }
 
-void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
+bool AssetRecord::isParsed() const
+{
+	return m_isParsed;
+}
+
+void AssetRecord::makeDirty()
+{
+	m_isDirty = true;
+}
+
+bool AssetRecord::isDirty() const
+{
+	return m_isDirty;
+}
+
+void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 {
 	if (!uDesc.assetDirectory.empty())
 	{
@@ -171,7 +188,7 @@ void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
 
 	for (const auto& attrib : uDesc.attributes)
 	{
-		attributes[attrib.first] = attrib.second;
+		engineAttributes[attrib.first] = attrib.second;
 	}
 
 	fileName = name + ext;
@@ -196,9 +213,4 @@ void AssetInfo::update(const AssetUpdateDescriptor& uDesc)
 	relativefilePath = std::filesystem::path(relativefilePath).lexically_normal().generic_string();
 
 	establishFilepath();
-}
-
-AssetWrapper<ResourceBase> AssetInfo::data() const
-{
-	return AssetWrapper<ResourceBase>(uuid);
 }

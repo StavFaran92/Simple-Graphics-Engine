@@ -19,7 +19,7 @@
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"
 #include "component/Transformation.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/SkyboxComponent.h"
@@ -33,7 +33,7 @@ ObjectPicker::ObjectPicker()
 
 bool ObjectPicker::init()
 {
-	m_pickingShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PickingShader.glsl");
+	m_pickingShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PickingShader.glsl");
 
 	m_frameBuffer = std::make_shared<FrameBufferObject>();
 
@@ -47,7 +47,18 @@ bool ObjectPicker::init()
 	int height = Engine::get()->getWindow()->getHeight();
 
 	// Create a empty texture and attach to FBO
-	m_targetTexture = Texture::createEmptyTexture(width, height, GL_RGB32UI, GL_RGB_INTEGER, GL_UNSIGNED_INT);
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
+	textureData.width = width;
+	textureData.height = height;
+	textureData.channels = 3;
+	textureData.internalFormat = TextureInternalFormat::RG32UI;
+	textureData.format = TextureFormat::RGB_INTEGER;
+	textureData.type = TextureType::UNSIGNED_INT;
+	textureData.filter = TextureFilter::Nearest;
+	textureData.wrap = TextureWrap::Clamp;
+	textureData.data = nullptr;
+	m_targetTexture = Texture::createTexture(textureData);
 	m_frameBuffer->attachTexture(m_targetTexture.get()->getID());
 
 	// Create RBO and attach to FBO
@@ -102,7 +113,7 @@ int ObjectPicker::pickObject(int x, int y, Entity camera)
 		m_pickingShader->setUniformValue("objectIndex", (unsigned int)entityhandler.handlerID());
 		
 
-		for (auto& mesh : meshComponent.mesh.get()->getMeshes())
+		for (auto& mesh : meshComponent.mesh.resource()->getMeshes())
 		{
 			m_pickingShader->setUniformValue("model", transform.getWorldTransformation() * mesh->getRestTransform());
 			auto vao = mesh->getVAO();

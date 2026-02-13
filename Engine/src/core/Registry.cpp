@@ -4,6 +4,7 @@
 #include "component/Component.h"
 #include "component/Transformation.h"
 #include "component/ObjectComponent.h"
+#include "core/Logger.h"
 
 
 entt::registry& SGE_Regsitry::get()

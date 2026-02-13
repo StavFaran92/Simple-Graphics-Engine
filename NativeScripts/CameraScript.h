@@ -22,14 +22,14 @@ public:
 
 	void onCreate() override
 	{
-		auto eventSystem = Engine::get()->getEventSystem();
+		//auto eventSystem = Engine::get()->getEventSystem();
 
-		eventHandler = eventSystem->bindToLayer("GameLayer");
+		//eventHandler = eventSystem->bindToLayer("GameLayer");
 
-		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
-		eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
-		eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONUP, this);
-		eventSystem->subscribe(eventHandler, SDL_MOUSEWHEEL, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONUP, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEWHEEL, this);
 
 		m_cameraController->onCreate(entity);
 	}
@@ -37,9 +37,9 @@ public:
 	{
 		m_cameraController->onUpdate(deltaTime);
 	}
-	void onEvent(SDL_Event e)
+	bool onEvent(SDL_Event e)
 	{
-		m_cameraController->onEvent(e);
+		return m_cameraController->onEvent(e);
 	}
 private:
 	bool m_isLocked = true;

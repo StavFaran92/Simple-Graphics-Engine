@@ -1,11 +1,17 @@
 #pragma once
 
-#include <string>
 #include <vector>
 
 #include "core/Core.h"
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
+
+#include "component/FoliageField.h"
+
+#include "utils/Math3D.h"
+#include "texture/Texture.h"
+#include "render/Material.h"
+#include "geometry/MeshGroup.h"
 
 class Entity;
 
@@ -13,7 +19,7 @@ static const int MAX_TEXTURE_COUNT = 4;
 
 struct TextureBlend
 {
-	AssetWrapper<Texture> texture;
+	AssetHandle<TextureAsset> texture;
 	float blend = 0;
 	float scaleX = 1;
 	float scaleY = 1;
@@ -27,32 +33,45 @@ struct TextureBlend
 class EngineAPI Terrain : public Component
 {
 public:
-	static Terrain generateTerrain(int width, int height, float scale, const std::string& heightMapFilepath);
-	static Terrain generateTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap);
-
-	static Entity createTerrain(int width, int height, float scale, AssetWrapper<Texture> heightMap);
-
-
 	Terrain() = default;
 
-	ResourceWrapper<MeshCollection> getMesh() const;
+	static Entity createTerrain(int width, int height);
+
+	ResourceWrapper<MeshGroup> getMesh() const;
+
+	void setHeightmap(AssetHandle<TextureAsset> heightmap);
 	ResourceWrapper<Texture> getHeightmap() const;
-	float getHeightAtPoint(float x, float y) const;
+
+	bool getHeightAtPoint(float x, float y, float& outHeight) const;
 
 	float getScale() const;
 	int getWidth() const;
 	int getHeight() const;
 
-	void setTexture(int index, AssetWrapper<Texture> texture);
+	void setPixel(int x, int y, unsigned char value);
+
+	void setTexture(int index, AssetHandle<TextureAsset> texture);
 	void setTextureScaleX(int index, float scaleX);
 	void setTextureScaleY(int index, float scaleY);
 	void setTextureBlend(int index, float val);
 
-	AssetWrapper<Texture>& getTexture(int index);
+	AssetHandle<TextureAsset>& getTexture(int index);
 	float getTextureBlend(int index) const;
 	glm::vec2 getTextureScale(int index) const;
 
+	AABB getAABB() const;
+
 	int getTextureCount() const;
+
+	void buildFoliage();
+
+	void resize(int newW, int newH);
+	
+	void build();
+
+	void syncHeightmap();
+
+	RayHit raycast(const Ray& ray, float maxDistance = 10000.0f);
 
 	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
 
@@ -64,25 +83,28 @@ public:
 		SERIALIZED_MEMBER(m_height);
 		SERIALIZED_MEMBER(m_scale);
 		SERIALIZED_MEMBER(m_material);
+		SERIALIZED_MEMBER(m_foliageField);
 	}
 
-
-	
-	AssetWrapper<Texture> m_heightmap;
-	
-
-	int m_width = 100;
-	int m_height = 100;
-	int m_scale = 1;
+	float m_scale = 1.0f;
 	int m_textureCount = 0;
 
 	std::vector<TextureBlend> m_textureBlends {  };
-	//std::vector<Resource<Texture>> m_textures{  };
-	//std::vector<float> m_blends{ };
-	AssetWrapper<Material> m_material;
+
+	AssetHandle<MaterialAsset> m_material;
+
+	FoliageField m_foliageField;
 
 private:
-	AssetWrapper<MeshCollection> m_mesh;
+	static Terrain createTerrainComponent(int width, int height);
+	AssetHandle<TextureAsset> generateHeightmap(int width, int height);
+private:
+	int m_width = 100;
+	int m_height = 100;
+	AssetHandle<TextureAsset> m_heightmap;
+	std::vector<float> m_heightDataCPU;
+
+	AssetHandle<MeshGroupAsset> m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
 
 	

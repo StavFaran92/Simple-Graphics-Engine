@@ -12,21 +12,23 @@
 #include "component/Component.h"
 #include "render/RenderCommand.h"
 #include <GL/glew.h>
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "component/MeshRendererComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
+#include "core/Logger.h"
 
 ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture)
 {
-	auto dstTexture = Texture::create2DTextureFromBuffer(srcTexture.get()->getData());
+	auto dstTexture = srcTexture->clone();
+	//auto dstTexture = Texture::createTexture(srcTexture.get()->getData());
 	flipVertical(srcTexture, dstTexture);
 	return dstTexture;
 }
 
 void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture)
 {
-	auto shader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/FlipTextureShader.glsl");
+	auto shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/FlipTextureShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -56,7 +58,7 @@ void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, Resou
 	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
 	quad.RemoveComponent<RenderableComponent>();
 	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	RenderCommand::clear();
 
@@ -66,14 +68,14 @@ void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, Resou
 
 ResourceWrapper<Texture> TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTexture)
 {
-	auto dstTexture = Texture::create2DTextureFromBuffer(srcTexture.get()->getData());
+	auto dstTexture = srcTexture->clone();
 	applyGammaCorrection(srcTexture, dstTexture);
 	return dstTexture;
 }
 
 void TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture)
 {
-	auto shader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/ApplyGammaCorrectionShader.glsl");
+	auto shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/ApplyGammaCorrectionShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -103,7 +105,7 @@ void TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTextur
 	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
 	quad.RemoveComponent<RenderableComponent>();
 	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	RenderCommand::clear();
 

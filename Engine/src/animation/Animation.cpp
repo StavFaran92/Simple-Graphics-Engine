@@ -2,35 +2,15 @@
 
 #include "animation/Bone.h"
 #include "animation/AnimationLoader.h"
-#include "memory/AssetLoader.h"
-
-#include <filesystem>
-
-namespace {
-	struct AnimationManagerRegistration {
-		AnimationManagerRegistration() {
-			AssetFactory::registerManager(AssetType::ANIMATION, std::make_shared<AnimationAssetManager>());
-		}
-	} _animationManagerRegistration;
-}
-
-bool AnimationAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
-{
-	return Engine::get()->getSubSystem<AnimationLoader>()->copyFileToResourceFolder(fileLocation, aInfo);
-}
-
-ResourceWrapper<ResourceBase> AnimationAssetManager::load(AssetInfo& aInfo)
-{
-	return Engine::get()->getSubSystem<AnimationLoader>()->load(aInfo);
-}
-
-void AnimationAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
-{
-	throw new std::runtime_error("Not yet implemented!");
-}
 
 Animation::Animation()
 {
+}
+
+ResourceWrapper<Animation> Animation::load(const std::string& fileLocation, AnimationLoadDescriptor desc)
+{
+	desc.sourcePath = fileLocation;
+	return Engine::get()->getSubSystem<AnimationLoader>()->load(desc);
 }
 
 void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices)
@@ -110,11 +90,24 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-AssetWrapper<Animation> Animation::import(const std::string& fileLocation, AnimationImportSettings desc)
+AssetHandle<AnimationAsset> AnimationAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
 {
 	desc.aType = AssetType::ANIMATION;
-	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Animation>();
+	AnimationAsset* asset = new AnimationAsset(desc);
+	return asset->importAsset(fileLocation).as<AnimationAsset>();
 }
 
+void AnimationAsset::save(const AssetRecord& aInfo)
+{
+	throw new std::runtime_error("Not yet implemented!");
+}
 
+bool AnimationAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+{
+	const std::string savedFilePath = aInfo.fullFilePath;
+	return std::filesystem::copy_file(fileLocation, savedFilePath);
+}
+
+ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource() {
+	return Animation::load(sourcePath, *this);
+}

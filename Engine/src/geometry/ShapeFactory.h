@@ -7,7 +7,7 @@
 
 class Entity;
 class SGE_Regsitry;
-class MeshCollection;
+class MeshGroup;
 template<typename>class ResourceWrapper;
 
 class EngineAPI ShapeFactory

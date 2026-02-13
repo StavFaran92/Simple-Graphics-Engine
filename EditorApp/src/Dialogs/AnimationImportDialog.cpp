@@ -30,10 +30,10 @@ bool AnimationImportDialog::acceptContent()
 {
 	if (uniqueName.isValid())
 	{
-		AnimationImportSettings desc;
+		AssetCreateDescriptor desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		Animation::import(filepath.m_filepath, desc);
+		AnimationAsset::import(filepath.m_filepath, desc);
 
 		return true;
 	}

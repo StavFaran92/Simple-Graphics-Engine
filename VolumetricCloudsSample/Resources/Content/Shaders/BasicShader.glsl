@@ -114,9 +114,9 @@ float lightMarch(vec3 p0)
     return transmittance;
 }
 
-float rayMarch(vec3 ro, vec3 rd)
+vec4 rayMarch(vec3 ro, vec3 rd)
 {
-    float d = 0.;
+    float d = fract(sin(dot(ro.xy + rd.xy, vec2(12.9898, 78.233))) * 43758.5453) * MARCH_SIZE;
     vec4 res = vec4(0.0);
 
     float totalTransmittance = 1.0;
@@ -128,54 +128,44 @@ float rayMarch(vec3 ro, vec3 rd)
         float density = sceneSDF(p);
         if(density > 0.0)
         {
-            float transmittance = lightMarch(p);
-            totalTransmittance *= transmittance;
-            float luminance = density;
-            lightEnergy += totalTransmittance * luminance;
+            // float transmittance = lightMarch(p);
+            // totalTransmittance *= transmittance;
+            // float luminance = density;
+            // lightEnergy += totalTransmittance * luminance;
 
             // Directional derivative for fast diffuse lighting
-            // float diffuse = clamp((density - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
-            // vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
-            // vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
-            // color.rgb *= lin * color.a;
-            // res += color * (1.0 - res.a);
+            float diffuse = clamp((density - sceneSDF(p + .3 * sunDirection)) / .3, .0, 1.);
+            vec3 lin = vec3(0.60,0.60,0.75) * 1.1 + 0.8 * vec3(1.0,0.6,0.3) * diffuse;
+            vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
+            color.rgb *= lin * density;
+            res += color * (1.0 - res.a);
         }
         d += MARCH_SIZE;
+        if(density > 1.0) break;
+
     } 
-    return lightEnergy;
+    return res;
 }
 
-mat3 lookAt(vec3 ro, vec3 target) {
-    vec3 f = normalize(target - ro);
-    vec3 r = normalize(cross(vec3(0,1,0), f));
-    vec3 u = cross(f, r);
-    return mat3(r, u, f);
-}
-
-// void frag(inout vec3 color)
-// {
-//     vec2 xy = uv - .5;
-//     xy *= vec2(1, -1); // hack
-//     vec3 ro = vec3(0.0, 0.0, 5.0);
-//     vec3 rd = normalize(vec3(xy, -1));
-
-//     float res = rayMarch(ro, rd);
-//     color = vec3(res);
-
-
-// }
-
-void frag(inout vec3 color)
+void frag(inout vec4 color)
 {
-    vec2 screenPos = gl_FragCoord.xy;
-    vec2 screenUV = screenPos / screenSize;
-    vec2 xy = screenUV - .5;
+    vec2 screenPos = gl_FragCoord.xy; // x in range [0.5 , width − 0.5]
+    vec2 screenUV = screenPos / screenSize; // (0,1)
+    vec2 ndc = screenUV * 2.0 - 1.0;   // [-1, 1]
+    ndc.x *= screenSize.x / screenSize.y; // aspect correction
 
-    //color = texture(MainTexture, screenUV.xy).rgb;
-    mat3 lookAt = lookAt(cameraPos, cameraLookAt);
+    float tanHalfFov = tan(cameraFov * 0.5);
+    vec3 rayView = normalize(vec3(ndc.x * tanHalfFov, ndc.y * tanHalfFov, -1.0));
+
     vec3 ro = cameraPos;
-    vec3 rd =  normalize(lookAt *vec3(xy, 1));
+    mat3 camToWorld = transpose(mat3(view)); //from view-space to world-space
+    vec3 rd = normalize(camToWorld * rayView);
 
-    float res = rayMarch(ro, rd);
-    color = vec3(res);
+    vec4 res = rayMarch(ro, rd);
+    
+    vec3 volumeColor = vec3(1.0);
+
+    vec3 bgColor = texture(uMainTexture, screenUV).rgb;
+
+    color = vec4(bgColor * (1.0 - res.a) + res.rgb, res.a);;
 }

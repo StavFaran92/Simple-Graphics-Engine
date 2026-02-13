@@ -5,6 +5,7 @@
 #include "render/RenderCommand.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
+#include "core/Logger.h"
 
 RenderTarget::RenderTarget(Viewport viewport)
 {
@@ -13,13 +14,19 @@ RenderTarget::RenderTarget(Viewport viewport)
 
 	m_renderTargetFBO->bind();
 
-	m_renderTargetTexture = Texture::createEmptyTexture(viewport.w, viewport.h, Texture::InternalFormat::RGBA8, Texture::Format::RGB, Texture::Type::UNSIGNED_BYTE, 
-		{ 
-			{GL_TEXTURE_MIN_FILTER, GL_LINEAR },
-			{GL_TEXTURE_MAG_FILTER, GL_LINEAR },
-			{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-			{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE} 
-		});
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
+	textureData.width = viewport.w;
+	textureData.height = viewport.h;
+	textureData.channels = 3;
+	textureData.internalFormat = TextureInternalFormat::RGBA8;
+	textureData.format = TextureFormat::RGB;
+	textureData.type = TextureType::UNSIGNED_BYTE;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
+	textureData.data = nullptr;
+
+	m_renderTargetTexture = Texture::createTexture(textureData);
 	m_renderTargetFBO->attachTexture(m_renderTargetTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };
@@ -66,7 +73,7 @@ ResourceWrapper<Texture> RenderView::getRenderTargetTexture() const
 
 unsigned int RenderView::getRenderTargetFrameBufferID() const
 {
-        return renderTargets[0].m_renderTargetFBO->getID();
+    return renderTargets[0].m_renderTargetFBO->getID();
 }
 
 void RenderView::setTexture(ResourceWrapper<Texture> texture)
@@ -100,10 +107,15 @@ void RenderView::swapToAdditionalTarget()
 void RenderView::swapBackToMainTarget()
 {
 	m_boundTargetTextureSlot = 0;
+}
+
+void RenderView::swapBackToMainTargetWithCopy()
+{
+	m_boundTargetTextureSlot = 0;
 
 	renderTargets[0].m_renderTargetFBO->bind();
 
-	RenderCommand::clear();
+	//RenderCommand::clear();
 
 	RenderCommand::copyFrameBufferData(renderTargets[1].m_renderTargetFBO->getID(),
 		renderTargets[0].m_renderTargetFBO->getID(),

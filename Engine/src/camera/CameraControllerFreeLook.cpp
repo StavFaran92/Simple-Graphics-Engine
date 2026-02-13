@@ -20,52 +20,46 @@ void CameraControllerFreeLook::onCreate(Entity& e)
 
 void CameraControllerFreeLook::onUpdate(float deltaTime)
 {
-	if(Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_W))
+	auto* mouse = Engine::get()->getInput()->getMouse();
+	bool rmb = mouse->getMouseState().rmb;
+
+	if (!rmb)
 	{
-		m_velocityF = m_cameraComponent->front * velocity * deltaTime;
-	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_S))
-	{
-		m_velocityF = -m_cameraComponent->front * velocity * deltaTime;
-	}
-	else
-	{
-		m_velocityF = glm::vec3{ 0 };
+		if (m_state != ControllerState::IDLE)
+		{
+			m_state = ControllerState::IDLE;
+			Engine::get()->getWindow()->unlockMouse();
+		}
 	}
 
-	if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_D))
-	{
-		m_velocityR = m_cameraComponent->right * velocity * deltaTime;
-	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_A))
-	{
-		m_velocityR = -m_cameraComponent->right * velocity * deltaTime;
-	}
-	else
-	{
-		m_velocityR = glm::vec3{ 0 };
-	}
+	auto* kb = Engine::get()->getInput()->getKeyboard();
+	glm::vec3 dir(0.0f);
 
-	if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_E))
-	{
-		m_velocityU = glm::vec3{0,1,0} *velocity * deltaTime;
-	}
-	else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_Q))
-	{
-		m_velocityU = glm::vec3{ 0,-1,0 }  * velocity * deltaTime;
-	}
-	else
-	{
-		m_velocityU = glm::vec3{ 0 };
-	}
+	if (kb->getKeyState(KeyCode::SCANCODE_W))
+		dir += m_cameraComponent->front;
+	if (kb->getKeyState(KeyCode::SCANCODE_S))
+		dir -= m_cameraComponent->front;
 
-	auto finalMovement = m_velocityF + m_velocityR + m_velocityU;
+	if (kb->getKeyState(KeyCode::SCANCODE_D))
+		dir += m_cameraComponent->right;
+	if (kb->getKeyState(KeyCode::SCANCODE_A))
+		dir -= m_cameraComponent->right;
 
-	m_cameraTransform->translate(finalMovement);
+	if (kb->getKeyState(KeyCode::SCANCODE_E))
+		dir.y += 1.0f;
+	if (kb->getKeyState(KeyCode::SCANCODE_Q))
+		dir.y -= 1.0f;
+
+	if (glm::length(dir) > 0.001f)
+		dir = glm::normalize(dir) * m_movementSpeed * deltaTime;
+
+	m_cameraTransform->translate(dir);
 }
 
-void CameraControllerFreeLook::onEvent(SDL_Event e)
+bool CameraControllerFreeLook::onEvent(SDL_Event e)
 {
+	// We only allow for state enter and TRS modify to be event based,
+	// state leave should ALWAYS be handled in onUpdate.
 	if (e.type == SDL_MOUSEMOTION)
 	{
 		auto system = Engine::get()->getSubSystem<System>();
@@ -138,16 +132,11 @@ void CameraControllerFreeLook::onEvent(SDL_Event e)
 			}
 		}
 	}
-	else if (e.type == SDL_MOUSEBUTTONUP)
-	{
-		if (e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_MIDDLE)
-		{
-			m_state = ControllerState::IDLE;
-			Engine::get()->getWindow()->unlockMouse();
-		}
-	}
+
 	else if (e.type == SDL_MOUSEWHEEL)
 	{
 		m_cameraTransform->translate(m_cameraComponent->front * (float)e.wheel.y);
 	}
+
+	return false;
 }

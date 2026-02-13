@@ -16,9 +16,8 @@
 #include "component/Component.h"
 #include "component/MeshRendererComponent.h"
 #include "geometry/Mesh.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "runtime/Context.h"
-#include "texture/Cubemap.h"
 #include "component/RenderableComponent.h"
 #include "component/ObjectComponent.h"
 
@@ -28,7 +27,7 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Irradiance map");
 
-	auto irradianceShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/IrradianceShader.glsl");
+	auto irradianceShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/IrradianceShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -36,7 +35,19 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 	fbo.bind();
 
 	// Generate cubemap
-	auto irradianceMap = Cubemap::createEmptyCubemap(32, 32, GL_RGB16F, GL_RGB, GL_FLOAT);
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_CUBE_MAP;
+	textureData.width = 32;
+	textureData.height = 32;
+	textureData.channels = 3;
+	textureData.internalFormat = TextureInternalFormat::RGB16F;
+	textureData.format = TextureFormat::RGB;
+	textureData.type = TextureType::FLOAT;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
+	textureData.genMipMap = false;
+	textureData.data = nullptr;
+	auto irradianceMap = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 32, 32 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
@@ -73,7 +84,7 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 	auto box = ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getRegistry());
 	box.RemoveComponent<RenderableComponent>();
 	box.RemoveComponent<ObjectComponent>();
-	auto vao = box.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = box.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -103,7 +114,7 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Prefilter Environemnt map");
 
-	auto prefilterShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/IBLPrefilterShader.glsl");
+	auto prefilterShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/IBLPrefilterShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -111,13 +122,19 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 	fbo.bind();
 
 	// Generate cubemap
-	auto prefilterEnvMap = Cubemap::createEmptyCubemap(128, 128, GL_RGB16F, GL_RGB, GL_FLOAT, {
-		{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR },
-		{ GL_TEXTURE_MAG_FILTER, GL_LINEAR },
-		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
-		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
-		{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE }
-	}, true);
+	TextureData textureData2;
+	textureData2.target = TextureTarget::TEXTURE_CUBE_MAP;
+	textureData2.width = 128;
+	textureData2.height = 128;
+	textureData2.channels = 3;
+	textureData2.internalFormat = TextureInternalFormat::RGB16F;
+	textureData2.format = TextureFormat::RGB;
+	textureData2.type = TextureType::FLOAT;
+	textureData2.filter = TextureFilter::Linear;
+	textureData2.wrap = TextureWrap::Clamp;
+	textureData2.genMipMap = true;
+	textureData2.data = nullptr;
+	auto prefilterEnvMap = Texture::createTexture(textureData2);
 
 	RenderBufferObject rbo{ 128, 128 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
@@ -151,7 +168,7 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 	auto box = ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getRegistry());
 	box.RemoveComponent<RenderableComponent>();
 	box.RemoveComponent<ObjectComponent>();
-	auto vao = box.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = box.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -197,7 +214,7 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate BRDF Integration map");
 
-	auto BRDFIntegrationShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/BRDFIntegrationShader.glsl");
+	auto BRDFIntegrationShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/BRDFIntegrationShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -205,14 +222,18 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 	fbo.bind();
 
 	// Generate 2D LUT
-	auto lut = Texture::create2DTextureFromBuffer(512, 512, GL_RG16F, GL_RG, GL_FLOAT, 
-		{	
-			{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
-			{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR },
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR } 
-		},
-		true, nullptr);
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
+	textureData.width = 512;
+	textureData.height = 512;
+	textureData.channels = 2;
+	textureData.internalFormat = TextureInternalFormat::RG16F;
+	textureData.format = TextureFormat::RG;
+	textureData.type = TextureType::FLOAT;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
+	textureData.data = nullptr;
+	auto lut = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 512, 512 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
@@ -234,7 +255,7 @@ ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
 	quad.RemoveComponent<RenderableComponent>();
 	quad.RemoveComponent<ObjectComponent>();
 
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

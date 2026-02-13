@@ -3,24 +3,38 @@
 #include "core/Core.h"
 #include "memory/Asset.h"
 
-struct LuaScriptImportSettings : public AssetCreateDescriptor
-{
-
-};
-
-struct LuaScriptAssetManager : public AssetManager
-{
-	bool copyFiles(const std::string& fileLocation, AssetInfo& aInfo) override;
-	ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) override;
-	void save(const AssetWrapper<ResourceBase>& script, const AssetInfo& aInfo) override;
-};
-
-class EngineAPI LuaScript : public ResourceBase
+// Resource
+class EngineAPI LuaScript : public Resource
 {
 public:
-	static AssetWrapper<LuaScript> import(const std::string& fileLocation, LuaScriptImportSettings settings = {});
+	struct LoadDescriptor : public ResourceLoadDescriptor
+	{
+		ResourceWrapper<Resource> loadResource() override {
+			return LuaScript::load(sourcePath, *this);
+		}
+	};
+
+	static ResourceWrapper<LuaScript> load(const std::string& fileLocation, LoadDescriptor desc = {});
+
 	static ResourceWrapper<LuaScript> create();
-	static void updateAsset(const AssetWrapper<LuaScript>& script, AssetUpdateDescriptor desc);
 
 	std::string filepath;
+};
+
+// Asset
+class EngineAPI LuaScriptAsset : public Asset
+{
+public:
+	using ResourceType = LuaScript;
+
+	using Asset::Asset;
+
+	static AssetHandle<LuaScriptAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
+
+	static AssetHandle<LuaScriptAsset> create(const ResourceWrapper<LuaScript>& script, AssetCreateDescriptor desc = {});
+
+	void save(const AssetRecord& aInfo) override;
+
+protected:
+	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

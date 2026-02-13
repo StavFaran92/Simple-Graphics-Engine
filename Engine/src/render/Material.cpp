@@ -17,44 +17,17 @@
 #include <fstream>
 #include <regex>
 #include "memory/BuiltInAssets.h"
+#include "memory/BuiltInResources.h"
 #include "render/ShadersInfo.h"
 
 #include <filesystem>
 
-namespace {
-	struct MaterialManagerRegistration {
-		MaterialManagerRegistration() {
-			AssetFactory::registerManager(AssetType::MATERIAL, std::make_shared<MaterialAssetManager>());
-		}
-	} _materialManagerRegistration;
-}
-
-bool MaterialAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool MaterialAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	return false;
 }
 
-ResourceWrapper<ResourceBase> MaterialAssetManager::load(AssetInfo& aInfo)
-{
-	std::ifstream is(aInfo.fullFilePath);
-	cereal::JSONInputArchive iarchive(is);
-	ResourceWrapper<Material> material = Factory<Material>::create();
-
-	try
-	{
-		iarchive(*material.get());
-		return material;
-
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Deserialization Error occured: {}", e.what());
-	}
-
-	return ResourceWrapper<ResourceBase>::empty;
-}
-
-void MaterialAssetManager::save(const AssetWrapper<ResourceBase>& mat, const AssetInfo& aInfo)
+void MaterialAsset::save(const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(aInfo.fullFilePath);
@@ -62,7 +35,7 @@ void MaterialAssetManager::save(const AssetWrapper<ResourceBase>& mat, const Ass
 
 	try
 	{
-		oarchive(*mat.as<Material>().resource().get());
+		oarchive(*AssetHandle<MaterialAsset>(m_uuid).resource().get());
 	}
 	catch (const cereal::Exception& e)
 	{
@@ -75,45 +48,83 @@ void MaterialAssetManager::save(const AssetWrapper<ResourceBase>& mat, const Ass
 Material::Material()
 {}
 
+void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ResourceWrapper<Shader>& shader, int slot)
+{
+	// if texture is empty use dummy texture
+	AssetHandle<TextureAsset> texture;
+	if (!sampler || sampler->texture.isEmpty())
+	{
+		texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
+	}
+	else
+	{
+		texture = sampler->texture;
+	}
+
+	texture.resource()->setSlot(slot);
+	texture.resource()->bind();
+
+	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
+	shader->setUniformValue(name + ".texture", slot);
+
+	shader->setUniformValue(name + ".isActive", sampler->isActive);
+	shader->setUniformValue(name + ".xOffset", sampler ? sampler->xOffset : 0.0f);
+	shader->setUniformValue(name + ".yOffset", sampler ? sampler->yOffset : 0.0f);
+	shader->setUniformValue(name + ".xScale", sampler ? sampler->xScale : 1.0f);
+	shader->setUniformValue(name + ".yScale", sampler ? sampler->yScale : 1.0f);
+	shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->channelMaskR : 1);
+	shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->channelCount > 1 ? sampler->channelMaskG : 0) : 0);
+	shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->channelCount > 2 ? sampler->channelMaskB : 0) : 0);
+	shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->channelCount > 3 ? sampler->channelMaskA : 0) : 0);
+}
+
 void Material::use()
 {
-	int slot = 0;
-	auto shader = m_shader.resource();
-	for (const auto& [name, sampler] : m_samplers)
+	ResourceWrapper<Shader> shader = getActiveShader();
+
+	if (shader.isEmpty())
 	{
-		// if texture is empty use dummy texture
-		AssetWrapper<Texture> texture;
-		if (!sampler || sampler->texture.isEmpty())
-		{
-			texture = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
-		}
-		else
-		{
-			texture = sampler->texture;
-		}
+		logWarning("Material {} shader is invalid.", m_name);
+		return;
+	}
 
-		texture.get()->setSlot(slot);
-		texture.get()->bind();
+	shader->use();
 
-		// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-		shader->setUniformValue(name + ".texture", slot);
+	int slot = 0;
 
-		shader->setUniformValue(name + ".isActive", sampler->isActive);
-		shader->setUniformValue(name + ".xOffset", sampler ? sampler->xOffset : 0.0f);
-		shader->setUniformValue(name + ".yOffset", sampler ? sampler->yOffset : 0.0f);
-		shader->setUniformValue(name + ".xScale", sampler ? sampler->xScale : 1.0f);
-		shader->setUniformValue(name + ".yScale", sampler ? sampler->yScale : 1.0f);
-		shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->channelMaskR : 1);
-		shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->channelCount > 1 ? sampler->channelMaskG : 0) : 0);
-		shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->channelCount > 2 ? sampler->channelMaskB : 0) : 0);
-		shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->channelCount > 3 ? sampler->channelMaskA : 0) : 0);
-
+	// Set persistent samplers
+	for (const auto& [name, sampler] : getPersistentBlock().m_samplers)
+	{
+		useSamplerInShader(name, sampler, shader, slot);
 		slot++;
 	}
 
-	for (const auto& [name, property] : m_uniformProperties)
+	// Set Non persistent samplers
+	for (const auto& [name, sampler] : getNonPersistentBlock().m_samplers)
+	{
+		useSamplerInShader(name, sampler, shader, slot);
+		slot++;
+	}
+
+	// Set Non persistent Textures
+	for (const auto& [name, texture] : getNonPersistentBlock().m_textures)
+	{
+		texture.get()->setSlot(slot);
+		texture.get()->bind();
+		shader->setUniformValue(name, slot);
+		slot++;
+	}
+
+	// Set persistent uniforms
+	for (const auto& [name, property] : getPersistentBlock().m_uniformProperties)
 	{
 		shader->setUniformValue(name, property.value);
+	}
+
+	// Set Non persistent uniforms
+	for (const auto& [name, value] : getNonPersistentBlock().m_uniformProperties)
+	{
+		shader->setUniformValue(name, value);
 	}
 }
 
@@ -128,31 +139,17 @@ void Material::release()
 
 std::shared_ptr<TextureSampler> Material::getSampler(const std::string& name)
 {
-	auto it = m_samplers.find(name);
-	if (it == m_samplers.end())
-	{
-		logError("Sampler '{}' not found in Material.", name);
-		throw std::runtime_error("");
-	}
-
-	return it->second;
+	return getPersistentBlock().getSampler(name);
 }
 
 void Material::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
 {
-	m_samplers[name] = sampler;
+	getPersistentBlock().setSampler(name, sampler);
 }
 
 void Material::setSamplerEnabled(const std::string& name, bool isEnabled)
 {
-	m_samplers[name]->isActive = isEnabled;
-}
-
-AssetWrapper<Material> Material::import(const std::string& fileLocation, MaterialImportSettings desc)
-{
-	desc.aType = AssetType::MATERIAL;
-	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Material>();
+	getPersistentBlock().getSampler(name)->isActive = isEnabled;
 }
 
 ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
@@ -162,40 +159,47 @@ ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
 	return mat;
 }
 
-ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader)
-{
-	auto mat = Factory<Material>::create();
-	mat->setMaterialRenderMode(renderMode, customShader);
-	return mat;
-}
-
-void Material::updateAsset(const AssetWrapper<Material>& material, AssetUpdateDescriptor desc)
-{
-	Engine::get()->getSubSystem<Assets>()->updateAsset(material, desc);
-}
-
 ResourceWrapper<Material> Material::clone(bool isTransient) const
 {
 	auto newMaterial = Material::create(m_renderMode);
 
-	newMaterial->m_samplers = m_samplers;
-	newMaterial->m_shader = m_shader;
-	newMaterial->m_uniformProperties = m_uniformProperties;
+	newMaterial->m_persistentBlock = m_persistentBlock;
+	newMaterial->m_nonPersistentBlock = m_nonPersistentBlock;
+	newMaterial->m_customShader = m_customShader;
 
 	return newMaterial;
 }
 
-//bool Material::isOpaque() const
-//{
-//	auto it = m_uniformProperties.find(SHADER_PROPERTY_PBR_OPACITY_FACTOR);
-//	if (it != m_uniformProperties.end()) {
-//		float opacity = std::get<float>(it->second);  // throws if wrong type
-//		return opacity == 1.f;
-//	}
-//	return true;
-//}
+ResourceWrapper<Shader> Material::getActiveShader() const
+{
+	if (m_renderMode != MaterialRenderMode::Custom)
+	{
+		return getShaderFromRenderMode(m_renderMode);
+	}
+	else
+	{
+		return m_customShader.resource();
+	}
+}
 
-bool parseEditablePragmaLine(const std::string& line, Material::EditableUniform& editableUniform) {
+ResourceWrapper<Shader> Material::getShaderFromRenderMode(MaterialRenderMode renderMode)
+{
+	switch(renderMode)
+	{
+	case MaterialRenderMode::Opaque:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
+	case MaterialRenderMode::Transparent:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+	case MaterialRenderMode::Terrain:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);
+	case MaterialRenderMode::Volume:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_VOLUME);
+	}
+
+	return ResourceWrapper<Shader>::empty;
+}
+
+bool parseEditablePragmaLine(const std::string& line, EditableUniform& editableUniform) {
 	// Check if line contains #pragma editable
 	std::regex pragmaRegex(R"(^\s*#pragma\s+editable)");
 
@@ -242,13 +246,14 @@ std::vector<float> parseFloatTuple(const std::string& s) {
 
 void Material::parseUniforms(const std::string& sourceCode)
 {
-	m_uniformProperties.clear();
-	m_samplers.clear();
+	getPersistentBlock().m_uniformProperties.clear();
+	getPersistentBlock().m_samplers.clear();
 
 	std::istringstream stream(sourceCode);
 	std::string line;
 
-	auto& uniformProperties = m_uniformProperties;
+	auto& uniformProperties = getPersistentBlock().m_uniformProperties;
+	auto& samplers = getPersistentBlock().m_samplers;
 
 	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
 	EditableUniform pendingMeta;
@@ -327,7 +332,7 @@ void Material::parseUniforms(const std::string& sourceCode)
 			}
 			else if (type == "PBR_Sampler") 
 			{
-				m_samplers[name] = std::make_shared<TextureSampler>();
+				samplers[name] = std::make_shared<TextureSampler>();
 			}
 
 			
@@ -336,12 +341,10 @@ void Material::parseUniforms(const std::string& sourceCode)
 	}
 }
 
-void Material::setShader(AssetWrapper<Shader> shader)
+void Material::parseFromShader(ResourceWrapper<Shader> shader)
 {
-	m_shader = shader;
-
 	std::string sourceCode;
-	ShadersInfo sInfo = shader.resource()->getShadersInfo();
+	ShadersInfo sInfo = shader->getShadersInfo();
 	sourceCode += sInfo.vertexCode + "\n";
 	sourceCode += sInfo.fragmentCode + "\n";
 	sourceCode += sInfo.computeCode + "\n";
@@ -354,12 +357,17 @@ void Material::setShader(AssetWrapper<Shader> shader)
 
 void Material::update()
 {
-	auto oldUniforms = m_uniformProperties;
-	auto oldSamplers = m_samplers;
+	auto oldUniforms = getPersistentBlock().m_uniformProperties;
+	auto oldSamplers = getPersistentBlock().m_samplers;
 
-	setShader(m_shader);
+	ResourceWrapper<Shader> shader = getActiveShader();
 
-	auto& newSamplers = m_samplers;
+	if (shader.isEmpty())
+		return;
+
+	parseFromShader(shader);
+
+	auto& newSamplers = getPersistentBlock().m_samplers;
 	for (const auto [name, sampler] : oldSamplers)
 	{
 		auto iter = newSamplers.find(name);
@@ -369,7 +377,7 @@ void Material::update()
 		}
 	}
 
-	auto& newUniforms = m_uniformProperties;
+	auto& newUniforms = getPersistentBlock().m_uniformProperties;
 	for (const auto [name, value] : oldUniforms)
 	{
 		auto iter = newUniforms.find(name);
@@ -379,9 +387,9 @@ void Material::update()
 		}
 	}
 
-	for (const auto& [name, uniform] : m_uniformProperties)
+	for (const auto& [name, uniform] : getPersistentBlock().m_uniformProperties)
 	{
-		m_shader.resource()->setUniformValue(name, uniform.value);
+		shader->setUniformValue(name, uniform.value);
 	}
 
 	// TODO fix
@@ -393,46 +401,87 @@ void Material::update()
 
 void Material::setUniformValue(const std::string& name, const Value& v)
 {
-	m_uniformProperties[name].value = v;
+	getPersistentBlock().setUniformValue(name, v);
 }
 
 void Material::setName(const std::string& name)
 {
 	m_name = name;
 }
+
 std::string Material::getName() const
 {
 	return m_name;
 }
 
-void Material::setMaterialRenderMode(MaterialRenderMode renderMode, const AssetWrapper<Shader>& customShader)
+Material::PersistentBlock& Material::getPersistentBlock()
+{
+	return m_persistentBlock;
+}
+
+Material::NonPersistentBlock& Material::getNonPersistentBlock()
+{
+	return m_nonPersistentBlock;
+}
+
+void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
 {
 	m_renderMode = renderMode;
+	update();
+}
 
-	if (m_renderMode == MaterialRenderMode::Opaque)
-	{
-		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM));
-	}
-	else if (m_renderMode == MaterialRenderMode::Transparent)
-	{
-		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_FORWARD_PBR));
-	}
-	else if (m_renderMode == MaterialRenderMode::Terrain)
-	{
-		setShader(BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN));
-	}
-	else if (m_renderMode == MaterialRenderMode::Custom)
-	{
-		if (customShader.isEmpty())
-		{
-			logError("Specified render mode is custom, therefore you must assign a valid shader as argument.");
-			return;
-		}
-		setShader(customShader);
-	}
+void Material::setCustomShader(AssetHandle<ShaderAsset>& customShader)
+{
+	m_customShader = customShader;
+	update();
+}
+
+AssetHandle<ShaderAsset> Material::getCustomShader() const
+{
+	return m_customShader;
 }
 
 MaterialRenderMode Material::getMaterialRenderMode() const
 {
 	return m_renderMode;
+}
+
+AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::MATERIAL;
+	desc.sourcePath = fileLocation;
+	MaterialAsset* asset = new MaterialAsset(desc);
+	return asset->importAsset(fileLocation).as<MaterialAsset>();
+}
+
+AssetHandle<MaterialAsset> MaterialAsset::create(const ResourceWrapper<Material>& mat, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::MATERIAL;
+	MaterialAsset* asset = new MaterialAsset(desc);
+	return asset->createAsset(mat).as<MaterialAsset>();
+}
+
+ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDescriptor desc)
+{
+	desc.sourcePath = fileLocation;
+	std::string filepath = desc.sourcePath;
+	auto projectDir = Engine::get()->getProjectDirectory();
+	filepath = projectDir + filepath;
+	std::ifstream is(filepath);
+	cereal::JSONInputArchive iarchive(is);
+	ResourceWrapper<Material> material = Factory<Material>::create();
+
+	try
+	{
+		iarchive(*material.get());
+		material->setMaterialRenderMode(material->getMaterialRenderMode());
+		return material;
+
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Deserialization Error occured: {}", e.what());
+	}
+
+	return ResourceWrapper<Material>::empty;
 }

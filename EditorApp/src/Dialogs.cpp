@@ -170,18 +170,19 @@ void displayTextureSelectDialog()
 
 		static int selectedTextureIndex = -1;
 
-		auto& textureList = assets->getAllAssetsOfType(AssetType::TEXTURE);
+		const auto& textureRecordList = assets->getAllRecordsOfType(AssetType::TEXTURE);
 
-		if (selectedTextureIndex != -1)
+		if (selectedTextureIndex != -1 && selectedTextureIndex < textureRecordList.size())
 		{
-			ResourceWrapper<Texture> displayTexture = textureList.at(selectedTextureIndex).resource.as<Texture>();
+			AssetHandle<TextureAsset> textureHandle = AssetHandle<TextureAsset>(textureRecordList.at(selectedTextureIndex)->uuid);
+			ResourceWrapper<Texture> displayTexture = textureHandle.resource();
 			ImVec2 imageSize(150, 150);
 			ImGui::Image(reinterpret_cast<ImTextureID>(displayTexture.get()->getID()), imageSize, ImVec2(0, 1), ImVec2(1, 0), ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1));
 		}
 
 		ImGui::Separator();
 
-		for (int i = 0; i < textureList.size(); i++)
+		for (int i = 0; i < textureRecordList.size(); i++)
 		{
 			bool isSelected = (selectedTextureIndex == i);
 			if (isSelected)
@@ -193,7 +194,7 @@ void displayTextureSelectDialog()
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // Default color
 			}
 
-			if (ImGui::Selectable(textureList[i].name.c_str(), false, ImGuiSelectableFlags_DontClosePopups))
+			if (ImGui::Selectable(textureRecordList[i]->name.c_str(), false, ImGuiSelectableFlags_DontClosePopups))
 			{
 				selectedTextureIndex = i;
 			}
@@ -204,9 +205,9 @@ void displayTextureSelectDialog()
 		ImGui::Separator();
 
 		if (ImGui::Button("OK")) {
-			if (selectedTextureIndex >= 0 && selectedTextureIndex < textureList.size())
+			if (selectedTextureIndex >= 0 && selectedTextureIndex < textureRecordList.size())
 			{
-				EditorState::Instance().assetTextureSelectCB(textureList[selectedTextureIndex].uuid);
+				EditorState::Instance().assetTextureSelectCB(textureRecordList[selectedTextureIndex]->uuid);
 
 			}
 			ImGui::CloseCurrentPopup();
@@ -233,12 +234,12 @@ void displayTextureCreatorDialog()
 	static TextureDataWidget textureDataWidget;
 	if (EditorState::Instance().showTextureCreateWindow)
 	{
-		ImGui::OpenPopup("CreateEmptyTexture");
+		ImGui::OpenPopup("createTexture");
 		EditorState::Instance().showTextureCreateWindow = false;
 
 		uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("NewTexture", EditorState::Instance().getWorkingDir().path());
 	}
-	if (ImGui::BeginPopupModal("CreateEmptyTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("createTexture", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		static int width = 512;
 		static int height = 512;
@@ -254,14 +255,26 @@ void displayTextureCreatorDialog()
 		{
 			if (uniqueName.isValid())
 			{
-				auto texture = Texture::createEmptyTexture(width, height);
+				TextureData textureData;
+				textureData.target = TextureTarget::TEXTURE_2D;
+				textureData.width = width;
+				textureData.height = height;
+				textureData.channels = 4;
+				textureData.internalFormat = TextureInternalFormat::RGBA8;
+				textureData.format = TextureFormat::RGBA;
+				textureData.type = TextureType::UNSIGNED_BYTE;
+				textureData.filter = TextureFilter::Linear;
+				textureData.wrap = TextureWrap::Clamp;
+				textureData.data = nullptr;
+				textureData.fillEmpty = true;
+				auto texture = Texture::createTexture(textureData);
 				
 				AssetCreateDescriptor desc;
 				desc.aType = AssetType::TEXTURE;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-				desc.attributes = texture->getTextureAssetAttributes().toMap();
-				Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc);
+				TextureAsset::create(texture, desc);
+				// desc.attributes = texture->getTextureAssetAttributes().toMap(); // TODO: Fix this - getTextureAssetAttributes doesn't exist anymore
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -327,11 +340,10 @@ void displayShaderCreatorDialog()
 
 			AssetCreateDescriptor desc;
 			desc.name = uniqueName.name;
-			desc.origFilePath = filepath.m_filepath;
+			desc.sourcePath = filepath.m_filepath;
 			desc.aType = AssetType::SHADER;
 			desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-			desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(shaderOverrideType);
-			Engine::get()->getSubSystem<Assets>()->createAsset(shader, desc);
+			ShaderAsset::create(shader, desc);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -370,7 +382,7 @@ void displayLuaScriptCreatorDialog()
 				desc.aType = AssetType::LUA_SCRIPT;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-				Engine::get()->getSubSystem<Assets>()->createAsset(script, desc);
+				LuaScriptAsset::create(script, desc);
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -468,7 +480,7 @@ void displayMaterialEditDialog()
 	{
 		ImGui::OpenPopup("Edit Material");
 		
-		previousMaterial = EditorState::Instance().selectedMaterialForEdit.get()->clone(true);
+		previousMaterial = EditorState::Instance().selectedMaterialForEdit.resource()->clone(true);
 		EditorState::Instance().showMaterialEditWindow = false;
 	}
 	if (ImGui::BeginPopupModal("Edit Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
@@ -482,7 +494,7 @@ void displayMaterialEditDialog()
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
 			//Material::updateAsset(mat, {});
-			Engine::get()->getSubSystem<Assets>()->updateAsset(mat);
+			mat->updateAsset({});
 			ImGui::CloseCurrentPopup();
 		}
 

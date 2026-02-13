@@ -12,24 +12,15 @@
 #include "memory/AssetLoader.h"
 #include "core/Factory.h"
 #include "component/ObjectComponent.h"
+#include "core/Engine.h"
 
-namespace {
-	struct PrefabManagerRegistration {
-		PrefabManagerRegistration() {
-			AssetFactory::registerManager(AssetType::PREFAB, std::make_shared<PrefabAssetManager>());
-		}
-	} _PrefabManagerRegistration;
-}
-
-bool PrefabAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, LoadDescriptor desc)
 {
-	return false;
-}
-
-ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
-{
+	desc.sourcePath = fileLocation;
+	std::string filepath = desc.sourcePath;
 	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ifstream is(projectDir + aInfo.relativefilePath);
+	filepath = projectDir + filepath;
+	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
 
 	ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
@@ -48,7 +39,12 @@ ResourceWrapper<ResourceBase> PrefabAssetManager::load(AssetInfo& aInfo)
 	return ResourceWrapper<Prefab>::empty;
 }
 
-void PrefabAssetManager::save(const AssetWrapper<ResourceBase>& prefab, const AssetInfo& aInfo)
+bool PrefabAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+{
+	return false;
+}
+
+void PrefabAsset::save(const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::ofstream os(projectDir + "/" + aInfo.relativefilePath);
@@ -56,24 +52,12 @@ void PrefabAssetManager::save(const AssetWrapper<ResourceBase>& prefab, const As
 
 	try
 	{
-		oarchive(*prefab.as<Prefab>().resource().get());
+		oarchive(*AssetHandle<PrefabAsset>(m_uuid).resource().get());
 	}
 	catch (const cereal::Exception& e)
 	{
 		logError("Serialization Error occured: {}", e.what());
 	}
-}
-
-AssetWrapper<Prefab> Prefab::import(const std::string& fileLocation, PrefabImportSettings desc)
-{
-	desc.aType = AssetType::PREFAB;
-	desc.origFilePath = fileLocation;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Prefab>();
-}
-
-void Prefab::save(const ResourceWrapper<Prefab>& prefab, AssetInfo aInfo)
-{
-	//Engine::get()->getSubSystem<Assets>()->updateAsset<Prefab>(prefab, aInfo); 
 }
 
 void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)
@@ -182,4 +166,15 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	return root;
 }
 
+AssetHandle<PrefabAsset> PrefabAsset::import(const std::string& fileLocation, PrefabImportSettings desc)
+{
+	desc.aType = AssetType::PREFAB;
+	desc.sourcePath = fileLocation;
+	PrefabAsset* asset = new PrefabAsset(desc);
+	return asset->importAsset(fileLocation).as<PrefabAsset>();
+}
 
+AssetHandle<PrefabAsset> PrefabAsset::create(const ResourceWrapper<Prefab>& prefab, AssetCreateDescriptor desc)
+{
+	return AssetHandle<PrefabAsset>();
+}

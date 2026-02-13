@@ -2,6 +2,7 @@
 
 class Scene;
 #include "memory/ResourceWrapper.h"
+#include "texture/Texture.h"
 
 class IBL
 {

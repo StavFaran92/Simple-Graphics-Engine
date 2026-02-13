@@ -1,72 +1,119 @@
 #include "runtime/Scene.h"
 
-#include "systems/Skybox.h"
-#include "lights/DirectionalLight.h"
-#include "lights/PointLight.h"
+#include <filesystem>
+#include <fstream>
+#include <cereal/archives/json.hpp>
+
 #include "core/Engine.h"
-#include "camera/ICamera.h"
 #include "core/CoroutineSystem.h"
 #include "core/Logger.h"
 #include "runtime/Context.h"
 #include "core/Window.h"
 #include "systems/ObjectPicker.h"
-#include "core/Configurations.h"
 #include "render/Shader.h"
 #include "runtime/Entity.h"
 #include "component/Transformation.h"
 #include "geometry/Mesh.h"
 #include "component/RenderableComponent.h"
-#include "component/Component.h"
 #include "component/WaterBodyComponent.h"
 #include "render/Material.h"
 #include "component/ScriptableEntity.h"
 #include "physics/PhysicsSystem.h"
-#include "geometry/Box.h"
 #include "systems/ShadowSystem.h"
 #include "lights/LightSystem.h"
 #include "systems/TimeManager.h"
 #include "render/UniformBufferObject.h"
 #include "render/DeferredRenderer.h"
 #include "render/Renderer.h"
-#include "core/Random.h"
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
-#include "utils/EquirectangularToCubemapConverter.h"
 
 #include "render/RenderCommand.h"
-#include "glm/ext.hpp"
 #include "render/IBL.h"
 #include "core/Registry.h"
-#include "physics/Physics.h"
 #include "serialize/Archiver.h"
 #include "animation/Animator.h"
 #include "component/Terrain.h"
-#include "geometry/AABB.h"
 #include "geometry/Frustum.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "render/Graphics.h"
 #include "utils/DebugHelper.h"
-#include "texture/Cubemap.h"
 #include "render/RenderView.h"
-#include "core/GameLayer.h"
 #include "core/EventSystem.h"
 #include "core/EngineConfig.h"
 #include "geometry/WireframeGrid.h"
 
-#include "component/FoliageComponent.h"
 #include "systems/FoliageSystem.h"
 #include "systems/WaterSystem.h"
+#include "systems/VolumetricCloudsSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
-#include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/SkyboxComponent.h"
 #include "component/NativeScriptComponent.h"
 #include "component/ImageComponent.h"
 #include "component/PostProcessComponent.h"
+#include "component/VolumeComponent.h"
+#include "component/VolumetricCloudsComponent.h"
 #include "scripts/ScriptSystem.h"
 #include "memory/BuiltInAssets.h"
+#include "memory/BuiltInResources.h"
+#include "systems/VolumetricSystem.h"
+#include "core/Factory.h"
 
+bool SceneAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+{
+	return false;
+}
+
+void SceneAsset::save(const AssetRecord& aInfo)
+{
+	
+	auto projectDir = Engine::get()->getProjectDirectory();
+	std::ofstream os(aInfo.fullFilePath);
+	cereal::JSONOutputArchive oarchive(os);
+
+	try
+	{
+		SerializedScene serializedScene = Archiver::serializeScene(AssetHandle<SceneAsset>(m_uuid).resource().get());
+		oarchive(serializedScene);
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Serialization Error occured: {}", e.what());
+	}
+}
+
+ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, LoadDescriptor desc)
+{
+	std::string filepath = desc.sourcePath;
+	auto projectDir = Engine::get()->getProjectDirectory();
+	filepath = projectDir + filepath;
+	std::ifstream is(filepath);
+	cereal::JSONInputArchive iarchive(is);
+	ResourceWrapper<Scene> scene = Factory<Scene>::create();
+
+	try
+	{
+		SerializedScene serializedScene;
+		iarchive(serializedScene);
+		Archiver::deserializeScene(serializedScene, *scene.get());
+		return scene;
+
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Deserialization Error occured: {}", e.what());
+	}
+
+	return ResourceWrapper<Scene>::empty;
+}
+
+ResourceWrapper<Scene> Scene::create()
+{
+	auto scene = Factory<Scene>::create(Engine::get()->getContext());
+	return scene;
+}
 
 struct PlaneGPU {
 	glm::vec3 normal;
@@ -96,7 +143,7 @@ void Scene::displayWireframeMesh(Entity e)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-	for (auto& mesh : e.tryGetComponent<MeshRendererComponent>()->mesh.get()->getMeshes())
+	for (auto& mesh : e.tryGetComponent<MeshRendererComponent>()->mesh.resource()->getMeshes())
 	{
 		graphics->entity = e;
 		graphics->shader = m_tempOutlineShader;
@@ -167,25 +214,53 @@ void Scene::init(Context* context)
 	m_quadUI.RemoveComponent<RenderableComponent>();
 	m_quadUI.RemoveComponent<ObjectComponent>();
 
-	m_UIShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/UIShader.glsl");
-	m_terrainShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_TERRAIN);
-	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/OutlineShader.glsl");
+	m_UIShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/UIShader.glsl");
+	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/OutlineShader.glsl");
 
 	m_uboTime = std::make_shared<UniformBufferObject>(sizeof(float));
 	m_uboTime->attachToBindPoint(0);
 
 	// Create irradiance map using created cubemap
-	m_irradianceMap = Cubemap::createDefaultCubemap();
+	TextureData defaultCubemapData;
+	defaultCubemapData.target = TextureTarget::TEXTURE_CUBE_MAP;
+	defaultCubemapData.width = 1;
+	defaultCubemapData.height = 1;
+	defaultCubemapData.channels = 3;
+	defaultCubemapData.internalFormat = TextureInternalFormat::RGB;
+	defaultCubemapData.format = TextureFormat::RGB;
+	defaultCubemapData.type = TextureType::UNSIGNED_BYTE;
+	defaultCubemapData.filter = TextureFilter::Linear;
+	defaultCubemapData.wrap = TextureWrap::Clamp;
+	defaultCubemapData.genMipMap = false;
+	static unsigned char FULL_WHITE[3] = { 255, 255, 255 };
+	for (int i = 0; i < 6; i++)
+	{
+		defaultCubemapData.facesData[i] = FULL_WHITE;
+	}
+	m_irradianceMap = Texture::createTexture(defaultCubemapData);
 
 	// Create prefilter env map using created cubemap
-	m_prefilterEnvMap = Cubemap::createDefaultCubemap();
+	TextureData defaultCubemapData2;
+	defaultCubemapData2.target = TextureTarget::TEXTURE_CUBE_MAP;
+	defaultCubemapData2.width = 1;
+	defaultCubemapData2.height = 1;
+	defaultCubemapData2.channels = 3;
+	defaultCubemapData2.internalFormat = TextureInternalFormat::RGB;
+	defaultCubemapData2.format = TextureFormat::RGB;
+	defaultCubemapData2.type = TextureType::UNSIGNED_BYTE;
+	defaultCubemapData2.filter = TextureFilter::Linear;
+	defaultCubemapData2.wrap = TextureWrap::Clamp;
+	defaultCubemapData2.genMipMap = false;
+	for (int i = 0; i < 6; i++)
+	{
+		defaultCubemapData2.facesData[i] = FULL_WHITE;
+	}
+	m_prefilterEnvMap = Texture::createTexture(defaultCubemapData2);
 
 	// Create BRDF look up texture
 	m_BRDFIntegrationLUT = IBL::generateBRDFIntegrationLUT(this);
 
-	m_skyboxShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SkyboxShader.glsl");
-
-	m_basicBox = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX).resource();
+	m_skyboxShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SkyboxShader.glsl");
 
 	addRenderView("Game View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), Entity::EmptyEntity);
 
@@ -193,9 +268,9 @@ void Scene::init(Context* context)
 
 	m_highlightRenderView = std::make_shared<RenderView>(Viewport{ 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight() }, Entity::EmptyEntity);
 
-	m_highlightMaskShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlighMaskShader.glsl");
-	m_highlightEdgeDetectionShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
-	m_highlightMergeShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
+	m_highlightMaskShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlighMaskShader.glsl");
+	m_highlightEdgeDetectionShader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", ShaderOverride::PostProcess, true);
+	m_highlightMergeShader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlightMergeShader.glsl", ShaderOverride::PostProcess, true);
 
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
 
@@ -207,7 +282,7 @@ void Scene::init(Context* context)
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo); // Binding = 0
 
 
-	//m_sampleComputeShader = Shader::create(SGE_ROOT_DIR + "Resources/Engine/Shaders/SampleComputeShader.glsl");
+	//m_sampleComputeShader = Shader::create(SGE_ROOT_DIR "Resources/Engine/Shaders/SampleComputeShader.glsl");
 
 	//m_sampleComputeShader->use();
 	//glDispatchCompute((GLuint)data.size(), 1, 1);
@@ -347,6 +422,11 @@ void Scene::draw(float deltaTime)
 			Engine::get()->getSubSystem<WaterSystem>()->prepareWaterBodyForRender(waterBody);
 		}
 
+		for (auto&& [entity, clouds, transform] : m_registry->get().view<VolumetricCloudsComponent, Transformation>().each())
+		{
+			Engine::get()->getSubSystem <VolumetricCloudsSystem>()->prepareVolumetricCloudsForRender(clouds);
+		}
+
 		// PRE Render Phase
 		for (const auto& cb : m_renderCallbacks[RenderPhase::PRE_RENDER_BEGIN])
 		{
@@ -400,13 +480,13 @@ void Scene::draw(float deltaTime)
 
 			graphics->renderView->bind();
 
-			for (auto&& [entity, foliage, transform] : m_registry->get().view<FoliageComponent, Transformation>().each())
+			for (auto&& [entity, terrain, transform] : m_registry->get().view<Terrain, Transformation>().each())
 			{
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				Engine::get()->getSubSystem<FoliageSystem>()->setView(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getForward());
 				Engine::get()->getSubSystem<FoliageSystem>()->setFrustum(frustum);
-				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(foliage);
+				Engine::get()->getSubSystem<FoliageSystem>()->drawFoliage(terrain);
 				glDisable(GL_BLEND);
 			}
 
@@ -428,7 +508,7 @@ void Scene::draw(float deltaTime)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Terrain render pass");
 
-			ResourceWrapper<Shader> terrainShader = m_terrainShader.resource();
+			ResourceWrapper<Shader> terrainShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);;
 			terrainShader->use();
 
 			// Render terrain
@@ -459,7 +539,7 @@ void Scene::draw(float deltaTime)
 				terrainShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 8);
 				terrainShader->setTextureInShader(heightmap, "heightMap", 9);
 
-				terrain.m_material.get()->use();
+				terrain.m_material.resource()->use();
 
 				//int textureCount = terrain.getTextureCount();
 				//m_terrainShader->setUniformValue("textureCount", textureCount);
@@ -507,7 +587,7 @@ void Scene::draw(float deltaTime)
 			{
 				Entity entityhandler{ entity, m_registry.get() };
 				graphics->entity = entityhandler;
-				graphics->mesh = m_basicBox.get()->getPrimaryMesh().get(); // todo can be optimized using a single mesh
+				graphics->mesh = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh().get();
 				graphics->model = transform.getWorldTransformation();
 
 				if (skybox.cubemap.isEmpty()) continue;
@@ -537,43 +617,12 @@ void Scene::draw(float deltaTime)
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Volumetrics render pass");
 
 			// Render Volumetrics
-			for (auto&& [entity, volume, shader] : m_registry->get().view<VolumeComponent, ShaderComponent>().each())
+			for (auto&& [entity, volume] : m_registry->get().view<VolumeComponent>().each())
 			{
-				ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
-				renderView->swapToAdditionalTarget();
-				renderView->bind();
-				RenderCommand::clear();
-				glDisable(GL_DEPTH_TEST);
-				// TODO assert post process shader
-
-				// bind shader
-				shader.m_customShader.resource()->use();
-
-				// read texture from graphics FBO
-				shader.m_customShader.resource()->setTextureInShader(renderTargetTexture, "MainTexture", 0); //todo check slot
-
-				shader.m_customShader.resource()->setModelMatrix(glm::mat4(1.0));
-				shader.m_customShader.resource()->setViewMatrix(graphics->view);
-				shader.m_customShader.resource()->setProjectionMatrix(graphics->projection);
-
-				auto viewport = renderView->getViewport();
-				shader.m_customShader.resource()->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
-
-				shader.m_customShader.resource()->setUniformValue("cameraPos", graphics->cameraPos);
-				shader.m_customShader.resource()->setUniformValue("cameraLookAt", primaryCamera.front);
-
-				// bind mesh
-				auto vao = m_basicBox.get()->getPrimaryMesh().get()->getVAO();
-				//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
-
-				// in frag shader i need access to mesh extentes & main texture -> set uniforms
-
-				// draw
-				RenderCommand::draw(vao);
-
-				renderView->swapBackToMainTarget();
-				renderView->bind();
-				glEnable(GL_DEPTH_TEST);
+				Entity entityHandler(entity, &getRegistry());
+				auto& transform = entityHandler.getComponent<Transformation>();
+				glm::mat4 modelTransform = transform.getWorldTransformation();
+				VolumetricSystem::get()->drawVolumetric(volume, modelTransform);
 			}
 
 			glPopDebugGroup();
@@ -607,7 +656,7 @@ void Scene::draw(float deltaTime)
 				if ((entity_id)entity == selectedObject)
 				{
 					Entity e(entity, &getRegistry());
-					ResourceWrapper<MeshCollection> mesh;
+					ResourceWrapper<MeshGroup> mesh;
 					auto meshRenderer = e.tryGetComponent<MeshRendererComponent>();
 					if (meshRenderer)
 					{
@@ -682,7 +731,7 @@ void Scene::draw(float deltaTime)
 						m_highlightEdgeDetectionShader->setUniformValue("uTexelSize", texelSize);
 						m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
 
-						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -693,7 +742,7 @@ void Scene::draw(float deltaTime)
 
 						// 3rd pass
 						ResourceWrapper<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
-						m_highlightRenderView->swapBackToMainTarget(); // todo optimize (i should fetch the secondary texture instead)
+						m_highlightRenderView->swapBackToMainTargetWithCopy(); // todo optimize (i should fetch the secondary texture instead)
 						auto& edgeDetectedTexture = m_highlightRenderView->getRenderTargetTexture(); // todo fix
 						auto width = Engine::get()->getWindow()->getWidth();
 						auto height = Engine::get()->getWindow()->getHeight();
@@ -707,7 +756,7 @@ void Scene::draw(float deltaTime)
 
 						graphics->renderView->bind();
 
-						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -792,14 +841,14 @@ void Scene::draw(float deltaTime)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		m_UIShader->use();
 		m_UIShader->setProjectionMatrix(m_defaultUIProjection);
-		auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO();
+		auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 		for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
 		{
 			Entity entityhandler{ entity, m_registry.get() };
 			graphics->entity = entityhandler;
-			image.image.get()->bind();
-			image.image.get()->setSlot(0);
+			image.image.resource()->bind();
+			image.image.resource()->setSlot(0);
 
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, glm::vec3(image.position, 0.0f));
@@ -906,14 +955,14 @@ void Scene::draw(float deltaTime)
 				//shader->setUniformValue("cameraLookAt", primaryCamera.front);
 
 				// bind mesh
-				auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.get()->getPrimaryMesh()->getVAO(); 
+				auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
 
 				// in frag shader i need access to mesh extentes & main texture -> set uniforms
 
 				// draw
 				RenderCommand::draw(vao);
 
-				renderView->swapBackToMainTarget();
+				renderView->swapBackToMainTargetWithCopy();
 				renderView->bind();
 				glEnable(GL_DEPTH_TEST);
 			}
@@ -1067,26 +1116,10 @@ void Scene::close()
 	clear();
 }
 
-//bool Scene::isSelected(uint32_t id) const
-//{
-//	if (!m_isObjectSelectionEnabled)
-//	{
-//		logWarning("Object selection isn't enabled for this scene.");
-//		return false;
-//	}
-//
-//	return m_objectSelection->isObjectSelected(id);
-//}
-
 void Scene::addCoroutine(const std::function<bool(float)>& coroutine)
 {
 	m_coroutineManager->addCoroutine(coroutine);
 }
-
-//void Scene::removeCoroutine(std::function<bool(float)>* coroutine)
-//{
-//	m_coroutineManager->removeCoroutine(coroutine);
-//}
 
 Entity Scene::getEntityByName(const std::string& name) const
 {
@@ -1275,4 +1308,19 @@ std::shared_ptr<RenderView> Scene::getRenderView(const std::string& name) const
 bool Scene::isSimulationActive() const
 {
 	return m_isSimulationActive;
+}
+
+AssetHandle<SceneAsset> SceneAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::SCENE;
+	desc.sourcePath = fileLocation;
+	SceneAsset* asset = new SceneAsset(desc);
+	return asset->importAsset(fileLocation).as<SceneAsset>();
+}
+
+AssetHandle<SceneAsset> SceneAsset::create(const ResourceWrapper<Scene>& scene, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::SCENE;
+	SceneAsset* asset = new SceneAsset(desc);
+	return asset->createAsset(scene).as<SceneAsset>();
 }

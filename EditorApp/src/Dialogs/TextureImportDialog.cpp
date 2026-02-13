@@ -33,10 +33,14 @@ bool TextureImportDialog::acceptContent()
 {
 	if (uniqueName.isValid())
 	{
-		Texture::TextureAssetDescriptor desc;
+		AssetCreateDescriptor desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		Texture::import(filepath.m_filepath, desc);
+
+		TextureLoadDescriptor* texDesc = new TextureLoadDescriptor();
+		texDesc->usage = textureDataWidget.m_semantic;
+		desc.resourceDescriptor = texDesc;
+		TextureAsset::import(filepath.m_filepath, desc);
 
 		return true;
 	}

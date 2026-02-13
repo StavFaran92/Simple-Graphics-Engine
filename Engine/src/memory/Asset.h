@@ -2,58 +2,38 @@
 
 #include <string>
 
-#include "Assets.h"
+#include "memory/AssetHandle.h"
 #include "AssetFactory.h"
-#include "memory/AssetWrapper.h"
 
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-using namespace nlohmann::literals;
-
-//struct BaseAssetParameters
-//{
-//	std::string name;
-//	UUID customUUID;
-//	std::string targetDirectory;
-//	bool isTransient = false;
-//
-//	void fillAssetInfo(AssetInfo& aInfo) const
-//	{
-//		if (!name.empty())
-//		{
-//			aInfo.name = name;
-//		}
-//
-//		aInfo.assetDirectory = targetDirectory;
-//
-//		aInfo.filePath = (std::filesystem::path(aInfo.assetDirectory) / aInfo.fileName).generic_string();
-//
-//		aInfo.importSettings = fillParams();
-//	}
-//	virtual json fillParams() const { return {}; };
-//
-//	virtual ~BaseAssetParameters() = default;
-//};
-
-template<AssetType T>
-class AssetFnRegister
+class EngineAPI Asset
 {
 public:
-	AssetFnRegister(const AssetFactory::LoadFn& fn)
-	{
-		AssetFactory::registerLoadFunc(T, fn);
-	}
+	using ResourceType = Resource;
 
-	static AssetFnRegister<T> staticRegister;
-};
+	Asset(const AssetCreateDescriptor& desc);
 
-template<AssetType T>
-AssetFnRegister<T> AssetFnRegister<T>::staticRegister;
+	AssetHandle<Asset> importAsset(const std::string& fileLocation);
 
-class AssetManager {
-public:
-	virtual bool copyFiles(const std::string& fileLocation, AssetInfo&) = 0;
-	virtual ResourceWrapper<ResourceBase> load(AssetInfo& aInfo) = 0;
-	virtual void save(const AssetWrapper<ResourceBase>& asset, const AssetInfo& aInfo) {};
+	AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset);
+
+	void updateAsset(const AssetUpdateDescriptor& uDesc);
+
+	void reimportAsset();
+
+	virtual void save(const AssetRecord& aInfo) = 0;
+
+	const AssetCreateDescriptor& getDescriptor() const;
+
+	UUID getUUID() const;
+protected:
+	virtual bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) = 0;
+
+	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };
+
+	bool importAssetInner(AssetRecord& aInfo);
+
+protected:
+	AssetCreateDescriptor m_createDesc;
+
+	UUID m_uuid = EMPTY_UUID;
 };

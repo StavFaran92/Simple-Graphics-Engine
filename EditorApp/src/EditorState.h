@@ -5,6 +5,8 @@
 
 #include "sge.h"
 
+#include "EditorTool.h"
+
 class DialogBase;
 
 class EditorState {
@@ -33,6 +35,7 @@ public:
     bool isMouseInSceneView = false;
     bool showTextureDisplayWindow = false;
     bool showLuaScriptCreateWindow = false;
+    bool showSceneCreateWindow = false;
     bool showSettingsWindow = false;
     bool showTextureImportWindow = false;
     bool showModelImportWindow = false;
@@ -52,16 +55,34 @@ public:
     void addDialogDisplay(DialogBase* dialog);
 
     void displayDialogs();
+
+    void setActiveEditorTool(EditorTool::Type tool);
+    EditorTool::Type getActiveToolType() const;
+    std::shared_ptr<EditorTool> getActiveEditorTool();
     
 
     std::function<void(UUID uuid)> assetTextureSelectCB;
     std::function<void(Entity e)> entitySelectCB;
-    AssetWrapper<Texture> selectedAssetTexture;
+    AssetHandle<TextureAsset> selectedAssetTexture;
 
     std::shared_ptr<TextureSampler> selectedSampler;
     std::shared_ptr<TextureSampler> previousSampler;
 
-    AssetWrapper<Material> selectedMaterialForEdit;
+    AssetHandle<MaterialAsset> selectedMaterialForEdit;
+
+    struct Rect2D {
+        glm::vec2 min;
+        glm::vec2 max;
+
+        bool contains(const glm::vec2& p) const
+        {
+            return
+                p.x >= min.x && p.x <= max.x &&
+                p.y >= min.y && p.y <= max.y;
+        }
+    };
+
+    Rect2D sceneViewRect;
 
     WorkingDirectory& getWorkingDir();
     //void setWorkingDir(std::filesystem::path path);
@@ -73,6 +94,9 @@ public:
     EditorState& operator=(EditorState&&) = delete;
 
 private:
+    static std::shared_ptr<EditorTool> getTool(EditorTool::Type type);
+
+private:
     // Private constructor
     EditorState() = default;
 
@@ -81,4 +105,7 @@ private:
     WorkingDirectory cwd;
 
     std::vector<DialogBase*> m_dialogs;
+
+    EditorTool::Type m_activeEditorToolType = EditorTool::Type::None;
+    std::shared_ptr<EditorTool> m_activeEditorTool;
 };

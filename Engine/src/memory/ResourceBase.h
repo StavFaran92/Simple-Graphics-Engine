@@ -1,21 +1,21 @@
 #pragma once
 
-#include <string>
-
 template<typename T>
 class ResourceWrapper;
 
-class ResourceBase
+class Resource
 {
 public:
-	ResourceBase() = default;
-	virtual ~ResourceBase() = default;
+	Resource() = default;
+	virtual ~Resource() = default;
 
-	template<typename T>
-	static ResourceWrapper<T> createNewResource(ResourceID id)
-	{
-		return ResourceWrapper<T>(id);
-	}
+	//ResourceWrapper<Resource> loadResource(const std::string& fileLocation);
+
+	//template<typename T>
+	//static ResourceWrapper<T> createNewResource(ResourceID id)
+	//{
+	//	return ResourceWrapper<T>(id);
+	//}
 
 	static ResourceID getNewResourceID()
 	{

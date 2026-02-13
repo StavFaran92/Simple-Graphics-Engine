@@ -14,7 +14,7 @@
 #include "render/RenderCommand.h"
 #include "runtime/Context.h"
 #include "animation/Animator.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "render/Graphics.h"
 #include "core/System.h"
 #include "geometry/ShapeFactory.h"
@@ -26,6 +26,7 @@
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 #include "memory/BuiltInAssets.h"
+#include "memory/BuiltInResources.h"
 
 static float lerp(float a, float b, float t)
 {
@@ -37,31 +38,31 @@ bool DeferredRenderer::setupGBuffer(int width, int height)
 	m_gBuffer.bind();
 
 	// Generate Texture for Position data
-	m_positionTexture = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_positionTexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
 	m_gBuffer.attachTexture(m_positionTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	// Generate Texture for Normal data
-	m_normalTexture = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_normalTexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
 	m_gBuffer.attachTexture(m_normalTexture.get()->getID(), GL_COLOR_ATTACHMENT1);
 
 	// Generate Texture for Albedo
-	m_albedoTexture = Texture::createEmptyTexture(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_albedoTexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA, TextureFormat::RGBA, TextureType::UNSIGNED_BYTE);
 	m_gBuffer.attachTexture(m_albedoTexture.get()->getID(), GL_COLOR_ATTACHMENT2);
 
 	// Generate Texture for MRA
-	m_MRATexture = Texture::createEmptyTexture(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	m_MRATexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA, TextureFormat::RGBA, TextureType::UNSIGNED_BYTE);
 	m_gBuffer.attachTexture(m_MRATexture.get()->getID(), GL_COLOR_ATTACHMENT3);
 
 	// Generate Texture for Position ViewSpace data
-	m_positionTextureVS = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_positionTextureVS = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
 	m_gBuffer.attachTexture(m_positionTextureVS.get()->getID(), GL_COLOR_ATTACHMENT4);
 
 	// Generate Texture for Normal ViewSpace data
-	m_normalTextureVS = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_normalTextureVS = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
 	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
 
 	// Generate Texture for Tangent data
-	m_TangentTexture = Texture::createEmptyTexture(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_TangentTexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
 	m_gBuffer.attachTexture(m_TangentTexture.get()->getID(), GL_COLOR_ATTACHMENT6);
 
 	unsigned int attachments[7] = { 
@@ -122,22 +123,19 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 			});
 	}
 
-	m_ssaoNoiseTexture = Texture::create2DTextureFromBuffer(4, 4,
-		GL_RGBA32F,
-		GL_RGB,
-		GL_FLOAT, {
-		{ GL_TEXTURE_MIN_FILTER,	GL_NEAREST	},
-		{ GL_TEXTURE_MAG_FILTER,	GL_NEAREST	},
-		{ GL_TEXTURE_WRAP_S,		GL_REPEAT	},
-		{ GL_TEXTURE_WRAP_T,		GL_REPEAT   } },
-		true,
+	m_ssaoNoiseTexture = Texture::createTexture(4, 4, 1,
+		TextureInternalFormat::RGBA32F,
+		TextureFormat::RGB,
+		TextureType::FLOAT, 
+		TextureFilter::Nearest,
+		TextureWrap::Repeat,
 		&ssaoNoise[0]
 		);
 
 	// Initialize SSAO FBO
 	m_ssaoFBO.bind();
 
-	m_ssaoColorBuffer = Texture::createEmptyTexture(ssaoBufferWidth, ssaoBufferHeight, GL_RED, GL_RED, GL_FLOAT);
+	m_ssaoColorBuffer = Texture::createTexture(ssaoBufferWidth, ssaoBufferHeight, 3, TextureInternalFormat::R16, TextureFormat::RED, TextureType::FLOAT);
 	m_ssaoFBO.attachTexture(m_ssaoColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };
@@ -155,12 +153,12 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 	m_ssaoFBO.unbind();
 
-	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
+	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SSAOPassShader.glsl");
 
 	// Initialize SSAO Blur
 	m_ssaoBlurFBO.bind();
 
-	m_ssaoBlurColorBuffer = Texture::createEmptyTexture(ssaoBufferWidth, ssaoBufferHeight, GL_RED, GL_RED, GL_FLOAT);
+	m_ssaoBlurColorBuffer = Texture::createTexture(ssaoBufferWidth, ssaoBufferHeight, 3, TextureInternalFormat::R16, TextureFormat::RED, TextureType::FLOAT);
 	m_ssaoBlurFBO.attachTexture(m_ssaoBlurColorBuffer.get()->getID(), GL_COLOR_ATTACHMENT0);
 
 	// Create RBO and attach to FBO
@@ -175,7 +173,7 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 	m_ssaoBlurFBO.unbind();
 
-	m_ssaoBlurPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOBlurPassShader.glsl");
+	m_ssaoBlurPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SSAOBlurPassShader.glsl");
 
 	DebugHelper::getInstance().registerTextureForDebug("SSAO Color", m_ssaoBlurColorBuffer);
 
@@ -184,8 +182,6 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 
 bool DeferredRenderer::init()
 {
-	m_gBufferShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_GEOM); //Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl");
-	m_lightPassShader = BuiltInAssets::getByName<Shader>(SGE_SHADER_DEFFERED_PBR_LIGHT);
 
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
@@ -195,8 +191,7 @@ bool DeferredRenderer::init()
 	setupSSAO(width, height);
 
 	// Generate screen quad
-	UUID quadUUID = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD);
-	m_quad = Engine::get()->getSubSystem<Assets>()->getAsset(quadUUID).resource.as<MeshCollection>();
+	m_quad = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD).as<MeshGroupAsset>().resource();
 
 	return true;
 }
@@ -244,7 +239,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 		glLineWidth(1); // Size in pixels
 	}
 
-	graphics->shader = m_gBufferShader.resource();
+	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
 	graphics->shader->use();
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
@@ -264,7 +259,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 		prepareEntityForRender(entityHandler);
 
-		for (auto& mesh : meshRenderer.mesh.get()->getMeshes())
+		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
 			{
@@ -328,8 +323,8 @@ void DeferredRenderer::renderScene(Scene* scene)
 		// We set the viewport to half the screen size to improve the SSAO performance
 		RenderCommand::setViewport(0, 0, width / 2.f, height / 2.f);
 
-		m_ssaoPassShader->setUniformValue("screenWidth", width / 2.f);
-		m_ssaoPassShader->setUniformValue("screenHeight", height / 2.f);
+		m_ssaoPassShader->setUniformValue("screenWidth", (int)(width / 2.f));
+		m_ssaoPassShader->setUniformValue("screenHeight", (int)(height / 2.f));
 
 		for (unsigned int i = 0; i < 64; ++i)
 		{
@@ -369,7 +364,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	// bind textures
 	// Todo solve slots issue
-	ResourceWrapper<Shader> lightPassShaderResource = m_lightPassShader.resource();
+	ResourceWrapper<Shader> lightPassShaderResource = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT);
 	lightPassShaderResource->use();
 	lightPassShaderResource->setTextureInShader(m_positionTexture, "gPosition", 0);
 	lightPassShaderResource->setTextureInShader(m_normalTexture, "gNormal", 1);
@@ -413,7 +408,7 @@ void DeferredRenderer::resize(int w, int h)
 
 //void DeferredRenderer::reloadShaders()
 //{
-//	m_gBufferShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl"); // TODO fix, now when its a built in asset it will cause issues
-//	m_lightPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
-//	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SSAOPassShader.glsl");
+//	m_gBufferShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBR_GeomPassShader.glsl"); // TODO fix, now when its a built in asset it will cause issues
+//	m_lightPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+//	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SSAOPassShader.glsl");
 //}

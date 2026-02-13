@@ -1,7 +1,6 @@
 #include "systems/BuiltInAssetsLoader.h"
 
 #include "memory/Assets.h"
-#include "texture/Cubemap.h"
 #include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
 #include "core/CacheSystem.h"
@@ -20,19 +19,18 @@
 
 void acquireTexture(const std::string& name, const std::string& path)
 {
-	Texture::TextureAssetDescriptor aDesc;
+	AssetCreateDescriptor aDesc;
 	aDesc.isEngineOwned = true;
 	aDesc.name = name;
-	Texture::import(path, aDesc);
+	TextureAsset::import(path, aDesc);
 }
 
-void addAsAsset(const std::string& name, const ResourceWrapper<MeshCollection>& meshCollection)
+void addAsAsset(const std::string& name, const ResourceWrapper<MeshGroup>& meshCollection)
 {
 	AssetCreateDescriptor aInfo;
-	aInfo.aType = AssetType::MESH;
 	aInfo.name = name;
 	aInfo.isEngineOwned = true;
-	Engine::get()->getSubSystem<Assets>()->createAsset(meshCollection, aInfo);
+	MeshGroupAsset::create(meshCollection, aInfo);
 }
 
 void BuiltInAssetsLoader::loadTextures()
@@ -40,60 +38,52 @@ void BuiltInAssetsLoader::loadTextures()
 	{
 		static unsigned char* whiteColor = new unsigned char[3] { 255, 255, 255 }; // todo rethink this
 
-		Texture::TextureData tData;
-		tData.target = Texture::TextureTarget::TEXTURE_2D;
+		TextureData tData;
+		tData.target = TextureTarget::TEXTURE_2D;
 		tData.width = 1;
 		tData.height = 1;
-		tData.bpp = 3;
+		tData.channels = 3;
 		tData.data = whiteColor;
-		tData.internalFormat = Texture::InternalFormat::RGB2;
-		tData.format = Texture::Format::RGB;
-		tData.type = Texture::Type::UNSIGNED_BYTE;
-		tData.isEngineOwned = true;
+		tData.internalFormat = TextureInternalFormat::RGB;
+		tData.format = TextureFormat::RGB;
+		tData.type = TextureType::UNSIGNED_BYTE;
+		tData.filter = TextureFilter::Linear;
+		tData.wrap = TextureWrap::Repeat;
 		tData.textureName = "SGE_TEXTURE_WHITE";
-		tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-						{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-						{GL_TEXTURE_WRAP_S, GL_REPEAT},
-						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
 
-		auto texture = Texture::create2DTextureFromBuffer(tData);
+		auto texture = Texture::createTexture(tData);
 
-		AssetCreateDescriptor aInfo;
-		aInfo.aType = AssetType::TEXTURE;
-		aInfo.name = tData.textureName;
-		aInfo.isEngineOwned = true;
-		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::TEXTURE;
+		desc.name = tData.textureName;
+		desc.isEngineOwned = true;
+		TextureAsset::create(texture, desc);
 	}
 
 	{
 		static unsigned char* blackColor = new unsigned char[3] { 0, 0, 0};
-		Texture::TextureData tData;
-		tData.target = Texture::TextureTarget::TEXTURE_2D;
+		TextureData tData;
+		tData.target = TextureTarget::TEXTURE_2D;
 		tData.width = 1;
 		tData.height = 1;
-		tData.bpp = 3;
+		tData.channels = 3;
 		tData.data = blackColor;
-		tData.internalFormat = Texture::InternalFormat::RGB2;
-		tData.format = Texture::Format::RGB;
-		tData.type = Texture::Type::UNSIGNED_BYTE;
-		tData.isEngineOwned = true;
+		tData.internalFormat = TextureInternalFormat::RGB;
+		tData.format = TextureFormat::RGB;
+		tData.type = TextureType::UNSIGNED_BYTE;
+		tData.filter = TextureFilter::Linear;
+		tData.wrap = TextureWrap::Repeat;
 		tData.textureName = "SGE_TEXTURE_BLACK";
-		tData.params = { {GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-						{GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-						{GL_TEXTURE_WRAP_S, GL_REPEAT},
-						{GL_TEXTURE_WRAP_T, GL_REPEAT } };
-		auto texture = Texture::create2DTextureFromBuffer(tData);
+		auto texture = Texture::createTexture(tData);
 
-		AssetCreateDescriptor aInfo;
-		aInfo.aType = AssetType::TEXTURE;
-		aInfo.name = tData.textureName;
-		aInfo.isEngineOwned = true;
-		aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-		Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::TEXTURE;
+		desc.name = tData.textureName;
+		desc.isEngineOwned = true;
+		TextureAsset::create(texture, desc);
 	}
 
-	acquireTexture("SGE_TEXTURE_GRASS", SGE_ROOT_DIR + "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
+	acquireTexture("SGE_TEXTURE_GRASS", SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
 }
 
 void BuiltInAssetsLoader::loadMaterials()
@@ -104,16 +94,15 @@ void BuiltInAssetsLoader::loadMaterials()
 		aDesc.name = SGE_MATERIAL_DEFAULT;
 		aDesc.aType = AssetType::MATERIAL;
 		ResourceWrapper<Material> material = Material::create(MaterialRenderMode::Opaque);
-		Engine::get()->getSubSystem<Assets>()->createAsset(material, aDesc);
+		MaterialAsset::create(material, aDesc);
 	}
 
 	{
 		AssetCreateDescriptor aDesc;
 		aDesc.isEngineOwned = true;
 		aDesc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
-		aDesc.aType = AssetType::MATERIAL;
 		ResourceWrapper<Material> material = Material::create(MaterialRenderMode::Terrain);
-		Engine::get()->getSubSystem<Assets>()->createAsset(material, aDesc);
+		MaterialAsset::create(material, aDesc);
 	}
 }
 
@@ -121,76 +110,43 @@ void BuiltInAssetsLoader::loadMeshes()
 {
 	{
 		// Create box
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
 		Box::createMesh(meshCollection);
 		addAsAsset("SGE_MESH_BOX", meshCollection);
 	}
 
 	{
 		// Create Quad
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
 		Quad::createMesh(meshCollection);
 		addAsAsset("SGE_MESH_QUAD", meshCollection);
 	}
 
 	{
 		// Create sphere
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
 		Sphere::createMesh(meshCollection, 1, 36, 36);
 		addAsAsset("SGE_MESH_SPHERE", meshCollection);
 	}
 
 	{
-		ResourceWrapper<MeshCollection> meshCollection = Factory<MeshCollection>::create();
+		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
 		Grid::generateGrid(meshCollection, 10, 10);
 		addAsAsset("SGE_MESH_GRID", meshCollection);
 	}
 
 	{
-		ModelImportSettings aInfo;
+		AssetCreateDescriptor aInfo;
 		aInfo.aType = AssetType::MESH;
 		aInfo.name = "SGE_MESH_CAMERA";
 		aInfo.isEngineOwned = true;
-		MeshCollection::import(SGE_ROOT_DIR + "Resources/Engine/Meshes/camera_v2.dae", aInfo);
+		MeshGroupLoadDescriptor* resourceDesc = aInfo.makeResourceDescriptor<MeshGroupLoadDescriptor>();
+		MeshGroupAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
 	}
 }
 
 void BuiltInAssetsLoader::loadShaders()
 {
-	{
-		ShaderAssetDescriptor desc;
-		desc.isEngineOwned = true;
-		desc.name = SGE_SHADER_DEFFERED_PBR_GEOM;
-		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_GeomPassShader.glsl", desc);
-	}
-
-	{
-		ShaderAssetDescriptor desc;
-		desc.isEngineOwned = true;
-		desc.name = SGE_SHADER_DEFFERED_PBR_LIGHT;
-		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBR_LightPassShader.glsl", desc);
-	}
-
-	{
-		ShaderAssetDescriptor desc;
-		desc.isEngineOwned = true;
-		desc.name = SGE_SHADER_FORWARD_PBR;
-		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/PBRShader.glsl", desc);
-	}
-
-	{
-		ShaderAssetDescriptor desc;
-		desc.isEngineOwned = true;
-		desc.name = SGE_SHADER_TERRAIN;
-		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/TerrainShader.glsl", desc);
-	}
-
-	{
-		ShaderAssetDescriptor desc;
-		desc.isEngineOwned = true;
-		desc.name = SGE_SHADER_DEBUG_DATA;
-		Shader::import(SGE_ROOT_DIR + "Resources/Engine/Shaders/normalDisplayShader.glsl", desc);
-	}
 }
 
 void BuiltInAssetsLoader::loadAssets()

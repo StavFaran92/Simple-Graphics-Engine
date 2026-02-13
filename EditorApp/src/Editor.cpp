@@ -11,6 +11,9 @@
 
 #include "NativeScriptsLoader.h"
 #include "UIEventLayer.h"
+#include "UIEditorToolsEventLayer.h"
+#include "UINavigationLayer.h"
+#include "UIEntitySelectionLayer.h"
 
 #include "EditorCamera.h"
 #include "EditorState.h"
@@ -25,6 +28,8 @@
 
 #include "EntityState.h"
 #include "InspectorWindow.h"
+#include "SceneHierarchyWindow.h"
+#include "SceneViewWindow.h"
 #include "Dialogs.h"
 #include "Dialogs/MaterialCreateDialog.h"
 #include "Dialogs/ModelImportDialog.h"
@@ -33,12 +38,20 @@
 #include "Dialogs/LuaScriptImportDialog.h"
 #include "Dialogs/FolderCreateDialog.h"
 #include "Dialogs/AssetSelectDialog.h"
+#include "Dialogs/SceneCreateDialog.h"
 
 #include "ImguiHandler.h"
 #include "GUIMenu.h"
 
+extern bool g_testRay;
+
+AssetSelectDialog assetSelectDialog;
+
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
+std::shared_ptr<EventLayer> uiEditorToolsLayer = std::make_shared<UIEditorToolsEventLayer>();
+std::shared_ptr<EventLayer> uiNavigationLayer = std::make_shared<UINavigationLayer>();
+std::shared_ptr<EventLayer> uiEntitySelectionLayer = std::make_shared<UIEntitySelectionLayer>();
 
 namespace fs = std::filesystem;
 
@@ -82,6 +95,7 @@ static AnimationImportDialog animationImportDialog;
 static TextureImportDialog textureImportDialog;
 static LuaScriptImportDialog luaScriptImportDialog;
 static FolderCreateDialog folderCreateDialog;
+static SceneCreateDialog sceneCreateDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -129,40 +143,6 @@ static void startsimulation()
 	state.selectEntity(Entity::EmptyEntity);
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock(); //TODO this should be in camera event
 
-}
-
-void focusOnEntity(Entity e)
-{
-	// get camera forward
-	auto& camera = g_editorCamera.getComponent<CameraComponent>();
-	auto front = camera.front;
-
-	// get entity location
-	auto& targetTransform = e.getComponent<Transformation>();
-		
-	glm::vec3 targetLocation = targetTransform.getWorldPosition() - front * 5.f;
-
-	auto targetMesh = e.tryGetComponent<MeshRendererComponent>();
-	if (targetMesh)
-	{
-		auto& targetAABB = targetMesh->mesh.get()->getPrimaryMesh()->getAABB();
-
-		// set destination to location + forward
-		targetLocation = targetTransform.getWorldPosition() - front * 5.f + targetAABB.extents() * .5f;
-
-		// create fake frustum
-		Frustum fakeFrustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.getFOVYInRadians(), camera.znear, camera.zfar);
-
-		// we start at the target object location and step back until the object AABB is inside the frustum.
-		while (!targetAABB.isOnFrustum(fakeFrustum))
-		{
-			targetLocation -= front;
-			fakeFrustum = Frustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.getFOVYInRadians(), camera.znear, camera.zfar);
-		}
-	}
-
-	auto& transform = g_editorCamera.getComponent<Transformation>();
-	transform.setLocalPosition(targetLocation);
 }
 
 void RenderSimulationControlView()
@@ -258,649 +238,6 @@ void LightCreatorWindow()
 		ImGui::End();
 	}
 
-}
-
-void displayentityName(const Entity& e)
-{
-	auto& obj = e.getComponent<ObjectComponent>();
-
-	ImGui::Selectable(obj.name.c_str(), (state.getSelectedEntity() == e));
-
-	if (ImGui::IsItemClicked())
-	{
-		state.selectEntity(e);
-	}
-}
-
-void displayEntityHelper(Entity& e)
-{
-	auto& transform = e.getComponent<Transformation>();
-	auto& obj = e.getComponent<ObjectComponent>();
-
-	
-
-	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
-	{
-		state.selectEntity(e);
-	}
-
-	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-	{
-		state.selectEntity(e);
-		ImGui::OpenPopup("SceneObjectContextPopup");
-	}
-
-	
-
-	if (state.getSelectedEntity() == e)
-	{
-		if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
-		{
-			if (ImGui::IsMouseDoubleClicked(0))
-			{
-				focusOnEntity(e);
-			}
-		}
-
-		//if (selectedEntityRename)
-		//{
-		//	// Editable text field
-		//	char buffer[256];
-		//	strncpy(buffer, obj.name.c_str(), sizeof(buffer));
-		//	buffer[sizeof(buffer) - 1] = '\0'; // Ensure null termination
-
-		//	if (ImGui::InputText("##edit", buffer, IM_ARRAYSIZE(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
-		//	{
-		//		bool isValid = true;
-		//		for (int j = 0; j < sceneObjects.size(); j++)
-		//		{
-		//			if (sceneObjects[j].e == e) continue;
-
-		//			if (sceneObjects[j].name == buffer)
-		//			{
-		//				logError("Cannot rename to already existing name.");
-		//				isValid = false;
-		//			}
-		//		}
-
-		//		if (isValid)
-		//		{
-		//			obj.name = buffer;
-		//			updateScene(); // Assuming this updates any necessary scene state
-		//			selectedEntityRename = false;
-		//		}
-		//	}
-		//}
-
-		if (ImGui::BeginPopup("SceneObjectContextPopup"))
-		{
-			if (ImGui::MenuItem("Rename"))
-			{
-				// Focus the input text when renaming
-				EditorState::Instance().selectedEntityRename = true;
-			}
-
-			if (ImGui::MenuItem("Create Prefab"))
-			{
-				std::string assetName = state.getSelectedEntity().getComponent<ObjectComponent>().name;
-
-				auto prefab = Prefab::create(state.getSelectedEntity());
-
-				AssetCreateDescriptor aInfo;
-				aInfo.name = assetName;
-				aInfo.aType = AssetType::PREFAB;
-				Engine::get()->getSubSystem<Assets>()->createAsset(prefab, aInfo);
-
-			}
-
-			if (e.HasComponent<CameraComponent>())
-			{
-				if (ImGui::MenuItem("Set as Primary Camera"))
-				{
-					auto scene = Engine::get()->getContext()->getActiveScene();
-					scene->setGameCamera(e);
-				}
-			}
-
-			if (ImGui::MenuItem("Remove from parent")) // todo fix this nonsense
-			{
-				e.getComponent<Transformation>().removeParent();
-			}
-
-			if (ImGui::MenuItem("Delete"))
-			{
-				e.remove();
-				updateScene();
-				state.selectEntity(Entity::EmptyEntity);
-			}
-
-			ImGui::EndPopup();
-
-		}
-
-		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
-		{
-			ImGui::SetDragDropPayload("DND_ITEM", &e, sizeof(Entity));
-			ImGui::Text("Dragging %s", obj.name.c_str());
-			ImGui::EndDragDropSource();
-		}
-	}
-
-	if (ImGui::BeginDragDropTarget())
-	{
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_ITEM"))
-		{
-			Entity sourceEntity = *(const Entity*)payload->Data;
-			if (sourceEntity != e)
-			{
-				sourceEntity.getComponent<Transformation>().setParent(e);
-			}
-		}
-		ImGui::EndDragDropTarget();
-	}
-
-	ImGui::SameLine();
-	ImGui::SetNextItemWidth(150.0f);
-	if (EditorState::Instance().selectedEntityRename && state.getSelectedEntity() == e)
-	{
-		ImGui::SetKeyboardFocusHere();
-		std::string& renameText = state.getCurrentEntityState().renameBuffer;
-
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0)); // Fully transparent background
-		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0, 0, 0, 0));
-		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0, 0, 0, 0));
-
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-
-		ImGui::InputText(("##edit_" + obj.name).c_str(), &renameText);
-
-		ImGui::PopStyleVar();
-		ImGui::PopStyleColor(3); // Pop all three
-
-		if (ImGui::IsItemDeactivated())
-		{
-			obj.name = renameText;
-			updateScene(); // Assuming this updates any necessary scene state
-			EditorState::Instance().selectedEntityRename = false;
-		}
-		//ImGui::InputText("##edit", &yourNameString);
-	}
-	else
-	{
-		ImGui::Text(obj.name.c_str());
-	}
-}
-
-void displayEntity(Entity& e)
-{
-	auto& transform = e.getComponent<Transformation>();
-	auto& obj = e.getComponent<ObjectComponent>();
-	bool hasChildren = transform.getChildren().size() > 0;
-
-	static int nonLeafTreeFlags = ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
-	static int leafTreeFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
-
-	ImGui::SetNextItemWidth(300.0f);
-
-	
-	if (hasChildren)
-	{
-		int flags = nonLeafTreeFlags;
-		flags = (state.getSelectedEntity() == e) ? flags | ImGuiTreeNodeFlags_Selected : flags;
-		bool isOpen = ImGui::TreeNodeEx(("##" + obj.name).c_str(), flags);
-
-		displayEntityHelper(e);
-
-		if (isOpen)
-		{
-			//ImGui::TreePush(obj.name.c_str());
-			auto childrens = transform.getChildren();
-			auto childIter = childrens.begin();
-			while (childIter != childrens.end())
-			{
-				displayEntity(childIter->second);
-				childIter++;
-			}
-			//ImGui::TreePop();
-			ImGui::TreePop();
-		}
-	}
-	else
-	{
-		int flags = leafTreeFlags;
-		flags = (state.getSelectedEntity() == e) ? flags | ImGuiTreeNodeFlags_Selected : flags;
-		ImGui::TreeNodeEx(("##" + obj.name).c_str(), flags);
-		displayEntityHelper(e);
-	}
-
-	
-}
-
-void displaySceneObjects()
-{
-	// todo fix this shitty hack
-	auto sceneName = "Scene " + std::to_string(Engine::get()->getContext()->getActiveSceneID());
-	ImGui::Text(sceneName.c_str());
-
-	if (ImGui::BeginDragDropTarget())
-	{
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_ITEM"))
-		{
-			Entity sourceEntity = *(const Entity*)payload->Data;
-			sourceEntity.getComponent<Transformation>().removeParent();
-		}
-		ImGui::EndDragDropTarget();
-	}
-
-	ImGui::Separator();
-
-	ImGui::BeginChild("##items", ImGui::GetContentRegionAvail(), true, ImGuiWindowFlags_NoScrollbar);
-
-	for (int i = 0; i < sceneObjects.size(); ++i)
-	{
-		auto& sceneObject = sceneObjects[i];
-		auto& transform = sceneObject.e.getComponent<Transformation>();
-
-		// if has parent it will be rendered in the recursive call (can be optimized if needed)
-		if (transform.getParent().valid()) 
-			continue;
-
-		ImGui::PushID(i); // Push a unique ID to avoid ImGui ID conflicts
-		
-		displayEntity(sceneObject.e);
-
-		ImGui::PopID();
-	}
-
-	ImGui::EndChild(); // End background drop zone
-}
-
-void RenderSceneHierarchyWindow()
-{
-	ImGui::Begin("Scene Hierarchy", nullptr, windowFlags);
-
-	//displayWindowHeader("Scene Hierarchy");
-
-	float windowWidth = ImGui::GetContentRegionAvail().x;
-	if (ImGui::Button("+", ImVec2(windowWidth, 0)))
-	{
-		ImGui::OpenPopup("AddObjectToScenePopup");
-	}
-
-	if (ImGui::BeginPopup("AddObjectToScenePopup")) 
-	{
-		if (ImGui::MenuItem("Entity"))
-		{
-			Engine::get()->getContext()->getActiveScene()->createEntity();
-			updateScene();
-			state.selectEntity(sceneObjects[0].e);
-		}
-		if (ImGui::BeginMenu("Primitive")) 
-		{ // Begin the submenu
-			if (ImGui::MenuItem("Cube")) 
-			{
-				ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getActiveScene()->getRegistry());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-			if (ImGui::MenuItem("Sphere")) 
-			{
-				ShapeFactory::createSphere(&Engine::get()->getContext()->getActiveScene()->getRegistry());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-			if (ImGui::MenuItem("Quad")) 
-			{
-				ShapeFactory::createQuad(&Engine::get()->getContext()->getActiveScene()->getRegistry());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			ImGui::EndMenu(); // End the submenu
-		}
-
-		if (ImGui::BeginMenu("Light"))
-		{ // Begin the submenu
-			if (ImGui::MenuItem("Directional Light"))
-			{
-				static int createdDLightCount = 0;
-				auto e = Engine::get()->getContext()->getActiveScene()->createEntity("Directional_Light_" + std::to_string(createdDLightCount++));
-				e.addComponent<DirectionalLight>(glm::vec3{ 0,0,0 }, glm::vec3{0,-1,0}, 1.f, 1.f);
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-			if (ImGui::MenuItem("Point Light"))
-			{
-				static int createdPLightCount = 0;
-				auto e = Engine::get()->getContext()->getActiveScene()->createEntity("Point_Light_" + std::to_string(createdPLightCount++));
-				e.addComponent<PointLight>(glm::vec3{ 0,0,0 }, 1.f, 1.f, Attenuation());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			ImGui::EndMenu(); // End the submenu
-		}
-
-		if (ImGui::BeginMenu("Environment"))
-		{ // Begin the submenu
-			if (ImGui::MenuItem("Skybox"))
-			{
-				Entity e = Skybox::createSkybox(SGE_ROOT_DIR + "Resources/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR);
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			if (ImGui::MenuItem("Terrain"))
-			{
-				Entity e = Terrain::createTerrain(100, 100, 1, BuiltInAssets::getByName<Texture>(SGE_TEXTURE_BLACK));
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			if (ImGui::MenuItem("Pool"))
-			{
-				Entity e = WaterSystem::createPool();
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			if (ImGui::MenuItem("Grass Field"))
-			{
-				Entity e = FoliageComponent::createGrassField();
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			ImGui::EndMenu(); // End the submenu
-		}
-
-		// Add more submenus or menu items as needed
-		ImGui::EndPopup();
-	}
-
-	ImVec2 listBoxSize = ImGui::GetContentRegionAvail();
-
-	// Render list view
-	if (ImGui::BeginListBox("##Objects", listBoxSize))
-	{
-		// Iterate through each scene object and render it as a selectable item in the list
-		displaySceneObjects();
-		ImGui::EndListBox();
-	}
-
-	ImGui::End();
-}
-
-void RenderSceneViewWindow()
-{
-	ImGui::Begin("View", nullptr, windowFlags);
-
-	ImVec2 windowPos = ImGui::GetWindowPos();
-
-	// Get the current window size to support resizing
-	ImVec2 renderViewWindowSize = ImGui::GetContentRegionAvail();
-
-	// Display the texture
-	ImVec2 imageSize(renderViewWindowSize.x, renderViewWindowSize.y);
-
-	unsigned int activeViewID = 0;
-	if (Engine::get()->getContext()->getActiveScene()->isSimulationActive())
-	{
-		activeViewID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewTextureID();
-	}
-	else
-	{
-		activeViewID = Engine::get()->getContext()->getActiveScene()->getRenderViewTextureID("Editor View");
-	}
-
-	ImGui::Image(reinterpret_cast<ImTextureID>(activeViewID), imageSize, ImVec2(0, 1), ImVec2(1, 0));
-
-	// Calculate the top left position of the rendered image within the window
-	ImVec2 viewportOffset = ImGui::GetWindowContentRegionMin();
-	ImVec2 viewportPos{ windowPos.x + viewportOffset.x, windowPos.y + viewportOffset.y };
-
-	ImVec2 mousePos = ImGui::GetMousePos();
-
-	// Check if the mouse is within the viewport bounds
-	if (mousePos.x >= viewportPos.x && mousePos.x <= viewportPos.x + renderViewWindowSize.x &&
-		mousePos.y >= viewportPos.y && mousePos.y <= viewportPos.y + renderViewWindowSize.y)
-	{
-		EditorState::Instance().isMouseInSceneView = true;
-	}
-	else
-	{
-		EditorState::Instance().isMouseInSceneView = false;
-	}
-
-	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
-	{
-		// Define the size and position of the inner window
-		float innerWindowWidth = renderViewWindowSize.x;
-		float innerWindowHeight = 35.0f;
-		ImVec2 toolbarPos(windowPos.x + 10, windowPos.y + 30);
-
-		bool isPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-
-		if (!isPopupOpen && !ImGuizmo::IsUsing() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered())
-		{
-			ImVec2 mousePos = ImGui::GetMousePos();
-			ImVec2 windowPos = ImGui::GetWindowPos();
-			ImVec2 viewportOffset = ImGui::GetWindowContentRegionMin();
-			ImVec2 viewportPos{ windowPos.x + viewportOffset.x, windowPos.y + viewportOffset.y };
-
-			bool mouseInsideViewport = (mousePos.x >= viewportPos.x && mousePos.x <= viewportPos.x + renderViewWindowSize.x &&
-				mousePos.y >= viewportPos.y && mousePos.y <= viewportPos.y + renderViewWindowSize.y);
-			bool mouseInsideToolbar = (mousePos.x >= toolbarPos.x && mousePos.x <= toolbarPos.x + innerWindowWidth &&
-				mousePos.y >= toolbarPos.y && mousePos.y <= toolbarPos.y + innerWindowHeight);
-
-			if (mouseInsideViewport && !mouseInsideToolbar)
-			{
-				// We alter the mouse position from small window into full screen (the renderered object pick texture)
-				int alteredX = (mousePos.x - viewportPos.x) / renderViewWindowSize.x * Engine::get()->getWindow()->getWidth();
-				int alteredY = (mousePos.y - viewportPos.y) / renderViewWindowSize.y * Engine::get()->getWindow()->getHeight();
-				int selectedID = Engine::get()->getSubSystem<ObjectPicker>()->pickObject(alteredX, alteredY, g_editorCamera);
-
-				if (selectedID == -1)
-				{
-					state.selectEntity(Entity::EmptyEntity);
-
-				}
-				else
-				{
-
-					for (auto& sceneObj : sceneObjects)
-					{
-						if (sceneObj.e.handlerID() == selectedID)
-						{
-							state.selectEntity(sceneObj.e);
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		ImGui::SetNextWindowPos(toolbarPos); // Adjust position as needed
-		ImGui::SetNextWindowSize(ImVec2(innerWindowWidth, innerWindowHeight)); // Adjust size as needed
-
-		// Transformation mode enum and current mode variable
-		enum TransformMode { TRANSLATE, ROTATE, SCALE, UNIVERSAL };
-		static TransformMode currentMode = TRANSLATE;
-
-		// Gizmo mode variable
-		static ImGuizmo::MODE currentGizmoMode = ImGuizmo::LOCAL;
-
-		// Snap options
-		static bool useSnap = false;
-		static float snapValues[3] = { 1.0f, 1.0f, 1.0f };
-
-		
-
-		if (ImGui::BeginChild("TransformWindow", ImVec2(innerWindowWidth, innerWindowHeight), true, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar))
-		{
-			// Radio buttons for transformation mode
-			ImGui::RadioButton("Translate", (int*)&currentMode, TRANSLATE);
-			ImGui::SameLine();
-			ImGui::RadioButton("Rotate", (int*)&currentMode, ROTATE);
-			ImGui::SameLine();
-			ImGui::RadioButton("Scale", (int*)&currentMode, SCALE);
-			ImGui::SameLine();
-			ImGui::RadioButton("Universal", (int*)&currentMode, UNIVERSAL);
-
-			// Button to toggle between local and world gizmo modes
-			ImGui::SameLine();
-			if (ImGui::Button(currentGizmoMode == ImGuizmo::LOCAL ? "Local" : "World"))
-			{
-				currentGizmoMode = (currentGizmoMode == ImGuizmo::LOCAL) ? ImGuizmo::WORLD : ImGuizmo::LOCAL;
-			}
-
-			// Checkbox for snap
-			ImGui::SameLine();
-			ImGui::Checkbox("Snap", &useSnap);
-
-			// Input fields for snap values
-			ImGui::SameLine();
-			float snapInputWidth = 80.0f;
-			if (currentMode == TRANSLATE)
-			{
-				ImGui::SetNextItemWidth(snapInputWidth * 3);
-				ImGui::InputFloat3("Snap Translate", snapValues);
-			}
-			else if (currentMode == ROTATE)
-			{
-				ImGui::SetNextItemWidth(snapInputWidth);
-				ImGui::InputFloat("Snap Angle", &snapValues[0]);
-			}
-			else if (currentMode == SCALE)
-			{
-				ImGui::SetNextItemWidth(snapInputWidth);
-				ImGui::InputFloat("Snap Scale", &snapValues[0]);
-			}
-
-			ImGui::SameLine();
-
-			static const char* renderModeOptions[] = { "Shaded", "Wireframe"};
-			static int currentItem = 0; // Index of the selected item
-
-			ImGui::SetCursorPosX(renderViewWindowSize.x - 170); // Adjust 200 to match the width of the dropdown
-			ImGui::PushItemWidth(150.0f); // Set dropdown width to 150
-			if (ImGui::BeginCombo("##RenderMode", renderModeOptions[currentItem])) // Label for the combo box
-			{
-				for (int i = 0; i < IM_ARRAYSIZE(renderModeOptions); i++)
-				{
-					bool isSelected = (currentItem == i);
-					if (ImGui::Selectable(renderModeOptions[i], isSelected))
-					{
-						currentItem = i; // Update selected index
-						Engine::get()->getContext()->setRenderMode((RenderMode)currentItem);
-					}
-
-					if (isSelected)
-						ImGui::SetItemDefaultFocus(); // Set focus to the current item
-				}
-				ImGui::EndCombo();
-			}
-			ImGui::PopItemWidth(); // Restore default width
-			ImGui::EndChild(); // End the inner window
-		}
-
-		if (state.getSelectedEntity() != Entity::EmptyEntity)
-		{
-			auto& transform = state.getSelectedEntity().getComponent<Transformation>();
-
-			glm::mat4 glmMat = transform.getWorldTransformation();
-			float* matrixPtr = glm::value_ptr(glmMat);
-
-			auto& primaryCamera = g_editorCamera.getComponent<CameraComponent>();
-			auto& primaryCameraTransform = g_editorCamera.getComponent<Transformation>();
-
-			auto camView = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
-			const float* camViewPtr = glm::value_ptr(camView);
-
-			auto projection = primaryCamera.getProjection();
-			const float* projectionPtr = glm::value_ptr(projection);
-
-			ImGuizmo::SetDrawlist();
-			ImVec2 winPos = ImGui::GetWindowPos();
-			ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
-			ImGuizmo::SetRect(winPos.x + contentMin.x, winPos.y + contentMin.y, renderViewWindowSize.x, renderViewWindowSize.y);
-
-			// Set the operation mode based on the selected radio button
-			ImGuizmo::OPERATION operationMode = ImGuizmo::TRANSLATE;
-			switch (currentMode)
-			{
-			case TRANSLATE:
-				operationMode = ImGuizmo::TRANSLATE;
-				break;
-			case ROTATE:
-				operationMode = ImGuizmo::ROTATE;
-				break;
-			case SCALE:
-				operationMode = ImGuizmo::SCALE;
-				break;
-			case UNIVERSAL:
-				operationMode = ImGuizmo::UNIVERSAL;
-				break;
-			}
-
-			ImGuizmo::Manipulate(camViewPtr, projectionPtr, operationMode, currentGizmoMode, matrixPtr, NULL, useSnap ? &snapValues[0] : NULL, NULL, NULL);
-
-			float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-			auto& localTransform = transform.worldToLocal(glmMat);
-
-			ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localTransform), matrixTranslation, matrixRotation, matrixScale);
-
-			transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
-			transform.setLocalRotation(glm::vec3(Constants::toRadians* matrixRotation[0], Constants::toRadians* matrixRotation[1], Constants::toRadians* matrixRotation[2]));
-			transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
-		}
-
-	}
-
-	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
-	{
-		if (state.getSelectedEntity() != Entity::EmptyEntity &&
-			state.getSelectedEntity().HasComponent<CameraComponent>() &&
-			state.getSelectedEntity() == Engine::get()->getContext()->getActiveScene()->getGameCamera())
-		{
-			// This is a shit hack and it will break at some point in the future, should use events or something as a better solution.
-			Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(true);
-
-			ImVec2 cameraPreviewSize = ImVec2(300, 200);
-			// Placeholder for camera frame
-
-			ImVec2 bottomRightOffset = ImVec2(10, 10);  // Padding from the bottom-right corne
-
-			// Adjust cursor position for the child window
-			ImVec2 childPos = ImVec2(
-				renderViewWindowSize.x - cameraPreviewSize.x - bottomRightOffset.x,
-				renderViewWindowSize.y - cameraPreviewSize.y - bottomRightOffset.y);
-
-			ImGui::SetCursorPos(childPos);
-			ImGui::BeginChild("Camera Preview", cameraPreviewSize, true, ImGuiWindowFlags_NoScrollbar);
-
-			ImVec2 contentSize = ImGui::GetContentRegionAvail(); // Get size of the available region
-
-
-			// Add content to the child window (camera preview)
-			ImGui::Text("Camera Preview");
-			ImGui::Separator();
-
-
-
-			auto renderTargetID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewTextureID();
-			ImGui::Image(reinterpret_cast<ImTextureID>(renderTargetID), cameraPreviewSize, ImVec2(0, 1), ImVec2(1, 0));
-
-			ImGui::EndChild();
-		}
-		else
-		{
-			Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(false);
-		}
-	}
-
-
-	ImGui::End();
 }
 
 void RenderConsoleWindow()
@@ -1084,6 +421,11 @@ class GUI_Helper : public GuiMenu {
 							EditorState::Instance().showLuaScriptCreateWindow = true;
 
 						}
+
+						if (ImGui::MenuItem("Scene")) {
+							sceneCreateDialog.activate();
+
+						}
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenu();
@@ -1135,8 +477,8 @@ class GUI_Helper : public GuiMenu {
 
 		// Render UI
 		RenderSimulationControlView();
-		RenderSceneViewWindow();
-		RenderSceneHierarchyWindow();
+		SceneViewWindow::display();
+		SceneHierarchyWindow::display();
 		InspectorWindow::display();
         AssetViewWindow::display();
         RenderConsoleWindow();
@@ -1146,21 +488,6 @@ class GUI_Helper : public GuiMenu {
 		displayMaterialEditDialog();
 		displayProjectSettingsDialog();
 		EditorState::Instance().displayDialogs();
-		//displayMaterialCreatorDialog();
-        //ShowTextureDisplayWindow();
-
-		//if (EditorState::Instance().showAssetSelectorWindow) 
-		//{
-		//	UUID uuid;
-		//	displayAssetSelectDialog(EditorState::Instance().assetSelectType, uuid);
-		//	if (!uuid.empty())
-		//	{
-		//		if (EditorState::Instance().assetSelectCB)
-		//		{
-		//			EditorState::Instance().assetSelectCB(uuid);
-		//		}
-		//	}
-		//}
 
 		DisplayDebugInfoWindow();
 		
@@ -1264,6 +591,19 @@ public:
 
         NativeScriptsLoader::instance->init();
 
+		/*
+		* 
+		* Layer ordering:
+		* 
+		1. UI / ImGui layer (blocks everything if interacting with UI)
+		2. ToolsLayer (active tool : TRS, foliage paint, terrain sculpt, etc.)
+		3. SelectionLayer (entity picking, marquee, deselect)
+		4. Camera / navigation layer
+		5. Gameplay / scene input 
+		*/
+        Engine::get()->getEventSystem()->pushLayer(uiNavigationLayer);
+        Engine::get()->getEventSystem()->pushLayer(uiEntitySelectionLayer);
+        Engine::get()->getEventSystem()->pushLayer(uiEditorToolsLayer);
         Engine::get()->getEventSystem()->pushLayer(uiLayer);
 
 		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
@@ -1279,17 +619,18 @@ public:
 		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 3000.0f));
 		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
 		auto& nsc = editorCamera.getComponent<NativeScriptComponent>();
-		nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
+		//nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
 
 		nsc.script->onCreate();
 
 		g_editorCamera = editorCamera;
 
-		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](Keyboard::KeyEvent e) { stopSimulation(); });
+		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](Keyboard::KeyEvent e) { stopSimulation(); return false; });
 		
 		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiHandler, KeyCode::SCANCODE_X, [](Keyboard::KeyEvent e) {
 			debugTerrainFlag = true;
+			return false;
 			});
 
 		//g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView(0, 0, 300, 200, g_primaryCamera);
@@ -1314,8 +655,10 @@ public:
 
 	void update(float deltaTime) override
 	{
-		g_editorCamera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
-		g_editorCamera.getComponent<Transformation>().update();
+		
+			g_editorCamera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
+			g_editorCamera.getComponent<Transformation>().update();
+
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
 	

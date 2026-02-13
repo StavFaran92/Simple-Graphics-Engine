@@ -3,19 +3,16 @@
 #include <vector>
 
 #include "core/Core.h"
-#include "render/Shader.h"
-#include "memory/ResourceWrapper.h"
 #include "memory/Asset.h"
+#include "render/VertexLayout.h"
+#include "geometry/AABB.h"
 
+// Forward declerations
+class MeshBuilder;
+class Model;
 class VertexBufferObject;
 class ElementBufferObject;
 class VertexArrayObject;
-
-#include "core/ApplicationConstants.h"
-
-#include "core/Configurations.h"
-#include "render/VertexLayout.h"
-#include "geometry/AABB.h"
 
 struct MeshData
 {
@@ -31,16 +28,12 @@ struct MeshData
 	VertexLayout m_layout;
 };
 
-// Forward declerations
-class MeshBuilder;
-class Model;
-
 /**
  * The mesh class is used to represent the Egnine's basic mesh object,
  * it can be used to manipulate an existing Mesh data or to generate one yourself.
  * It should be used with the MeshBuilder class.
  */
-class EngineAPI Mesh : public ResourceBase
+class EngineAPI Mesh : public Resource
 {
 public:
 	// -------------------- Methods -------------------- //

@@ -5,7 +5,6 @@
 #include "core/Window.h"
 #include "camera/ICamera.h"
 #include "runtime/Scene.h"
-#include "systems/Skybox.h"
 #include "ui/Input.h"
 #include "core/EventSystem.h"
 #include "geometry/ModelImporter.h"
@@ -14,7 +13,6 @@
 #include "systems/TimeManager.h"
 #include "physics/PhysicsSystem.h"
 #include "core/Random.h"
-#include "systems/ShadowSystem.h"
 #include "render/ShaderLoader.h"
 #include "render/ShaderParser_tntmeijsImpl.h"
 #include "memory/ResourceManager.h"
@@ -23,7 +21,6 @@
 #include "geometry/ShapeFactory.h"
 #include "render/Material.h"
 #include "lights/DirectionalLight.h"
-#include "render/CommonShaders.h"
 #include "systems/BuiltInAssetsLoader.h"
 #include "memory/BuiltInAssets.h"
 #include "systems/ObjectPicker.h"
@@ -38,6 +35,8 @@
 
 #include "systems/FoliageSystem.h"
 #include "systems/WaterSystem.h"
+#include "systems/VolumetricCloudsSystem.h"
+#include "systems/VolumetricSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/PostProcessComponent.h"
@@ -46,6 +45,7 @@
 #include "scripts/ScriptSystem.h"
 #include "core/GameLayer.h"
 #include "systems/UniqueNameManager.h"
+#include "memory/BuiltInResources.h"
 #include "fileSystem/FileSystem.h"
 
 #include "core/Application.h"
@@ -73,36 +73,14 @@ bool Engine::init(const InitParams& initParams)
     m_resourceManager = std::make_shared<ResourceManager>();
     if (!SGE_EXPORT_PACKAGE)
     {
-        auto found = false;
-        try
-        {
-            size_t len = 0;
-            char* sgeRoot = nullptr;
-            errno_t err = _dupenv_s(&sgeRoot, &len, "SGE");
-            if (err == 0 && sgeRoot)
-            {
-                found = true;
-                m_resourceManager->setRootDir(std::string(sgeRoot) + "/Engine/");
-            }
-            free(sgeRoot);
-        }
-        catch (std::exception e)
-        {
-            logError(e.what());
-        }
-
-        if (!found)
-        {
-            m_resourceManager->setRootDir("./");
-        }
-
+        m_resourceManager->setRootDir(SGE_ROOT_DIR "/");
     }
     else
     {
         m_resourceManager->setRootDir("./");
     }
 
-    m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR + "/EngineConfig.json");
+    m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR "/EngineConfig.json");
 
     m_projectDirectory = initParams.projectDir + "/";
 
@@ -165,7 +143,7 @@ bool Engine::init(const InitParams& initParams)
     gameEventLayer->setEnabled(false);
     m_eventSystem->pushLayer(gameEventLayer);
 
-    m_memoryPool = std::make_shared<MemoryPool<ResourceBase>>();
+    m_memoryPool = std::make_shared<MemoryPool<Resource>>();
 
     m_projectManager = std::make_shared<ProjectManager>();
 
@@ -204,13 +182,17 @@ bool Engine::init(const InitParams& initParams)
     //    return false;
     //}
 
+    auto builtInResources = new BuiltInResources();
+    auto assets = new Assets();
+
+    builtInResources->loadAllResources();
+
     auto modelImporter = new ModelImporter();
     auto animationLoader = new AnimationLoader();
     auto graphics = new Graphics();
-    auto system = new System();
+    auto system = new System(); // TODO change to systemAnalytics
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
-    auto assets = new Assets();
     auto uniqueNameManager = new UniqueNameManager();
 
     
@@ -254,6 +236,13 @@ bool Engine::init(const InitParams& initParams)
     }
 
     auto waterSystem = new WaterSystem();
+    auto volumetricSystem = new VolumetricSystem();
+    if (!volumetricSystem->init())
+    {
+        logError("Volumetric System init failed!");
+        return false;
+    }
+    auto volumetricCloudsSystem = new VolumetricCloudsSystem();
 
     if (initParams.loadExistingProject)
     {
@@ -377,7 +366,7 @@ void Engine::run(Application* app)
         //glBindFramebuffer(GL_READ_FRAMEBUFFER, m_context->getActiveScene()->getRenderTarget());
         //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         //glBlitFramebuffer(0, 0, m_window->getWidth(), m_window->getHeight(), 0, 0, m_window->getWidth(), m_window->getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "GUI render pass");
         for (auto& GUILayer : m_GUILayers)
@@ -490,7 +479,7 @@ const EngineConfig& Engine::getConfig() const
     return *m_engineConfig.get();
 }
 
-MemoryPool<ResourceBase>& Engine::getMemoryPool() const
+MemoryPool<Resource>& Engine::getMemoryPool() const
 {
     return *m_memoryPool.get();
 }
@@ -529,7 +518,7 @@ std::string Engine::getProjectDirectory() const
 
 ResourceWrapper<Material> Engine::getDefaultMaterial() const
 {
-    return BuiltInAssets::getByName<Material>(SGE_MATERIAL_DEFAULT).resource();
+    return BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
 }
 
 void Engine::reloadEngineConfig()
@@ -590,7 +579,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.getComponent<Transformation>().setLocalPosition({10,10,10});
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
-    mainCamera.addComponent<MeshRendererComponent>(BuiltInAssets::getByName<MeshCollection>(SGE_MESH_CAMERA));
+    mainCamera.addComponent<MeshRendererComponent>(BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_CAMERA));
     mainCamera.addComponent<RenderableComponent>();
 
     m_context->getActiveScene()->setGameCamera(mainCamera);
@@ -600,25 +589,30 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     auto& postProcess = eFXAA.addComponent<PostProcessComponent>();
 
 
-    auto FXAAShader = Shader::createOverrideShader(SGE_ROOT_DIR + "Resources/Engine/Shaders/SamplePostProcessShader.glsl", ShaderOverride::PostProcess);
+    auto FXAAShader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl", ShaderOverride::PostProcess);
     AssetCreateDescriptor desc;
     desc.aType = AssetType::SHADER;
     desc.name = "FXAAShader";
     desc.isEngineOwned = true;
-    desc.origFilePath = SGE_ROOT_DIR + "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
-    desc.attributes[Shader::ATTRIB_SHADER_OVERRIDE] = Shader::getShaderOverrideAsStr(ShaderOverride::PostProcess);
-    auto FXAAShaderAsset = getSubSystem<Assets>()->createAsset(FXAAShader, desc);
-    postProcess.shader = FXAAShaderAsset.as<Shader>();
+    desc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
+
+    ShaderLoadDescriptor* shaderDesc = desc.makeResourceDescriptor<ShaderLoadDescriptor>();
+    shaderDesc->shaderOverride = ShaderOverride::PostProcess;
+
+    desc.resourceDescriptor = shaderDesc;
+    auto FXAAShaderAsset = ShaderAsset::create(FXAAShader, desc);
+
+    postProcess.shader = FXAAShaderAsset;
 
     if (initParams.templateScene)
     {
         //Skybox::CreateSkyboxFromEquirectangularMap( "C:/dev/repos/LearnOpenGL/resources/textures/hdr/newport_loft.hdr", context->getActiveScene().get());
-        //Skybox::CreateSkyboxFromCubemap({ SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/right.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/left.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/top.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/bottom.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/front.jpg",
-        //SGE_ROOT_DIR + "Resources/Engine/Textures/Skybox/back.jpg" }, context->getActiveScene().get());
+        //Skybox::CreateSkyboxFromCubemap({ SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/right.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/left.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/top.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/bottom.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/front.jpg",
+        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/back.jpg" }, context->getActiveScene().get());
 
         // todo revert
         //{
@@ -626,7 +620,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
         //    auto& groundTransfrom = ground.getComponent<Transformation>();
         //    groundTransfrom.setLocalScale({ 50, .5f, 50 });
         //    auto& mat = ground.addComponent<MaterialComponent>();
-        //    auto tex = Engine::get()->getSubSystem<Assets>()->importTexture2D(SGE_ROOT_DIR + "Resources/Engine/Textures/floor.jpg");
+        //    auto tex = Engine::get()->getSubSystem<Assets>()->importTexture2D(SGE_ROOT_DIR "Resources/Engine/Textures/floor.jpg");
         //    mat.begin()->get()->setTexture(Texture::Type::Albedo, tex);
         //    auto& rb = ground.addComponent<RigidBodyComponent>(RigidbodyType::Static, 1.f);
         //    auto& collisionBox = ground.addComponent<CollisionBoxComponent>(.5f);

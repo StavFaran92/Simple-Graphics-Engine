@@ -5,6 +5,7 @@
 #include "component/ComponentSerializer.h"
 #include "serialize/CerealHelpers.h"
 #include <vector>
+#include <glm/glm.hpp>
 
 struct FoliagePatch
 {
@@ -17,19 +18,24 @@ struct FoliagePatch
 	int instanceCount = 0;
 };
 
-struct EngineAPI FoliageComponent : public Component
+struct EngineAPI FoliageField
 {
-	FoliageComponent() = default;
+	FoliageField() = default;
 
-	void build();
+	void build(int width, int height);
 
 	glm::vec2 getPatchCount() const;
 
+	//std::shared_ptr<FoliagePatch> getPatch(int idx, int idy);
+
+	void setPixel(int idx, int idy, float value);
+	void paintCircle(int cx, int cy, int radius, float value);
+
+	void update();
+
+	void resize(int width, int height);
+
 	const std::vector<std::shared_ptr<FoliagePatch>>& getPatches() const;
-
-	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
-
-	static Entity createGrassField();
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -39,22 +45,22 @@ struct EngineAPI FoliageComponent : public Component
 	    SERIALIZED_MEMBER(colorB);
 	    SERIALIZED_MEMBER(patchWidth);
 	    SERIALIZED_MEMBER(patchHeight);
-	    SERIALIZED_MEMBER(width);
-	    SERIALIZED_MEMBER(height);
-	    SERIALIZED_MEMBER(terrainRef);
+	    SERIALIZED_MEMBER(isActive);
 	}
 
-	AssetWrapper<Texture> m_foliageSpreadMap;
+	std::vector<float> m_foliageSpreadMap;
 	float globalDensity = 1.f;
 	glm::vec3 colorA = glm::vec3(0.1, 0.3, 0.1);
 	glm::vec3 colorB = glm::vec3(0.4, 0.8, 0.3);
-	int patchWidth = 10;
-	int patchHeight = 10;
+	int patchWidth = 1;
+	int patchHeight = 1;
 	int pixelPerPatch = 1;
 	float width = 10;
 	float height = 10;
+	//float heightScale = 1;
+	//AssetHandle<TextureAsset> foliageHeightMap;
 
-	Entity terrainRef = Entity::EmptyEntity;
+	bool isActive = false;
 
 private:
 
@@ -62,7 +68,6 @@ private:
 	glm::vec2 m_patchCount;
 	unsigned int m_patchInstanceDataSSBO;
 	
+	glm::vec2 ratio{ 1.0f, 1.0f };
+	
 };
-
-
-REGISTER_COMPONENT(FoliageComponent)

@@ -5,32 +5,23 @@
 #include "render/RenderBufferObject.h"
 #include "memory/ResourceWrapper.h"
 #include "render/Shader.h"
-#include "geometry/ShapeFactory.h"
 
 #include "GL/glew.h"
 #include "glm/ext.hpp"
 #include "core/Logger.h"
 
 #include "render/RenderCommand.h"
-#include "runtime/Entity.h"
 #include "component/Component.h"
-#include "geometry/MeshCollection.h"
-#include "runtime/Context.h"
-#include "texture/Cubemap.h"
-#include "texture/TextureTransformer.h"
-#include "component/MeshRendererComponent.h"
-#include "component/ObjectComponent.h"
-#include "component/RenderableComponent.h"
+#include "geometry/MeshGroup.h"
 #include "memory/BuiltInAssets.h"
 
-#include "core/Engine.h"
 
 
 ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(ResourceWrapper<Texture> equirectangularTexture)
 {
 	//equirectangularTexture = TextureTransformer::flipVertical(equirectangularTexture);
 
-	auto equirectangularShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/EquirectangularToCubemap.glsl");
+	auto equirectangularShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/EquirectangularToCubemap.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -38,13 +29,19 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 	fbo.bind();
 
 	// Generate cubemap
-	auto cubemap = Cubemap::createEmptyCubemap(512, 512, GL_RGB16F, GL_RGB, GL_FLOAT, {
-		{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-		{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-		{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE},
-		}, true);
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_CUBE_MAP;
+	textureData.width = 512;
+	textureData.height = 512;
+	textureData.channels = 3;
+	textureData.internalFormat = TextureInternalFormat::RGB16F;
+	textureData.format = TextureFormat::RGB;
+	textureData.type = TextureType::FLOAT;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
+	textureData.genMipMap = true;
+	textureData.data = nullptr;
+	auto cubemap = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 512, 512 };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
@@ -80,8 +77,8 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 	equirectangularTexture.get()->bind();
 	
 
-	auto box = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
-	auto vao = box.get()->getPrimaryMesh()->getVAO();
+	auto box = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX);
+	auto vao = box.resource()->getPrimaryMesh()->getVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -107,7 +104,7 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 
 ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirectangular(ResourceWrapper<Texture> cubemapTexture)
 {
-	auto cubemapToEquirectangularShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/CubemapToEquirectangular.glsl");
+	auto cubemapToEquirectangularShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/CubemapToEquirectangular.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -118,16 +115,18 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	int outputHeight = cubemapTexture.get()->getHeight() * 2;
 
 	// Generate cubemap
-	auto equirectnagular = Texture::create2DTextureFromBuffer(
-		outputWidth,
-		outputHeight,
-		GL_RGB, GL_RGB, GL_UNSIGNED_BYTE,
-		{
-			{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
-			{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
-			{ GL_TEXTURE_MIN_FILTER, GL_LINEAR },
-			{ GL_TEXTURE_MAG_FILTER, GL_LINEAR }
-		}, true, nullptr);
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
+	textureData.width = outputWidth;
+	textureData.height = outputHeight;
+	textureData.channels = 3;
+	textureData.internalFormat = TextureInternalFormat::RGB;
+	textureData.format = TextureFormat::RGB;
+	textureData.type = TextureType::UNSIGNED_BYTE;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
+	textureData.data = nullptr;
+	auto equirectnagular = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ outputWidth, outputHeight };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
@@ -149,8 +148,8 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	cubemapTexture.get()->setSlot(0);
 	cubemapTexture.get()->bind();
 
-	auto quad = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_QUAD);
-	auto vao = quad.get()->getPrimaryMesh()->getVAO();
+	auto quad = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_QUAD);
+	auto vao = quad.resource()->getPrimaryMesh()->getVAO();
 
 	// render to quad
 	// attach cubemap face to fbo

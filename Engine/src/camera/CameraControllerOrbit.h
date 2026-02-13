@@ -6,12 +6,13 @@
 #include "component/Component.h"
 #include "core/Subscriber.h"
 #include "component/CameraComponent.h"
+#include "component/Transformation.h"
 
 class CameraControllerOrbit : public ICameraController
 {
 public:
 	void onCreate(Entity& e) override;
-	void onEvent(SDL_Event e) override;
+	bool onEvent(SDL_Event e) override;
 
 private:
 	enum class ControllerState

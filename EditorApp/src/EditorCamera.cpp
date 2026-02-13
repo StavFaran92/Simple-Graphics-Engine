@@ -6,6 +6,19 @@
 
 #include "EditorState.h"
 
+bool shouldSceneViewGetKeyboardInner()
+{
+	const ImGuiIO& io = ImGui::GetIO();
+
+	bool uiFocused = io.WantTextInput;
+
+	// If UI needs keyboard -> block scene
+	if (uiFocused)
+		return false;
+
+	// Otherwise: Override ImGui's WantCaptureKeyboard
+	return true;
+}
 
 EditorCamera::EditorCamera()
 {
@@ -14,13 +27,6 @@ EditorCamera::EditorCamera()
 
 void EditorCamera::onCreate()
 {
-	auto eventSystem = Engine::get()->getEventSystem();
-
-	eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
-	eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
-	eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONUP, this);
-	eventSystem->subscribe(eventHandler, SDL_MOUSEWHEEL, this);
-
 	m_cameraController->onCreate(entity);
 }
 
@@ -29,17 +35,23 @@ void EditorCamera::onUpdate(float deltaTime)
 	if (m_isLocked)
 		return;
 
+	if (!shouldSceneViewGetKeyboardInner())
+		return;
+
 	m_cameraController->onUpdate(deltaTime);
 }
 
-void EditorCamera::onEvent(SDL_Event e)
+bool EditorCamera::onEvent(SDL_Event e)
 {
 	if (m_isLocked)
-		return;
+		return false;
 
-	if (!EditorState::Instance().isMouseInSceneView) return;
+	if (!EditorState::Instance().isMouseInSceneView) 
+		return false;
 
 	m_cameraController->onEvent(e);
+
+	return false;
 }
 
 void EditorCamera::lock()

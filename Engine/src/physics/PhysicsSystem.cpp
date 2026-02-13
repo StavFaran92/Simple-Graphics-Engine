@@ -67,7 +67,7 @@ bool PhysicsSystem::init()
 
     m_defaultMaterial = m_physics->createMaterial(0.5f, 0.5f, 0.1f);
 
-    m_debugVisualizeShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/UnlitShader.glsl");
+    m_debugVisualizeShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/UnlitShader.glsl");
 
     m_isInit = true;
 
@@ -230,7 +230,7 @@ void PhysicsSystem::createTerrainActor(Scene* scene, entt::entity entity)
             physx::PxHeightFieldSample* currentSample = (physx::PxHeightFieldSample*)currentByte;
 
             // we flip the row and col order, I have no idea why physx accept the data like that
-            auto a = static_cast<uint8_t*>(heightmapData.data)[(column * heightmapData.width + row) * heightmapData.bpp]; 
+            auto a = static_cast<uint8_t*>(heightmapData.data)[(column * heightmapData.width + row) * heightmapData.channels]; 
             currentSample->height = static_cast<int16_t>(a/* * 2^8*/); // we use the full range of the height map field
 
             currentSample->clearTessFlag();
@@ -397,7 +397,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     PxVec3 extents = geometry.box().halfExtents * 2.;
                     model = glm::scale(model, glm::vec3(extents.x, extents.y, extents.z));
                     m_debugVisualizeShader->setModelMatrix(model);
-                    auto& mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_BOX);
+                    auto& mesh = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX);
                     auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
                 }
@@ -407,7 +407,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     float radius2 = geometry.sphere().radius * 2.;
                     model = glm::scale(model, glm::vec3(radius2));
                     m_debugVisualizeShader->setModelMatrix(model);
-                    auto& mesh = BuiltInAssets::getByName<MeshCollection>(SGE_MESH_SPHERE);
+                    auto& mesh = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_SPHERE);
                     auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
                 }
@@ -529,7 +529,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
                 physx::PxHeightFieldSample* currentSample = (physx::PxHeightFieldSample*)currentByte;
 
                 // we flip the row and col order, I have no idea why physx accept the data like that
-                auto a = static_cast<uint8_t*>(heightmapData.data)[(column * heightmapData.width + row) * heightmapData.bpp];
+                auto a = static_cast<uint8_t*>(heightmapData.data)[(column * heightmapData.width + row) * heightmapData.channels];
                 currentSample->height = static_cast<int16_t>(a/* * 2^8*/); // we use the full range of the height map field
 
                 currentSample->clearTessFlag();

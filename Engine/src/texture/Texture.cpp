@@ -5,173 +5,365 @@
 
 #include "core/Logger.h"
 #include "core/Configurations.h"
-#include "core/CacheSystem.h"
 #include "core/Engine.h"
 #include "memory/ResourceWrapper.h"
 #include "core/Factory.h"
-#include "runtime/Context.h"
-
-#include "utils/EquirectangularToCubemapConverter.h" // todo remove
-
-//#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-//#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
 
 #include "memory/Assets.h"
 
 #include "memory/AssetFactory.h"
 
-#include "memory/AssetLoader.h"
+#include "utils/EXRLoader.h"
 
-namespace {
-	struct TextureManagerRegistration {
-		TextureManagerRegistration() {
-			AssetFactory::registerManager(AssetType::TEXTURE, std::make_shared<TextureAssetManager>());
-		}
-	} _textureManagerRegistration;
+#include "utils/STBIHelper.h"
+
+#include "utils/TextureUtils.h"
+
+GLint TextureWrapToOpenGL(TextureWrap wrap)
+{
+	switch (wrap)
+	{
+	case TextureWrap::Repeat: return GL_REPEAT;
+	case TextureWrap::Clamp:  return GL_CLAMP_TO_EDGE;
+	case TextureWrap::Mirror: return GL_MIRRORED_REPEAT;
+	default: return GL_CLAMP_TO_EDGE;
+	}
 }
 
-bool TextureAssetManager::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+GLint TextureFilterToOpenGL(TextureFilter filter, bool hasMipmaps, bool isMinFilter)
+{
+	if (filter == TextureFilter::Nearest)
+	{
+		if (isMinFilter && hasMipmaps)
+			return GL_NEAREST_MIPMAP_NEAREST;
+		else
+			return GL_NEAREST;
+	}
+
+	// Linear
+	if (isMinFilter && hasMipmaps)
+		return GL_LINEAR_MIPMAP_LINEAR;
+	else
+		return GL_LINEAR;
+}
+
+bool TextureAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
 	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
 	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-ResourceWrapper<ResourceBase> TextureAssetManager::load(AssetInfo& aInfo)
+std::string TextureAsset::getRecommendedExtension(const AssetRecord& aInfo)
 {
-	std::string filepath = aInfo.fullFilePath;
 
-	Texture::TextureData textureData;
-
-	// extract texture build data
-	Texture::TextureAssetDescriptor settings{};
+	TextureLoadDescriptor settings{};
 
 	if (aInfo.importSettings.is_object() && !aInfo.importSettings.empty())
 	{
-		settings = aInfo.importSettings.get<Texture::TextureAssetDescriptor>();
+		settings = aInfo.importSettings.get<TextureLoadDescriptor>();
+
+		if (settings.usage == TextureSemantic::Heightmap ||
+			settings.usage == TextureSemantic::Environment ||
+			settings.usage == TextureSemantic::LUT ||
+			settings.usage == TextureSemantic::Data)
+		{
+			return ".exr";
+		}
+		else if (settings.usage == TextureSemantic::Color ||
+			settings.usage == TextureSemantic::Normal||
+			settings.usage == TextureSemantic::Mask)
+		{
+			return ".png";
+		}
 	}
-	Texture::extractTextureDataFromSettings(settings, textureData);
-	Texture::extractTextureDataFromFile(filepath, textureData);
 
-	// Create texture resource
-	ResourceWrapper<Texture> texture = Factory<Texture>::create();
-	texture->build(textureData);
+	return ".png";
 
-	return texture;
+
 }
 
-void TextureAssetManager::save(const AssetWrapper<ResourceBase>& texture, const AssetInfo& aInfo)
+void TextureAsset::save(const AssetRecord& aInfo)
 {
 	auto projectDir = Engine::get()->getProjectDirectory();
 	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
+	auto resource = AssetHandle<TextureAsset>(m_uuid).resource();
 
-	Texture::writeTexture2D(fileLocation, texture.as<Texture>().resource());
+	if (resource.get()->getData().type == TextureType::FLOAT)
+	{
+		EXRLoader::saveSingleChannelEXR(fileLocation, resource.get()->getWidth(),
+			resource.get()->getHeight(),
+			(const float*)resource.get()->getData().data);
+	}
+	else
+	{
+		STBIHelper::writeToPNG(fileLocation,
+			resource.get()->getWidth(),
+			resource.get()->getHeight(),
+			resource.get()->getChannels(),
+			resource.get()->getData().data,
+			resource.get()->getWidth() * resource.get()->getChannels());
+
+		
+	}
 }
 
 Texture::Texture()
 	:m_id(0), m_slot(0)
+{}
+
+void Texture::setTextureParameters(const TextureData& tData)
 {
+	GLenum targetGL = toGL(tData.target);
+
+	// Filtering
+	glTexParameteri(targetGL, GL_TEXTURE_MIN_FILTER, TextureFilterToOpenGL(tData.filter, tData.genMipMap, true));
+	glTexParameteri(targetGL, GL_TEXTURE_MAG_FILTER, TextureFilterToOpenGL(tData.filter, tData.genMipMap, false));
+
+	// Wrapping - all dimensions default to same wrap mode
+	glTexParameteri(targetGL, GL_TEXTURE_WRAP_S, TextureWrapToOpenGL(tData.wrap));
+	glTexParameteri(targetGL, GL_TEXTURE_WRAP_T, TextureWrapToOpenGL(tData.wrap));
+
+	if (tData.target == TextureTarget::TEXTURE_3D || tData.target == TextureTarget::TEXTURE_CUBE_MAP)
+	{
+		glTexParameteri(targetGL, GL_TEXTURE_WRAP_R, TextureWrapToOpenGL(tData.wrap));
+	}
 }
 
-Texture::Texture(const Texture& other)
-	: m_id(other.m_id), m_slot(other.m_slot), m_data(other.m_data)
+void Texture::fillTextureBufferIfNeeded(TextureData& tData)
 {
+	if (!tData.data)
+	{
+		if (tData.target == TextureTarget::TEXTURE_2D)
+		{
+			tData.data = TextureUtils::createBlankTextureBuffer2D(
+				tData.width,
+				tData.height,
+				tData.format,
+				tData.type);
+		}
+		else if (tData.target == TextureTarget::TEXTURE_3D)
+		{
+			tData.data = TextureUtils::createBlankTextureBuffer3D(
+				tData.width,
+				tData.height,
+				tData.depth,
+				tData.format,
+				tData.type);
+		}
+		else if (tData.target == TextureTarget::TEXTURE_CUBE_MAP)
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				tData.facesData[i] = TextureUtils::createBlankTextureBuffer2D(
+					tData.width,
+					tData.height,
+					tData.format,
+					tData.type);
+			}
+		}
+		else 
+		{
+			logError("Texture target not supported.");
+			return;
+		}
+	}
 }
 
-ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height)
+void Texture::copyBufferIntoInternalBuffer(void*& data, size_t bufferSize)
 {
-	return createEmptyTexture(width, height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE);
+	if (!data)
+	{
+		logError("Texture data is null.");
+		return;
+	}
+
+	void* newBuffer = std::malloc(bufferSize);
+	if (!newBuffer)
+	{
+		logError("Texture buffer allocation failed.");
+		return;
+	}
+
+	// COPY FROM OLD -> NEW
+	std::memcpy(newBuffer, data, bufferSize);
+
+	// Redirect pointer
+	data = newBuffer;
 }
 
-ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int internalFormat, int format, int type)
+ResourceWrapper<Texture> Texture::createTexture(TextureData& textureData)
 {
-	TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
-	textureData.width = width;
-	textureData.height = height;
-	textureData.internalFormat = (InternalFormat)internalFormat;
-	textureData.format = (Format)format;
-	textureData.type = (Type)type;
-	textureData.params = {
-		{GL_TEXTURE_MIN_FILTER, GL_LINEAR },
-		{GL_TEXTURE_MAG_FILTER, GL_LINEAR },
-		{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-		{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
-	};
+	ResourceWrapper<Texture> texture = Factory<Texture>::create();
 
-	return create2DTextureFromBuffer(textureData);
-}
+	const uint32_t bytesPerPixel =
+		TextureUtils::channelCount(textureData.format) *
+		TextureUtils::bytesPerChannel(textureData.type);
 
-ResourceWrapper<Texture> Texture::createEmptyTexture(int width, int height, int internalFormat, int format, int type, std::map<int, int> params)
-{
-	TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
-	textureData.width = width;
-	textureData.height = height;
-	textureData.internalFormat = (InternalFormat)internalFormat;
-	textureData.format = (Format)format;
-	textureData.type = (Type)type;
-	textureData.params = params;
+	const size_t bufferSize =
+		static_cast<size_t>(textureData.width) *
+		static_cast<size_t>(textureData.height) *
+		static_cast<size_t>(std::max(1, textureData.depth)) *
+		bytesPerPixel;
 
-	return create2DTextureFromBuffer(textureData);
-}
-
-ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(const TextureData& textureData)
-{
-	ResourceWrapper<Texture> texture;
-	//UUID uuid = textureData.textureName.empty() ? UUID::generate_uuid_v4() : textureData.textureName;
-	texture = Factory<Texture>::create();
+	if (textureData.data)
+	{
+		copyBufferIntoInternalBuffer(textureData.data, bufferSize);
+	}
+	if (textureData.facesData[0])
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			copyBufferIntoInternalBuffer(textureData.facesData[i], bufferSize);
+		}
+	}
+	else if (textureData.fillEmpty)
+	{
+		fillTextureBufferIfNeeded(textureData);
+	}
 	texture.get()->build(textureData);
-
 	return texture;
 }
 
-ResourceWrapper<Texture> Texture::create2DTextureFromBuffer(int width, int height, int internalFormat, int format, int type, std::map<int, int> params, bool isEngineOwned, void* data)
+ResourceWrapper<Texture> Texture::createTexture(int width, int height, int channels, TextureInternalFormat internalFormat, TextureFormat format, TextureType type, TextureFilter filter, TextureWrap wrap, void* data)
 {
 	TextureData textureData;
-	textureData.target = Texture::TextureTarget::TEXTURE_2D;
+	textureData.target = TextureTarget::TEXTURE_2D;
 	textureData.width = width;
 	textureData.height = height;
-	textureData.bpp = 4;
-	textureData.internalFormat = (InternalFormat)internalFormat;
-	textureData.format = (Format)format;
-	textureData.type = (Type)type;
-	textureData.params = params;
-	textureData.isEngineOwned = isEngineOwned;
+	textureData.channels = channels;
+	textureData.internalFormat = internalFormat;
+	textureData.format = format;
+	textureData.type = type;
+	textureData.filter = filter;
+	textureData.wrap = wrap;
 	textureData.data = data;
 
-	return create2DTextureFromBuffer(textureData);
+	return createTexture(textureData);
+}
+
+ResourceWrapper<Texture> Texture::createTexture(int width, int height, TextureSemantic usage, void* data)
+{
+	TextureInternalFormat internalFormat = getInternalFormatFromUsage(usage);
+	TextureFormat format = TextureFormat::RGBA;
+	TextureType type = TextureType::UNSIGNED_BYTE;
+	TextureFilter filter = TextureFilter::Linear;
+	TextureWrap wrap = TextureWrap::Clamp;
+	int channels = 3;
+
+	switch (usage)
+	{
+	case TextureSemantic::Color:
+		format = TextureFormat::RGBA;
+		type = TextureType::UNSIGNED_BYTE;
+		channels = 3;
+		break;
+
+	case TextureSemantic::Normal:
+		format = TextureFormat::RGB;
+		type = TextureType::UNSIGNED_BYTE;
+		channels = 3;
+		break;
+
+	case TextureSemantic::Mask:
+		format = TextureFormat::RED;
+		type = TextureType::UNSIGNED_BYTE;
+		channels = 1;
+		break;
+
+	case TextureSemantic::Heightmap:
+		format = TextureFormat::RED;
+		type = TextureType::FLOAT;
+		channels = 1;
+		break;
+
+	case TextureSemantic::Data:
+		format = TextureFormat::RGBA;
+		type = TextureType::FLOAT;
+		channels = 4;
+		break;
+
+	case TextureSemantic::Environment:
+		format = TextureFormat::RGB;
+		type = TextureType::FLOAT;
+		channels = 3;
+		break;
+
+	case TextureSemantic::LUT:
+		format = TextureFormat::RGB;
+		type = TextureType::UNSIGNED_BYTE;
+		channels = 3;
+		break;
+
+	default:
+		format = TextureFormat::RGBA;
+		type = TextureType::UNSIGNED_BYTE;
+		channels = 3;
+		break;
+	}
+
+	return Texture::createTexture(width, height, channels, internalFormat, format, type, filter, wrap, data);
 }
 
 void Texture::build(const TextureData& textureData)
 {
 	m_data = textureData;
 
-	m_attributes.flip = textureData.flip;
-	m_attributes.genMipMap = textureData.genMipMap;
-	m_attributes.isHDR = textureData.isHDR;
-	m_attributes.params = textureData.params;
-
 	// generate texture
 	glGenTextures(1, &m_id);
 	bind();
 
-	for (auto& [paramKey, paramValue] : textureData.params)
-	{
-		glTexParameteri(GL_TEXTURE_2D, paramKey, paramValue);
-	}
+	setTextureParameters(textureData);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, textureData.internalFormat, m_data.width, m_data.height, 0, textureData.format, (int)textureData.type, textureData.data);
+	if (textureData.target == TextureTarget::TEXTURE_2D)
+	{
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glTexImage2D(toGL(textureData.target),
+			0,
+			toGL(textureData.internalFormat),
+			m_data.width,
+			m_data.height,
+			0,
+			toGL(textureData.format),
+			toGL(textureData.type),
+			textureData.data);
+	}
+	else if (textureData.target == TextureTarget::TEXTURE_CUBE_MAP)
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+				0, 
+				toGL(textureData.internalFormat), 
+				m_data.width, 
+				m_data.height, 0, 
+				toGL(textureData.format),
+				toGL(textureData.type),
+				textureData.facesData[i]);
+		}
+	}
+	else if (textureData.target == TextureTarget::TEXTURE_3D)
+	{
+		glTexImage3D(toGL(textureData.target), 
+			0, 
+			toGL(textureData.internalFormat),
+			m_data.width,
+			m_data.height, 
+			m_data.depth,
+			0, 
+			toGL(textureData.format),
+			toGL(textureData.type),
+			textureData.data);
+	}
+	else {
+		logError("Unsupported texture format.");
+		return;
+	}
 
 	if (textureData.genMipMap)
 	{
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glGenerateMipmap(toGL(textureData.target));
 	}
-
-	unbind();
 }
 
 int Texture::getWidth() const
@@ -184,9 +376,9 @@ int Texture::getHeight() const
 	return m_data.height;
 }
 
-int Texture::getBitDepth() const
+int Texture::getChannels() const
 {
-	return m_data.bpp;
+	return m_data.channels;
 }
 
 void Texture::setData(int xoffset, int yoffset, int width, int height, const void* data)
@@ -199,44 +391,19 @@ void Texture::setData(int xoffset, int yoffset, int width, int height, const voi
 void Texture::generateMipMaps()
 {
 	bind();
-	glGenerateMipmap(m_data.target);
-}
-
-std::string Texture::textureTypeToString(TextureType type)
-{
-	switch (type)
-	{
-		case Texture::TextureType::Diffuse:
-			return Constants::g_textureAlbedo;
-		case Texture::TextureType::Specular:
-			return Constants::g_textureSpecular;
-		case Texture::TextureType::Albedo:
-			return Constants::g_textureAlbedo;
-		case Texture::TextureType::Normal:
-			return Constants::g_textureNormal;
-		case Texture::TextureType::Metallic:
-			return Constants::g_textureMetallic;
-		case Texture::TextureType::Roughness:
-			return Constants::g_textureRoughness;
-		case Texture::TextureType::AmbientOcclusion:
-			return Constants::g_textureAO;
-
-		default:
-			logError("Unsupported texture format");
-			return "";
-	}
+	glGenerateMipmap(toGL(m_data.target));
 }
 
 void Texture::bind() const
 {
 	glActiveTexture(GL_TEXTURE0 + m_slot);
-	glBindTexture(m_data.target, m_id);
+	glBindTexture(toGL(m_data.target), m_id);
 }
 
 void Texture::unbind() const
 {
 	glActiveTexture(GL_TEXTURE0 + m_slot);
-	glBindTexture(m_data.target, 0);
+	glBindTexture(toGL(m_data.target), 0);
 }
 
 unsigned int Texture::getID() const
@@ -247,6 +414,15 @@ unsigned int Texture::getID() const
 void Texture::ClearTexture()
 {
 	glDeleteTextures(1, &m_id);
+
+	if (m_data.data)
+		free(m_data.data);
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (m_data.facesData[i]) 
+			free(m_data.facesData[i]);
+	}
 }
 
 Texture::~Texture()
@@ -254,104 +430,115 @@ Texture::~Texture()
 	ClearTexture();
 }
 
-
-
-Texture::TextureAssetAttributes Texture::getTextureAssetAttributes()
+ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureLoadDescriptor desc)
 {
-	return m_attributes;;
+	std::string filepath = fileLocation;
+
+	TextureData textureData;
+
+	// extract texture build data
+	Texture::extractTextureDataFromSettings(desc, textureData);
+	Texture::extractTextureDataFromFile(filepath, textureData);
+
+	assert(textureData.data);
+
+	// Create texture resource
+	ResourceWrapper<Texture> texture = Factory<Texture>::create();
+	texture->build(textureData);
+
+	return texture;
 }
 
-void Texture::writeTexture2D(const std::string& fileLocation, ResourceWrapper<Texture> texture)
+ResourceWrapper<Texture> Texture::clone() const
 {
-	stbi_write_png(fileLocation.c_str(),
-		texture.get()->getWidth(),
-		texture.get()->getHeight(),
-		texture.get()->getBitDepth(),
-		texture.get()->getData().data,
-		texture.get()->getWidth() * texture.get()->getBitDepth());
-}
-
-AssetWrapper<Texture> Texture::import(const std::string& fileLocation, TextureAssetDescriptor desc)
-{
-	desc.aType = AssetType::TEXTURE;
-	return Engine::get()->getSubSystem<Assets>()->importAsset(fileLocation, desc).as<Texture>();
-}
-
-ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureAssetDescriptor desc)
-{
-	desc.aType = AssetType::TEXTURE;
-	return Engine::get()->getSubSystem<Assets>()->loadResource(fileLocation, desc).as<Texture>();
-}
-
-void Texture::addTexture2D(ResourceWrapper<Texture> texture)
-{
-	addTexture2D("Texture_" + std::to_string(texture.getUID()).substr(4), texture);
-}
-
-void Texture::addTexture2D(const std::string& name, ResourceWrapper<Texture> texture)
-{
-	texture.get()->bind();
-
-	// Allocate memory for the pixels
-	void* pixels = malloc(texture.get()->getWidth() * texture.get()->getHeight() * 3);
-
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-	texture->m_data.data = pixels;
-	texture->m_data.bpp = 3;
-
-	AssetCreateDescriptor aInfo;
-	aInfo.aType = AssetType::TEXTURE;
-	aInfo.name = name;
-	aInfo.attributes = texture->getTextureAssetAttributes().toMap();
-	Engine::get()->getSubSystem<Assets>()->createAsset(texture, aInfo);
-}
-
-void Texture::extractTextureDataFromSettings(const TextureAssetDescriptor& settings, Texture::TextureData& textureData)
-{
-	textureData.params = settings.params;
-
-	// if params not specified use default params values
-	if (textureData.params.empty())
+	if (m_data.target == TextureTarget::TEXTURE_3D)
 	{
-		if (settings.genMipMap)
-		{
-			textureData.params = {
-				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR},
-			};
-		}
-		else
-		{
-			textureData.params = {
-				{ GL_TEXTURE_WRAP_S, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_T, GL_REPEAT},
-				{ GL_TEXTURE_WRAP_R, GL_REPEAT},
-				{ GL_TEXTURE_MIN_FILTER, GL_LINEAR},
-				{ GL_TEXTURE_MAG_FILTER, GL_LINEAR},
-			};
-		}
+		logError("Clone is not supported for 3D textures");
+		return ResourceWrapper<Texture>::empty;
 	}
 
+	TextureData newTextureData(m_data);
+
+	const uint32_t bpp = TextureUtils::channelCount(m_data.format) * TextureUtils::bytesPerChannel(m_data.type);
+	const size_t size = static_cast<size_t>(m_data.width) * m_data.height * bpp;
+
+	// Calculate buffer size
+	const size_t bufferSize = size;
+
+	// Allocate new buffer
+	newTextureData.data = std::malloc(bufferSize);
+	if (!newTextureData.data)
+	{
+		logError("Texture clone: allocation failed.");
+		return ResourceWrapper<Texture>::empty;
+	}
+
+	// Copy raw pixel data
+	std::memcpy(newTextureData.data, m_data.data, bufferSize);
+
+	ResourceWrapper<Texture> clonedTexture = Texture::createTexture(newTextureData);
+
+	if (clonedTexture.isEmpty())
+	{
+		logWarning("Texture clone failed.");
+	}
+
+	return clonedTexture;
+}
+
+TextureFormat Texture::getFormatFromChannels(int channels)
+{
+	if (channels == 1) return TextureFormat::RED;
+	else if (channels == 3) return TextureFormat::RGB;
+	else if (channels == 4) return TextureFormat::RGBA;
+	else {
+		logError("Unsupported texture format!");
+		return TextureFormat::RGB;
+	}
+}
+
+TextureInternalFormat Texture::getInternalFormatFromUsage(TextureSemantic usage)
+{
+	switch (usage)
+	{
+	case TextureSemantic::Color:
+		return TextureInternalFormat::RGBA;
+
+	case TextureSemantic::Normal:
+		return TextureInternalFormat::RGB16F;
+
+	case TextureSemantic::Heightmap:
+		return TextureInternalFormat::R32F;
+
+	case TextureSemantic::Mask:
+		return TextureInternalFormat::R8UI;
+
+	case TextureSemantic::Data:
+		return TextureInternalFormat::RGBA32F;
+
+	case TextureSemantic::Environment:
+		return TextureInternalFormat::RGB16F;
+	}
+
+	return TextureInternalFormat::RGB;
+}
+
+void Texture::extractTextureDataFromSettings(const TextureLoadDescriptor& settings, TextureData& textureData)
+{
+	textureData.filter = settings.filter;
+	textureData.wrap = settings.wrap;
 	textureData.genMipMap = settings.genMipMap;
 	textureData.flip = settings.flip;
-	//textureData.isTransient = settings.isTransient;
-	
+	textureData.internalFormat = getInternalFormatFromUsage(settings.usage);
 }
 
-unsigned char* Texture::decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels) 
-{
-	auto buffer = stbi_load_from_memory(rawBuffer, len, outWidth, outHeight, outChannels, 3);
-	return buffer;
-}
 
-ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocation)
-{
+
+//ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocation)
+//{
 	// TODO fix
 
-	//Texture::TextureData textureData;
+	//TextureData textureData;
 
 	//textureData.target = GL_TEXTURE_3D;
 
@@ -412,27 +599,34 @@ ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocatio
 	//texture.get()->unbind();
 
 	//return texture;
-	return {};
-}
+	//return {};
+//}
 
-void Texture::extractTextureDataFromFile(const std::string& fileLocation, Texture::TextureData& textureData)
+void Texture::extractTextureDataFromFile(const std::string& fileLocation, TextureData& textureData)
 {
-	// Determine if the image is HDR
-	if (isHDRImage(fileLocation))
+	// flip if needed
+	STBIHelper::setFlip(textureData.flip);
+
+	std::filesystem::path p(fileLocation);
+	std::string ext = p.extension().string();
+
+	if (ext == ".exr")
 	{
-		textureData.isHDR = true;
+		EXRLoader::loadSingleChannelEXR(fileLocation, textureData.width, textureData.height, textureData.data);
+		textureData.type = TextureType::FLOAT;
+		textureData.channels = 1;
+
+		//InspectEXRChannels(fileLocation.c_str());
 	}
-
-	stbi_set_flip_vertically_on_load(textureData.flip);
-
-	if (textureData.isHDR)
+	else if (STBIHelper::isHDR(fileLocation.c_str()))
 	{
-		textureData.data = stbi_loadf(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+		textureData.data = STBIHelper::loadImageFloat(fileLocation, &textureData.width, &textureData.height, &textureData.channels);
+		textureData.type = TextureType::FLOAT;
 
 		float* pixels = static_cast<float*>(textureData.data);
 
 		bool detectedOverflowRadianceValues = false;
-		for (int i = 0; i < textureData.width * textureData.height * textureData.bpp; ++i) {
+		for (int i = 0; i < textureData.width * textureData.height * textureData.channels; ++i) {
 			if (!std::isfinite(pixels[i]) || std::abs(pixels[i]) > HALF_MAX)
 			{
 				pixels[i] = std::clamp(pixels[i], -HALF_MAX, HALF_MAX);
@@ -448,7 +642,8 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	}
 	else
 	{
-		textureData.data = stbi_load(fileLocation.c_str(), &textureData.width, &textureData.height, &textureData.bpp, 0);
+		textureData.data = STBIHelper::loadImage(fileLocation, &textureData.width, &textureData.height, &textureData.channels);
+		textureData.type = TextureType::UNSIGNED_BYTE;
 	}
 
 	// load validation
@@ -457,36 +652,33 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 		logError("Failed to load file: {}", fileLocation);
 	}
 
-	// Determine format based on bits per pixel (bpp)
-	if (textureData.bpp == 1)
-	{
-		textureData.format = (Texture::Format)GL_RED;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_R16F : GL_R8); // HDR: 16-bit float, Non-HDR: 8-bit
-	}
-	else if (textureData.bpp == 3)
-	{
-		textureData.format = (Texture::Format)GL_RGB;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGB16F : GL_RGB8); // HDR: 16-bit float, Non-HDR: 8-bit
-	}
-	else if (textureData.bpp == 4)
-	{
-		textureData.format = (Texture::Format)GL_RGBA;
-		textureData.internalFormat = (Texture::InternalFormat)((textureData.isHDR) ? GL_RGBA16F : GL_RGBA8); // HDR: 16-bit float, Non-HDR: 8-bit
-	}
-	else {
-		logError("Unsupported texture format!");
-		return;
-	}
+	textureData.format = getFormatFromChannels(textureData.channels);
 
 	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
 	textureData.textureName = textureName;
-
-	textureData.type = (textureData.isHDR) ? (Texture::Type)GL_FLOAT : (Texture::Type)GL_UNSIGNED_BYTE;
 }
 
-// Function to determine if the file is HDR based on its extension
-bool Texture::isHDRImage(const std::string& filename) {
-	return stbi_is_hdr(filename.c_str());
+AssetHandle<TextureAsset> TextureAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::TEXTURE;
+	if (!desc.resourceDescriptor)
+	{
+		desc.makeResourceDescriptor<TextureLoadDescriptor>();
+	}
+	TextureAsset* asset = new TextureAsset(desc);
+	return asset->importAsset(fileLocation).as<TextureAsset>();
 }
+
+AssetHandle<TextureAsset> TextureAsset::create(const ResourceWrapper<Texture>& texture, AssetCreateDescriptor desc)
+{
+	desc.aType = AssetType::TEXTURE;
+	TextureAsset* asset = new TextureAsset(desc);
+	return asset->createAsset(texture).as<TextureAsset>();
+}
+
+ResourceWrapper<Resource> TextureLoadDescriptor::loadResource() {
+	return Texture::load(sourcePath, *this);
+}
+
 
 //adi is your love of your life

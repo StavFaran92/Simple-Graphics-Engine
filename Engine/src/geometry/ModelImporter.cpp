@@ -3,24 +3,21 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <algorithm>
 
 #include "core/Logger.h"
 #include <filesystem>
 #include "geometry/MeshBuilder.h"
 #include "memory/ResourceWrapper.h"
 #include "render/Material.h"
-#include "runtime/Entity.h"
 #include "component/Component.h"
 #include "render/Shader.h"
 #include "core/Engine.h"
-#include "core/CacheSystem.h"
-#include "runtime/Scene.h"
 #include "memory/Assets.h"
 #include "utils/AssimpGLMHelpers.h"
 #include "core/Factory.h"
-#include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
+#include "utils/STBIHelper.h"
+#include "geometry/MeshGroup.h"
 
 #include "Utils/MikkTSpaceImpl.h"
 
@@ -158,76 +155,66 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string modelName = std::filesystem::path(aInfo.relativefilePath).filename().stem().string();
-
-	// create new model session
-	ModelImporter::ModelLoadSession session;
-	session.filepath = aInfo.relativefilePath;
-	session.fileDir = std::filesystem::path(aInfo.relativefilePath).parent_path().string();
-	session.name = modelName;
-	session.mesh = modelInfo.mesh;
-
-	m_currentSession = session;
-
 	// extract mesh from root node
 	processNode(scene, scene->mRootNode);
 
-	if (scene->HasMaterials())
-	{
-		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		{
-			auto& aMaterial = scene->mMaterials[i];
+	// TODO fix
+	//if (scene->HasMaterials())
+	//{
+	//	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+	//	{
+	//		auto& aMaterial = scene->mMaterials[i];
 
-			//PrintMaterialProperties(aMaterial);
+	//		//PrintMaterialProperties(aMaterial);
 
-			for (const auto& [key, value] : aInfo.attributes)
-			{
-				// Look for _MAT_ in the attribute key
-				const std::string tag = "_MAT_";
-				size_t pos = key.find(tag);
-				if (pos == std::string::npos)
-					continue; // not a material attribute
+	//		for (const auto& [key, value] : aInfo.createDescriptor.engineAttributes)
+	//		{
+	//			// Look for _MAT_ in the attribute key
+	//			const std::string tag = "_MAT_";
+	//			size_t pos = key.find(tag);
+	//			if (pos == std::string::npos)
+	//				continue; // not a material attribute
 
-				// Extract index: key format is NAME_MAT_X
-				// so we read everything after "_MAT_"
-				size_t indexPos = pos + tag.length();
-				std::string indexStr = key.substr(indexPos);
+	//			// Extract index: key format is NAME_MAT_X
+	//			// so we read everything after "_MAT_"
+	//			size_t indexPos = pos + tag.length();
+	//			std::string indexStr = key.substr(indexPos);
 
-				// Convert to integer safely
-				int matIndex = -1;
-				try {
-					matIndex = std::stoi(indexStr);
-				}
-				catch (...) {
-					logError("Invalid material index for attribute '{}'", key);
-					continue;
-				}
+	//			// Convert to integer safely
+	//			int matIndex = -1;
+	//			try {
+	//				matIndex = std::stoi(indexStr);
+	//			}
+	//			catch (...) {
+	//				logError("Invalid material index for attribute '{}'", key);
+	//				continue;
+	//			}
 
-				// Convert attribute value to UUID
-				UUID uuid;
-				try {
-					uuid = UUID(std::stoull(value));
-				}
-				catch (...) {
-					logError("Invalid UUID for material '{}'", key);
-					continue;
-				}
+	//			// Convert attribute value to UUID
+	//			UUID uuid;
+	//			try {
+	//				uuid = UUID(std::stoull(value));
+	//			}
+	//			catch (...) {
+	//				logError("Invalid UUID for material '{}'", key);
+	//				continue;
+	//			}
 
-				// Load material asset
-				AssetWrapper<Material> material(uuid);
-				modelInfo.materials[matIndex] = material.resource();
+	//			// Load material asset
+	//			AssetHandle<MaterialAsset> material(uuid);
+	//			modelInfo.materials[matIndex] = material.resource();
 
-				logTrace("Assigned material index {} -> UUID {}", matIndex, uuid);
-			}
-		}
-	}
+	//			logTrace("Assigned material index {} -> UUID {}", matIndex, uuid);
+	//		}
+	//	}
+	//}
 }
 
-void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
 {
-	std::string filepath = aInfo.fullFilePath;
+	std::string filepath = resourceDesc.sourcePath;
 
 	if (!std::filesystem::exists(filepath))
 	{
@@ -261,10 +248,21 @@ void ModelImporter::loadModelFromFile(const AssetInfo& aInfo, ModelImporter::Mod
 
 	m_lastLoadedSceneName = filepath;
 
-	loadModelFromAssimpScene(scene, aInfo, modelInfo);
+	std::string modelName = std::filesystem::path(filepath).filename().stem().string();
+
+	// create new model session
+	ModelImporter::ModelLoadSession session;
+	session.filepath = filepath;
+	session.fileDir = std::filesystem::path(filepath).parent_path().string();
+	session.name = modelName;
+	session.mesh = modelInfo.mesh;
+
+	m_currentSession = session;
+
+	loadModelFromAssimpScene(scene, modelInfo);
 }
 
-bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
+bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
 {
 	std::string finalFilePath = fileLocation;
 
@@ -314,7 +312,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 
 	m_lastImportedMaterials = LastImportedMaterials();
 
-	std::unordered_map<std::string, AssetWrapper<Texture>> cachedTextures;
+	std::unordered_map<std::string, AssetHandle<TextureAsset>> cachedTextures;
 
 	// Import materials and textures
 	if (scene->HasMaterials())
@@ -323,7 +321,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 		{
 			auto& aMaterial = scene->mMaterials[i];
 			std::string materialName = std::string(aMaterial->GetName().C_Str());
-			std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
+			//std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
 
 			// get uuid using tex name from association map
 			auto& material = Material::create(MaterialRenderMode::Opaque);
@@ -333,7 +331,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
 			material->setName(materialName);
 
-			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, fileDir, cachedTextures, aInfo);
+			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures, aInfo);
 			if (!diffuse.isEmpty())
 			{
 				auto diffuseSampler = std::make_shared<TextureSampler>(3);
@@ -342,7 +340,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, true);
 			}
 
-			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, fileDir, cachedTextures, aInfo);
+			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures, aInfo);
 			if (!normal.isEmpty())
 			{
 				auto normalSampler = std::make_shared<TextureSampler>(3);
@@ -351,7 +349,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, true);
 			}
 
-			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, fileDir, cachedTextures, aInfo);
+			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures, aInfo);
 			if (!roughness.isEmpty())
 			{
 				auto roughnessSampler = std::make_shared<TextureSampler>(1);
@@ -362,7 +360,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			}
 
 			// Metallic map
-			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, fileDir, cachedTextures, aInfo);
+			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, cachedTextures, aInfo);
 			if (!metallic.isEmpty())
 			{
 				auto metallicSampler = std::make_shared<TextureSampler>(1);
@@ -373,7 +371,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			}
 
 			// Ambient Occlusion map
-			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, fileDir, cachedTextures, aInfo);
+			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, cachedTextures, aInfo);
 			if (!ao.isEmpty())
 			{
 				auto aoSampler = std::make_shared<TextureSampler>(1);
@@ -391,13 +389,11 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetInfo& aInfo)
 			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
-			AssetWrapper<Material> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(material, materialAssetInfo).as<Material>();
-			m_lastImportedMaterials.materials[i] = materialAsset;
-			aInfo.attributes[materialID] = materialAsset.getUID();
+			m_lastImportedMaterials.materials[i] = MaterialAsset::create(material, materialAssetInfo);
 		}
 	}
 
-	ResourceWrapper<MeshCollection> mesh = Factory<MeshCollection>::create();
+	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
 
 	return true;
 }
@@ -589,22 +585,21 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 
 
 
-AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
+AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 	aiMaterial* mat, 
 	aiTextureType type, 
-	const std::string& dir, 
 	std::unordered_map<std::string, 
-	AssetWrapper<Texture>>& cachedTextures,
-	const AssetInfo& aInfo)
+	AssetHandle<TextureAsset>>& cachedTextures,
+	AssetRecord& aInfo)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
 	{
-		return AssetWrapper<Texture>::empty;
+		return AssetHandle<TextureAsset>::empty;
 	}
 
 	ResourceWrapper<Texture> texture;
-	AssetWrapper<Texture> AssetTexture;
+	AssetHandle<TextureAsset> AssetTexture;
 	const aiTexture* aiTexture = scene->GetEmbeddedTexture(str.C_Str());
 	if(aiTexture)
 	{
@@ -622,6 +617,7 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 
 		int width = 0;
 		int height = 0;
+		int channels = 0;
 		unsigned char* pixelData = nullptr;
 		if (aiTexture->mHeight == 0)
 		{
@@ -629,8 +625,8 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 			size_t size = aiTexture->mWidth;
 			const unsigned char* data = reinterpret_cast<unsigned char*>(aiTexture->pcData);
 
-			int channels = 0;
-			pixelData = Texture::decodeCompressedFromMemory(data, size, &width, &height, &channels);
+			
+			pixelData = STBIHelper::decodeCompressedFromMemory(data, size, &width, &height, &channels);
 		}
 		else {
 			// Raw ARGB8888 pixels
@@ -639,49 +635,45 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 			pixelData = reinterpret_cast<unsigned char*>(aiTexture->pcData);
 		}
 
-		Texture::TextureData tData;
-		tData.target = Texture::TextureTarget::TEXTURE_2D;
-		tData.format = Texture::Format::RGB;
-		tData.internalFormat = Texture::InternalFormat::RGB2;
-		tData.isEngineOwned = aInfo.isEngineOwned;
-		tData.genMipMap = false;
-		tData.textureName = textureName;
-		tData.height = height;
-		tData.width = width;
-		tData.type = Texture::Type::UNSIGNED_BYTE;
-		tData.bpp = 3;
-		tData.data = (void*)pixelData;
+		TextureSemantic usage = TextureSemantic::Color;
+		if (type == aiTextureType_DIFFUSE || type == aiTextureType_DIFFUSE_ROUGHNESS || type == aiTextureType_METALNESS || type == aiTextureType_AMBIENT_OCCLUSION) // todo fix
+		{
+			usage = TextureSemantic::Color;
+		}
+		else if (type == aiTextureType_NORMALS)
+		{
+			usage = TextureSemantic::Normal;
+		}
 
-		tData.params = {
-			{GL_TEXTURE_MIN_FILTER, GL_NEAREST },
-			{GL_TEXTURE_MAG_FILTER, GL_NEAREST },
-			{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-			{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}
-		};
-
-		texture = Factory<Texture>::create();
-		texture.get()->build(tData);
+		texture = Texture::createTexture(width,
+			height,
+			channels,
+			Texture::getInternalFormatFromUsage(usage),
+			Texture::getFormatFromChannels(channels),
+			TextureType::UNSIGNED_BYTE,
+			TextureFilter::Linear,
+			TextureWrap::Repeat,
+			pixelData);
 
 		AssetCreateDescriptor textureAssetDesc;
 		textureAssetDesc.aType = AssetType::TEXTURE;
-		textureAssetDesc.name = tData.textureName;
+		textureAssetDesc.name = textureName;
 		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.targetDirectory = aInfo.targetDirectory;
-		textureAssetDesc.attributes = texture->getTextureAssetAttributes().toMap();
-		AssetTexture = Engine::get()->getSubSystem<Assets>()->createAsset(texture, textureAssetDesc).as<Texture>();
+		TextureAsset::create(texture, textureAssetDesc);
 
 		if (!textureName.empty())
 		{
-			cachedTextures.insert({ tData.textureName, AssetTexture });
+			cachedTextures.insert({ textureName, AssetTexture });
 		}
 	}	
 	else
 	{
-		std::string path = findTexture(str, dir);
+		std::string path = findTexture(str, aInfo.assetDirectory); // todo fix
 		if (path.empty())
 		{
-			return AssetWrapper<Texture>::empty;
+			return AssetHandle<TextureAsset>::empty;
 		}
 
 		if (cachedTextures.find(path) != cachedTextures.end())
@@ -690,29 +682,18 @@ AssetWrapper<Texture> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 			return cachedTextures[path];
 		}
 
-		Texture::TextureAssetDescriptor tSettings;
+		AssetCreateDescriptor tSettings;
 		tSettings.assetDirectory = aInfo.assetDirectory;
 		tSettings.isEngineOwned = aInfo.isEngineOwned;
-		AssetTexture = Texture::import(path, tSettings);
+		TextureLoadDescriptor* textureDesc = new TextureLoadDescriptor();
+		textureDesc->usage = TextureSemantic::Color;
+
+		tSettings.resourceDescriptor = textureDesc;
+
+		AssetTexture = TextureAsset::import(path, tSettings);
 
 		cachedTextures.insert({ path, AssetTexture });
 	}
 
 	return AssetTexture;
-}
-
-Texture::TextureType ModelImporter::getTextureType(aiTextureType type)
-{
-	switch (type)
-	{
-	case aiTextureType::aiTextureType_DIFFUSE:
-		return Texture::TextureType::Diffuse;
-	case aiTextureType::aiTextureType_SPECULAR:
-		return Texture::TextureType::Specular;
-	case aiTextureType::aiTextureType_HEIGHT:
-		return Texture::TextureType::Normal;
-	default:
-		logError("Unsupported type: " + type);
-		return Texture::TextureType::None;
-	}
 }

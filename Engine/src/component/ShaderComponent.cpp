@@ -9,7 +9,7 @@ ShaderComponent::ShaderComponent()
 	renderViewProjection = std::make_shared<RenderView>(Viewport{ 0, 0, 1920, 1080 }, Entity::EmptyEntity);
 };
 
-void ShaderComponent::setProjectionTexture(AssetWrapper<Texture> texture)
+void ShaderComponent::setProjectionTexture(AssetHandle<TextureAsset> texture)
 {
 	renderViewProjection->bind();
 	renderViewProjection->setTexture(texture.resource());
@@ -57,14 +57,14 @@ void ShaderComponent::parseUniforms(const std::string& sourceCode)
 			uniformProperties[name] = glm::mat4(1.0f);
 		}
 		else if (type == "sampler2D") {
-			customTextures[name] = BuiltInAssets::getByName<Texture>(SGE_TEXTURE_WHITE);
+			customTextures[name] = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE);
 		}
 
 		searchStart = match.suffix().first;
 	}
 }
 
-void ShaderComponent::setShader(AssetWrapper<Shader> shader)
+void ShaderComponent::parseFromShader(AssetHandle<ShaderAsset> shader)
 {
 	m_customShader = shader;
 

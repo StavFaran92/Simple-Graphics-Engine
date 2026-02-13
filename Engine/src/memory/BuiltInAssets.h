@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "memory/AssetWrapper.h"
+#include "memory/AssetHandle.h"
 #include "memory/Assets.h"
 
 const std::string SGE_TEXTURE_WHITE = "SGE_TEXTURE_WHITE";
@@ -17,17 +17,20 @@ const std::string SGE_MESH_CAMERA = "SGE_MESH_CAMERA";
 const std::string SGE_MATERIAL_DEFAULT = "SGE_MATERIAL_DEFAULT";
 const std::string SGE_MATERIAL_TERRAIN_DEFAULT = "SGE_MATERIAL_TERRAIN_DEFAULT";
 
-const std::string SGE_SHADER_DEFFERED_PBR_GEOM = "SGE_SHADER_DEFFERED_PBR_GEOM";
-const std::string SGE_SHADER_DEFFERED_PBR_LIGHT = "SGE_SHADER_DEFFERED_PBR_LIGHT";
-const std::string SGE_SHADER_FORWARD_PBR = "SGE_SHADER_FORWARD_PBR";
-const std::string SGE_SHADER_TERRAIN = "SGE_SHADER_TERRAIN";
-const std::string SGE_SHADER_DEBUG_DATA = "SGE_SHADER_DEBUG_DATA";
+//const std::string SGE_SHADER_DEFFERED_PBR_GEOM = "SGE_SHADER_DEFFERED_PBR_GEOM";
+//const std::string SGE_SHADER_DEFFERED_PBR_LIGHT = "SGE_SHADER_DEFFERED_PBR_LIGHT";
+//const std::string SGE_SHADER_FORWARD_PBR = "SGE_SHADER_FORWARD_PBR";
+//const std::string SGE_SHADER_TERRAIN = "SGE_SHADER_TERRAIN";
+//const std::string SGE_SHADER_DEBUG_DATA = "SGE_SHADER_DEBUG_DATA";
 
+// Registry for engine-shipped, user-selectable content.
+// Entries have stable UUIDs, are serialized when referenced,
+// and are exposed through the asset browser.
 class BuiltInAssets
 {
 public:
 	template<typename T>
-	static AssetWrapper<T> get(const UUID& uuid)
+	static AssetHandle<T> get(const UUID& uuid)
 	{
 		if (!Engine::get()->getSubSystem<Assets>()->hasAsset(uuid))
 		{
@@ -38,16 +41,14 @@ public:
 	}
 
 	template<typename T>
-	static AssetWrapper<T> getByName(const std::string& name)
+	static AssetHandle<T> getByName(const std::string& name)
 	{
-		UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromName(name);
-		return get<T>(uuid);
+		return Engine::get()->getSubSystem<Assets>()->getAssetFromName(name).as<T>();
 	}
 
 	template<typename T>
-	static AssetWrapper<T> getByPath(const std::string& path)
+	static AssetHandle<T> getByPath(const std::string& path)
 	{
-		UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(path);
-		return get<T>(uuid);
+		return Engine::get()->getSubSystem<Assets>()->getAssetFromPath(path).as<T>();
 	}
 };

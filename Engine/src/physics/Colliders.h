@@ -7,6 +7,10 @@
 #include <cereal/cereal.hpp>
 #include "serialize/CerealHelpers.h"
 
+#include "memory/ResourceWrapper.h"
+
+class Mesh;
+
 enum class ColliderType : int
 {
 	NONE,

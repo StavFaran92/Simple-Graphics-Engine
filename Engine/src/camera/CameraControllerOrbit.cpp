@@ -27,7 +27,7 @@ void CameraControllerOrbit::onCreate(Entity& e)
 	m_cameraTransform = &e.getComponent<Transformation>();
 }
 
-void CameraControllerOrbit::onEvent(SDL_Event e)
+bool CameraControllerOrbit::onEvent(SDL_Event e)
 {
 	if (e.type == SDL_MOUSEMOTION)
 	{
@@ -87,4 +87,5 @@ void CameraControllerOrbit::onEvent(SDL_Event e)
 		m_distance = std::clamp(m_distance - e.wheel.y, 1.f, 50.f);
 	}
 
+	return false;
 }

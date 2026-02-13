@@ -1,9 +1,11 @@
 #pragma once
 
 #include "memory/ResourceWrapper.h"
-#include "geometry/MeshCollection.h"
-#include "component/FoliageComponent.h"
+#include "geometry/MeshGroup.h"
+#include "component/FoliageField.h"
 #include "systems/SubSystem.h"
+
+class Terrain;
 
 class FoliageSystem : public SubSystem
 {
@@ -16,12 +18,11 @@ public:
 
 	glm::vec3 getRandomLocation(int instanceID) const;
 
-	void drawFoliage(FoliageComponent& foliage);
+	void drawFoliage(Terrain& terrain);
 
 private:
-	ResourceWrapper<MeshCollection> m_grassBlade;
+	ResourceWrapper<MeshGroup> m_grassBlade;
 	int count = 0;
-	ResourceWrapper<Shader> m_foliageShader;
 	ResourceWrapper<Shader> m_foliageQuadShader;
 
 	unsigned int m_foliagePatchesSSBO;

@@ -15,7 +15,7 @@
 #include "runtime/Context.h"
 #include "texture/Texture.h"
 #include "animation/Animator.h"
-#include "geometry/MeshCollection.h"
+#include "geometry/MeshGroup.h"
 #include "render/Graphics.h"
 #include "render/RenderCommand.h"
 #include "geometry/ShapeFactory.h"
@@ -41,7 +41,18 @@ bool ShadowSystem::init()
 	m_fbo.bind();
 
 	// Generate 2D texture
-	m_depthMapTexture = Texture::createEmptyTexture(SHADOW_WIDTH, SHADOW_HEIGHT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT);
+	TextureData textureData;
+	textureData.target = TextureTarget::TEXTURE_2D;
+	textureData.width = SHADOW_WIDTH;
+	textureData.height = SHADOW_HEIGHT;
+	textureData.channels = 1;
+	textureData.internalFormat = TextureInternalFormat::DEPTH_COMPONENT;
+	textureData.format = TextureFormat::DEPTH_COMPONENT;
+	textureData.type = TextureType::FLOAT;
+	textureData.filter = TextureFilter::Linear;
+	textureData.wrap = TextureWrap::Clamp;
+	textureData.data = nullptr;
+	m_depthMapTexture = Texture::createTexture(textureData);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -62,7 +73,7 @@ bool ShadowSystem::init()
 
 	m_fbo.unbind();
 
-	m_simpleDepthShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/SimpleDepthShader.glsl");
+	m_simpleDepthShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SimpleDepthShader.glsl");
 
 	DebugHelper::getInstance().registerTextureForDebug("Depth map", m_depthMapTexture);
 
@@ -131,7 +142,7 @@ void ShadowSystem::renderToDepthMap()
 		if (animator)
 		{
 			std::vector<glm::mat4> finalBoneMatrices;
-			animator->getFinalBoneMatrices(meshCollection.get(), finalBoneMatrices);
+			animator->getFinalBoneMatrices(meshCollection.resource().get(), finalBoneMatrices);
 			for (int i = 0; i < finalBoneMatrices.size(); ++i)
 			{
 				m_simpleDepthShader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
@@ -145,7 +156,7 @@ void ShadowSystem::renderToDepthMap()
 		}
 
 		
-		for (auto& mesh : mesh.mesh.get()->getMeshes())
+		for (auto& mesh : mesh.mesh.resource()->getMeshes())
 		{
 			graphics->mesh = mesh.get();
 

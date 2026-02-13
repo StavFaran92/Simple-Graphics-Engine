@@ -14,6 +14,8 @@
 #include "systems/TimeManager.h"
 #include "component/Terrain.h"
 #include <glm/ext.hpp>
+#include "memory/BuiltInResources.h"
+#include "core/ApplicationConstants.h"
 
 FoliageSystem::FoliageSystem()
 {
@@ -22,12 +24,8 @@ FoliageSystem::FoliageSystem()
 
 bool FoliageSystem::init()
 {
-	m_foliageShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageShader.glsl");
-	m_foliageQuadShader = Shader::load(SGE_ROOT_DIR + "Resources/Engine/Shaders/FoliageQuadShader.glsl");
-
-	ModelImportSettings settings;
-	settings.isEngineOwned = true;
-	m_grassBlade = MeshCollection::load(SGE_ROOT_DIR + "Resources/Engine/Meshes/grass_blade.fbx", settings);
+	m_foliageQuadShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/FoliageQuadShader.glsl");
+	m_grassBlade = MeshGroup::load(SGE_ROOT_DIR "Resources/Engine/Meshes/grass_blade_v3.fbx");
 
 	glGenBuffers(1, &m_frustumUBO);
 
@@ -58,27 +56,23 @@ bool FoliageSystem::init()
 	//glBindBufferBase(GL_UNIFORM_BUFFER, 4, m_randomPatchSampleUBO);
 
 	{
-		Texture::TextureAssetDescriptor tSettings;
+		TextureLoadDescriptor tSettings;
 		tSettings.flip = true;
-		grassTexture = Texture::load(SGE_ROOT_DIR + "Resources/Engine/Textures/grass_v2.png", tSettings);
+		grassTexture = Texture::load(SGE_ROOT_DIR "Resources/Engine/Textures/grass_v2.png", tSettings);
 	}
 
 	{
-		Texture::TextureAssetDescriptor noiseSettings;
-		noiseSettings.params[GL_TEXTURE_WRAP_S] = GL_MIRRORED_REPEAT;
-		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
-		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
-		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-		windNoise = Texture::load(SGE_ROOT_DIR + "Resources/Engine/Textures/wind_noise.png", noiseSettings);
+		TextureLoadDescriptor noiseSettings;
+		noiseSettings.filter = TextureFilter::Linear;
+		noiseSettings.wrap = TextureWrap::Mirror;
+		windNoise = Texture::load(SGE_ROOT_DIR "Resources/Engine/Textures/wind_noise.png", noiseSettings);
 	}
 
 	{
-		Texture::TextureAssetDescriptor noiseSettings;
-		noiseSettings.params[GL_TEXTURE_WRAP_S] = GL_MIRRORED_REPEAT;
-		noiseSettings.params[GL_TEXTURE_WRAP_T] = GL_MIRRORED_REPEAT;
-		noiseSettings.params[GL_TEXTURE_MIN_FILTER] = GL_LINEAR;
-		noiseSettings.params[GL_TEXTURE_MAG_FILTER] = GL_LINEAR;
-		noiseTexture = Texture::load(SGE_ROOT_DIR + "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
+		TextureLoadDescriptor noiseSettings;
+		noiseSettings.filter = TextureFilter::Linear;
+		noiseSettings.wrap = TextureWrap::Mirror;
+		noiseTexture = Texture::load(SGE_ROOT_DIR "Resources/Engine/Textures/noiseTexture.png", noiseSettings);
 	}
 
 	return true;
@@ -134,9 +128,11 @@ bool isInFrustum(const Frustum& frustum, glm::vec3 pos)
 		isForwardOfPlane(pos, frustum.m_down);
 }
 
-void FoliageSystem::drawFoliage(FoliageComponent& foliage)
+void FoliageSystem::drawFoliage(Terrain& terrain)
 {
-	if (foliage.m_foliageSpreadMap.isEmpty())
+	const FoliageField& foliage = terrain.m_foliageField;
+
+	if (!foliage.isActive)
 	{
 		return;
 	}
@@ -150,6 +146,9 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	{
 		if (isInFrustum(m_frustum, patches[i]->pos))
 		{
+			if (patches[i]->instanceCount == 0)
+				continue;
+
 			visiblePatches.push_back(patches[i]);
 		}
 	}
@@ -165,14 +164,16 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	//glDepthMask(GL_TRUE);
 	//glEnable(GL_CULL_FACE);
 
-	auto& foliageShader = m_foliageShader;
+	auto& foliageShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FOLIAGE);
 	foliageShader->use();
 	foliageShader->setUniformValue("view", graphics->view);
 	foliageShader->setUniformValue("projection", graphics->projection);
 	foliageShader->setUniformValue("colorA", foliage.colorA);
 	foliageShader->setUniformValue("colorB", foliage.colorB);
+	foliageShader->setUniformValue("heightScale", terrain.m_scale);
+	foliageShader->setUniformValue("patchCount", foliage.getPatchCount());
 	foliageShader->setTextureInShader(windNoise, "windNoise", 0);
-	foliageShader->setTextureInShader(foliage.m_foliageSpreadMap.resource(), "densityMap", 1);
+	foliageShader->setTextureInShader(terrain.getHeightmap(), "foliageHeightMap", 1);
 	foliageShader->setTextureInShader(noiseTexture, "noiseTexture", 2);
 	foliageShader->setUniformValue("time", (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000);
 
@@ -189,12 +190,12 @@ void FoliageSystem::drawFoliage(FoliageComponent& foliage)
 	std::vector<std::shared_ptr<FoliagePatch>> patchesMaxLOD;
 	for (int i = 0; i < visiblePatches.size(); i++)
 	{
-
 		float distance = glm::dot(visiblePatches[i]->pos - m_camPos, m_camFront);
 
 		if (distance < maxFoliageViewDistance)
 		{
 			foliageShader->setUniformValue("patchPosition", visiblePatches[i]->pos);
+			foliageShader->setUniformValue("patchID", glm::vec2(visiblePatches[i]->idx, visiblePatches[i]->idy));
 
 			//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
 			auto& grassBlade = m_grassBlade;

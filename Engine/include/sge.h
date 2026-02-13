@@ -8,6 +8,7 @@
 #endif
 
 //sge
+#include "core/ApplicationConstants.h"
 #include "runtime/Context.h"
 #include "core/Window.h"
 #include "geometry/Mesh.h"
@@ -47,13 +48,13 @@
 #include "core/System.h"
 #include "utils/DebugHelper.h"
 #include "systems/WaterSystem.h"
+#include "systems/VolumetricCloudsSystem.h"
 #include "systems/UniqueNameManager.h"
 #include "render/RenderCommand.h"
 #include "camera/CameraControllerFreeLook.h"
 
 #include "animation/Animator.h"
 #include "component/Terrain.h"
-#include "component/FoliageComponent.h"
 #include "component/PhysicsComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/ShaderComponent.h"
@@ -66,6 +67,8 @@
 #include "component/ImageComponent.h"
 #include "component/PostProcessComponent.h"
 #include "component/WaterBodyComponent.h"
+#include "component/VolumeComponent.h"
+#include "component/VolumetricCloudsComponent.h"
 
 #include "runtime/Prefab.h"
 #include "memory/BuiltInAssets.h"
@@ -73,3 +76,6 @@
 #include "fileSystem/WorkingDirectory.h"
 #include "fileSystem/ScopedPath.h"
 #include "core/GUILayer.h"
+#include "component/TexturePainter.h"
+
+#include "utils/Math3D.h"

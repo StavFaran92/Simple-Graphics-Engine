@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <filesystem>
+#include "core/Logger.h"
 
 void MeshExporter::exportMesh(const std::string& name, const std::string& targetDir, const aiScene* scene)
 {
@@ -21,8 +22,9 @@ void MeshExporter::exportMesh(const std::string& name, const std::string& target
 	exporter.Export(scene, "collada", savedFilePath);
 }
 
-void MeshExporter::exportMesh(const AssetInfo& aInfo, const ResourceWrapper<MeshCollection>& meshCollection)
+void MeshExporter::exportMesh(const AssetHandle<MeshGroupAsset>& meshGroup)
 {
+    const AssetRecord& aInfo = meshGroup.info();
     auto& projectDir = Engine::get()->getProjectDirectory();
     const std::string savedFilePath = projectDir + "/" + aInfo.relativefilePath;
 
@@ -34,7 +36,7 @@ void MeshExporter::exportMesh(const AssetInfo& aInfo, const ResourceWrapper<Mesh
     }
 
     int vertexOffset = 1; // OBJ indices start at 1
-    const auto& meshes = meshCollection.get()->getMeshes();
+    const auto& meshes = meshGroup.resource()->getMeshes();
 
     for (size_t meshIndex = 0; meshIndex < meshes.size(); ++meshIndex)
     {
