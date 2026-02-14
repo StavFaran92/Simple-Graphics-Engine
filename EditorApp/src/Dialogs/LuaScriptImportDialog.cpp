@@ -1,6 +1,7 @@
 #include "LuaScriptImportDialog.h"
 
 #include "EditorState.h"
+#include "memory/Assets.h"
 
 LuaScriptImportDialog::LuaScriptImportDialog()
 	: DialogBase("LuaScriptImportDialog")
@@ -31,9 +32,11 @@ bool LuaScriptImportDialog::acceptContent()
 	if (uniqueName.isValid())
 	{
 		AssetCreateDescriptor desc;
+		desc.aType = AssetType::LUA_SCRIPT;
 		desc.name = uniqueName.name;
+		desc.sourcePath = filepath.m_filepath;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		LuaScriptAsset::import(filepath.m_filepath, desc);
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc);
 
 		return true;
 	}

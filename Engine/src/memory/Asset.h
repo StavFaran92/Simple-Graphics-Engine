@@ -12,29 +12,18 @@ public:
 
 	Asset(const AssetCreateDescriptor& desc);
 
-	AssetHandle<Asset> importAsset(const std::string& fileLocation);
-
-	AssetHandle<Asset> createAsset(const ResourceWrapper<Resource>& asset);
-
 	void updateAsset(const AssetUpdateDescriptor& uDesc);
 
-	void reimportAsset();
-
-	virtual void save(const AssetRecord& aInfo) = 0;
+	virtual void save(const AssetRecord& aInfo) {}
 
 	const AssetCreateDescriptor& getDescriptor() const;
 
 	UUID getUUID() const;
 
-	// Unified pipeline entry points (delegate to Assets subsystem)
-	static AssetHandle<Asset> create(AssetCreateDescriptor desc);
-	static AssetHandle<Asset> import(AssetCreateDescriptor desc);
 protected:
-	virtual bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) = 0;
+	virtual bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) { return false; }
 
 	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };
-
-	bool importAssetInner(AssetRecord& aInfo);
 
 protected:
 	AssetCreateDescriptor m_createDesc;

@@ -22,26 +22,6 @@
 
 #include <filesystem>
 
-bool MaterialAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	return false;
-}
-
-void MaterialAsset::save(const AssetRecord& aInfo)
-{
-	auto projectDir = Engine::get()->getProjectDirectory();
-	std::ofstream os(aInfo.fullFilePath);
-	cereal::JSONOutputArchive oarchive(os);
-
-	try
-	{
-		oarchive(*AssetHandle<MaterialAsset>(m_uuid).resource().get());
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Serialization Error occured: {}", e.what());
-	}
-}
 
 //static AssetFnRegister<AssetType::MATERIAL> assetRegister(AssetTraits<Material>::load);
 
@@ -446,20 +426,6 @@ MaterialRenderMode Material::getMaterialRenderMode() const
 	return m_renderMode;
 }
 
-AssetHandle<MaterialAsset> MaterialAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::MATERIAL;
-	desc.sourcePath = fileLocation;
-	MaterialAsset* asset = new MaterialAsset(desc);
-	return asset->importAsset(fileLocation).as<MaterialAsset>();
-}
-
-AssetHandle<MaterialAsset> MaterialAsset::create(const ResourceWrapper<Material>& mat, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::MATERIAL;
-	MaterialAsset* asset = new MaterialAsset(desc);
-	return asset->createAsset(mat).as<MaterialAsset>();
-}
 
 ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDescriptor desc)
 {

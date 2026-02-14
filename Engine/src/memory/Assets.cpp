@@ -11,6 +11,7 @@
 #include "core/Factory.h"
 #include "render/ShaderBuilder.h"
 #include "memory/AssetFactory.h"
+#include "memory/RegisterManagers.h"
 #include "systems/UniqueNameManager.h"
 
 #include <filesystem>
@@ -19,6 +20,8 @@ Assets::Assets()
 {
 	m_assets = {};
 	Engine::get()->registerSubSystem<Assets>(this);
+
+	registerAllManagers();
 }
 
 void Assets::addAsset(AssetRecord& aInfo)
@@ -358,6 +361,9 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 {
 	AssetType type = desc.aType;
 
+	AssetRecord record(desc);
+	record.parse();
+
 	ResourceTypeManager* manager = AssetFactory::getManager(type);
 	if (!manager)
 	{
@@ -381,7 +387,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	saver->save(desc);
+	saver->save(record);
 
 	IAssetFactory* factory = manager->getAssetFactory();
 	if (!factory)
@@ -390,9 +396,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	AssetRecord record(desc);
 	record.asset = factory->create(desc);
-	record.parse();
 	addAsset(record);
 
 	return AssetHandle<Asset>(record.uuid);
@@ -401,6 +405,9 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 {
 	AssetType type = desc.aType;
+
+	AssetRecord record(desc);
+	record.parse();
 
 	ResourceTypeManager* manager = AssetFactory::getManager(type);
 	if (!manager)
@@ -425,7 +432,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	importer->import(desc);
+	importer->import(record);
 
 	IAssetFactory* factory = manager->getAssetFactory();
 	if (!factory)
@@ -434,9 +441,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	AssetRecord record(desc);
 	record.asset = factory->create(desc);
-	record.parse();
 	addAsset(record);
 
 	return AssetHandle<Asset>(record.uuid);

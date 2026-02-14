@@ -1,5 +1,6 @@
 #include "MaterialCreateDialog.h"
 #include "EditorState.h"
+#include "memory/Assets.h"
 
 MaterialCreateDialog::MaterialCreateDialog()
 	: DialogBase("MaterialCreateDialog")
@@ -25,9 +26,11 @@ bool MaterialCreateDialog::acceptContent()
 	if (m_uniqueName.isValid())
 	{
 		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MATERIAL;
 		desc.name = m_uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		MaterialAsset::create(m_tempMaterial, desc);
+		// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with render mode + material data
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 		return true;
 	}
 	return false;

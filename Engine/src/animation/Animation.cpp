@@ -90,23 +90,6 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-AssetHandle<AnimationAsset> AnimationAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::ANIMATION;
-	AnimationAsset* asset = new AnimationAsset(desc);
-	return asset->importAsset(fileLocation).as<AnimationAsset>();
-}
-
-void AnimationAsset::save(const AssetRecord& aInfo)
-{
-	throw new std::runtime_error("Not yet implemented!");
-}
-
-bool AnimationAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	const std::string savedFilePath = aInfo.fullFilePath;
-	return std::filesystem::copy_file(fileLocation, savedFilePath);
-}
 
 ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource() {
 	return Animation::load(sourcePath, *this);

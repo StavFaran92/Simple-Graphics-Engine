@@ -214,8 +214,7 @@ void bindAssets(sol::state& lua)
 {
     lua.new_usertype<Animation>("Animation",
         "getDuration", &Animation::getDuration,
-        "getTicksPerSecond", &Animation::getTicksPerSecond,
-        "import", &AnimationAsset::import
+        "getTicksPerSecond", &Animation::getTicksPerSecond
     );
 
 
@@ -240,8 +239,7 @@ void bindAssets(sol::state& lua)
         "getShaderOverride", &Shader::getShaderOverride,
         "recompile", &Shader::recompile,
         "getSourceCode", &Shader::getSourceCode,
-        "createOverrideShader", &Shader::createOverrideShader,
-        "import", &ShaderAsset::import
+        "createOverrideShader", &Shader::createOverrideShader
     );
 
     // todo fix
@@ -311,8 +309,7 @@ void bindAssets(sol::state& lua)
         "getNumOfVertices", &MeshGroup::getNumOfVertices,
         "addBonesInfo", &MeshGroup::addBonesInfo,
         "getBoneOffsets", &MeshGroup::getBoneOffsets,
-        "getBoneID", &MeshGroup::getBoneID,
-        "import", &MeshGroupAsset::import
+        "getBoneID", &MeshGroup::getBoneID
     );
 }
 

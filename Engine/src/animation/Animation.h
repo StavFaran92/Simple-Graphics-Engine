@@ -59,11 +59,4 @@ public:
 	using ResourceType = Animation;
 
 	using Asset::Asset;
-
-	static AssetHandle<AnimationAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-
-	void save(const AssetRecord& aInfo) override;
-
-protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

@@ -2,6 +2,7 @@
 
 #include "Dialogs.h"
 #include "EditorState.h"
+#include "memory/Assets.h"
 
 #include "EntityState.h"
 #include <imgui_stdlib.h>
@@ -48,11 +49,11 @@ void displayEntityHelper(Entity& e)
 			{
 				std::string assetName = state.getSelectedEntity().getComponent<ObjectComponent>().name;
 
-				auto prefab = Prefab::create(state.getSelectedEntity());
-
 				AssetCreateDescriptor aInfo;
+				aInfo.aType = AssetType::PREFAB;
 				aInfo.name = assetName;
-				PrefabAsset::create(prefab, aInfo);
+				// TODO: makeResourceCreateDescriptor<PrefabCreateDescriptor>() with entity
+				Engine::get()->getSubSystem<Assets>()->createAsset(aInfo);
 
 			}
 

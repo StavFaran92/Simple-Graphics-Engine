@@ -24,7 +24,7 @@ enum class ShaderOverride : int
 	PostProcess
 };
 
-struct ShaderLoadDescriptor : public ResourceLoadDescriptor
+struct EngineAPI ShaderLoadDescriptor : public ResourceLoadDescriptor
 {
 	ResourceWrapper<Resource> loadResource() override;
 
@@ -162,15 +162,4 @@ public:
 	using ResourceType = Shader;
 
 	using Asset::Asset;
-
-	static AssetHandle<ShaderAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-
-	static AssetHandle<ShaderAsset> create(const ResourceWrapper<Shader>& shader, AssetCreateDescriptor desc = {});
-
-	void save(const AssetRecord& aInfo) override;
-
-	
-
-protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

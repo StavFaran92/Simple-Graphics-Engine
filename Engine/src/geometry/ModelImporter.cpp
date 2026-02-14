@@ -17,6 +17,7 @@
 #include "core/Factory.h"
 #include <GL/glew.h>
 #include "utils/STBIHelper.h"
+#include "texture/Texture.h"
 #include "geometry/MeshGroup.h"
 
 #include "Utils/MikkTSpaceImpl.h"
@@ -389,7 +390,8 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
 			materialAssetInfo.name = materialName;
 			materialAssetInfo.aType = AssetType::MATERIAL;
-			m_lastImportedMaterials.materials[i] = MaterialAsset::create(material, materialAssetInfo);
+			// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with material data
+			m_lastImportedMaterials.materials[i] = Engine::get()->getSubSystem<Assets>()->createAsset(materialAssetInfo).as<MaterialAsset>();
 		}
 	}
 
@@ -645,23 +647,24 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 			usage = TextureSemantic::Normal;
 		}
 
-		texture = Texture::createTexture(width,
-			height,
-			channels,
-			Texture::getInternalFormatFromUsage(usage),
-			Texture::getFormatFromChannels(channels),
-			TextureType::UNSIGNED_BYTE,
-			TextureFilter::Linear,
-			TextureWrap::Repeat,
-			pixelData);
-
 		AssetCreateDescriptor textureAssetDesc;
 		textureAssetDesc.aType = AssetType::TEXTURE;
 		textureAssetDesc.name = textureName;
 		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
 		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
 		textureAssetDesc.targetDirectory = aInfo.targetDirectory;
-		TextureAsset::create(texture, textureAssetDesc);
+		auto* createDesc = textureAssetDesc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+		createDesc->textureData.width = width;
+		createDesc->textureData.height = height;
+		createDesc->textureData.channels = channels;
+		createDesc->textureData.internalFormat = Texture::getInternalFormatFromUsage(usage);
+		createDesc->textureData.format = Texture::getFormatFromChannels(channels);
+		createDesc->textureData.type = TextureType::UNSIGNED_BYTE;
+		createDesc->textureData.filter = TextureFilter::Linear;
+		createDesc->textureData.wrap = TextureWrap::Repeat;
+		createDesc->textureData.data = pixelData;
+		createDesc->textureData.textureName = textureName;
+		Engine::get()->getSubSystem<Assets>()->createAsset(textureAssetDesc);
 
 		if (!textureName.empty())
 		{
@@ -683,14 +686,14 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		}
 
 		AssetCreateDescriptor tSettings;
+		tSettings.aType = AssetType::TEXTURE;
+		tSettings.sourcePath = path;
 		tSettings.assetDirectory = aInfo.assetDirectory;
 		tSettings.isEngineOwned = aInfo.isEngineOwned;
-		TextureLoadDescriptor* textureDesc = new TextureLoadDescriptor();
+		auto* textureDesc = tSettings.makeResourceLoadDescriptor<TextureLoadDescriptor>();
 		textureDesc->usage = TextureSemantic::Color;
 
-		tSettings.resourceLoadDescriptor = textureDesc;
-
-		AssetTexture = TextureAsset::import(path, tSettings);
+		AssetTexture = Engine::get()->getSubSystem<Assets>()->importAsset(tSettings).as<TextureAsset>();
 
 		cachedTextures.insert({ path, AssetTexture });
 	}

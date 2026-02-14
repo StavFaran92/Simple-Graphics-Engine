@@ -7,7 +7,7 @@
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
-struct MeshGroupLoadDescriptor : public ResourceLoadDescriptor
+struct EngineAPI MeshGroupLoadDescriptor : public ResourceLoadDescriptor
 {
 	ResourceWrapper<Resource> loadResource() override;
 };
@@ -47,17 +47,4 @@ public:
 	using ResourceType = MeshGroup;
 
 	using Asset::Asset;
-
-	static AssetHandle<MeshGroupAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-	static AssetHandle<MeshGroupAsset> create(const ResourceWrapper<MeshGroup>& mesh, AssetCreateDescriptor desc = {});
-
-	const std::vector<AssetHandle<MaterialAsset>>& getImportedMaterials() const;
-
-	void save(const AssetRecord& aInfo) override;
-protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord&) override;
-
-
-private:
-	std::vector<AssetHandle<MaterialAsset>> m_importedMaterials;
 };

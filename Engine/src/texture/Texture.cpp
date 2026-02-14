@@ -47,66 +47,6 @@ GLint TextureFilterToOpenGL(TextureFilter filter, bool hasMipmaps, bool isMinFil
 		return GL_LINEAR;
 }
 
-bool TextureAsset::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
-{
-	const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-	const std::filesystem::path savedFilePath = projectDir / aInfo.relativefilePath;
-	return std::filesystem::copy_file(fileLocation, savedFilePath, std::filesystem::copy_options::overwrite_existing);
-}
-
-std::string TextureAsset::getRecommendedExtension(const AssetRecord& aInfo)
-{
-
-	TextureLoadDescriptor settings{};
-
-	if (aInfo.importSettings.is_object() && !aInfo.importSettings.empty())
-	{
-		settings = aInfo.importSettings.get<TextureLoadDescriptor>();
-
-		if (settings.usage == TextureSemantic::Heightmap ||
-			settings.usage == TextureSemantic::Environment ||
-			settings.usage == TextureSemantic::LUT ||
-			settings.usage == TextureSemantic::Data)
-		{
-			return ".exr";
-		}
-		else if (settings.usage == TextureSemantic::Color ||
-			settings.usage == TextureSemantic::Normal||
-			settings.usage == TextureSemantic::Mask)
-		{
-			return ".png";
-		}
-	}
-
-	return ".png";
-
-
-}
-
-void TextureAsset::save(const AssetRecord& aInfo)
-{
-	auto projectDir = Engine::get()->getProjectDirectory();
-	std::string fileLocation = projectDir + "/" + aInfo.relativefilePath;
-	auto resource = AssetHandle<TextureAsset>(m_uuid).resource();
-
-	if (resource.get()->getData().type == TextureType::FLOAT)
-	{
-		EXRLoader::saveSingleChannelEXR(fileLocation, resource.get()->getWidth(),
-			resource.get()->getHeight(),
-			(const float*)resource.get()->getData().data);
-	}
-	else
-	{
-		STBIHelper::writeToPNG(fileLocation,
-			resource.get()->getWidth(),
-			resource.get()->getHeight(),
-			resource.get()->getChannels(),
-			resource.get()->getData().data,
-			resource.get()->getWidth() * resource.get()->getChannels());
-
-		
-	}
-}
 
 Texture::Texture()
 	:m_id(0), m_slot(0)
@@ -658,23 +598,6 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	textureData.textureName = textureName;
 }
 
-AssetHandle<TextureAsset> TextureAsset::import(const std::string& fileLocation, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::TEXTURE;
-	if (!desc.resourceLoadDescriptor)
-	{
-		desc.makeResourceDescriptor<TextureLoadDescriptor>();
-	}
-	TextureAsset* asset = new TextureAsset(desc);
-	return asset->importAsset(fileLocation).as<TextureAsset>();
-}
-
-AssetHandle<TextureAsset> TextureAsset::create(const ResourceWrapper<Texture>& texture, AssetCreateDescriptor desc)
-{
-	desc.aType = AssetType::TEXTURE;
-	TextureAsset* asset = new TextureAsset(desc);
-	return asset->createAsset(texture).as<TextureAsset>();
-}
 
 ResourceWrapper<Resource> TextureLoadDescriptor::loadResource() {
 	return Texture::load(sourcePath, *this);

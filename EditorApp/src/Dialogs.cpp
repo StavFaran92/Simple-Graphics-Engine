@@ -6,6 +6,9 @@
 #include "Common.h"
 #include "Widgets.h"
 #include "tinyfiledialogs.h"
+#include "memory/Assets.h"
+#include "texture/Texture.h"
+#include "render/Shader.h"
 
 #include <imgui_stdlib.h>
 
@@ -267,14 +270,13 @@ void displayTextureCreatorDialog()
 				textureData.wrap = TextureWrap::Clamp;
 				textureData.data = nullptr;
 				textureData.fillEmpty = true;
-				auto texture = Texture::createTexture(textureData);
-				
 				AssetCreateDescriptor desc;
 				desc.aType = AssetType::TEXTURE;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-				TextureAsset::create(texture, desc);
-				// desc.attributes = texture->getTextureAssetAttributes().toMap(); // TODO: Fix this - getTextureAssetAttributes doesn't exist anymore
+				auto* createDesc = desc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+				createDesc->textureData = textureData;
+				Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -336,14 +338,14 @@ void displayShaderCreatorDialog()
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			auto& shader = Shader::createOverrideShader(filepath.m_filepath, shaderOverrideType); // todo fix
-
 			AssetCreateDescriptor desc;
+			desc.aType = AssetType::SHADER;
 			desc.name = uniqueName.name;
 			desc.sourcePath = filepath.m_filepath;
-			desc.aType = AssetType::SHADER;
 			desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-			ShaderAsset::create(shader, desc);
+			auto* shaderLoadDesc = desc.makeResourceLoadDescriptor<ShaderLoadDescriptor>();
+			shaderLoadDesc->shaderOverride = shaderOverrideType;
+			Engine::get()->getSubSystem<Assets>()->importAsset(desc);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -376,13 +378,12 @@ void displayLuaScriptCreatorDialog()
 		{
 			if (uniqueName.isValid())
 			{
-				ResourceWrapper<LuaScript> script = LuaScript::create();
-
 				AssetCreateDescriptor desc;
 				desc.aType = AssetType::LUA_SCRIPT;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-				LuaScriptAsset::create(script, desc);
+				// TODO: makeResourceCreateDescriptor<LuaScriptCreateDescriptor>()
+				Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 				ImGui::CloseCurrentPopup();
 			}
 

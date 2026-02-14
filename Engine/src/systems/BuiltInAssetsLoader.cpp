@@ -8,6 +8,7 @@
 #include <gl/glew.h>
 
 #include "render/Material.h"
+#include "texture/Texture.h"
 #include "geometry/Quad.h"
 #include "geometry/Box.h"
 #include "geometry/Sphere.h"
@@ -16,132 +17,131 @@
 #include "geometry/ModelImporter.h"
 #include "memory/BuiltInAssets.h"
 
-
-void acquireTexture(const std::string& name, const std::string& path)
-{
-	AssetCreateDescriptor aDesc;
-	aDesc.isEngineOwned = true;
-	aDesc.name = name;
-	TextureAsset::import(path, aDesc);
-}
-
-void addAsAsset(const std::string& name, const ResourceWrapper<MeshGroup>& meshCollection)
-{
-	AssetCreateDescriptor aInfo;
-	aInfo.name = name;
-	aInfo.isEngineOwned = true;
-	MeshGroupAsset::create(meshCollection, aInfo);
-}
-
 void BuiltInAssetsLoader::loadTextures()
 {
 	{
-		static unsigned char* whiteColor = new unsigned char[3] { 255, 255, 255 }; // todo rethink this
-
-		TextureData tData;
-		tData.target = TextureTarget::TEXTURE_2D;
-		tData.width = 1;
-		tData.height = 1;
-		tData.channels = 3;
-		tData.data = whiteColor;
-		tData.internalFormat = TextureInternalFormat::RGB;
-		tData.format = TextureFormat::RGB;
-		tData.type = TextureType::UNSIGNED_BYTE;
-		tData.filter = TextureFilter::Linear;
-		tData.wrap = TextureWrap::Repeat;
-		tData.textureName = "SGE_TEXTURE_WHITE";
-
-		auto texture = Texture::createTexture(tData);
+		static unsigned char whiteColor[3] = { 255, 255, 255 };
 
 		AssetCreateDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
-		desc.name = tData.textureName;
+		desc.name = "SGE_TEXTURE_WHITE";
 		desc.isEngineOwned = true;
-		TextureAsset::create(texture, desc);
+		auto* createDesc = desc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+		createDesc->textureData.target = TextureTarget::TEXTURE_2D;
+		createDesc->textureData.width = 1;
+		createDesc->textureData.height = 1;
+		createDesc->textureData.channels = 3;
+		createDesc->textureData.data = whiteColor;
+		createDesc->textureData.internalFormat = TextureInternalFormat::RGB;
+		createDesc->textureData.format = TextureFormat::RGB;
+		createDesc->textureData.type = TextureType::UNSIGNED_BYTE;
+		createDesc->textureData.filter = TextureFilter::Linear;
+		createDesc->textureData.wrap = TextureWrap::Repeat;
+		createDesc->textureData.textureName = "SGE_TEXTURE_WHITE";
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
 	{
-		static unsigned char* blackColor = new unsigned char[3] { 0, 0, 0};
-		TextureData tData;
-		tData.target = TextureTarget::TEXTURE_2D;
-		tData.width = 1;
-		tData.height = 1;
-		tData.channels = 3;
-		tData.data = blackColor;
-		tData.internalFormat = TextureInternalFormat::RGB;
-		tData.format = TextureFormat::RGB;
-		tData.type = TextureType::UNSIGNED_BYTE;
-		tData.filter = TextureFilter::Linear;
-		tData.wrap = TextureWrap::Repeat;
-		tData.textureName = "SGE_TEXTURE_BLACK";
-		auto texture = Texture::createTexture(tData);
+		static unsigned char blackColor[3] = { 0, 0, 0 };
 
 		AssetCreateDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
-		desc.name = tData.textureName;
+		desc.name = "SGE_TEXTURE_BLACK";
 		desc.isEngineOwned = true;
-		TextureAsset::create(texture, desc);
+		auto* createDesc = desc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+		createDesc->textureData.target = TextureTarget::TEXTURE_2D;
+		createDesc->textureData.width = 1;
+		createDesc->textureData.height = 1;
+		createDesc->textureData.channels = 3;
+		createDesc->textureData.data = blackColor;
+		createDesc->textureData.internalFormat = TextureInternalFormat::RGB;
+		createDesc->textureData.format = TextureFormat::RGB;
+		createDesc->textureData.type = TextureType::UNSIGNED_BYTE;
+		createDesc->textureData.filter = TextureFilter::Linear;
+		createDesc->textureData.wrap = TextureWrap::Repeat;
+		createDesc->textureData.textureName = "SGE_TEXTURE_BLACK";
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
-	acquireTexture("SGE_TEXTURE_GRASS", SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg");
+	{
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::TEXTURE;
+		desc.isEngineOwned = true;
+		desc.name = "SGE_TEXTURE_GRASS";
+		desc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg";
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc);
+	}
 }
 
 void BuiltInAssetsLoader::loadMaterials()
 {
+	// TODO: procedural material creation needs MaterialCreateDescriptor + IResourceFactory impl
 	{
-		AssetCreateDescriptor aDesc;
-		aDesc.isEngineOwned = true;
-		aDesc.name = SGE_MATERIAL_DEFAULT;
-		aDesc.aType = AssetType::MATERIAL;
-		ResourceWrapper<Material> material = Material::create(MaterialRenderMode::Opaque);
-		MaterialAsset::create(material, aDesc);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MATERIAL;
+		desc.isEngineOwned = true;
+		desc.name = SGE_MATERIAL_DEFAULT;
+		// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with renderMode = Opaque
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
 	{
-		AssetCreateDescriptor aDesc;
-		aDesc.isEngineOwned = true;
-		aDesc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
-		ResourceWrapper<Material> material = Material::create(MaterialRenderMode::Terrain);
-		MaterialAsset::create(material, aDesc);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MATERIAL;
+		desc.isEngineOwned = true;
+		desc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
+		// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with renderMode = Terrain
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 }
 
 void BuiltInAssetsLoader::loadMeshes()
 {
+	// TODO: procedural mesh creation needs MeshGroupCreateDescriptor + IResourceFactory impl
 	{
-		// Create box
-		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
-		Box::createMesh(meshCollection);
-		addAsAsset("SGE_MESH_BOX", meshCollection);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MESH;
+		desc.name = "SGE_MESH_BOX";
+		desc.isEngineOwned = true;
+		// TODO: makeResourceCreateDescriptor<MeshGroupCreateDescriptor>() with primitiveType = Box
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
 	{
-		// Create Quad
-		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
-		Quad::createMesh(meshCollection);
-		addAsAsset("SGE_MESH_QUAD", meshCollection);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MESH;
+		desc.name = "SGE_MESH_QUAD";
+		desc.isEngineOwned = true;
+		// TODO: makeResourceCreateDescriptor<MeshGroupCreateDescriptor>() with primitiveType = Quad
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
 	{
-		// Create sphere
-		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
-		Sphere::createMesh(meshCollection, 1, 36, 36);
-		addAsAsset("SGE_MESH_SPHERE", meshCollection);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MESH;
+		desc.name = "SGE_MESH_SPHERE";
+		desc.isEngineOwned = true;
+		// TODO: makeResourceCreateDescriptor<MeshGroupCreateDescriptor>() with primitiveType = Sphere
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
 	{
-		ResourceWrapper<MeshGroup> meshCollection = Factory<MeshGroup>::create();
-		Grid::generateGrid(meshCollection, 10, 10);
-		addAsAsset("SGE_MESH_GRID", meshCollection);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MESH;
+		desc.name = "SGE_MESH_GRID";
+		desc.isEngineOwned = true;
+		// TODO: makeResourceCreateDescriptor<MeshGroupCreateDescriptor>() with primitiveType = Grid
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
 	{
-		AssetCreateDescriptor aInfo;
-		aInfo.aType = AssetType::MESH;
-		aInfo.name = "SGE_MESH_CAMERA";
-		aInfo.isEngineOwned = true;
-		MeshGroupLoadDescriptor* resourceDesc = aInfo.makeResourceDescriptor<MeshGroupLoadDescriptor>();
-		MeshGroupAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae", aInfo);
+		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MESH;
+		desc.name = "SGE_MESH_CAMERA";
+		desc.isEngineOwned = true;
+		desc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae";
+		desc.makeResourceLoadDescriptor<MeshGroupLoadDescriptor>();
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc);
 	}
 }
 
@@ -156,4 +156,3 @@ void BuiltInAssetsLoader::loadAssets()
 	loadMaterials();
 	loadMeshes();
 }
-

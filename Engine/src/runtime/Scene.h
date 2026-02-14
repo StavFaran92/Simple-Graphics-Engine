@@ -219,12 +219,4 @@ public:
 	using ResourceType = Scene;
 
 	using Asset::Asset;
-
-	static AssetHandle<SceneAsset> import(const std::string& fileLocation, AssetCreateDescriptor aDesc = {});
-	static AssetHandle<SceneAsset> create(const ResourceWrapper<Scene>& scene, AssetCreateDescriptor aDesc = {});
-
-	void save(const AssetRecord& aInfo) override;
-
-protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

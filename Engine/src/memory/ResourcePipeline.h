@@ -5,6 +5,8 @@
 struct ResourceLoadDescriptor;
 struct ResourceCreateDescriptor;
 struct AssetCreateDescriptor;
+struct AssetRecord;
+class Asset;
 
 // Validates / fills defaults on resource descriptors
 class IResourceParser
@@ -36,7 +38,7 @@ class IResourceSaver
 {
 public:
 	virtual ~IResourceSaver() = default;
-	virtual void save(const AssetCreateDescriptor& desc) = 0;
+	virtual void save(const AssetRecord& record) = 0;
 };
 
 // Imports an asset from an external file into the project
@@ -44,7 +46,7 @@ class IResourceImporter
 {
 public:
 	virtual ~IResourceImporter() = default;
-	virtual void import(const AssetCreateDescriptor& desc) = 0;
+	virtual void import(const AssetRecord& record) = 0;
 };
 
 // Creates a resource procedurally given a create descriptor

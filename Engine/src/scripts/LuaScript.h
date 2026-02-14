@@ -28,13 +28,4 @@ public:
 	using ResourceType = LuaScript;
 
 	using Asset::Asset;
-
-	static AssetHandle<LuaScriptAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-
-	static AssetHandle<LuaScriptAsset> create(const ResourceWrapper<LuaScript>& script, AssetCreateDescriptor desc = {});
-
-	void save(const AssetRecord& aInfo) override;
-
-protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

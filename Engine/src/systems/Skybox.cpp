@@ -2,6 +2,7 @@
 
 #include "geometry/Box.h"
 #include "memory/ResourceWrapper.h"
+#include "memory/Assets.h"
 #include "runtime/Context.h"
 #include "core/Engine.h"
 #include "runtime/Scene.h"
@@ -24,7 +25,10 @@ Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
     }
     else if (texType == TexType::EQUIRECTANGULAR)
     {
-        auto skyboxTexture = TextureAsset::import(textureFilepath);
+        AssetCreateDescriptor texDesc;
+        texDesc.aType = AssetType::TEXTURE;
+        texDesc.sourcePath = textureFilepath;
+        auto skyboxTexture = Engine::get()->getSubSystem<Assets>()->importAsset(texDesc).as<TextureAsset>();
         auto& skyboxComponent = skyboxEntity.addComponent<SkyboxComponent>(skyboxTexture);
         skyboxComponent.build();
     }

@@ -1,6 +1,7 @@
 #include "systems/WaterSystem.h"
 
 #include "core/Engine.h"
+#include "memory/Assets.h"
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
 #include "geometry/ModelImporter.h"
@@ -24,33 +25,34 @@ Entity WaterSystem::createPool()
 
 	// TODO use grid instead
 	AssetCreateDescriptor meshDesc;
+	meshDesc.aType = AssetType::MESH;
 	meshDesc.isEngineOwned = true;
-	AssetHandle<MeshGroupAsset> mesh = MeshGroupAsset::import(SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx", meshDesc);
+	meshDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx";
+	auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(meshDesc).as<MeshGroupAsset>();
 	auto& meshRendererComponent = waterBodyNestedImpl.addComponent<MeshRendererComponent>(mesh);
 
-	auto& shader = Shader::createOverrideShader(SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl", ShaderOverride::PBR);
 	AssetCreateDescriptor shaderDesc;
 	shaderDesc.aType = AssetType::SHADER;
 	shaderDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl";
 	shaderDesc.name = "WaterShader";
-	
 	shaderDesc.isEngineOwned = true;
-	auto& shaderAsset = ShaderAsset::create(shader, shaderDesc);
+	auto* shaderLoadDesc = shaderDesc.makeResourceLoadDescriptor<ShaderLoadDescriptor>();
+	shaderLoadDesc->shaderOverride = ShaderOverride::PBR;
+	auto shaderAsset = Engine::get()->getSubSystem<Assets>()->importAsset(shaderDesc).as<ShaderAsset>();
 
-	auto& material = Material::create(MaterialRenderMode::Custom);
-	material->setCustomShader(shaderAsset);
 	AssetCreateDescriptor materialDesc;
 	materialDesc.aType = AssetType::MATERIAL;
 	materialDesc.name = "WaterMaterial";
 	materialDesc.isEngineOwned = true;
-	auto materialAsset = MaterialAsset::create(material, materialDesc);
+	// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with renderMode = Custom, customShader = shaderAsset
+	auto materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(materialDesc).as<MaterialAsset>();
 
 	meshRendererComponent.setMaterial(0, materialAsset);
 
-	//auto& shaderComponent = poolQuad.addComponent<ShaderComponent>();
-	//shaderComponent.setShader(shaderAsset);
-
-	auto waterNormal = TextureAsset::import(SGE_ROOT_DIR "Resources/Engine/Textures/water_new_height.png");
+	AssetCreateDescriptor waterNormalDesc;
+	waterNormalDesc.aType = AssetType::TEXTURE;
+	waterNormalDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/water_new_height.png";
+	auto waterNormal = Engine::get()->getSubSystem<Assets>()->importAsset(waterNormalDesc).as<TextureAsset>();
 	auto waterNormalSampler = std::make_shared<TextureSampler>(1);
 	waterNormalSampler->texture = waterNormal;
 	waterBodyComponent.waterBodyNormal = waterNormalSampler;

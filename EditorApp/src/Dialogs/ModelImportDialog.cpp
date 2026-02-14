@@ -1,5 +1,7 @@
 #include "ModelImportDialog.h"
 #include "EditorState.h"
+#include "memory/Assets.h"
+#include "geometry/MeshGroup.h"
 
 ModelImportDialog::ModelImportDialog()
 	: DialogBase("ModelImportDialog")
@@ -34,27 +36,25 @@ bool ModelImportDialog::acceptContent()
 		entity.addComponent<RenderableComponent>();
 
 		AssetCreateDescriptor desc;
+		desc.aType = AssetType::MESH;
 		desc.name = uniqueName.name;
+		desc.sourcePath = filepath.m_filepath;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		auto mesh = MeshGroupAsset::import(filepath.m_filepath, desc);
+		desc.makeResourceLoadDescriptor<MeshGroupLoadDescriptor>();
+		auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(desc).as<MeshGroupAsset>();
 
 		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
 
-		auto& materials = mesh->getImportedMaterials();
-
-		// TODO fix
-		//for (auto& [idx, m] : materials)
-		//{
-		//	meshRenderer.setMaterial(idx, m);
-
-		//}
+		// TODO: get imported materials from ModelImporter and assign to meshRenderer
 
 		ResourceWrapper<Prefab> prefab = Prefab::create(entity);
 
 		AssetCreateDescriptor aInfo;
+		aInfo.aType = AssetType::PREFAB;
 		aInfo.name = uniqueName.name + "_PREFAB";
 		aInfo.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		PrefabAsset::create(prefab, aInfo);
+		// TODO: makeResourceCreateDescriptor<PrefabCreateDescriptor>() with prefab resource
+		Engine::get()->getSubSystem<Assets>()->createAsset(aInfo);
 
 		entity.remove();
 

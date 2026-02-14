@@ -83,7 +83,6 @@ public:
 
 	void reimportAsset()
 	{
-		get()->reimportAsset();
 	}
 
 	T* operator->()

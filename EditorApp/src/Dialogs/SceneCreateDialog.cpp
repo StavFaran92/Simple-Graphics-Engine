@@ -1,5 +1,6 @@
 #include "SceneCreateDialog.h"
 #include "EditorState.h"
+#include "memory/Assets.h"
 
 SceneCreateDialog::SceneCreateDialog()
 	: DialogBase("SceneCreateDialog")
@@ -28,7 +29,8 @@ bool SceneCreateDialog::acceptContent()
 		desc.aType = AssetType::SCENE;
 		desc.name = m_uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		SceneAsset::create(m_tempScene, desc);
+		// TODO: makeResourceCreateDescriptor<SceneCreateDescriptor>() with scene resource
+		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 		return true;
 	}
 	return false;

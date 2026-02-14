@@ -213,12 +213,4 @@ public:
 	using ResourceType = Material;
 
 	using Asset::Asset;
-
-	static AssetHandle<MaterialAsset> import(const std::string& fileLocation, AssetCreateDescriptor desc = {});
-	static AssetHandle<MaterialAsset> create(const ResourceWrapper<Material>& mat, AssetCreateDescriptor desc = {});
-
-	void save(const AssetRecord& aInfo) override;
-
-protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };

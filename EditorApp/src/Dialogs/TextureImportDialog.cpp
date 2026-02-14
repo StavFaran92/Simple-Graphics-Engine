@@ -1,5 +1,6 @@
 #include "TextureImportDialog.h"
 #include "EditorState.h"
+#include "memory/Assets.h"
 
 TextureImportDialog::TextureImportDialog()
 	: DialogBase("TextureImportDialog")
@@ -37,10 +38,11 @@ bool TextureImportDialog::acceptContent()
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 
-		TextureLoadDescriptor* texDesc = new TextureLoadDescriptor();
+		desc.aType = AssetType::TEXTURE;
+		desc.sourcePath = filepath.m_filepath;
+		auto* texDesc = desc.makeResourceLoadDescriptor<TextureLoadDescriptor>();
 		texDesc->usage = textureDataWidget.m_semantic;
-		desc.resourceDescriptor = texDesc;
-		TextureAsset::import(filepath.m_filepath, desc);
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc);
 
 		return true;
 	}

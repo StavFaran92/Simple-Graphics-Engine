@@ -1,5 +1,6 @@
 #include "AnimationImportDialog.h"
 #include "EditorState.h"
+#include "memory/Assets.h"
 
 AnimationImportDialog::AnimationImportDialog()
 	: DialogBase("AnimationImportDialog")
@@ -31,9 +32,11 @@ bool AnimationImportDialog::acceptContent()
 	if (uniqueName.isValid())
 	{
 		AssetCreateDescriptor desc;
+		desc.aType = AssetType::ANIMATION;
 		desc.name = uniqueName.name;
+		desc.sourcePath = filepath.m_filepath;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		AnimationAsset::import(filepath.m_filepath, desc);
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc);
 
 		return true;
 	}

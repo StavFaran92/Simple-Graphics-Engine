@@ -42,13 +42,4 @@ public:
 	using ResourceType = Prefab;
 
 	using Asset::Asset;
-
-	static AssetHandle<PrefabAsset> import(const std::string& fileLocation, PrefabImportSettings aDesc = {});
-
-	static AssetHandle<PrefabAsset> create(const ResourceWrapper<Prefab>& prefab, AssetCreateDescriptor desc = {});
-
-	void save(const AssetRecord& aInfo) override;
-
-protected:
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) override;
 };
