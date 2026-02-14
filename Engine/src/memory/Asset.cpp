@@ -99,13 +99,3 @@ void Asset::updateAsset(const AssetUpdateDescriptor& uDesc)
 
 	Engine::get()->getSubSystem<Assets>()->updateAsset(aInfo);
 }
-
-AssetHandle<Asset> Asset::create(AssetCreateDescriptor desc)
-{
-	return Engine::get()->getSubSystem<Assets>()->createAsset(std::move(desc));
-}
-
-AssetHandle<Asset> Asset::import(AssetCreateDescriptor desc)
-{
-	return Engine::get()->getSubSystem<Assets>()->importAsset(std::move(desc));
-}

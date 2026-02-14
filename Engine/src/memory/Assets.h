@@ -46,6 +46,7 @@ public:
 
 	// Unified pipeline entry points
 	AssetHandle<Asset> createAsset(AssetCreateDescriptor desc);
+
 	AssetHandle<Asset> importAsset(AssetCreateDescriptor desc);
 
 private:

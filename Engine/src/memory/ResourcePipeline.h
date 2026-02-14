@@ -47,6 +47,14 @@ public:
 	virtual void import(const AssetCreateDescriptor& desc) = 0;
 };
 
+// Creates a resource procedurally given a create descriptor
+class IAssetFactory
+{
+public:
+	virtual ~IAssetFactory() = default;
+	virtual Asset* create(AssetCreateDescriptor& desc) = 0;
+};
+
 // Per-type manager that provides access to the pipeline stages
 class ResourceTypeManager
 {
@@ -57,4 +65,5 @@ public:
 	virtual IResourceFactory*  getFactory() = 0;
 	virtual IResourceSaver*    getSaver(const std::string& ext) = 0;
 	virtual IResourceImporter* getImporter(const std::string& ext) = 0;
+	virtual IAssetFactory*     getAssetFactory() = 0;
 };

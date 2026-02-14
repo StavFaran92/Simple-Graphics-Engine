@@ -375,13 +375,27 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	// Save the asset to disk
 	std::string ext = getExtensionFromType(type);
 	IResourceSaver* saver = manager->getSaver(ext);
-	if (saver)
+	if (!saver)
 	{
-		saver->save(desc);
+		logError("No Resource saver registered for asset type {}", static_cast<int>(type));
+		return AssetHandle<Asset>::empty;
 	}
 
-	// TODO: addAsset once AssetRecord integration is finalized
-	return AssetHandle<Asset>::empty;
+	saver->save(desc);
+
+	IAssetFactory* factory = manager->getAssetFactory();
+	if (!factory)
+	{
+		logError("No asset factory registered for asset type {}", static_cast<int>(type));
+		return AssetHandle<Asset>::empty;
+	}
+
+	AssetRecord record(desc);
+	record.asset = factory->create(desc);
+	record.parse();
+	addAsset(record);
+
+	return AssetHandle<Asset>(record.uuid);
 }
 
 AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
@@ -405,11 +419,25 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	// Import from source file
 	std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.'));
 	IResourceImporter* importer = manager->getImporter(ext);
-	if (importer)
+	if (!importer)
 	{
-		importer->import(desc);
+		logError("No resource importer registered for asset type {}", static_cast<int>(type));
+		return AssetHandle<Asset>::empty;
 	}
 
-	// TODO: addAsset once AssetRecord integration is finalized
-	return AssetHandle<Asset>::empty;
+	importer->import(desc);
+
+	IAssetFactory* factory = manager->getAssetFactory();
+	if (!factory)
+	{
+		logError("No asset factory registered for asset type {}", static_cast<int>(type));
+		return AssetHandle<Asset>::empty;
+	}
+
+	AssetRecord record(desc);
+	record.asset = factory->create(desc);
+	record.parse();
+	addAsset(record);
+
+	return AssetHandle<Asset>(record.uuid);
 }
