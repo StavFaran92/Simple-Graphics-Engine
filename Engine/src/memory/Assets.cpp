@@ -353,3 +353,63 @@ void Assets::deleteAsset(AssetHandle<Asset> asset)
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
 	m_assets.erase(aInfo.uuid);
 }
+
+AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
+{
+	AssetType type = desc.aType;
+
+	ResourceTypeManager* manager = AssetFactory::getManager(type);
+	if (!manager)
+	{
+		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(type));
+		return AssetHandle<Asset>::empty;
+	}
+
+	// Parse the resource descriptor
+	IResourceParser* parser = manager->getParser();
+	if (parser && desc.resourceCreateDescriptor)
+	{
+		parser->parse(*desc.resourceCreateDescriptor);
+	}
+
+	// Save the asset to disk
+	std::string ext = getExtensionFromType(type);
+	IResourceSaver* saver = manager->getSaver(ext);
+	if (saver)
+	{
+		saver->save(desc);
+	}
+
+	// TODO: addAsset once AssetRecord integration is finalized
+	return AssetHandle<Asset>::empty;
+}
+
+AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
+{
+	AssetType type = desc.aType;
+
+	ResourceTypeManager* manager = AssetFactory::getManager(type);
+	if (!manager)
+	{
+		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(type));
+		return AssetHandle<Asset>::empty;
+	}
+
+	// Parse the resource descriptor
+	IResourceParser* parser = manager->getParser();
+	if (parser && desc.resourceLoadDescriptor)
+	{
+		parser->parse(*desc.resourceLoadDescriptor);
+	}
+
+	// Import from source file
+	std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.'));
+	IResourceImporter* importer = manager->getImporter(ext);
+	if (importer)
+	{
+		importer->import(desc);
+	}
+
+	// TODO: addAsset once AssetRecord integration is finalized
+	return AssetHandle<Asset>::empty;
+}

@@ -25,6 +25,10 @@ public:
 	const AssetCreateDescriptor& getDescriptor() const;
 
 	UUID getUUID() const;
+
+	// Unified pipeline entry points (delegate to Assets subsystem)
+	static AssetHandle<Asset> create(AssetCreateDescriptor desc);
+	static AssetHandle<Asset> import(AssetCreateDescriptor desc);
 protected:
 	virtual bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo) = 0;
 

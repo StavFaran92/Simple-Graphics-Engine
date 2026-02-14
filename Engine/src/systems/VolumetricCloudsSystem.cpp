@@ -40,7 +40,7 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	shaderAssetDesc.name = "VolumetricCloudsShader";
 	ShaderLoadDescriptor* shaderDesc = new ShaderLoadDescriptor();
 	shaderDesc->shaderOverride = ShaderOverride::Volume;
-	shaderAssetDesc.resourceDescriptor = shaderDesc;
+	shaderAssetDesc.resourceLoadDescriptor = shaderDesc;
 	shaderAssetDesc.isEngineOwned = false;
 	auto shaderAsset = ShaderAsset::create(shader, shaderAssetDesc);
 

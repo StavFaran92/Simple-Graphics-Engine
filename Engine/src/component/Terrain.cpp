@@ -58,7 +58,7 @@ AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 	TextureLoadDescriptor* resourceDesc = new TextureLoadDescriptor();
 	resourceDesc->usage = TextureSemantic::Heightmap;
 
-	desc.resourceDescriptor = resourceDesc;
+	desc.resourceLoadDescriptor = resourceDesc;
 	auto heightmap = TextureAsset::create(texture, desc);
 	//auto heightmap = Engine::get()->getSubSystem<Assets>()->createAsset(texture, desc).as<TextureAsset>();
 

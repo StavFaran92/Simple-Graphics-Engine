@@ -1,21 +1,18 @@
 #pragma once
 
+#include "core/Configurations.h"
+
 template<typename T>
 class ResourceWrapper;
+
+struct ResourceLoadDescriptor;
+struct ResourceCreateDescriptor;
 
 class Resource
 {
 public:
 	Resource() = default;
 	virtual ~Resource() = default;
-
-	//ResourceWrapper<Resource> loadResource(const std::string& fileLocation);
-
-	//template<typename T>
-	//static ResourceWrapper<T> createNewResource(ResourceID id)
-	//{
-	//	return ResourceWrapper<T>(id);
-	//}
 
 	static ResourceID getNewResourceID()
 	{
@@ -24,22 +21,7 @@ public:
 
 	inline static ResourceID resourceCounter = 1;
 
-	//static ResourceWrapper<ResourceBase> import(const std::string& fileLocation, AssetInfo& params);
-
-	////virtual Resource<Asset> load(AssetInfo aInfo) = 0;
-
-	//// CRTP
-	//template <typename T>
-	//static ResourceWrapper<T> import(const std::string& fileLocation, AssetInfo& params) {
-	//	return T::import(fileLocation, params);
-	//}
-
-	//template <typename T>
-	//static ResourceWrapper<T> load(AssetInfo& aInfo) {
-	//	return T::load(aInfo);
-	//}
-
-	
-public:
-	//AssetInfo m_assetInfo;
+	// Unified pipeline entry points (delegate to ResourceTypeManager registry)
+	static ResourceWrapper<Resource> load(ResourceLoadDescriptor& desc);
+	static ResourceWrapper<Resource> create(ResourceCreateDescriptor& desc);
 };

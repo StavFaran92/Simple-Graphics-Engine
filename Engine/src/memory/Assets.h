@@ -43,6 +43,11 @@ public:
 	void addAsset(AssetRecord& aInfo);
 
 	void updateAsset(AssetRecord& aInfo);
+
+	// Unified pipeline entry points
+	AssetHandle<Asset> createAsset(AssetCreateDescriptor desc);
+	AssetHandle<Asset> importAsset(AssetCreateDescriptor desc);
+
 private:
 
 	void updateRegistry(const AssetRecord& aInfo);

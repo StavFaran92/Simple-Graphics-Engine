@@ -688,7 +688,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		TextureLoadDescriptor* textureDesc = new TextureLoadDescriptor();
 		textureDesc->usage = TextureSemantic::Color;
 
-		tSettings.resourceDescriptor = textureDesc;
+		tSettings.resourceLoadDescriptor = textureDesc;
 
 		AssetTexture = TextureAsset::import(path, tSettings);
 

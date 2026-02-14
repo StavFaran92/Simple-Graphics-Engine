@@ -19,7 +19,15 @@ struct ResourceLoadDescriptor
 
 	virtual nlohmann::json fillParams() const { return {}; }
 
+	AssetType aType = AssetType::NONE;
 	std::string sourcePath;
+};
+
+struct ResourceCreateDescriptor
+{
+	virtual ~ResourceCreateDescriptor() = default;
+
+	AssetType aType = AssetType::NONE;
 };
 
 struct AssetCreateDescriptor
@@ -34,7 +42,8 @@ struct AssetCreateDescriptor
 	ScopedPath targetDirectory;
 	std::string assetDirectory; // todo consider remove
 
-	ResourceLoadDescriptor* resourceDescriptor = nullptr;
+	ResourceLoadDescriptor* resourceLoadDescriptor = nullptr; // TODO: rename callers to use resourceLoadDescriptor
+	ResourceCreateDescriptor* resourceCreateDescriptor = nullptr;
 
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetCreateDescriptor,
 		name,
@@ -46,15 +55,22 @@ struct AssetCreateDescriptor
 		);
 
 	template<typename T, typename... Args>
-	T* makeResourceDescriptor(Args&&... args)
+	T* makeResourceLoadDescriptor(Args&&... args)
 	{
 		static_assert(std::is_base_of_v<ResourceLoadDescriptor, T>);
 		T* obj = new T(std::forward<Args>(args)...);
-		resourceDescriptor = obj;
+		resourceLoadDescriptor = obj;
 		return obj;
 	}
 
-	//virtual nlohmann::json fillParams() const { return {}; }
+	template<typename T, typename... Args>
+	T* makeResourceCreateDescriptor(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<ResourceCreateDescriptor, T>);
+		T* obj = new T(std::forward<Args>(args)...);
+		resourceCreateDescriptor = obj;
+		return obj;
+	}
 
 	//timestamp
 	//size

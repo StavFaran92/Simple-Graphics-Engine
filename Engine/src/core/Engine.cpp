@@ -599,7 +599,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     ShaderLoadDescriptor* shaderDesc = desc.makeResourceDescriptor<ShaderLoadDescriptor>();
     shaderDesc->shaderOverride = ShaderOverride::PostProcess;
 
-    desc.resourceDescriptor = shaderDesc;
+    desc.resourceLoadDescriptor = shaderDesc;
     auto FXAAShaderAsset = ShaderAsset::create(FXAAShader, desc);
 
     postProcess.shader = FXAAShaderAsset;

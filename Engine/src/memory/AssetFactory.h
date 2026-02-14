@@ -1,19 +1,18 @@
 #pragma once
 
 #include "Assets.h"
-
-class AssetManager;
+#include "memory/ResourcePipeline.h"
 
 class AssetFactory
 {
 public:
 	using LoadFn = std::function<AssetHandle<Asset>(AssetRecord&)>;
 
-	// Register a manager instance for a specific asset type.
-	static void registerManager(AssetType aType, std::shared_ptr<AssetManager> manager);
+	// Register a resource type manager for a specific asset type.
+	static void registerManager(AssetType aType, std::shared_ptr<ResourceTypeManager> manager);
 
 	// Retrieve the manager (non-owning pointer).
-	static AssetManager* getManager(AssetType aType);
+	static ResourceTypeManager* getManager(AssetType aType);
 
 	static bool loadAsset(AssetRecord& aInfo);
 
@@ -29,5 +28,5 @@ private:
 	}
 
 private:
-	static std::map<AssetType, std::shared_ptr<AssetManager>>& getManagerRegistry();
+	static std::map<AssetType, std::shared_ptr<ResourceTypeManager>>& getManagerRegistry();
 };

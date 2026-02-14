@@ -44,7 +44,7 @@ public:
 		return Engine::get()->getResourceManager()->createOrGetCached(record.resourceID, [this, &record]() {
 			const Asset* asset = get();
 			const AssetCreateDescriptor& createDesc = asset->getDescriptor();
-			ResourceLoadDescriptor* loadDesc = createDesc.resourceDescriptor;
+			ResourceLoadDescriptor* loadDesc = createDesc.resourceLoadDescriptor;
 
 			loadDesc->sourcePath = record.sourcePath;
 
