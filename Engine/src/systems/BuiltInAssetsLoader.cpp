@@ -103,7 +103,9 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_BOX";
 		desc.isEngineOwned = true;
-		// TODO: makeResourceCreateDescriptor<MeshGroupCreateDescriptor>() with primitiveType = Box
+		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
+		meshDesc->data = Box::createMesh()->getMeshData(); // can and should be optimized, instead of building the mesh, it should return the raw data.
+
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 

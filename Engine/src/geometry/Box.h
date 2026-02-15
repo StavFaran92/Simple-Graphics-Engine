@@ -8,6 +8,6 @@
 class EngineAPI Box
 {
 public:
-	static void createMesh(ResourceWrapper<MeshGroup>& meshCollection);
+	static std::shared_ptr<Mesh> createMesh();
 };
 

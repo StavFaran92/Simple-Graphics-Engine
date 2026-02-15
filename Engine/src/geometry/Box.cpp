@@ -71,7 +71,7 @@ static const unsigned int indices[] = {
     6, 7, 3
 };
 
-void Box::createMesh(ResourceWrapper<MeshGroup>& meshCollection)
+std::shared_ptr<Mesh> Box::createMesh()
 {
     //ModelImporter::ModelImportSettings settings;
     //settings.name = "SGE_BOX_MESH";
@@ -90,5 +90,5 @@ void Box::createMesh(ResourceWrapper<MeshGroup>& meshCollection)
         .addRawVertices((float*)vertices, layout)
         .build(*mesh.get());
 
-    meshCollection.get()->addMesh(mesh);
+    return mesh;
 }

@@ -27,6 +27,8 @@ struct ResourceCreateDescriptor
 {
 	virtual ~ResourceCreateDescriptor() = default;
 
+	virtual ResourceWrapper<Resource> createResource() = 0;
+
 	AssetType aType = AssetType::NONE;
 };
 

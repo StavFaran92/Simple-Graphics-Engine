@@ -12,6 +12,13 @@ struct EngineAPI MeshGroupLoadDescriptor : public ResourceLoadDescriptor
 	ResourceWrapper<Resource> loadResource() override;
 };
 
+struct EngineAPI MeshGroupCreateDescriptor : public ResourceCreateDescriptor
+{
+	ResourceWrapper<Resource> createResource() override;
+
+	MeshData data;
+};
+
 // Resource
 class EngineAPI MeshGroup : public Resource
 {
