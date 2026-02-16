@@ -26,7 +26,7 @@ class ShaderTypeManager : public ResourceTypeManager
 public:
 	IResourceParser*   getParser() override { return nullptr; }
 	IResourceLoader*   getLoader(const std::string&) override { return nullptr; }
-	IResourceFactory*  getFactory() override { return nullptr; }
+	//IResourceFactory*  getFactory() override { return nullptr; }
 	IResourceSaver*    getSaver(const std::string&) override { return &m_saver; }
 	IResourceImporter* getImporter(const std::string&) override { return &m_importer; }
 	IAssetFactory*     getAssetFactory() override { return &m_factory; }

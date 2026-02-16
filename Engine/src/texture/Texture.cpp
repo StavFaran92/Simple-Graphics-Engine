@@ -599,9 +599,16 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 }
 
 
-ResourceWrapper<Resource> TextureLoadDescriptor::loadResource() {
+ResourceWrapper<Resource> TextureLoadDescriptor::loadResource() 
+{
 	return Texture::load(sourcePath, *this);
+}
+
+ResourceWrapper<Resource> TextureCreateDescriptor::createResource()
+{
+	return Texture::createTexture(textureData);
 }
 
 
 //adi is your love of your life
+

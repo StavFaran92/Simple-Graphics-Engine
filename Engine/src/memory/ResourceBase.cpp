@@ -53,13 +53,12 @@ ResourceWrapper<Resource> Resource::create(ResourceCreateDescriptor& desc)
 		parser->parse(desc);
 	}
 
-	// Create procedurally
-	IResourceFactory* factory = manager->getFactory();
-	if (!factory)
+	ResourceWrapper<Resource> resource = desc.createResource();
+	if (resource.isEmpty())
 	{
-		logError("No factory registered for asset type {}", static_cast<int>(type));
+		logError("Failed to create resource of type {}", static_cast<int>(type));
 		return ResourceWrapper<Resource>::empty;
 	}
 
-	return factory->create(desc);
+	return resource;
 }

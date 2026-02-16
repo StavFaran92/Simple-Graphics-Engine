@@ -26,12 +26,12 @@ public:
 };
 
 // Creates a resource procedurally given a create descriptor
-class IResourceFactory
-{
-public:
-	virtual ~IResourceFactory() = default;
-	virtual ResourceWrapper<Resource> create(ResourceCreateDescriptor& desc) = 0;
-};
+//class IResourceFactory
+//{
+//public:
+//	virtual ~IResourceFactory() = default;
+//	virtual ResourceWrapper<Resource> create(ResourceCreateDescriptor& desc) = 0;
+//};
 
 // Saves an asset to disk
 class IResourceSaver
@@ -64,7 +64,7 @@ public:
 	virtual ~ResourceTypeManager() = default;
 	virtual IResourceParser*   getParser() = 0;
 	virtual IResourceLoader*   getLoader(const std::string& ext) = 0;
-	virtual IResourceFactory*  getFactory() = 0;
+	//virtual IResourceFactory*  getFactory() = 0;
 	virtual IResourceSaver*    getSaver(const std::string& ext) = 0;
 	virtual IResourceImporter* getImporter(const std::string& ext) = 0;
 	virtual IAssetFactory*     getAssetFactory() = 0;

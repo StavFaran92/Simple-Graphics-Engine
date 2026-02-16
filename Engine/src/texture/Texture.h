@@ -153,6 +153,8 @@ struct EngineAPI TextureLoadDescriptor : public ResourceLoadDescriptor
 struct EngineAPI TextureCreateDescriptor : public ResourceCreateDescriptor
 {
 	TextureData textureData;
+
+	ResourceWrapper<Resource> createResource() override;
 };
 
 // Resource

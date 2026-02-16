@@ -81,3 +81,9 @@ ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, Mesh
 ResourceWrapper<Resource> MeshGroupLoadDescriptor::loadResource() {
 	return MeshGroup::load(sourcePath, *this);
 }
+
+ResourceWrapper<Resource> MeshGroupCreateDescriptor::createResource()
+{
+	throw std::exception("Not yet implmeneted.");
+	//return MeshGroup::cre(sourcePath, *this);
+}
