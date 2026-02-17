@@ -437,7 +437,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	ScopedPath dest = calculateAssetDestinationPathCreate(desc);
 	if(!manager->saveResource(*desc.resourceCreateDescriptor, dest)) // todo change return to bool for validation
 	{
-		logError("Failed to save asset type {} to: ", static_cast<int>(type), dest.absolute().c_str());
+		logError("Failed to save asset type {} to: {}", static_cast<int>(type), dest.absolute().string());
 		return AssetHandle<Asset>::empty;
 	}
 
@@ -480,7 +480,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	ScopedPath dest = calculateAssetDestinationPathImport(desc);
 	if (!manager->importAsset(desc.resourceLoadDescriptor->sourcePath, dest))
 	{
-		logError("Failed to save asset type {} to: ", static_cast<int>(type), dest.absolute().c_str());
+		logError("Failed to save asset type {} to: ", static_cast<int>(type), dest.absolute().string());
 		return AssetHandle<Asset>::empty;
 	}
 

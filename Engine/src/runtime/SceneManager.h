@@ -5,12 +5,21 @@
 class SceneTypeManager : public ResourceTypeManager
 {
 public:
-	ResourceWrapper<Resource> loadFromDisk(ResourceLoadDescriptor& desc) override;
-	void saveAsset(const AssetRecord& record) override;
-	void importAsset(const AssetRecord& record) override;
-	Asset* createAsset(AssetCreateDescriptor& desc) override;
-	ResourceLoadDescriptor* createLoadDescriptor(const AssetRecord& record) override;
 
-	virtual void parse(ResourceLoadDescriptor& desc) override;
-	virtual void parse(ResourceCreateDescriptor& desc) override;
+
+	// Inherited via ResourceTypeManager
+	Asset* createAsset(AssetCreateDescriptor& desc) override;
+
+	bool importAsset(const std::string& src, const ScopedPath& dst) override;
+
+	bool saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst) override;
+
+	ResourceLoadDescriptor* makeResourceLoadDescriptor() override;
+
+	ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) override;
+
+	void parse(ResourceLoadDescriptor& desc) override;
+
+	void parse(ResourceCreateDescriptor& desc) override;
+
 };

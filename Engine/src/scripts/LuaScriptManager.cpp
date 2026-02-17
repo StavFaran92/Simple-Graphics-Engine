@@ -8,17 +8,37 @@
 
 #include <filesystem>
 
-void LuaScriptTypeManager::saveAsset(const AssetRecord& record)
-{
-	std::filesystem::copy_file(record.sourcePath, record.fullFilePath, std::filesystem::copy_options::overwrite_existing);
-}
-
-void LuaScriptTypeManager::importAsset(const AssetRecord& record)
-{
-	std::filesystem::copy_file(record.sourcePath, record.fullFilePath, std::filesystem::copy_options::overwrite_existing);
-}
-
 Asset* LuaScriptTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new LuaScriptAsset(desc);
 }
+
+bool LuaScriptTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
+{
+	return std::filesystem::copy_file(src, dst.absolute(), std::filesystem::copy_options::overwrite_existing);
+}
+
+bool LuaScriptTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+{
+	return false;
+}
+
+ResourceLoadDescriptor* LuaScriptTypeManager::makeResourceLoadDescriptor()
+{
+	return nullptr;
+}
+
+ResourceWrapper<Resource> LuaScriptTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+{
+	return ResourceWrapper<Resource>();
+}
+
+void LuaScriptTypeManager::parse(ResourceLoadDescriptor& desc)
+{
+}
+
+void LuaScriptTypeManager::parse(ResourceCreateDescriptor& desc)
+{
+}
+
+

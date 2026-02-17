@@ -9,18 +9,36 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-void PrefabTypeManager::saveAsset(const AssetRecord& record)
-{
-	// TODO: save is called before the asset/resource exists in the system.
-	// Original: cereal JSON serialize *AssetHandle<PrefabAsset>(m_uuid).resource().get() to record.fullFilePath
-}
-
-void PrefabTypeManager::importAsset(const AssetRecord& record)
-{
-	// Prefab import is a no-op
-}
-
 Asset* PrefabTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new PrefabAsset(desc);
 }
+
+bool PrefabTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
+{
+	return false;
+}
+
+bool PrefabTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+{
+	return false;
+}
+
+ResourceLoadDescriptor* PrefabTypeManager::makeResourceLoadDescriptor()
+{
+	return nullptr;
+}
+
+ResourceWrapper<Resource> PrefabTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+{
+	return ResourceWrapper<Resource>();
+}
+
+void PrefabTypeManager::parse(ResourceLoadDescriptor& desc)
+{
+}
+
+void PrefabTypeManager::parse(ResourceCreateDescriptor& desc)
+{
+}
+

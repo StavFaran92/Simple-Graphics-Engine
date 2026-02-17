@@ -43,7 +43,7 @@ public:
 		const AssetRecord& record = info();
 		return Engine::get()->getResourceManager()->createOrGetCached(record.resourceID, [this, &record]() {
 
-			ResourceLoadDescriptor* loadDesc = AssetFactory::getManager(record.aType)->createLoadDescriptor(record);
+			ResourceLoadDescriptor* loadDesc = AssetFactory::getManager(record.aType)->makeResourceLoadDescriptor();
 			assert(loadDesc);
 			//SGE_ASSERT(loadDesc);
 			ResourceWrapper<Resource> resource = loadDesc->loadResource();

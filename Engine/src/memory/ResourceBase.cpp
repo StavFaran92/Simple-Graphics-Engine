@@ -17,7 +17,7 @@ ResourceWrapper<Resource> Resource::load(ResourceLoadDescriptor& desc)
 	}
 
 	manager->parse(desc);
-	ResourceWrapper<Resource> resource = manager->loadFromDisk(desc);
+	ResourceWrapper<Resource> resource = manager->loadResourceFromDisk(desc);
 	return resource;
 }
 
