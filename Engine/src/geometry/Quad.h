@@ -7,6 +7,6 @@
 class EngineAPI Quad 
 {
 public:
-	static void createMesh(ResourceWrapper<MeshGroup>&);
+	static std::shared_ptr<Mesh> createMesh();
 };
 

@@ -10,19 +10,25 @@
 
 #include <filesystem>
 
-void TextureTypeManager::Saver::save(const AssetRecord& record)
+void TextureTypeManager::saveAsset(const AssetRecord& record)
 {
 	// TODO: save is called before the asset/resource exists in the system,
 	// so we can't do AssetHandle<TextureAsset>(uuid).resource() here yet.
 	// Original logic: if float texture -> EXRLoader::saveSingleChannelEXR, else STBIHelper::writeToPNG
 }
 
-void TextureTypeManager::Importer::import(const AssetRecord& record)
+void TextureTypeManager::importAsset(const AssetRecord& record)
 {
 	std::filesystem::copy_file(record.sourcePath, record.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-Asset* TextureTypeManager::Factory::create(AssetCreateDescriptor& desc)
+Asset* TextureTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new TextureAsset(desc);
+}
+
+ResourceLoadDescriptor* TextureTypeManager::createLoadDescriptor(const AssetRecord& record)
+{
+	auto desc = new TextureLoadDescriptor();
+	return desc;
 }

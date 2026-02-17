@@ -42,17 +42,17 @@ public:
 
 		const AssetRecord& record = info();
 		return Engine::get()->getResourceManager()->createOrGetCached(record.resourceID, [this, &record]() {
-			const Asset* asset = get();
-			const AssetCreateDescriptor& createDesc = asset->getDescriptor();
-			ResourceLoadDescriptor* loadDesc = createDesc.resourceLoadDescriptor;
 
-			loadDesc->sourcePath = record.sourcePath;
-
+			ResourceLoadDescriptor* loadDesc = AssetFactory::getManager(record.aType)->createLoadDescriptor(record);
+			assert(loadDesc);
+			//SGE_ASSERT(loadDesc);
 			ResourceWrapper<Resource> resource = loadDesc->loadResource();
-			AssetRecord newRecord = record;
-			newRecord.resourceID = resource.getUID();
-			Engine::get()->getSubSystem<Assets>()->updateAsset(newRecord);
+			Engine::get()->getResourceManager()->addResourceToCache(record.resourceID, resource);
 			return resource;
+
+			//AssetRecord newRecord = record;
+			//newRecord.resourceID = resource.getUID();
+			//Engine::get()->getSubSystem<Assets>()->updateAsset(newRecord);
 		}).as<ResourceType>();
 	}
 

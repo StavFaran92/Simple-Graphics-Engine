@@ -1,71 +1,52 @@
 #pragma once
 
+#include "memory/AssetRecord.h"
+#include "memory/AssetDescriptors.h"
 #include "memory/ResourceWrapper.h"
 
-struct ResourceLoadDescriptor;
-struct ResourceCreateDescriptor;
-struct AssetCreateDescriptor;
-struct AssetRecord;
 class Asset;
+class Resource;
+struct AssetCreateDescriptor;
+struct ResourceCreateDescriptor;
+struct ResourceLoadDescriptor;
 
 // Validates / fills defaults on resource descriptors
-class IResourceParser
-{
-public:
-	virtual ~IResourceParser() = default;
-	virtual void parse(ResourceLoadDescriptor& desc) = 0;
-	virtual void parse(ResourceCreateDescriptor& desc) = 0;
-};
-
-// Loads a resource from disk given a load descriptor
-class IResourceLoader
-{
-public:
-	virtual ~IResourceLoader() = default;
-	virtual ResourceWrapper<Resource> loadFromDisk(ResourceLoadDescriptor& desc) = 0;
-};
-
-// Creates a resource procedurally given a create descriptor
-//class IResourceFactory
-//{
-//public:
-//	virtual ~IResourceFactory() = default;
-//	virtual ResourceWrapper<Resource> create(ResourceCreateDescriptor& desc) = 0;
-//};
-
-// Saves an asset to disk
-class IResourceSaver
-{
-public:
-	virtual ~IResourceSaver() = default;
-	virtual void save(const AssetRecord& record) = 0;
-};
-
-// Imports an asset from an external file into the project
-class IResourceImporter
-{
-public:
-	virtual ~IResourceImporter() = default;
-	virtual void import(const AssetRecord& record) = 0;
-};
-
-// Creates a resource procedurally given a create descriptor
-class IAssetFactory
-{
-public:
-	virtual ~IAssetFactory() = default;
-	virtual Asset* create(AssetCreateDescriptor& desc) = 0;
-};
-
-// Per-type manager that provides access to the pipeline stages
 class ResourceTypeManager
 {
 public:
-	virtual ~ResourceTypeManager() = default;
-	virtual IResourceParser*   getParser() = 0;
-	virtual IResourceLoader*   getLoader(const std::string& ext) = 0;
-	//virtual IResourceFactory*  getFactory() = 0;
-	virtual IResourceSaver*    getSaver(const std::string& ext) = 0;
-	virtual IResourceImporter* getImporter(const std::string& ext) = 0;
-	virtual IAssetFactory*     getAssetFactory() = 0;
+    // ============================================================
+    //  Creation (Editor side)
+    // ============================================================
+
+    // Create a new asset instance in memory (e.g new Material, new Mesh)
+    virtual Asset* createAsset(AssetCreateDescriptor& desc) = 0;
+
+    // Called when user imports an external file (FBX/PNG/etc)
+    virtual void importAsset(const AssetRecord& record) = 0;
+
+    // Save asset metadata (.asset / .meta)
+    virtual void saveAsset(const AssetRecord& record) = 0;
+
+
+    // ============================================================
+    //  Runtime resource loading
+    // ============================================================
+
+    // Create a load descriptor from asset record
+    virtual ResourceLoadDescriptor* createLoadDescriptor(const AssetRecord& record) = 0;
+
+    // Actually load the runtime resource (GPU buffers, textures, etc)
+    virtual ResourceWrapper<Resource> loadFromDisk(ResourceLoadDescriptor& desc) = 0;
+
+
+    // ============================================================
+    //  Descriptor parsing
+    // ============================================================
+
+    // Parse serialized asset data -> runtime loading descriptor
+    virtual void parse(ResourceLoadDescriptor& desc) = 0;
+
+    // Parse asset data -> creation descriptor (editor creation)
+    virtual void parse(ResourceCreateDescriptor& desc) = 0;
+
 };

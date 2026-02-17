@@ -46,7 +46,7 @@ aiScene* generateScene(const std::vector<float>& vertices, const std::vector<uns
 	return scene;
 }
 
-void Grid::generateGrid(ResourceWrapper<MeshGroup>& meshCollection, int x, int y)
+std::shared_ptr<Mesh> Grid::createMesh(int x, int y)
 {
 	int xRez = x;
 	int yRez = y;
@@ -116,5 +116,5 @@ void Grid::generateGrid(ResourceWrapper<MeshGroup>& meshCollection, int x, int y
 		.addIndices(indices)
 		.build(*mesh.get());
 
-	meshCollection.get()->addMesh(mesh);
+	return mesh;
 }

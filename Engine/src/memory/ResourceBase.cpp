@@ -16,23 +16,9 @@ ResourceWrapper<Resource> Resource::load(ResourceLoadDescriptor& desc)
 		return ResourceWrapper<Resource>::empty;
 	}
 
-	// Parse the descriptor
-	IResourceParser* parser = manager->getParser();
-	if (parser)
-	{
-		parser->parse(desc);
-	}
-
-	// Load from disk
-	std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.'));
-	IResourceLoader* loader = manager->getLoader(ext);
-	if (!loader)
-	{
-		logError("No loader registered for extension '{}' on asset type {}", ext, static_cast<int>(type));
-		return ResourceWrapper<Resource>::empty;
-	}
-
-	return loader->loadFromDisk(desc);
+	manager->parse(desc);
+	ResourceWrapper<Resource> resource = manager->loadFromDisk(desc);
+	return resource;
 }
 
 ResourceWrapper<Resource> Resource::create(ResourceCreateDescriptor& desc)
@@ -46,12 +32,7 @@ ResourceWrapper<Resource> Resource::create(ResourceCreateDescriptor& desc)
 		return ResourceWrapper<Resource>::empty;
 	}
 
-	// Parse the descriptor
-	IResourceParser* parser = manager->getParser();
-	if (parser)
-	{
-		parser->parse(desc);
-	}
+	manager->parse(desc);
 
 	ResourceWrapper<Resource> resource = desc.createResource();
 	if (resource.isEmpty())

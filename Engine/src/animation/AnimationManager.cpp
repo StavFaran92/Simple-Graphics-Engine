@@ -8,18 +8,18 @@
 #include <filesystem>
 #include <stdexcept>
 
-void AnimationTypeManager::Saver::save(const AssetRecord& record)
+void AnimationTypeManager::saveAsset(const AssetRecord& record)
 {
 	// TODO: implement animation save
 	throw std::runtime_error("Animation save not yet implemented!");
 }
 
-void AnimationTypeManager::Importer::import(const AssetRecord& record)
+void AnimationTypeManager::importAsset(const AssetRecord& record)
 {
 	std::filesystem::copy_file(record.sourcePath, record.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-Asset* AnimationTypeManager::Factory::create(AssetCreateDescriptor& desc)
+Asset* AnimationTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new AnimationAsset(desc);
 }

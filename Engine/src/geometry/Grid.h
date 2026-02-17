@@ -7,5 +7,5 @@
 class Grid
 {
 public:
-	static void generateGrid(ResourceWrapper<MeshGroup>& meshCollection,int x, int y);
+	static std::shared_ptr<Mesh> createMesh(int x, int y);
 };

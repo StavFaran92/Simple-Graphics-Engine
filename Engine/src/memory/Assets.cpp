@@ -372,22 +372,20 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	}
 
 	// Parse the resource descriptor
-	IResourceParser* parser = manager->getParser();
-	if (parser && desc.resourceCreateDescriptor)
+	if (!desc.resourceCreateDescriptor)
 	{
-		parser->parse(*desc.resourceCreateDescriptor);
+		logError("Create Asset must have resource create descriptor.");
+		return AssetHandle<Asset>::empty;
 	}
+	manager->parse(*desc.resourceCreateDescriptor);
 
 	// Save the asset to disk
 	std::string ext = getExtensionFromType(type);
-	IResourceSaver* saver = manager->getSaver(ext);
-	if (!saver)
+	if(!manager->save(ext, record))
 	{
 		logError("No Resource saver registered for asset type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;
 	}
-
-	saver->save(record);
 
 	IAssetFactory* factory = manager->getAssetFactory();
 	if (!factory)

@@ -6,5 +6,5 @@
 class EngineAPI Sphere
 {
 public:
-	static void createMesh(ResourceWrapper<MeshGroup>& meshCollection, float radius, int sectors, int stacks);
+	static std::shared_ptr<Mesh> createMesh(float radius, int sectors, int stacks);
 };

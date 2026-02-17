@@ -19,7 +19,7 @@ static const unsigned int indices[] = {
 	1, 0, 3    // second triangle
 };
 
-void Quad::createMesh(ResourceWrapper<MeshGroup>& meshCollection)
+std::shared_ptr<Mesh> Quad::createMesh()
 {
 	//ModelImporter::ModelImportSettings settings;
 	//settings.name = "SGE_QUAD_MESH";
@@ -39,6 +39,6 @@ void Quad::createMesh(ResourceWrapper<MeshGroup>& meshCollection)
 		.addIndices((unsigned int*)indices, sizeof(indices) / sizeof(unsigned int))
 		.build(*mesh.get());
 
-	meshCollection.get()->addMesh(mesh);
+	return mesh;
 }
 

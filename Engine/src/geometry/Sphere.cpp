@@ -7,7 +7,7 @@
 #include "core/Factory.h"
 #include "memory/Assets.h"
 
-void Sphere::createMesh(ResourceWrapper<MeshGroup>& meshCollection, float radius, int sectors, int stacks)
+std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
 {
     //ModelImporter::ModelImportSettings settings;
     //settings.name = "SGE_SPHERE_MESH";
@@ -118,5 +118,5 @@ void Sphere::createMesh(ResourceWrapper<MeshGroup>& meshCollection, float radius
         .addIndices(*indices)
         .build(*mesh.get());
 
-    meshCollection.get()->addMesh(mesh);
+    return mesh;
 }

@@ -97,14 +97,17 @@ void BuiltInAssetsLoader::loadMaterials()
 
 void BuiltInAssetsLoader::loadMeshes()
 {
-	// TODO: procedural mesh creation needs MeshGroupCreateDescriptor + IResourceFactory impl
+	//TODO
+	// the use of ::createMesh can and should be optimized, instead of building the mesh
+	// binding VBOs all on the GPU, it should return the raw data directly on the CPU.
+
 	{
 		AssetCreateDescriptor desc;
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_BOX";
 		desc.isEngineOwned = true;
 		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
-		meshDesc->data = Box::createMesh()->getMeshData(); // can and should be optimized, instead of building the mesh, it should return the raw data.
+		meshDesc->data = Box::createMesh()->getMeshData(); 
 
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
@@ -114,7 +117,8 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_QUAD";
 		desc.isEngineOwned = true;
-		// TODO: makeResourceCreateDescriptor<MeshGroupCreateDescriptor>() with primitiveType = Quad
+		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
+		meshDesc->data = Quad::createMesh()->getMeshData();
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
@@ -123,7 +127,8 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_SPHERE";
 		desc.isEngineOwned = true;
-		// TODO: makeResourceCreateDescriptor<MeshGroupCreateDescriptor>() with primitiveType = Sphere
+		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
+		meshDesc->data = Sphere::createMesh(1, 36, 36)->getMeshData();
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
@@ -132,7 +137,8 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_GRID";
 		desc.isEngineOwned = true;
-		// TODO: makeResourceCreateDescriptor<MeshGroupCreateDescriptor>() with primitiveType = Grid
+		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
+		meshDesc->data = Grid::createMesh(10, 10)->getMeshData();
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
