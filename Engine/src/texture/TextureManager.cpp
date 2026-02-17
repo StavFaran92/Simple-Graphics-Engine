@@ -17,7 +17,7 @@ Asset* TextureTypeManager::createAsset(AssetCreateDescriptor& desc)
 
 bool TextureTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
 {
-	return false;
+	return std::filesystem::copy_file(src, dst.absolute(), std::filesystem::copy_options::overwrite_existing);
 }
 
 bool TextureTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
@@ -55,7 +55,7 @@ bool TextureTypeManager::saveResource(const ResourceCreateDescriptor& desc, cons
 
 ResourceLoadDescriptor* TextureTypeManager::makeResourceLoadDescriptor()
 {
-	return nullptr;
+	return new TextureLoadDescriptor();
 }
 
 ResourceWrapper<Resource> TextureTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

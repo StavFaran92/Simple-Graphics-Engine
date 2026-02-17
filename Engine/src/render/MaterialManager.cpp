@@ -21,12 +21,31 @@ bool MaterialTypeManager::importAsset(const std::string& src, const ScopedPath& 
 
 bool MaterialTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
 {
-	return false;
+	auto materialDesc = dynamic_cast<const MaterialCreateDescriptor*>(&desc);
+	if (!materialDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
+	std::ofstream os(dst.absolute());
+	cereal::JSONOutputArchive oarchive(os);
+
+	try
+	{
+		oarchive(materialDesc->data);
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Serialization Error occured: {}", e.what());
+	}
+
+	return true;
 }
 
 ResourceLoadDescriptor* MaterialTypeManager::makeResourceLoadDescriptor()
 {
-	return nullptr;
+	return new MaterialLoadDescriptor();
 }
 
 ResourceWrapper<Resource> MaterialTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

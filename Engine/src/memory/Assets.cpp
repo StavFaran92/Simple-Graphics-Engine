@@ -468,19 +468,22 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	// Parse the resource descriptor
+	// Use default load desc if not specified.
 	if (!desc.resourceLoadDescriptor)
 	{
-		logError("Descriptor must have resource Resource Load descriptor.");
-		return AssetHandle<Asset>::empty;
+		desc.resourceLoadDescriptor = manager->makeResourceLoadDescriptor();
+		assert(desc.resourceLoadDescriptor);
+		desc.resourceLoadDescriptor->sourcePath = desc.sourcePath;
 	}
+
+	// Parse the resource descriptor
 	manager->parse(*desc.resourceLoadDescriptor);
 
 	//std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.')); // I think this will be needed.
 	ScopedPath dest = calculateAssetDestinationPathImport(desc);
 	if (!manager->importAsset(desc.resourceLoadDescriptor->sourcePath, dest))
 	{
-		logError("Failed to save asset type {} to: ", static_cast<int>(type), dest.absolute().string());
+		logError("Failed to import asset type {} to: ", static_cast<int>(type), dest.absolute().string());
 		return AssetHandle<Asset>::empty;
 	}
 

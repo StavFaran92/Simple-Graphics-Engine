@@ -60,6 +60,12 @@ struct MaterialData
 {
 	MaterialRenderMode renderMode = MaterialRenderMode::None;
 	AssetHandle<ShaderAsset> customShader = AssetHandle<ShaderAsset>::empty; //optional
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(renderMode);
+		SERIALIZED_MEMBER(customShader);
+	}
 };
 
 struct EngineAPI MaterialCreateDescriptor : public ResourceCreateDescriptor
