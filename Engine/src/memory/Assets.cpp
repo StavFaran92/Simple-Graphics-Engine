@@ -423,7 +423,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	// Parse the resource descriptor
 	if (!desc.resourceCreateDescriptor)
 	{
-		logError("Create Asset must have resource create descriptor.");
+		logError("Descriptor must have resource Resource Create descriptor.");
 		return AssetHandle<Asset>::empty;
 	}
 	manager->parse(*desc.resourceCreateDescriptor);
@@ -471,7 +471,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	// Parse the resource descriptor
 	if (!desc.resourceLoadDescriptor)
 	{
-		logError("Create Asset must have resource load descriptor.");
+		logError("Descriptor must have resource Resource Load descriptor.");
 		return AssetHandle<Asset>::empty;
 	}
 	manager->parse(*desc.resourceLoadDescriptor);

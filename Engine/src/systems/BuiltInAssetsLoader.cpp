@@ -26,7 +26,7 @@ void BuiltInAssetsLoader::loadTextures()
 		desc.aType = AssetType::TEXTURE;
 		desc.name = "SGE_TEXTURE_WHITE";
 		desc.isEngineOwned = true;
-		auto* createDesc = desc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+		auto createDesc = desc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
 		createDesc->textureData.target = TextureTarget::TEXTURE_2D;
 		createDesc->textureData.width = 1;
 		createDesc->textureData.height = 1;
@@ -48,7 +48,7 @@ void BuiltInAssetsLoader::loadTextures()
 		desc.aType = AssetType::TEXTURE;
 		desc.name = "SGE_TEXTURE_BLACK";
 		desc.isEngineOwned = true;
-		auto* createDesc = desc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+		auto createDesc = desc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
 		createDesc->textureData.target = TextureTarget::TEXTURE_2D;
 		createDesc->textureData.width = 1;
 		createDesc->textureData.height = 1;
@@ -81,7 +81,8 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.aType = AssetType::MATERIAL;
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_DEFAULT;
-		// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with renderMode = Opaque
+		auto createDesc = desc.makeResourceCreateDescriptor<MaterialCreateDescriptor>();
+		createDesc->data.renderMode = MaterialRenderMode::Opaque;
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
@@ -90,7 +91,8 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.aType = AssetType::MATERIAL;
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
-		// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with renderMode = Terrain
+		auto createDesc = desc.makeResourceCreateDescriptor<MaterialCreateDescriptor>();
+		createDesc->data.renderMode = MaterialRenderMode::Terrain;
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 }

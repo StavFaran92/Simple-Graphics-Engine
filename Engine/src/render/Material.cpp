@@ -427,7 +427,7 @@ MaterialRenderMode Material::getMaterialRenderMode() const
 }
 
 
-ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDescriptor desc)
+ResourceWrapper<Material> Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
@@ -450,4 +450,14 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, LoadDe
 	}
 
 	return ResourceWrapper<Material>::empty;
+}
+
+ResourceWrapper<Resource> MaterialCreateDescriptor::createResource()
+{
+	return Material::create(data.renderMode); //todo fix
+}
+
+ResourceWrapper<Resource> MaterialLoadDescriptor::loadResource()
+{
+	return Material::load(sourcePath, *this);
 }

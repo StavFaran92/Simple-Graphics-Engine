@@ -56,6 +56,24 @@ struct EditableUniform {
 	}
 };
 
+struct MaterialData
+{
+	MaterialRenderMode renderMode = MaterialRenderMode::None;
+	AssetHandle<ShaderAsset> customShader = AssetHandle<ShaderAsset>::empty; //optional
+};
+
+struct EngineAPI MaterialCreateDescriptor : public ResourceCreateDescriptor
+{
+	MaterialData data;
+
+	ResourceWrapper<Resource> createResource() override;
+};
+
+struct EngineAPI MaterialLoadDescriptor : public ResourceLoadDescriptor
+{
+	ResourceWrapper<Resource> loadResource() override;
+};
+
 //Resource
 class EngineAPI Material : public Resource
 {
@@ -127,14 +145,7 @@ public:
 	Material();
 	~Material() = default;
 
-	struct LoadDescriptor : public ResourceLoadDescriptor
-	{
-		ResourceWrapper<Resource> loadResource() override {
-			return Material::load(sourcePath, *this);
-		}
-	};
-
-	static ResourceWrapper<Material> load(const std::string& fileLocation, LoadDescriptor desc = {});
+	static ResourceWrapper<Material> load(const std::string& fileLocation, MaterialLoadDescriptor desc = {});
 
 	void use();
 	void release();
