@@ -25,7 +25,7 @@ public:
     virtual bool importAsset(const std::string& src, const ScopedPath& dst) = 0;
 
     // Save resource data on disk
-    virtual bool saveResourceToDisk(const ResourceCreateDescriptor& desc, const std::string& dst) = 0;
+    virtual bool saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst) = 0;
 
     // Load asset metadata (.asset / .meta)
     //virtual AssetRecord loadAsset(UUID uid) = 0; ???

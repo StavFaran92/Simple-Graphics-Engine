@@ -357,13 +357,62 @@ void Assets::deleteAsset(AssetHandle<Asset> asset)
 	m_assets.erase(aInfo.uuid);
 }
 
+ScopedPath calculateAssetDestinationPathImport(const AssetCreateDescriptor& desc)
+{
+	// Determine root
+	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+
+	// determine relative folder
+	std::filesystem::path relativefolder;
+	if (!desc.assetDirectory.empty())
+	{
+		relativefolder = desc.assetDirectory;
+	}
+
+	// determine file name
+	auto& path = std::filesystem::path(desc.resourceLoadDescriptor->sourcePath);
+	std::filesystem::path name = path.filename();
+
+	p.setPath(relativefolder / name);
+
+	return p;
+}
+
+
+ScopedPath calculateAssetDestinationPathCreate(const AssetCreateDescriptor& desc)
+{
+	// Determine root
+	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+
+	// determine relative folder
+	std::filesystem::path relativefolder;
+	if (!desc.assetDirectory.empty())
+	{
+		relativefolder = desc.assetDirectory;
+	}
+
+	assert(desc.aType != AssetType::NONE);
+	assert(!desc.name.empty());
+
+	// determine file name
+	auto& path = std::filesystem::path(desc.name);
+	std::string name = path.filename().string();
+
+	// determine externsion
+	std::string ext = getExtensionFromType(desc.aType);
+
+	std::filesystem::path filename = name + ext;
+
+	p.setPath(relativefolder / filename);
+
+	return p;
+}
+
 AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 {
 	AssetType type = desc.aType;
 
-	AssetRecord record(desc);
-	record.parse();
-
+	// Obtain resource manager
 	ResourceTypeManager* manager = AssetFactory::getManager(type);
 	if (!manager)
 	{
@@ -379,13 +428,18 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	}
 	manager->parse(*desc.resourceCreateDescriptor);
 
+
+	AssetRecord record(desc);
+	record.parse();
+
 	// Save the asset to disk
 	//std::string ext = getExtensionFromType(type);
-	manager->saveAsset(record); // todo change return to bool for validation
-	//{
-	//	logError("No Resource saver registered for asset type {}", static_cast<int>(type));
-	//	return AssetHandle<Asset>::empty;
-	//}
+	ScopedPath dest = calculateAssetDestinationPathCreate(desc);
+	if(!manager->saveResource(*desc.resourceCreateDescriptor, dest)) // todo change return to bool for validation
+	{
+		logError("Failed to save asset type {} to: ", static_cast<int>(type), dest.absolute().c_str());
+		return AssetHandle<Asset>::empty;
+	}
 
 	Asset* asset = manager->createAsset(desc); 
 	if (!asset)
@@ -423,7 +477,12 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	manager->parse(*desc.resourceLoadDescriptor);
 
 	//std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.')); // I think this will be needed.
-	manager->importAsset(record);
+	ScopedPath dest = calculateAssetDestinationPathImport(desc);
+	if (!manager->importAsset(desc.resourceLoadDescriptor->sourcePath, dest))
+	{
+		logError("Failed to save asset type {} to: ", static_cast<int>(type), dest.absolute().c_str());
+		return AssetHandle<Asset>::empty;
+	}
 
 	Asset* asset = manager->createAsset(desc);
 	if (!asset)
@@ -431,17 +490,6 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		logError("Failed to create asset of type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;
 	}
-
-	//// Import from source file
-	//std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.'));
-	//IResourceImporter* importer = manager->getImporter(ext);
-	//if (!importer)
-	//{
-	//	logError("No resource importer registered for asset type {}", static_cast<int>(type));
-	//	return AssetHandle<Asset>::empty;
-	//}
-
-	//importer->import(record);
 
 	record.asset = asset;
 	addAsset(record);
