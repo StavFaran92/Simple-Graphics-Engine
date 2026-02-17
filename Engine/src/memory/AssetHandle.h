@@ -4,6 +4,14 @@
 #include "memory/AssetRecord.h"
 #include "core/Engine.h"
 #include "memory/ResourceManager.h"
+#include "memory/Asset.h"
+
+class EngineAPI Test
+{
+public:
+	static ResourceWrapper<Resource> loadAssetResourceInternal(const AssetRecord& record, UUID uuid);
+
+};
 
 template<typename T>
 class AssetHandle
@@ -38,22 +46,18 @@ public:
 
 	ResourceWrapper<ResourceType> resource() const
 	{
-		if (isEmpty()) return ResourceWrapper<ResourceType>::empty;
+		if (isEmpty())
+			return ResourceWrapper<ResourceType>::empty;
 
 		const AssetRecord& record = info();
-		return Engine::get()->getResourceManager()->createOrGetCached(record.resourceID, [this, &record]() {
 
-			ResourceLoadDescriptor* loadDesc = AssetFactory::getManager(record.aType)->makeResourceLoadDescriptor();
-			assert(loadDesc);
-			//SGE_ASSERT(loadDesc);
-			ResourceWrapper<Resource> resource = loadDesc->loadResource();
+		auto resource = Engine::get()->getResourceManager()->createOrGetCached(
+			record.resourceID,
+			[this, &record]() {
+				return Test::loadAssetResourceInternal(record, uuid);
+			});
 
-			Engine::get()->getSubSystem<Assets>()->bindResourceToAsset(uuid, resource.getUID());
-
-			return resource;
-
-			
-		}).as<ResourceType>();
+		return resource.as<ResourceType>();
 	}
 
 	void erase()
@@ -122,3 +126,4 @@ private:
 
 template<typename T>
 inline AssetHandle<T> AssetHandle<T>::empty;
+
