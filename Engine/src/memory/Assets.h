@@ -49,6 +49,8 @@ public:
 
 	AssetHandle<Asset> importAsset(AssetCreateDescriptor desc);
 
+	void bindResourceToAsset(UUID uuid, ResourceID resID);
+
 private:
 
 	void updateRegistry(const AssetRecord& aInfo);

@@ -47,12 +47,12 @@ public:
 			assert(loadDesc);
 			//SGE_ASSERT(loadDesc);
 			ResourceWrapper<Resource> resource = loadDesc->loadResource();
-			Engine::get()->getResourceManager()->addResourceToCache(record.resourceID, resource);
+
+			Engine::get()->getSubSystem<Assets>()->bindResourceToAsset(uuid, resource.getUID());
+
 			return resource;
 
-			//AssetRecord newRecord = record;
-			//newRecord.resourceID = resource.getUID();
-			//Engine::get()->getSubSystem<Assets>()->updateAsset(newRecord);
+			
 		}).as<ResourceType>();
 	}
 

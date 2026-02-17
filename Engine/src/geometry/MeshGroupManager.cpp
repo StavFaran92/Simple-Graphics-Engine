@@ -8,19 +8,19 @@
 #include "memory/AssetHandle.h"
 #include "core/Engine.h"
 
-void MeshGroupTypeManager::Saver::save(const AssetRecord& record)
+void MeshGroupTypeManager::saveAsset(const AssetRecord& record)
 {
 	// TODO: save is called before the asset exists, can't use AssetHandle yet.
 	// Original: MeshExporter::exportMesh(AssetHandle<MeshGroupAsset>(m_uuid));
 }
 
-void MeshGroupTypeManager::Importer::import(const AssetRecord& record)
+void MeshGroupTypeManager::importAsset(const AssetRecord& record)
 {
 	// TODO: ModelImporter::copyFiles takes non-const AssetRecord&, need to reconcile
 	// Original: Engine::get()->getSubSystem<ModelImporter>()->copyFiles(fileLocation, aInfo);
 }
 
-Asset* MeshGroupTypeManager::Factory::create(AssetCreateDescriptor& desc)
+Asset* MeshGroupTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new MeshGroupAsset(desc);
 }

@@ -9,18 +9,18 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-void SceneTypeManager::Saver::save(const AssetRecord& record)
+void SceneTypeManager::saveAsset(const AssetRecord& record)
 {
 	// TODO: save is called before the asset/resource exists in the system.
 	// Original: Archiver::serializeScene(resource) -> cereal JSON to record.fullFilePath
 }
 
-void SceneTypeManager::Importer::import(const AssetRecord& record)
+void SceneTypeManager::importAsset(const AssetRecord& record)
 {
 	// Scene import is a no-op
 }
 
-Asset* SceneTypeManager::Factory::create(AssetCreateDescriptor& desc)
+Asset* SceneTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new SceneAsset(desc);
 }

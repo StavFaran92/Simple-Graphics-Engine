@@ -7,17 +7,17 @@
 
 #include <filesystem>
 
-void ShaderTypeManager::Saver::save(const AssetRecord& record)
+void ShaderTypeManager::saveAsset(const AssetRecord& record)
 {
 	std::filesystem::copy_file(record.sourcePath, record.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-void ShaderTypeManager::Importer::import(const AssetRecord& record)
+void ShaderTypeManager::importAsset(const AssetRecord& record)
 {
 	std::filesystem::copy_file(record.sourcePath, record.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-Asset* ShaderTypeManager::Factory::create(AssetCreateDescriptor& desc)
+Asset* ShaderTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new ShaderAsset(desc);
 }

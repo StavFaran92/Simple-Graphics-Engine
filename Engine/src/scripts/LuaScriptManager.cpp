@@ -8,17 +8,17 @@
 
 #include <filesystem>
 
-void LuaScriptTypeManager::Saver::save(const AssetRecord& record)
+void LuaScriptTypeManager::saveAsset(const AssetRecord& record)
 {
 	std::filesystem::copy_file(record.sourcePath, record.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-void LuaScriptTypeManager::Importer::import(const AssetRecord& record)
+void LuaScriptTypeManager::importAsset(const AssetRecord& record)
 {
 	std::filesystem::copy_file(record.sourcePath, record.fullFilePath, std::filesystem::copy_options::overwrite_existing);
 }
 
-Asset* LuaScriptTypeManager::Factory::create(AssetCreateDescriptor& desc)
+Asset* LuaScriptTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new LuaScriptAsset(desc);
 }

@@ -9,18 +9,18 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-void MaterialTypeManager::Saver::save(const AssetRecord& record)
+void MaterialTypeManager::saveAsset(const AssetRecord& record)
 {
 	// TODO: save is called before the asset/resource exists in the system.
 	// Original: cereal JSON serialize *AssetHandle<MaterialAsset>(m_uuid).resource().get() to record.fullFilePath
 }
 
-void MaterialTypeManager::Importer::import(const AssetRecord& record)
+void MaterialTypeManager::importAsset(const AssetRecord& record)
 {
 	// Material import is a no-op
 }
 
-Asset* MaterialTypeManager::Factory::create(AssetCreateDescriptor& desc)
+Asset* MaterialTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
 	return new MaterialAsset(desc);
 }

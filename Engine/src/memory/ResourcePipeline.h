@@ -15,28 +15,31 @@ class ResourceTypeManager
 {
 public:
     // ============================================================
-    //  Creation (Editor side)
+    //  Asset Creation
     // ============================================================
 
-    // Create a new asset instance in memory (e.g new Material, new Mesh)
+    // Create a new asset instance in memory
     virtual Asset* createAsset(AssetCreateDescriptor& desc) = 0;
 
-    // Called when user imports an external file (FBX/PNG/etc)
-    virtual void importAsset(const AssetRecord& record) = 0;
+    // Import asset into the engine
+    virtual bool importAsset(const std::string& src, const ScopedPath& dst) = 0;
 
-    // Save asset metadata (.asset / .meta)
-    virtual void saveAsset(const AssetRecord& record) = 0;
+    // Save resource data on disk
+    virtual bool saveResourceToDisk(const ResourceCreateDescriptor& desc, const std::string& dst) = 0;
+
+    // Load asset metadata (.asset / .meta)
+    //virtual AssetRecord loadAsset(UUID uid) = 0; ???
 
 
     // ============================================================
     //  Runtime resource loading
     // ============================================================
 
-    // Create a load descriptor from asset record
-    virtual ResourceLoadDescriptor* createLoadDescriptor(const AssetRecord& record) = 0;
+    // Create load descriptor
+    virtual ResourceLoadDescriptor* makeResourceLoadDescriptor() = 0;
 
-    // Actually load the runtime resource (GPU buffers, textures, etc)
-    virtual ResourceWrapper<Resource> loadFromDisk(ResourceLoadDescriptor& desc) = 0;
+    // load the runtime resource
+    virtual ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) = 0;
 
 
     // ============================================================

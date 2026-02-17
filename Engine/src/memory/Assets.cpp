@@ -380,21 +380,21 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	manager->parse(*desc.resourceCreateDescriptor);
 
 	// Save the asset to disk
-	std::string ext = getExtensionFromType(type);
-	if(!manager->save(ext, record))
+	//std::string ext = getExtensionFromType(type);
+	manager->saveAsset(record); // todo change return to bool for validation
+	//{
+	//	logError("No Resource saver registered for asset type {}", static_cast<int>(type));
+	//	return AssetHandle<Asset>::empty;
+	//}
+
+	Asset* asset = manager->createAsset(desc); 
+	if (!asset)
 	{
-		logError("No Resource saver registered for asset type {}", static_cast<int>(type));
+		logError("Failed to create asset of type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;
 	}
 
-	IAssetFactory* factory = manager->getAssetFactory();
-	if (!factory)
-	{
-		logError("No asset factory registered for asset type {}", static_cast<int>(type));
-		return AssetHandle<Asset>::empty;
-	}
-
-	record.asset = factory->create(desc);
+	record.asset = asset;
 	addAsset(record);
 
 	return AssetHandle<Asset>(record.uuid);
@@ -415,32 +415,43 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	}
 
 	// Parse the resource descriptor
-	IResourceParser* parser = manager->getParser();
-	if (parser && desc.resourceLoadDescriptor)
+	if (!desc.resourceLoadDescriptor)
 	{
-		parser->parse(*desc.resourceLoadDescriptor);
+		logError("Create Asset must have resource load descriptor.");
+		return AssetHandle<Asset>::empty;
 	}
+	manager->parse(*desc.resourceLoadDescriptor);
 
-	// Import from source file
-	std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.'));
-	IResourceImporter* importer = manager->getImporter(ext);
-	if (!importer)
+	//std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.')); // I think this will be needed.
+	manager->importAsset(record);
+
+	Asset* asset = manager->createAsset(desc);
+	if (!asset)
 	{
-		logError("No resource importer registered for asset type {}", static_cast<int>(type));
+		logError("Failed to create asset of type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;
 	}
 
-	importer->import(record);
+	//// Import from source file
+	//std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.'));
+	//IResourceImporter* importer = manager->getImporter(ext);
+	//if (!importer)
+	//{
+	//	logError("No resource importer registered for asset type {}", static_cast<int>(type));
+	//	return AssetHandle<Asset>::empty;
+	//}
 
-	IAssetFactory* factory = manager->getAssetFactory();
-	if (!factory)
-	{
-		logError("No asset factory registered for asset type {}", static_cast<int>(type));
-		return AssetHandle<Asset>::empty;
-	}
+	//importer->import(record);
 
-	record.asset = factory->create(desc);
+	record.asset = asset;
 	addAsset(record);
 
 	return AssetHandle<Asset>(record.uuid);
+}
+
+void Assets::bindResourceToAsset(UUID uuid, ResourceID resID)
+{
+	AssetRecord newAssetInfo = getInfo(uuid);
+	newAssetInfo.resourceID = resID;
+	updateAsset(newAssetInfo);
 }
