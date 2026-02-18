@@ -20,12 +20,23 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath&
 
 bool MeshGroupTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
 {
-	return false;
+	auto meshGroupDesc = dynamic_cast<const MeshGroupCreateDescriptor*>(&desc);
+	if (!meshGroupDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
+	const MeshData& data = meshGroupDesc->data;
+
+	MeshExporter::exportMesh(data, dst.absolute().string());
+
+	return true;
 }
 
 ResourceLoadDescriptor* MeshGroupTypeManager::makeResourceLoadDescriptor()
 {
-	return nullptr;
+	return new MeshGroupLoadDescriptor();
 }
 
 ResourceWrapper<Resource> MeshGroupTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

@@ -52,6 +52,11 @@ ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, cons
     // Create outside the lock (important)
     ResourceWrapper<Resource> created = creationCallback();
 
+    if (created.isEmpty())
+    {
+        return ResourceWrapper<Resource>::empty;
+    }
+
     {
         std::scoped_lock lock(cacheMutex);
 

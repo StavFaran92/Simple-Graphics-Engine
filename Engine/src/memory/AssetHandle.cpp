@@ -16,6 +16,12 @@ ResourceWrapper<Resource> Test::loadAssetResourceInternal(const AssetRecord& rec
 
     ResourceWrapper<Resource> resource = loadDesc->loadResource();
 
+    if (resource.isEmpty())
+    {
+        logError("Failed to load resource: {}", uuid.str());
+        return ResourceWrapper<Resource>::empty;
+    }
+
     Engine::get()->getSubSystem<Assets>()->bindResourceToAsset(uuid, resource.getUID());
 
     return resource;
