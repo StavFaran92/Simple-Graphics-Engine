@@ -156,7 +156,7 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelLoadSession& session)
+void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelParseSession& session)
 {
 	// extract mesh from root node
 	processNode(scene, scene->mRootNode, session);
@@ -213,63 +213,63 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter
 	//}
 }
 
-void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
-{
-	std::string filepath = resourceDesc.sourcePath;
+//void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
+//{
+//	std::string filepath = resourceDesc.sourcePath;
+//
+//	if (!std::filesystem::exists(filepath))
+//	{
+//		logError("File doesn't exists: " + filepath);
+//		return;
+//	}
+//
+//	const aiScene* scene = nullptr;
+//
+//	// If the scene was previously loaded last, we can optimize the load since it is already in memory.
+//	if (filepath == m_lastLoadedSceneName)
+//	{
+//		scene = m_importer->GetScene();
+//	}
+//	else
+//	{
+//
+//		// read scene from file
+//		scene = m_importer->ReadFile(filepath, aiProcess_Triangulate |
+//			aiProcess_GenSmoothNormals |
+//			aiProcess_FlipUVs |
+//			//aiProcess_CalcTangentSpace |
+//			aiProcess_ValidateDataStructure);
+//
+//		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+//		{
+//			logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
+//			return;
+//		}
+//	}
+//
+//	m_lastLoadedSceneName = filepath;
+//
+//	std::string modelName = std::filesystem::path(filepath).filename().stem().string();
+//
+//	// create new model session
+//	ModelImporter::ModelLoadSession session;
+//	session.filepath = filepath;
+//	session.fileDir = std::filesystem::path(filepath).parent_path().string();
+//	session.name = modelName;
+//	session.mesh = modelInfo.mesh;
+//
+//	m_currentSession = session;
+//
+//	loadModelFromAssimpScene(scene, modelInfo);
+//}
 
-	if (!std::filesystem::exists(filepath))
-	{
-		logError("File doesn't exists: " + filepath);
-		return;
-	}
-
-	const aiScene* scene = nullptr;
-
-	// If the scene was previously loaded last, we can optimize the load since it is already in memory.
-	if (filepath == m_lastLoadedSceneName)
-	{
-		scene = m_importer->GetScene();
-	}
-	else
-	{
-
-		// read scene from file
-		scene = m_importer->ReadFile(filepath, aiProcess_Triangulate |
-			aiProcess_GenSmoothNormals |
-			aiProcess_FlipUVs |
-			//aiProcess_CalcTangentSpace |
-			aiProcess_ValidateDataStructure);
-
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-		{
-			logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
-			return;
-		}
-	}
-
-	m_lastLoadedSceneName = filepath;
-
-	std::string modelName = std::filesystem::path(filepath).filename().stem().string();
-
-	// create new model session
-	ModelImporter::ModelLoadSession session;
-	session.filepath = filepath;
-	session.fileDir = std::filesystem::path(filepath).parent_path().string();
-	session.name = modelName;
-	session.mesh = modelInfo.mesh;
-
-	m_currentSession = session;
-
-	loadModelFromAssimpScene(scene, modelInfo);
-}
-
-bool ModelImporter::importModel(const std::string& filepath, const ScopedPath& dst, std::vector<ScopedPath>& outImportedFiles)
+bool ModelImporter::parseModel(const std::string& filepath, const ScopedPath& dst, ModelImporter::ModelInfo& outModelInfo)
 {
 	// Validate
 	if (!std::filesystem::exists(filepath))
 	{
 		logError("File doesn't exists: " + filepath);
-		return;
+		return false;
 	}
 
 	// If the scene was previously loaded last, we can optimize the load since it is already in memory.
@@ -291,7 +291,7 @@ bool ModelImporter::importModel(const std::string& filepath, const ScopedPath& d
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
-			return;
+			return false;
 		}
 	}
 
@@ -300,7 +300,7 @@ bool ModelImporter::importModel(const std::string& filepath, const ScopedPath& d
 	std::string modelName = std::filesystem::path(filepath).filename().stem().string();
 
 	// create new model session
-	ModelImporter::ModelLoadSession session;
+	ModelImporter::ModelParseSession session;
 	session.filepath = filepath;
 	session.fileDir = std::filesystem::path(filepath).parent_path().string();
 	session.name = modelName;
@@ -310,152 +310,152 @@ bool ModelImporter::importModel(const std::string& filepath, const ScopedPath& d
 	// for its mesh -> open -> write to obj -> save
 
 	// TODO support - for its materials -> parse -> invoke asset import for 
-	return false;
-}
-
-bool ModelImporter::copyFiles(const std::string& fileLocation, const ScopedPath& dst)
-{
-	std::string finalFilePath = fileLocation;
-
-	// If GLTF2, search for corresponding .GLB file
-	std::filesystem::path path(fileLocation);
-	if (path.extension().generic_string() == ".gltf")
-	{
-		// Switch to GLB file if found
-		auto parentPath = path.parent_path();
-		auto filenameStem = path.stem(); // filename without extension
-
-		// Construct potential .glb path
-		std::filesystem::path glbPath = parentPath / (filenameStem.string() + ".glb");
-
-		if (std::filesystem::exists(glbPath))
-		{
-			finalFilePath = glbPath.generic_string();
-		}
-
-		// Check for a .bin file with the same name
-		std::filesystem::path binPath = parentPath / (filenameStem.string() + ".bin");
-		if (std::filesystem::exists(binPath))
-		{
-			
-
-			std::filesystem::path targetParentPath = std::filesystem::path(dst.absolute()).parent_path();
-			std::filesystem::path targetBinFilePath = targetParentPath / (filenameStem.string() + ".bin");
-			std::filesystem::copy_file(binPath, targetBinFilePath, std::filesystem::copy_options::overwrite_existing);
-
-			logInfo("Found external .bin file: {}, copy into {}", binPath.generic_string(), targetBinFilePath.generic_string());
-			// Use it as the buffer source
-		}
-	}
-
-	std::filesystem::copy_file(finalFilePath, dst.absolute(), std::filesystem::copy_options::overwrite_existing);
-
-	auto fileDir = std::filesystem::path(finalFilePath).parent_path().string();
-
-	// read scene from file
-	const aiScene* scene = m_importer->ReadFile(finalFilePath, aiProcess_ValidateDataStructure);
-
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-	{
-		logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
-		return false;
-	}
-
-	m_lastImportedMaterials = LastImportedMaterials();
-
-	std::unordered_map<std::string, AssetHandle<TextureAsset>> cachedTextures;
-
-	// Import materials and textures
-	if (scene->HasMaterials())
-	{
-		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		{
-			auto& aMaterial = scene->mMaterials[i];
-			std::string materialName = std::string(aMaterial->GetName().C_Str());
-			//std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
-
-			// get uuid using tex name from association map
-			auto& material = Material::create(MaterialRenderMode::Opaque);
-
-			extractAiMaterialProperties(aMaterial, material);
-			
-			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
-			material->setName(materialName);
-
-			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures, aInfo);
-			if (!diffuse.isEmpty())
-			{
-				auto diffuseSampler = std::make_shared<TextureSampler>(3);
-				diffuseSampler->texture = diffuse;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, diffuseSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, true);
-			}
-
-			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures, aInfo);
-			if (!normal.isEmpty())
-			{
-				auto normalSampler = std::make_shared<TextureSampler>(3);
-				normalSampler->texture = normal;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, normalSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, true);
-			}
-
-			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures, aInfo);
-			if (!roughness.isEmpty())
-			{
-				auto roughnessSampler = std::make_shared<TextureSampler>(1);
-				roughnessSampler->texture = roughness;
-				roughnessSampler->channelMaskR = TextureSampler::Color::G;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, roughnessSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, true);
-			}
-
-			// Metallic map
-			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, cachedTextures, aInfo);
-			if (!metallic.isEmpty())
-			{
-				auto metallicSampler = std::make_shared<TextureSampler>(1);
-				metallicSampler->texture = metallic;
-				metallicSampler->channelMaskR = TextureSampler::Color::B;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, metallicSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, true);
-			}
-
-			// Ambient Occlusion map
-			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, cachedTextures, aInfo);
-			if (!ao.isEmpty())
-			{
-				auto aoSampler = std::make_shared<TextureSampler>(1);
-				aoSampler->texture = ao;
-				aoSampler->channelMaskR = TextureSampler::Color::R;
-				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_AO, aoSampler);
-				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_AO, true);
-			}
-
-			
-
-			AssetCreateDescriptor materialAssetInfo;
-			materialAssetInfo.isEngineOwned = aInfo.isEngineOwned;
-			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
-			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
-			materialAssetInfo.name = materialName;
-			materialAssetInfo.aType = AssetType::MATERIAL;
-			// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with material data
-			m_lastImportedMaterials.materials[i] = Engine::get()->getSubSystem<Assets>()->createAsset(materialAssetInfo).as<MaterialAsset>();
-		}
-	}
-
-	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
-
 	return true;
 }
 
-const ModelImporter::LastImportedMaterials& ModelImporter::getLastImportedMaterial() const
-{
-	return m_lastImportedMaterials;
-}
+//bool ModelImporter::copyFiles(const std::string& fileLocation, const ScopedPath& dst)
+//{
+//	std::string finalFilePath = fileLocation;
+//
+//	// If GLTF2, search for corresponding .GLB file
+//	std::filesystem::path path(fileLocation);
+//	if (path.extension().generic_string() == ".gltf")
+//	{
+//		// Switch to GLB file if found
+//		auto parentPath = path.parent_path();
+//		auto filenameStem = path.stem(); // filename without extension
+//
+//		// Construct potential .glb path
+//		std::filesystem::path glbPath = parentPath / (filenameStem.string() + ".glb");
+//
+//		if (std::filesystem::exists(glbPath))
+//		{
+//			finalFilePath = glbPath.generic_string();
+//		}
+//
+//		// Check for a .bin file with the same name
+//		std::filesystem::path binPath = parentPath / (filenameStem.string() + ".bin");
+//		if (std::filesystem::exists(binPath))
+//		{
+//			
+//
+//			std::filesystem::path targetParentPath = std::filesystem::path(dst.absolute()).parent_path();
+//			std::filesystem::path targetBinFilePath = targetParentPath / (filenameStem.string() + ".bin");
+//			std::filesystem::copy_file(binPath, targetBinFilePath, std::filesystem::copy_options::overwrite_existing);
+//
+//			logInfo("Found external .bin file: {}, copy into {}", binPath.generic_string(), targetBinFilePath.generic_string());
+//			// Use it as the buffer source
+//		}
+//	}
+//
+//	std::filesystem::copy_file(finalFilePath, dst.absolute(), std::filesystem::copy_options::overwrite_existing);
+//
+//	auto fileDir = std::filesystem::path(finalFilePath).parent_path().string();
+//
+//	// read scene from file
+//	const aiScene* scene = m_importer->ReadFile(finalFilePath, aiProcess_ValidateDataStructure);
+//
+//	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+//	{
+//		logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
+//		return false;
+//	}
+//
+//	m_lastImportedMaterials = LastImportedMaterials();
+//
+//	std::unordered_map<std::string, AssetHandle<TextureAsset>> cachedTextures;
+//
+//	// Import materials and textures
+//	if (scene->HasMaterials())
+//	{
+//		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+//		{
+//			auto& aMaterial = scene->mMaterials[i];
+//			std::string materialName = std::string(aMaterial->GetName().C_Str());
+//			//std::string materialID = aInfo.name + "_MAT_" + std::to_string(i);
+//
+//			// get uuid using tex name from association map
+//			auto& material = Material::create(MaterialRenderMode::Opaque);
+//
+//			extractAiMaterialProperties(aMaterial, material);
+//			
+//			//Engine::get()->getMemoryManagementSystem()->addAssociation(materialID, material.getUID());
+//			material->setName(materialName);
+//
+//			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures, aInfo);
+//			if (!diffuse.isEmpty())
+//			{
+//				auto diffuseSampler = std::make_shared<TextureSampler>(3);
+//				diffuseSampler->texture = diffuse;
+//				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, diffuseSampler);
+//				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO, true);
+//			}
+//
+//			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures, aInfo);
+//			if (!normal.isEmpty())
+//			{
+//				auto normalSampler = std::make_shared<TextureSampler>(3);
+//				normalSampler->texture = normal;
+//				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, normalSampler);
+//				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_NORMAL, true);
+//			}
+//
+//			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures, aInfo);
+//			if (!roughness.isEmpty())
+//			{
+//				auto roughnessSampler = std::make_shared<TextureSampler>(1);
+//				roughnessSampler->texture = roughness;
+//				roughnessSampler->channelMaskR = TextureSampler::Color::G;
+//				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, roughnessSampler);
+//				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS, true);
+//			}
+//
+//			// Metallic map
+//			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, cachedTextures, aInfo);
+//			if (!metallic.isEmpty())
+//			{
+//				auto metallicSampler = std::make_shared<TextureSampler>(1);
+//				metallicSampler->texture = metallic;
+//				metallicSampler->channelMaskR = TextureSampler::Color::B;
+//				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, metallicSampler);
+//				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_METALLIC, true);
+//			}
+//
+//			// Ambient Occlusion map
+//			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, cachedTextures, aInfo);
+//			if (!ao.isEmpty())
+//			{
+//				auto aoSampler = std::make_shared<TextureSampler>(1);
+//				aoSampler->texture = ao;
+//				aoSampler->channelMaskR = TextureSampler::Color::R;
+//				material->setSampler(SHADER_PROPERTY_PBR_SAMPLER_AO, aoSampler);
+//				material->setSamplerEnabled(SHADER_PROPERTY_PBR_SAMPLER_AO, true);
+//			}
+//
+//			
+//
+//			AssetCreateDescriptor materialAssetInfo;
+//			materialAssetInfo.isEngineOwned = aInfo.isEngineOwned;
+//			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
+//			materialAssetInfo.targetDirectory = aInfo.targetDirectory;
+//			materialAssetInfo.name = materialName;
+//			materialAssetInfo.aType = AssetType::MATERIAL;
+//			// TODO: makeResourceCreateDescriptor<MaterialCreateDescriptor>() with material data
+//			m_lastImportedMaterials.materials[i] = Engine::get()->getSubSystem<Assets>()->createAsset(materialAssetInfo).as<MaterialAsset>();
+//		}
+//	}
+//
+//	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
+//
+//	return true;
+//}
 
-void ModelImporter::processNode(const aiScene* scene, aiNode* node, ModelImporter::ModelLoadSession& session)
+//const ModelImporter::LastImportedMaterials& ModelImporter::getLastImportedMaterial() const
+//{
+//	return m_lastImportedMaterials;
+//}
+
+void ModelImporter::processNode(const aiScene* scene, aiNode* node, ModelImporter::ModelParseSession& session)
 {
 	// process all the node's meshes (if any)
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -487,11 +487,14 @@ struct BoneWeight
 	float weight = 0.f;
 };
 
-std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelLoadSession& session)
+std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelParseSession& session)
 {
 	MeshBuilder builder;
 
 	std::shared_ptr<Mesh> generatedMesh = std::make_shared<Mesh>();
+
+	MeshData meshData;
+	meshData.name = aiMesh->mName.C_Str();
 
 	generatedMesh->setName(aiMesh->mName.C_Str());
 

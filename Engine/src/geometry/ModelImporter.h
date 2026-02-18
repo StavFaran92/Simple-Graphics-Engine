@@ -34,7 +34,17 @@ namespace Assimp
 class EngineAPI ModelImporter : public SubSystem
 {
 public:
-	struct ModelLoadSession
+
+	struct ModelInfo
+	{
+		std::vector<MeshData> meshDataList;
+		std::vector<MaterialData> materialDataList;
+		std::vector<int> materialSlotList;
+		std::vector<TextureData> textureDataList;
+
+	};
+
+	struct ModelParseSession
 	{
 		std::string filepath;
 		std::string fileDir;
@@ -44,24 +54,24 @@ public:
 		Entity root;
 		std::unordered_map<std::string, unsigned int> boneNameToIDMap;
 		unsigned int boneCount = 0;
-		ResourceWrapper<MeshGroup> mesh;
+		ModelInfo modelInfo;
 	};
 
-	struct LastImportedMaterials
-	{
-		std::map<int, AssetHandle<MaterialAsset>> materials;
-	};
+	//struct LastImportedMaterials
+	//{
+	//	std::map<int, AssetHandle<MaterialAsset>> materials;
+	//};
 
 	
 
-	struct ModelInfo
-	{
-		ResourceWrapper<MeshGroup> mesh;
-		std::map<int, ResourceWrapper<Material>> materials;
-		std::vector<ResourceWrapper<Texture>> textures;
+	//struct ModelInfo
+	//{
+	//	ResourceWrapper<MeshGroup> mesh;
+	//	std::map<int, ResourceWrapper<Material>> materials;
+	//	std::vector<ResourceWrapper<Texture>> textures;
 
-		std::map<std::string, std::string> materialInfo;
-	};
+	//	std::map<std::string, std::string> materialInfo;
+	//};
 
 	/** Constructor */
 	ModelImporter();
@@ -73,20 +83,22 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	void loadModelFromFile(const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
+	//void loadModelFromFile(const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
 
-	bool importModel(const std::string& fileLocation, const ScopedPath& dst, std::vector<ScopedPath>& outImportedFiles);
+	
 
-	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo);
+	bool parseModel(const std::string& fileLocation, const ScopedPath& dst, ModelImporter::ModelInfo& outModelInfo);
 
-	const LastImportedMaterials& getLastImportedMaterial() const;
+	//bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo);
+
+	//const LastImportedMaterials& getLastImportedMaterial() const;
 
 private:
-	void loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelLoadSession& session);
+	void loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelParseSession& session);
 
-	void processNode(const aiScene* aiScene, aiNode* aiNode, ModelImporter::ModelLoadSession& session);
+	void processNode(const aiScene* aiScene, aiNode* aiNode, ModelImporter::ModelParseSession& session);
 
-	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelLoadSession& session);
+	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelParseSession& session);
 
 	AssetHandle<TextureAsset> copyAiMaterialTexture(const aiScene* scene, 
 		aiMaterial* mat, 
@@ -99,5 +111,5 @@ private:
 	std::shared_ptr<Assimp::Importer> m_importer = nullptr;
 
 	std::string m_lastLoadedSceneName;
-	LastImportedMaterials m_lastImportedMaterials;
+	//LastImportedMaterials m_lastImportedMaterials;
 };
