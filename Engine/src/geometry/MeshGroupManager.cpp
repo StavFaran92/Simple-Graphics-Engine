@@ -15,6 +15,23 @@ Asset* MeshGroupTypeManager::createAsset(AssetCreateDescriptor& desc)
 
 bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
 {
+	// we want to do the most work we can do here, so it will not need to happen during load
+	// we open the file and parse all its inner data
+	// and so at the end what imported is
+	// array of meshes
+	// textures
+	// materials
+	// skeleton
+	// etc
+	// so i may need to alter the signature to store dependant assets
+	// or at least connect them somehow.
+	// so what i will do is open the file using assimp 
+	// and bring mesh currently as OBJ.
+	// and for each dependant assets currently bring them also, no connection ATM
+
+	std::vector<ScopedPath> importedFiles;
+	Engine::get()->getSubSystem<ModelImporter>()->importModel(src, dst, importedFiles);
+
 	return false;
 }
 

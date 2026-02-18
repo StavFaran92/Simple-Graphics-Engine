@@ -156,10 +156,10 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
-void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelInfo& modelInfo)
+void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelLoadSession& session)
 {
 	// extract mesh from root node
-	processNode(scene, scene->mRootNode);
+	processNode(scene, scene->mRootNode, session);
 
 	// TODO fix
 	//if (scene->HasMaterials())
@@ -263,7 +263,57 @@ void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDes
 	loadModelFromAssimpScene(scene, modelInfo);
 }
 
-bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInfo)
+bool ModelImporter::importModel(const std::string& filepath, const ScopedPath& dst, std::vector<ScopedPath>& outImportedFiles)
+{
+	// Validate
+	if (!std::filesystem::exists(filepath))
+	{
+		logError("File doesn't exists: " + filepath);
+		return;
+	}
+
+	// If the scene was previously loaded last, we can optimize the load since it is already in memory.
+	const aiScene* scene = nullptr;
+	if (filepath == m_lastLoadedSceneName)
+	{
+		scene = m_importer->GetScene();
+	}
+	else
+	{
+
+		// read scene from file
+		scene = m_importer->ReadFile(filepath, aiProcess_Triangulate |
+			aiProcess_GenSmoothNormals |
+			aiProcess_FlipUVs |
+			//aiProcess_CalcTangentSpace |
+			aiProcess_ValidateDataStructure);
+
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+		{
+			logError("ERROR::ASSIMP::{}", m_importer->GetErrorString());
+			return;
+		}
+	}
+
+	m_lastLoadedSceneName = filepath;
+
+	std::string modelName = std::filesystem::path(filepath).filename().stem().string();
+
+	// create new model session
+	ModelImporter::ModelLoadSession session;
+	session.filepath = filepath;
+	session.fileDir = std::filesystem::path(filepath).parent_path().string();
+	session.name = modelName;
+
+	loadModelFromAssimpScene(scene, session);
+
+	// for its mesh -> open -> write to obj -> save
+
+	// TODO support - for its materials -> parse -> invoke asset import for 
+	return false;
+}
+
+bool ModelImporter::copyFiles(const std::string& fileLocation, const ScopedPath& dst)
 {
 	std::string finalFilePath = fileLocation;
 
@@ -289,7 +339,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 		{
 			
 
-			std::filesystem::path targetParentPath = std::filesystem::path(aInfo.fullFilePath).parent_path();
+			std::filesystem::path targetParentPath = std::filesystem::path(dst.absolute()).parent_path();
 			std::filesystem::path targetBinFilePath = targetParentPath / (filenameStem.string() + ".bin");
 			std::filesystem::copy_file(binPath, targetBinFilePath, std::filesystem::copy_options::overwrite_existing);
 
@@ -298,7 +348,7 @@ bool ModelImporter::copyFiles(const std::string& fileLocation, AssetRecord& aInf
 		}
 	}
 
-	std::filesystem::copy_file(finalFilePath, aInfo.fullFilePath, std::filesystem::copy_options::overwrite_existing);
+	std::filesystem::copy_file(finalFilePath, dst.absolute(), std::filesystem::copy_options::overwrite_existing);
 
 	auto fileDir = std::filesystem::path(finalFilePath).parent_path().string();
 
@@ -405,12 +455,12 @@ const ModelImporter::LastImportedMaterials& ModelImporter::getLastImportedMateri
 	return m_lastImportedMaterials;
 }
 
-void ModelImporter::processNode(const aiScene* scene, aiNode* node)
+void ModelImporter::processNode(const aiScene* scene, aiNode* node, ModelImporter::ModelLoadSession& session)
 {
 	// process all the node's meshes (if any)
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
-		std::shared_ptr<Mesh> mesh = processMesh(scene, scene->mMeshes[node->mMeshes[i]]);
+		std::shared_ptr<Mesh> mesh = processMesh(scene, scene->mMeshes[node->mMeshes[i]], session);
 
 		aiMatrix4x4 transform = node->mTransformation;
 		aiNode* parent = node->mParent;
@@ -421,13 +471,13 @@ void ModelImporter::processNode(const aiScene* scene, aiNode* node)
 		}
 
 		mesh->setRestTransform(AssimpGLMHelpers::convertMat4ToGLMFormat(transform));
-		m_currentSession.mesh->addMesh(mesh);
+		session.mesh->addMesh(mesh);
 	}
 
 	// then do the same for each of its children
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		processNode(scene, node->mChildren[i]);
+		processNode(scene, node->mChildren[i], session);
 	}
 }
 
@@ -437,7 +487,7 @@ struct BoneWeight
 	float weight = 0.f;
 };
 
-std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh)
+std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelLoadSession& session)
 {
 	MeshBuilder builder;
 
@@ -516,8 +566,8 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 		std::map<int, std::map<float, BoneWeight>> vertexToBoneMap;
 
 		// Extract Bone to ID map 
-		auto& boneNameToIDMap = m_currentSession.boneNameToIDMap;
-		auto& boneCount = m_currentSession.boneCount;
+		auto& boneNameToIDMap = session.boneNameToIDMap;
+		auto& boneCount = session.boneCount;
 
 		// Iterate all bones in Assimp model
 		for (int i = 0; i < aiMesh->mNumBones; i++)
@@ -568,7 +618,7 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 		builder.addBoneIDs(bonesIDs)
 			.addBoneWeights(bonesWeights);
 
-		m_currentSession.mesh->addBonesInfo(bonesOffsets, boneNameToIDMap);
+		session.mesh->addBonesInfo(bonesOffsets, boneNameToIDMap);
 	}
 
 	builder.setMaterialIndex(aiMesh->mMaterialIndex);

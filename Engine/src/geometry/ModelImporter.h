@@ -75,16 +75,19 @@ public:
 	 */
 	void loadModelFromFile(const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
 
+	bool importModel(const std::string& fileLocation, const ScopedPath& dst, std::vector<ScopedPath>& outImportedFiles);
+
 	bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo);
 
 	const LastImportedMaterials& getLastImportedMaterial() const;
 
 private:
-	friend class Engine;
+	void loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelLoadSession& session);
 
-	void loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelInfo& modelInfo);
-	void processNode(const aiScene* aiScene, aiNode* aiNode);
-	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh);
+	void processNode(const aiScene* aiScene, aiNode* aiNode, ModelImporter::ModelLoadSession& session);
+
+	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelLoadSession& session);
+
 	AssetHandle<TextureAsset> copyAiMaterialTexture(const aiScene* scene, 
 		aiMaterial* mat, 
 		aiTextureType type, 
@@ -92,7 +95,7 @@ private:
 		AssetRecord& aInfo);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;
-	ModelLoadSession m_currentSession;
+	//ModelLoadSession m_currentSession;
 	std::shared_ptr<Assimp::Importer> m_importer = nullptr;
 
 	std::string m_lastLoadedSceneName;
