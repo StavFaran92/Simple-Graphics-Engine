@@ -469,7 +469,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	}
 
 	// Use default load desc if not specified.
-	if (!desc.resourceLoadDescriptor)
+	if (!desc.resourceLoadDescriptor || desc.resourceLoadDescriptor->sourcePath.empty())
 	{
 		desc.resourceLoadDescriptor = manager->makeResourceLoadDescriptor();
 		assert(desc.resourceLoadDescriptor);

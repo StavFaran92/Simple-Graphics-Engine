@@ -307,6 +307,8 @@ bool ModelImporter::parseModel(const std::string& filepath, const ScopedPath& ds
 
 	loadModelFromAssimpScene(scene, session);
 
+	outModelInfo = session.modelInfo;
+
 	// for its mesh -> open -> write to obj -> save
 
 	// TODO support - for its materials -> parse -> invoke asset import for 
@@ -460,7 +462,7 @@ void ModelImporter::processNode(const aiScene* scene, aiNode* node, ModelImporte
 	// process all the node's meshes (if any)
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
-		std::shared_ptr<Mesh> mesh = processMesh(scene, scene->mMeshes[node->mMeshes[i]], session);
+		MeshData meshData = processMesh(scene, scene->mMeshes[node->mMeshes[i]], session);
 
 		aiMatrix4x4 transform = node->mTransformation;
 		aiNode* parent = node->mParent;
@@ -470,8 +472,8 @@ void ModelImporter::processNode(const aiScene* scene, aiNode* node, ModelImporte
 			parent = parent->mParent;
 		}
 
-		mesh->setRestTransform(AssimpGLMHelpers::convertMat4ToGLMFormat(transform));
-		session.mesh->addMesh(mesh);
+		meshData.restTransform = AssimpGLMHelpers::convertMat4ToGLMFormat(transform);
+		session.modelInfo.meshDataList.push_back(meshData);
 	}
 
 	// then do the same for each of its children
@@ -487,16 +489,16 @@ struct BoneWeight
 	float weight = 0.f;
 };
 
-std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelParseSession& session)
+MeshData ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelParseSession& session)
 {
-	MeshBuilder builder;
+	//MeshBuilder builder;
 
-	std::shared_ptr<Mesh> generatedMesh = std::make_shared<Mesh>();
+	//std::shared_ptr<Mesh> generatedMesh = std::make_shared<Mesh>();
 
 	MeshData meshData;
 	meshData.name = aiMesh->mName.C_Str();
 
-	generatedMesh->setName(aiMesh->mName.C_Str());
+	//generatedMesh->setName(aiMesh->mName.C_Str());
 
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
@@ -569,7 +571,7 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 		std::map<int, std::map<float, BoneWeight>> vertexToBoneMap;
 
 		// Extract Bone to ID map 
-		auto& boneNameToIDMap = session.boneNameToIDMap;
+		auto& boneNameToIDMap = session.modelInfo.bonesNameToIDMap;
 		auto& boneCount = session.boneCount;
 
 		// Iterate all bones in Assimp model
@@ -581,8 +583,14 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 			// a new bone is found, increment bone ID and add bone offset to offsets array
 			if (boneNameToIDMap.find(boneName) == boneNameToIDMap.end())
 			{
-				boneNameToIDMap[boneName] = boneCount++;
-				bonesOffsets.push_back(AssimpGLMHelpers::convertMat4ToGLMFormat(bone->mOffsetMatrix));
+				unsigned int boneID = boneCount++;
+				boneNameToIDMap[boneName] = boneID;
+				glm::mat4 offset = AssimpGLMHelpers::convertMat4ToGLMFormat(bone->mOffsetMatrix);
+				bonesOffsets.push_back(offset);
+				
+				// Accumulate bone info into ModelInfo
+				session.modelInfo.bonesNameToIDMap[boneName] = boneID;
+				session.modelInfo.bonesOffsets.push_back(offset);
 			}
 
 			// Extract weights for each vertex, we use a map container and a (-weight) key so the entries will be sorted in descending order when we iterate it
@@ -618,24 +626,18 @@ std::shared_ptr<Mesh> ModelImporter::processMesh(const aiScene* aiScene, aiMesh*
 			}
 		}
 
-		builder.addBoneIDs(bonesIDs)
-			.addBoneWeights(bonesWeights);
-
-		session.mesh->addBonesInfo(bonesOffsets, boneNameToIDMap);
+		meshData.bonesIDs.insert(meshData.bonesIDs.end(), bonesIDs.begin(), bonesIDs.end());
+		meshData.bonesWeights.insert(meshData.bonesWeights.end(), bonesWeights.begin(), bonesWeights.end());
 	}
 
-	builder.setMaterialIndex(aiMesh->mMaterialIndex);
+	meshData.materialIndex = aiMesh->mMaterialIndex;
+	meshData.m_positions = positions;
+	meshData.m_normals = normals;
+	meshData.m_texCoords = texcoords;
+	meshData.m_indices = indices;
+	meshData.m_tangents = tangents;
 
-	builder.addPositions(positions)
-		.addNormals(normals)
-		.addTexcoords(texcoords)
-		.addIndices(indices)
-		.addTangents(tangents);
-
-	// build mesh
-	builder.build(*generatedMesh.get());
-
-	return generatedMesh;
+	return meshData;
 }
 
 

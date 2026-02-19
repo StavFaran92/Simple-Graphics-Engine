@@ -16,6 +16,7 @@ class VertexArrayObject;
 
 struct MeshData
 {
+	std::string name;
 	std::vector<glm::vec3> m_positions;
 	std::vector<glm::vec3> m_normals;
 	std::vector<glm::vec4> m_tangents;
@@ -26,6 +27,7 @@ struct MeshData
 	std::vector<glm::vec3> bonesWeights;
 	int materialIndex{};
 	VertexLayout m_layout;
+	glm::mat4 restTransform{ 1.0f };
 };
 
 /**

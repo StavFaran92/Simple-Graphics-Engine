@@ -29,8 +29,8 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath&
 	// and bring mesh currently as OBJ.
 	// and for each dependant assets currently bring them also, no connection ATM
 
-	std::vector<ScopedPath> importedFiles;
-	Engine::get()->getSubSystem<ModelImporter>()->importModel(src, dst, importedFiles);
+	ModelImporter::ModelInfo modelInfo;
+	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, dst, modelInfo);
 
 	return false;
 }

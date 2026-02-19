@@ -41,6 +41,8 @@ public:
 		std::vector<MaterialData> materialDataList;
 		std::vector<int> materialSlotList;
 		std::vector<TextureData> textureDataList;
+		std::vector<glm::mat4> bonesOffsets;
+		std::unordered_map<std::string, unsigned int> bonesNameToIDMap;
 
 	};
 
@@ -52,7 +54,7 @@ public:
 		int nodeIndex = 0;
 		int childIndex = 0;
 		Entity root;
-		std::unordered_map<std::string, unsigned int> boneNameToIDMap;
+		//std::unordered_map<std::string, unsigned int> boneNameToIDMap;
 		unsigned int boneCount = 0;
 		ModelInfo modelInfo;
 	};
@@ -98,7 +100,7 @@ private:
 
 	void processNode(const aiScene* aiScene, aiNode* aiNode, ModelImporter::ModelParseSession& session);
 
-	std::shared_ptr<Mesh> processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelParseSession& session);
+	MeshData processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelParseSession& session);
 
 	AssetHandle<TextureAsset> copyAiMaterialTexture(const aiScene* scene, 
 		aiMaterial* mat, 
