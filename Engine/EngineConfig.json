@@ -10,6 +10,7 @@
     "RenderWireframeGrid": true,
     "RenderWaterBodyPass": true,
     "RenderNonOpaquePass": true,
-    "RenderDebugDataPass": false
+    "RenderDebugDataPass": false,
+	"RenderPostProcess": false 
   }
 }

@@ -48,5 +48,7 @@ void EngineConfig::loadConfig()
             renderConfig.renderNonOpaquePass = render["RenderNonOpaquePass"].get<bool>();
         if (render.contains("RenderDebugDataPass"))
             renderConfig.renderDebugDataPass = render["RenderDebugDataPass"].get<bool>();
+        if (render.contains("RenderPostProcess"))
+            renderConfig.renderPostProcess = render["RenderPostProcess"].get<bool>();
     }
 }
