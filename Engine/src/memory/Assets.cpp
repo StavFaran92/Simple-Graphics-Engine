@@ -371,9 +371,14 @@ ScopedPath calculateAssetDestinationPathImport(const AssetCreateDescriptor& desc
 
 	// determine file name
 	auto& path = std::filesystem::path(desc.resourceLoadDescriptor->sourcePath);
-	std::filesystem::path name = path.filename();
+	std::string name = path.filename().stem().string();
 
-	p.setPath(relativefolder / name);
+	// determine externsion
+	std::string ext = getExtensionFromType(desc.aType);
+
+	std::filesystem::path filename = name + ext;
+
+	p.setPath(relativefolder / filename);
 
 	return p;
 }
@@ -441,6 +446,8 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
+	//record.relativefilePath = dest.relative().string();
+
 	Asset* asset = manager->createAsset(desc); 
 	if (!asset)
 	{
@@ -486,6 +493,8 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		logError("Failed to import asset type {} to: ", static_cast<int>(type), dest.absolute().string());
 		return AssetHandle<Asset>::empty;
 	}
+
+	record.relativefilePath = dest.scoped().string();
 
 	Asset* asset = manager->createAsset(desc);
 	if (!asset)

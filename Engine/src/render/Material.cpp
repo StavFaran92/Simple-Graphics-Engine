@@ -431,16 +431,19 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, Materi
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
-	auto projectDir = Engine::get()->getProjectDirectory();
-	filepath = projectDir + filepath;
+	//auto projectDir = Engine::get()->getProjectDirectory();
+	//filepath = projectDir + filepath;
 	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
-	ResourceWrapper<Material> material = Factory<Material>::create();
+	MaterialData materialData;
+	//ResourceWrapper<Material> material = Factory<Material>::create();
 
 	try
 	{
-		iarchive(*material.get());
-		material->setMaterialRenderMode(material->getMaterialRenderMode());
+		iarchive(materialData);
+		ResourceWrapper<Material> material = Factory<Material>::create();
+		material->setMaterialRenderMode(materialData.renderMode);
+		material->setCustomShader(materialData.customShader);
 		return material;
 
 	}

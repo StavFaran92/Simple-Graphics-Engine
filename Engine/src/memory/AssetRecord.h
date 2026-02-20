@@ -24,7 +24,7 @@ struct EngineAPI AssetRecord
 	ScopedPath targetDirectory;
 	std::string assetDirectory; // todo consider remove
 	std::string relativefilePath;
-	std::string fullFilePath;
+	//std::string fullFilePath;
 	std::string fileName;
 	std::string ext;
 	nlohmann::json importSettings;
@@ -45,7 +45,7 @@ struct EngineAPI AssetRecord
 	bool isDirty() const;
 
 	void update(const AssetUpdateDescriptor& desc);
-	void establishFilepath();
+	//void establishFilepath();
 
 	//NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRecord,
 	//	createDescriptor,

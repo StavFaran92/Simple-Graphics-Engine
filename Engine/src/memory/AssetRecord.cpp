@@ -29,21 +29,21 @@ void from_json(const nlohmann::json& j, AssetRecord& asset)
 	j.at("filename").get_to(asset.fileName);
 	j.at("ext").get_to(asset.ext);
 
-	asset.establishFilepath();
+	//asset.establishFilepath();
 }
 
-void AssetRecord::establishFilepath()
-{
-	if (!isTransient)
-	{
-		fullFilePath = Engine::get()->getProjectDirectory() + "/" + relativefilePath;
-		std::filesystem::create_directories(std::filesystem::path(fullFilePath).parent_path());
-	}
-	else
-	{
-		fullFilePath = sourcePath;
-	}
-}
+//void AssetRecord::establishFilepath()
+//{
+//	if (!isTransient)
+//	{
+//		fullFilePath = Engine::get()->getProjectDirectory() + "/" + relativefilePath;
+//		std::filesystem::create_directories(std::filesystem::path(fullFilePath).parent_path());
+//	}
+//	else
+//	{
+//		fullFilePath = sourcePath;
+//	}
+//}
 
 AssetRecord::AssetRecord(AssetCreateDescriptor& assetDesc)
 {
@@ -154,7 +154,7 @@ void AssetRecord::parse()
 
 	relativefilePath = std::filesystem::path(relativefilePath).lexically_normal().generic_string();
 
-	establishFilepath();
+	//establishFilepath();
 
 	m_isParsed = true;
 }
@@ -212,5 +212,5 @@ void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 
 	relativefilePath = std::filesystem::path(relativefilePath).lexically_normal().generic_string();
 
-	establishFilepath();
+	//establishFilepath();
 }
