@@ -422,6 +422,11 @@ MeshBuilder::MeshBuilder()
 	
 }
 
+MeshBuilder::MeshBuilder(const MeshData& meshData)
+	: m_data(std::move(meshData))
+{
+}
+
 void MeshBuilder::enableAttribute(LayoutAttribute attribute)
 {
 	if (std::find(m_data.m_layout.attribs.begin(), m_data.m_layout.attribs.end(), attribute) == m_data.m_layout.attribs.end())

@@ -89,7 +89,7 @@ public:
 
 	
 
-	bool parseModel(const std::string& fileLocation, const ScopedPath& dst, ModelImporter::ModelInfo& outModelInfo);
+	bool parseModel(const std::string& fileLocation, ModelImporter::ModelInfo& outModelInfo);
 
 	//bool copyFiles(const std::string& fileLocation, AssetRecord& aInfo);
 

@@ -14,6 +14,7 @@ class MeshBuilder
 {
 public:
 	MeshBuilder();
+	MeshBuilder(const MeshData& meshData);
 
 	MeshBuilder& addPosition(const glm::vec3& position);
 	MeshBuilder& addPositions(const std::vector<glm::vec3>& positions);

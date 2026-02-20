@@ -263,7 +263,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter
 //	loadModelFromAssimpScene(scene, modelInfo);
 //}
 
-bool ModelImporter::parseModel(const std::string& filepath, const ScopedPath& dst, ModelImporter::ModelInfo& outModelInfo)
+bool ModelImporter::parseModel(const std::string& filepath, ModelImporter::ModelInfo& outModelInfo)
 {
 	// Validate
 	if (!std::filesystem::exists(filepath))

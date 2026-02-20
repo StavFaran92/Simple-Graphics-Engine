@@ -24,7 +24,7 @@ bool ShaderTypeManager::saveResource(const ResourceCreateDescriptor& desc, const
 
 ResourceLoadDescriptor* ShaderTypeManager::makeResourceLoadDescriptor()
 {
-	return nullptr;
+	return new ShaderLoadDescriptor();
 }
 
 ResourceWrapper<Resource> ShaderTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

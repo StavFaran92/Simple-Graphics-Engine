@@ -14,6 +14,8 @@ ResourceWrapper<Resource> Test::loadAssetResourceInternal(const AssetRecord& rec
 
     assert(loadDesc);
 
+    loadDesc->sourcePath = record.fullFilePath;
+
     ResourceWrapper<Resource> resource = loadDesc->loadResource();
 
     if (resource.isEmpty())

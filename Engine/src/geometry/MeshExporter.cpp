@@ -54,94 +54,113 @@ void MeshExporter::exportMesh(const AssetHandle<MeshGroupAsset>& meshGroup)
     //out.close();
 }
 
-void MeshExporter::exportMesh(const MeshData& meshData, const std::string& targetDir)
+void MeshExporter::exportMeshes(
+    const std::vector<MeshData>& meshes,
+    const std::string& targetFile)
 {
-    std::ofstream out(targetDir);
+    std::ofstream out(targetFile);
     if (!out.is_open())
     {
-        logError("Failed to open file for writing: {}", targetDir);
+        logError("Failed to open file for writing: {}", targetFile);
         return;
     }
+
+    // OBJ GLOBAL OFFSETS
+    uint32_t vOffset = 1; // positions
+    uint32_t vtOffset = 1; // uvs
+    uint32_t vnOffset = 1; // normals
+
     size_t meshIndex = 0;
-    int vertexOffset = 1; // OBJ indices start at 1
-    const auto& positions = meshData.m_positions;
-    const auto& texCoords = meshData.m_texCoords;
-    const auto& indices = meshData.m_indices;
 
-    out << "o Mesh_" << meshIndex << "\n";
-
-    // Write vertex positions
-    for (const auto& pos : positions)
-        out << "v " << pos.x << " " << pos.y << " " << pos.z << "\n";
-
-    // Write texture coordinates (if available)
-    if (!texCoords.empty())
+    for (const MeshData& meshData : meshes)
     {
+        out << "o Mesh_" << meshIndex++ << "\n";
+
+        const auto& positions = meshData.m_positions;
+        const auto& texCoords = meshData.m_texCoords;
+        const auto& normals = meshData.m_normals;
+        const auto& indices = meshData.m_indices;
+
+        // ----------------------
+        // Write vertices
+        // ----------------------
+        for (const auto& pos : positions)
+            out << "v " << pos.x << " " << pos.y << " " << pos.z << "\n";
+
+        // ----------------------
+        // Write UVs
+        // ----------------------
         for (const auto& uv : texCoords)
-            out << "vt " << uv.x << " " << (1.0f - uv.y) << "\n"; // flip Y to match OBJ convention
-    }
+            out << "vt " << uv.x << " " << (1.0f - uv.y) << "\n";
 
-    // Write normals (optional, if you want them)
-    if (!meshData.m_normals.empty())
-    {
-        for (const auto& n : meshData.m_normals)
+        // ----------------------
+        // Write normals
+        // ----------------------
+        for (const auto& n : normals)
             out << "vn " << n.x << " " << n.y << " " << n.z << "\n";
-    }
 
-    // Write faces
-    if (!indices.empty())
-    {
-        // Assuming triangles (3 indices per face)
-        for (size_t i = 0; i + 2 < indices.size(); i += 3)
+        // ----------------------
+        // Write faces
+        // ----------------------
+        auto writeFace = [&](uint32_t i0, uint32_t i1, uint32_t i2)
+            {
+                uint32_t v0 = vOffset + i0;
+                uint32_t v1 = vOffset + i1;
+                uint32_t v2 = vOffset + i2;
+
+                if (!texCoords.empty() && !normals.empty())
+                {
+                    uint32_t t0 = vtOffset + i0;
+                    uint32_t t1 = vtOffset + i1;
+                    uint32_t t2 = vtOffset + i2;
+
+                    uint32_t n0 = vnOffset + i0;
+                    uint32_t n1 = vnOffset + i1;
+                    uint32_t n2 = vnOffset + i2;
+
+                    out << "f "
+                        << v0 << "/" << t0 << "/" << n0 << " "
+                        << v1 << "/" << t1 << "/" << n1 << " "
+                        << v2 << "/" << t2 << "/" << n2 << "\n";
+                }
+                else if (!texCoords.empty())
+                {
+                    uint32_t t0 = vtOffset + i0;
+                    uint32_t t1 = vtOffset + i1;
+                    uint32_t t2 = vtOffset + i2;
+
+                    out << "f "
+                        << v0 << "/" << t0 << " "
+                        << v1 << "/" << t1 << " "
+                        << v2 << "/" << t2 << "\n";
+                }
+                else
+                {
+                    out << "f "
+                        << v0 << " "
+                        << v1 << " "
+                        << v2 << "\n";
+                }
+            };
+
+        if (!indices.empty())
         {
-            const unsigned int i0 = vertexOffset + indices[i];
-            const unsigned int i1 = vertexOffset + indices[i + 1];
-            const unsigned int i2 = vertexOffset + indices[i + 2];
-
-            // Include UVs (and normals if present)
-            if (!texCoords.empty() && !meshData.m_normals.empty())
-                out << "f "
-                << i0 << "/" << i0 << "/" << i0 << " "
-                << i1 << "/" << i1 << "/" << i1 << " "
-                << i2 << "/" << i2 << "/" << i2 << "\n";
-            else if (!texCoords.empty())
-                out << "f "
-                << i0 << "/" << i0 << " "
-                << i1 << "/" << i1 << " "
-                << i2 << "/" << i2 << "\n";
-            else
-                out << "f "
-                << i0 << " "
-                << i1 << " "
-                << i2 << "\n";
+            for (size_t i = 0; i + 2 < indices.size(); i += 3)
+                writeFace(indices[i], indices[i + 1], indices[i + 2]);
         }
-    }
-    else
-    {
-        // No indices: use sequential vertices
-        for (size_t i = 0; i + 2 < positions.size(); i += 3)
+        else
         {
-            const unsigned int i0 = vertexOffset + static_cast<unsigned int>(i);
-            const unsigned int i1 = vertexOffset + static_cast<unsigned int>(i + 1);
-            const unsigned int i2 = vertexOffset + static_cast<unsigned int>(i + 2);
-
-            if (!texCoords.empty() && !meshData.m_normals.empty())
-                out << "f "
-                << i0 << "/" << i0 << "/" << i0 << " "
-                << i1 << "/" << i1 << "/" << i1 << " "
-                << i2 << "/" << i2 << "/" << i2 << "\n";
-            else if (!texCoords.empty())
-                out << "f "
-                << i0 << "/" << i0 << " "
-                << i1 << "/" << i1 << " "
-                << i2 << "/" << i2 << "\n";
-            else
-                out << "f "
-                << i0 << " "
-                << i1 << " "
-                << i2 << "\n";
+            // non-indexed mesh
+            for (uint32_t i = 0; i + 2 < positions.size(); i += 3)
+                writeFace(i, i + 1, i + 2);
         }
-    }
 
-    vertexOffset += static_cast<int>(positions.size());
+        // ----------------------
+        // Update global offsets
+        // ----------------------
+        vOffset += static_cast<uint32_t>(positions.size());
+        vtOffset += static_cast<uint32_t>(texCoords.size());
+        vnOffset += static_cast<uint32_t>(normals.size());
+    }
 }
+

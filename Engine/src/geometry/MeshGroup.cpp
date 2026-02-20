@@ -5,6 +5,7 @@
 #include "geometry/MeshExporter.h"
 #include "core/Factory.h"
 #include "core/Engine.h"
+#include "geometry/MeshBuilder.h"
 
 void MeshGroup::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
@@ -69,12 +70,24 @@ int MeshGroup::getMaterialCount() const
 
 ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, MeshGroupLoadDescriptor desc)
 {
-	desc.sourcePath = fileLocation;
-	ResourceWrapper<MeshGroup> mesh = Factory<MeshGroup>::create();
+	ModelImporter::ModelInfo modelInfo;
+	Engine::get()->getSubSystem<ModelImporter>()->parseModel(fileLocation, modelInfo);
+
+	ResourceWrapper<MeshGroup> model = Factory<MeshGroup>::create();
+	for (const auto& data : modelInfo.meshDataList)
+	{
+		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
+		MeshBuilder builder(data);
+		builder.build(*mesh.get());
+		model->addMesh(mesh);
+	}
+
+	
+
 	//ModelImporter::ModelInfo mInfo;
 	//mInfo.mesh = mesh;
 	//Engine::get()->getSubSystem<ModelImporter>()->loadModelFromFile(desc, mInfo);
-	return mesh;
+	return model;
 }
 
 

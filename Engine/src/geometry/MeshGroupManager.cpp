@@ -30,9 +30,11 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath&
 	// and for each dependant assets currently bring them also, no connection ATM
 
 	ModelImporter::ModelInfo modelInfo;
-	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, dst, modelInfo);
+	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, modelInfo);
 
-	return false;
+	MeshExporter::exportMeshes(modelInfo.meshDataList, dst.absolute().string());
+
+	return true;
 }
 
 bool MeshGroupTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
@@ -46,7 +48,7 @@ bool MeshGroupTypeManager::saveResource(const ResourceCreateDescriptor& desc, co
 
 	const MeshData& data = meshGroupDesc->data;
 
-	MeshExporter::exportMesh(data, dst.absolute().string());
+	MeshExporter::exportMeshes(std::vector<MeshData>{ data }, dst.absolute().string());
 
 	return true;
 }
