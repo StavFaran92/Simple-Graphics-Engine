@@ -47,6 +47,7 @@
 #include "systems/UniqueNameManager.h"
 #include "memory/BuiltInResources.h"
 #include "fileSystem/FileSystem.h"
+#include "memory/MemoryPool.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"

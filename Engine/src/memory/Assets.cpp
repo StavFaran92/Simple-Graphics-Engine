@@ -13,6 +13,7 @@
 #include "memory/AssetFactory.h"
 #include "memory/RegisterManagers.h"
 #include "systems/UniqueNameManager.h"
+#include "runtime/Context.h"
 
 #include <filesystem>
 
