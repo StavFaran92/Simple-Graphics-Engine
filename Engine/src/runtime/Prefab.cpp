@@ -18,16 +18,16 @@ ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoad
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
-	auto projectDir = Engine::get()->getProjectDirectory();
-	filepath = projectDir + filepath;
 	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
 
-	ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
+	
 
 	try
 	{
-		iarchive(*prefab.get());
+		PrefabData data;
+		iarchive(data);
+		ResourceWrapper<Prefab> prefab = Prefab::create(data.entity);
 		return prefab;
 
 	}
