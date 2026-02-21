@@ -434,8 +434,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	manager->parse(*desc.resourceCreateDescriptor);
 
 
-	AssetRecord record(desc);
-	record.parse();
+	
 
 	// Save the asset to disk
 	//std::string ext = getExtensionFromType(type);
@@ -446,8 +445,6 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	//record.relativefilePath = dest.relative().string();
-
 	Asset* asset = manager->createAsset(desc); 
 	if (!asset)
 	{
@@ -455,6 +452,9 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
+	AssetRecord record(desc);
+	record.parse();
+	record.relativefilePath = dest.scoped().string();
 	record.asset = asset;
 	addAsset(record);
 
@@ -464,9 +464,6 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 {
 	AssetType type = desc.aType;
-
-	AssetRecord record(desc);
-	record.parse();
 
 	ResourceTypeManager* manager = AssetFactory::getManager(type);
 	if (!manager)
@@ -494,8 +491,6 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	record.relativefilePath = dest.scoped().string();
-
 	Asset* asset = manager->createAsset(desc);
 	if (!asset)
 	{
@@ -503,6 +498,9 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
+	AssetRecord record(desc);
+	record.parse();
+	record.relativefilePath = dest.scoped().string();
 	record.asset = asset;
 	addAsset(record);
 
