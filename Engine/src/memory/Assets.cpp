@@ -433,9 +433,6 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	}
 	manager->parse(*desc.resourceCreateDescriptor);
 
-
-	
-
 	// Save the asset to disk
 	//std::string ext = getExtensionFromType(type);
 	ScopedPath dest = calculateAssetDestinationPathCreate(desc);

@@ -43,17 +43,15 @@ bool ModelImportDialog::acceptContent()
 		desc.makeResourceLoadDescriptor<MeshGroupLoadDescriptor>();
 		auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(desc).as<MeshGroupAsset>();
 
-		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
+		entity.addComponent<MeshRendererComponent>(mesh);
 
 		// TODO: get imported materials from ModelImporter and assign to meshRenderer
-
-		ResourceWrapper<Prefab> prefab = Prefab::create(entity);
 
 		AssetCreateDescriptor aInfo;
 		aInfo.aType = AssetType::PREFAB;
 		aInfo.name = uniqueName.name + "_PREFAB";
 		aInfo.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		// TODO: makeResourceCreateDescriptor<PrefabCreateDescriptor>() with prefab resource
+		aInfo.makeResourceCreateDescriptor<PrefabCreateDescriptor>()->data.entity = entity;
 		Engine::get()->getSubSystem<Assets>()->createAsset(aInfo);
 
 		entity.remove();

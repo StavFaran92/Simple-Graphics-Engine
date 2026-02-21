@@ -21,12 +21,31 @@ bool PrefabTypeManager::importAsset(const std::string& src, const ScopedPath& ds
 
 bool PrefabTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
 {
-	return false;
+	auto prefabDesc = dynamic_cast<const PrefabCreateDescriptor*>(&desc);
+	if (!prefabDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
+	std::ofstream os(dst.absolute());
+	cereal::JSONOutputArchive oarchive(os);
+
+	try
+	{
+		oarchive(prefabDesc->data);
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Serialization Error occured: {}", e.what());
+	}
+
+	return true;
 }
 
 ResourceLoadDescriptor* PrefabTypeManager::makeResourceLoadDescriptor()
 {
-	return nullptr;
+	return new PrefabLoadDescriptor();
 }
 
 ResourceWrapper<Resource> PrefabTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

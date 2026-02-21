@@ -14,7 +14,7 @@
 #include "component/ObjectComponent.h"
 #include "core/Engine.h"
 
-ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, LoadDescriptor desc)
+ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
@@ -146,3 +146,12 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	return root;
 }
 
+ResourceWrapper<Resource> PrefabCreateDescriptor::createResource()
+{
+	return Prefab::create(data.entity);
+}
+
+ResourceWrapper<Resource> PrefabLoadDescriptor::loadResource()
+{
+	return Prefab::load(sourcePath, *this);
+}
