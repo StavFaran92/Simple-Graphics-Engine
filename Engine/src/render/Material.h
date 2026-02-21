@@ -58,8 +58,12 @@ struct EditableUniform {
 
 struct MaterialData
 {
+	std::string name;
 	MaterialRenderMode renderMode = MaterialRenderMode::None;
 	AssetHandle<ShaderAsset> customShader = AssetHandle<ShaderAsset>::empty; //optional
+
+	std::map<std::string, Value> uniforms;
+	std::map<std::string, std::shared_ptr<TextureSampler>> samplers;
 
 	template <class Archive>
 	void serialize(Archive& archive) {

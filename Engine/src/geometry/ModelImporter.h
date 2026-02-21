@@ -105,8 +105,8 @@ private:
 	AssetHandle<TextureAsset> copyAiMaterialTexture(const aiScene* scene, 
 		aiMaterial* mat, 
 		aiTextureType type, 
-		std::unordered_map<std::string, AssetHandle<TextureAsset>>& cachedTextures,
-		AssetRecord& aInfo);
+		std::unordered_set<std::string>& cachedTextureNames,
+		ModelImporter::ModelParseSession& session);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;
 	//ModelLoadSession m_currentSession;

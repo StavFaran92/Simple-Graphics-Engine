@@ -22,7 +22,7 @@
 
 #include "Utils/MikkTSpaceImpl.h"
 
-void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Material>& mat)
+void extractAiMaterialProperties(const aiMaterial* aiMat, MaterialData& materialData)
 {
 	if (!aiMat)
 	{
@@ -35,8 +35,9 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Materi
 	{
 		if (opacityFactor < 1.f)
 		{
-			mat->setMaterialRenderMode(MaterialRenderMode::Transparent);
-			mat->setUniformValue(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
+			materialData.renderMode = MaterialRenderMode::Transparent;
+			materialData.uniforms[SHADER_PROPERTY_PBR_OPACITY_FACTOR] = opacityFactor;
+			//mat->setUniformValue(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
 		}
 
 	}
@@ -44,19 +45,22 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, ResourceWrapper<Materi
 	aiColor3D diffuseColor;
 	if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
 	{
-		mat->setUniformValue(SHADER_PROPERTY_PBR_COLOR_DIFFUSE, glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b));
+		//mat->setUniformValue(SHADER_PROPERTY_PBR_COLOR_DIFFUSE, glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b));
+		materialData.uniforms[SHADER_PROPERTY_PBR_COLOR_DIFFUSE] = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
 	}
 
 	ai_real rounghnessFactor;
 	if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, rounghnessFactor) == aiReturn_SUCCESS)
 	{
-		mat->setUniformValue(SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR, rounghnessFactor);
+		//mat->setUniformValue(SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR, rounghnessFactor);
+		materialData.uniforms[SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR] = rounghnessFactor;
 	}
 
 	ai_real metallicFactor;
 	if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallicFactor) == aiReturn_SUCCESS)
 	{
-		mat->setUniformValue(SHADER_PROPERTY_PBR_METALLIC_FACTOR, metallicFactor);
+		//mat->setUniformValue(SHADER_PROPERTY_PBR_METALLIC_FACTOR, metallicFactor);
+		materialData.uniforms[SHADER_PROPERTY_PBR_METALLIC_FACTOR] = metallicFactor;
 	}
 
 
@@ -161,56 +165,81 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter
 	// extract mesh from root node
 	processNode(scene, scene->mRootNode, session);
 
-	// TODO fix
-	//if (scene->HasMaterials())
-	//{
-	//	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-	//	{
-	//		auto& aMaterial = scene->mMaterials[i];
+	std::unordered_set<std::string> cachedTextures;
 
-	//		//PrintMaterialProperties(aMaterial);
+	// Import materials and textures
+	if (scene->HasMaterials())
+	{
+		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+		{
+			auto& aMaterial = scene->mMaterials[i];
+			std::string materialName = std::string(aMaterial->GetName().C_Str());
 
-	//		for (const auto& [key, value] : aInfo.createDescriptor.engineAttributes)
-	//		{
-	//			// Look for _MAT_ in the attribute key
-	//			const std::string tag = "_MAT_";
-	//			size_t pos = key.find(tag);
-	//			if (pos == std::string::npos)
-	//				continue; // not a material attribute
+			MaterialData materialData;
+			materialData.name = materialName;
 
-	//			// Extract index: key format is NAME_MAT_X
-	//			// so we read everything after "_MAT_"
-	//			size_t indexPos = pos + tag.length();
-	//			std::string indexStr = key.substr(indexPos);
+			extractAiMaterialProperties(aMaterial, materialData);
 
-	//			// Convert to integer safely
-	//			int matIndex = -1;
-	//			try {
-	//				matIndex = std::stoi(indexStr);
-	//			}
-	//			catch (...) {
-	//				logError("Invalid material index for attribute '{}'", key);
-	//				continue;
-	//			}
+			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures, session);
+			if (!diffuse.isEmpty())
+			{
+				auto sampler = std::make_shared<TextureSampler>(3);
+				sampler->texture = diffuse;
+				sampler->isActive = true;
 
-	//			// Convert attribute value to UUID
-	//			UUID uuid;
-	//			try {
-	//				uuid = UUID(std::stoull(value));
-	//			}
-	//			catch (...) {
-	//				logError("Invalid UUID for material '{}'", key);
-	//				continue;
-	//			}
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_ALBEDO] = sampler;
+			}
 
-	//			// Load material asset
-	//			AssetHandle<MaterialAsset> material(uuid);
-	//			modelInfo.materials[matIndex] = material.resource();
+			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures, aInfo);
+			if (!normal.isEmpty())
+			{
+				auto sampler = std::make_shared<TextureSampler>(3);
+				sampler->texture = normal;
+				sampler->isActive = true;
 
-	//			logTrace("Assigned material index {} -> UUID {}", matIndex, uuid);
-	//		}
-	//	}
-	//}
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_NORMAL] = sampler;
+			}
+
+			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures, aInfo);
+			if (!roughness.isEmpty())
+			{
+				auto sampler = std::make_shared<TextureSampler>(1);
+				sampler->texture = roughness;
+				sampler->channelMaskR = TextureSampler::Color::G;
+				sampler->isActive = true;
+
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS] = sampler;
+			}
+
+			// Metallic map
+			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, cachedTextures, aInfo);
+			if (!metallic.isEmpty())
+			{
+				auto sampler = std::make_shared<TextureSampler>(1);
+				sampler->texture = metallic;
+				sampler->channelMaskR = TextureSampler::Color::B;
+				sampler->isActive = true;
+
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_METALLIC] = sampler;
+			}
+
+			// Ambient Occlusion map
+			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, cachedTextures, aInfo);
+			if (!ao.isEmpty())
+			{
+				auto sampler = std::make_shared<TextureSampler>(1);
+				sampler->texture = ao;
+				sampler->channelMaskR = TextureSampler::Color::R;
+				sampler->isActive = true;
+
+				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_AO] = sampler;
+			}
+
+			session.modelInfo.materialDataList.push_back(materialData);
+		}
+
+		
+	}
 }
 
 //void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
@@ -645,9 +674,8 @@ MeshData ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, Mode
 AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
 	aiMaterial* mat, 
 	aiTextureType type, 
-	std::unordered_map<std::string, 
-	AssetHandle<TextureAsset>>& cachedTextures,
-	AssetRecord& aInfo)
+	std::unordered_set<std::string>& cachedTextureNames, 
+	ModelImporter::ModelParseSession& session)
 {
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
@@ -664,7 +692,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 
 		if (!textureName.empty())
 		{
-			if (cachedTextures.find(textureName) != cachedTextures.end())
+			if (cachedTextureNames.find(textureName) != cachedTextureNames.end())
 			{
 				// Already loaded
 				return cachedTextures[textureName];
