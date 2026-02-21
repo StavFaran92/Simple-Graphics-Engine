@@ -7,11 +7,11 @@
 
 struct PrefabData
 {
-	Entity entity;
+	std::vector<SerializedEntity> m_serializedPrefab;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(entity);
+		SERIALIZED_MEMBER(m_serializedPrefab);
 	}
 };
 
@@ -41,10 +41,12 @@ public:
 		SERIALIZED_MEMBER(m_serializedPrefab);
 	}
 
+	static PrefabData serializeEntityToPrefabData(const Entity& e); // todo make private
 private:
-	static void extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab);
+	static void serializeEntityToPrefabDataHelper(const Entity& e, PrefabData& prefabData);
 private:
-	std::vector<SerializedEntity> m_serializedPrefab;
+	PrefabData m_data;
+	//std::vector<SerializedEntity> m_serializedPrefab;
 };
 
 // Asset

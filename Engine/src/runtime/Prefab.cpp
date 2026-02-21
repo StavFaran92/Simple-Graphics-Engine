@@ -27,7 +27,8 @@ ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoad
 	{
 		PrefabData data;
 		iarchive(data);
-		ResourceWrapper<Prefab> prefab = Prefab::create(data.entity);
+		ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
+		prefab->m_data = data;
 		return prefab;
 
 	}
@@ -39,32 +40,31 @@ ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoad
 	return ResourceWrapper<Prefab>::empty;
 }
 
-
-void Prefab::extractChildrenRecursive(const Entity& e, ResourceWrapper<Prefab>& prefab)
+PrefabData Prefab::serializeEntityToPrefabData(const Entity& e)
 {
-	prefab->m_serializedPrefab.push_back(Archiver::serializeEntity(e));
+	PrefabData prefabData;
+	serializeEntityToPrefabDataHelper(e, prefabData);
+	return prefabData;
+}
+
+void Prefab::serializeEntityToPrefabDataHelper(const Entity& e, PrefabData& prefabData)
+{
+	prefabData.m_serializedPrefab.push_back(Archiver::serializeEntity(e));
 	auto& children = e.getComponent<Transformation>().getChildren();
 	if (children.size() > 0)
 	{
 		for (auto& [_, child] : children)
 		{
-			extractChildrenRecursive(child, prefab);
+			serializeEntityToPrefabDataHelper(child, prefabData);
 		}
 	}
 }
 
 ResourceWrapper<Prefab> Prefab::create(const Entity& e)
 {
-	//AssetInfo aInfo(aDesc);
-
-	//aInfo.aType = AssetType::PREFAB;
-	//aInfo.ext = ".asset";
-
 	ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
-
-	extractChildrenRecursive(e, prefab);
-
-	//AssetLoader<Prefab>::save(prefab, aInfo.parse());
+	PrefabData prefabData = serializeEntityToPrefabData(e);
+	prefab->m_data = prefabData;
 
 	return prefab;
 }
@@ -74,7 +74,7 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	std::map<entity_id, Entity> entityIDRemapTable;
 	std::vector<Entity> createdEntities;
 
-	for (SerializedEntity& serializedEntity : m_serializedPrefab)
+	for (SerializedEntity& serializedEntity : m_data.m_serializedPrefab)
 	{
 		auto& e = Archiver::deserializeEntity(serializedEntity, *Engine::get()->getContext()->getActiveScene());
 		entity_id oldEntityID = e.getComponent<ObjectComponent>().e.handlerID();
@@ -148,7 +148,7 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 
 ResourceWrapper<Resource> PrefabCreateDescriptor::createResource()
 {
-	return Prefab::create(data.entity);
+	return ResourceWrapper<Resource>::empty;//Prefab::create(data.entity);
 }
 
 ResourceWrapper<Resource> PrefabLoadDescriptor::loadResource()
