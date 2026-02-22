@@ -160,83 +160,84 @@ ModelImporter::ModelImporter()
 	logInfo("Model importer init successfully.");
 }
 
+void ModelImporter::parseAiMaterials(const aiScene* scene, ModelImporter::ModelParseSession& session)
+{
+	std::unordered_set<std::string> cachedTextures;
+
+	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+	{
+		aiMaterial* aMaterial = scene->mMaterials[i];
+		std::string materialName = std::string(aMaterial->GetName().C_Str());
+
+		MaterialData materialData;
+		materialData.name = materialName;
+
+		extractAiMaterialProperties(aMaterial, materialData);
+
+		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures, materialData, session);
+
+		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures, materialData, session);
+
+		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures, materialData, session);
+
+		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, cachedTextures, materialData, session);
+
+		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, cachedTextures, materialData, session);
+
+		//auto& normal = 
+		//if (!normal.empty())
+		//{
+		//	auto sampler = std::make_shared<TextureSampler>(3);
+		//	sampler->isActive = true;
+
+		//	materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_NORMAL] = sampler;
+		//}
+
+		//auto& roughness = 
+		//if (!roughness.empty())
+		//{
+		//	auto sampler = std::make_shared<TextureSampler>(1);
+		//	sampler->channelMaskR = TextureSampler::Color::G;
+		//	sampler->isActive = true;
+
+		//	materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS] = sampler;
+		//}
+
+		//// Metallic map
+		//auto& metallic = 
+		//if (!metallic.empty())
+		//{
+		//	auto sampler = std::make_shared<TextureSampler>(1);
+		//	sampler->channelMaskR = TextureSampler::Color::B;
+		//	sampler->isActive = true;
+
+		//	materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_METALLIC] = sampler;
+		//}
+
+		//// Ambient Occlusion map
+		//auto& ao = 
+		//if (!ao.empty())
+		//{
+		//	auto sampler = std::make_shared<TextureSampler>(1);
+		//	sampler->channelMaskR = TextureSampler::Color::R;
+		//	sampler->isActive = true;
+
+		//	materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_AO] = sampler;
+		//}
+
+		session.modelInfo.materialDataList.push_back(materialData);
+	}
+}
+
 void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter::ModelParseSession& session)
 {
 	// extract mesh from root node
 	processNode(scene, scene->mRootNode, session);
 
-	std::unordered_set<std::string> cachedTextures;
-
 	// Import materials and textures
 	if (scene->HasMaterials())
 	{
-		for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		{
-			auto& aMaterial = scene->mMaterials[i];
-			std::string materialName = std::string(aMaterial->GetName().C_Str());
-
-			MaterialData materialData;
-			materialData.name = materialName;
-
-			extractAiMaterialProperties(aMaterial, materialData);
-
-			auto& diffuse = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures, session);
-			if (!diffuse.isEmpty())
-			{
-				auto sampler = std::make_shared<TextureSampler>(3);
-				sampler->texture = diffuse;
-				sampler->isActive = true;
-
-				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_ALBEDO] = sampler;
-			}
-
-			auto& normal = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures, aInfo);
-			if (!normal.isEmpty())
-			{
-				auto sampler = std::make_shared<TextureSampler>(3);
-				sampler->texture = normal;
-				sampler->isActive = true;
-
-				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_NORMAL] = sampler;
-			}
-
-			auto& roughness = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures, aInfo);
-			if (!roughness.isEmpty())
-			{
-				auto sampler = std::make_shared<TextureSampler>(1);
-				sampler->texture = roughness;
-				sampler->channelMaskR = TextureSampler::Color::G;
-				sampler->isActive = true;
-
-				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS] = sampler;
-			}
-
-			// Metallic map
-			auto& metallic = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, cachedTextures, aInfo);
-			if (!metallic.isEmpty())
-			{
-				auto sampler = std::make_shared<TextureSampler>(1);
-				sampler->texture = metallic;
-				sampler->channelMaskR = TextureSampler::Color::B;
-				sampler->isActive = true;
-
-				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_METALLIC] = sampler;
-			}
-
-			// Ambient Occlusion map
-			auto& ao = copyAiMaterialTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, cachedTextures, aInfo);
-			if (!ao.isEmpty())
-			{
-				auto sampler = std::make_shared<TextureSampler>(1);
-				sampler->texture = ao;
-				sampler->channelMaskR = TextureSampler::Color::R;
-				sampler->isActive = true;
-
-				materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_AO] = sampler;
-			}
-
-			session.modelInfo.materialDataList.push_back(materialData);
-		}
+		parseAiMaterials(scene, session);
 
 		
 	}
@@ -670,24 +671,43 @@ MeshData ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, Mode
 }
 
 
+std::string convertAiTextureTypeToSGETextureType(aiTextureType type)
+{
+	switch (type)
+	{
+	case aiTextureType::aiTextureType_DIFFUSE:
+		return SHADER_PROPERTY_PBR_SAMPLER_ALBEDO;
+		case aiTextureType::aiTextureType_NORMALS:
+		return SHADER_PROPERTY_PBR_SAMPLER_NORMAL;
+	case aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS:
+		return SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS;
+	case aiTextureType::aiTextureType_METALNESS:
+		return SHADER_PROPERTY_PBR_SAMPLER_METALLIC;
+	case aiTextureType::aiTextureType_AMBIENT_OCCLUSION:
+		return SHADER_PROPERTY_PBR_SAMPLER_AO;
+	}
+	return "";
+}
 
-AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* scene,
+void ModelImporter::parseAiTexture(const aiScene* scene,
 	aiMaterial* mat, 
 	aiTextureType type, 
 	std::unordered_set<std::string>& cachedTextureNames, 
+	MaterialData& materialData,
 	ModelImporter::ModelParseSession& session)
 {
+	std::string sgeTextureType = convertAiTextureTypeToSGETextureType(type);
+
 	aiString str;
 	if (mat->GetTexture(type, 0, &str) != aiReturn_SUCCESS)
 	{
-		return AssetHandle<TextureAsset>::empty;
+		return;
 	}
 
-	ResourceWrapper<Texture> texture;
-	AssetHandle<TextureAsset> AssetTexture;
 	const aiTexture* aiTexture = scene->GetEmbeddedTexture(str.C_Str());
 	if(aiTexture)
 	{
+		//Embedded texture found, extract it.
 		std::string textureName = std::filesystem::path(aiTexture->mFilename.C_Str()).filename().stem().string();
 
 		if (!textureName.empty())
@@ -695,7 +715,7 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 			if (cachedTextureNames.find(textureName) != cachedTextureNames.end())
 			{
 				// Already loaded
-				return cachedTextures[textureName];
+				return;
 			}
 		}
 
@@ -721,7 +741,10 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 		}
 
 		TextureSemantic usage = TextureSemantic::Color;
-		if (type == aiTextureType_DIFFUSE || type == aiTextureType_DIFFUSE_ROUGHNESS || type == aiTextureType_METALNESS || type == aiTextureType_AMBIENT_OCCLUSION) // todo fix
+		if (type == aiTextureType_DIFFUSE || 
+			type == aiTextureType_DIFFUSE_ROUGHNESS || 
+			type == aiTextureType_METALNESS || 
+			type == aiTextureType_AMBIENT_OCCLUSION) // todo fix
 		{
 			usage = TextureSemantic::Color;
 		}
@@ -730,56 +753,41 @@ AssetHandle<TextureAsset> ModelImporter::copyAiMaterialTexture(const aiScene* sc
 			usage = TextureSemantic::Normal;
 		}
 
-		AssetCreateDescriptor textureAssetDesc;
-		textureAssetDesc.aType = AssetType::TEXTURE;
-		textureAssetDesc.name = textureName;
-		textureAssetDesc.isEngineOwned = aInfo.isEngineOwned;
-		textureAssetDesc.assetDirectory = aInfo.assetDirectory;
-		textureAssetDesc.targetDirectory = aInfo.targetDirectory;
-		auto* createDesc = textureAssetDesc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
-		createDesc->textureData.width = width;
-		createDesc->textureData.height = height;
-		createDesc->textureData.channels = channels;
-		createDesc->textureData.internalFormat = Texture::getInternalFormatFromUsage(usage);
-		createDesc->textureData.format = Texture::getFormatFromChannels(channels);
-		createDesc->textureData.type = TextureType::UNSIGNED_BYTE;
-		createDesc->textureData.filter = TextureFilter::Linear;
-		createDesc->textureData.wrap = TextureWrap::Repeat;
-		createDesc->textureData.data = pixelData;
-		createDesc->textureData.textureName = textureName;
-		Engine::get()->getSubSystem<Assets>()->createAsset(textureAssetDesc);
+		TextureData textureData;
+		textureData.width = width;
+		textureData.height = height;
+		textureData.channels = channels;
+		textureData.internalFormat = Texture::getInternalFormatFromUsage(usage);
+		textureData.format = Texture::getFormatFromChannels(channels);
+		textureData.type = TextureType::UNSIGNED_BYTE;
+		textureData.filter = TextureFilter::Linear;
+		textureData.wrap = TextureWrap::Repeat;
+		textureData.data = pixelData;
+		textureData.textureName = textureName;
 
 		if (!textureName.empty())
 		{
-			cachedTextures.insert({ textureName, AssetTexture });
+			cachedTextureNames.insert(textureName);
+			session.modelInfo.textureDataList.push_back(textureData);
+			session.modelInfo.materialToTextureMap[materialData.name][sgeTextureType] = textureName;
 		}
 	}	
 	else
 	{
-		std::string path = findTexture(str, aInfo.assetDirectory); // todo fix
+		std::string path = findTexture(str, session.fileDir);
 		if (path.empty())
 		{
-			return AssetHandle<TextureAsset>::empty;
+			return;
 		}
 
-		if (cachedTextures.find(path) != cachedTextures.end())
+		if (cachedTextureNames.find(path) != cachedTextureNames.end())
 		{
 			// Already loaded
-			return cachedTextures[path];
+			return;
 		}
 
-		AssetCreateDescriptor tSettings;
-		tSettings.aType = AssetType::TEXTURE;
-		tSettings.sourcePath = path;
-		tSettings.assetDirectory = aInfo.assetDirectory;
-		tSettings.isEngineOwned = aInfo.isEngineOwned;
-		auto* textureDesc = tSettings.makeResourceLoadDescriptor<TextureLoadDescriptor>();
-		textureDesc->usage = TextureSemantic::Color;
-
-		AssetTexture = Engine::get()->getSubSystem<Assets>()->importAsset(tSettings).as<TextureAsset>();
-
-		cachedTextures.insert({ path, AssetTexture });
+		session.modelInfo.textureFilepathList.insert(path);
+		session.modelInfo.materialToTextureMap[materialData.name][sgeTextureType] = path;
 	}
 
-	return AssetTexture;
 }

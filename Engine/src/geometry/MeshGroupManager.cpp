@@ -32,7 +32,58 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath&
 	ModelImporter::ModelInfo modelInfo;
 	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, modelInfo);
 
+	// save Mesh resource
 	MeshExporter::exportMeshes(modelInfo.meshDataList, dst.absolute().string());
+
+	std::map<std::string, AssetHandle<TextureAsset>> textures;
+	std::map<std::string, AssetHandle<MaterialAsset>> materials;
+
+	// Load Embedded Textures 
+	for (const TextureData& tData : modelInfo.textureDataList)
+	{
+		AssetCreateDescriptor textureAssetDesc;
+		textureAssetDesc.aType = AssetType::TEXTURE;
+		textureAssetDesc.name = tData.textureName;
+		auto TextureResourceDesc = textureAssetDesc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+		TextureResourceDesc->textureData = tData;
+		AssetHandle<TextureAsset> textureAsset = Engine::get()->getSubSystem<Assets>()->createAsset(textureAssetDesc).as<TextureAsset>();
+		textures[tData.textureName] = textureAsset;
+	}
+
+	// Load External Textures 
+	for (const std::string& texturePath : modelInfo.textureFilepathList)
+	{
+		AssetCreateDescriptor textureAssetDesc;
+		textureAssetDesc.aType = AssetType::TEXTURE;
+		auto TextureResourceDesc = textureAssetDesc.makeResourceLoadDescriptor<TextureLoadDescriptor>();
+		TextureResourceDesc->sourcePath = texturePath;
+		AssetHandle<TextureAsset> textureAsset = Engine::get()->getSubSystem<Assets>()->importAsset(textureAssetDesc).as<TextureAsset>();
+		textures[texturePath] = textureAsset;
+	}
+
+	// Load Materials
+	for (const MaterialData& mData : modelInfo.materialDataList)
+	{
+		AssetCreateDescriptor materialAssetDesc;
+		materialAssetDesc.aType = AssetType::MATERIAL;
+		materialAssetDesc.name = mData.name;
+		auto materialResourceDesc = materialAssetDesc.makeResourceCreateDescriptor<MaterialCreateDescriptor>();
+		materialResourceDesc->data = mData;
+		AssetHandle<MaterialAsset> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(materialAssetDesc).as<MaterialAsset>();
+		materials[mData.name] = materialAsset;
+	}
+
+	// Bind Textures to Materials
+	for (const auto& [_, materialSpec]: modelInfo.materialToTextureMap)
+	{
+		for (const auto& [materialTextureType, textureName] : materialSpec)
+		{
+
+		}
+	}
+
+	// Bind Materials to Meshes
+
 
 	return true;
 }

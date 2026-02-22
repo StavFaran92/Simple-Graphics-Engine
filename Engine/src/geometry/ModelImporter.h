@@ -44,6 +44,9 @@ public:
 		std::vector<glm::mat4> bonesOffsets;
 		std::unordered_map<std::string, unsigned int> bonesNameToIDMap;
 
+		std::unordered_set<std::string> textureFilepathList;
+		std::unordered_map<std::string, std::map<std::string, std::string>> materialToTextureMap;
+
 	};
 
 	struct ModelParseSession
@@ -102,10 +105,13 @@ private:
 
 	MeshData processMesh(const aiScene* aiScene, aiMesh* aiMesh, ModelImporter::ModelParseSession& session);
 
-	AssetHandle<TextureAsset> copyAiMaterialTexture(const aiScene* scene, 
+	void parseAiMaterials(const aiScene* scene, ModelImporter::ModelParseSession& session);
+
+	void parseAiTexture(const aiScene* scene,
 		aiMaterial* mat, 
 		aiTextureType type, 
 		std::unordered_set<std::string>& cachedTextureNames,
+		MaterialData& materialData,
 		ModelImporter::ModelParseSession& session);
 private:
 	//std::unordered_map<std::string, std::weak_ptr<Texture>> m_texturesCache;
