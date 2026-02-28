@@ -58,6 +58,7 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath&
 	}
 
 	// Build material dependency nodes with texture dependencies
+	int matIndex = 0;
 	for (const MaterialData& mData : modelInfo.materialDataList)
 	{
 		ImportNode materialNode;
@@ -84,7 +85,10 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath&
 			}
 		}
 
-		result.dependencies["MATERIAL_" + mData.name] = materialNode;
+		std::string slotStr = std::to_string(matIndex);
+
+		result.dependencies["MATERIAL_" + mData.name + "_SLOT_" + slotStr] = materialNode;
+		matIndex++;
 	}
 
 	return true;

@@ -21,9 +21,10 @@ enum class CreationType
 struct ImportNode
 {
 	std::string name;
-	AssetCreateDescriptor createDescriptor;
 	std::map<std::string, ImportNode> dependencies;
+	AssetCreateDescriptor createDescriptor;
     CreationType creationType = CreationType::Create;
+    int index = 0;
 };
 
 // Validates / fills defaults on resource descriptors

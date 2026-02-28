@@ -100,3 +100,42 @@ ResourceWrapper<Resource> MeshGroupCreateDescriptor::createResource()
 	throw std::exception("Not yet implmeneted.");
 	//return MeshGroup::cre(sourcePath, *this);
 }
+
+void MeshGroupAsset::bindDependency(const std::string& slot, UUID dependency)
+{
+	// We only care about materials here
+	const std::string token = "SLOT_";
+
+	size_t pos = slot.find(token);
+	if (pos == std::string::npos)
+		return; // not a material slot binding
+
+	pos += token.size();
+
+	// Extract consecutive digits after SLOT_
+	size_t end = pos;
+	while (end < slot.size() && std::isdigit(slot[end]))
+		++end;
+
+	if (end == pos)
+	{
+		logWarning("MeshGroupAsset: invalid SLOT format '{}'", slot);
+		return;
+	}
+
+	int index = std::stoi(slot.substr(pos, end - pos));
+
+	// Fetch the asset
+	AssetHandle<Asset> generic =
+		Engine::get()->getSubSystem<Assets>()->getAsset(dependency);
+
+	AssetHandle<MaterialAsset> material = generic.as<MaterialAsset>();
+
+	if (material.isEmpty())
+	{
+		logWarning("MeshGroupAsset: dependency '{}' is not a MaterialAsset", slot);
+		return;
+	}
+
+	m_materials[index] = material;
+}

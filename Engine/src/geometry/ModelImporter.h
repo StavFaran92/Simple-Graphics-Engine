@@ -39,7 +39,6 @@ public:
 	{
 		std::vector<MeshData> meshDataList;
 		std::vector<MaterialData> materialDataList;
-		std::vector<int> materialSlotList;
 		std::vector<TextureData> textureDataList;
 		std::vector<glm::mat4> bonesOffsets;
 		std::unordered_map<std::string, unsigned int> bonesNameToIDMap;

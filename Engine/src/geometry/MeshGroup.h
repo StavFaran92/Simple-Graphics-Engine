@@ -54,4 +54,8 @@ public:
 	using ResourceType = MeshGroup;
 
 	using Asset::Asset;
+
+	void bindDependency(const std::string& slot, UUID dependency) override;
+
+	std::map<int, AssetHandle<MaterialAsset>> m_materials;
 };

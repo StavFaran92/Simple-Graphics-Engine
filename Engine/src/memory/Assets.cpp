@@ -500,10 +500,6 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	
-
-	
-
 	AssetRecord record(desc);
 	record.parse();
 	record.relativefilePath = dest.scoped().string();
@@ -514,8 +510,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 
 	populateAssetFromNode(handle, importNode);
 
-
-	return AssetHandle<Asset>(record.uuid);
+	return handle;
 }
 
 AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node)
@@ -569,8 +564,10 @@ void Assets::populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& n
 		// 2) recursively populate the child
 		populateAssetFromNode(child, childNode);
 
+		UUID uid = child.getUID(); // assethandle AND asset have UUID aset is not updated
+
 		// 3) bind to parent
-		asset->bindDependency(slotName, child->getUUID());
+		asset->bindDependency(slotName, uid);
 	}
 }
 
