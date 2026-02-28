@@ -14,8 +14,9 @@ Asset* PrefabTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new PrefabAsset(desc);
 }
 
-bool PrefabTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
+bool PrefabTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
 {
+	// Prefab import not implemented
 	return false;
 }
 

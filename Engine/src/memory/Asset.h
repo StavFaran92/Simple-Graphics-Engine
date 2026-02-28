@@ -16,6 +16,8 @@ public:
 
 	virtual void save(const AssetRecord& aInfo) {}
 
+	virtual void bindDependency(const std::string& slot, UUID dependency) {}
+
 	const AssetCreateDescriptor& getDescriptor() const;
 
 	UUID getUUID() const;

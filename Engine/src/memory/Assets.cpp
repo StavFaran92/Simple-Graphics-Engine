@@ -481,14 +481,18 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	// Parse the resource descriptor
 	manager->parse(*desc.resourceLoadDescriptor);
 
-	//std::string ext = desc.sourcePath.substr(desc.sourcePath.find_last_of('.')); // I think this will be needed.
 	ScopedPath dest = calculateAssetDestinationPathImport(desc);
-	if (!manager->importAsset(desc.resourceLoadDescriptor->sourcePath, dest))
+
+	ImportNode importNode;
+	importNode.createDescriptor = desc;
+
+	if (!manager->importAsset(desc.resourceLoadDescriptor->sourcePath, dest, importNode))
 	{
-		logError("Failed to import asset type {} to: ", static_cast<int>(type), dest.absolute().string());
+		logError("Failed to import asset type {} to: {}", static_cast<int>(type), dest.absolute().string());
 		return AssetHandle<Asset>::empty;
 	}
 
+	// Create assets from import graph
 	Asset* asset = manager->createAsset(desc);
 	if (!asset)
 	{
@@ -496,13 +500,78 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
+	
+
+	
+
 	AssetRecord record(desc);
 	record.parse();
 	record.relativefilePath = dest.scoped().string();
 	record.asset = asset;
 	addAsset(record);
 
+	AssetHandle<Asset> handle(record.uuid);
+
+	populateAssetFromNode(handle, importNode);
+
+
 	return AssetHandle<Asset>(record.uuid);
+}
+
+AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node)
+{
+	ResourceTypeManager* manager =
+		AssetFactory::getManager(node.createDescriptor.aType);
+
+	if (!manager)
+	{
+		logError("No ResourceTypeManager registered for asset type {}",
+			static_cast<int>(node.createDescriptor.aType));
+		return AssetHandle<Asset>::empty;
+	}
+
+	AssetHandle<Asset> created;
+
+	if (node.creationType == CreationType::Create)
+	{
+		created = createAsset(node.createDescriptor);
+	}
+	else // CreationType::Import
+	{
+		created = importAsset(node.createDescriptor);
+	}
+
+	if (created.isEmpty())
+	{
+		logWarning("Failed to create asset '{}' from import node", node.name);
+		return AssetHandle<Asset>::empty;
+	}
+
+	return created;
+}
+
+void Assets::populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& node)
+{
+	if (asset.isEmpty())
+		return;
+
+	for (const auto& [slotName, childNode] : node.dependencies)
+	{
+		// 1) create the child asset
+		AssetHandle<Asset> child = instantiateNode(childNode);
+		if (child.isEmpty())
+		{
+			logWarning("Failed to create dependency '{}' for asset '{}'",
+				childNode.name, node.name);
+			continue;
+		}
+
+		// 2) recursively populate the child
+		populateAssetFromNode(child, childNode);
+
+		// 3) bind to parent
+		asset->bindDependency(slotName, child->getUUID());
+	}
 }
 
 void Assets::bindResourceToAsset(UUID uuid, ResourceID resID)

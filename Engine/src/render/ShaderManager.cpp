@@ -12,8 +12,9 @@ Asset* ShaderTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new ShaderAsset(desc);
 }
 
-bool ShaderTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
+bool ShaderTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
 {
+	// Shader import not implemented
 	return false;
 }
 

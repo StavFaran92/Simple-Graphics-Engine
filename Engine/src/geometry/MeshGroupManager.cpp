@@ -13,77 +13,79 @@ Asset* MeshGroupTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new MeshGroupAsset(desc);
 }
 
-bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
+bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
 {
-	// we want to do the most work we can do here, so it will not need to happen during load
-	// we open the file and parse all its inner data
-	// and so at the end what imported is
-	// array of meshes
-	// textures
-	// materials
-	// skeleton
-	// etc
-	// so i may need to alter the signature to store dependant assets
-	// or at least connect them somehow.
-	// so what i will do is open the file using assimp 
-	// and bring mesh currently as OBJ.
-	// and for each dependant assets currently bring them also, no connection ATM
-
 	ModelImporter::ModelInfo modelInfo;
 	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, modelInfo);
 
 	// save Mesh resource
 	MeshExporter::exportMeshes(modelInfo.meshDataList, dst.absolute().string());
 
-	std::map<std::string, AssetHandle<TextureAsset>> textures;
-	std::map<std::string, AssetHandle<MaterialAsset>> materials;
+	// Build root MeshGroup node
+	std::filesystem::path path(src);
+	result.name = path.filename().stem().string();
+	result.createDescriptor.aType = AssetType::MESH; // TODO fix
+	result.createDescriptor.sourcePath = src;
+	result.createDescriptor.makeResourceLoadDescriptor<MeshGroupLoadDescriptor>()->sourcePath = dst.absolute().string();
 
-	// Load Embedded Textures 
+	// Build texture dependency nodes (embedded textures)
+	//std::map<std::string, std::string> textureNameToSlot; // texture name -> slot name
 	for (const TextureData& tData : modelInfo.textureDataList)
 	{
-		AssetCreateDescriptor textureAssetDesc;
-		textureAssetDesc.aType = AssetType::TEXTURE;
-		textureAssetDesc.name = tData.textureName;
-		auto TextureResourceDesc = textureAssetDesc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
-		TextureResourceDesc->textureData = tData;
-		AssetHandle<TextureAsset> textureAsset = Engine::get()->getSubSystem<Assets>()->createAsset(textureAssetDesc).as<TextureAsset>();
-		textures[tData.textureName] = textureAsset;
+		ImportNode textureNode;
+		textureNode.name = tData.textureName;
+		textureNode.createDescriptor.aType = AssetType::TEXTURE;
+		textureNode.createDescriptor.name = tData.textureName;
+		auto textureResourceDesc = textureNode.createDescriptor.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+		textureResourceDesc->textureData = tData;
+		
+		// Store texture node - we'll add it to material dependencies
+		//textureNameToSlot[tData.textureName] = ""; // Will be set when mapping to materials
+		result.dependencies["TEXTURE_" + tData.textureName] = textureNode;
 	}
 
-	// Load External Textures 
+	// Build texture dependency nodes (external textures)
 	for (const std::string& texturePath : modelInfo.textureFilepathList)
 	{
-		AssetCreateDescriptor textureAssetDesc;
-		textureAssetDesc.aType = AssetType::TEXTURE;
-		auto TextureResourceDesc = textureAssetDesc.makeResourceLoadDescriptor<TextureLoadDescriptor>();
-		TextureResourceDesc->sourcePath = texturePath;
-		AssetHandle<TextureAsset> textureAsset = Engine::get()->getSubSystem<Assets>()->importAsset(textureAssetDesc).as<TextureAsset>();
-		textures[texturePath] = textureAsset;
+		ImportNode textureNode;
+		std::filesystem::path texPath(texturePath);
+		textureNode.name = texPath.filename().stem().string();
+		textureNode.createDescriptor.aType = AssetType::TEXTURE;
+		textureNode.createDescriptor.sourcePath = texturePath;
+		textureNode.createDescriptor.makeResourceLoadDescriptor<TextureLoadDescriptor>()->sourcePath = texturePath;
+		
+		result.dependencies["TEXTURE_" + texturePath] = textureNode;
 	}
 
-	// Load Materials
+	// Build material dependency nodes with texture dependencies
 	for (const MaterialData& mData : modelInfo.materialDataList)
 	{
-		AssetCreateDescriptor materialAssetDesc;
-		materialAssetDesc.aType = AssetType::MATERIAL;
-		materialAssetDesc.name = mData.name;
-		auto materialResourceDesc = materialAssetDesc.makeResourceCreateDescriptor<MaterialCreateDescriptor>();
+		ImportNode materialNode;
+		materialNode.name = mData.name;
+		materialNode.createDescriptor.aType = AssetType::MATERIAL;
+		materialNode.createDescriptor.name = mData.name;
+		auto materialResourceDesc = materialNode.createDescriptor.makeResourceCreateDescriptor<MaterialCreateDescriptor>();
 		materialResourceDesc->data = mData;
-		AssetHandle<MaterialAsset> materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(materialAssetDesc).as<MaterialAsset>();
-		materials[mData.name] = materialAsset;
-	}
 
-	// Bind Textures to Materials
-	for (const auto& [_, materialSpec]: modelInfo.materialToTextureMap)
-	{
-		for (const auto& [materialTextureType, textureName] : materialSpec)
+		// Add texture dependencies to this material
+		auto materialTextureIt = modelInfo.materialToTextureMap.find(mData.name);
+		if (materialTextureIt != modelInfo.materialToTextureMap.end())
 		{
-
+			for (const auto& [materialTextureType, textureName] : materialTextureIt->second)
+			{
+				// Find the texture node in root dependencies
+				std::string textureKey = "TEXTURE_" + textureName;
+				auto textureIt = result.dependencies.find(textureKey);
+				if (textureIt != result.dependencies.end())
+				{
+					// Add texture as dependency to material with slot name
+					materialNode.dependencies[materialTextureType] = textureIt->second;
+				}
+			}
 		}
+
+		result.dependencies["MATERIAL_" + mData.name] = materialNode;
 	}
-
-	// Bind Materials to Meshes
-
 
 	return true;
 }

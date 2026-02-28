@@ -13,9 +13,20 @@ Asset* AnimationTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new AnimationAsset(desc);
 }
 
-bool AnimationTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
+bool AnimationTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
 {
-	return std::filesystem::copy_file(src, dst.absolute(), std::filesystem::copy_options::overwrite_existing);
+	if (!std::filesystem::copy_file(src, dst.absolute(), std::filesystem::copy_options::overwrite_existing))
+	{
+		return false;
+	}
+
+	std::filesystem::path path(src);
+	result.name = path.filename().stem().string();
+	result.createDescriptor.aType = AssetType::ANIMATION;
+	result.createDescriptor.sourcePath = src;
+	result.createDescriptor.makeResourceLoadDescriptor<AnimationLoadDescriptor>()->sourcePath = src;
+
+	return true;
 }
 
 bool AnimationTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)

@@ -16,8 +16,9 @@ Asset* SceneTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new SceneAsset(desc);
 }
 
-bool SceneTypeManager::importAsset(const std::string& src, const ScopedPath& dst)
+bool SceneTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
 {
+	// Scene import not implemented
 	return false;
 }
 

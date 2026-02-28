@@ -234,4 +234,6 @@ public:
 	using ResourceType = Material;
 
 	using Asset::Asset;
+
+	void bindDependency(const std::string& slot, UUID dependency) override;
 };

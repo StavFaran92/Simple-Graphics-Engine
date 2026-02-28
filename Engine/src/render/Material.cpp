@@ -21,6 +21,9 @@
 #include "render/ShadersInfo.h"
 
 #include <filesystem>
+#include "memory/AssetHandle.h"
+#include "texture/Texture.h"
+#include "texture/TextureSampler.h"
 
 
 //static AssetFnRegister<AssetType::MATERIAL> assetRegister(AssetTraits<Material>::load);
@@ -463,4 +466,64 @@ ResourceWrapper<Resource> MaterialCreateDescriptor::createResource()
 ResourceWrapper<Resource> MaterialLoadDescriptor::loadResource()
 {
 	return Material::load(sourcePath, *this);
+}
+
+void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
+{
+	// Map slot names to shader property names
+	std::string shaderPropertyName;
+	if (slot == "ALBEDO" || slot == SHADER_PROPERTY_PBR_SAMPLER_ALBEDO)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_ALBEDO;
+	}
+	else if (slot == "NORMAL" || slot == SHADER_PROPERTY_PBR_SAMPLER_NORMAL)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_NORMAL;
+	}
+	else if (slot == "ROUGHNESS" || slot == SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS;
+	}
+	else if (slot == "METALLIC" || slot == SHADER_PROPERTY_PBR_SAMPLER_METALLIC)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_METALLIC;
+	}
+	else if (slot == "AO" || slot == SHADER_PROPERTY_PBR_SAMPLER_AO)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_AO;
+	}
+	else
+	{
+		// Use slot name directly if it doesn't match known patterns
+		shaderPropertyName = slot;
+	}
+
+	// Cast dependency to TextureAsset
+	AssetHandle<TextureAsset> textureAsset(dependency);
+	if (textureAsset.isEmpty())
+	{
+		logWarning("MaterialAsset::bindDependency: Dependency is not a TextureAsset for slot '{}'", slot);
+		return;
+	}
+
+	// Get the Material resource
+	AssetHandle<MaterialAsset> materialAsset(getUUID());
+	ResourceWrapper<Material> material = materialAsset.resource();
+	if (material.isEmpty())
+	{
+		logWarning("MaterialAsset::bindDependency: Material resource is empty");
+		return;
+	}
+
+	// Create or get existing sampler
+	std::shared_ptr<TextureSampler> sampler = material->getSampler(shaderPropertyName);
+	if (!sampler)
+	{
+		sampler = std::make_shared<TextureSampler>();
+		sampler->isActive = true;
+	}
+
+	// Set the texture
+	sampler->texture = textureAsset;
+	material->setSampler(shaderPropertyName, sampler);
 }

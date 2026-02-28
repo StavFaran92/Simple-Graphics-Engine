@@ -4,6 +4,7 @@
 #include "core/Core.h"
 #include "core/Configurations.h"
 #include "systems/SubSystem.h"
+#include "memory/ResourcePipeline.h"
 
 class Asset;
 
@@ -48,6 +49,12 @@ public:
 	AssetHandle<Asset> createAsset(AssetCreateDescriptor desc);
 
 	AssetHandle<Asset> importAsset(AssetCreateDescriptor desc);
+
+	Asset* createAssetsFromImportNode(ImportNode node); // todo fix qualifier
+
+	AssetHandle<Asset> instantiateNode(const ImportNode& node);
+
+	void populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& node);
 
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 

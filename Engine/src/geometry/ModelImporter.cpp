@@ -175,55 +175,10 @@ void ModelImporter::parseAiMaterials(const aiScene* scene, ModelImporter::ModelP
 		extractAiMaterialProperties(aMaterial, materialData);
 
 		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE, cachedTextures, materialData, session);
-
 		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_NORMALS, cachedTextures, materialData, session);
-
 		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, cachedTextures, materialData, session);
-
 		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_METALNESS, cachedTextures, materialData, session);
-
 		parseAiTexture(scene, aMaterial, aiTextureType::aiTextureType_AMBIENT_OCCLUSION, cachedTextures, materialData, session);
-
-		//auto& normal = 
-		//if (!normal.empty())
-		//{
-		//	auto sampler = std::make_shared<TextureSampler>(3);
-		//	sampler->isActive = true;
-
-		//	materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_NORMAL] = sampler;
-		//}
-
-		//auto& roughness = 
-		//if (!roughness.empty())
-		//{
-		//	auto sampler = std::make_shared<TextureSampler>(1);
-		//	sampler->channelMaskR = TextureSampler::Color::G;
-		//	sampler->isActive = true;
-
-		//	materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS] = sampler;
-		//}
-
-		//// Metallic map
-		//auto& metallic = 
-		//if (!metallic.empty())
-		//{
-		//	auto sampler = std::make_shared<TextureSampler>(1);
-		//	sampler->channelMaskR = TextureSampler::Color::B;
-		//	sampler->isActive = true;
-
-		//	materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_METALLIC] = sampler;
-		//}
-
-		//// Ambient Occlusion map
-		//auto& ao = 
-		//if (!ao.empty())
-		//{
-		//	auto sampler = std::make_shared<TextureSampler>(1);
-		//	sampler->channelMaskR = TextureSampler::Color::R;
-		//	sampler->isActive = true;
-
-		//	materialData.samplers[SHADER_PROPERTY_PBR_SAMPLER_AO] = sampler;
-		//}
 
 		session.modelInfo.materialDataList.push_back(materialData);
 	}

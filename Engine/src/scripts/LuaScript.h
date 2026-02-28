@@ -3,18 +3,23 @@
 #include "core/Core.h"
 #include "memory/Asset.h"
 
+struct EngineAPI LuaScriptCreateDescriptor : public ResourceCreateDescriptor
+{
+	//MaterialData data;
+
+	ResourceWrapper<Resource> createResource() override;
+};
+
+struct EngineAPI LuaScriptLoadDescriptor : public ResourceLoadDescriptor
+{
+	ResourceWrapper<Resource> loadResource() override;
+};
+
 // Resource
 class EngineAPI LuaScript : public Resource
 {
 public:
-	struct LoadDescriptor : public ResourceLoadDescriptor
-	{
-		ResourceWrapper<Resource> loadResource() override {
-			return LuaScript::load(sourcePath, *this);
-		}
-	};
-
-	static ResourceWrapper<LuaScript> load(const std::string& fileLocation, LoadDescriptor desc = {});
+	static ResourceWrapper<LuaScript> load(const std::string& fileLocation, LuaScriptLoadDescriptor desc = {});
 
 	static ResourceWrapper<LuaScript> create();
 
