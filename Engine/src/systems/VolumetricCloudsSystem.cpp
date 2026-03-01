@@ -73,7 +73,7 @@ void VolumetricCloudsSystem::prepareVolumetricCloudsForRender(VolumetricCloudsCo
 	materialResource->setUniformValue("u_aabbMin", aabb.getMin());
 	materialResource->setUniformValue("u_aabbMax", aabb.getMax());
 
-	materialResource->getNonPersistentBlock().setTexture("iChannel0", m_noiseTexture);
+	materialResource->setTexture("iChannel0", m_noiseTexture);
 
 	//if (!aabb.isOnFrustum(*graphics->frustum))
 	//{

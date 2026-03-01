@@ -171,6 +171,7 @@ void ModelImporter::parseAiMaterials(const aiScene* scene, ModelImporter::ModelP
 
 		MaterialData materialData;
 		materialData.name = materialName;
+		materialData.renderMode = MaterialRenderMode::Opaque;
 
 		extractAiMaterialProperties(aMaterial, materialData);
 

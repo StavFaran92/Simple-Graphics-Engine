@@ -139,7 +139,7 @@ void Renderer::renderSceneNonOpaque(Scene* scene)
             }
 
             // Only render transparent objects
-            if (graphics->material->getMaterialRenderMode() != MaterialRenderMode::Transparent)
+            if (graphics->material->getRenderMode() != MaterialRenderMode::Transparent)
             {
                 continue;
             }
@@ -245,7 +245,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
                 continue;
             }
 
-            if (graphics->material->getMaterialRenderMode() != MaterialRenderMode::Custom)
+            if (graphics->material->getRenderMode() != MaterialRenderMode::Custom)
                 continue;
 
             //if (graphics->material->m_shader.get()->getShaderOverride() != ShaderOverride::PBR)

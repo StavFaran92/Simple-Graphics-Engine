@@ -43,9 +43,12 @@ bool ModelImportDialog::acceptContent()
 		desc.makeResourceLoadDescriptor<MeshGroupLoadDescriptor>();
 		auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(desc).as<MeshGroupAsset>();
 
-		entity.addComponent<MeshRendererComponent>(mesh);
+		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
 
-		// TODO: get imported materials from ModelImporter and assign to meshRenderer
+		for (auto&[slot, mat] : mesh->m_materials)
+		{
+			meshRenderer.setMaterial(slot, mat);
+		}
 
 		AssetCreateDescriptor aInfo;
 		aInfo.aType = AssetType::PREFAB;

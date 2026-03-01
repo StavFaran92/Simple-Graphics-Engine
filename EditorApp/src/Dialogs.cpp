@@ -488,7 +488,7 @@ void displayMaterialEditDialog()
 	{
 		auto& mat = EditorState::Instance().selectedMaterialForEdit;
 
-		materialData.draw(mat.resource());
+		materialData.draw(mat);
 
 		ImGui::Separator();
 

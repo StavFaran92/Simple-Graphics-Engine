@@ -135,7 +135,7 @@ void Assets::saveDirtyAssets()
 		if (assetInfo.isDirty())
 		{
 			AssetHandle<Asset> asset = getAsset(uuid);
-			asset->save(asset.info());
+			//asset->save(asset.info()); // TODO fix
 			assetInfo.m_isDirty = false;
 		}
 	}

@@ -201,9 +201,9 @@ bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::f
 
 
 
-void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
+void MaterialDataWidget::draw(const AssetHandle<MaterialAsset>& mat)
 {
-	ImGui::Text(mat.get()->getName().c_str());
+	ImGui::Text(mat->data.name.c_str());
 
 	ImGui::Dummy(ImVec2(0, 4));
 
@@ -220,7 +220,7 @@ void MaterialDataWidget::draw(const ResourceWrapper<Material>& mat)
 	};
 
 	static MaterialRenderMode currentMode;
-	currentMode = mat.get()->getMaterialRenderMode();
+	currentMode = mat->data.renderMode;
 	int currentIndex = static_cast<int>(currentMode);
 
 	if (ImGui::BeginCombo("Render Mode", RenderModeNames[currentIndex])) {

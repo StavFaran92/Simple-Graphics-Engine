@@ -86,23 +86,23 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 
 	//mat->getNonPersistentBlock().setTexture("MainTexture", renderTargetTexture);
 
-	mat.get()->getNonPersistentBlock().setUniformValue("model", model);
-	mat.get()->getNonPersistentBlock().setUniformValue("view", graphics->view);
-	mat.get()->getNonPersistentBlock().setUniformValue("projection", graphics->projection);
+	mat->setUniformValue("model", model);
+	mat->setUniformValue("view", graphics->view);
+	mat->setUniformValue("projection", graphics->projection);
 
 	auto viewport = graphics->renderView->getViewport();
-	mat.get()->getNonPersistentBlock().setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
+	mat->setUniformValue("screenSize", glm::vec2(viewport.w, viewport.h));
 
-	mat.get()->getNonPersistentBlock().setUniformValue("cameraPos", graphics->cameraPos);
+	mat->setUniformValue("cameraPos", graphics->cameraPos);
 
 	const Entity& camera = graphics->renderView->getCamera();
 	auto& primaryCamera = camera.getComponent<CameraComponent>();
-	mat.get()->getNonPersistentBlock().setUniformValue("cameraLookAt", primaryCamera.front);
-	mat.get()->getNonPersistentBlock().setUniformValue("cameraFov", primaryCamera.fovyRadians);
+	mat->setUniformValue("cameraLookAt", primaryCamera.front);
+	mat->setUniformValue("cameraFov", primaryCamera.fovyRadians);
 
-	mat.get()->getNonPersistentBlock().setTexture("uMainTexture", renderTargetTexture);
+	mat->setTexture("uMainTexture", renderTargetTexture);
 
-	mat.get()->use();
+	mat->use();
 
 	// bind mesh
 	ResourceWrapper<MeshGroup> mesh;

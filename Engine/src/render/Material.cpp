@@ -19,17 +19,29 @@
 #include "memory/BuiltInAssets.h"
 #include "memory/BuiltInResources.h"
 #include "render/ShadersInfo.h"
+#include "memory/Assets.h"
 
 #include <filesystem>
 #include "memory/AssetHandle.h"
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
 
+ResourceWrapper<Shader> getShaderFromRenderMode(MaterialRenderMode renderMode)
+{
+	switch (renderMode)
+	{
+	case MaterialRenderMode::Opaque:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
+	case MaterialRenderMode::Transparent:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+	case MaterialRenderMode::Terrain:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);
+	case MaterialRenderMode::Volume:
+		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_VOLUME);
+	}
 
-//static AssetFnRegister<AssetType::MATERIAL> assetRegister(AssetTraits<Material>::load);
-
-Material::Material()
-{}
+	return ResourceWrapper<Shader>::empty;
+}
 
 void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ResourceWrapper<Shader>& shader, int slot)
 {
@@ -75,37 +87,15 @@ void Material::use()
 
 	int slot = 0;
 
-	// Set persistent samplers
-	for (const auto& [name, sampler] : getPersistentBlock().m_samplers)
+	// Set samplers
+	for (const auto& [name, sampler] : m_samplers)
 	{
 		useSamplerInShader(name, sampler, shader, slot);
 		slot++;
 	}
 
-	// Set Non persistent samplers
-	for (const auto& [name, sampler] : getNonPersistentBlock().m_samplers)
-	{
-		useSamplerInShader(name, sampler, shader, slot);
-		slot++;
-	}
-
-	// Set Non persistent Textures
-	for (const auto& [name, texture] : getNonPersistentBlock().m_textures)
-	{
-		texture.get()->setSlot(slot);
-		texture.get()->bind();
-		shader->setUniformValue(name, slot);
-		slot++;
-	}
-
-	// Set persistent uniforms
-	for (const auto& [name, property] : getPersistentBlock().m_uniformProperties)
-	{
-		shader->setUniformValue(name, property.value);
-	}
-
-	// Set Non persistent uniforms
-	for (const auto& [name, value] : getNonPersistentBlock().m_uniformProperties)
+	// Set uniforms
+	for (const auto& [name, value] : m_uniformProperties)
 	{
 		shader->setUniformValue(name, value);
 	}
@@ -122,33 +112,36 @@ void Material::release()
 
 std::shared_ptr<TextureSampler> Material::getSampler(const std::string& name)
 {
-	return getPersistentBlock().getSampler(name);
+	auto it = m_samplers.find(name);
+	return it != m_samplers.end() ? it->second : nullptr;
 }
 
 void Material::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
 {
-	getPersistentBlock().setSampler(name, sampler);
+	m_samplers[name] = sampler;
 }
 
-void Material::setSamplerEnabled(const std::string& name, bool isEnabled)
+Value Material::getUniformValue(const std::string& name)
 {
-	getPersistentBlock().getSampler(name)->isActive = isEnabled;
+	auto it = m_uniformProperties.find(name);
+	return it != m_uniformProperties.end() ? it->second : Value{};
 }
 
 ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
 {
 	auto mat = Factory<Material>::create();
-	mat->setMaterialRenderMode(renderMode);
+	mat->m_renderMode = renderMode;
 	return mat;
 }
 
-ResourceWrapper<Material> Material::clone(bool isTransient) const
+ResourceWrapper<Material> Material::clone(bool isEngineOwned) const
 {
 	auto newMaterial = Material::create(m_renderMode);
 
-	newMaterial->m_persistentBlock = m_persistentBlock;
-	newMaterial->m_nonPersistentBlock = m_nonPersistentBlock;
+	newMaterial->m_samplers = m_samplers;
+	newMaterial->m_uniformProperties = m_uniformProperties;
 	newMaterial->m_customShader = m_customShader;
+	newMaterial->m_name = m_name;
 
 	return newMaterial;
 }
@@ -161,25 +154,12 @@ ResourceWrapper<Shader> Material::getActiveShader() const
 	}
 	else
 	{
-		return m_customShader.resource();
+		return m_customShader;
 	}
 }
 
-ResourceWrapper<Shader> Material::getShaderFromRenderMode(MaterialRenderMode renderMode)
+void Material::setTexture(const std::string& name, const ResourceWrapper<Texture>& texture)
 {
-	switch(renderMode)
-	{
-	case MaterialRenderMode::Opaque:
-		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
-	case MaterialRenderMode::Transparent:
-		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
-	case MaterialRenderMode::Terrain:
-		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);
-	case MaterialRenderMode::Volume:
-		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_VOLUME);
-	}
-
-	return ResourceWrapper<Shader>::empty;
 }
 
 bool parseEditablePragmaLine(const std::string& line, EditableUniform& editableUniform) {
@@ -227,16 +207,74 @@ std::vector<float> parseFloatTuple(const std::string& s) {
 	return values;
 }
 
-void Material::parseUniforms(const std::string& sourceCode)
+void Material::setUniformValue(const std::string& name, const Value& v)
 {
-	getPersistentBlock().m_uniformProperties.clear();
-	getPersistentBlock().m_samplers.clear();
+	m_uniformProperties[name] = v;
+}
+
+std::string Material::getName() const
+{
+	return m_name;
+}
+
+MaterialRenderMode Material::getRenderMode() const
+{
+	return m_renderMode;
+}
+
+ResourceWrapper<Material> Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)
+{
+	desc.sourcePath = fileLocation;
+	std::string filepath = desc.sourcePath;
+	//auto projectDir = Engine::get()->getProjectDirectory();
+	//filepath = projectDir + filepath;
+	std::ifstream is(filepath);
+	cereal::JSONInputArchive iarchive(is);
+	MaterialData materialData;
+	//ResourceWrapper<Material> material = Factory<Material>::create();
+
+	try
+	{
+		iarchive(materialData);
+		ResourceWrapper<Material> material = Factory<Material>::create();
+		material->m_renderMode = materialData.renderMode;
+		material->m_customShader = materialData.customShader.resource();
+		material->m_name = materialData.name;
+		return material;
+
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Deserialization Error occured: {}", e.what());
+	}
+
+	return ResourceWrapper<Material>::empty;
+}
+
+ResourceWrapper<Resource> MaterialCreateDescriptor::createResource()
+{
+	return Material::create(data.renderMode); //todo fix
+}
+
+ResourceWrapper<Resource> MaterialLoadDescriptor::loadResource()
+{
+	return Material::load(sourcePath, *this);
+}
+
+//////////////////////////
+// Asset
+//////////////////////////
+
+void MaterialAsset::parseUniforms(const std::string& sourceCode)
+{
+	data.uniforms.clear();
+	data.samplers.clear();
 
 	std::istringstream stream(sourceCode);
 	std::string line;
 
-	auto& uniformProperties = getPersistentBlock().m_uniformProperties;
-	auto& samplers = getPersistentBlock().m_samplers;
+	auto& uniformProperties = m_uniformProperties;
+	auto& samplers = data.samplers;
 
 	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
 	EditableUniform pendingMeta;
@@ -259,27 +297,27 @@ void Material::parseUniforms(const std::string& sourceCode)
 			pendingMeta.uniformName = name;
 			pendingMeta.type = type;
 
-			
+
 
 			// Parse default
 			std::vector<float> defVals = parseFloatTuple(pendingMeta.defaultValueRaw);
 
-			if (type == "float") 
+			if (type == "float")
 			{
 				pendingMeta.value = defVals.size() > 0 ? defVals[0] : 0.0f;
 				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "int") 
+			else if (type == "int")
 			{
 				pendingMeta.value = defVals.size() > 0 ? static_cast<int>(defVals[0]) : 0;
 				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "uint") 
+			else if (type == "uint")
 			{
 				pendingMeta.value = defVals.size() > 0 ? static_cast<unsigned int>(defVals[0]) : 0u;
 				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "vec2") 
+			else if (type == "vec2")
 			{
 				glm::vec2 val(0.0f);
 				for (size_t i = 0; i < std::min<size_t>(2, defVals.size()); ++i)
@@ -287,7 +325,7 @@ void Material::parseUniforms(const std::string& sourceCode)
 				pendingMeta.value = val;
 				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "vec3") 
+			else if (type == "vec3")
 			{
 				glm::vec3 val(0.0f);
 				for (size_t i = 0; i < std::min<size_t>(3, defVals.size()); ++i)
@@ -295,7 +333,7 @@ void Material::parseUniforms(const std::string& sourceCode)
 				pendingMeta.value = val;
 				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "vec4") 
+			else if (type == "vec4")
 			{
 				glm::vec4 val(0.0f);
 				for (size_t i = 0; i < std::min<size_t>(4, defVals.size()); ++i)
@@ -303,28 +341,28 @@ void Material::parseUniforms(const std::string& sourceCode)
 				pendingMeta.value = val;
 				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "mat3") 
+			else if (type == "mat3")
 			{
 				pendingMeta.value = glm::mat3(1.0f);
 				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "mat4") 
+			else if (type == "mat4")
 			{
 				pendingMeta.value = glm::mat4(1.0f);
 				uniformProperties[name] = pendingMeta;
 			}
-			else if (type == "PBR_Sampler") 
+			else if (type == "PBR_Sampler")
 			{
 				samplers[name] = std::make_shared<TextureSampler>();
 			}
 
-			
+
 			isNextLineEditableUniform = false;
 		}
 	}
 }
 
-void Material::parseFromShader(ResourceWrapper<Shader> shader)
+void MaterialAsset::parseFromShader(ResourceWrapper<Shader> shader)
 {
 	std::string sourceCode;
 	ShadersInfo sInfo = shader->getShadersInfo();
@@ -338,10 +376,10 @@ void Material::parseFromShader(ResourceWrapper<Shader> shader)
 	parseUniforms(sourceCode);
 }
 
-void Material::update()
+void MaterialAsset::update()
 {
-	auto oldUniforms = getPersistentBlock().m_uniformProperties;
-	auto oldSamplers = getPersistentBlock().m_samplers;
+	auto oldUniforms = data.uniforms;
+	auto oldSamplers = data.samplers;
 
 	ResourceWrapper<Shader> shader = getActiveShader();
 
@@ -350,7 +388,7 @@ void Material::update()
 
 	parseFromShader(shader);
 
-	auto& newSamplers = getPersistentBlock().m_samplers;
+	auto& newSamplers = data.samplers;
 	for (const auto [name, sampler] : oldSamplers)
 	{
 		auto iter = newSamplers.find(name);
@@ -360,7 +398,7 @@ void Material::update()
 		}
 	}
 
-	auto& newUniforms = getPersistentBlock().m_uniformProperties;
+	auto& newUniforms = data.uniforms;
 	for (const auto [name, value] : oldUniforms)
 	{
 		auto iter = newUniforms.find(name);
@@ -370,160 +408,138 @@ void Material::update()
 		}
 	}
 
-	for (const auto& [name, uniform] : getPersistentBlock().m_uniformProperties)
+	for (const auto& [name, value] : data.uniforms)
 	{
-		shader->setUniformValue(name, uniform.value);
+		shader->setUniformValue(name, value);
 	}
-
-	// TODO fix
-	//if (!projectionTexture.resource().isEmpty())
-	//{
-	//	setProjectionTexture(projectionTexture);
-	//}
-}
-
-void Material::setUniformValue(const std::string& name, const Value& v)
-{
-	getPersistentBlock().setUniformValue(name, v);
-}
-
-void Material::setName(const std::string& name)
-{
-	m_name = name;
-}
-
-std::string Material::getName() const
-{
-	return m_name;
-}
-
-Material::PersistentBlock& Material::getPersistentBlock()
-{
-	return m_persistentBlock;
-}
-
-Material::NonPersistentBlock& Material::getNonPersistentBlock()
-{
-	return m_nonPersistentBlock;
-}
-
-void Material::setMaterialRenderMode(MaterialRenderMode renderMode)
-{
-	m_renderMode = renderMode;
-	update();
-}
-
-void Material::setCustomShader(AssetHandle<ShaderAsset>& customShader)
-{
-	m_customShader = customShader;
-	update();
-}
-
-AssetHandle<ShaderAsset> Material::getCustomShader() const
-{
-	return m_customShader;
-}
-
-MaterialRenderMode Material::getMaterialRenderMode() const
-{
-	return m_renderMode;
-}
-
-
-ResourceWrapper<Material> Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)
-{
-	desc.sourcePath = fileLocation;
-	std::string filepath = desc.sourcePath;
-	//auto projectDir = Engine::get()->getProjectDirectory();
-	//filepath = projectDir + filepath;
-	std::ifstream is(filepath);
-	cereal::JSONInputArchive iarchive(is);
-	MaterialData materialData;
-	//ResourceWrapper<Material> material = Factory<Material>::create();
-
-	try
-	{
-		iarchive(materialData);
-		ResourceWrapper<Material> material = Factory<Material>::create();
-		material->setMaterialRenderMode(materialData.renderMode);
-		material->setCustomShader(materialData.customShader);
-		return material;
-
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Deserialization Error occured: {}", e.what());
-	}
-
-	return ResourceWrapper<Material>::empty;
-}
-
-ResourceWrapper<Resource> MaterialCreateDescriptor::createResource()
-{
-	return Material::create(data.renderMode); //todo fix
-}
-
-ResourceWrapper<Resource> MaterialLoadDescriptor::loadResource()
-{
-	return Material::load(sourcePath, *this);
 }
 
 void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 {
-	//// Map slot names to shader property names
-	//std::string shaderPropertyName;
-	//if (slot == "ALBEDO" || slot == SHADER_PROPERTY_PBR_SAMPLER_ALBEDO)
-	//{
-	//	shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_ALBEDO;
-	//}
-	//else if (slot == "NORMAL" || slot == SHADER_PROPERTY_PBR_SAMPLER_NORMAL)
-	//{
-	//	shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_NORMAL;
-	//}
-	//else if (slot == "ROUGHNESS" || slot == SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS)
-	//{
-	//	shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS;
-	//}
-	//else if (slot == "METALLIC" || slot == SHADER_PROPERTY_PBR_SAMPLER_METALLIC)
-	//{
-	//	shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_METALLIC;
-	//}
-	//else if (slot == "AO" || slot == SHADER_PROPERTY_PBR_SAMPLER_AO)
-	//{
-	//	shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_AO;
-	//}
-	//else
-	//{
-	//	// Use slot name directly if it doesn't match known patterns
-	//	shaderPropertyName = slot;
-	//}
+	// Map slot names to shader property names
+	std::string shaderPropertyName;
+	int samplerChannels = 1;
+	if (slot == "ALBEDO" || slot == SHADER_PROPERTY_PBR_SAMPLER_ALBEDO)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_ALBEDO;
+		samplerChannels = 3;
+	}
+	else if (slot == "NORMAL" || slot == SHADER_PROPERTY_PBR_SAMPLER_NORMAL)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_NORMAL;
+		samplerChannels = 3;
+	}
+	else if (slot == "ROUGHNESS" || slot == SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_ROUGHNESS;
+		samplerChannels = 1;
+	}
+	else if (slot == "METALLIC" || slot == SHADER_PROPERTY_PBR_SAMPLER_METALLIC)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_METALLIC;
+		samplerChannels = 1;
+	}
+	else if (slot == "AO" || slot == SHADER_PROPERTY_PBR_SAMPLER_AO)
+	{
+		shaderPropertyName = SHADER_PROPERTY_PBR_SAMPLER_AO;
+		samplerChannels = 1;
+	}
+	else
+	{
+		// Use slot name directly if it doesn't match known patterns
+		shaderPropertyName = slot;
+	}
 
-	//// Cast dependency to TextureAsset
-	//AssetHandle<TextureAsset> textureAsset(dependency);
-	//if (textureAsset.isEmpty())
-	//{
-	//	logWarning("MaterialAsset::bindDependency: Dependency is not a TextureAsset for slot '{}'", slot);
-	//	return;
-	//}
+	// Cast dependency to TextureAsset
+	AssetHandle<TextureAsset> textureAsset(dependency);
+	if (textureAsset.isEmpty())
+	{
+		logWarning("MaterialAsset::bindDependency: Dependency is not a TextureAsset for slot '{}'", slot);
+		return;
+	}
+	
+	std::shared_ptr<TextureSampler> sampler = std::make_shared<TextureSampler>(samplerChannels);
+	sampler->isActive = true;
+	sampler->texture = textureAsset;
+	data.samplers[shaderPropertyName] = sampler;
+}
 
-	//// Get the Material resource
-	//AssetHandle<MaterialAsset> materialAsset(getUUID());
-	//ResourceWrapper<Material> material = materialAsset.resource();
-	//if (material.isEmpty())
-	//{
-	//	logWarning("MaterialAsset::bindDependency: Material resource is empty");
-	//	return;
-	//}
+void MaterialAsset::setName(const std::string& name)
+{
+	data.name = name;
+}
 
-	//// Create or get existing sampler
-	//std::shared_ptr<TextureSampler> sampler = material->getSampler(shaderPropertyName);
-	//if (!sampler)
-	//{
-	//	sampler = std::make_shared<TextureSampler>();
-	//	sampler->isActive = true;
-	//}
+std::string MaterialAsset::getName() const
+{
+	return data.name;
+}
 
-	//// Set the texture
-	//sampler->texture = textureAsset;
-	//material->setSampler(shaderPropertyName, sampler);
+void MaterialAsset::setCustomShader(AssetHandle<ShaderAsset>& customShader)
+{
+	data.customShader = customShader;
+}
+
+AssetHandle<ShaderAsset> MaterialAsset::getCustomShader() const
+{
+	return data.customShader;
+}
+
+void MaterialAsset::setMaterialRenderMode(MaterialRenderMode renderMode)
+{
+	data.renderMode = renderMode;
+}
+
+MaterialRenderMode MaterialAsset::getMaterialRenderMode() const
+{
+	return data.renderMode;
+}
+
+void MaterialAsset::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
+{
+	data.samplers[name] = sampler;
+}
+
+std::shared_ptr<TextureSampler> MaterialAsset::getSampler(const std::string& name)
+{
+	auto it = data.samplers.find(name);
+	return it != data.samplers.end() ? it->second : nullptr;
+}
+
+void MaterialAsset::setSamplerEnabled(const std::string& name, bool isEnabled)
+{
+	auto it = data.samplers.find(name);
+	if (it != data.samplers.end() && it->second)
+	{
+		it->second->isActive = isEnabled;
+	}
+}
+
+void MaterialAsset::setUniformValue(const std::string& name, const Value& v)
+{
+	data.uniforms[name] = v;
+}
+
+Value MaterialAsset::getUniformValue(const std::string& name)
+{
+	auto it = data.uniforms.find(name);
+	return it != data.uniforms.end() ? it->second : Value{};
+}
+
+ResourceWrapper<Shader> MaterialAsset::getActiveShader() const
+{
+	return ResourceWrapper<Shader>();
+}
+
+AssetHandle<MaterialAsset> MaterialAsset::clone(bool isEngineOwned) const
+{
+	AssetCreateDescriptor desc;
+	desc.aType = AssetType::MATERIAL;
+	desc.name = data.name + "_clone";
+	desc.isEngineOwned = isEngineOwned;
+	
+	auto* materialDesc = desc.makeResourceCreateDescriptor<MaterialCreateDescriptor>();
+	materialDesc->data = data;
+	
+	AssetHandle<MaterialAsset> cloned = Engine::get()->getSubSystem<Assets>()->createAsset(desc).as<MaterialAsset>();
+	return cloned;
 }
