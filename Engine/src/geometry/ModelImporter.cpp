@@ -671,6 +671,7 @@ void ModelImporter::parseAiTexture(const aiScene* scene,
 			if (cachedTextureNames.find(textureName) != cachedTextureNames.end())
 			{
 				// Already loaded
+				session.modelInfo.materialToTextureMap[materialData.name][sgeTextureType] = textureName;
 				return;
 			}
 		}
@@ -739,6 +740,7 @@ void ModelImporter::parseAiTexture(const aiScene* scene,
 		if (cachedTextureNames.find(path) != cachedTextureNames.end())
 		{
 			// Already loaded
+			session.modelInfo.materialToTextureMap[materialData.name][sgeTextureType] = path;
 			return;
 		}
 

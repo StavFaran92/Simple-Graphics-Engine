@@ -267,7 +267,7 @@ ResourceWrapper<Resource> MaterialLoadDescriptor::loadResource()
 
 void MaterialAsset::parseUniforms(const std::string& sourceCode)
 {
-	data.uniforms.clear();
+	m_uniformProperties.clear();
 	data.samplers.clear();
 
 	std::istringstream stream(sourceCode);
@@ -359,6 +359,11 @@ void MaterialAsset::parseUniforms(const std::string& sourceCode)
 
 			isNextLineEditableUniform = false;
 		}
+	}
+
+	for (const auto& [name, uniform] : m_uniformProperties)
+	{
+		data.uniforms[name] = uniform.value;
 	}
 }
 
