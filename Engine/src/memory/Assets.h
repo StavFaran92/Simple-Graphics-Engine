@@ -52,9 +52,9 @@ public:
 
 	Asset* createAssetsFromImportNode(ImportNode node); // todo fix qualifier
 
-	AssetHandle<Asset> instantiateNode(const ImportNode& node);
+	AssetHandle<Asset> instantiateNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
 
-	void populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& node);
+	void populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& node, const AssetCreateDescriptor& rootDesc);
 
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 

@@ -435,9 +435,8 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	manager->parse(*desc.resourceCreateDescriptor);
 
 	// Save the asset to disk
-	//std::string ext = getExtensionFromType(type);
 	ScopedPath dest = calculateAssetDestinationPathCreate(desc);
-	if(!manager->saveResource(*desc.resourceCreateDescriptor, dest)) // todo change return to bool for validation
+	if(!manager->saveResource(*desc.resourceCreateDescriptor, dest))
 	{
 		logError("Failed to save asset type {} to: {}", static_cast<int>(type), dest.absolute().string());
 		return AssetHandle<Asset>::empty;
@@ -508,12 +507,12 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 
 	AssetHandle<Asset> handle(record.uuid);
 
-	populateAssetFromNode(handle, importNode);
+	populateAssetFromNode(handle, importNode, desc);
 
 	return handle;
 }
 
-AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node)
+AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
 {
 	ResourceTypeManager* manager =
 		AssetFactory::getManager(node.createDescriptor.aType);
@@ -527,13 +526,18 @@ AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node)
 
 	AssetHandle<Asset> created;
 
+	AssetCreateDescriptor nodeDesc = node.createDescriptor;
+	nodeDesc.assetDirectory = rootDesc.assetDirectory;
+	nodeDesc.isEngineOwned = rootDesc.isEngineOwned;
+	nodeDesc.targetDirectory = rootDesc.targetDirectory;
+
 	if (node.creationType == CreationType::Create)
 	{
-		created = createAsset(node.createDescriptor);
+		created = createAsset(nodeDesc);
 	}
 	else // CreationType::Import
 	{
-		created = importAsset(node.createDescriptor);
+		created = importAsset(nodeDesc);
 	}
 
 	if (created.isEmpty())
@@ -545,7 +549,7 @@ AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node)
 	return created;
 }
 
-void Assets::populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& node)
+void Assets::populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& node, const AssetCreateDescriptor& rootDesc)
 {
 	if (asset.isEmpty())
 		return;
@@ -553,7 +557,7 @@ void Assets::populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& n
 	for (const auto& [slotName, childNode] : node.dependencies)
 	{
 		// 1) create the child asset
-		AssetHandle<Asset> child = instantiateNode(childNode);
+		AssetHandle<Asset> child = instantiateNode(childNode, rootDesc);
 		if (child.isEmpty())
 		{
 			logWarning("Failed to create dependency '{}' for asset '{}'",
@@ -562,7 +566,7 @@ void Assets::populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& n
 		}
 
 		// 2) recursively populate the child
-		populateAssetFromNode(child, childNode);
+		populateAssetFromNode(child, childNode, rootDesc);
 
 		UUID uid = child.getUID(); // assethandle AND asset have UUID aset is not updated
 
