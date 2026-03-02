@@ -17,6 +17,6 @@ public:
 	void cancelContent() override;
 
 	UniqueNameWidget m_uniqueName{ "Name" };
-	ResourceWrapper<Material> m_tempMaterial;
+	AssetHandle<MaterialAsset> m_tempMaterial;
 	MaterialDataWidget m_matData;
 };

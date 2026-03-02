@@ -9,7 +9,13 @@ MaterialCreateDialog::MaterialCreateDialog()
 
 void MaterialCreateDialog::appearContent()
 {
-	m_tempMaterial = Material::create(MaterialRenderMode::Opaque);
+	AssetCreateDescriptor desc;
+	desc.aType = AssetType::MATERIAL;
+	desc.name = "SGE_MATERIAL_TEMP";
+	auto matDesc = desc.makeResourceCreateDescriptor<MaterialCreateDescriptor>();
+	matDesc->data.renderMode = MaterialRenderMode::Opaque;
+	m_tempMaterial = Engine::get()->getSubSystem<Assets>()->createAsset(desc).as<MaterialAsset>();
+
 	m_uniqueName.name = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName("New Material", EditorState::Instance().getWorkingDir().path());
 }
 

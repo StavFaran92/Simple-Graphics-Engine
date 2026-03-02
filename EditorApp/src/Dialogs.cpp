@@ -495,7 +495,7 @@ void displayMaterialEditDialog()
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
 			//Material::updateAsset(mat, {});
-			mat->updateAsset({});
+			//mat->updateAsset({}); // TODO fix
 			ImGui::CloseCurrentPopup();
 		}
 

@@ -543,3 +543,13 @@ AssetHandle<MaterialAsset> MaterialAsset::clone(bool isEngineOwned) const
 	AssetHandle<MaterialAsset> cloned = Engine::get()->getSubSystem<Assets>()->createAsset(desc).as<MaterialAsset>();
 	return cloned;
 }
+
+std::map<std::string, std::shared_ptr<TextureSampler>> MaterialAsset::getSamplers()
+{
+	return data.samplers;
+}
+
+std::map<std::string, EditableUniform> MaterialAsset::getUniformProperties()
+{
+	return m_uniformProperties;
+}

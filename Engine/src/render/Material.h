@@ -69,6 +69,8 @@ struct MaterialData
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(renderMode);
 		SERIALIZED_MEMBER(customShader);
+		SERIALIZED_MEMBER(uniforms);
+		SERIALIZED_MEMBER(samplers);
 	}
 };
 
@@ -142,6 +144,9 @@ public:
 
 	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
 	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
+
+	std::map<std::string, std::shared_ptr<TextureSampler>> getSamplers();
+	std::map<std::string, EditableUniform> getUniformProperties();
 
 	void setSamplerEnabled(const std::string& name, bool isEnabled);
 
