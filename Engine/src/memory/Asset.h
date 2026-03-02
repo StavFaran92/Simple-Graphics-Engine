@@ -14,6 +14,8 @@ public:
 
 	virtual void bindDependency(const std::string& slot, UUID dependency) {}
 
+	virtual void fillData(ResourceWrapper<Resource> resource) {};
+
 protected:
 	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };
 

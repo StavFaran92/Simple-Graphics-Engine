@@ -90,9 +90,21 @@ ResourceWrapper<MeshGroup> MeshGroup::load(const std::string& fileLocation, Mesh
 	return model;
 }
 
-
+#include "geometry/MeshBinaryLoader.h"
 ResourceWrapper<Resource> MeshGroupLoadDescriptor::loadResource() {
-	return MeshGroup::load(sourcePath, *this);
+	std::vector<MeshData> meshDataList;
+	MeshBinaryLoader::load(sourcePath, meshDataList);
+
+	ResourceWrapper<MeshGroup> model = Factory<MeshGroup>::create();
+	for (const auto& data : meshDataList)
+	{
+		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
+		MeshBuilder builder(data);
+		builder.build(*mesh.get());
+		model->addMesh(mesh);
+	}
+
+	return model;
 }
 
 ResourceWrapper<Resource> MeshGroupCreateDescriptor::createResource()

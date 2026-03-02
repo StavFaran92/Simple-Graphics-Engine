@@ -48,8 +48,8 @@ const std::map<AssetType, std::string> g_assetTypeToExt
 {
 	{ AssetType::NONE,			"N/A" },
 	{ AssetType::TEXTURE,		".png" },
-	{ AssetType::MESH,			".obj" },
-	{ AssetType::ANIMATION,		".obj" },
+	{ AssetType::MESH,			".mesh" },
+	{ AssetType::ANIMATION,		".anim" },
 	{ AssetType::SHADER,		".glsl" },
 	{ AssetType::PREFAB,		".prefab" },
 	{ AssetType::MATERIAL,		".mat" },

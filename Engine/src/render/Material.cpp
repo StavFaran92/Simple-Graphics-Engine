@@ -414,6 +414,13 @@ void MaterialAsset::update()
 	}
 }
 
+MaterialAsset::MaterialAsset(AssetCreateDescriptor& desc)
+	: Asset(desc)
+{
+	auto matDesc = dynamic_cast<MaterialCreateDescriptor*>(desc.resourceCreateDescriptor);
+	data = matDesc->data;
+}
+
 void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 {
 	// Map slot names to shader property names
@@ -462,6 +469,15 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 	sampler->isActive = true;
 	sampler->texture = textureAsset;
 	data.samplers[shaderPropertyName] = sampler;
+}
+
+void MaterialAsset::fillData(ResourceWrapper<Resource> resource)
+{
+	auto materialResource = resource.as<Material>();
+	materialResource->m_name = data.name;
+	materialResource->m_renderMode = data.renderMode;
+	materialResource->m_uniformProperties = data.uniforms;
+	materialResource->m_samplers = data.samplers;
 }
 
 void MaterialAsset::setName(const std::string& name)

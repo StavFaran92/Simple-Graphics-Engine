@@ -9,8 +9,7 @@
 
 ResourceWrapper<Resource> Test::loadAssetResourceInternal(const AssetRecord& record, UUID uuid)
 {
-    ResourceLoadDescriptor* loadDesc =
-        AssetFactory::getManager(record.aType)->makeResourceLoadDescriptor();
+    ResourceLoadDescriptor* loadDesc = AssetFactory::getManager(record.aType)->makeResourceLoadDescriptor();
 
     assert(loadDesc);
 
@@ -23,6 +22,8 @@ ResourceWrapper<Resource> Test::loadAssetResourceInternal(const AssetRecord& rec
         logError("Failed to load resource: {}", uuid.str());
         return ResourceWrapper<Resource>::empty;
     }
+
+    record.asset->fillData(resource);
 
     Engine::get()->getSubSystem<Assets>()->bindResourceToAsset(uuid, resource.getUID());
 

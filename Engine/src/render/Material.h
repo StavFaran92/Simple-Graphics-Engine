@@ -115,6 +115,7 @@ public:
 	ResourceWrapper<Material> clone(bool isEngineOwned) const;
 
 private:
+	friend class MaterialAsset;
 	std::string m_name;
 	ResourceWrapper<Shader> m_customShader;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
@@ -129,9 +130,11 @@ class EngineAPI MaterialAsset : public Asset
 public:
 	using ResourceType = Material;
 
-	using Asset::Asset;
+	MaterialAsset(AssetCreateDescriptor& desc);
 
 	void bindDependency(const std::string& slot, UUID dependency) override;
+
+	void fillData(ResourceWrapper<Resource> resource) override;
 
 	void setName(const std::string& name);
 	std::string getName() const;

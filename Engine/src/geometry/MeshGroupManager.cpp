@@ -3,6 +3,7 @@
 #include "geometry/MeshGroup.h"
 #include "geometry/ModelImporter.h"
 #include "geometry/MeshExporter.h"
+#include "geometry/MeshBinaryLoader.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
 #include "memory/AssetHandle.h"
@@ -19,7 +20,8 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath&
 	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, modelInfo);
 
 	// save Mesh resource
-	MeshExporter::exportMeshes(modelInfo.meshDataList, dst.absolute().string());
+	//MeshExporter::exportMeshes(modelInfo.meshDataList, dst.absolute().string());
+	MeshBinaryLoader::save(modelInfo.meshDataList, dst.absolute().string());
 
 	// Build root MeshGroup node
 	std::filesystem::path path(src);
@@ -105,7 +107,8 @@ bool MeshGroupTypeManager::saveResource(const ResourceCreateDescriptor& desc, co
 
 	const MeshData& data = meshGroupDesc->data;
 
-	MeshExporter::exportMeshes(std::vector<MeshData>{ data }, dst.absolute().string());
+	//MeshExporter::exportMeshes(std::vector<MeshData>{ data }, dst.absolute().string());
+	MeshBinaryLoader::save(std::vector<MeshData>{ data }, dst.absolute().string());
 
 	return true;
 }
