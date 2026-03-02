@@ -419,6 +419,7 @@ MaterialAsset::MaterialAsset(AssetCreateDescriptor& desc)
 {
 	auto matDesc = dynamic_cast<MaterialCreateDescriptor*>(desc.resourceCreateDescriptor);
 	data = matDesc->data;
+	update();
 }
 
 void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
@@ -493,6 +494,7 @@ std::string MaterialAsset::getName() const
 void MaterialAsset::setCustomShader(AssetHandle<ShaderAsset>& customShader)
 {
 	data.customShader = customShader;
+	update();
 }
 
 AssetHandle<ShaderAsset> MaterialAsset::getCustomShader() const
@@ -503,6 +505,7 @@ AssetHandle<ShaderAsset> MaterialAsset::getCustomShader() const
 void MaterialAsset::setMaterialRenderMode(MaterialRenderMode renderMode)
 {
 	data.renderMode = renderMode;
+	update();
 }
 
 MaterialRenderMode MaterialAsset::getMaterialRenderMode() const
@@ -543,7 +546,14 @@ Value MaterialAsset::getUniformValue(const std::string& name)
 
 ResourceWrapper<Shader> MaterialAsset::getActiveShader() const
 {
-	return ResourceWrapper<Shader>();
+	if (data.renderMode != MaterialRenderMode::Custom)
+	{
+		return getShaderFromRenderMode(data.renderMode);
+	}
+	else
+	{
+		return data.customShader.resource();
+	}
 }
 
 AssetHandle<MaterialAsset> MaterialAsset::clone(bool isEngineOwned) const
