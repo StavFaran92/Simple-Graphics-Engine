@@ -21,14 +21,20 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath&
 
 	// save Mesh resource
 	//MeshExporter::exportMeshes(modelInfo.meshDataList, dst.absolute().string());
-	MeshBinaryLoader::save(modelInfo.meshDataList, dst.absolute().string());
+	//MeshBinaryLoader::save(modelInfo.meshDataList, dst.absolute().string());
 
-	// Build root MeshGroup node
+	// Build root Model node
+	//std::filesystem::path path(src);
+	//result.name = path.filename().stem().string();
+	//result.createDescriptor.aType = AssetType::MODEL;
+	//result.createDescriptor.sourcePath = src;
+	//result.createDescriptor.makeResourceCreateDescriptor<ModelCreateDescriptor>()->data = modelInfo.meshDataList;
+
+	// Build MeshArray node
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
-	result.createDescriptor.aType = AssetType::MESH; // TODO fix
-	result.createDescriptor.sourcePath = src;
-	result.createDescriptor.makeResourceLoadDescriptor<MeshGroupLoadDescriptor>()->sourcePath = dst.absolute().string();
+	result.createDescriptor.aType = AssetType::MESH;
+	result.createDescriptor.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>()->data = modelInfo.meshDataList;
 
 	// Build texture dependency nodes (embedded textures)
 	//std::map<std::string, std::string> textureNameToSlot; // texture name -> slot name
@@ -105,10 +111,10 @@ bool MeshGroupTypeManager::saveResource(const ResourceCreateDescriptor& desc, co
 		return false;
 	}
 
-	const MeshData& data = meshGroupDesc->data;
+	const std::vector<MeshData>& data = meshGroupDesc->data;
 
 	//MeshExporter::exportMeshes(std::vector<MeshData>{ data }, dst.absolute().string());
-	MeshBinaryLoader::save(std::vector<MeshData>{ data }, dst.absolute().string());
+	MeshBinaryLoader::save(data, dst.absolute().string());
 
 	return true;
 }

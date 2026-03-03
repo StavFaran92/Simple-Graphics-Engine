@@ -96,6 +96,7 @@ enum AssetType : int
 {
 	NONE = 0,
 	TEXTURE,
+	MODEL,
 	MESH,
 	ANIMATION,
 	SHADER,

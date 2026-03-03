@@ -491,23 +491,12 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	// Create assets from import graph
-	Asset* asset = manager->createAsset(desc);
-	if (!asset)
+	AssetHandle<Asset> handle = populateAssetFromNode(importNode, desc);
+
+	if (handle.isEmpty())
 	{
-		logError("Failed to create asset of type {}", static_cast<int>(type));
-		return AssetHandle<Asset>::empty;
+		logWarning("Failed to create asset of type {}", static_cast<int>(type));
 	}
-
-	AssetRecord record(desc);
-	record.parse();
-	record.relativefilePath = dest.scoped().string();
-	record.asset = asset;
-	addAsset(record);
-
-	AssetHandle<Asset> handle(record.uuid);
-
-	populateAssetFromNode(handle, importNode, desc);
 
 	return handle;
 }
@@ -549,15 +538,22 @@ AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node, const AssetCr
 	return created;
 }
 
-void Assets::populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& node, const AssetCreateDescriptor& rootDesc)
+AssetHandle<Asset> Assets::populateAssetFromNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
 {
-	if (asset.isEmpty())
-		return;
+	// 1) Create this node
+	AssetHandle<Asset> created = instantiateNode(node, rootDesc);
 
+	if (created.isEmpty())
+	{
+		logWarning("Failed to create asset '{}' from import node", node.name);
+		return AssetHandle<Asset>::empty;
+	}
+
+	// 2) Recursively create and bind dependencies
 	for (const auto& [slotName, childNode] : node.dependencies)
 	{
-		// 1) create the child asset
-		AssetHandle<Asset> child = instantiateNode(childNode, rootDesc);
+		AssetHandle<Asset> child = populateAssetFromNode(childNode, rootDesc);
+
 		if (child.isEmpty())
 		{
 			logWarning("Failed to create dependency '{}' for asset '{}'",
@@ -565,14 +561,11 @@ void Assets::populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& n
 			continue;
 		}
 
-		// 2) recursively populate the child
-		populateAssetFromNode(child, childNode, rootDesc);
-
-		UUID uid = child.getUID(); // assethandle AND asset have UUID aset is not updated
-
-		// 3) bind to parent
-		asset->bindDependency(slotName, uid);
+		// 3) Bind dependency to this asset
+		created->bindDependency(slotName, child.getUID());
 	}
+
+	return created;
 }
 
 void Assets::bindResourceToAsset(UUID uuid, ResourceID resID)

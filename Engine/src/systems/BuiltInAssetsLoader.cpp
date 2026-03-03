@@ -109,7 +109,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.name = "SGE_MESH_BOX";
 		desc.isEngineOwned = true;
 		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
-		meshDesc->data = Box::createMesh()->getMeshData(); 
+		meshDesc->data = std::vector<MeshData>{ Box::createMesh()->getMeshData() };
 
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
@@ -120,7 +120,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.name = "SGE_MESH_QUAD";
 		desc.isEngineOwned = true;
 		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
-		meshDesc->data = Quad::createMesh()->getMeshData();
+		meshDesc->data = std::vector<MeshData>{ Quad::createMesh()->getMeshData() };
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
@@ -130,7 +130,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.name = "SGE_MESH_SPHERE";
 		desc.isEngineOwned = true;
 		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
-		meshDesc->data = Sphere::createMesh(1, 36, 36)->getMeshData();
+		meshDesc->data = std::vector<MeshData>{ Sphere::createMesh(1, 36, 36)->getMeshData() };
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 
@@ -140,7 +140,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.name = "SGE_MESH_GRID";
 		desc.isEngineOwned = true;
 		auto meshDesc = desc.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>();
-		meshDesc->data = Grid::createMesh(10, 10)->getMeshData();
+		meshDesc->data = std::vector<MeshData>{ Grid::createMesh(10, 10)->getMeshData() };
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc);
 	}
 

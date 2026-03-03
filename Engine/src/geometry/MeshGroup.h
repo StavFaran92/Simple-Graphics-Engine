@@ -16,7 +16,7 @@ struct EngineAPI MeshGroupCreateDescriptor : public ResourceCreateDescriptor
 {
 	ResourceWrapper<Resource> createResource() override;
 
-	MeshData data;
+	std::vector<MeshData> data;
 };
 
 // Resource

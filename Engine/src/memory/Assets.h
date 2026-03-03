@@ -54,7 +54,7 @@ public:
 
 	AssetHandle<Asset> instantiateNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
 
-	void populateAssetFromNode(AssetHandle<Asset> asset, const ImportNode& node, const AssetCreateDescriptor& rootDesc);
+	AssetHandle<Asset> populateAssetFromNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
 
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 
