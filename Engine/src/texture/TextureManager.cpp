@@ -15,18 +15,16 @@ Asset* TextureTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new TextureAsset(desc);
 }
 
-bool TextureTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
+bool TextureTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
-	if (!std::filesystem::copy_file(src, dst.absolute(), std::filesystem::copy_options::overwrite_existing))
-	{
-		return false;
-	}
+	TextureData textureData;
+	Texture::extractTextureDataFromFile(src, textureData);
 
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
 	result.createDescriptor.aType = AssetType::TEXTURE;
 	result.createDescriptor.sourcePath = src;
-	result.createDescriptor.makeResourceLoadDescriptor<TextureLoadDescriptor>()->sourcePath = src;
+	result.createDescriptor.makeResourceCreateDescriptor<TextureCreateDescriptor>()->textureData = textureData;
 
 	return true;
 }

@@ -13,18 +13,13 @@ Asset* LuaScriptTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new LuaScriptAsset(desc);
 }
 
-bool LuaScriptTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
+bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
-	if (!std::filesystem::copy_file(src, dst.absolute(), std::filesystem::copy_options::overwrite_existing))
-	{
-		return false;
-	}
-
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
 	result.createDescriptor.aType = AssetType::LUA_SCRIPT;
 	result.createDescriptor.sourcePath = src;
-	result.createDescriptor.makeResourceLoadDescriptor<LuaScriptLoadDescriptor>()->sourcePath = src;
+	result.createDescriptor.makeResourceLoadDescriptor<LuaScriptLoadDescriptor>()->sourcePath = src; //todo fix
 
 	return true;
 }

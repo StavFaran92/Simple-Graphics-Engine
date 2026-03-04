@@ -13,13 +13,8 @@ Asset* AnimationTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new AnimationAsset(desc);
 }
 
-bool AnimationTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
+bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
-	if (!std::filesystem::copy_file(src, dst.absolute(), std::filesystem::copy_options::overwrite_existing))
-	{
-		return false;
-	}
-
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
 	result.createDescriptor.aType = AssetType::ANIMATION;

@@ -204,6 +204,8 @@ public:
 
 	static TextureInternalFormat getInternalFormatFromUsage(TextureSemantic usage);
 
+	static void extractTextureDataFromFile(const std::string& fileLocation, TextureData& textureData);
+
 	~Texture();
 private:
 	void build(const TextureData& textureData);
@@ -216,7 +218,6 @@ private:
 
 	static void copyBufferIntoInternalBuffer(void*& data, size_t bufferSize);
 	
-	static void extractTextureDataFromFile(const std::string& fileLocation, TextureData& textureData);
 
 	static void extractTextureDataFromSettings(const TextureLoadDescriptor& settings, TextureData& textureData);
 

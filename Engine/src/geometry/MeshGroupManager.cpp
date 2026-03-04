@@ -14,14 +14,10 @@ Asset* MeshGroupTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new MeshGroupAsset(desc);
 }
 
-bool MeshGroupTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
+bool MeshGroupTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	ModelImporter::ModelInfo modelInfo;
 	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, modelInfo);
-
-	// save Mesh resource
-	//MeshExporter::exportMeshes(modelInfo.meshDataList, dst.absolute().string());
-	//MeshBinaryLoader::save(modelInfo.meshDataList, dst.absolute().string());
 
 	// Build root Model node
 	//std::filesystem::path path(src);

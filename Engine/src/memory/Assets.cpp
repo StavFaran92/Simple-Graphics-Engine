@@ -358,31 +358,31 @@ void Assets::deleteAsset(AssetHandle<Asset> asset)
 	m_assets.erase(aInfo.uuid);
 }
 
-ScopedPath calculateAssetDestinationPathImport(const AssetCreateDescriptor& desc)
-{
-	// Determine root
-	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
-
-	// determine relative folder
-	std::filesystem::path relativefolder;
-	if (!desc.assetDirectory.empty())
-	{
-		relativefolder = desc.assetDirectory;
-	}
-
-	// determine file name
-	auto& path = std::filesystem::path(desc.resourceLoadDescriptor->sourcePath);
-	std::string name = path.filename().stem().string();
-
-	// determine externsion
-	std::string ext = getExtensionFromType(desc.aType);
-
-	std::filesystem::path filename = name + ext;
-
-	p.setPath(relativefolder / filename);
-
-	return p;
-}
+//ScopedPath calculateAssetDestinationPathImport(const AssetCreateDescriptor& desc)
+//{
+//	// Determine root
+//	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+//
+//	// determine relative folder
+//	std::filesystem::path relativefolder;
+//	if (!desc.assetDirectory.empty())
+//	{
+//		relativefolder = desc.assetDirectory;
+//	}
+//
+//	// determine file name
+//	auto& path = std::filesystem::path(desc.resourceLoadDescriptor->sourcePath);
+//	std::string name = path.filename().stem().string();
+//
+//	// determine externsion
+//	std::string ext = getExtensionFromType(desc.aType);
+//
+//	std::filesystem::path filename = name + ext;
+//
+//	p.setPath(relativefolder / filename);
+//
+//	return p;
+//}
 
 
 ScopedPath calculateAssetDestinationPathCreate(const AssetCreateDescriptor& desc)
@@ -436,6 +436,10 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 
 	// Save the asset to disk
 	ScopedPath dest = calculateAssetDestinationPathCreate(desc);
+
+	// Verify target dir exists
+	fs::create_directories(dest.absolute().parent_path());
+
 	if(!manager->saveResource(*desc.resourceCreateDescriptor, dest))
 	{
 		logError("Failed to save asset type {} to: {}", static_cast<int>(type), dest.absolute().string());
@@ -480,15 +484,19 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	// Parse the resource descriptor
 	manager->parse(*desc.resourceLoadDescriptor);
 
-	ScopedPath dest = calculateAssetDestinationPathImport(desc);
-
 	ImportNode importNode;
 	importNode.createDescriptor = desc;
 
-	if (!manager->importAsset(desc.resourceLoadDescriptor->sourcePath, dest, importNode))
+	if (!manager->importAsset(desc.resourceLoadDescriptor->sourcePath, importNode))
 	{
-		logError("Failed to import asset type {} to: {}", static_cast<int>(type), dest.absolute().string());
+		logError("Failed to import asset type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;
+	}
+
+	// If asset is composed of multiple assets place them all in a dedicated directory
+	if (importNode.dependencies.size() > 0)
+	{
+		desc.assetDirectory = desc.name;
 	}
 
 	AssetHandle<Asset> handle = populateAssetFromNode(importNode, desc);

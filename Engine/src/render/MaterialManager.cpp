@@ -14,7 +14,7 @@ Asset* MaterialTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return new MaterialAsset(desc);
 }
 
-bool MaterialTypeManager::importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result)
+bool MaterialTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	// Material import not implemented
 	return false;

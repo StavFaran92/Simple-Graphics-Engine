@@ -10,7 +10,7 @@ public:
 	// Inherited via ResourceTypeManager
 	Asset* createAsset(AssetCreateDescriptor& desc) override;
 
-	bool importAsset(const std::string& src, const ScopedPath& dst, ImportNode& result) override;
+	bool importAsset(const std::string& src, ImportNode& result) override;
 
 	bool saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst) override;
 
