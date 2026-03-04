@@ -9,10 +9,6 @@
 #include "memory/ResourceWrapper.h"
 #include "core/Factory.h"
 
-#include "memory/Assets.h"
-
-#include "memory/AssetFactory.h"
-
 #include "utils/EXRLoader.h"
 
 #include "utils/STBIHelper.h"
@@ -598,10 +594,13 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	textureData.textureName = textureName;
 }
 
-
+#include "texture/TextureBinaryLoader.h"
 ResourceWrapper<Resource> TextureLoadDescriptor::loadResource() 
 {
-	return Texture::load(sourcePath, *this);
+	TextureData textureData;
+	TextureBinaryLoader::load(sourcePath, textureData);
+	ResourceWrapper<Texture> texture = Texture::createTexture(textureData);
+	return texture;
 }
 
 ResourceWrapper<Resource> TextureCreateDescriptor::createResource()
