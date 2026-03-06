@@ -9,28 +9,28 @@
 #include "core/Logger.h"
 
 // Serialization (to JSON)
-void to_json(nlohmann::json& j, const AssetRecord& asset)
-{
-	j = nlohmann::json{
-		{"uuid", asset.uuid},
-		{"relativefilePath", asset.relativefilePath},
-		{"importSettings", asset.importSettings},
-		{"filename", asset.fileName},
-		{"ext", asset.ext}
-	};
-}
-
-// Deserialization (from JSON)
-void from_json(const nlohmann::json& j, AssetRecord& asset)
-{
-	j.at("uuid").get_to(asset.uuid); 
-	j.at("relativefilePath").get_to(asset.relativefilePath);
-	j.at("importSettings").get_to(asset.importSettings);
-	j.at("filename").get_to(asset.fileName);
-	j.at("ext").get_to(asset.ext);
-
-	//asset.establishFilepath();
-}
+//void to_json(nlohmann::json& j, const AssetRecord& asset)
+//{
+//	j = nlohmann::json{
+//		{"uuid", asset.uuid},
+//		{"relativefilePath", asset.relativefilePath},
+//		{"importSettings", asset.importSettings},
+//		{"filename", asset.fileName},
+//		{"ext", asset.ext}
+//	};
+//}
+//
+//// Deserialization (from JSON)
+//void from_json(const nlohmann::json& j, AssetRecord& asset)
+//{
+//	j.at("uuid").get_to(asset.uuid); 
+//	j.at("relativefilePath").get_to(asset.relativefilePath);
+//	j.at("importSettings").get_to(asset.importSettings);
+//	j.at("filename").get_to(asset.fileName);
+//	j.at("ext").get_to(asset.ext);
+//
+//	//asset.establishFilepath();
+//}
 
 AssetRecord::AssetRecord(AssetCreateDescriptor& assetDesc)
 {

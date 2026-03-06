@@ -47,15 +47,17 @@ struct EngineAPI AssetRecord
 	void update(const AssetUpdateDescriptor& desc);
 	//void establishFilepath();
 
-	//NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRecord,
-	//	createDescriptor,
-	//	uuid,
-	//	isValid,
-	//	relativefilePath,
-	//	fileName,
-	//	ext,
-	//	importSettings,
-	//);
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRecord,
+		name,
+		uuid,
+		sourcePath,
+		aType,
+		engineAttributes,
+		isEngineOwned,
+		assetDirectory,
+		fileName,
+		ext
+	);
 private:
 	friend class Assets;
 
@@ -64,5 +66,5 @@ private:
 };
 
 // Serialization (to JSON)
-void to_json(nlohmann::json& j, const AssetRecord& asset);
-void from_json(const nlohmann::json& j, AssetRecord& asset);
+//void to_json(nlohmann::json& j, const AssetRecord& asset);
+//void from_json(const nlohmann::json& j, AssetRecord& asset);
