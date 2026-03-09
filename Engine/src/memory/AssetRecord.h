@@ -56,6 +56,7 @@ struct EngineAPI AssetRecord
 		isEngineOwned,
 		assetDirectory,
 		fileName,
+		relativefilePath,
 		ext
 	);
 private:
