@@ -7,9 +7,9 @@
 
 #include <filesystem>
 
-Asset* ShaderTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> ShaderTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return new ShaderAsset(desc);
+	return createRef< ShaderAsset>();
 }
 
 bool ShaderTypeManager::importAsset(const std::string& src, ImportNode& result)

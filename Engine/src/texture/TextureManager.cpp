@@ -11,9 +11,9 @@
 
 #include <filesystem>
 
-Asset* TextureTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> TextureTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return new TextureAsset(desc);
+	return createRef< TextureAsset>();
 }
 
 bool TextureTypeManager::importAsset(const std::string& src, ImportNode& result)

@@ -8,9 +8,9 @@
 
 #include <filesystem>
 
-Asset* LuaScriptTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> LuaScriptTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return new LuaScriptAsset(desc);
+	return createRef< LuaScriptAsset>();
 }
 
 bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& result)

@@ -9,9 +9,9 @@
 #include "memory/AssetHandle.h"
 #include "core/Engine.h"
 
-Asset* MeshGroupTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> MeshGroupTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return new MeshGroupAsset(desc);
+	return createRef< MeshGroupAsset>();
 }
 
 bool MeshGroupTypeManager::importAsset(const std::string& src, ImportNode& result)

@@ -58,5 +58,5 @@ class EngineAPI AnimationAsset : public Asset
 public:
 	using ResourceType = Animation;
 
-	using Asset::Asset;
+	AnimationAsset() = default;
 };

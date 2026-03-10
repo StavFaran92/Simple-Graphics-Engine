@@ -27,6 +27,15 @@ struct ImportNode
     int index = 0;
 };
 
+template<typename T>
+using Ref = std::shared_ptr<T>;
+
+template<typename T, typename... Args>
+Ref<T> createRef(Args&&... args)
+{
+    return std::make_shared<T>(std::forward<Args>(args)...);
+}
+
 // Validates / fills defaults on resource descriptors
 class ResourceTypeManager
 {
@@ -36,7 +45,7 @@ public:
     // ============================================================
 
     // Create a new asset instance in memory
-    virtual Asset* createAsset(AssetCreateDescriptor& desc) = 0;
+    virtual Ref<Asset> createAsset(AssetCreateDescriptor& desc) = 0;
 
     // Import asset into the engine
     virtual bool importAsset(const std::string& src, ImportNode& result) = 0;

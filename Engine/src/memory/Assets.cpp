@@ -446,7 +446,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	Asset* asset = manager->createAsset(desc); 
+	Ref<Asset> asset = manager->createAsset(desc);
 	if (!asset)
 	{
 		logError("Failed to create asset of type {}", static_cast<int>(type));

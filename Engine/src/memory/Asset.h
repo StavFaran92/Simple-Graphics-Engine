@@ -10,15 +10,22 @@ class EngineAPI Asset
 public:
 	using ResourceType = Resource;
 
-	Asset(const AssetCreateDescriptor& desc);
+	//Asset(const AssetCreateDescriptor& desc);
+
+	Asset() = default;
 
 	virtual void bindDependency(const std::string& slot, UUID dependency) {}
 
 	virtual void fillData(ResourceWrapper<Resource> resource) {};
 
-protected:
-	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };
+	template <class Archive>
+	void serialize(Archive& archive) {
+	}
 
 protected:
-	AssetCreateDescriptor m_createDesc;
+	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };
+protected:
+	//AssetCreateDescriptor m_createDesc;
 };
+
+//CEREAL_REGISTER_TYPE(Asset);

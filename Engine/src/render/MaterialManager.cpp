@@ -9,9 +9,9 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-Asset* MaterialTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> MaterialTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return new MaterialAsset(desc);
+	return createRef< MaterialAsset>();
 }
 
 bool MaterialTypeManager::importAsset(const std::string& src, ImportNode& result)

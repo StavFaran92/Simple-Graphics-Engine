@@ -7,7 +7,7 @@ class TextureTypeManager : public ResourceTypeManager
 public:
 
 	// Inherited via ResourceTypeManager
-	Asset* createAsset(AssetCreateDescriptor& desc) override;
+	Ref<Asset> createAsset(AssetCreateDescriptor& desc) override;
 
 	bool importAsset(const std::string& src, ImportNode& result) override;
 

@@ -419,11 +419,9 @@ void MaterialAsset::update()
 	}
 }
 
-MaterialAsset::MaterialAsset(AssetCreateDescriptor& desc)
-	: Asset(desc)
+MaterialAsset::MaterialAsset(const MaterialCreateDescriptor& desc)
 {
-	auto matDesc = dynamic_cast<MaterialCreateDescriptor*>(desc.resourceCreateDescriptor);
-	data = matDesc->data;
+	data = desc.data;
 	update();
 }
 

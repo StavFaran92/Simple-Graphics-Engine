@@ -130,7 +130,8 @@ class EngineAPI MaterialAsset : public Asset
 public:
 	using ResourceType = Material;
 
-	MaterialAsset(AssetCreateDescriptor& desc);
+	MaterialAsset() = default;
+	MaterialAsset(const MaterialCreateDescriptor&);
 
 	void bindDependency(const std::string& slot, UUID dependency) override;
 

@@ -11,9 +11,9 @@
 
 
 
-Asset* SceneTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> SceneTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return new SceneAsset(desc);
+	return createRef<SceneAsset>();
 }
 
 bool SceneTypeManager::importAsset(const std::string& src, ImportNode& result)

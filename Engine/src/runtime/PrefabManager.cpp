@@ -9,9 +9,9 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-Asset* PrefabTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> PrefabTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return new PrefabAsset(desc);
+	return createRef< PrefabAsset>();
 }
 
 bool PrefabTypeManager::importAsset(const std::string& src, ImportNode& result)

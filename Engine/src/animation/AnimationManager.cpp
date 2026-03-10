@@ -8,9 +8,9 @@
 #include <filesystem>
 #include <stdexcept>
 
-Asset* AnimationTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> AnimationTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return new AnimationAsset(desc);
+	return createRef< AnimationAsset>();
 }
 
 bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& result)

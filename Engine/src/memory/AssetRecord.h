@@ -5,6 +5,7 @@
 #include "memory/UUID.h"
 #include "core/Configurations.h"
 #include "AssetDescriptors.h"
+#include "cereal/types/memory.hpp"
 
 class Asset;
 
@@ -28,7 +29,7 @@ struct EngineAPI AssetRecord
 	std::string fileName;
 	std::string ext;
 	nlohmann::json importSettings;
-	Asset* asset = nullptr;
+	std::shared_ptr<Asset> asset;
 	ResourceID resourceID = 0;
 
 
@@ -59,6 +60,22 @@ struct EngineAPI AssetRecord
 		relativefilePath,
 		ext
 	);
+
+	//template <class Archive>
+	//void serialize(Archive& archive) {
+	//	SERIALIZED_MEMBER(name);
+	//	SERIALIZED_MEMBER(uuid);
+	//	SERIALIZED_MEMBER(sourcePath);
+	//	SERIALIZED_MEMBER(engineAttributes);
+	//	SERIALIZED_MEMBER(isEngineOwned);
+	//	SERIALIZED_MEMBER(assetDirectory);
+	//	SERIALIZED_MEMBER(fileName);
+	//	SERIALIZED_MEMBER(relativefilePath);
+	//	SERIALIZED_MEMBER(ext);
+	//	SERIALIZED_MEMBER(asset);
+	//}
+		
+
 private:
 	friend class Assets;
 

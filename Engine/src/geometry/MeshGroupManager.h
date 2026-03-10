@@ -7,7 +7,7 @@ class MeshGroupTypeManager : public ResourceTypeManager
 public:
 
 	// Inherited via ResourceTypeManager
-	Asset* createAsset(AssetCreateDescriptor& desc) override;
+	Ref<Asset> createAsset(AssetCreateDescriptor& desc) override;
 	bool importAsset(const std::string& src, ImportNode& result) override;
 	bool saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst) override;
 	ResourceLoadDescriptor* makeResourceLoadDescriptor() override;

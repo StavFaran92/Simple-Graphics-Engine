@@ -53,9 +53,17 @@ class EngineAPI MeshGroupAsset : public Asset
 public:
 	using ResourceType = MeshGroup;
 
-	using Asset::Asset;
+	MeshGroupAsset() = default;
 
 	void bindDependency(const std::string& slot, UUID dependency) override;
 
 	std::map<int, AssetHandle<MaterialAsset>> m_materials;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(m_materials);
+	}
 };
+
+CEREAL_REGISTER_TYPE(MeshGroupAsset);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Asset, MeshGroupAsset)
