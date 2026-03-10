@@ -151,3 +151,13 @@ void MeshGroupAsset::bindDependency(const std::string& slot, UUID dependency)
 
 	m_materials[index] = material;
 }
+
+void MeshGroupAsset::serialize(nlohmann::json& j) const
+{
+	j["materials"] = m_materials;
+}
+
+void MeshGroupAsset::deserialize(const nlohmann::json& j)
+{
+	j.at("materials").get_to(m_materials);
+}

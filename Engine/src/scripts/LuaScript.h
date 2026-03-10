@@ -33,4 +33,9 @@ public:
 	using ResourceType = LuaScript;
 
 	using Asset::Asset;
+
+	void serialize(nlohmann::json& j) const override;
+	void deserialize(const nlohmann::json& j) override;
+
+	std::string filepath;
 };

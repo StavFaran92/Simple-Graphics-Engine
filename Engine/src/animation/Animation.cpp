@@ -94,3 +94,18 @@ bool Animation::preprocess(const std::string& path)
 ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource() {
 	return Animation::load(sourcePath, *this);
 }
+
+void AnimationAsset::serialize(nlohmann::json& j) const
+{
+	// Animation assets currently do not expose additional persistent
+	// metadata beyond what is stored with the animation resource itself.
+	// Use an explicit empty object for forward-compatible extension.
+	j = nlohmann::json::object();
+}
+
+void AnimationAsset::deserialize(const nlohmann::json& j)
+{
+	// No custom fields to restore at the moment; placeholder for future
+	// animation-asset-specific metadata.
+	(void)j;
+}

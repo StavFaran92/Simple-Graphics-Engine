@@ -6,6 +6,7 @@
 #include "core/Configurations.h"
 #include "AssetDescriptors.h"
 #include "cereal/types/memory.hpp"
+#include "memory/Ref.h"
 
 class Asset;
 
@@ -29,7 +30,7 @@ struct EngineAPI AssetRecord
 	std::string fileName;
 	std::string ext;
 	nlohmann::json importSettings;
-	std::shared_ptr<Asset> asset;
+	Ref<Asset> asset;
 	ResourceID resourceID = 0;
 
 

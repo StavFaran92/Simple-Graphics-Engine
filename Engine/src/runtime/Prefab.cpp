@@ -69,6 +69,24 @@ ResourceWrapper<Prefab> Prefab::create(const Entity& e)
 	return prefab;
 }
 
+// ============================================================
+//  PrefabAsset (Asset wrapper)
+// ============================================================
+
+void PrefabAsset::serialize(nlohmann::json& j) const
+{
+	// PrefabAsset does not add extra data on top of Prefab resource
+	// at the moment. Use an explicit empty object placeholder so we
+	// can extend this later if needed.
+	j = nlohmann::json::object();
+}
+
+void PrefabAsset::deserialize(const nlohmann::json& j)
+{
+	// No prefab-asset specific fields to restore yet.
+	(void)j;
+}
+
 Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 {
 	std::map<entity_id, Entity> entityIDRemapTable;

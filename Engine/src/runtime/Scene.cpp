@@ -1113,6 +1113,24 @@ Entity Scene::getEntityByName(const std::string& name) const
 	return Entity::EmptyEntity;
 }
 
+// ============================================================
+//  SceneAsset (Asset wrapper)
+// ============================================================
+
+void SceneAsset::serialize(nlohmann::json& j) const
+{
+	// SceneAsset itself does not currently track extra metadata
+	// beyond what is stored in the Scene resource and registry.
+	// Keep this as an explicit empty object for future extension.
+	j = nlohmann::json::object();
+}
+
+void SceneAsset::deserialize(const nlohmann::json& j)
+{
+	// No scene-asset specific fields to restore yet.
+	(void)j;
+}
+
 void Scene::startSimulation()
 {
 	if (m_isSimulationActive)

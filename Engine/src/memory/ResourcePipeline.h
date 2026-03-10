@@ -5,6 +5,7 @@
 #include "memory/ResourceWrapper.h"
 #include <map>
 #include <string>
+#include "memory/Ref.h"
 
 class Asset;
 class Resource;
@@ -27,15 +28,6 @@ struct ImportNode
     int index = 0;
 };
 
-template<typename T>
-using Ref = std::shared_ptr<T>;
-
-template<typename T, typename... Args>
-Ref<T> createRef(Args&&... args)
-{
-    return std::make_shared<T>(std::forward<Args>(args)...);
-}
-
 // Validates / fills defaults on resource descriptors
 class ResourceTypeManager
 {
@@ -54,7 +46,9 @@ public:
     virtual bool saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst) = 0;
 
     // Load asset metadata (.asset / .meta)
-    //virtual AssetRecord loadAsset(UUID uid) = 0; ???
+    virtual nlohmann::json serializeAsset(const Ref<Asset>& asset) { return {}; };
+
+    virtual Ref<Asset> deserializeAsset(const nlohmann::json& j) { return {}; };
 
 
     // ============================================================

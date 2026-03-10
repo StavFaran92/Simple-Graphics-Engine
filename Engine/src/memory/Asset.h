@@ -18,9 +18,8 @@ public:
 
 	virtual void fillData(ResourceWrapper<Resource> resource) {};
 
-	template <class Archive>
-	void serialize(Archive& archive) {
-	}
+	virtual void serialize(nlohmann::json& j) const = 0;
+	virtual void deserialize(const nlohmann::json& j) = 0;
 
 protected:
 	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };

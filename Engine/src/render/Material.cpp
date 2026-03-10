@@ -582,3 +582,26 @@ std::map<std::string, EditableUniform> MaterialAsset::getUniformProperties()
 {
 	return m_uniformProperties;
 }
+
+void MaterialAsset::serialize(nlohmann::json& j) const
+{
+	// For now, only persist the high-level MaterialData block using
+	// JSON serialization via nlohmann::json's ADL support for basic
+	// types. Complex sampler/uniform state is handled via MaterialData
+	// and engine-side resource creation.
+	j = nlohmann::json::object();
+	j["name"] = data.name;
+	j["renderMode"] = static_cast<int>(data.renderMode);
+	// customShader, uniforms and samplers are omitted for now; they are
+	// resolved via dependencies and MaterialData at import/create time.
+}
+
+void MaterialAsset::deserialize(const nlohmann::json& j)
+{
+	if (j.contains("name"))
+		data.name = j.at("name").get<std::string>();
+	if (j.contains("renderMode"))
+		data.renderMode = static_cast<MaterialRenderMode>(j.at("renderMode").get<int>());
+	// customShader, uniforms and samplers remain default; they are
+	// re-established through the import graph and editor interactions.
+}

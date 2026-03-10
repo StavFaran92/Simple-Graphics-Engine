@@ -59,4 +59,8 @@ public:
 	using ResourceType = Animation;
 
 	AnimationAsset() = default;
+
+	// Inherited via Asset
+	void serialize(nlohmann::json& j) const override;
+	void deserialize(const nlohmann::json& j) override;
 };

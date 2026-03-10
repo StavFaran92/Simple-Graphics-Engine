@@ -89,25 +89,27 @@ public:
 	{
 	}
 
-	T* operator->()
+	Ref<T> operator->()
 	{
 		return get();
 	}
 
-	T* operator->() const
+	Ref<T> operator->() const
 	{
 		return get();
 	}
 
-	inline T* get() const
+	inline Ref<T> get() const
 	{
-		return static_cast<T*>(info().asset);
+		return std::dynamic_pointer_cast<T>(info().asset);
 	}
 
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(uuid);
 	}
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetHandle, uuid);
 
 private:
 	UUID uuid = EMPTY_UUID;

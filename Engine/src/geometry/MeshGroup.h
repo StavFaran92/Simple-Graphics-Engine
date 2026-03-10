@@ -59,10 +59,9 @@ public:
 
 	std::map<int, AssetHandle<MaterialAsset>> m_materials;
 
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(m_materials);
-	}
+	// Inherited via Asset
+	void serialize(nlohmann::json& j) const override;
+	void deserialize(const nlohmann::json& j) override;
 };
 
 CEREAL_REGISTER_TYPE(MeshGroupAsset);

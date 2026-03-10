@@ -35,3 +35,23 @@ ResourceWrapper<Resource> LuaScriptCreateDescriptor::createResource()
 {
 	return ResourceWrapper<Resource>();
 }
+
+// ============================================================
+//  LuaScriptAsset (Asset wrapper)
+// ============================================================
+
+void LuaScriptAsset::serialize(nlohmann::json& j) const
+{
+	// Persist the script filepath so the editor/runtime can restore
+	// which script file this asset points to.
+	j = nlohmann::json::object();
+	j["filepath"] = filepath;
+}
+
+void LuaScriptAsset::deserialize(const nlohmann::json& j)
+{
+	if (j.contains("filepath"))
+	{
+		filepath = j.at("filepath").get<std::string>();
+	}
+}

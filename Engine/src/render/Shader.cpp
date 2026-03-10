@@ -18,6 +18,7 @@
 
 
 #include <filesystem>
+#include <nlohmann/json.hpp>
 
 const  std::map<ShaderOverride, std::string> shaderOverrideToString
 {
@@ -635,4 +636,22 @@ Shader::~Shader() {
 ResourceWrapper<Resource> ShaderLoadDescriptor::loadResource() 
 {
 	return Shader::load(sourcePath, *this);
+}
+
+// ============================================================
+//  ShaderAsset (Asset wrapper)
+// ============================================================
+
+void ShaderAsset::serialize(nlohmann::json& j) const
+{
+	// ShaderAsset currently does not hold additional persistent data
+	// beyond what is stored in the shader resource and asset record.
+	// Keep this explicit and empty for forward compatibility.
+	j = nlohmann::json::object();
+}
+
+void ShaderAsset::deserialize(const nlohmann::json& j)
+{
+	// Placeholder for future shader-asset specific metadata.
+	(void)j;
 }
