@@ -14,6 +14,13 @@ Ref<Asset> MeshGroupTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return createRef< MeshGroupAsset>();
 }
 
+Ref<Asset> MeshGroupTypeManager::deserializeAsset(const nlohmann::json& j)
+{
+	auto asset = createRef<MeshGroupAsset>();
+	asset->deserialize(j);
+	return asset;
+}
+
 bool MeshGroupTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	ModelImporter::ModelInfo modelInfo;

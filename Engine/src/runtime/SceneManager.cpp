@@ -16,6 +16,13 @@ Ref<Asset> SceneTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return createRef<SceneAsset>();
 }
 
+Ref<Asset> SceneTypeManager::deserializeAsset(const nlohmann::json& j)
+{
+	auto asset = createRef<SceneAsset>();
+	asset->deserialize(j);
+	return asset;
+}
+
 bool SceneTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	// Scene import not implemented

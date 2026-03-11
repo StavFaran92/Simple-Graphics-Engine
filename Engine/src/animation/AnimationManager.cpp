@@ -13,6 +13,13 @@ Ref<Asset> AnimationTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return createRef< AnimationAsset>();
 }
 
+Ref<Asset> AnimationTypeManager::deserializeAsset(const nlohmann::json& j)
+{
+	auto asset = createRef<AnimationAsset>();
+	asset->deserialize(j);
+	return asset;
+}
+
 bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	std::filesystem::path path(src);

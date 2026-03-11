@@ -12,6 +12,13 @@ Ref<Asset> ShaderTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return createRef< ShaderAsset>();
 }
 
+Ref<Asset> ShaderTypeManager::deserializeAsset(const nlohmann::json& j)
+{
+	auto asset = createRef<ShaderAsset>();
+	asset->deserialize(j);
+	return asset;
+}
+
 bool ShaderTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	// Shader import not implemented

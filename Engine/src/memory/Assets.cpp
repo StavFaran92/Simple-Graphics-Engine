@@ -124,6 +124,9 @@ void Assets::loadAssetsDatabase()
 
 	for (auto& assetInfo : assets)
 	{
+		//Ref<Asset> asset = AssetFactory::getManager(assetInfo.aType)->deserializeAsset();
+		//assetInfo.asset = asset;
+
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
 }

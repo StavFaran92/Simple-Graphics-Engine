@@ -9,6 +9,8 @@ public:
 	// Inherited via ResourceTypeManager
 	Ref<Asset> createAsset(AssetCreateDescriptor& desc) override;
 
+	Ref<Asset> deserializeAsset(const nlohmann::json& j) override;
+
 	bool importAsset(const std::string& src, ImportNode& result) override;
 
 	bool saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst) override;

@@ -13,6 +13,13 @@ Ref<Asset> LuaScriptTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return createRef< LuaScriptAsset>();
 }
 
+Ref<Asset> LuaScriptTypeManager::deserializeAsset(const nlohmann::json& j)
+{
+	auto asset = createRef<LuaScriptAsset>();
+	asset->deserialize(j);
+	return asset;
+}
+
 bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	std::filesystem::path path(src);

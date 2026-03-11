@@ -14,6 +14,13 @@ Ref<Asset> MaterialTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return createRef< MaterialAsset>();
 }
 
+Ref<Asset> MaterialTypeManager::deserializeAsset(const nlohmann::json& j)
+{
+	auto asset = createRef<MaterialAsset>();
+	asset->deserialize(j);
+	return asset;
+}
+
 bool MaterialTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	// Material import not implemented

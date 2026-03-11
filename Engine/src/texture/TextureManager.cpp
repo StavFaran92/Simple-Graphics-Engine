@@ -16,6 +16,13 @@ Ref<Asset> TextureTypeManager::createAsset(AssetCreateDescriptor& desc)
 	return createRef< TextureAsset>();
 }
 
+Ref<Asset> TextureTypeManager::deserializeAsset(const nlohmann::json& j)
+{
+	auto asset = createRef<TextureAsset>();
+	asset->deserialize(j);
+	return asset;
+}
+
 bool TextureTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	TextureData textureData;

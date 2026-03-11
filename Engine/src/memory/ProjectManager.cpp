@@ -18,6 +18,8 @@ void ProjectManager::loadProject(const std::string& filePath, std::shared_ptr<Co
 void ProjectManager::saveProject()
 {
     Engine::get()->getSubSystem<Assets>()->saveDirtyAssets();
+
+    // Save Assets
     Engine::get()->getContext()->save();
     Archiver::save();
 }

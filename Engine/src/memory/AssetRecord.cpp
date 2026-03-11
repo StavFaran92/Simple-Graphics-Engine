@@ -8,29 +8,50 @@
 #include "memory/Asset.h"
 #include "core/Logger.h"
 
+nlohmann::json serializeAsset(const Ref<Asset>& asset)
+{
+	nlohmann::json j;
+	asset->serialize(j);
+	return j;
+}
+
+
+
 // Serialization (to JSON)
-//void to_json(nlohmann::json& j, const AssetRecord& asset)
-//{
-//	j = nlohmann::json{
-//		{"uuid", asset.uuid},
-//		{"relativefilePath", asset.relativefilePath},
-//		{"importSettings", asset.importSettings},
-//		{"filename", asset.fileName},
-//		{"ext", asset.ext}
-//	};
-//}
-//
-//// Deserialization (from JSON)
-//void from_json(const nlohmann::json& j, AssetRecord& asset)
-//{
-//	j.at("uuid").get_to(asset.uuid); 
-//	j.at("relativefilePath").get_to(asset.relativefilePath);
-//	j.at("importSettings").get_to(asset.importSettings);
-//	j.at("filename").get_to(asset.fileName);
-//	j.at("ext").get_to(asset.ext);
-//
-//	//asset.establishFilepath();
-//}
+void to_json(nlohmann::json& j, const AssetRecord& r)
+{
+	j = nlohmann::json{
+		{"name", r.name},
+		{"uuid", r.uuid},
+		{"sourcePath", r.sourcePath},
+		{"aType", r.aType},
+		{"engineAttributes", r.engineAttributes},
+		{"isEngineOwned", r.isEngineOwned},
+		{"assetDirectory", r.assetDirectory},
+		{"fileName", r.fileName},
+		{"relativefilePath", r.relativefilePath},
+		{"ext", r.ext},
+		{"asset", serializeAsset(r.asset)}
+	};
+}
+
+void from_json(const nlohmann::json& j, AssetRecord& r)
+{
+	j.at("name").get_to(r.name);
+	j.at("uuid").get_to(r.uuid);
+	j.at("sourcePath").get_to(r.sourcePath);
+	j.at("aType").get_to(r.aType);
+	j.at("engineAttributes").get_to(r.engineAttributes);
+	j.at("isEngineOwned").get_to(r.isEngineOwned);
+	j.at("assetDirectory").get_to(r.assetDirectory);
+	j.at("fileName").get_to(r.fileName);
+	j.at("relativefilePath").get_to(r.relativefilePath);
+	j.at("ext").get_to(r.ext);
+
+	nlohmann::json jsonAsset = j.at("asset");
+	Ref<Asset> asset = AssetFactory::getManager(r.aType)->deserializeAsset(jsonAsset);
+	r.asset = asset;
+}
 
 AssetRecord::AssetRecord(AssetCreateDescriptor& assetDesc)
 {
