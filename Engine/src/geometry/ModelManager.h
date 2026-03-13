@@ -2,7 +2,7 @@
 
 #include "memory/ResourcePipeline.h"
 
-class MeshGroupTypeManager : public ResourceTypeManager
+class ModelTypeManager : public ResourceTypeManager
 {
 public:
 

@@ -580,7 +580,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     mainCamera.getComponent<Transformation>().setLocalPosition({10,10,10});
     mainCamera.getComponent<CameraComponent>().center = {0,0,0};
     mainCamera.getComponent<CameraComponent>().up = {0,1,0};
-    mainCamera.addComponent<MeshRendererComponent>(BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_CAMERA));
+    mainCamera.addComponent<MeshRendererComponent>(BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CAMERA));
     mainCamera.addComponent<RenderableComponent>();
 
     m_context->getActiveScene()->setGameCamera(mainCamera);

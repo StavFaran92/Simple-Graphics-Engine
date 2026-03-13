@@ -1,7 +1,7 @@
 #pragma once
 
 #include "memory/ResourceWrapper.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 
 class Grid

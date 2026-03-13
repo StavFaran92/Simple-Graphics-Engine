@@ -18,7 +18,7 @@
 #include <GL/glew.h>
 #include "utils/STBIHelper.h"
 #include "texture/Texture.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 #include "Utils/MikkTSpaceImpl.h"
 
@@ -199,7 +199,7 @@ void ModelImporter::loadModelFromAssimpScene(const aiScene* scene, ModelImporter
 	}
 }
 
-//void ModelImporter::loadModelFromFile(const MeshGroupLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
+//void ModelImporter::loadModelFromFile(const ModelLoadDescriptor& resourceDesc, ModelImporter::ModelInfo& modelInfo)
 //{
 //	std::string filepath = resourceDesc.sourcePath;
 //

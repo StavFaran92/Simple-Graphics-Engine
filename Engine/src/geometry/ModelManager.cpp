@@ -1,6 +1,6 @@
-#include "MeshGroupManager.h"
+#include "ModelManager.h"
 
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "geometry/ModelImporter.h"
 #include "geometry/MeshExporter.h"
 #include "geometry/MeshBinaryLoader.h"
@@ -9,19 +9,19 @@
 #include "memory/AssetHandle.h"
 #include "core/Engine.h"
 
-Ref<Asset> MeshGroupTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> ModelTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return createRef< MeshGroupAsset>();
+	return createRef< ModelAsset>();
 }
 
-Ref<Asset> MeshGroupTypeManager::deserializeAsset(const nlohmann::json& j)
+Ref<Asset> ModelTypeManager::deserializeAsset(const nlohmann::json& j)
 {
-	auto asset = createRef<MeshGroupAsset>();
+	auto asset = createRef<ModelAsset>();
 	asset->deserialize(j);
 	return asset;
 }
 
-bool MeshGroupTypeManager::importAsset(const std::string& src, ImportNode& result)
+bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
 	ModelImporter::ModelInfo modelInfo;
 	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, modelInfo);
@@ -37,7 +37,7 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, ImportNode& resul
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
 	result.createDescriptor.aType = AssetType::MESH;
-	result.createDescriptor.makeResourceCreateDescriptor<MeshGroupCreateDescriptor>()->data = modelInfo.meshDataList;
+	result.createDescriptor.makeResourceCreateDescriptor<ModelCreateDescriptor>()->data = modelInfo.meshDataList;
 
 	// Build texture dependency nodes (embedded textures)
 	//std::map<std::string, std::string> textureNameToSlot; // texture name -> slot name
@@ -105,9 +105,9 @@ bool MeshGroupTypeManager::importAsset(const std::string& src, ImportNode& resul
 	return true;
 }
 
-bool MeshGroupTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool ModelTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
 {
-	auto meshGroupDesc = dynamic_cast<const MeshGroupCreateDescriptor*>(&desc);
+	auto meshGroupDesc = dynamic_cast<const ModelCreateDescriptor*>(&desc);
 	if (!meshGroupDesc)
 	{
 		logError("Invalid Descriptor specified.");
@@ -122,20 +122,20 @@ bool MeshGroupTypeManager::saveResource(const ResourceCreateDescriptor& desc, co
 	return true;
 }
 
-ResourceLoadDescriptor* MeshGroupTypeManager::makeResourceLoadDescriptor()
+ResourceLoadDescriptor* ModelTypeManager::makeResourceLoadDescriptor()
 {
-	return new MeshGroupLoadDescriptor();
+	return new ModelLoadDescriptor();
 }
 
-ResourceWrapper<Resource> MeshGroupTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceWrapper<Resource> ModelTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	return ResourceWrapper<Resource>();
 }
 
-void MeshGroupTypeManager::parse(ResourceLoadDescriptor& desc)
+void ModelTypeManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void MeshGroupTypeManager::parse(ResourceCreateDescriptor& desc)
+void ModelTypeManager::parse(ResourceCreateDescriptor& desc)
 {
 }

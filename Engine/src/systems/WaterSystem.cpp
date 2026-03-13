@@ -28,7 +28,7 @@ Entity WaterSystem::createPool()
 	meshDesc.aType = AssetType::MESH;
 	meshDesc.isEngineOwned = true;
 	meshDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx";
-	auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(meshDesc).as<MeshGroupAsset>();
+	auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(meshDesc).as<ModelAsset>();
 	auto& meshRendererComponent = waterBodyNestedImpl.addComponent<MeshRendererComponent>(mesh);
 
 	AssetCreateDescriptor shaderDesc;

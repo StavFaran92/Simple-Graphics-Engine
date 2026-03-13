@@ -25,7 +25,7 @@ FoliageSystem::FoliageSystem()
 bool FoliageSystem::init()
 {
 	m_foliageQuadShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/FoliageQuadShader.glsl");
-	m_grassBlade = MeshGroup::load(SGE_ROOT_DIR "Resources/Engine/Meshes/grass_blade_v3.fbx");
+	m_grassBlade = Model::load(SGE_ROOT_DIR "Resources/Engine/Meshes/grass_blade_v3.fbx");
 
 	glGenBuffers(1, &m_frustumUBO);
 

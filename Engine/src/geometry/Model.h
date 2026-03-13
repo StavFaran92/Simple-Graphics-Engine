@@ -7,12 +7,12 @@
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
-struct EngineAPI MeshGroupLoadDescriptor : public ResourceLoadDescriptor
+struct EngineAPI ModelLoadDescriptor : public ResourceLoadDescriptor
 {
 	ResourceWrapper<Resource> loadResource() override;
 };
 
-struct EngineAPI MeshGroupCreateDescriptor : public ResourceCreateDescriptor
+struct EngineAPI ModelCreateDescriptor : public ResourceCreateDescriptor
 {
 	ResourceWrapper<Resource> createResource() override;
 
@@ -20,10 +20,10 @@ struct EngineAPI MeshGroupCreateDescriptor : public ResourceCreateDescriptor
 };
 
 // Resource
-class EngineAPI MeshGroup : public Resource
+class EngineAPI Model : public Resource
 {
 public:
-	static ResourceWrapper<MeshGroup> load(const std::string& fileLocation, MeshGroupLoadDescriptor desc = {});
+	static ResourceWrapper<Model> load(const std::string& fileLocation, ModelLoadDescriptor desc = {});
 
 	void addMesh(const std::shared_ptr<Mesh>& mesh);
 
@@ -48,12 +48,12 @@ private:
 };
 
 // Asset
-class EngineAPI MeshGroupAsset : public Asset
+class EngineAPI ModelAsset : public Asset
 {
 public:
-	using ResourceType = MeshGroup;
+	using ResourceType = Model;
 
-	MeshGroupAsset() = default;
+	ModelAsset() = default;
 
 	void bindDependency(const std::string& slot, UUID dependency) override;
 
@@ -64,5 +64,5 @@ public:
 	void deserialize(const nlohmann::json& j) override;
 };
 
-CEREAL_REGISTER_TYPE(MeshGroupAsset);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Asset, MeshGroupAsset)
+CEREAL_REGISTER_TYPE(ModelAsset);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Asset, ModelAsset)

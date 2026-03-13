@@ -12,7 +12,7 @@
 
 #include "render/RenderCommand.h"
 #include "component/Component.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "memory/BuiltInAssets.h"
 
 
@@ -77,7 +77,7 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 	equirectangularTexture.get()->bind();
 	
 
-	auto box = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX);
+	auto box = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX);
 	auto vao = box.resource()->getPrimaryMesh()->getVAO();
 
 	// render to cube
@@ -148,7 +148,7 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirec
 	cubemapTexture.get()->setSlot(0);
 	cubemapTexture.get()->bind();
 
-	auto quad = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_QUAD);
+	auto quad = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD);
 	auto vao = quad.resource()->getPrimaryMesh()->getVAO();
 
 	// render to quad

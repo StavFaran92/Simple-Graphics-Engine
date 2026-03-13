@@ -177,7 +177,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uuid) {
-				meshComponent.mesh = AssetHandle<MeshGroupAsset>(uuid);
+				meshComponent.mesh = AssetHandle<ModelAsset>(uuid);
 			});
 
 			if (ImGui::CollapsingHeader("Materials"))
@@ -636,7 +636,7 @@ void InspectorWindow::display()
 			}
 
 			addAssetSelectWidget(meshName, AssetType::MESH, [&volume](UUID uuid) {
-				volume.mesh = AssetHandle<MeshGroupAsset>(uuid);
+				volume.mesh = AssetHandle<ModelAsset>(uuid);
 				});
 
 			std::string matName = "None";

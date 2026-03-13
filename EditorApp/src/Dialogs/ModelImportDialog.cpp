@@ -1,7 +1,7 @@
 #include "ModelImportDialog.h"
 #include "EditorState.h"
 #include "memory/Assets.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 ModelImportDialog::ModelImportDialog()
 	: DialogBase("ModelImportDialog")
@@ -40,8 +40,8 @@ bool ModelImportDialog::acceptContent()
 		desc.name = uniqueName.name;
 		desc.sourcePath = filepath.m_filepath;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		desc.makeResourceLoadDescriptor<MeshGroupLoadDescriptor>();
-		auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(desc).as<MeshGroupAsset>();
+		desc.makeResourceLoadDescriptor<ModelLoadDescriptor>();
+		auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(desc).as<ModelAsset>();
 
 		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
 

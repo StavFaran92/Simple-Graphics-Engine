@@ -2,7 +2,7 @@
 #include "animation/Animator.h"
 
 #include "animation/Animation.h"
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 #include "runtime/Scene.h"
 
 Animator::Animator(AssetHandle<AnimationAsset> animation)
@@ -22,7 +22,7 @@ void Animator::update(float dt)
 	}
 }
 
-void Animator::getFinalBoneMatrices(const MeshGroup* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
+void Animator::getFinalBoneMatrices(const Model* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
 {
 	if (m_currentAnimation.resource().isEmpty())
 		return;

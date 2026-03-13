@@ -21,8 +21,8 @@ struct aiMaterial;
 enum aiTextureType;
 class Engine;
 class TextureHandler;
-class MeshGroup;
-class MeshGroupLoadDescriptor;
+class Model;
+class ModelLoadDescriptor;
 class Scene;
 template<typename T>class ResourceWrapper;
 
@@ -87,7 +87,7 @@ public:
 	 * \param flipTexture	should flip loaded texture
 	 * \return A poitner to the newly created model
 	 */
-	//void loadModelFromFile(const MeshGroupLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
+	//void loadModelFromFile(const ModelLoadDescriptor& desc, ModelImporter::ModelInfo& modelInfo);
 
 	
 

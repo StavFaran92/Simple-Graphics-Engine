@@ -2,7 +2,7 @@
 
 #include "core/Core.h"
 
-#include "geometry/MeshGroup.h"
+#include "geometry/Model.h"
 
 class EngineAPI Quad 
 {

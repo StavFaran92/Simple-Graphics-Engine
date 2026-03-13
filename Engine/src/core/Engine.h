@@ -33,7 +33,7 @@ class ShaderLoader;
 class ResourceManager;
 class Texture;
 class Mesh;
-class MeshGroup;
+class Model;
 class ProjectManager;
 class Material;
 class Texture;

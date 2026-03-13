@@ -105,14 +105,14 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	mat->use();
 
 	// bind mesh
-	ResourceWrapper<MeshGroup> mesh;
+	ResourceWrapper<Model> mesh;
 	if (!volume.mesh.isEmpty())
 	{
 		mesh = volume.mesh.resource(); // will not work for hierarchical meshes
 	}
 	else
 	{
-		mesh = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_BOX).resource();
+		mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX).resource();
 
 	}
 
@@ -128,7 +128,7 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	m_renderVolumeIntoSceneShader->setTextureInShader(renderTargetTexture, "uMainTexture", 0);
 	m_renderVolumeIntoSceneShader->setTextureInShader(m_renderTargetTexture, "uVolumeColor", 1);
 
-	auto quadVAO = BuiltInAssets::getByName<MeshGroupAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+	auto quadVAO = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 	RenderCommand::draw(quadVAO);
 
 	//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
