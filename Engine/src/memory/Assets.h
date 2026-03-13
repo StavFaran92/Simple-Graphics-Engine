@@ -41,8 +41,6 @@ public:
 
 	void makeDirty(UUID uuid);
 
-	void addAsset(AssetRecord& aInfo);
-
 	void updateAsset(AssetRecord& aInfo);
 
 	// Unified pipeline entry points
@@ -50,17 +48,18 @@ public:
 
 	AssetHandle<Asset> importAsset(AssetCreateDescriptor desc);
 
-	Asset* createAssetsFromImportNode(ImportNode node); // todo fix qualifier
-
-	AssetHandle<Asset> instantiateNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
-
-	AssetHandle<Asset> populateAssetFromNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
-
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 
 private:
 
+	AssetHandle<Asset> createAssetsFromImportNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
+
+	AssetHandle<Asset> createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
+
 	void updateRegistry(const AssetRecord& aInfo);
+
+	void addAsset(AssetRecord& aInfo);
+
 private:
 	std::unordered_map<UUID, AssetRecord> m_assets;
 };

@@ -502,7 +502,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		desc.assetDirectory = desc.name;
 	}
 
-	AssetHandle<Asset> handle = populateAssetFromNode(importNode, desc);
+	AssetHandle<Asset> handle = createAssetAndChildrenFromNodeRecursive(importNode, desc);
 
 	if (handle.isEmpty())
 	{
@@ -514,7 +514,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	return handle;
 }
 
-AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
+AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
 {
 	ResourceTypeManager* manager =
 		AssetFactory::getManager(node.createDescriptor.aType);
@@ -551,10 +551,10 @@ AssetHandle<Asset> Assets::instantiateNode(const ImportNode& node, const AssetCr
 	return created;
 }
 
-AssetHandle<Asset> Assets::populateAssetFromNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
+AssetHandle<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
 {
 	// 1) Create this node
-	AssetHandle<Asset> created = instantiateNode(node, rootDesc);
+	AssetHandle<Asset> created = createAssetsFromImportNode(node, rootDesc);
 
 	if (created.isEmpty())
 	{
@@ -565,7 +565,7 @@ AssetHandle<Asset> Assets::populateAssetFromNode(const ImportNode& node, const A
 	// 2) Recursively create and bind dependencies
 	for (const auto& [slotName, childNode] : node.dependencies)
 	{
-		AssetHandle<Asset> child = populateAssetFromNode(childNode, rootDesc);
+		AssetHandle<Asset> child = createAssetAndChildrenFromNodeRecursive(childNode, rootDesc);
 
 		if (child.isEmpty())
 		{
