@@ -267,13 +267,13 @@ ResourceWrapper<Resource> MaterialLoadDescriptor::loadResource()
 
 void MaterialAsset::parseUniforms(const std::string& sourceCode)
 {
-	m_uniformProperties.clear();
+	data.uniforms.clear();
 	data.samplers.clear();
 
 	std::istringstream stream(sourceCode);
 	std::string line;
 
-	auto& uniformProperties = m_uniformProperties;
+	auto& uniformProperties = data.uniforms;
 	auto& samplers = data.samplers;
 
 	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
@@ -361,9 +361,9 @@ void MaterialAsset::parseUniforms(const std::string& sourceCode)
 		}
 	}
 
-	for (const auto& [name, uniform] : m_uniformProperties)
+	for (const auto& [name, uniform] : data.uniforms)
 	{
-		data.uniforms[name] = uniform.value;
+		data.uniforms[name].value = uniform.value;
 	}
 }
 
@@ -411,11 +411,6 @@ void MaterialAsset::update()
 		{
 			iter->second = value;
 		}
-	}
-
-	for (const auto& [name, value] : data.uniforms)
-	{
-		shader->setUniformValue(name, value);
 	}
 }
 
@@ -480,8 +475,14 @@ void MaterialAsset::fillData(ResourceWrapper<Resource> resource)
 	auto materialResource = resource.as<Material>();
 	materialResource->m_name = data.name;
 	materialResource->m_renderMode = data.renderMode;
-	materialResource->m_uniformProperties = data.uniforms;
+	materialResource->m_customShader = data.customShader.resource();
 	materialResource->m_samplers = data.samplers;
+
+	for (const auto& [name, uniform] : data.uniforms)
+	{
+		materialResource->m_uniformProperties[name] = uniform.value;
+	}
+	
 }
 
 void MaterialAsset::setName(const std::string& name)
@@ -538,13 +539,13 @@ void MaterialAsset::setSamplerEnabled(const std::string& name, bool isEnabled)
 
 void MaterialAsset::setUniformValue(const std::string& name, const Value& v)
 {
-	data.uniforms[name] = v;
+	data.uniforms[name].value = v;
 }
 
 Value MaterialAsset::getUniformValue(const std::string& name)
 {
 	auto it = data.uniforms.find(name);
-	return it != data.uniforms.end() ? it->second : Value{};
+	return it != data.uniforms.end() ? it->second.value : Value{};
 }
 
 ResourceWrapper<Shader> MaterialAsset::getActiveShader() const
@@ -580,28 +581,44 @@ std::map<std::string, std::shared_ptr<TextureSampler>> MaterialAsset::getSampler
 
 std::map<std::string, EditableUniform> MaterialAsset::getUniformProperties()
 {
-	return m_uniformProperties;
+	return data.uniforms;
 }
 
 void MaterialAsset::serialize(nlohmann::json& j) const
 {
-	// For now, only persist the high-level MaterialData block using
-	// JSON serialization via nlohmann::json's ADL support for basic
-	// types. Complex sampler/uniform state is handled via MaterialData
-	// and engine-side resource creation.
 	j = nlohmann::json::object();
-	j["name"] = data.name;
-	j["renderMode"] = static_cast<int>(data.renderMode);
-	// customShader, uniforms and samplers are omitted for now; they are
-	// resolved via dependencies and MaterialData at import/create time.
+
+	std::stringstream ss;
+	{
+		cereal::JSONOutputArchive archive(ss);
+		archive(cereal::make_nvp("data", data));
+	}
+
+	auto parsed = nlohmann::json::parse(ss.str(), nullptr, false);
+
+	if (!parsed.is_discarded() && parsed.contains("data"))
+		j["data"] = parsed["data"];
+	else
+		j["data"] = nlohmann::json::object();
 }
 
 void MaterialAsset::deserialize(const nlohmann::json& j)
 {
-	if (j.contains("name"))
-		data.name = j.at("name").get<std::string>();
-	if (j.contains("renderMode"))
-		data.renderMode = static_cast<MaterialRenderMode>(j.at("renderMode").get<int>());
-	// customShader, uniforms and samplers remain default; they are
-	// re-established through the import graph and editor interactions.
+	if (!j.contains("data"))
+		return;
+
+	nlohmann::json wrapper;
+	wrapper["data"] = j["data"];
+
+	std::stringstream ss(wrapper.dump());
+
+	try
+	{
+		cereal::JSONInputArchive archive(ss);
+		archive(cereal::make_nvp("data", data));
+	}
+	catch (const std::exception& e)
+	{
+		logError("Failed to deserialize material: {}", e.what());
+	}
 }

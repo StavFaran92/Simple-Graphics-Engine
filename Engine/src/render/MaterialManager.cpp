@@ -11,7 +11,13 @@
 
 Ref<Asset> MaterialTypeManager::createAsset(AssetCreateDescriptor& desc)
 {
-	return createRef< MaterialAsset>();
+	auto materialDesc = dynamic_cast<MaterialCreateDescriptor*>(desc.resourceCreateDescriptor);
+	if (!materialDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return nullptr;
+	}
+	return createRef< MaterialAsset>(*materialDesc);
 }
 
 Ref<Asset> MaterialTypeManager::deserializeAsset(const nlohmann::json& j)

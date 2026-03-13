@@ -509,6 +509,8 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		logWarning("Failed to create asset of type {}", static_cast<int>(type));
 	}
 
+	Engine::get()->getContext()->getProjectAssetRegistry()->save();
+
 	return handle;
 }
 
@@ -575,6 +577,9 @@ AssetHandle<Asset> Assets::populateAssetFromNode(const ImportNode& node, const A
 		// 3) Bind dependency to this asset
 		created->bindDependency(slotName, child.getUID());
 	}
+
+	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(created.info());
+	
 
 	return created;
 }

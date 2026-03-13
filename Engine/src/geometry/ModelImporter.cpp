@@ -36,7 +36,7 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, MaterialData& material
 		if (opacityFactor < 1.f)
 		{
 			materialData.renderMode = MaterialRenderMode::Transparent;
-			materialData.uniforms[SHADER_PROPERTY_PBR_OPACITY_FACTOR] = opacityFactor;
+			materialData.uniforms[SHADER_PROPERTY_PBR_OPACITY_FACTOR].value = opacityFactor;
 			//mat->setUniformValue(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
 		}
 
@@ -46,21 +46,21 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, MaterialData& material
 	if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
 	{
 		//mat->setUniformValue(SHADER_PROPERTY_PBR_COLOR_DIFFUSE, glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b));
-		materialData.uniforms[SHADER_PROPERTY_PBR_COLOR_DIFFUSE] = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+		materialData.uniforms[SHADER_PROPERTY_PBR_COLOR_DIFFUSE].value = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
 	}
 
 	ai_real rounghnessFactor;
 	if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, rounghnessFactor) == aiReturn_SUCCESS)
 	{
 		//mat->setUniformValue(SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR, rounghnessFactor);
-		materialData.uniforms[SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR] = rounghnessFactor;
+		materialData.uniforms[SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR].value = rounghnessFactor;
 	}
 
 	ai_real metallicFactor;
 	if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallicFactor) == aiReturn_SUCCESS)
 	{
 		//mat->setUniformValue(SHADER_PROPERTY_PBR_METALLIC_FACTOR, metallicFactor);
-		materialData.uniforms[SHADER_PROPERTY_PBR_METALLIC_FACTOR] = metallicFactor;
+		materialData.uniforms[SHADER_PROPERTY_PBR_METALLIC_FACTOR].value = metallicFactor;
 	}
 
 
