@@ -29,18 +29,19 @@ void Context::init()
 	
 }
 
-bool Context::addScene(ResourceWrapper<Scene>& scene)
+bool Context::addScene(const AssetHandle<SceneAsset>& sceneAsset)
 {
+	auto scene = sceneAsset.resource();
 	m_scenesCounter += 1;
 	scene->SetID(m_scenesCounter);
-	m_scenes.emplace(m_scenesCounter, scene);
+	m_scenes[m_scenesCounter] = sceneAsset;
 
 	logInfo("Scene {} Added successfully.", std::to_string(m_scenesCounter));
 
 	return true;
 }
 
-bool Context::removeScene(const ResourceWrapper<Scene>& scene)
+bool Context::removeScene(const AssetHandle<SceneAsset>& scene)
 {
 	return false;
 }
@@ -49,6 +50,14 @@ ResourceWrapper<Scene> Context::getActiveScene() const
 {
 	if (m_activeScene == -1)
 		return nullptr;
+
+	return m_scenes.at(m_activeScene).resource();
+}
+
+AssetHandle<SceneAsset> Context::getActiveSceneAsset() const
+{
+	if (m_activeScene == -1)
+		return AssetHandle<SceneAsset>::empty;
 
 	return m_scenes.at(m_activeScene);
 }
@@ -97,7 +106,7 @@ void Context::setActiveScene(uint32_t index)
 
 const std::map<uint32_t, ResourceWrapper<Scene>>& Context::getAllScenes() const
 {
-	return m_scenes;
+	return {}; // todo fix
 }
 
 uint32_t Context::getActiveSceneID() const
@@ -132,7 +141,7 @@ void Context::update(float deltaTime)
 	//	m_scenes[m_activeScene]->startSimulation();
 	//}
 
-	m_scenes[m_activeScene]->update(deltaTime);
+	m_scenes[m_activeScene].resource()->update(deltaTime); // todo fix
 }
 
 void Context::draw(float deltaTime)
@@ -140,7 +149,7 @@ void Context::draw(float deltaTime)
 	if (m_activeScene == -1)
 		return;
 
-	m_scenes[m_activeScene]->draw(deltaTime);
+	m_scenes[m_activeScene].resource()->draw(deltaTime); // todo fix
 }
 
 Window* Context::getWindow() const
@@ -171,5 +180,4 @@ EventSystem* Context::getEventSystem() const
 void Context::close()
 {
 	m_scenes.clear();
-	m_shaders.clear();
 }

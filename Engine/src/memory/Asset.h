@@ -14,6 +14,8 @@ public:
 
 	Asset() = default;
 
+	void updateAsset(AssetUpdateDescriptor desc);
+
 	virtual void bindDependency(const std::string& slot, UUID dependency) {}
 
 	virtual void fillData(ResourceWrapper<Resource> resource) {};
@@ -24,6 +26,7 @@ public:
 protected:
 	virtual std::string getRecommendedExtension(const AssetRecord& aInfo) { return getExtensionFromType(aInfo.aType); };
 protected:
+	UUID uuid;
 	//AssetCreateDescriptor m_createDesc;
 };
 

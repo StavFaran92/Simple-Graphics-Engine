@@ -41,12 +41,14 @@ public:
 
 	void makeDirty(UUID uuid);
 
-	void updateAsset(AssetRecord& aInfo);
+	
 
 	// Unified pipeline entry points
 	AssetHandle<Asset> createAsset(AssetCreateDescriptor desc);
 
 	AssetHandle<Asset> importAsset(AssetCreateDescriptor desc);
+
+	void updateAsset(UUID uuid, AssetUpdateDescriptor desc);
 
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 
@@ -59,6 +61,8 @@ private:
 	void updateRegistry(const AssetRecord& aInfo);
 
 	void addAsset(AssetRecord& aInfo);
+
+	void updateAssetInner(AssetRecord& aInfo);
 
 private:
 	std::unordered_map<UUID, AssetRecord> m_assets;

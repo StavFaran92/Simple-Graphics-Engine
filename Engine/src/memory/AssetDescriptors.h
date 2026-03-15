@@ -83,4 +83,15 @@ struct AssetUpdateDescriptor
 	std::string assetDirectory;
 	std::map<std::string, std::string> attributes;
 	std::string name;
+
+	ResourceCreateDescriptor* resourceBuildDescriptor = nullptr;
+
+	template<typename T, typename... Args>
+	T* makeResourceUpdateDescriptor(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<ResourceCreateDescriptor, T>);
+		T* obj = new T(std::forward<Args>(args)...);
+		resourceUpdateDescriptor = obj;
+		return obj;
+	}
 };

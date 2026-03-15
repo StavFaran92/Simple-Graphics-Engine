@@ -50,7 +50,7 @@ void Assets::addAsset(AssetRecord& aInfo)
 	logInfo("Successfully Added asset: '" + aInfo.name + "'.");
 }
 
-void Assets::updateAsset(AssetRecord& aInfo)
+void Assets::updateAssetInner(AssetRecord& aInfo)
 {
 	updateRegistry(aInfo);
 	m_assets[aInfo.uuid] = aInfo;
@@ -514,6 +514,21 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 	return handle;
 }
 
+void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor desc)
+{
+	auto& record = getInfo(uuid);
+
+	ResourceTypeManager* manager = AssetFactory::getManager(record.aType);
+
+	if (!manager)
+	{
+		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(record.aType));
+		return;
+	}
+
+	manager->saveResource(*desc.resourceBuildDescriptor, record.targetDirectory); // todo fix
+}
+
 AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
 {
 	ResourceTypeManager* manager =
@@ -588,5 +603,5 @@ void Assets::bindResourceToAsset(UUID uuid, ResourceID resID)
 {
 	AssetRecord newAssetInfo = getInfo(uuid);
 	newAssetInfo.resourceID = resID;
-	updateAsset(newAssetInfo);
+	updateAssetInner(newAssetInfo);
 }

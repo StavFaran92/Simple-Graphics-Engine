@@ -8,6 +8,25 @@ public:
 	static void init()
 	{
         Archiver::registerSerializeFunction([]() {
+            SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
+
+            //ResourceTypeManager* manager = AssetFactory::getManager(AssetType::SCENE);
+            //if (!manager)
+            //{
+            //    logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(AssetType::SCENE));
+            //    return AssetHandle<Asset>::empty;
+            //}
+
+            //if (!manager->saveResource(*desc.resourceCreateDescriptor, dest))
+            //{
+            //    logError("Failed to save asset type {} to: {}", static_cast<int>(type), dest.absolute().string());
+            //    return AssetHandle<Asset>::empty;
+            //}
+            
+            AssetUpdateDescriptor desc;
+            desc.makeResourceUpdateDescriptor<SceneCreateDescriptor>();
+            Engine::get()->getContext()->getActiveSceneAsset()->updateAsset(desc);
+
             //SerializedContext serializedContext = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
 
             //auto projectDir = Engine::get()->getProjectDirectory();

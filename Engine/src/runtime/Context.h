@@ -4,6 +4,7 @@
 #include <memory>
 #include "core/Core.h"
 #include "memory/ResourceWrapper.h"
+#include "memory/AssetHandle.h"
 
 class Model;
 class Shader;
@@ -12,6 +13,7 @@ class PointLight;
 class DirectionalLight;
 class Skybox;
 class Object3D;
+class SceneAsset;
 class Scene;
 class Engine;
 class PhongShader;
@@ -35,8 +37,8 @@ class EngineAPI Context
 public:
 	Context(const std::shared_ptr<ProjectAssetRegistry>& par);
 
-	bool addScene(ResourceWrapper<Scene>& scene);
-	bool removeScene(const ResourceWrapper<Scene>& scene);
+	bool addScene(const AssetHandle<SceneAsset>& scene);
+	bool removeScene(const AssetHandle<SceneAsset>& scene);
 
 	Window* getWindow() const;
 	//ImguiHandler* getImguiHandler() const;
@@ -45,6 +47,8 @@ public:
 	//Resource<Material> getDefaultMaterial() const;
 
 	ResourceWrapper<Scene> getActiveScene() const;
+
+	AssetHandle<SceneAsset> getActiveSceneAsset() const;
 
 	void startSimulation();
 
@@ -78,10 +82,7 @@ private:
 
 	int m_activeScene = -1;
 	uint32_t m_scenesCounter = 0;
-	std::map<uint32_t, ResourceWrapper<Scene>> m_scenes;
-
-	std::map<uint32_t, ResourceWrapper<Shader>> m_shaders;
-	uint32_t m_shaderCounter = 0;
+	std::map<uint32_t, AssetHandle<SceneAsset>> m_scenes;
 
 	std::shared_ptr<ProjectAssetRegistry> m_projectAssetRegistry;
 
