@@ -97,7 +97,7 @@ const std::map<std::string, AssetHandle<AnimationAsset>>& Animator::getAllAnimat
 	return m_animations;
 }
 
-void Animator::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+void Animator::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 {
 	(void)scene;
 	if (auto ac = std::dynamic_pointer_cast<Animator>(c))

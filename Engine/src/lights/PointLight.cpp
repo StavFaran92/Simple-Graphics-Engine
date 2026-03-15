@@ -31,7 +31,7 @@ void PointLight::useLight(Shader& shader, int index)
 	shader.setUniformValue(m_name + "["+std::to_string(index) +"]"+ ".quadratic", attenuation.quadratic);
 }
 
-void PointLight::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+void PointLight::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 {
 	(void)scene;
 	if (auto pl = std::dynamic_pointer_cast<PointLight>(c))

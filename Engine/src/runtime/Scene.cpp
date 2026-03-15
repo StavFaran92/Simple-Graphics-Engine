@@ -61,8 +61,17 @@
 #include "systems/VolumetricSystem.h"
 #include "core/Factory.h"
 
+ResourceWrapper<Resource> SceneCreateDescriptor::createResource()
+{
+	return Scene::create();
+}
 
-ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, LoadDescriptor desc)
+ResourceWrapper<Resource> SceneLoadDescriptor::loadResource()
+{
+	return Scene::load(sourcePath, *this);
+}
+
+ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
 	std::string filepath = desc.sourcePath;
 	auto projectDir = Engine::get()->getProjectDirectory();
@@ -75,7 +84,7 @@ ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, LoadDescript
 	{
 		SerializedScene serializedScene;
 		iarchive(serializedScene);
-		Archiver::deserializeScene(serializedScene, *scene.get());
+		Archiver::deserializeScene(serializedScene, scene);
 		return scene;
 
 	}
@@ -1139,8 +1148,6 @@ void Scene::startSimulation()
 		return;
 	}
 
-	m_serializedScene = Archiver::serializeScene(this);
-
 	Engine::get()->getPhysicsSystem()->startScenePhysics(this);
 
 	// Run all User Scriptable Entities scripts
@@ -1222,8 +1229,6 @@ void Scene::stopSimulation()
 	}
 
 	getRegistry().getRegistry().clear();
-
-	Archiver::deserializeScene(m_serializedScene, *this);
 
 	gameEventLayer->setEnabled(false);
 

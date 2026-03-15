@@ -13,6 +13,8 @@
 #include "core/Factory.h"
 #include "component/ObjectComponent.h"
 #include "core/Engine.h"
+#include "component/Transformation.h"
+#include "runtime/Context.h"
 
 ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoadDescriptor desc)
 {
@@ -94,7 +96,7 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 
 	for (SerializedEntity& serializedEntity : m_data.m_serializedPrefab)
 	{
-		auto& e = Archiver::deserializeEntity(serializedEntity, *Engine::get()->getContext()->getActiveScene());
+		auto& e = Archiver::deserializeEntity(serializedEntity, Engine::get()->getContext()->getActiveScene());
 		entity_id oldEntityID = e.getComponent<ObjectComponent>().e.handlerID();
 
 		entityIDRemapTable[oldEntityID] = e;

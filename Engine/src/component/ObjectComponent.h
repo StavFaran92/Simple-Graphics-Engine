@@ -8,7 +8,7 @@ struct EngineAPI ObjectComponent : public Component
 	ObjectComponent() = default;
 	ObjectComponent(Entity e, const std::string& name) : name(name), e(e) {};
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene);
 
 	template <class Archive>
 	void serialize(Archive& archive) {

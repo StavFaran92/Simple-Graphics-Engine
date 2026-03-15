@@ -23,7 +23,7 @@ AssetHandle<MaterialAsset> WaterBodyComponent::getMaterial()
 	return mat;
 }
 
-void WaterBodyComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+void WaterBodyComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 {
 	if (auto tc = std::dynamic_pointer_cast<WaterBodyComponent>(c))
 	{

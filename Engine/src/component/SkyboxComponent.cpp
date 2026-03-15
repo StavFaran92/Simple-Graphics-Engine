@@ -6,7 +6,7 @@
 #include "render/IBL.h"
 #include "texture/TextureTransformer.h"
 
-void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 {
 	if (auto sc = std::dynamic_pointer_cast<SkyboxComponent>(c))
 	{

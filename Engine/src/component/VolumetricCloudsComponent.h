@@ -11,7 +11,7 @@ struct EngineAPI VolumetricCloudsComponent : public Component
 	VolumetricCloudsComponent() = default;
 	VolumetricCloudsComponent(Entity entity);
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene);
 
 	AssetHandle<MaterialAsset> getMaterial();
 

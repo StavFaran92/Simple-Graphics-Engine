@@ -11,7 +11,7 @@ public:
 
 	AssetHandle<ShaderAsset> shader;
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 	{
 		attachSimple<PostProcessComponent>(c, entityHandler);
 	}

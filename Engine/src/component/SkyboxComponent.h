@@ -24,7 +24,7 @@ struct EngineAPI SkyboxComponent : public Component
 	AssetHandle<TextureAsset> originalImage;
 	ResourceWrapper<Texture> cubemapIBL;
 	ResourceWrapper<Texture> cubemap;
-	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
 };
 
 REGISTER_COMPONENT(SkyboxComponent)

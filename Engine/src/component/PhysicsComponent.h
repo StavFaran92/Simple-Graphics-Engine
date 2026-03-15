@@ -38,7 +38,7 @@ struct EngineAPI PhysicsComponent : public Component
 	std::shared_ptr<Collider> collider;
 	ColliderType colliderType = ColliderType::NONE;
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 	{
 		attachSimple<PhysicsComponent>(c, entityHandler);
 	}

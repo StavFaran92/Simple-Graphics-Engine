@@ -565,7 +565,16 @@ void Engine::handleEvents(bool& quit)
 
 void Engine::createStartupScene(const std::shared_ptr<Context>& context, const InitParams& initParams)
 {
-    auto startupScene = std::make_shared<Scene>(m_context.get());
+    AssetCreateDescriptor desc;
+    desc.name = "Scene_0";
+    desc.aType = AssetType::SCENE;
+    auto sceneDesc = desc.makeResourceCreateDescriptor<SceneCreateDescriptor>();
+    AssetHandle<SceneAsset> sceneAsset = getSubSystem<Assets>()->createAsset(desc).as<SceneAsset>();
+
+    auto startupScene = sceneAsset.resource();
+    startupScene->init(m_context.get());
+
+    //auto startupScene = std::make_shared<Scene>(m_context.get());
 
     m_context->addScene(startupScene);
     m_context->setActiveScene(startupScene->getID());

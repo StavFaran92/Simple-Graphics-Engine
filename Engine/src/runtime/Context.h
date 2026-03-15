@@ -26,6 +26,7 @@ class Material;
 class ProjectAssetRegistry;
 class SGE_Regsitry;
 class Archiver;
+struct SerializedScene;
 enum class RenderMode;
 
 
@@ -34,14 +35,8 @@ class EngineAPI Context
 public:
 	Context(const std::shared_ptr<ProjectAssetRegistry>& par);
 
-	//bool addObject(std::shared_ptr<Object3D> object);
-	//bool removeObject(std::shared_ptr <Object3D> object);
-
-	bool addScene(std::shared_ptr<Scene> scene);
-	bool removeScene(std::shared_ptr<Scene> scene);
-
-	bool AddShader(ResourceWrapper<Shader> shader);
-	bool RemoveShader(ResourceWrapper<Shader> shader);
+	bool addScene(ResourceWrapper<Scene>& scene);
+	bool removeScene(const ResourceWrapper<Scene>& scene);
 
 	Window* getWindow() const;
 	//ImguiHandler* getImguiHandler() const;
@@ -49,11 +44,13 @@ public:
 	EventSystem* getEventSystem() const;
 	//Resource<Material> getDefaultMaterial() const;
 
-	std::shared_ptr<Scene> getActiveScene() const;
+	ResourceWrapper<Scene> getActiveScene() const;
+
+	void startSimulation();
+
+	void stopSimulation();
 
 	ProjectAssetRegistry* getProjectAssetRegistry() const;
-
-	void populateScenesFromJSON(const std::string& json);
 
 	SGE_Regsitry& getRegistry() const;
 	
@@ -62,7 +59,7 @@ public:
 
 	//Resource<Texture> getDummyTexture();
 
-	const std::map<uint32_t, std::shared_ptr<Scene>>& getAllScenes() const;
+	const std::map<uint32_t, ResourceWrapper<Scene>>& getAllScenes() const;
 	uint32_t getActiveSceneID() const;
 
 	void save() const;
@@ -81,7 +78,7 @@ private:
 
 	int m_activeScene = -1;
 	uint32_t m_scenesCounter = 0;
-	std::map<uint32_t, std::shared_ptr<Scene>> m_scenes;
+	std::map<uint32_t, ResourceWrapper<Scene>> m_scenes;
 
 	std::map<uint32_t, ResourceWrapper<Shader>> m_shaders;
 	uint32_t m_shaderCounter = 0;
@@ -89,6 +86,8 @@ private:
 	std::shared_ptr<ProjectAssetRegistry> m_projectAssetRegistry;
 
 	std::shared_ptr<SGE_Regsitry> m_orphanRegistry;
+
+	std::shared_ptr<SerializedScene> m_serializedScene;
 };
 
 

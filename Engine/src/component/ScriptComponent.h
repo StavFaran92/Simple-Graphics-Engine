@@ -24,7 +24,7 @@ public:
 		SERIALIZED_MEMBER(entity);
 	}
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene);
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene);
 
 
 	AssetHandle<LuaScriptAsset> script;

@@ -7,7 +7,7 @@ struct EngineAPI RenderableComponent : public Component
 {
 	RenderableComponent() = default;
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 	{
 		(void)scene;
 		attachSimple<RenderableComponent>(c, entityHandler);

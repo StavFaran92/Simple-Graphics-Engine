@@ -2,6 +2,7 @@
 
 #include "memory/Assets.h"
 #include "serialize/Archiver.h"
+#include "core/Engine.h"
 //#include "TextureSerializer.h"
 #include <nlohmann/json.hpp>
 

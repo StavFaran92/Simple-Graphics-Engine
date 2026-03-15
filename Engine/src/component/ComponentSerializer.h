@@ -7,13 +7,13 @@ class EngineAPI ComponentSerializer
 {
 public:
 	using SerializeFn = std::function<std::shared_ptr<Component>(const Entity& e)>;
-	using DeserializeFn = std::function<void(std::shared_ptr<Component>, Entity, Scene&)>;
+	using DeserializeFn = std::function<void(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&)>;
 
 	static void registerSerializeFunc(const SerializeFn& fn);
 	static void serializeComponents(const Entity& e, std::vector<std::shared_ptr<Component>>& components);
 
 	static void registerDeserializeFunc(const DeserializeFn& fn);
-	static void deserializeComponents(const std::vector<std::shared_ptr<Component>>& components, Entity& e, Scene& scene);
+	static void deserializeComponents(const std::vector<std::shared_ptr<Component>>& components, Entity& e, ResourceWrapper<Scene>& scene);
 
 private:
 

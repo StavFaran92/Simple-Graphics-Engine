@@ -21,7 +21,7 @@ Entity Terrain::createTerrain(int width, int height)
 	return terrainEntity;
 }
 
-void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+void Terrain::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 {
 	(void)scene;
 	if (auto tc = std::dynamic_pointer_cast<Terrain>(c))

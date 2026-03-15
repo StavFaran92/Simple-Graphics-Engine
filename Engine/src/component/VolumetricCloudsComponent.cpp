@@ -23,7 +23,7 @@ AssetHandle<MaterialAsset> VolumetricCloudsComponent::getMaterial()
 	return mat;
 }
 
-void VolumetricCloudsComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+void VolumetricCloudsComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 {
 	if (auto tc = std::dynamic_pointer_cast<VolumetricCloudsComponent>(c))
 	{

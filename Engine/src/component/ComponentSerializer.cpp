@@ -22,7 +22,7 @@ void ComponentSerializer::registerDeserializeFunc(const DeserializeFn& fn)
 	getDeserializeFunctionRegistry().push_back(fn);
 }
 
-void ComponentSerializer::deserializeComponents(const std::vector<std::shared_ptr<Component>>& components, Entity& e, Scene& scene)
+void ComponentSerializer::deserializeComponents(const std::vector<std::shared_ptr<Component>>& components, Entity& e, ResourceWrapper<Scene>& scene)
 {
 	auto& funcs = getDeserializeFunctionRegistry();
 	for (const auto& f : funcs)

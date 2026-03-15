@@ -13,6 +13,8 @@
 #include "glm/glm.hpp"
 #include "runtime/Entity.h"
 #include "serialize/Archiver.h"
+#include "memory/AssetDescriptors.h"
+#include "memory/Asset.h"
 
 
 class Model;
@@ -44,7 +46,7 @@ class LightSystem;
 class DeferredRenderer;
 class FrameBufferObject;
 class RenderBufferObject;
-class TextureHandler;
+class Texture;
 class SGE_Regsitry;
 class Entity;
 class RenderView;
@@ -55,17 +57,32 @@ namespace physx {
 }
 template<typename T> class ObjectHandler;
 
+struct SceneData
+{
+	SerializedScene m_serializedScene;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(m_serializedScene);
+	}
+};
+
+struct EngineAPI SceneCreateDescriptor : public ResourceCreateDescriptor
+{
+	SceneData data;
+
+	ResourceWrapper<Resource> createResource() override;
+};
+
+struct EngineAPI SceneLoadDescriptor : public ResourceLoadDescriptor
+{
+	ResourceWrapper<Resource> loadResource() override;
+};
+
 // Resource
 class EngineAPI Scene : public Resource
 {
 public:
-	struct LoadDescriptor : public ResourceLoadDescriptor
-	{
-		ResourceWrapper<Resource> loadResource() override {
-			return Scene::load(*this);
-		}
-	};
-
 	enum class RenderPhase
 	{
 		PRE_RENDER_BEGIN,
@@ -82,8 +99,8 @@ public:
 	Scene() = default;
 	Scene(Context* context);
 
-	static ResourceWrapper<Scene> load(const std::string& fileLocation, LoadDescriptor desc = {});
-	static ResourceWrapper<Scene> load(LoadDescriptor desc);
+	static ResourceWrapper<Scene> load(const std::string& fileLocation, SceneLoadDescriptor desc = {});
+
 	static ResourceWrapper<Scene> create();
 
 	void addCoroutine(const std::function<bool(float)>& coroutine);
@@ -106,8 +123,6 @@ public:
 
 	//int getRenderTarget() const;
 
-	void startSimulation();
-	void stopSimulation();
 	bool isSimulationActive() const;
 
 	Entity getEntityByName(const std::string& name) const;
@@ -133,7 +148,7 @@ public:
     glm::mat4 getGameCameraView() const;
 
     void onWindowResize(int w, int h);
-
+	void init(Context* context);
 private:
 	// -------------------- Methods -------------------- //
 	friend class Context;
@@ -142,7 +157,9 @@ private:
 	inline void SetID(uint32_t id) { m_id = id; }
 	void draw(float deltaTime);
 	
-	void init(Context* context);
+	void startSimulation();
+	void stopSimulation();
+	
 	void clear();
 	void close();
 

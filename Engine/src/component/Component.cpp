@@ -5,7 +5,7 @@
 #include <GL/glew.h>
 #include "render/VertexArrayObject.h"
 
-void InstanceBatch::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, Scene& scene)
+void InstanceBatch::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 {
         (void)scene;
         attachSimple<InstanceBatch>(c, entityHandler);

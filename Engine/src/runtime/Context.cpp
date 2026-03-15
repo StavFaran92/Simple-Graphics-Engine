@@ -20,6 +20,8 @@ Context::Context(const std::shared_ptr<ProjectAssetRegistry>& par)
 	m_projectAssetRegistry = par;
 
 	m_orphanRegistry = std::make_shared<SGE_Regsitry>();
+
+	m_serializedScene = std::make_shared<SerializedScene>();
 }
 
 void Context::init()
@@ -27,7 +29,7 @@ void Context::init()
 	
 }
 
-bool Context::addScene(std::shared_ptr<Scene> scene)
+bool Context::addScene(ResourceWrapper<Scene>& scene)
 {
 	m_scenesCounter += 1;
 	scene->SetID(m_scenesCounter);
@@ -38,40 +40,12 @@ bool Context::addScene(std::shared_ptr<Scene> scene)
 	return true;
 }
 
-bool Context::removeScene(std::shared_ptr<Scene> scene)
+bool Context::removeScene(const ResourceWrapper<Scene>& scene)
 {
 	return false;
 }
 
-bool Context::AddShader(ResourceWrapper<Shader> shader)
-{
-	m_shaderCounter += 1;
-	shader->SetID(m_shaderCounter);
-	m_shaders.emplace(m_shaderCounter, shader);
-
-	logInfo("Shader {} Added successfully.", std::to_string(m_shaderCounter));
-
-	return true;
-}
-
-bool Context::RemoveShader(ResourceWrapper<Shader> shader)
-{
-	uint32_t uid = shader->getID();
-	auto iter = m_shaders.find(uid);
-	if (iter == m_shaders.end())
-	{
-		logError("Could not locate shader {}", uid);
-		return false;
-	}
-
-	m_shaders.erase(iter);
-
-	logInfo("Shader {} Erased successfully.", std::to_string(uid));
-
-	return true;
-}
-
-std::shared_ptr<Scene> Context::getActiveScene() const
+ResourceWrapper<Scene> Context::getActiveScene() const
 {
 	if (m_activeScene == -1)
 		return nullptr;
@@ -79,19 +53,25 @@ std::shared_ptr<Scene> Context::getActiveScene() const
 	return m_scenes.at(m_activeScene);
 }
 
+void Context::startSimulation()
+{
+	auto activeScene = getActiveScene();
+
+	*m_serializedScene = Archiver::serializeScene(activeScene);
+	activeScene->startSimulation();
+}
+
+void Context::stopSimulation()
+{
+	auto activeScene = getActiveScene();
+
+	activeScene->stopSimulation();
+	Archiver::deserializeScene(*m_serializedScene, activeScene);
+}
+
 ProjectAssetRegistry* Context::getProjectAssetRegistry() const
 {
 	return m_projectAssetRegistry.get();
-}
-
-void Context::populateScenesFromJSON(const std::string& json)
-{
-	//auto defaultScene = std::make_shared<Scene>(this);
-
-	//addScene(defaultScene);
-	//m_activeScene = defaultScene->getID();
-
-	//defaultScene->deserialize();
 }
 
 SGE_Regsitry& Context::getRegistry() const
@@ -115,7 +95,7 @@ void Context::setActiveScene(uint32_t index)
 //	return m_dummyTexture;
 //}
 
-const std::map<uint32_t, std::shared_ptr<Scene>>& Context::getAllScenes() const
+const std::map<uint32_t, ResourceWrapper<Scene>>& Context::getAllScenes() const
 {
 	return m_scenes;
 }

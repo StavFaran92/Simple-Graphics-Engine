@@ -134,7 +134,7 @@ static void stopSimulation()
 static void startsimulation()
 {
 	EditorState::Instance().startButtonPressed = true; // Toggle the state
-	Engine::get()->getContext()->getActiveScene()->startSimulation();
+	Engine::get()->getContext()->startSimulation();
 
 	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
 	uiLayer->setEnabled(false);

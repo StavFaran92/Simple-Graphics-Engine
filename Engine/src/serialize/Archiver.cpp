@@ -33,10 +33,10 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	return serializedEntity;
 }
 
-Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
+Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, ResourceWrapper<Scene>& scene)
 {
-	auto e = scene.getRegistry().getRegistry().create(serializedEnt.entity);
-	auto entityHandler = Entity(e, &scene.getRegistry());
+	auto e = scene->getRegistry().getRegistry().create(serializedEnt.entity);
+	auto entityHandler = Entity(e, &scene->getRegistry());
 
 	ComponentSerializer::deserializeComponents(serializedEnt.components, entityHandler, scene);
 
@@ -44,7 +44,7 @@ Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, Scene& scene)
 
 }
 
-SerializedScene Archiver::serializeScene(Scene* scene)
+SerializedScene Archiver::serializeScene(ResourceWrapper<Scene>& scene)
 {
 	SerializedScene serializedScene;
 
@@ -65,7 +65,7 @@ SerializedScene Archiver::serializeScene(Scene* scene)
 	return serializedScene;
 }
 
-void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
+void Archiver::deserializeScene(SerializedScene serializedScene, ResourceWrapper<Scene>& scene)
 {
 	//scene.getRegistry().getRegistry().clear();
 
@@ -74,12 +74,12 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 		deserializeEntity(serializedEnt, scene);
 	}
 
-	Entity gameCameraEntity(serializedScene.gameCamera, &scene.getRegistry());
+	Entity gameCameraEntity(serializedScene.gameCamera, &scene->getRegistry());
 	if (!gameCameraEntity.valid() || !gameCameraEntity.HasComponent<CameraComponent>())
 	{
 		logError("Invalid game camera serialized, creating a new camera.");
 
-		gameCameraEntity = scene.createEntity("Main Camera");
+		gameCameraEntity = scene->createEntity("Main Camera");
 		gameCameraEntity.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 1000.0f));
 		gameCameraEntity.getComponent<Transformation>().setLocalPosition({ 10,10,10 });
 		gameCameraEntity.getComponent<CameraComponent>().center = { 0,0,0 };
@@ -87,11 +87,11 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 		gameCameraEntity.addComponent<MeshRendererComponent>().mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CAMERA);
 		gameCameraEntity.addComponent<RenderableComponent>();
 	}
-	scene.setGameCamera(gameCameraEntity);
+	scene->setGameCamera(gameCameraEntity);
 
 	// We postpone the transform update because at the moment of transform creation not all transforms 
 	// have been created yet.
-	for (auto& [e, trans] : scene.getRegistry().getRegistry().view<Transformation>().each())
+	for (auto& [e, trans] : scene->getRegistry().getRegistry().view<Transformation>().each())
 	{
 		trans.forceUpdate();
 	}
@@ -99,32 +99,32 @@ void Archiver::deserializeScene(SerializedScene serializedScene, Scene& scene)
 	
 }
 
-SerializedContext Archiver::serializeContext(const Context* ctx)
-{
-	SerializedContext serializedContext;
-
-	for (auto& [sceneID, scene] : ctx->getAllScenes())
-	{
-		serializedContext.serializedScenes[sceneID] = serializeScene(scene.get());
-	}
-
-	serializedContext.activeScene = ctx->getActiveSceneID();
-
-	return serializedContext;
-}
-
-void Archiver::deserializeContext(SerializedContext serializedContext, Context* ctx)
-{
-	ctx->m_scenes.clear();
-
-	ctx->m_activeScene = serializedContext.activeScene;
-
-	for (auto& [sceneID, serializedScene] : serializedContext.serializedScenes)
-	{
-		std::shared_ptr<Scene> scene = std::make_shared<Scene>(ctx);
-		ctx->m_scenes[sceneID] = scene;
-		deserializeScene(serializedScene, *scene.get());
-	}
-
-	
-}
+//SerializedContext Archiver::serializeContext(const Context* ctx)
+//{
+//	SerializedContext serializedContext;
+//
+//	for (auto& [sceneID, scene] : ctx->getAllScenes())
+//	{
+//		serializedContext.serializedScenes[sceneID] = serializeScene(scene.get());
+//	}
+//
+//	serializedContext.activeScene = ctx->getActiveSceneID();
+//
+//	return serializedContext;
+//}
+//
+//void Archiver::deserializeContext(SerializedContext serializedContext, Context* ctx)
+//{
+//	ctx->m_scenes.clear();
+//
+//	ctx->m_activeScene = serializedContext.activeScene;
+//
+//	for (auto& [sceneID, serializedScene] : serializedContext.serializedScenes)
+//	{
+//		std::shared_ptr<Scene> scene = std::make_shared<Scene>(ctx);
+//		ctx->m_scenes[sceneID] = scene;
+//		deserializeScene(serializedScene, *scene.get());
+//	}
+//
+//	
+//}

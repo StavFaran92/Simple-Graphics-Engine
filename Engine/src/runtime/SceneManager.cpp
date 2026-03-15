@@ -31,7 +31,26 @@ bool SceneTypeManager::importAsset(const std::string& src, ImportNode& result)
 
 bool SceneTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
 {
-	return false;
+	auto sceneDesc = dynamic_cast<const SceneCreateDescriptor*>(&desc);
+	if (!sceneDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
+	std::ofstream os(dst.absolute());
+	cereal::JSONOutputArchive oarchive(os);
+
+	try
+	{
+		oarchive(sceneDesc->data);
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Serialization Error occured: {}", e.what());
+	}
+
+	return true;
 }
 
 ResourceLoadDescriptor* SceneTypeManager::makeResourceLoadDescriptor()

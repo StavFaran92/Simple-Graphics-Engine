@@ -73,7 +73,7 @@ public:
 
 	RayHit raycast(const Ray& ray, float maxDistance = 10000.0f);
 
-	static void attachToEntity(std::shared_ptr<Component>, Entity, Scene&);
+	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
