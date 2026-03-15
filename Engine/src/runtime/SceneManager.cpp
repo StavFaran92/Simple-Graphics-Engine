@@ -55,7 +55,7 @@ bool SceneTypeManager::saveResource(const ResourceCreateDescriptor& desc, const 
 
 ResourceLoadDescriptor* SceneTypeManager::makeResourceLoadDescriptor()
 {
-	return nullptr;
+	return new SceneLoadDescriptor();
 }
 
 ResourceWrapper<Resource> SceneTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

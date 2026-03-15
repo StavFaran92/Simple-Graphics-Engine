@@ -6,7 +6,7 @@
 #include "runtime/Scene.h"
 #include "geometry/ModelImporter.h"
 #include "component/MeshRendererComponent.h"
-#include "component/ShaderComponent.h"
+#include "component/Transformation.h"
 #include "component/RenderableComponent.h"
 #include "component/VolumetricCloudsComponent.h"
 #include "component/VolumeComponent.h"

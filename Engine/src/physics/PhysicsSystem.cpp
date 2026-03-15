@@ -14,6 +14,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include "component/PlayerControllerComponent.h"
 #include "memory/BuiltInAssets.h"
+#include "component/Terrain.h"
 
 
 using namespace physx;

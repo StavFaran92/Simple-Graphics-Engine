@@ -12,6 +12,7 @@
 #include "render/Material.h"
 #include "runtime/Prefab.h"
 #include "runtime/Scene.h"
+#include "runtime/Context.h"
 #include "scripts/LuaScript.h"
 #include "texture/Texture.h"
 #include "component/CameraComponent.h"
@@ -503,7 +504,7 @@ void bindAll(sol::state& lua)
 
     
 
-    lua.set_function("getActiveScene", []() { return  std::ref(*Engine::get()->getContext()->getActiveScene()); });
+    lua.set_function("getActiveScene", []() { return  Engine::get()->getContext()->getActiveScene(); });
     lua.set_function("assets", []() { return std::ref(*Engine::get()->getSubSystem<Assets>()); });
 
 }

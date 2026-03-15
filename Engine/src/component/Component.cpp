@@ -51,36 +51,36 @@ const std::vector<glm::mat4> InstanceBatch::getMatrices() const
 
 void InstanceBatch::build()
 {
-	if (mesh.isEmpty() || transformations.empty()) return;
+	//if (mesh.isEmpty() || transformations.empty()) return;
 
-	auto matrices = getMatrices();
+	//auto matrices = getMatrices();
 
-	mesh.get()->getVAO()->Bind();
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
-	glBufferData(GL_ARRAY_BUFFER, getCount() * sizeof(glm::mat4), matrices.data(), GL_STATIC_DRAW);
+	//mesh.get()->getVAO()->Bind();
+	//glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	//glBufferData(GL_ARRAY_BUFFER, getCount() * sizeof(glm::mat4), matrices.data(), GL_STATIC_DRAW);
 
-	//VertexLayout layout;
-	//layout.attribs = {
-	//	LayoutAttribute::InstanceModel_0,
-	//	LayoutAttribute::InstanceModel_1,
-	//	LayoutAttribute::InstanceModel_2,
-	//	LayoutAttribute::InstanceModel_3,
-	//};
+	////VertexLayout layout;
+	////layout.attribs = {
+	////	LayoutAttribute::InstanceModel_0,
+	////	LayoutAttribute::InstanceModel_1,
+	////	LayoutAttribute::InstanceModel_2,
+	////	LayoutAttribute::InstanceModel_3,
+	////};
 
-	//mesh.get()->setVertexLayout(layout);
+	////mesh.get()->setVertexLayout(layout);
 
-	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-	glEnableVertexAttribArray(7);
-	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
-	glEnableVertexAttribArray(8);
-	glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
-	glEnableVertexAttribArray(9);
-	glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+	//glEnableVertexAttribArray(6);
+	//glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+	//glEnableVertexAttribArray(7);
+	//glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+	//glEnableVertexAttribArray(8);
+	//glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+	//glEnableVertexAttribArray(9);
+	//glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
 
-	glVertexAttribDivisor(6, 1);
-	glVertexAttribDivisor(7, 1);
-	glVertexAttribDivisor(8, 1);
-	glVertexAttribDivisor(9, 1);
+	//glVertexAttribDivisor(6, 1);
+	//glVertexAttribDivisor(7, 1);
+	//glVertexAttribDivisor(8, 1);
+	//glVertexAttribDivisor(9, 1);
 }
 

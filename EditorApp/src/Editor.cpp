@@ -122,7 +122,7 @@ uint32_t g_previewWindowID = 0;
 static void stopSimulation()
 {
 	EditorState::Instance().startButtonPressed = false; // Toggle the state
-	Engine::get()->getContext()->getActiveScene()->stopSimulation();
+	Engine::get()->getContext()->stopSimulation();
 
 	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_editorCamera);
 	Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(false);

@@ -73,18 +73,24 @@ ResourceWrapper<Resource> SceneLoadDescriptor::loadResource()
 
 ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
+	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
-	auto projectDir = Engine::get()->getProjectDirectory();
-	filepath = projectDir + filepath;
 	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
+
+	//std::string filepath = desc.sourcePath;
+	//auto projectDir = Engine::get()->getProjectDirectory();
+	//filepath = projectDir + filepath;
+	//std::ifstream is(filepath);
+	//cereal::JSONInputArchive iarchive(is);
 	ResourceWrapper<Scene> scene = Factory<Scene>::create();
+	scene->init(Engine::get()->getContext());
 
 	try
 	{
-		SerializedScene serializedScene;
-		iarchive(serializedScene);
-		Archiver::deserializeScene(serializedScene, scene);
+		SceneData sceneData;
+		iarchive(sceneData);
+		Archiver::deserializeScene(sceneData.m_serializedScene, scene);
 		return scene;
 
 	}
