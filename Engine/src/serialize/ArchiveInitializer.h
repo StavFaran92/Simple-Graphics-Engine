@@ -8,7 +8,7 @@ public:
 	static void init()
 	{
         Archiver::registerSerializeFunction([]() {
-            SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
+            //SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
 
             //ResourceTypeManager* manager = AssetFactory::getManager(AssetType::SCENE);
             //if (!manager)
@@ -23,9 +23,9 @@ public:
             //    return AssetHandle<Asset>::empty;
             //}
             
-            AssetUpdateDescriptor desc;
-            desc.makeResourceUpdateDescriptor<SceneCreateDescriptor>();
-            Engine::get()->getContext()->getActiveSceneAsset()->updateAsset(desc);
+            //AssetUpdateDescriptor desc;
+            //desc.makeResourceUpdateDescriptor<SceneCreateDescriptor>();
+            //Engine::get()->getContext()->getActiveSceneAsset()->updateAsset(desc);
 
             //SerializedContext serializedContext = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
 

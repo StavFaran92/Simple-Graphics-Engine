@@ -152,6 +152,7 @@ public:
 private:
 	// -------------------- Methods -------------------- //
 	friend class Context;
+	friend class SceneManager;
 	friend class Archiver;
 	void update(float deltaTime);
 	inline void SetID(uint32_t id) { m_id = id; }

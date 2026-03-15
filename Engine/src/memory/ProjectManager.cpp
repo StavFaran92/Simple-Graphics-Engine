@@ -5,6 +5,7 @@
 #include "core/Engine.h"
 //#include "TextureSerializer.h"
 #include <nlohmann/json.hpp>
+#include "runtime/Scene.h"
 
 using json = nlohmann::json;
 
@@ -23,4 +24,12 @@ void ProjectManager::saveProject()
     // Save Assets
     Engine::get()->getContext()->save();
     Archiver::save();
+
+    SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
+
+    AssetUpdateDescriptor desc;
+    desc.makeResourceUpdateDescriptor<SceneCreateDescriptor>()->data.m_serializedScene = serializedScene;
+    UUID uid = Engine::get()->getContext()->getActiveSceneAsset().getUID();
+    Engine::get()->getSubSystem<Assets>()->updateAsset(uid, desc);
+    //Engine::get()->getContext()->getActiveSceneAsset()->updateAsset(desc);
 }

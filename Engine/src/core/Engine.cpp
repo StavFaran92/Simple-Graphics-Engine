@@ -576,7 +576,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
 
     //auto startupScene = std::make_shared<Scene>(m_context.get());
 
-    m_context->addScene(startupScene);
+    m_context->addScene(sceneAsset);
     m_context->setActiveScene(startupScene->getID());
 
     // Add default dir light

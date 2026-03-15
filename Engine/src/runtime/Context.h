@@ -15,6 +15,7 @@ class Skybox;
 class Object3D;
 class SceneAsset;
 class Scene;
+class SceneManager;
 class Engine;
 class PhongShader;
 class PickingShader;
@@ -66,6 +67,8 @@ public:
 	const std::map<uint32_t, ResourceWrapper<Scene>>& getAllScenes() const;
 	uint32_t getActiveSceneID() const;
 
+	SceneManager* getSceneManager() const;
+
 	void save() const;
 
 	void close();
@@ -80,15 +83,11 @@ private:
 	void draw(float deltaTime);
 	void init();
 
-	int m_activeScene = -1;
-	uint32_t m_scenesCounter = 0;
-	std::map<uint32_t, AssetHandle<SceneAsset>> m_scenes;
+	std::shared_ptr<SceneManager> m_sceneManager;
 
 	std::shared_ptr<ProjectAssetRegistry> m_projectAssetRegistry;
 
 	std::shared_ptr<SGE_Regsitry> m_orphanRegistry;
-
-	std::shared_ptr<SerializedScene> m_serializedScene;
 };
 
 

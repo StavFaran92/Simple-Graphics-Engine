@@ -1,27 +1,40 @@
 #pragma once
 
-#include "memory/ResourcePipeline.h"
+#include <map>
+#include <memory>
+#include "core/Core.h"
+#include "memory/ResourceWrapper.h"
+#include "memory/AssetHandle.h"
 
-class SceneTypeManager : public ResourceTypeManager
+class SceneAsset;
+class Scene;
+struct SerializedScene;
+
+class EngineAPI SceneManager
 {
 public:
+	SceneManager();
 
+	bool addScene(const AssetHandle<SceneAsset>& scene);
+	bool removeScene(const AssetHandle<SceneAsset>& scene);
 
-	// Inherited via ResourceTypeManager
-	Ref<Asset> createAsset(AssetCreateDescriptor& desc) override;
+	ResourceWrapper<Scene> getActiveScene() const;
+	AssetHandle<SceneAsset> getActiveSceneAsset() const;
 
-	Ref<Asset> deserializeAsset(const nlohmann::json& j) override;
+	void setActiveScene(uint32_t index);
 
-	bool importAsset(const std::string& src, ImportNode& result) override;
+	const std::map<uint32_t, ResourceWrapper<Scene>>& getAllScenes() const;
+	uint32_t getActiveSceneID() const;
 
-	bool saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst) override;
+	void startSimulation();
+	void stopSimulation();
 
-	ResourceLoadDescriptor* makeResourceLoadDescriptor() override;
+	void close();
 
-	ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) override;
-
-	void parse(ResourceLoadDescriptor& desc) override;
-
-	void parse(ResourceCreateDescriptor& desc) override;
-
+private:
+	int m_activeScene = -1;
+	uint32_t m_scenesCounter = 0;
+	std::map<uint32_t, AssetHandle<SceneAsset>> m_scenes;
+	std::map<uint32_t, ResourceWrapper<Scene>> m_scenesCache; // Cache for getAllScenes()
+	std::shared_ptr<SerializedScene> m_serializedScene;
 };

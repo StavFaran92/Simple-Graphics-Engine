@@ -91,7 +91,7 @@ struct AssetUpdateDescriptor
 	{
 		static_assert(std::is_base_of_v<ResourceCreateDescriptor, T>);
 		T* obj = new T(std::forward<Args>(args)...);
-		resourceUpdateDescriptor = obj;
+		resourceBuildDescriptor = obj;
 		return obj;
 	}
 };

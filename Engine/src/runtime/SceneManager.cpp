@@ -1,73 +1,92 @@
-#include "SceneManager.h"
+#include "runtime/SceneManager.h"
 
 #include "runtime/Scene.h"
-#include "memory/AssetDescriptors.h"
-#include "memory/AssetRecord.h"
 #include "memory/AssetHandle.h"
-#include "core/Engine.h"
+#include "serialize/Archiver.h"
+#include "core/Logger.h"
 
-#include <fstream>
-#include <cereal/archives/json.hpp>
-
-
-
-Ref<Asset> SceneTypeManager::createAsset(AssetCreateDescriptor& desc)
+SceneManager::SceneManager()
 {
-	return createRef<SceneAsset>();
+	m_serializedScene = std::make_shared<SerializedScene>();
 }
 
-Ref<Asset> SceneTypeManager::deserializeAsset(const nlohmann::json& j)
+bool SceneManager::addScene(const AssetHandle<SceneAsset>& sceneAsset)
 {
-	auto asset = createRef<SceneAsset>();
-	asset->deserialize(j);
-	return asset;
-}
+	auto scene = sceneAsset.resource();
+	m_scenesCounter += 1;
+	scene->SetID(m_scenesCounter);
+	m_scenes[m_scenesCounter] = sceneAsset;
+	m_scenesCache[m_scenesCounter] = scene;
 
-bool SceneTypeManager::importAsset(const std::string& src, ImportNode& result)
-{
-	// Scene import not implemented
-	return false;
-}
-
-bool SceneTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
-{
-	auto sceneDesc = dynamic_cast<const SceneCreateDescriptor*>(&desc);
-	if (!sceneDesc)
-	{
-		logError("Invalid Descriptor specified.");
-		return false;
-	}
-
-	std::ofstream os(dst.absolute());
-	cereal::JSONOutputArchive oarchive(os);
-
-	try
-	{
-		oarchive(sceneDesc->data);
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Serialization Error occured: {}", e.what());
-	}
+	logInfo("Scene {} Added successfully.", std::to_string(m_scenesCounter));
 
 	return true;
 }
 
-ResourceLoadDescriptor* SceneTypeManager::makeResourceLoadDescriptor()
+bool SceneManager::removeScene(const AssetHandle<SceneAsset>& scene)
 {
-	return new SceneLoadDescriptor();
+	return false;
 }
 
-ResourceWrapper<Resource> SceneTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceWrapper<Scene> SceneManager::getActiveScene() const
 {
-	return ResourceWrapper<Resource>();
+	if (m_activeScene == -1)
+		return nullptr;
+
+	return m_scenes.at(m_activeScene).resource();
 }
 
-void SceneTypeManager::parse(ResourceLoadDescriptor& desc)
+AssetHandle<SceneAsset> SceneManager::getActiveSceneAsset() const
 {
+	if (m_activeScene == -1)
+		return AssetHandle<SceneAsset>::empty;
+
+	return m_scenes.at(m_activeScene);
 }
 
-void SceneTypeManager::parse(ResourceCreateDescriptor& desc)
+void SceneManager::setActiveScene(uint32_t index)
 {
+	if (index > m_scenesCounter)
+	{
+		logError("Illegal index specified: " + std::to_string(index));
+		return;
+	}
+
+	m_activeScene = index;
 }
 
+const std::map<uint32_t, ResourceWrapper<Scene>>& SceneManager::getAllScenes() const
+{
+	return m_scenesCache;
+}
+
+uint32_t SceneManager::getActiveSceneID() const
+{
+	return m_activeScene;
+}
+
+void SceneManager::startSimulation()
+{
+	auto activeScene = getActiveScene();
+	if (activeScene.isEmpty())
+		return;
+
+	*m_serializedScene = Archiver::serializeScene(activeScene);
+	activeScene->startSimulation();
+}
+
+void SceneManager::stopSimulation()
+{
+	auto activeScene = getActiveScene();
+	if (activeScene.isEmpty())
+		return;
+
+	activeScene->stopSimulation();
+	Archiver::deserializeScene(*m_serializedScene, activeScene);
+}
+
+void SceneManager::close()
+{
+	m_scenes.clear();
+	m_scenesCache.clear();
+}

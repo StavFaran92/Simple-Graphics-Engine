@@ -5,6 +5,7 @@
 #include "camera/ICamera.h"
 #include "render/Shader.h"
 
+#include "runtime/SceneManager.h"
 #include "runtime/Scene.h"
 #include "core/Engine.h"
 
@@ -21,7 +22,7 @@ Context::Context(const std::shared_ptr<ProjectAssetRegistry>& par)
 
 	m_orphanRegistry = std::make_shared<SGE_Regsitry>();
 
-	m_serializedScene = std::make_shared<SerializedScene>();
+	m_sceneManager = std::make_shared<SceneManager>();
 }
 
 void Context::init()
@@ -31,51 +32,32 @@ void Context::init()
 
 bool Context::addScene(const AssetHandle<SceneAsset>& sceneAsset)
 {
-	auto scene = sceneAsset.resource();
-	m_scenesCounter += 1;
-	scene->SetID(m_scenesCounter);
-	m_scenes[m_scenesCounter] = sceneAsset;
-
-	logInfo("Scene {} Added successfully.", std::to_string(m_scenesCounter));
-
-	return true;
+	return m_sceneManager->addScene(sceneAsset);
 }
 
 bool Context::removeScene(const AssetHandle<SceneAsset>& scene)
 {
-	return false;
+	return m_sceneManager->removeScene(scene);
 }
 
 ResourceWrapper<Scene> Context::getActiveScene() const
 {
-	if (m_activeScene == -1)
-		return nullptr;
-
-	return m_scenes.at(m_activeScene).resource();
+	return m_sceneManager->getActiveScene();
 }
 
 AssetHandle<SceneAsset> Context::getActiveSceneAsset() const
 {
-	if (m_activeScene == -1)
-		return AssetHandle<SceneAsset>::empty;
-
-	return m_scenes.at(m_activeScene);
+	return m_sceneManager->getActiveSceneAsset();
 }
 
 void Context::startSimulation()
 {
-	auto activeScene = getActiveScene();
-
-	*m_serializedScene = Archiver::serializeScene(activeScene);
-	activeScene->startSimulation();
+	m_sceneManager->startSimulation();
 }
 
 void Context::stopSimulation()
 {
-	auto activeScene = getActiveScene();
-
-	activeScene->stopSimulation();
-	Archiver::deserializeScene(*m_serializedScene, activeScene);
+	m_sceneManager->stopSimulation();
 }
 
 ProjectAssetRegistry* Context::getProjectAssetRegistry() const
@@ -90,13 +72,7 @@ SGE_Regsitry& Context::getRegistry() const
 
 void Context::setActiveScene(uint32_t index)
 {
-	if (index > m_scenesCounter)
-	{
-		logError("Illegal index specified: " + index);
-		return;
-	}
-
-	m_activeScene = index;
+	m_sceneManager->setActiveScene(index);
 }
 
 //Resource<Texture> Context::getDummyTexture()
@@ -106,12 +82,17 @@ void Context::setActiveScene(uint32_t index)
 
 const std::map<uint32_t, ResourceWrapper<Scene>>& Context::getAllScenes() const
 {
-	return {}; // todo fix
+	return m_sceneManager->getAllScenes();
 }
 
 uint32_t Context::getActiveSceneID() const
 {
-	return m_activeScene;
+	return m_sceneManager->getActiveSceneID();
+}
+
+SceneManager* Context::getSceneManager() const
+{
+	return m_sceneManager.get();
 }
 
 void Context::save() const
@@ -133,23 +114,25 @@ RenderMode Context::getRenderMode() const
 
 void Context::update(float deltaTime)
 {
-	if (m_activeScene == -1)
+	auto activeScene = m_sceneManager->getActiveScene();
+	if (activeScene.isEmpty())
 		return;
 
-	//if (!m_scenes[m_activeScene]->isSimulationActive())
+	//if (!activeScene->isSimulationActive())
 	//{
-	//	m_scenes[m_activeScene]->startSimulation();
+	//	activeScene->startSimulation();
 	//}
 
-	m_scenes[m_activeScene].resource()->update(deltaTime); // todo fix
+	activeScene->update(deltaTime);
 }
 
 void Context::draw(float deltaTime)
 {
-	if (m_activeScene == -1)
+	auto activeScene = m_sceneManager->getActiveScene();
+	if (activeScene.isEmpty())
 		return;
 
-	m_scenes[m_activeScene].resource()->draw(deltaTime); // todo fix
+	activeScene->draw(deltaTime);
 }
 
 Window* Context::getWindow() const
@@ -179,5 +162,5 @@ EventSystem* Context::getEventSystem() const
 
 void Context::close()
 {
-	m_scenes.clear();
+	m_sceneManager->close();
 }
