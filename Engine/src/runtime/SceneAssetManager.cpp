@@ -38,7 +38,8 @@ bool SceneAssetManager::saveResource(const ResourceCreateDescriptor& desc, const
 		return false;
 	}
 
-	std::ofstream os(dst.absolute());
+	auto path = dst.absolute();
+	std::ofstream os(path);
 	cereal::JSONOutputArchive oarchive(os);
 
 	try

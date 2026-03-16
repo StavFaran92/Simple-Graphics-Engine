@@ -13,7 +13,9 @@ ResourceWrapper<Resource> Test::loadAssetResourceInternal(const AssetRecord& rec
 
     assert(loadDesc);
 
-    loadDesc->sourcePath = Engine::get()->getProjectDirectory() + record.relativefilePath;
+    ScopedPath p = record.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+    p.setPath(record.relativefilePath);
+    loadDesc->sourcePath = p.absolute().string();
 
     ResourceWrapper<Resource> resource = loadDesc->loadResource();
 

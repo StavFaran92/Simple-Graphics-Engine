@@ -458,7 +458,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 
 	AssetRecord record(desc);
 	record.parse();
-	record.relativefilePath = dest.scoped().string();
+	record.relativefilePath = dest.relative().string();
 	record.asset = asset;
 	addAsset(record);
 
@@ -525,8 +525,11 @@ void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor desc)
 		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(record.aType));
 		return;
 	}
+	
+	ScopedPath p = record.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+	p.setPath(record.relativefilePath);
 
-	manager->saveResource(*desc.resourceBuildDescriptor, record.targetDirectory); // todo fix
+	manager->saveResource(*desc.resourceBuildDescriptor, p); // todo fix
 }
 
 AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)

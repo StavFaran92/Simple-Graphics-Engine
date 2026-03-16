@@ -78,7 +78,7 @@ void Archiver::deserializeScene(SerializedScene serializedScene, ResourceWrapper
 	Entity gameCameraEntity(serializedScene.gameCamera, &scene->getRegistry());
 	if (!gameCameraEntity.valid() || !gameCameraEntity.HasComponent<CameraComponent>())
 	{
-		logError("Invalid game camera serialized, creating a new camera.");
+		logWarning("Invalid game camera serialized, creating a new camera.");
 
 		gameCameraEntity = scene->createEntity("Main Camera");
 		gameCameraEntity.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 1000.0f));
