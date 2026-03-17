@@ -573,7 +573,6 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     AssetHandle<SceneAsset> sceneAsset = getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
 
     auto startupScene = sceneAsset.resource();
-    startupScene->init(m_context.get());
 
     //auto startupScene = std::make_shared<Scene>(m_context.get());
 
