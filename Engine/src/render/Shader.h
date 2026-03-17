@@ -30,11 +30,6 @@ struct EngineAPI ShaderLoadDescriptor : public ResourceLoadDescriptor
 
 	ShaderOverride shaderOverride = ShaderOverride::None;
 
-	json fillParams() const override
-	{
-		return *this;
-	}
-
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(ShaderLoadDescriptor,
 		shaderOverride
 	);

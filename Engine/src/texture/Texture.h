@@ -135,11 +135,6 @@ struct EngineAPI TextureLoadDescriptor : public ResourceLoadDescriptor
 	TextureFilter filter = TextureFilter::Linear;
 	TextureWrap wrap = TextureWrap::Repeat;
 
-	nlohmann::json fillParams() const override
-	{
-		return *this;
-	}
-
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(TextureLoadDescriptor,
 		genMipMap,
 		flip,

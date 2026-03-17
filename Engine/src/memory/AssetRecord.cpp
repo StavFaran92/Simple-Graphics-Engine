@@ -25,12 +25,9 @@ void to_json(nlohmann::json& j, const AssetRecord& r)
 		{"uuid", r.uuid},
 		{"sourcePath", r.sourcePath},
 		{"aType", r.aType},
-		{"engineAttributes", r.engineAttributes},
 		{"isEngineOwned", r.isEngineOwned},
 		{"assetDirectory", r.assetDirectory},
-		{"fileName", r.fileName},
 		{"relativefilePath", r.relativefilePath},
-		{"ext", r.ext},
 		{"asset", serializeAsset(r.asset)}
 	};
 }
@@ -41,12 +38,9 @@ void from_json(const nlohmann::json& j, AssetRecord& r)
 	j.at("uuid").get_to(r.uuid);
 	j.at("sourcePath").get_to(r.sourcePath);
 	j.at("aType").get_to(r.aType);
-	j.at("engineAttributes").get_to(r.engineAttributes);
 	j.at("isEngineOwned").get_to(r.isEngineOwned);
 	j.at("assetDirectory").get_to(r.assetDirectory);
-	j.at("fileName").get_to(r.fileName);
 	j.at("relativefilePath").get_to(r.relativefilePath);
-	j.at("ext").get_to(r.ext);
 
 	nlohmann::json jsonAsset = j.at("asset");
 	Ref<Asset> asset = AssetFactory::getManager(r.aType)->deserializeAsset(jsonAsset);
@@ -81,42 +75,4 @@ void AssetRecord::makeDirty()
 bool AssetRecord::isDirty() const
 {
 	return m_isDirty;
-}
-
-void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
-{
-	// TODO fix
-
-	//if (!uDesc.assetDirectory.empty())
-	//{
-	//	assetDirectory = uDesc.assetDirectory;
-	//}
-
-	if (!uDesc.name.empty())
-	{
-		name = uDesc.name;
-	}
-
-	fileName = name + ext;
-
-	relativefilePath = "";
-	if (isEngineOwned)
-	{
-		relativefilePath += "Engine/";
-	}
-	else
-	{
-		relativefilePath += "Content/";
-	}
-
-	if (!assetDirectory.empty())
-	{
-		relativefilePath += assetDirectory + "/";
-	}
-
-	relativefilePath += "/" + fileName;
-
-	relativefilePath = std::filesystem::path(relativefilePath).lexically_normal().generic_string();
-
-	//establishFilepath();
 }

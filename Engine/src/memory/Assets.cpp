@@ -220,34 +220,54 @@ void Assets::deleteAsset(UUID uuid)
 	m_assets.erase(aInfo.uuid);
 }
 
-ScopedPath calculateAssetDestinationPathCreate(const AssetBuildDescriptor& desc)
+ScopedPath calculateAssetDestinationPath(
+	bool isEngineOwned,
+	const std::filesystem::path& relativeFolder,
+	const std::string& assetName,
+	AssetType type)
 {
-	// Determine root
-	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+	ScopedPath p = isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
 
-	// determine relative folder
-	std::filesystem::path relativefolder;
-	if (!desc.assetDirectory.empty())
-	{
-		relativefolder = desc.assetDirectory;
-	}
+	assert(type != AssetType::NONE);
+	assert(!assetName.empty());
 
-	assert(desc.aType != AssetType::NONE);
-	assert(!desc.name.empty());
+	std::string ext = getExtensionFromType(type);
 
-	// determine file name
-	auto& path = std::filesystem::path(desc.name);
-	std::string name = path.filename().string();
+	std::filesystem::path filename = assetName + ext;
 
-	// determine externsion
-	std::string ext = getExtensionFromType(desc.aType);
-
-	std::filesystem::path filename = name + ext;
-
-	p.setPath(relativefolder / filename);
+	p.setPath(relativeFolder / filename);
 
 	return p;
 }
+
+//ScopedPath calculateAssetDestinationPathCreate(const AssetBuildDescriptor& desc)
+//{
+//	// Determine root
+//	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+//
+//	// determine relative folder
+//	std::filesystem::path relativefolder;
+//	if (!desc.assetDirectory.empty())
+//	{
+//		relativefolder = desc.assetDirectory;
+//	}
+//
+//	assert(desc.aType != AssetType::NONE);
+//	assert(!desc.name.empty());
+//
+//	// determine file name
+//	auto& path = std::filesystem::path(desc.name);
+//	std::string name = path.filename().string();
+//
+//	// determine externsion
+//	std::string ext = getExtensionFromType(desc.aType);
+//
+//	std::filesystem::path filename = name + ext;
+//
+//	p.setPath(relativefolder / filename);
+//
+//	return p;
+//}
 
 AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
 {
@@ -265,7 +285,7 @@ AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuild
 	manager->parse(resourceDesc);
 
 	// Save the asset to disk
-	ScopedPath dest = calculateAssetDestinationPathCreate(desc);
+	ScopedPath dest = calculateAssetDestinationPath(desc.isEngineOwned, desc.assetDirectory, desc.name, desc.aType);
 
 	// Verify target dir exists
 	fs::create_directories(dest.absolute().parent_path());

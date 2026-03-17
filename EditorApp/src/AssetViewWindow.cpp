@@ -226,20 +226,8 @@ void AssetViewWindow::display()
 					ImGui::Separator();
 					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
 					ImGui::Text("Path: %s", aInfo.relativefilePath.c_str());
-					ImGui::Text("Extension: %s", aInfo.ext.c_str());
 					ImGui::Text("UUID: %s", aInfo.uuid.str().c_str());
-					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);
-
-					if (aInfo.engineAttributes.size() > 0)
-					{
-						ImGui::LabelText("##Attributes:", "Attributes:");
-						for (const auto& [attribName, attribVal] : aInfo.engineAttributes)
-						{
-							ImGui::Text("%s: %s", attribName.c_str(), attribVal.c_str());
-
-						}
-					}
-					
+					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);				
 
 				}
 				ImGui::EndTooltip();

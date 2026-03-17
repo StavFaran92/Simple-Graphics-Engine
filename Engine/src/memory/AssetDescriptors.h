@@ -5,17 +5,11 @@
 #include "memory/ResourceBase.h"
 #include "fileSystem/ScopedPath.h"
 
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
 struct ResourceLoadDescriptor
 {
 	virtual ~ResourceLoadDescriptor() = default;
 
 	virtual ResourceWrapper<Resource> loadResource() = 0;
-
-	virtual nlohmann::json fillParams() const { return {}; } // todo consider remove
 
 	std::string sourcePath;
 };

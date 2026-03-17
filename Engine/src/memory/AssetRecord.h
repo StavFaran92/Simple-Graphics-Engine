@@ -19,17 +19,11 @@ struct EngineAPI AssetRecord
 	UUID uuid = EMPTY_UUID;
 	std::string sourcePath;
 	AssetType aType = AssetType::NONE;
-	std::map<std::string, std::string> engineAttributes;
 	bool isEngineOwned = false;
 	bool isTransient = false;
-	bool isCompositeAsset = false; // this asset is composed of multiple external files 
 	ScopedPath targetDirectory;
-	std::string assetDirectory; // todo consider remove
+	std::string assetDirectory;
 	std::string relativefilePath;
-	//std::string fullFilePath;
-	std::string fileName;
-	std::string ext;
-	nlohmann::json importSettings;
 	Ref<Asset> asset;
 	ResourceID resourceID = 0;
 
@@ -45,36 +39,6 @@ struct EngineAPI AssetRecord
 
 	void makeDirty();
 	bool isDirty() const;
-
-	void update(const AssetUpdateDescriptor& desc);
-	//void establishFilepath();
-
-	//NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRecord,
-	//	name,
-	//	uuid,
-	//	sourcePath,
-	//	aType,
-	//	engineAttributes,
-	//	isEngineOwned,
-	//	assetDirectory,
-	//	fileName,
-	//	relativefilePath,
-	//	ext
-	//);
-
-	//template <class Archive>
-	//void serialize(Archive& archive) {
-	//	SERIALIZED_MEMBER(name);
-	//	SERIALIZED_MEMBER(uuid);
-	//	SERIALIZED_MEMBER(sourcePath);
-	//	SERIALIZED_MEMBER(engineAttributes);
-	//	SERIALIZED_MEMBER(isEngineOwned);
-	//	SERIALIZED_MEMBER(assetDirectory);
-	//	SERIALIZED_MEMBER(fileName);
-	//	SERIALIZED_MEMBER(relativefilePath);
-	//	SERIALIZED_MEMBER(ext);
-	//	SERIALIZED_MEMBER(asset);
-	//}
 		
 
 private:
