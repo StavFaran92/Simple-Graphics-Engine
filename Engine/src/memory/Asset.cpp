@@ -9,7 +9,7 @@
 //{
 //}
 
-void Asset::updateAsset(AssetUpdateDescriptor desc)
+void Asset::updateAsset(AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc)
 {
-	Engine::get()->getSubSystem<Assets>()->updateAsset(uuid, desc);
+	Engine::get()->getSubSystem<Assets>()->updateAsset(uuid, desc, resourceDesc);
 }

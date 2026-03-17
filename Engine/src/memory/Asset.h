@@ -14,7 +14,7 @@ public:
 
 	Asset() = default;
 
-	void updateAsset(AssetUpdateDescriptor desc);
+	void updateAsset(AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
 
 	virtual void bindDependency(const std::string& slot, UUID dependency) {}
 

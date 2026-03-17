@@ -44,11 +44,11 @@ public:
 	
 
 	// Unified pipeline entry points
-	AssetHandle<Asset> createAsset(AssetCreateDescriptor desc, ResourceCreateDescriptor& resourceDesc);
+	AssetHandle<Asset> createAsset(AssetCreateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
 
-	AssetHandle<Asset> importAsset(AssetCreateDescriptor desc, ResourceLoadDescriptor& resourceDesc);
+	AssetHandle<Asset> importAsset(AssetCreateDescriptor& desc, ResourceLoadDescriptor& resourceDesc);
 
-	void updateAsset(UUID uuid, AssetUpdateDescriptor desc);
+	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
 
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 

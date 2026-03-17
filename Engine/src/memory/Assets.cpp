@@ -417,7 +417,7 @@ ScopedPath calculateAssetDestinationPathCreate(const AssetCreateDescriptor& desc
 	return p;
 }
 
-AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc, ResourceCreateDescriptor& resourceDesc)
+AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor& desc, ResourceCreateDescriptor& resourceDesc)
 {
 	AssetType type = desc.aType;
 
@@ -460,7 +460,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc, ResourceCreat
 	return AssetHandle<Asset>(record.uuid);
 }
 
-AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc, ResourceLoadDescriptor& resourceDesc)
+AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor& desc, ResourceLoadDescriptor& resourceDesc)
 {
 	AssetType type = desc.aType;
 
@@ -469,12 +469,6 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc, ResourceLoadD
 	{
 		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;
-	}
-
-	// Ensure sourcePath is set
-	if (resourceDesc.sourcePath.empty())
-	{
-		resourceDesc.sourcePath = desc.sourcePath;
 	}
 
 	// Parse the resource descriptor
@@ -507,7 +501,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc, ResourceLoadD
 	return handle;
 }
 
-void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor desc)
+void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc)
 {
 	auto& record = getInfo(uuid);
 
@@ -522,7 +516,7 @@ void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor desc)
 	ScopedPath p = record.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
 	p.setPath(record.relativefilePath);
 
-	manager->saveResource(*desc.resourceBuildDescriptor, p);
+	manager->saveResource(resourceDesc, p);
 }
 
 AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
