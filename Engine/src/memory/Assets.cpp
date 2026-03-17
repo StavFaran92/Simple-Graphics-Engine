@@ -222,7 +222,8 @@ void Assets::deleteAsset(UUID uuid)
 
 ScopedPath calculateAssetDestinationPath(
 	bool isEngineOwned,
-	const std::filesystem::path& relativeFolder,
+	const std::filesystem::path& targetFolder,
+	const std::filesystem::path& parentFolder,
 	const std::string& assetName,
 	AssetType type)
 {
@@ -235,7 +236,7 @@ ScopedPath calculateAssetDestinationPath(
 
 	std::filesystem::path filename = assetName + ext;
 
-	p.setPath(relativeFolder / filename);
+	p.setPath(targetFolder / parentFolder / filename);
 
 	return p;
 }
@@ -285,7 +286,7 @@ AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuild
 	manager->parse(resourceDesc);
 
 	// Save the asset to disk
-	ScopedPath dest = calculateAssetDestinationPath(desc.isEngineOwned, desc.assetDirectory, desc.name, desc.aType);
+	ScopedPath dest = calculateAssetDestinationPath(desc.isEngineOwned, desc.targetDirectory.relative(), desc.assetDirectory, desc.name, desc.aType);
 
 	// Verify target dir exists
 	fs::create_directories(dest.absolute().parent_path());
@@ -364,11 +365,28 @@ void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDe
 		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(record.aType));
 		return;
 	}
-	
-	ScopedPath p = record.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
-	p.setPath(record.relativefilePath);
 
-	manager->saveResource(resourceDesc, p);
+	std::string newName = record.name;
+	if (!desc.name.empty())
+	{
+		newName = desc.name;
+	}
+
+	ScopedPath dest = calculateAssetDestinationPath(record.isEngineOwned, desc.targetDirectory.relative(), record.assetDirectory, newName, record.aType);
+
+	// Verify target dir exists
+	fs::create_directories(dest.absolute().parent_path());
+
+	//TODO might not need to save resource if not changed
+	//if(!manager->saveResource(resourceDesc, dest))
+	//{
+	//	logError("Failed to save resource type {} to: {}", static_cast<int>(type), dest.absolute().string());
+	//	return AssetHandle<Asset>::empty;
+	//}
+
+	AssetRecord newRecord = record;
+	newRecord.relativefilePath = dest.relative().string();
+	updateAssetInner(newRecord);
 }
 
 AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc)
