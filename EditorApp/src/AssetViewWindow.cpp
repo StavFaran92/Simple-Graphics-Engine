@@ -146,7 +146,7 @@ void AssetViewWindow::display()
 					continue; // Skip unwanted files
 
 				
-				std::string relativeFilePath = (cwd.path().scoped() / filename).generic_string();
+				std::string relativeFilePath = filename;
 				UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
 				if (!assets->hasAsset(uuid)) continue;
 
@@ -219,7 +219,7 @@ void AssetViewWindow::display()
 				
 				if (!fMetadata.isDirectory)
 				{
-					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
+					std::string relativeFilePath = fMetadata.filename;
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
 					const AssetRecord& aInfo = assets->getInfo(uuid);
 					ImGui::TextUnformatted(aInfo.name.c_str());
@@ -249,7 +249,7 @@ void AssetViewWindow::display()
 			{
 				if (ImGui::Selectable("Edit"))
 				{
-					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
+					std::string relativeFilePath = fMetadata.filename;
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
 					const AssetRecord& aInfo = assets->getInfo(uuid);
 
@@ -276,7 +276,7 @@ void AssetViewWindow::display()
 
 				if (ImGui::Selectable("Reimport"))
 				{
-					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
+					std::string relativeFilePath = fMetadata.filename;
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
 					Engine::get()->getSubSystem<Assets>()->getAsset(uuid).reimportAsset();
 				}
@@ -290,7 +290,7 @@ void AssetViewWindow::display()
 				{
 					if (!fMetadata.isDirectory)
 					{
-						std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
+						std::string relativeFilePath = fMetadata.filename;
 						UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
 						auto& asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 						std::string path = asset.info().relativefilePath;
@@ -318,7 +318,7 @@ void AssetViewWindow::display()
 
 				if (!fMetadata.isDirectory)
 				{
-					std::string relativeFilePath = (cwd.path().scoped() / fMetadata.filename).generic_string();
+					std::string relativeFilePath = fMetadata.filename;
 					UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
 					const AssetRecord& aInfo = assets->getInfo(uuid);
 
