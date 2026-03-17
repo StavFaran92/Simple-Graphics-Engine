@@ -27,7 +27,7 @@ void FoliageField::build(int newW, int newH)
 	//tData.data = data.data();
 	//ResourceWrapper<Texture> foliageSpreadMap = Texture::create2DTextureFromBuffer(tData);
 
-	//AssetCreateDescriptor desc;
+	//AssetBuildDescriptor desc;
 	//desc.isEngineOwned = true;
 	//desc.aType = AssetType::TEXTURE;
 	//desc.name = "Terrain_Foliage_SpreadMap"; // TODO Think of unique name mechanic here

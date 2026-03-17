@@ -34,7 +34,7 @@ bool TextureImportDialog::acceptContent()
 {
 	if (uniqueName.isValid())
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 

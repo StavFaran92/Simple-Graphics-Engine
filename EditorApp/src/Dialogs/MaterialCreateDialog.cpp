@@ -9,7 +9,7 @@ MaterialCreateDialog::MaterialCreateDialog()
 
 void MaterialCreateDialog::appearContent()
 {
-	AssetCreateDescriptor desc;
+	AssetBuildDescriptor desc;
 	desc.aType = AssetType::MATERIAL;
 	desc.name = "SGE_MATERIAL_TEMP";
 	MaterialCreateDescriptor matDesc;
@@ -32,7 +32,7 @@ bool MaterialCreateDialog::acceptContent()
 {
 	if (m_uniqueName.isValid())
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MATERIAL;
 		desc.name = m_uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();

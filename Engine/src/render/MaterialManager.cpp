@@ -9,7 +9,7 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-Ref<Asset> MaterialTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
+Ref<Asset> MaterialTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
 	auto materialDesc = dynamic_cast<const MaterialCreateDescriptor*>(&resourceDesc);
 	if (!materialDesc)
@@ -33,7 +33,7 @@ bool MaterialTypeManager::importAsset(const std::string& src, ImportNode& result
 	return false;
 }
 
-bool MaterialTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool MaterialTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
 	auto materialDesc = dynamic_cast<const MaterialCreateDescriptor*>(&desc);
 	if (!materialDesc)
@@ -71,6 +71,6 @@ void MaterialTypeManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void MaterialTypeManager::parse(ResourceCreateDescriptor& desc)
+void MaterialTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }

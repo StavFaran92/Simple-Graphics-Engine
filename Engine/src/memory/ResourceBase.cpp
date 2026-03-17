@@ -21,7 +21,7 @@ ResourceWrapper<Resource> Resource::load(ResourceLoadDescriptor& desc)
 	return resource;
 }
 
-ResourceWrapper<Resource> Resource::create(ResourceCreateDescriptor& desc)
+ResourceWrapper<Resource> Resource::create(ResourceBuildDescriptor& desc)
 {
 	AssetType type = desc.aType;
 

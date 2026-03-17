@@ -150,7 +150,7 @@ struct EngineAPI TextureLoadDescriptor : public ResourceLoadDescriptor
 	);
 };
 
-struct EngineAPI TextureCreateDescriptor : public ResourceCreateDescriptor
+struct EngineAPI TextureCreateDescriptor : public ResourceBuildDescriptor
 {
 	TextureData textureData;
 

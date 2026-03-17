@@ -9,7 +9,7 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-Ref<Asset> PrefabTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
+Ref<Asset> PrefabTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
 	return createRef< PrefabAsset>();
 }
@@ -27,7 +27,7 @@ bool PrefabTypeManager::importAsset(const std::string& src, ImportNode& result)
 	return false;
 }
 
-bool PrefabTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool PrefabTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
 	auto prefabDesc = dynamic_cast<const PrefabCreateDescriptor*>(&desc);
 	if (!prefabDesc)
@@ -65,7 +65,7 @@ void PrefabTypeManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void PrefabTypeManager::parse(ResourceCreateDescriptor& desc)
+void PrefabTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }
 

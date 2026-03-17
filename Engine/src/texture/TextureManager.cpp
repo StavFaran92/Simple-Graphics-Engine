@@ -11,7 +11,7 @@
 
 #include <filesystem>
 
-Ref<Asset> TextureTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
+Ref<Asset> TextureTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
 	return createRef< TextureAsset>();
 }
@@ -39,7 +39,7 @@ bool TextureTypeManager::importAsset(const std::string& src, ImportNode& result)
 	return true;
 }
 
-bool TextureTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool TextureTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
 	auto textureDesc = dynamic_cast<const TextureCreateDescriptor*>(&desc);
 	if (!textureDesc)
@@ -69,6 +69,6 @@ void TextureTypeManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void TextureTypeManager::parse(ResourceCreateDescriptor& desc)
+void TextureTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }

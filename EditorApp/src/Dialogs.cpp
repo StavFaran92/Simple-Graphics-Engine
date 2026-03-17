@@ -270,7 +270,7 @@ void displayTextureCreatorDialog()
 				textureData.wrap = TextureWrap::Clamp;
 				textureData.data = nullptr;
 				textureData.fillEmpty = true;
-				AssetCreateDescriptor desc;
+				AssetBuildDescriptor desc;
 				desc.aType = AssetType::TEXTURE;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
@@ -339,7 +339,7 @@ void displayShaderCreatorDialog()
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{
-			AssetCreateDescriptor desc;
+			AssetBuildDescriptor desc;
 			desc.aType = AssetType::SHADER;
 			desc.name = uniqueName.name;
 			desc.sourcePath = filepath.m_filepath;
@@ -381,7 +381,7 @@ void displayLuaScriptCreatorDialog()
 		{
 			if (uniqueName.isValid())
 			{
-				AssetCreateDescriptor desc;
+				AssetBuildDescriptor desc;
 				desc.aType = AssetType::LUA_SCRIPT;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
@@ -431,7 +431,7 @@ void displayMaterialCreatorDialog()
 	//	{
 	//		if (uniqueName.isValid())
 	//		{
-	//			AssetCreateDescriptor desc;
+	//			AssetBuildDescriptor desc;
 	//			desc.aType = AssetType::MATERIAL;
 	//			desc.name = uniqueName.name;
 	//			Engine::get()->getSubSystem<Assets>()->createAsset(tempMaterial, desc);

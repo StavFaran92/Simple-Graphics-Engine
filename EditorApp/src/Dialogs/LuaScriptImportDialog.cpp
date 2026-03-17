@@ -31,7 +31,7 @@ bool LuaScriptImportDialog::acceptContent()
 {
 	if (uniqueName.isValid())
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::LUA_SCRIPT;
 		desc.name = uniqueName.name;
 		desc.sourcePath = filepath.m_filepath;

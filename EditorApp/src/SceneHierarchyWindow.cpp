@@ -49,7 +49,7 @@ void displayEntityHelper(Entity& e)
 			{
 				std::string assetName = state.getSelectedEntity().getComponent<ObjectComponent>().name;
 
-				AssetCreateDescriptor aInfo;
+				AssetBuildDescriptor aInfo;
 				aInfo.aType = AssetType::PREFAB;
 				aInfo.name = assetName;
 				PrefabCreateDescriptor createDesc;

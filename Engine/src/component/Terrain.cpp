@@ -48,7 +48,7 @@ AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
 	tData.filter = TextureFilter::Linear;
 	tData.wrap = TextureWrap::Clamp;
 
-	AssetCreateDescriptor desc;
+	AssetBuildDescriptor desc;
 	desc.aType = AssetType::TEXTURE;
 	desc.name = "SGE_TERRAIN_HEIGHTMAP";
 	desc.isEngineOwned = true;

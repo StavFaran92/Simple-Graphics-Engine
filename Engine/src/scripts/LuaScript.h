@@ -3,7 +3,7 @@
 #include "core/Core.h"
 #include "memory/Asset.h"
 
-struct EngineAPI LuaScriptCreateDescriptor : public ResourceCreateDescriptor
+struct EngineAPI LuaScriptCreateDescriptor : public ResourceBuildDescriptor
 {
 	//MaterialData data;
 

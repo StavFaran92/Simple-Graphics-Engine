@@ -562,7 +562,7 @@ ResourceWrapper<Shader> MaterialAsset::getActiveShader() const
 
 AssetHandle<MaterialAsset> MaterialAsset::clone(bool isEngineOwned) const
 {
-	AssetCreateDescriptor desc;
+	AssetBuildDescriptor desc;
 	desc.aType = AssetType::MATERIAL;
 	desc.name = data.name + "_clone";
 	desc.isEngineOwned = isEngineOwned;

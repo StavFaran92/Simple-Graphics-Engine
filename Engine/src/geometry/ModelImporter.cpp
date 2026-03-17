@@ -422,7 +422,7 @@ bool ModelImporter::parseModel(const std::string& filepath, ModelImporter::Model
 //
 //			
 //
-//			AssetCreateDescriptor materialAssetInfo;
+//			AssetBuildDescriptor materialAssetInfo;
 //			materialAssetInfo.isEngineOwned = aInfo.isEngineOwned;
 //			materialAssetInfo.assetDirectory = aInfo.assetDirectory;
 //			materialAssetInfo.targetDirectory = aInfo.targetDirectory;

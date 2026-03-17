@@ -11,7 +11,7 @@
 
 
 
-Ref<Asset> SceneAssetManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
+Ref<Asset> SceneAssetManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
 	return createRef<SceneAsset>();
 }
@@ -29,7 +29,7 @@ bool SceneAssetManager::importAsset(const std::string& src, ImportNode& result)
 	return false;
 }
 
-bool SceneAssetManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool SceneAssetManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
 	auto sceneDesc = dynamic_cast<const SceneCreateDescriptor*>(&desc);
 	if (!sceneDesc)
@@ -68,6 +68,6 @@ void SceneAssetManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void SceneAssetManager::parse(ResourceCreateDescriptor& desc)
+void SceneAssetManager::parse(ResourceBuildDescriptor& desc)
 {
 }

@@ -25,7 +25,7 @@ Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
     }
     else if (texType == TexType::EQUIRECTANGULAR)
     {
-        AssetCreateDescriptor texDesc;
+        AssetBuildDescriptor texDesc;
         texDesc.aType = AssetType::TEXTURE;
         TextureLoadDescriptor loadDesc;
         loadDesc.sourcePath = textureFilepath;

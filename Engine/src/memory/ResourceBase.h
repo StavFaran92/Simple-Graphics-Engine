@@ -6,7 +6,7 @@ template<typename T>
 class ResourceWrapper;
 
 struct ResourceLoadDescriptor;
-struct ResourceCreateDescriptor;
+struct ResourceBuildDescriptor;
 
 class Resource
 {
@@ -23,5 +23,5 @@ public:
 
 	// Unified pipeline entry points (delegate to ResourceTypeManager registry)
 	static ResourceWrapper<Resource> load(ResourceLoadDescriptor& desc);
-	static ResourceWrapper<Resource> create(ResourceCreateDescriptor& desc);
+	static ResourceWrapper<Resource> create(ResourceBuildDescriptor& desc);
 };

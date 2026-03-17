@@ -565,7 +565,7 @@ void Engine::handleEvents(bool& quit)
 
 void Engine::createStartupScene(const std::shared_ptr<Context>& context, const InitParams& initParams)
 {
-    AssetCreateDescriptor desc;
+    AssetBuildDescriptor desc;
     desc.name = "Scene_0";
     desc.aType = AssetType::SCENE;
     SceneCreateDescriptor sceneDesc;
@@ -599,7 +599,7 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     auto& postProcess = eFXAA.addComponent<PostProcessComponent>();
 
 
-    AssetCreateDescriptor shaderAssetDesc;
+    AssetBuildDescriptor shaderAssetDesc;
     shaderAssetDesc.aType = AssetType::SHADER;
     shaderAssetDesc.name = "FXAAShader";
     shaderAssetDesc.isEngineOwned = true;

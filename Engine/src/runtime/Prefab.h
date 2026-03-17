@@ -15,7 +15,7 @@ struct PrefabData
 	}
 };
 
-struct EngineAPI PrefabCreateDescriptor : public ResourceCreateDescriptor
+struct EngineAPI PrefabCreateDescriptor : public ResourceBuildDescriptor
 {
 	ResourceWrapper<Resource> createResource() override;
 

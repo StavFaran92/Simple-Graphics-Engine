@@ -8,7 +8,7 @@
 
 #include <filesystem>
 
-Ref<Asset> LuaScriptTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
+Ref<Asset> LuaScriptTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
 	return createRef< LuaScriptAsset>();
 }
@@ -32,7 +32,7 @@ bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& resul
 	return true;
 }
 
-bool LuaScriptTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool LuaScriptTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
 	return false;
 }
@@ -51,7 +51,7 @@ void LuaScriptTypeManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void LuaScriptTypeManager::parse(ResourceCreateDescriptor& desc)
+void LuaScriptTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }
 

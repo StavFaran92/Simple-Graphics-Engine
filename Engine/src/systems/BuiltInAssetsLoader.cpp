@@ -22,7 +22,7 @@ void BuiltInAssetsLoader::loadTextures()
 	{
 		static unsigned char whiteColor[3] = { 255, 255, 255 };
 
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.name = "SGE_TEXTURE_WHITE";
 		desc.isEngineOwned = true;
@@ -45,7 +45,7 @@ void BuiltInAssetsLoader::loadTextures()
 	{
 		static unsigned char blackColor[3] = { 0, 0, 0 };
 
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.name = "SGE_TEXTURE_BLACK";
 		desc.isEngineOwned = true;
@@ -66,7 +66,7 @@ void BuiltInAssetsLoader::loadTextures()
 	}
 
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.isEngineOwned = true;
 		desc.name = "SGE_TEXTURE_GRASS";
@@ -82,7 +82,7 @@ void BuiltInAssetsLoader::loadMaterials()
 {
 	// TODO: procedural material creation needs MaterialCreateDescriptor + IResourceFactory impl
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MATERIAL;
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_DEFAULT;
@@ -93,7 +93,7 @@ void BuiltInAssetsLoader::loadMaterials()
 	}
 
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MATERIAL;
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
@@ -111,7 +111,7 @@ void BuiltInAssetsLoader::loadMeshes()
 	// binding VBOs all on the GPU, it should return the raw data directly on the CPU.
 
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_BOX";
 		desc.isEngineOwned = true;
@@ -123,7 +123,7 @@ void BuiltInAssetsLoader::loadMeshes()
 	}
 
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_QUAD";
 		desc.isEngineOwned = true;
@@ -134,7 +134,7 @@ void BuiltInAssetsLoader::loadMeshes()
 	}
 
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_SPHERE";
 		desc.isEngineOwned = true;
@@ -145,7 +145,7 @@ void BuiltInAssetsLoader::loadMeshes()
 	}
 
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_GRID";
 		desc.isEngineOwned = true;
@@ -156,7 +156,7 @@ void BuiltInAssetsLoader::loadMeshes()
 	}
 
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_CAMERA";
 		desc.isEngineOwned = true;

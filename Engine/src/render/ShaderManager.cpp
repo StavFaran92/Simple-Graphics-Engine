@@ -7,7 +7,7 @@
 
 #include <filesystem>
 
-Ref<Asset> ShaderTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
+Ref<Asset> ShaderTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
 	return createRef< ShaderAsset>();
 }
@@ -25,7 +25,7 @@ bool ShaderTypeManager::importAsset(const std::string& src, ImportNode& result)
 	return false;
 }
 
-bool ShaderTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool ShaderTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
 	return false;
 }
@@ -44,7 +44,7 @@ void ShaderTypeManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void ShaderTypeManager::parse(ResourceCreateDescriptor& desc)
+void ShaderTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }
 

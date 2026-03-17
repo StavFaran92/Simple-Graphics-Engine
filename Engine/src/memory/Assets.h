@@ -13,11 +13,11 @@ class EngineAPI Assets : public SubSystem
 public:
 	Assets();
 
-	AssetHandle<Asset> createAsset(AssetCreateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
+	AssetHandle<Asset> createAsset(AssetBuildDescriptor& desc, ResourceBuildDescriptor& resourceDesc);
 
-	AssetHandle<Asset> importAsset(AssetCreateDescriptor& desc, ResourceLoadDescriptor& resourceDesc);
+	AssetHandle<Asset> importAsset(AssetBuildDescriptor& desc, ResourceLoadDescriptor& resourceDesc);
 
-	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
+	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDescriptor& resourceDesc);
 
 	void deleteAsset(UUID uuid);
 
@@ -51,9 +51,9 @@ public:
 
 private:
 
-	AssetHandle<Asset> createAssetsFromImportNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
+	AssetHandle<Asset> createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc);
 
-	AssetHandle<Asset> createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetCreateDescriptor& rootDesc);
+	AssetHandle<Asset> createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc);
 
 	void updateRegistry(const AssetRecord& aInfo);
 

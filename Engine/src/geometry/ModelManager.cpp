@@ -9,7 +9,7 @@
 #include "memory/AssetHandle.h"
 #include "core/Engine.h"
 
-Ref<Asset> ModelTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
+Ref<Asset> ModelTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
 	return createRef< ModelAsset>();
 }
@@ -107,7 +107,7 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 	return true;
 }
 
-bool ModelTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool ModelTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
 	auto meshGroupDesc = dynamic_cast<const ModelCreateDescriptor*>(&desc);
 	if (!meshGroupDesc)
@@ -138,6 +138,6 @@ void ModelTypeManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void ModelTypeManager::parse(ResourceCreateDescriptor& desc)
+void ModelTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }

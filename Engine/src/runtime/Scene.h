@@ -67,7 +67,7 @@ struct SceneData
 	}
 };
 
-struct EngineAPI SceneCreateDescriptor : public ResourceCreateDescriptor
+struct EngineAPI SceneCreateDescriptor : public ResourceBuildDescriptor
 {
 	SceneData data;
 

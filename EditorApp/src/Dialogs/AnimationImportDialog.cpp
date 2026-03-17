@@ -31,7 +31,7 @@ bool AnimationImportDialog::acceptContent()
 {
 	if (uniqueName.isValid())
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::ANIMATION;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();

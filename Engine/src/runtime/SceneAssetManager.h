@@ -8,13 +8,13 @@ public:
 
 
 	// Inherited via ResourceTypeManager
-	Ref<Asset> createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc) override;
+	Ref<Asset> createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc) override;
 
 	Ref<Asset> deserializeAsset(const nlohmann::json& j) override;
 
 	bool importAsset(const std::string& src, ImportNode& result) override;
 
-	bool saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst) override;
+	bool saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst) override;
 
 	ResourceLoadDescriptor* makeResourceLoadDescriptor() override;
 
@@ -22,6 +22,6 @@ public:
 
 	void parse(ResourceLoadDescriptor& desc) override;
 
-	void parse(ResourceCreateDescriptor& desc) override;
+	void parse(ResourceBuildDescriptor& desc) override;
 
 };

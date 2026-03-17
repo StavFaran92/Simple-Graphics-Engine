@@ -25,7 +25,7 @@ bool SceneCreateDialog::acceptContent()
 {
 	if (m_uniqueName.isValid())
 	{
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::SCENE;
 		desc.name = m_uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();

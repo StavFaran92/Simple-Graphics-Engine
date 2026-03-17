@@ -4,12 +4,12 @@
 #include "memory/Assets.h"
 #include "core/Engine.h"
 //
-//Asset::Asset(const AssetCreateDescriptor& desc)
+//Asset::Asset(const AssetBuildDescriptor& desc)
 //	:m_createDesc (desc)
 //{
 //}
 
-void Asset::updateAsset(AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc)
+void Asset::updateAsset(AssetUpdateDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
 {
 	Engine::get()->getSubSystem<Assets>()->updateAsset(uuid, desc, resourceDesc);
 }

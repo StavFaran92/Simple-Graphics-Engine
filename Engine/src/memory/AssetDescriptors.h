@@ -23,16 +23,16 @@ struct ResourceLoadDescriptor
 	std::string sourcePath;
 };
 
-struct ResourceCreateDescriptor
+struct ResourceBuildDescriptor
 {
-	virtual ~ResourceCreateDescriptor() = default;
+	virtual ~ResourceBuildDescriptor() = default;
 
 	virtual ResourceWrapper<Resource> createResource() = 0;
 
 	AssetType aType = AssetType::NONE;
 };
 
-struct AssetCreateDescriptor
+struct AssetBuildDescriptor
 {
 	std::string name;
 	std::string sourcePath;
@@ -44,7 +44,7 @@ struct AssetCreateDescriptor
 	ScopedPath targetDirectory;
 	std::string assetDirectory; // todo consider remove
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetCreateDescriptor,
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetBuildDescriptor,
 		name,
 		aType,
 		engineAttributes,

@@ -24,7 +24,7 @@ Entity WaterSystem::createPool()
 	waterBodyNestedImpl.setParent(waterBodyEntity);
 
 	// TODO use grid instead
-	AssetCreateDescriptor meshDesc;
+	AssetBuildDescriptor meshDesc;
 	meshDesc.aType = AssetType::MESH;
 	meshDesc.isEngineOwned = true;
 	meshDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx";
@@ -34,7 +34,7 @@ Entity WaterSystem::createPool()
 	auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(meshDesc, meshLoadDesc).as<ModelAsset>();
 	auto& meshRendererComponent = waterBodyNestedImpl.addComponent<MeshRendererComponent>(mesh);
 
-	AssetCreateDescriptor shaderDesc;
+	AssetBuildDescriptor shaderDesc;
 	shaderDesc.aType = AssetType::SHADER;
 	shaderDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl";
 	shaderDesc.name = "WaterShader";
@@ -45,7 +45,7 @@ Entity WaterSystem::createPool()
 	shaderLoadDesc.shaderOverride = ShaderOverride::PBR;
 	auto shaderAsset = Engine::get()->getSubSystem<Assets>()->importAsset(shaderDesc, shaderLoadDesc).as<ShaderAsset>();
 
-	AssetCreateDescriptor materialDesc;
+	AssetBuildDescriptor materialDesc;
 	materialDesc.aType = AssetType::MATERIAL;
 	materialDesc.name = "WaterMaterial";
 	materialDesc.isEngineOwned = true;
@@ -56,7 +56,7 @@ Entity WaterSystem::createPool()
 
 	meshRendererComponent.setMaterial(0, materialAsset);
 
-	AssetCreateDescriptor waterNormalDesc;
+	AssetBuildDescriptor waterNormalDesc;
 	waterNormalDesc.aType = AssetType::TEXTURE;
 	waterNormalDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/water_new_height.png";
 	TextureLoadDescriptor waterNormalLoadDesc;

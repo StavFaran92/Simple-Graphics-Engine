@@ -35,7 +35,7 @@ bool ModelImportDialog::acceptContent()
 		auto entity = Engine::get()->getContext()->getActiveScene()->createEntity(uniqueName.name);
 		entity.addComponent<RenderableComponent>();
 
-		AssetCreateDescriptor desc;
+		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MESH;
 		desc.name = uniqueName.name;
 		desc.sourcePath = filepath.m_filepath;
@@ -52,7 +52,7 @@ bool ModelImportDialog::acceptContent()
 			meshRenderer.setMaterial(slot, mat);
 		}
 
-		AssetCreateDescriptor aInfo;
+		AssetBuildDescriptor aInfo;
 		aInfo.aType = AssetType::PREFAB;
 		aInfo.name = uniqueName.name + "_PREFAB";
 		aInfo.targetDirectory = EditorState::Instance().getWorkingDir().path();

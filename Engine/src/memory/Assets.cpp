@@ -322,7 +322,7 @@ void Assets::makeDirty(UUID uuid)
 //	m_assets[asset] = aInfo;
 //}
 
-//AssetHandle<Asset> Assets::importAsset(const std::string& fileLocation, AssetCreateDescriptor& desc)
+//AssetHandle<Asset> Assets::importAsset(const std::string& fileLocation, AssetBuildDescriptor& desc)
 //{
 //	desc.origFilePath = fileLocation;
 //	AssetRecord aInfo(desc);
@@ -337,7 +337,7 @@ void Assets::makeDirty(UUID uuid)
 //	return asset;
 //}
 
-//AssetHandle<Asset> Assets::createAsset(const ResourceWrapper<Resource>& resource, AssetCreateDescriptor& desc)
+//AssetHandle<Asset> Assets::createAsset(const ResourceWrapper<Resource>& resource, AssetBuildDescriptor& desc)
 //{
 //	// Add asset info
 //	AssetRecord aInfo(desc);
@@ -362,7 +362,7 @@ void Assets::deleteAsset(UUID uuid)
 	m_assets.erase(aInfo.uuid);
 }
 
-//ScopedPath calculateAssetDestinationPathImport(const AssetCreateDescriptor& desc)
+//ScopedPath calculateAssetDestinationPathImport(const AssetBuildDescriptor& desc)
 //{
 //	// Determine root
 //	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
@@ -389,7 +389,7 @@ void Assets::deleteAsset(UUID uuid)
 //}
 
 
-ScopedPath calculateAssetDestinationPathCreate(const AssetCreateDescriptor& desc)
+ScopedPath calculateAssetDestinationPathCreate(const AssetBuildDescriptor& desc)
 {
 	// Determine root
 	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
@@ -418,7 +418,7 @@ ScopedPath calculateAssetDestinationPathCreate(const AssetCreateDescriptor& desc
 	return p;
 }
 
-AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor& desc, ResourceCreateDescriptor& resourceDesc)
+AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
 {
 	AssetType type = desc.aType;
 
@@ -461,7 +461,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor& desc, ResourceCrea
 	return AssetHandle<Asset>(record.uuid);
 }
 
-AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor& desc, ResourceLoadDescriptor& resourceDesc)
+AssetHandle<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadDescriptor& resourceDesc)
 {
 	AssetType type = desc.aType;
 
@@ -502,7 +502,7 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor& desc, ResourceLoad
 	return handle;
 }
 
-void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc)
+void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
 {
 	auto& record = getInfo(uuid);
 
@@ -520,7 +520,7 @@ void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceCreateD
 	manager->saveResource(resourceDesc, p);
 }
 
-AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
+AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc)
 {
 	ResourceTypeManager* manager =
 		AssetFactory::getManager(node.assetDesc.aType);
@@ -534,7 +534,7 @@ AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, co
 
 	AssetHandle<Asset> created;
 
-	AssetCreateDescriptor nodeDesc = node.assetDesc;
+	AssetBuildDescriptor nodeDesc = node.assetDesc;
 	nodeDesc.assetDirectory = rootDesc.assetDirectory;
 	nodeDesc.isEngineOwned = rootDesc.isEngineOwned;
 	nodeDesc.targetDirectory = rootDesc.targetDirectory;
@@ -567,7 +567,7 @@ AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, co
 	return created;
 }
 
-AssetHandle<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
+AssetHandle<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc)
 {
 	// 1) Create this node
 	AssetHandle<Asset> created = createAssetsFromImportNode(node, rootDesc);

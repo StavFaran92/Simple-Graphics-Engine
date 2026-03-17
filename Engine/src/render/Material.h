@@ -84,7 +84,7 @@ struct MaterialData
 	}
 };
 
-struct EngineAPI MaterialCreateDescriptor : public ResourceCreateDescriptor
+struct EngineAPI MaterialCreateDescriptor : public ResourceBuildDescriptor
 {
 	MaterialData data;
 

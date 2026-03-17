@@ -8,7 +8,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-Ref<Asset> AnimationTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
+Ref<Asset> AnimationTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
 	return createRef< AnimationAsset>();
 }
@@ -32,7 +32,7 @@ bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& resul
 	return true;
 }
 
-bool AnimationTypeManager::saveResource(const ResourceCreateDescriptor& desc, const ScopedPath& dst)
+bool AnimationTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
 	throw std::runtime_error("Animation save not yet implemented!");
 }
@@ -51,6 +51,6 @@ void AnimationTypeManager::parse(ResourceLoadDescriptor& desc)
 {
 }
 
-void AnimationTypeManager::parse(ResourceCreateDescriptor& desc)
+void AnimationTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }
