@@ -568,8 +568,9 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     AssetCreateDescriptor desc;
     desc.name = "Scene_0";
     desc.aType = AssetType::SCENE;
-    auto sceneDesc = desc.makeResourceCreateDescriptor<SceneCreateDescriptor>();
-    AssetHandle<SceneAsset> sceneAsset = getSubSystem<Assets>()->createAsset(desc).as<SceneAsset>();
+    SceneCreateDescriptor sceneDesc;
+    sceneDesc.aType = desc.aType;
+    AssetHandle<SceneAsset> sceneAsset = getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
 
     auto startupScene = sceneAsset.resource();
     startupScene->init(m_context.get());
@@ -605,10 +606,12 @@ void Engine::createStartupScene(const std::shared_ptr<Context>& context, const I
     shaderAssetDesc.isEngineOwned = true;
     shaderAssetDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
 
-    ShaderLoadDescriptor* shaderDesc = shaderAssetDesc.makeResourceLoadDescriptor<ShaderLoadDescriptor>();
-    shaderDesc->shaderOverride = ShaderOverride::PostProcess;
+    ShaderLoadDescriptor shaderDesc;
+    shaderDesc.aType = shaderAssetDesc.aType;
+    shaderDesc.sourcePath = shaderAssetDesc.sourcePath;
+    shaderDesc.shaderOverride = ShaderOverride::PostProcess;
 
-    auto FXAAShaderAsset = getSubSystem<Assets>()->importAsset(shaderAssetDesc);
+    auto FXAAShaderAsset = getSubSystem<Assets>()->importAsset(shaderAssetDesc, shaderDesc);
 
     postProcess.shader = FXAAShaderAsset.as<ShaderAsset>();
 

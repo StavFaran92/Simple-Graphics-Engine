@@ -53,7 +53,7 @@ void from_json(const nlohmann::json& j, AssetRecord& r)
 	r.asset = asset;
 }
 
-AssetRecord::AssetRecord(AssetCreateDescriptor& assetDesc)
+AssetRecord::AssetRecord(const AssetCreateDescriptor& assetDesc)
 {
 	name = assetDesc.name;
 	aType = assetDesc.aType;

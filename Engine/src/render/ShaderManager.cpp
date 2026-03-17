@@ -7,7 +7,7 @@
 
 #include <filesystem>
 
-Ref<Asset> ShaderTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> ShaderTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
 {
 	return createRef< ShaderAsset>();
 }

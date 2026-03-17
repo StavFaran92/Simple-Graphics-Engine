@@ -40,9 +40,11 @@ bool TextureImportDialog::acceptContent()
 
 		desc.aType = AssetType::TEXTURE;
 		desc.sourcePath = filepath.m_filepath;
-		auto* texDesc = desc.makeResourceLoadDescriptor<TextureLoadDescriptor>();
-		texDesc->usage = textureDataWidget.m_semantic;
-		Engine::get()->getSubSystem<Assets>()->importAsset(desc);
+		TextureLoadDescriptor texDesc;
+		texDesc.aType = desc.aType;
+		texDesc.sourcePath = desc.sourcePath;
+		texDesc.usage = textureDataWidget.m_semantic;
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc, texDesc);
 
 		return true;
 	}

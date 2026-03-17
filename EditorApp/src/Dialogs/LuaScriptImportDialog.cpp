@@ -36,7 +36,9 @@ bool LuaScriptImportDialog::acceptContent()
 		desc.name = uniqueName.name;
 		desc.sourcePath = filepath.m_filepath;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		Engine::get()->getSubSystem<Assets>()->importAsset(desc);
+		LuaScriptLoadDescriptor loadDesc;
+		loadDesc.sourcePath = filepath.m_filepath;
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
 
 		return true;
 	}

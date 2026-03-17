@@ -274,9 +274,10 @@ void displayTextureCreatorDialog()
 				desc.aType = AssetType::TEXTURE;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-				auto* createDesc = desc.makeResourceCreateDescriptor<TextureCreateDescriptor>();
-				createDesc->textureData = textureData;
-				Engine::get()->getSubSystem<Assets>()->createAsset(desc);
+				TextureCreateDescriptor createDesc;
+				createDesc.aType = desc.aType;
+				createDesc.textureData = textureData;
+				Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 
 				ImGui::CloseCurrentPopup();
 			}
@@ -343,9 +344,11 @@ void displayShaderCreatorDialog()
 			desc.name = uniqueName.name;
 			desc.sourcePath = filepath.m_filepath;
 			desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-			auto* shaderLoadDesc = desc.makeResourceLoadDescriptor<ShaderLoadDescriptor>();
-			shaderLoadDesc->shaderOverride = shaderOverrideType;
-			Engine::get()->getSubSystem<Assets>()->importAsset(desc);
+			ShaderLoadDescriptor shaderLoadDesc;
+			shaderLoadDesc.aType = desc.aType;
+			shaderLoadDesc.sourcePath = desc.sourcePath;
+			shaderLoadDesc.shaderOverride = shaderOverrideType;
+			Engine::get()->getSubSystem<Assets>()->importAsset(desc, shaderLoadDesc);
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -382,8 +385,9 @@ void displayLuaScriptCreatorDialog()
 				desc.aType = AssetType::LUA_SCRIPT;
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
+				LuaScriptCreateDescriptor createDesc;
 				// TODO: makeResourceCreateDescriptor<LuaScriptCreateDescriptor>()
-				Engine::get()->getSubSystem<Assets>()->createAsset(desc);
+				Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 				ImGui::CloseCurrentPopup();
 			}
 

@@ -4,6 +4,7 @@
 #include "memory/AssetDescriptors.h"
 #include "memory/ResourceWrapper.h"
 #include <map>
+#include <memory>
 #include <string>
 #include "memory/Ref.h"
 
@@ -23,9 +24,32 @@ struct ImportNode
 {
 	std::string name;
 	std::map<std::string, ImportNode> dependencies;
-	AssetCreateDescriptor createDescriptor;
+	AssetCreateDescriptor assetDesc;
     CreationType creationType = CreationType::Create;
     int index = 0;
+
+	std::shared_ptr<ResourceCreateDescriptor> createDesc;
+	std::shared_ptr<ResourceLoadDescriptor>   loadDesc;
+
+	template<typename T, typename... Args>
+	std::shared_ptr<T> emplaceCreateDesc(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<ResourceCreateDescriptor, T>);
+		auto ptr = std::make_shared<T>(std::forward<Args>(args)...);
+		ptr->aType = assetDesc.aType;
+		createDesc = ptr;
+		return ptr;
+	}
+
+	template<typename T, typename... Args>
+	std::shared_ptr<T> emplaceLoadDesc(Args&&... args)
+	{
+		static_assert(std::is_base_of_v<ResourceLoadDescriptor, T>);
+		auto ptr = std::make_shared<T>(std::forward<Args>(args)...);
+		ptr->aType = assetDesc.aType;
+		loadDesc = ptr;
+		return ptr;
+	}
 };
 
 // Validates / fills defaults on resource descriptors
@@ -37,7 +61,7 @@ public:
     // ============================================================
 
     // Create a new asset instance in memory
-    virtual Ref<Asset> createAsset(AssetCreateDescriptor& desc) = 0;
+    virtual Ref<Asset> createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc) = 0;
 
     // Import asset into the engine
     virtual bool importAsset(const std::string& src, ImportNode& result) = 0;

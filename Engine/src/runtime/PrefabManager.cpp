@@ -9,7 +9,7 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-Ref<Asset> PrefabTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> PrefabTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
 {
 	return createRef< PrefabAsset>();
 }

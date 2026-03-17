@@ -8,7 +8,7 @@
 
 #include <filesystem>
 
-Ref<Asset> LuaScriptTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> LuaScriptTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
 {
 	return createRef< LuaScriptAsset>();
 }
@@ -24,9 +24,10 @@ bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& resul
 {
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
-	result.createDescriptor.aType = AssetType::LUA_SCRIPT;
-	result.createDescriptor.sourcePath = src;
-	result.createDescriptor.makeResourceLoadDescriptor<LuaScriptLoadDescriptor>()->sourcePath = src; //todo fix
+	result.assetDesc.aType = AssetType::LUA_SCRIPT;
+	result.assetDesc.sourcePath = src;
+	auto luaLoadDesc = result.emplaceLoadDesc<LuaScriptLoadDescriptor>();
+	luaLoadDesc->sourcePath = src; //todo fix
 
 	return true;
 }

@@ -8,7 +8,7 @@ public:
 
 
 	// Inherited via ResourceTypeManager
-	Ref<Asset> createAsset(AssetCreateDescriptor& desc) override;
+	Ref<Asset> createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc) override;
 
 	Ref<Asset> deserializeAsset(const nlohmann::json& j) override;
 

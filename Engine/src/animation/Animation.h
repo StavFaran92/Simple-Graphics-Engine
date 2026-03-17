@@ -19,7 +19,7 @@ struct MeshNodeData
 	std::vector<MeshNodeData> children;
 };
 
-struct AnimationLoadDescriptor : public ResourceLoadDescriptor
+struct EngineAPI AnimationLoadDescriptor : public ResourceLoadDescriptor
 {
 	ResourceWrapper<Resource> loadResource() override;
 };

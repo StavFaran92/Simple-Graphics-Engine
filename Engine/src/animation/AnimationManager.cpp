@@ -8,7 +8,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-Ref<Asset> AnimationTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> AnimationTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
 {
 	return createRef< AnimationAsset>();
 }
@@ -24,9 +24,10 @@ bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& resul
 {
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
-	result.createDescriptor.aType = AssetType::ANIMATION;
-	result.createDescriptor.sourcePath = src;
-	result.createDescriptor.makeResourceLoadDescriptor<AnimationLoadDescriptor>()->sourcePath = src;
+	result.assetDesc.aType = AssetType::ANIMATION;
+	result.assetDesc.sourcePath = src;
+	auto animDesc = result.emplaceLoadDesc<AnimationLoadDescriptor>();
+	animDesc->sourcePath = src;
 
 	return true;
 }

@@ -11,7 +11,7 @@
 
 #include <filesystem>
 
-Ref<Asset> TextureTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> TextureTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
 {
 	return createRef< TextureAsset>();
 }
@@ -30,10 +30,11 @@ bool TextureTypeManager::importAsset(const std::string& src, ImportNode& result)
 
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
-	result.createDescriptor.name = path.filename().stem().string();
-	result.createDescriptor.aType = AssetType::TEXTURE;
-	result.createDescriptor.sourcePath = src;
-	result.createDescriptor.makeResourceCreateDescriptor<TextureCreateDescriptor>()->textureData = textureData;
+	result.assetDesc.name = path.filename().stem().string();
+	result.assetDesc.aType = AssetType::TEXTURE;
+	result.assetDesc.sourcePath = src;
+	auto texCreateDesc = result.emplaceCreateDesc<TextureCreateDescriptor>();
+	texCreateDesc->textureData = textureData;
 
 	return true;
 }

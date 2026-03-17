@@ -9,7 +9,7 @@
 #include "memory/AssetHandle.h"
 #include "core/Engine.h"
 
-Ref<Asset> ModelTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> ModelTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
 {
 	return createRef< ModelAsset>();
 }
@@ -36,8 +36,9 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 	// Build MeshArray node
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
-	result.createDescriptor.aType = AssetType::MESH;
-	result.createDescriptor.makeResourceCreateDescriptor<ModelCreateDescriptor>()->data = modelInfo.meshDataList;
+	result.assetDesc.aType = AssetType::MESH;
+	auto rootModelDesc = result.emplaceCreateDesc<ModelCreateDescriptor>();
+	rootModelDesc->data = modelInfo.meshDataList;
 
 	// Build texture dependency nodes (embedded textures)
 	//std::map<std::string, std::string> textureNameToSlot; // texture name -> slot name
@@ -45,9 +46,9 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 	{
 		ImportNode textureNode;
 		textureNode.name = tData.textureName;
-		textureNode.createDescriptor.aType = AssetType::TEXTURE;
-		textureNode.createDescriptor.name = tData.textureName;
-		auto textureResourceDesc = textureNode.createDescriptor.makeResourceCreateDescriptor<TextureCreateDescriptor>();
+		textureNode.assetDesc.aType = AssetType::TEXTURE;
+		textureNode.assetDesc.name = tData.textureName;
+		auto textureResourceDesc = textureNode.emplaceCreateDesc<TextureCreateDescriptor>();
 		textureResourceDesc->textureData = tData;
 		
 		// Store texture node - we'll add it to material dependencies
@@ -61,9 +62,10 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 		ImportNode textureNode;
 		std::filesystem::path texPath(texturePath);
 		textureNode.name = texPath.filename().stem().string();
-		textureNode.createDescriptor.aType = AssetType::TEXTURE;
-		textureNode.createDescriptor.sourcePath = texturePath;
-		textureNode.createDescriptor.makeResourceLoadDescriptor<TextureLoadDescriptor>()->sourcePath = texturePath;
+		textureNode.assetDesc.aType = AssetType::TEXTURE;
+		textureNode.assetDesc.sourcePath = texturePath;
+		auto texLoadDesc = textureNode.emplaceLoadDesc<TextureLoadDescriptor>();
+		texLoadDesc->sourcePath = texturePath;
 		
 		result.dependencies["TEXTURE_" + texturePath] = textureNode;
 	}
@@ -74,9 +76,9 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 	{
 		ImportNode materialNode;
 		materialNode.name = mData.name;
-		materialNode.createDescriptor.aType = AssetType::MATERIAL;
-		materialNode.createDescriptor.name = mData.name;
-		auto materialResourceDesc = materialNode.createDescriptor.makeResourceCreateDescriptor<MaterialCreateDescriptor>();
+		materialNode.assetDesc.aType = AssetType::MATERIAL;
+		materialNode.assetDesc.name = mData.name;
+		auto materialResourceDesc = materialNode.emplaceCreateDesc<MaterialCreateDescriptor>();
 		materialResourceDesc->data = mData;
 
 		// Add texture dependencies to this material

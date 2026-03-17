@@ -27,8 +27,9 @@ Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
     {
         AssetCreateDescriptor texDesc;
         texDesc.aType = AssetType::TEXTURE;
-        texDesc.sourcePath = textureFilepath;
-        auto skyboxTexture = Engine::get()->getSubSystem<Assets>()->importAsset(texDesc).as<TextureAsset>();
+        TextureLoadDescriptor loadDesc;
+        loadDesc.sourcePath = textureFilepath;
+        auto skyboxTexture = Engine::get()->getSubSystem<Assets>()->importAsset(texDesc, loadDesc).as<TextureAsset>();
         auto& skyboxComponent = skyboxEntity.addComponent<SkyboxComponent>(skyboxTexture);
         skyboxComponent.build();
     }

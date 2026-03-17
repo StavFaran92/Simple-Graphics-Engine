@@ -38,7 +38,7 @@ struct EngineAPI AssetRecord
 
 	AssetRecord() = default;
 
-	AssetRecord(AssetCreateDescriptor& assetDesc);
+	AssetRecord(const AssetCreateDescriptor& assetDesc);
 
 	void parse();
 	bool isParsed() const;

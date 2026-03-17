@@ -9,9 +9,9 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
-Ref<Asset> MaterialTypeManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> MaterialTypeManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
 {
-	auto materialDesc = dynamic_cast<MaterialCreateDescriptor*>(desc.resourceCreateDescriptor);
+	auto materialDesc = dynamic_cast<const MaterialCreateDescriptor*>(&resourceDesc);
 	if (!materialDesc)
 	{
 		logError("Invalid Descriptor specified.");

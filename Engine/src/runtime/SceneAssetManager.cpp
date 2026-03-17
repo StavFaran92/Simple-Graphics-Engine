@@ -11,7 +11,7 @@
 
 
 
-Ref<Asset> SceneAssetManager::createAsset(AssetCreateDescriptor& desc)
+Ref<Asset> SceneAssetManager::createAsset(const AssetCreateDescriptor& assetDesc, const ResourceCreateDescriptor& resourceDesc)
 {
 	return createRef<SceneAsset>();
 }

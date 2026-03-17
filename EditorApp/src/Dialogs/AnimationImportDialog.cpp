@@ -34,9 +34,10 @@ bool AnimationImportDialog::acceptContent()
 		AssetCreateDescriptor desc;
 		desc.aType = AssetType::ANIMATION;
 		desc.name = uniqueName.name;
-		desc.sourcePath = filepath.m_filepath;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		Engine::get()->getSubSystem<Assets>()->importAsset(desc);
+		AnimationLoadDescriptor loadDesc;
+		loadDesc.sourcePath = filepath.m_filepath;
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
 
 		return true;
 	}

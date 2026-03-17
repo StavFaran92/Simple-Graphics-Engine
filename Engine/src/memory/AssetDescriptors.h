@@ -44,9 +44,6 @@ struct AssetCreateDescriptor
 	ScopedPath targetDirectory;
 	std::string assetDirectory; // todo consider remove
 
-	ResourceLoadDescriptor* resourceLoadDescriptor = nullptr; // TODO: rename callers to use resourceLoadDescriptor
-	ResourceCreateDescriptor* resourceCreateDescriptor = nullptr;
-
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetCreateDescriptor,
 		name,
 		aType,
@@ -55,24 +52,6 @@ struct AssetCreateDescriptor
 		isTransient,
 		isCompositeAsset
 		);
-
-	template<typename T, typename... Args>
-	T* makeResourceLoadDescriptor(Args&&... args)
-	{
-		static_assert(std::is_base_of_v<ResourceLoadDescriptor, T>);
-		T* obj = new T(std::forward<Args>(args)...);
-		resourceLoadDescriptor = obj;
-		return obj;
-	}
-
-	template<typename T, typename... Args>
-	T* makeResourceCreateDescriptor(Args&&... args)
-	{
-		static_assert(std::is_base_of_v<ResourceCreateDescriptor, T>);
-		T* obj = new T(std::forward<Args>(args)...);
-		resourceCreateDescriptor = obj;
-		return obj;
-	}
 
 	//timestamp
 	//size

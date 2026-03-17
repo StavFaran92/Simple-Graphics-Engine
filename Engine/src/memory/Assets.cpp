@@ -417,7 +417,7 @@ ScopedPath calculateAssetDestinationPathCreate(const AssetCreateDescriptor& desc
 	return p;
 }
 
-AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
+AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc, ResourceCreateDescriptor& resourceDesc)
 {
 	AssetType type = desc.aType;
 
@@ -430,12 +430,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	}
 
 	// Parse the resource descriptor
-	if (!desc.resourceCreateDescriptor)
-	{
-		logError("Descriptor must have resource Resource Create descriptor.");
-		return AssetHandle<Asset>::empty;
-	}
-	manager->parse(*desc.resourceCreateDescriptor);
+	manager->parse(resourceDesc);
 
 	// Save the asset to disk
 	ScopedPath dest = calculateAssetDestinationPathCreate(desc);
@@ -443,13 +438,13 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	// Verify target dir exists
 	fs::create_directories(dest.absolute().parent_path());
 
-	if(!manager->saveResource(*desc.resourceCreateDescriptor, dest))
+	if(!manager->saveResource(resourceDesc, dest))
 	{
 		logError("Failed to save asset type {} to: {}", static_cast<int>(type), dest.absolute().string());
 		return AssetHandle<Asset>::empty;
 	}
 
-	Ref<Asset> asset = manager->createAsset(desc);
+	Ref<Asset> asset = manager->createAsset(desc, resourceDesc);
 	if (!asset)
 	{
 		logError("Failed to create asset of type {}", static_cast<int>(type));
@@ -465,7 +460,7 @@ AssetHandle<Asset> Assets::createAsset(AssetCreateDescriptor desc)
 	return AssetHandle<Asset>(record.uuid);
 }
 
-AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
+AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc, ResourceLoadDescriptor& resourceDesc)
 {
 	AssetType type = desc.aType;
 
@@ -476,21 +471,19 @@ AssetHandle<Asset> Assets::importAsset(AssetCreateDescriptor desc)
 		return AssetHandle<Asset>::empty;
 	}
 
-	// Use default load desc if not specified.
-	if (!desc.resourceLoadDescriptor || desc.resourceLoadDescriptor->sourcePath.empty())
+	// Ensure sourcePath is set
+	if (resourceDesc.sourcePath.empty())
 	{
-		desc.resourceLoadDescriptor = manager->makeResourceLoadDescriptor();
-		assert(desc.resourceLoadDescriptor);
-		desc.resourceLoadDescriptor->sourcePath = desc.sourcePath;
+		resourceDesc.sourcePath = desc.sourcePath;
 	}
 
 	// Parse the resource descriptor
-	manager->parse(*desc.resourceLoadDescriptor);
+	manager->parse(resourceDesc);
 
 	ImportNode importNode;
-	importNode.createDescriptor = desc;
+	importNode.assetDesc = desc;
 
-	if (!manager->importAsset(desc.resourceLoadDescriptor->sourcePath, importNode))
+	if (!manager->importAsset(resourceDesc.sourcePath, importNode))
 	{
 		logError("Failed to import asset type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;
@@ -529,35 +522,45 @@ void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor desc)
 	ScopedPath p = record.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
 	p.setPath(record.relativefilePath);
 
-	manager->saveResource(*desc.resourceBuildDescriptor, p); // todo fix
+	manager->saveResource(*desc.resourceBuildDescriptor, p);
 }
 
 AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetCreateDescriptor& rootDesc)
 {
 	ResourceTypeManager* manager =
-		AssetFactory::getManager(node.createDescriptor.aType);
+		AssetFactory::getManager(node.assetDesc.aType);
 
 	if (!manager)
 	{
 		logError("No ResourceTypeManager registered for asset type {}",
-			static_cast<int>(node.createDescriptor.aType));
+			static_cast<int>(node.assetDesc.aType));
 		return AssetHandle<Asset>::empty;
 	}
 
 	AssetHandle<Asset> created;
 
-	AssetCreateDescriptor nodeDesc = node.createDescriptor;
+	AssetCreateDescriptor nodeDesc = node.assetDesc;
 	nodeDesc.assetDirectory = rootDesc.assetDirectory;
 	nodeDesc.isEngineOwned = rootDesc.isEngineOwned;
 	nodeDesc.targetDirectory = rootDesc.targetDirectory;
 
 	if (node.creationType == CreationType::Create)
 	{
-		created = createAsset(nodeDesc);
+		if (!node.createDesc)
+		{
+			logError("ImportNode '{}' is missing createDesc", node.name);
+			return AssetHandle<Asset>::empty;
+		}
+		created = createAsset(nodeDesc, *node.createDesc);
 	}
 	else // CreationType::Import
 	{
-		created = importAsset(nodeDesc);
+		if (!node.loadDesc)
+		{
+			logError("ImportNode '{}' is missing loadDesc", node.name);
+			return AssetHandle<Asset>::empty;
+		}
+		created = importAsset(nodeDesc, *node.loadDesc);
 	}
 
 	if (created.isEmpty())
