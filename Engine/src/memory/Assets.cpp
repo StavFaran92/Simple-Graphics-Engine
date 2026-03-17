@@ -353,8 +353,9 @@ void Assets::makeDirty(UUID uuid)
 //	return asset;
 //}
 
-void Assets::deleteAsset(AssetHandle<Asset> asset)
+void Assets::deleteAsset(UUID uuid)
 {
+	auto asset = getAsset(uuid);
 	AssetRecord aInfo = asset.info();
 	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.relativefilePath);
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);

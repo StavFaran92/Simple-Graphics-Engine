@@ -294,7 +294,7 @@ void AssetViewWindow::display()
 						UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(relativeFilePath).getUID();
 						auto& asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 						std::string path = asset.info().relativefilePath;
-						Engine::get()->getSubSystem<Assets>()->deleteAsset(asset);
+						asset.erase();
 						std::filesystem::remove(Engine::get()->getProjectDirectory() + "/" + path);
 					}
 					else

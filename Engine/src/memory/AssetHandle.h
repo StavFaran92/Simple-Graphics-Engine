@@ -62,7 +62,7 @@ public:
 
 	void erase()
 	{
-		Engine::get()->getSubSystem<Assets>()->deleteAsset(*this);
+		Engine::get()->getSubSystem<Assets>()->deleteAsset(uuid);
 	}
 
 	void makeDirty()

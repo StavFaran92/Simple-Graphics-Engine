@@ -13,6 +13,14 @@ class EngineAPI Assets : public SubSystem
 public:
 	Assets();
 
+	AssetHandle<Asset> createAsset(AssetCreateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
+
+	AssetHandle<Asset> importAsset(AssetCreateDescriptor& desc, ResourceLoadDescriptor& resourceDesc);
+
+	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
+
+	void deleteAsset(UUID uuid);
+
 	std::string getAlias(UUID uid) const;
 
 	std::vector<AssetHandle<Asset>> getAllAssetsOfType(AssetType aType) const;
@@ -37,18 +45,7 @@ public:
 
 	bool hasAsset(UUID uuid) const;
 
-	void deleteAsset(AssetHandle<Asset> asset);
-
 	void makeDirty(UUID uuid);
-
-	
-
-	// Unified pipeline entry points
-	AssetHandle<Asset> createAsset(AssetCreateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
-
-	AssetHandle<Asset> importAsset(AssetCreateDescriptor& desc, ResourceLoadDescriptor& resourceDesc);
-
-	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceCreateDescriptor& resourceDesc);
 
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 
