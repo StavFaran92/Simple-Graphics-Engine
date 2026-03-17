@@ -275,7 +275,6 @@ void displayTextureCreatorDialog()
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 				TextureCreateDescriptor createDesc;
-				createDesc.aType = desc.aType;
 				createDesc.textureData = textureData;
 				Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 
@@ -342,11 +341,9 @@ void displayShaderCreatorDialog()
 			AssetBuildDescriptor desc;
 			desc.aType = AssetType::SHADER;
 			desc.name = uniqueName.name;
-			desc.sourcePath = filepath.m_filepath;
 			desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 			ShaderLoadDescriptor shaderLoadDesc;
-			shaderLoadDesc.aType = desc.aType;
-			shaderLoadDesc.sourcePath = desc.sourcePath;
+			shaderLoadDesc.sourcePath = filepath.m_filepath;
 			shaderLoadDesc.shaderOverride = shaderOverrideType;
 			Engine::get()->getSubSystem<Assets>()->importAsset(desc, shaderLoadDesc);
 			ImGui::CloseCurrentPopup();

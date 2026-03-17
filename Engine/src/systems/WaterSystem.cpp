@@ -27,21 +27,17 @@ Entity WaterSystem::createPool()
 	AssetBuildDescriptor meshDesc;
 	meshDesc.aType = AssetType::MESH;
 	meshDesc.isEngineOwned = true;
-	meshDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx";
 	ModelLoadDescriptor meshLoadDesc;
-	meshLoadDesc.aType = meshDesc.aType;
-	meshLoadDesc.sourcePath = meshDesc.sourcePath;
+	meshLoadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx";
 	auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(meshDesc, meshLoadDesc).as<ModelAsset>();
 	auto& meshRendererComponent = waterBodyNestedImpl.addComponent<MeshRendererComponent>(mesh);
 
 	AssetBuildDescriptor shaderDesc;
 	shaderDesc.aType = AssetType::SHADER;
-	shaderDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl";
 	shaderDesc.name = "WaterShader";
 	shaderDesc.isEngineOwned = true;
 	ShaderLoadDescriptor shaderLoadDesc;
-	shaderLoadDesc.aType = shaderDesc.aType;
-	shaderLoadDesc.sourcePath = shaderDesc.sourcePath;
+	shaderLoadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/WaterShader.glsl";
 	shaderLoadDesc.shaderOverride = ShaderOverride::PBR;
 	auto shaderAsset = Engine::get()->getSubSystem<Assets>()->importAsset(shaderDesc, shaderLoadDesc).as<ShaderAsset>();
 
@@ -51,17 +47,14 @@ Entity WaterSystem::createPool()
 	materialDesc.isEngineOwned = true;
 	// TODO: MaterialCreateDescriptor with renderMode = Custom, customShader = shaderAsset
 	MaterialCreateDescriptor materialCreateDesc;
-	materialCreateDesc.aType = materialDesc.aType;
 	auto materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(materialDesc, materialCreateDesc).as<MaterialAsset>();
 
 	meshRendererComponent.setMaterial(0, materialAsset);
 
 	AssetBuildDescriptor waterNormalDesc;
 	waterNormalDesc.aType = AssetType::TEXTURE;
-	waterNormalDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/water_new_height.png";
 	TextureLoadDescriptor waterNormalLoadDesc;
-	waterNormalLoadDesc.aType = waterNormalDesc.aType;
-	waterNormalLoadDesc.sourcePath = waterNormalDesc.sourcePath;
+	waterNormalLoadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/water_new_height.png";
 	auto waterNormal = Engine::get()->getSubSystem<Assets>()->importAsset(waterNormalDesc, waterNormalLoadDesc).as<TextureAsset>();
 	auto waterNormalSampler = std::make_shared<TextureSampler>(1);
 	waterNormalSampler->texture = waterNormal;

@@ -568,7 +568,6 @@ AssetHandle<MaterialAsset> MaterialAsset::clone(bool isEngineOwned) const
 	desc.isEngineOwned = isEngineOwned;
 	
 	MaterialCreateDescriptor materialDesc;
-	materialDesc.aType = desc.aType;
 	materialDesc.data = data;
 	
 	AssetHandle<MaterialAsset> cloned = Engine::get()->getSubSystem<Assets>()->createAsset(desc, materialDesc).as<MaterialAsset>();

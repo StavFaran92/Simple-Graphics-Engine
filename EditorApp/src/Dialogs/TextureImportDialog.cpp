@@ -39,10 +39,8 @@ bool TextureImportDialog::acceptContent()
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 
 		desc.aType = AssetType::TEXTURE;
-		desc.sourcePath = filepath.m_filepath;
 		TextureLoadDescriptor texDesc;
-		texDesc.aType = desc.aType;
-		texDesc.sourcePath = desc.sourcePath;
+		texDesc.sourcePath = filepath.m_filepath;
 		texDesc.usage = textureDataWidget.m_semantic;
 		Engine::get()->getSubSystem<Assets>()->importAsset(desc, texDesc);
 

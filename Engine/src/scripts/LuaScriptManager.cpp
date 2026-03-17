@@ -25,9 +25,8 @@ bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& resul
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::LUA_SCRIPT;
-	result.assetDesc.sourcePath = src;
 	auto luaLoadDesc = result.emplaceLoadDesc<LuaScriptLoadDescriptor>();
-	luaLoadDesc->sourcePath = src; //todo fix
+	luaLoadDesc->sourcePath = src; 
 
 	return true;
 }

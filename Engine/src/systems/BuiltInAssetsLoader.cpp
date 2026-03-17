@@ -27,7 +27,6 @@ void BuiltInAssetsLoader::loadTextures()
 		desc.name = "SGE_TEXTURE_WHITE";
 		desc.isEngineOwned = true;
 		TextureCreateDescriptor createDesc;
-		createDesc.aType = desc.aType;
 		createDesc.textureData.target = TextureTarget::TEXTURE_2D;
 		createDesc.textureData.width = 1;
 		createDesc.textureData.height = 1;
@@ -50,7 +49,6 @@ void BuiltInAssetsLoader::loadTextures()
 		desc.name = "SGE_TEXTURE_BLACK";
 		desc.isEngineOwned = true;
 		TextureCreateDescriptor createDesc;
-		createDesc.aType = desc.aType;
 		createDesc.textureData.target = TextureTarget::TEXTURE_2D;
 		createDesc.textureData.width = 1;
 		createDesc.textureData.height = 1;
@@ -70,10 +68,8 @@ void BuiltInAssetsLoader::loadTextures()
 		desc.aType = AssetType::TEXTURE;
 		desc.isEngineOwned = true;
 		desc.name = "SGE_TEXTURE_GRASS";
-		desc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg";
 		TextureLoadDescriptor loadDesc;
-		loadDesc.aType = desc.aType;
-		loadDesc.sourcePath = desc.sourcePath;
+		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg";
 		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
 	}
 }
@@ -87,7 +83,6 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_DEFAULT;
 		MaterialCreateDescriptor createDesc;
-		createDesc.aType = desc.aType;
 		createDesc.data.renderMode = MaterialRenderMode::Opaque;
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 	}
@@ -98,7 +93,6 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
 		MaterialCreateDescriptor createDesc;
-		createDesc.aType = desc.aType;
 		createDesc.data.renderMode = MaterialRenderMode::Terrain;
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 	}
@@ -116,7 +110,6 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.name = "SGE_MESH_BOX";
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
-		meshDesc.aType = desc.aType;
 		meshDesc.data = std::vector<MeshData>{ Box::createMesh()->getMeshData() };
 
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
@@ -128,7 +121,6 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.name = "SGE_MESH_QUAD";
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
-		meshDesc.aType = desc.aType;
 		meshDesc.data = std::vector<MeshData>{ Quad::createMesh()->getMeshData() };
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
 	}
@@ -139,7 +131,6 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.name = "SGE_MESH_SPHERE";
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
-		meshDesc.aType = desc.aType;
 		meshDesc.data = std::vector<MeshData>{ Sphere::createMesh(1, 36, 36)->getMeshData() };
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
 	}
@@ -150,7 +141,6 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.name = "SGE_MESH_GRID";
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
-		meshDesc.aType = desc.aType;
 		meshDesc.data = std::vector<MeshData>{ Grid::createMesh(10, 10)->getMeshData() };
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
 	}
@@ -160,10 +150,8 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.aType = AssetType::MESH;
 		desc.name = "SGE_MESH_CAMERA";
 		desc.isEngineOwned = true;
-		desc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae";
 		ModelLoadDescriptor loadDesc;
-		loadDesc.aType = desc.aType;
-		loadDesc.sourcePath = desc.sourcePath;
+		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae";
 		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
 	}
 }

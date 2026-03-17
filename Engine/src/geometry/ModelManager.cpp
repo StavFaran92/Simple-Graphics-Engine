@@ -63,7 +63,6 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 		std::filesystem::path texPath(texturePath);
 		textureNode.name = texPath.filename().stem().string();
 		textureNode.assetDesc.aType = AssetType::TEXTURE;
-		textureNode.assetDesc.sourcePath = texturePath;
 		auto texLoadDesc = textureNode.emplaceLoadDesc<TextureLoadDescriptor>();
 		texLoadDesc->sourcePath = texturePath;
 		

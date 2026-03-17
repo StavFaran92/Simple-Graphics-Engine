@@ -36,7 +36,6 @@ struct ImportNode
 	{
 		static_assert(std::is_base_of_v<ResourceBuildDescriptor, T>);
 		auto ptr = std::make_shared<T>(std::forward<Args>(args)...);
-		ptr->aType = assetDesc.aType;
 		createDesc = ptr;
 		return ptr;
 	}
@@ -46,7 +45,6 @@ struct ImportNode
 	{
 		static_assert(std::is_base_of_v<ResourceLoadDescriptor, T>);
 		auto ptr = std::make_shared<T>(std::forward<Args>(args)...);
-		ptr->aType = assetDesc.aType;
 		loadDesc = ptr;
 		return ptr;
 	}

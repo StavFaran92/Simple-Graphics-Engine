@@ -38,11 +38,9 @@ bool ModelImportDialog::acceptContent()
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MESH;
 		desc.name = uniqueName.name;
-		desc.sourcePath = filepath.m_filepath;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		ModelLoadDescriptor modelLoadDesc;
-		modelLoadDesc.aType = desc.aType;
-		modelLoadDesc.sourcePath = desc.sourcePath;
+		modelLoadDesc.sourcePath = filepath.m_filepath;
 		auto mesh = Engine::get()->getSubSystem<Assets>()->importAsset(desc, modelLoadDesc).as<ModelAsset>();
 
 		auto& meshRenderer = entity.addComponent<MeshRendererComponent>(mesh);
@@ -57,7 +55,6 @@ bool ModelImportDialog::acceptContent()
 		aInfo.name = uniqueName.name + "_PREFAB";
 		aInfo.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		PrefabCreateDescriptor prefabDesc;
-		prefabDesc.aType = aInfo.aType;
 		prefabDesc.data = Prefab::serializeEntityToPrefabData(entity); // todo fix, should be inner
 		Engine::get()->getSubSystem<Assets>()->createAsset(aInfo, prefabDesc);
 

@@ -57,11 +57,7 @@ AssetRecord::AssetRecord(const AssetBuildDescriptor& assetDesc)
 {
 	name = assetDesc.name;
 	aType = assetDesc.aType;
-	sourcePath = assetDesc.sourcePath;
-	engineAttributes = assetDesc.engineAttributes;
 	isEngineOwned = assetDesc.isEngineOwned;
-	isTransient = assetDesc.isTransient;
-	isCompositeAsset = assetDesc.isCompositeAsset;
 	targetDirectory = assetDesc.targetDirectory;
 
 	uuid = UUID::generate_uuid_v4();
@@ -89,19 +85,16 @@ bool AssetRecord::isDirty() const
 
 void AssetRecord::update(const AssetUpdateDescriptor& uDesc)
 {
-	if (!uDesc.assetDirectory.empty())
-	{
-		assetDirectory = uDesc.assetDirectory;
-	}
+	// TODO fix
+
+	//if (!uDesc.assetDirectory.empty())
+	//{
+	//	assetDirectory = uDesc.assetDirectory;
+	//}
 
 	if (!uDesc.name.empty())
 	{
 		name = uDesc.name;
-	}
-
-	for (const auto& attrib : uDesc.attributes)
-	{
-		engineAttributes[attrib.first] = attrib.second;
 	}
 
 	fileName = name + ext;

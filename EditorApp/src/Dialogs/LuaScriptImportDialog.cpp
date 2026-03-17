@@ -34,7 +34,6 @@ bool LuaScriptImportDialog::acceptContent()
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::LUA_SCRIPT;
 		desc.name = uniqueName.name;
-		desc.sourcePath = filepath.m_filepath;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		LuaScriptLoadDescriptor loadDesc;
 		loadDesc.sourcePath = filepath.m_filepath;

@@ -13,7 +13,6 @@ void MaterialCreateDialog::appearContent()
 	desc.aType = AssetType::MATERIAL;
 	desc.name = "SGE_MATERIAL_TEMP";
 	MaterialCreateDescriptor matDesc;
-	matDesc.aType = desc.aType;
 	matDesc.data.renderMode = MaterialRenderMode::Opaque;
 	m_tempMaterial = Engine::get()->getSubSystem<Assets>()->createAsset(desc, matDesc).as<MaterialAsset>();
 
@@ -38,7 +37,6 @@ bool MaterialCreateDialog::acceptContent()
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		// TODO: MaterialCreateDescriptor with render mode + material data
 		MaterialCreateDescriptor matDesc;
-		matDesc.aType = desc.aType;
 		matDesc.data = m_tempMaterial->data;
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, matDesc);
 		return true;

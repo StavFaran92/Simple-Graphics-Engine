@@ -25,7 +25,6 @@ bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& resul
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::ANIMATION;
-	result.assetDesc.sourcePath = src;
 	auto animDesc = result.emplaceLoadDesc<AnimationLoadDescriptor>();
 	animDesc->sourcePath = src;
 

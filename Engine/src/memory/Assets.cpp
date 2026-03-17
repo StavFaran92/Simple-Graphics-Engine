@@ -1,18 +1,8 @@
 #include "memory/Assets.h"
 
-#include <GL/glew.h>
-
-
-#include "texture/Texture.h"
-#include "animation/Animation.h"
-#include "animation/AnimationLoader.h"
 #include "core/CacheSystem.h"
-#include "geometry/ModelImporter.h"
-#include "core/Factory.h"
-#include "render/ShaderBuilder.h"
 #include "memory/AssetFactory.h"
 #include "memory/RegisterManagers.h"
-#include "systems/UniqueNameManager.h"
 #include "runtime/Context.h"
 
 #include <filesystem>
@@ -186,29 +176,6 @@ void Assets::updateRegistry(const AssetRecord& aInfo)
 	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
 }
 
-//bool Assets::importAssetInner(AssetRecord& aInfo)
-//{
-//	std::string fileLocation = aInfo.createDescriptor->origFilePath;
-//
-//	// Validate input
-//	if (fileLocation.empty() || !std::filesystem::exists(fileLocation))
-//	{
-//		logError("Invalid asset path specified.");
-//		return false;
-//	}
-//
-//	// Copy + Paste
-//	if (!AssetFactory::getManager(aInfo.createDescriptor->aType)->copyFiles(fileLocation, aInfo))
-//	{
-//		logError("Failed to copy file from {} to resource folder", fileLocation);
-//		return false;
-//	}
-//
-//	addAsset(aInfo);
-//
-//	return true;
-//}
-
 std::string Assets::getAlias(UUID uid) const
 {
 	auto iter = m_assets.find(uid);
@@ -230,19 +197,6 @@ AssetHandle<Asset> Assets::getAssetFromName(const std::string& name) const
 	return Engine::get()->getMemoryManagementSystem()->getUUIDFromName(name);
 }
 
-//void Assets::updateAsset(AssetHandle<Asset> asset, const AssetUpdateDescriptor& uDesc)
-//{
-//	AssetRecord aInfo = getAsset(asset.getUID()).info();
-//	aInfo.update(uDesc);
-//
-//	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo); // todo check for non engine generated 
-//	updateRegistry(aInfo);
-//
-//	m_assets[aInfo.uuid] = aInfo;
-//
-//	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
-//}
-
 //void Assets::reimportAsset(UUID uuid)
 //{
 //	AssetRecord aInfo = getAsset(uuid).info();
@@ -257,102 +211,6 @@ void Assets::makeDirty(UUID uuid)
 	m_assets[uuid] = aInfo;
 }
 
-//std::vector<AssetHandle<Asset>> Assets::getAssetDependancies(UUID uuid) const
-//{
-//	std::vector<Asset> results;
-//
-//	AssetRecord aInfo = getAsset(uuid).info();
-//	for (UUID depedantAssetUUID : aInfo.assetsDependancies)
-//	{
-//		results.push_back(getAsset(depedantAssetUUID));
-//	}
-//	return results;
-//}
-
-//void Assets::addAssetDependency(UUID asset, UUID dependency)
-//{
-//	if (asset != dependency)
-//	{
-//		logError("Asset cannot depend on itself");
-//		return;
-//	}
-//
-//	if (!hasAsset(asset))
-//	{
-//		logError("Could not find asset {}", asset);
-//		return;
-//	}
-//
-//	if (!hasAsset(dependency))
-//	{
-//		logError("Could not find asset {}", dependency);
-//		return;
-//	}
-//
-//	AssetInfo aInfo = getAsset(asset);
-//	aInfo.assetsDependancies.push_back(dependency);
-//	m_assets[asset] = aInfo;
-//}
-//
-//void Assets::removeAssetDependency(UUID asset, UUID dependency)
-//{
-//	if (asset != dependency)
-//	{
-//		logError("Asset cannot depend on itself");
-//		return;
-//	}
-//
-//	if (!hasAsset(asset))
-//	{
-//		logError("Could not find asset {}", asset);
-//		return;
-//	}
-//
-//	if (!hasAsset(dependency))
-//	{
-//		logError("Could not find asset {}", dependency);
-//		return;
-//	}
-//
-//	AssetInfo aInfo = getAsset(asset);
-//	aInfo.assetsDependancies.erase(
-//		std::remove(aInfo.assetsDependancies.begin(), aInfo.assetsDependancies.end(), dependency),
-//		aInfo.assetsDependancies.end()
-//	);
-//	m_assets[asset] = aInfo;
-//}
-
-//AssetHandle<Asset> Assets::importAsset(const std::string& fileLocation, AssetBuildDescriptor& desc)
-//{
-//	desc.origFilePath = fileLocation;
-//	AssetRecord aInfo(desc);
-//
-//	if (!importAssetInner(aInfo))
-//	{
-//		return AssetHandle<Asset>::empty;
-//	}
-//
-//	AssetHandle<Asset> asset(aInfo.uuid);
-//
-//	return asset;
-//}
-
-//AssetHandle<Asset> Assets::createAsset(const ResourceWrapper<Resource>& resource, AssetBuildDescriptor& desc)
-//{
-//	// Add asset info
-//	AssetRecord aInfo(desc);
-//	aInfo.resourceID = resource.getUID();
-//	addAsset(aInfo);
-//
-//	// Create asset
-//	AssetHandle<Asset> asset(aInfo.uuid);
-//
-//	// Save asset
-//	AssetFactory::getManager(aInfo.aType)->save(asset, aInfo);
-//
-//	return asset;
-//}
-
 void Assets::deleteAsset(UUID uuid)
 {
 	auto asset = getAsset(uuid);
@@ -361,33 +219,6 @@ void Assets::deleteAsset(UUID uuid)
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
 	m_assets.erase(aInfo.uuid);
 }
-
-//ScopedPath calculateAssetDestinationPathImport(const AssetBuildDescriptor& desc)
-//{
-//	// Determine root
-//	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
-//
-//	// determine relative folder
-//	std::filesystem::path relativefolder;
-//	if (!desc.assetDirectory.empty())
-//	{
-//		relativefolder = desc.assetDirectory;
-//	}
-//
-//	// determine file name
-//	auto& path = std::filesystem::path(desc.resourceLoadDescriptor->sourcePath);
-//	std::string name = path.filename().stem().string();
-//
-//	// determine externsion
-//	std::string ext = getExtensionFromType(desc.aType);
-//
-//	std::filesystem::path filename = name + ext;
-//
-//	p.setPath(relativefolder / filename);
-//
-//	return p;
-//}
-
 
 ScopedPath calculateAssetDestinationPathCreate(const AssetBuildDescriptor& desc)
 {
