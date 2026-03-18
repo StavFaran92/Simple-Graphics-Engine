@@ -569,8 +569,6 @@ void setStyleAndColors()
 	// ImFont* smallFont = io.Fonts->AddFontDefault(&cfg);
 }
 
-
-
 static bool debugTerrainFlag = false;
 
 class EditorApp : public Application
@@ -609,21 +607,17 @@ public:
 		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
 
-		auto scene = Engine::get()->getContext()->getActiveScene();
+		//auto scene = Engine::get()->getContext()->getActiveScene();
 
-		// store Default scene camera
-		g_primaryCamera = scene->getGameCamera();
+		//// store Default scene camera
+		//g_primaryCamera = scene->getGameCamera();
 
 		// set Editor camera as active camera
 		auto editorCamera = m_editorRegistry->createEntity();
 		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 3000.0f));
 		editorCamera.addComponent<NativeScriptComponent>().bind<EditorCamera>();
 		auto& nsc = editorCamera.getComponent<NativeScriptComponent>();
-		//nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
-		//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(editorCamera);
-
 		nsc.script->onCreate();
-
 		g_editorCamera = editorCamera;
 
 		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](Keyboard::KeyEvent e) { stopSimulation(); return false; });
@@ -633,11 +627,13 @@ public:
 			return false;
 			});
 
-		//g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView(0, 0, 300, 200, g_primaryCamera);
-		//g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView("Game Preview", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), g_primaryCamera);
-		Engine::get()->getContext()->getActiveScene()->addRenderView("Editor View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), editorCamera);
-		g_previewWindowID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewFrameBufferID();
-		//Engine::get()->getContext()->getActiveScene()->setActiveRenderView("Editor View");
+		setupScene();
+
+		////g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView(0, 0, 300, 200, g_primaryCamera);
+		////g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView("Game Preview", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), g_primaryCamera);
+		//Engine::get()->getContext()->getActiveScene()->addRenderView("Editor View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), editorCamera);
+		//g_previewWindowID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewFrameBufferID();
+		////Engine::get()->getContext()->getActiveScene()->setActiveRenderView("Editor View");
 
 		updateScene();
 

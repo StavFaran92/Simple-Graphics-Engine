@@ -61,6 +61,11 @@ struct SceneObject
 
 extern std::vector<SceneObject> sceneObjects;
 
+extern Entity g_primaryCamera;
+extern Entity g_editorCamera;
+
+extern uint32_t g_previewWindowID;
+
 static void updateScene()
 {
 	sceneObjects.clear();
@@ -68,6 +73,13 @@ static void updateScene()
 	{
 		sceneObjects.emplace_back(SceneObject{ obj.name, obj.e });
 	}
+}
+
+static void setupScene()
+{
+	Engine::get()->getContext()->getActiveScene()->addRenderView("Editor View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), g_editorCamera);
+	g_previewWindowID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewFrameBufferID();
+	g_primaryCamera = Engine::get()->getContext()->getActiveScene()->getGameCamera();
 }
 
 template<typename T> 

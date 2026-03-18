@@ -333,6 +333,7 @@ void AssetViewWindow::display()
 						}
 
 						Engine::get()->getContext()->setActiveScene(scene.resource()->getID());
+						setupScene();
 						updateScene();
 
 					}
