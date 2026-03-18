@@ -21,7 +21,7 @@ public:
 		CSM
 	};
 
-	ShadowSystem(Context* context, Scene* scene);
+	ShadowSystem();
 
 	bool init();
 
@@ -35,11 +35,11 @@ private:
 	ShadowAlgorithm m_shadowAlgorithm = ShadowAlgorithm::ShadowMapping;
 
 	FrameBufferObject m_fbo;
-	Scene* m_scene = nullptr;
+	//Scene* m_scene = nullptr;
 	ResourceWrapper<Shader> m_simpleDepthShader = nullptr;
 	ResourceWrapper<Texture> m_depthMapTexture = nullptr;
 
-	Context* m_context = nullptr;
+	//Context* m_context = nullptr;
 
 	glm::mat4 m_lightSpaceMatrix;
 };

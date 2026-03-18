@@ -27,8 +27,7 @@
 const unsigned int SHADOW_WIDTH = 1024;
 const unsigned int SHADOW_HEIGHT = 1024;
 
-ShadowSystem::ShadowSystem(Context* context, Scene* scene)
-	: m_context(context), m_scene(scene)
+ShadowSystem::ShadowSystem()
 {}
 
 bool ShadowSystem::init()
@@ -99,9 +98,18 @@ void ShadowSystem::renderToDepthMap()
 	// Clear buffer
 	glClear(GL_DEPTH_BUFFER_BIT);
 
+	auto scene = Engine::get()->getContext()->getActiveScene();
+
+	auto view = scene->getRegistry().getRegistry().view<DirectionalLight>();
+	if (view.size() < 1)
+	{
+		// No directional light, for now simply return
+		return;
+	}
+
 	// Configure Shadow pass matrices
-	auto entt = m_scene->getRegistry().getRegistry().view<DirectionalLight>().front();
-	Entity e{ entt, &m_scene->getRegistry() };
+	auto entt = view.front();
+	Entity e{ entt, &scene->getRegistry() };
 	auto& dirLight = e.getComponent<DirectionalLight>();
 
 	//todo verify exists
@@ -129,11 +137,11 @@ void ShadowSystem::renderToDepthMap()
 
 	// Render Scene 
 	for (auto&& [entity, mesh, transform, renderable] : 
-		m_scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent>().each())
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent>().each())
 	{
 		
 
-		Entity entityhandler{ entity, &m_scene->getRegistry()};
+		Entity entityhandler{ entity, &scene->getRegistry()};
 		graphics->entity = entityhandler;
 
 		auto meshCollection = mesh.mesh;

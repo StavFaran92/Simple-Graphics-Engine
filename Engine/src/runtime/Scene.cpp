@@ -186,7 +186,7 @@ void Scene::init(Context* context)
 
 	m_PhysicsScene = Engine::get()->getPhysicsSystem()->createScene();
 
-	m_shadowSystem = std::make_shared<ShadowSystem>(m_context, this);
+	m_shadowSystem = std::make_shared<ShadowSystem>();
 	if (!m_shadowSystem->init())
 	{
 		logError("Shadow System init failed!");
