@@ -14,7 +14,12 @@ namespace fs = std::filesystem;
 void ProjectManager::loadProject(const std::string& filePath, std::shared_ptr<Context>& context)
 {
     Engine::get()->getSubSystem<Assets>()->loadAssetsDatabase();
-    Archiver::load();    
+    Archiver::load();
+
+    //UUID uid activeSceneID = Engine::get()->getProjectSettings()->get<int>("active_scene");
+    //AssetHandle<SceneAsset> activeSceneAsset(uid);
+    //activeSceneAsset.resource()->getID()
+    //Engine::get()->getContext()->setActiveScene()
 }
 
 void ProjectManager::saveProject()
@@ -24,13 +29,15 @@ void ProjectManager::saveProject()
     // Save Assets
     Engine::get()->getContext()->save();
     Archiver::save();
-
+    
+    // save active scene
     SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
-
     AssetUpdateDescriptor desc;
     SceneCreateDescriptor sceneDesc;
     sceneDesc.data.m_serializedScene = serializedScene;
     UUID uid = Engine::get()->getContext()->getActiveSceneAsset().getUID();
-    Engine::get()->getSubSystem<Assets>()->updateAsset(uid, desc, sceneDesc);
+    Engine::get()->getSubSystem<Assets>()->updateAsset(uid, desc, &sceneDesc);
     //Engine::get()->getContext()->getActiveSceneAsset()->updateAsset(desc);
+
+    //Engine::get()->getProjectSettings()->sync();
 }

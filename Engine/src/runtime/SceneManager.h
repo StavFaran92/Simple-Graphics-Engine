@@ -32,7 +32,7 @@ public:
 	void close();
 
 private:
-	int m_activeScene = -1;
+	int m_activeScene = 0;
 	uint32_t m_scenesCounter = 0;
 	std::map<uint32_t, AssetHandle<SceneAsset>> m_scenes;
 	std::map<uint32_t, ResourceWrapper<Scene>> m_scenesCache; // Cache for getAllScenes()

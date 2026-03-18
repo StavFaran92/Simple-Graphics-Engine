@@ -17,7 +17,7 @@ public:
 
 	AssetHandle<Asset> importAsset(AssetBuildDescriptor& desc, ResourceLoadDescriptor& resourceDesc);
 
-	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDescriptor& resourceDesc);
+	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDescriptor* resourceDesc = nullptr);
 
 	void deleteAsset(UUID uuid);
 

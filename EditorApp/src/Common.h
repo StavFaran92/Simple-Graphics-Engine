@@ -77,9 +77,16 @@ static void updateScene()
 
 static void setupScene()
 {
-	Engine::get()->getContext()->getActiveScene()->addRenderView("Editor View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), g_editorCamera);
-	g_previewWindowID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewFrameBufferID();
-	g_primaryCamera = Engine::get()->getContext()->getActiveScene()->getGameCamera();
+	auto scene = Engine::get()->getContext()->getActiveScene();
+
+	if (scene.isEmpty())
+	{
+		logError("Empty scene detected.");
+		return;
+	}
+	scene->addRenderView("Editor View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), g_editorCamera);
+	g_previewWindowID = scene->getGameRenderViewFrameBufferID();
+	g_primaryCamera = scene->getGameCamera();
 }
 
 template<typename T> 

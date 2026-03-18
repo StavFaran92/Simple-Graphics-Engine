@@ -13,12 +13,14 @@ SceneManager::SceneManager()
 bool SceneManager::addScene(const AssetHandle<SceneAsset>& sceneAsset)
 {
 	auto scene = sceneAsset.resource();
-	m_scenesCounter += 1;
+	
 	scene->SetID(m_scenesCounter);
 	m_scenes[m_scenesCounter] = sceneAsset;
 	m_scenesCache[m_scenesCounter] = scene;
+	m_scenesCounter += 1;
 
 	logInfo("Scene {} Added successfully.", std::to_string(m_scenesCounter));
+
 
 	return true;
 }

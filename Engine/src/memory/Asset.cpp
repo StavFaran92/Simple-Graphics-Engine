@@ -8,8 +8,3 @@
 //	:m_createDesc (desc)
 //{
 //}
-
-void Asset::updateAsset(AssetUpdateDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
-{
-	Engine::get()->getSubSystem<Assets>()->updateAsset(uuid, desc, resourceDesc);
-}

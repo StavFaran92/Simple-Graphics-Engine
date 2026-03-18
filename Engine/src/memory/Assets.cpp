@@ -4,6 +4,7 @@
 #include "memory/AssetFactory.h"
 #include "memory/RegisterManagers.h"
 #include "runtime/Context.h"
+#include "runtime/Scene.h"
 
 #include <filesystem>
 
@@ -118,7 +119,16 @@ void Assets::loadAssetsDatabase()
 		//assetInfo.asset = asset;
 
 		m_assets[assetInfo.uuid] = assetInfo;
+
+		// If its a scene we add it to the scene manager
+		if (assetInfo.aType == AssetType::SCENE)
+		{
+			AssetHandle<SceneAsset> sceneAsset(assetInfo.uuid);
+			Engine::get()->getContext()->addScene(sceneAsset);
+		}
 	}
+
+	// TODO store active scene in some settings file and load it
 }
 
 void Assets::saveDirtyAssets()
@@ -354,7 +364,7 @@ AssetHandle<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadD
 	return handle;
 }
 
-void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
+void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDescriptor* resourceDesc)
 {
 	auto& record = getInfo(uuid);
 
@@ -377,12 +387,12 @@ void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDe
 	// Verify target dir exists
 	fs::create_directories(dest.absolute().parent_path());
 
-	//TODO might not need to save resource if not changed
-	//if(!manager->saveResource(resourceDesc, dest))
-	//{
-	//	logError("Failed to save resource type {} to: {}", static_cast<int>(type), dest.absolute().string());
-	//	return AssetHandle<Asset>::empty;
-	//}
+	// Resource has changed so we must save it 
+	if (resourceDesc && !manager->saveResource(*resourceDesc, dest))
+	{
+		logError("Failed to save resource type {} to: {}", static_cast<int>(record.aType), dest.absolute().string());
+		return;
+	}
 
 	AssetRecord newRecord = record;
 	newRecord.relativefilePath = dest.relative().string();
