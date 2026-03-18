@@ -322,6 +322,20 @@ void AssetViewWindow::display()
 						updateScene();
 
 					}
+
+					if (aInfo.aType == AssetType::SCENE && ImGui::Selectable("Open"))
+					{
+						AssetHandle<SceneAsset> scene = assets->getAsset(uuid).as<SceneAsset>();
+						if (scene.isEmpty())
+						{
+							logWarning("Failed to cast asset to scene asset.");
+							continue;
+						}
+
+						Engine::get()->getContext()->setActiveScene(scene.resource()->getID());
+						updateScene();
+
+					}
 				}
 
 				

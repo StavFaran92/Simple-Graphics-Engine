@@ -30,7 +30,8 @@ bool SceneCreateDialog::acceptContent()
 		desc.name = m_uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		SceneCreateDescriptor sceneDesc;
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, sceneDesc);
+		auto scene = Engine::get()->getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
+		Engine::get()->getContext()->addScene(scene);
 		return true;
 	}
 	return false;
