@@ -55,6 +55,8 @@ void SceneManager::setActiveScene(uint32_t index)
 	}
 
 	m_activeScene = index;
+
+	m_scenes.at(m_activeScene).resource()->onActivate();
 }
 
 const std::map<uint32_t, ResourceWrapper<Scene>>& SceneManager::getAllScenes() const

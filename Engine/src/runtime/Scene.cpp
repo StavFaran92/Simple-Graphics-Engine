@@ -108,6 +108,18 @@ ResourceWrapper<Scene> Scene::create()
 	return scene;
 }
 
+void Scene::onActivate()
+{
+	for (auto& [c, meshRenderer] : m_registry->get().view<MeshRendererComponent>().each())
+	{
+		std::vector<AssetHandle<Asset>> assets = meshRenderer.gatherDependencies();
+		for (auto asset : assets)
+		{
+			m_cachedResources.push_back(asset.resource());
+		}
+	}
+}
+
 struct PlaneGPU {
 	glm::vec3 normal;
 	float d;

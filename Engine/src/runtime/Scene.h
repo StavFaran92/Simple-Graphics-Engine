@@ -103,6 +103,9 @@ public:
 
 	static ResourceWrapper<Scene> create();
 
+	void onActivate();
+	void onDeactivate();
+
 	void addCoroutine(const std::function<bool(float)>& coroutine);
 
 	uint32_t getID() const { return m_id; }
@@ -227,6 +230,8 @@ private:
 	std::shared_ptr<WireframeGrid> m_wireframeGrid;
 
 	ResourceWrapper<Shader> m_sampleComputeShader;
+
+	std::vector<ResourceWrapper<Resource>> m_cachedResources;;
 	
 };
 
