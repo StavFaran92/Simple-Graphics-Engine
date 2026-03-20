@@ -23,12 +23,24 @@ public:
 
 	static AssetHandle<T> empty;
 
-	AssetHandle() = default;
+	AssetHandle() : onChangedRegistry(std::make_shared<OnChangedRegistry>()) {};
 
-	AssetHandle(UUID uuid) : uuid(uuid)
+	AssetHandle(UUID uuid) : uuid(uuid), onChangedRegistry(std::make_shared<OnChangedRegistry>())
 	{
 		//m_resource = resource();
 	};
+
+	AssetHandle& operator=(const AssetHandle& other)
+	{
+		if (uuid == other.uuid)
+			return *this;
+
+		uuid = other.uuid;
+
+		notifyOnChanged();
+
+		return *this;
+	}
 
 	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
 	AssetHandle<U> as() const
@@ -111,8 +123,32 @@ public:
 
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetHandle, uuid);
 
+
+	void registerOnChanged(std::function<void(UUID)> cb)
+	{
+		onChangedRegistry->listeners.push_back(std::move(cb));
+	}
+
+private:
+	void notifyOnChanged()
+	{
+		if (onChangedRegistry)
+		{
+			for (auto& cb : onChangedRegistry->listeners)
+			{
+				cb(uuid);
+			}
+		}
+	}
 private:
 	UUID uuid = EMPTY_UUID;
+
+	struct OnChangedRegistry
+	{
+		std::vector<std::function<void(UUID)>> listeners;
+	};
+
+	std::shared_ptr<OnChangedRegistry> onChangedRegistry;
 
 	// Used mainly for debug
 	//ResourceWrapper<Resource> m_resource = ResourceWrapper<Resource>::empty;

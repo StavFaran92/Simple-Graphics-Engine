@@ -31,10 +31,8 @@ struct EngineAPI MeshRendererComponent : public Component
 		return iter->second.resource();
 	}
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>&)
-	{
-		attachSimple<MeshRendererComponent>(c, entityHandler);
-	}
+	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>&);
+	
 
 	template <class Archive>
 	void serialize(Archive& archive) {

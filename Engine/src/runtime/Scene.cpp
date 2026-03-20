@@ -303,6 +303,16 @@ void Scene::init(Context* context)
 	//logInfo("Sum is: {}", result);
 }
 
+void Scene::makeDirty()
+{
+	m_isDirty = true;
+}
+
+bool Scene::isDirty() const
+{
+	return m_isDirty;
+}
+
 void Scene::update(float deltaTime)
 {
 	for (auto&& [entity, transform] : m_registry->get().view<Transformation>().each())
@@ -362,6 +372,22 @@ void Scene::update(float deltaTime)
 		{
 			animator.update(deltaTime);
 		}
+	}
+
+	if (m_isDirty)
+	{
+		m_cachedResources.clear();
+
+		for (auto& [c, meshRenderer] : m_registry->get().view<MeshRendererComponent>().each())
+		{
+			std::vector<AssetHandle<Asset>> assets = meshRenderer.gatherDependencies();
+			for (auto asset : assets)
+			{
+				m_cachedResources.push_back(asset.resource());
+			}
+		}
+
+		m_isDirty = false;
 	}
 }
 

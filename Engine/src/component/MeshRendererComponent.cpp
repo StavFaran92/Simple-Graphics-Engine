@@ -2,10 +2,23 @@
 
 #include "memory/BuiltInAssets.h"
 #include "core/Logger.h"
+#include "runtime/Context.h"
+#include "runtime/Scene.h"
 
 MeshRendererComponent::MeshRendererComponent(AssetHandle<ModelAsset> mesh)
 	: mesh(mesh)
 {
+	static auto onChangedCB = [this](UUID)
+	{
+			Engine::get()->getContext()->getActiveScene()->makeDirty();
+	};
+	mesh.registerOnChanged(onChangedCB);
+	auto scene = Engine::get()->getContext()->getActiveScene();
+	if (!scene.isEmpty()) // Hack
+	{
+		scene->makeDirty();
+	}
+
 	int materialCount = mesh.resource()->getMaterialCount();
 	for (int i = 0; i < materialCount; i++)
 	{
@@ -22,4 +35,27 @@ AssetHandle<MaterialAsset> MeshRendererComponent::getMaterialBySlot(int slot) co
 		return AssetHandle<MaterialAsset>::empty;
 	}
 	return iter->second;
+}
+
+void MeshRendererComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>&)
+{
+	
+		if (auto tc = std::dynamic_pointer_cast<MeshRendererComponent>(c))
+		{
+			entityHandler.addComponent<MeshRendererComponent>(*tc);
+
+			static auto onChangedCB = [tc](UUID)
+				{
+					Engine::get()->getContext()->getActiveScene()->makeDirty();
+				};
+			tc->mesh.registerOnChanged(onChangedCB);
+			auto scene = Engine::get()->getContext()->getActiveScene();
+			if (!scene.isEmpty()) // Hack
+			{
+				scene->makeDirty();
+			}
+		}
+
+		//attachSimple<MeshRendererComponent>(c, entityHandler);
+	
 }

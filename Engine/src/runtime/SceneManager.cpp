@@ -32,8 +32,8 @@ bool SceneManager::removeScene(const AssetHandle<SceneAsset>& scene)
 
 ResourceWrapper<Scene> SceneManager::getActiveScene() const
 {
-	if (m_activeScene == -1)
-		return nullptr;
+	if (m_activeScene == -1 || m_activeScene >= m_scenes.size())
+		return ResourceWrapper<Scene>::empty;
 
 	return m_scenes.at(m_activeScene).resource();
 }

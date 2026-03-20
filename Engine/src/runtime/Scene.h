@@ -152,6 +152,9 @@ public:
 
     void onWindowResize(int w, int h);
 	void init(Context* context);
+
+	void makeDirty();
+	bool isDirty() const;
 private:
 	// -------------------- Methods -------------------- //
 	friend class Context;
@@ -232,6 +235,8 @@ private:
 	ResourceWrapper<Shader> m_sampleComputeShader;
 
 	std::vector<ResourceWrapper<Resource>> m_cachedResources;;
+
+	bool m_isDirty = false;
 	
 };
 
