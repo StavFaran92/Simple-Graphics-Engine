@@ -8,17 +8,6 @@
 MeshRendererComponent::MeshRendererComponent(AssetHandle<ModelAsset> mesh)
 	: mesh(mesh)
 {
-	static auto onChangedCB = [this](UUID)
-	{
-			Engine::get()->getContext()->getActiveScene()->makeDirty();
-	};
-	mesh.registerOnChanged(onChangedCB);
-	auto scene = Engine::get()->getContext()->getActiveScene();
-	if (!scene.isEmpty()) // Hack
-	{
-		scene->makeDirty();
-	}
-
 	int materialCount = mesh.resource()->getMaterialCount();
 	for (int i = 0; i < materialCount; i++)
 	{
@@ -37,25 +26,26 @@ AssetHandle<MaterialAsset> MeshRendererComponent::getMaterialBySlot(int slot) co
 	return iter->second;
 }
 
-void MeshRendererComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>&)
+void MeshRendererComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
 {
-	
-		if (auto tc = std::dynamic_pointer_cast<MeshRendererComponent>(c))
+	if (auto tc = std::dynamic_pointer_cast<MeshRendererComponent>(c))
+	{
+		entityHandler.addComponent<MeshRendererComponent>(*tc);
+	}
+}
+
+std::vector<AssetHandle<Asset>*> MeshRendererComponent::gatherDependencies() const
+{
+	std::vector<AssetHandle<Asset>*> dependencies;
+	dependencies.push_back((AssetHandle<Asset>*)&mesh);
+	for (auto& [name, mat] : m_material)
+	{
+		dependencies.push_back((AssetHandle<Asset>*) & mat);
+		auto samplers = mat->getSamplers();
+		for (const auto& [sName, sampler] : samplers)
 		{
-			entityHandler.addComponent<MeshRendererComponent>(*tc);
-
-			static auto onChangedCB = [tc](UUID)
-				{
-					Engine::get()->getContext()->getActiveScene()->makeDirty();
-				};
-			tc->mesh.registerOnChanged(onChangedCB);
-			auto scene = Engine::get()->getContext()->getActiveScene();
-			if (!scene.isEmpty()) // Hack
-			{
-				scene->makeDirty();
-			}
+			dependencies.push_back((AssetHandle<Asset>*) & sampler->texture);
 		}
-
-		//attachSimple<MeshRendererComponent>(c, entityHandler);
-	
+	}
+	return dependencies;
 }

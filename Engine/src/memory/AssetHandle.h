@@ -23,9 +23,9 @@ public:
 
 	static AssetHandle<T> empty;
 
-	AssetHandle() : onChangedRegistry(std::make_shared<OnChangedRegistry>()) {};
+	AssetHandle() = default;
 
-	AssetHandle(UUID uuid) : uuid(uuid), onChangedRegistry(std::make_shared<OnChangedRegistry>())
+	AssetHandle(UUID uuid) : uuid(uuid)
 	{
 		//m_resource = resource();
 	};
@@ -132,7 +132,7 @@ public:
 private:
 	void notifyOnChanged()
 	{
-		if (onChangedRegistry)
+		if (onChangedRegistry->listeners.size() > 0)
 		{
 			for (auto& cb : onChangedRegistry->listeners)
 			{
@@ -148,7 +148,7 @@ private:
 		std::vector<std::function<void(UUID)>> listeners;
 	};
 
-	std::shared_ptr<OnChangedRegistry> onChangedRegistry;
+	std::shared_ptr<OnChangedRegistry> onChangedRegistry = std::make_shared<OnChangedRegistry>();
 
 	// Used mainly for debug
 	//ResourceWrapper<Resource> m_resource = ResourceWrapper<Resource>::empty;

@@ -52,7 +52,9 @@ public:
             componentInstance->entity = Entity(m_entity, m_registry);
         }
 
-        T& component = m_registry->getRegistry().emplace_or_replace<T>(m_entity, *componentInstance);
+        T& component = m_registry->addComponent<T>(m_entity, componentInstance);
+
+        //T& component = m_registry->getRegistry().emplace_or_replace<T>(m_entity, *componentInstance);
 
         m_components.insert(typeid(T).name());
 
@@ -73,7 +75,9 @@ public:
 
         assert(valid() && "Invalid entity.");
 
-        T& component = m_registry->getRegistry().emplace_or_replace<T>(m_entity, std::forward<Args>(args)...);
+        T& component = m_registry->addComponent<T>(m_entity, std::forward<Args>(args)...);
+
+        //T& component = m_registry->getRegistry().emplace_or_replace<T>(m_entity, std::forward<Args>(args)...);
 
         if constexpr (std::is_same_v<T, NativeScriptComponent>)
         {

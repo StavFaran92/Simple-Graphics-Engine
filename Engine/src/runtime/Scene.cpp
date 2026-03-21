@@ -112,10 +112,10 @@ void Scene::onActivate()
 {
 	for (auto& [c, meshRenderer] : m_registry->get().view<MeshRendererComponent>().each())
 	{
-		std::vector<AssetHandle<Asset>> assets = meshRenderer.gatherDependencies();
+		std::vector<AssetHandle<Asset>*> assets = meshRenderer.gatherDependencies();
 		for (auto asset : assets)
 		{
-			m_cachedResources.push_back(asset.resource());
+			m_cachedResources.push_back(asset->resource());
 		}
 	}
 }
@@ -187,7 +187,20 @@ void Scene::init(Context* context)
 {
 	m_context = context;
 
+	static auto onChangedCB = [this](UUID) {
+		makeDirty();
+	};
+
 	m_registry = std::make_shared<SGE_Regsitry>();
+	m_registry->registerOnComponentAdded([](const Component& c) {
+		
+		auto assetDeps = c.gatherDependencies();
+		for (auto& asset : assetDeps)
+		{
+			asset->registerOnChanged(onChangedCB);
+		}
+		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
+	});
 
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
@@ -380,10 +393,10 @@ void Scene::update(float deltaTime)
 
 		for (auto& [c, meshRenderer] : m_registry->get().view<MeshRendererComponent>().each())
 		{
-			std::vector<AssetHandle<Asset>> assets = meshRenderer.gatherDependencies();
+			std::vector<AssetHandle<Asset>*> assets = meshRenderer.gatherDependencies();
 			for (auto asset : assets)
 			{
-				m_cachedResources.push_back(asset.resource());
+				m_cachedResources.push_back(asset->resource());
 			}
 		}
 

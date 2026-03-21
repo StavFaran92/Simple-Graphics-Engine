@@ -43,21 +43,8 @@ struct EngineAPI MeshRendererComponent : public Component
 
 	}
 
-	std::vector<AssetHandle<Asset>> gatherDependencies()
-	{
-		std::vector<AssetHandle<Asset>> dependencies;
-		dependencies.push_back(mesh);
-		for (auto& [name, mat] : m_material)
-		{
-			dependencies.push_back(mat);
-			auto samplers = mat->getSamplers();
-			for (const auto& [sName, sampler] : samplers)
-			{
-				dependencies.push_back(sampler->texture);
-			}
-		}
-		return dependencies;
-	}
+	std::vector<AssetHandle<Asset>*> gatherDependencies() const override;
+	
 
 	AssetHandle<ModelAsset> mesh = AssetHandle<ModelAsset>::empty;
 

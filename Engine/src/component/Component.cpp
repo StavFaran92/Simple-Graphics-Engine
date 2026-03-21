@@ -84,3 +84,7 @@ void InstanceBatch::build()
 	//glVertexAttribDivisor(9, 1);
 }
 
+std::vector<AssetHandle<Asset>*> Component::gatherDependencies() const
+{
+	return {};
+}

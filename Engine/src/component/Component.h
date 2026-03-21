@@ -20,6 +20,8 @@ class Scene;
 class Mesh;
 class Entity;
 class Transformation;
+class Asset;
+template<typename T> class AssetHandle;
 
 
 
@@ -27,6 +29,8 @@ struct EngineAPI Component
 {
 public:
 	virtual ~Component() = default;
+
+	virtual std::vector<AssetHandle<Asset>*> gatherDependencies() const;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
