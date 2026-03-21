@@ -173,6 +173,8 @@ private:
 	void bindScriptToLayer(entt::registry& reg, entt::entity entity);
 	std::shared_ptr<RenderView> getRenderView(const std::string& name) const;
 
+	void preloadSceneResources();
+
 private:
 	// -------------------- Attributes -------------------- //
 	uint32_t m_id = 0;

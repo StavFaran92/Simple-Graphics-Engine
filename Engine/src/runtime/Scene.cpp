@@ -110,14 +110,7 @@ ResourceWrapper<Scene> Scene::create()
 
 void Scene::onActivate()
 {
-	for (auto& [c, meshRenderer] : m_registry->get().view<MeshRendererComponent>().each())
-	{
-		std::vector<AssetHandle<Asset>*> assets = meshRenderer.gatherDependencies();
-		for (auto asset : assets)
-		{
-			m_cachedResources.push_back(asset->resource());
-		}
-	}
+	preloadSceneResources();
 }
 
 struct PlaneGPU {
@@ -389,17 +382,7 @@ void Scene::update(float deltaTime)
 
 	if (m_isDirty)
 	{
-		m_cachedResources.clear();
-
-		for (auto& [c, meshRenderer] : m_registry->get().view<MeshRendererComponent>().each())
-		{
-			std::vector<AssetHandle<Asset>*> assets = meshRenderer.gatherDependencies();
-			for (auto asset : assets)
-			{
-				m_cachedResources.push_back(asset->resource());
-			}
-		}
-
+		preloadSceneResources();
 		m_isDirty = false;
 	}
 }
@@ -1361,6 +1344,30 @@ std::shared_ptr<RenderView> Scene::getRenderView(const std::string& name) const
 	}
 
 	return iter->second;
+}
+
+void Scene::preloadSceneResources()
+{
+	std::vector<ResourceWrapper<Resource>> newCachedResources;
+
+	// Hack, I need THIS scene but cannot access it ATM
+	SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
+	for (auto& e : serializedScene.serializedEntities)
+	{
+		for (auto& c : e.components)
+		{
+			std::vector<AssetHandle<Asset>*> assets = c->gatherDependencies();
+			for (auto asset : assets)
+			{
+				newCachedResources.push_back(asset->resource());
+			}
+		}
+	}
+
+	// After the above collection its safe to clear the resources as 1 ref resources will not be cleaned (ref by the new list)
+	m_cachedResources = newCachedResources;
+
+	m_isDirty = false;
 }
 
 bool Scene::isSimulationActive() const
