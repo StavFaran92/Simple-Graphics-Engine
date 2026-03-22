@@ -84,7 +84,27 @@ void InstanceBatch::build()
 	//glVertexAttribDivisor(9, 1);
 }
 
-std::vector<AssetHandle<Asset>*> Component::gatherDependencies() const
+void Component::registerDependencyListener(const std::function<void(UUID)>& onChangedCB) const
+{
+	auto assetDeps = gatherDependenciesInternal();
+	for (auto& asset : assetDeps)
+	{
+		asset->registerOnChanged(onChangedCB);
+	}
+}
+
+std::vector<AssetHandle<Asset>> Component::gatherDependencies() const
+{
+	std::vector<AssetHandle<Asset>> result;
+	auto assetDependencies = gatherDependenciesInternal();
+	for (auto asset : assetDependencies)
+	{
+		result.push_back(*asset);
+	}
+	return result;
+}
+
+std::vector<AssetHandle<Asset>*> Component::gatherDependenciesInternal() const
 {
 	return {};
 }

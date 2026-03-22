@@ -43,7 +43,6 @@ struct EngineAPI MeshRendererComponent : public Component
 
 	}
 
-	std::vector<AssetHandle<Asset>*> gatherDependencies() const override;
 	
 
 	AssetHandle<ModelAsset> mesh = AssetHandle<ModelAsset>::empty;
@@ -59,7 +58,8 @@ struct EngineAPI MeshRendererComponent : public Component
 
 	RenderTechnique renderTechnique = RenderTechnique::Deferred;
 
-	
+protected:
+	std::vector<AssetHandle<Asset>*> gatherDependenciesInternal() const override;
 };
 
 REGISTER_COMPONENT(MeshRendererComponent)

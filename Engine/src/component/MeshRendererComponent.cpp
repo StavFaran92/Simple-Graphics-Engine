@@ -34,17 +34,17 @@ void MeshRendererComponent::attachToEntity(std::shared_ptr<Component> c, Entity 
 	}
 }
 
-std::vector<AssetHandle<Asset>*> MeshRendererComponent::gatherDependencies() const
+std::vector<AssetHandle<Asset>*> MeshRendererComponent::gatherDependenciesInternal() const
 {
 	std::vector<AssetHandle<Asset>*> dependencies;
-	dependencies.push_back((AssetHandle<Asset>*)&mesh);
+	dependencies.push_back((AssetHandle<Asset>*) &mesh);
 	for (auto& [name, mat] : m_material)
 	{
-		dependencies.push_back((AssetHandle<Asset>*) & mat);
+		dependencies.push_back((AssetHandle<Asset>*) &mat);
 		auto samplers = mat->getSamplers();
 		for (const auto& [sName, sampler] : samplers)
 		{
-			dependencies.push_back((AssetHandle<Asset>*) & sampler->texture);
+			dependencies.push_back((AssetHandle<Asset>*) &sampler->texture);
 		}
 	}
 	return dependencies;

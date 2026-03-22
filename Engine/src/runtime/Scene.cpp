@@ -187,11 +187,12 @@ void Scene::init(Context* context)
 	m_registry = std::make_shared<SGE_Regsitry>();
 	m_registry->registerOnComponentAdded([](const Component& c) {
 		
-		auto assetDeps = c.gatherDependencies();
-		for (auto& asset : assetDeps)
-		{
-			asset->registerOnChanged(onChangedCB);
-		}
+		c.registerDependencyListener(onChangedCB);
+		//auto assetDeps = c.gatherDependencies();
+		//for (auto& asset : assetDeps)
+		//{
+		//	asset->registerOnChanged(onChangedCB);
+		//}
 		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
 	});
 
@@ -1356,10 +1357,10 @@ void Scene::preloadSceneResources()
 	{
 		for (auto& c : e.components)
 		{
-			std::vector<AssetHandle<Asset>*> assets = c->gatherDependencies();
+			std::vector<AssetHandle<Asset>> assets = c->gatherDependencies();
 			for (auto asset : assets)
 			{
-				newCachedResources.push_back(asset->resource());
+				newCachedResources.push_back(asset.resource());
 			}
 		}
 	}

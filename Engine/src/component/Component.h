@@ -21,6 +21,7 @@ class Mesh;
 class Entity;
 class Transformation;
 class Asset;
+class UUID;
 template<typename T> class AssetHandle;
 
 
@@ -30,13 +31,17 @@ struct EngineAPI Component
 public:
 	virtual ~Component() = default;
 
-	virtual std::vector<AssetHandle<Asset>*> gatherDependencies() const;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
 	}
 
-	
+	void registerDependencyListener(const std::function<void(UUID)>& onChangedCB) const;
+
+	std::vector<AssetHandle<Asset>> gatherDependencies() const;
+
+protected:
+	virtual std::vector<AssetHandle<Asset>*> gatherDependenciesInternal() const;
 };
 
 template<typename T>
