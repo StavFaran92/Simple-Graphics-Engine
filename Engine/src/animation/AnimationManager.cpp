@@ -7,6 +7,9 @@
 
 #include "animation/AnimationLoader.h"
 
+#include "animation/AnimationBinaryLoader.h"
+#include "core/Factory.h"
+
 #include <filesystem>
 #include <stdexcept>
 
@@ -35,24 +38,46 @@ bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& resul
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::ANIMATION;
 	auto rootAnimDesc = result.emplaceCreateDesc<AnimationCreateDescriptor>();
-	//rootAnimDesc->data = modelInfo.meshDataList;
+	
+	rootAnimDesc->data.bones = animInfo.m_bones;
+	rootAnimDesc->data.name = animInfo.m_name;
+	rootAnimDesc->data.duration = animInfo.m_duration;
+	rootAnimDesc->data.ticksPerSecond = animInfo.m_ticksPerSecond;
+	rootAnimDesc->data.nodes = animInfo.m_nodes;
+	//TODO complete nodes
 
 	return true;
 }
 
 bool AnimationTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
-	throw std::runtime_error("Animation save not yet implemented!");
+	auto animDesc = dynamic_cast<const AnimationCreateDescriptor*>(&desc);
+	if (!animDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
+	const AnimationData& data = animDesc->data;
+
+	AnimationBinaryLoader::save(data, dst.absolute().string());
+
+	return true;
 }
 
 ResourceLoadDescriptor* AnimationTypeManager::makeResourceLoadDescriptor()
 {
-	return nullptr;
+	return new AnimationLoadDescriptor();
 }
 
 ResourceWrapper<Resource> AnimationTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
-	return ResourceWrapper<Resource>();
+	AnimationData animationData;
+	AnimationBinaryLoader::load(desc.sourcePath, animationData);
+
+	ResourceWrapper<Animation> animation = Factory<Animation>::create();
+	animation->build(animationData);
+	return animation;
 }
 
 void AnimationTypeManager::parse(ResourceLoadDescriptor& desc)

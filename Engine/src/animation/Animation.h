@@ -16,7 +16,16 @@ struct MeshNodeData
 	glm::mat4 transformation;
 	std::string name;
 	int childrenCount;
-	std::vector<MeshNodeData> children;
+	std::vector<int> children;
+};
+
+struct AnimationData
+{
+	std::string name;
+	std::unordered_map<std::string, std::shared_ptr<Bone>> bones;
+	float duration = 0;
+	float ticksPerSecond = 0;
+	std::vector<MeshNodeData> nodes;
 };
 
 struct EngineAPI AnimationLoadDescriptor : public ResourceLoadDescriptor
@@ -28,7 +37,7 @@ struct EngineAPI AnimationCreateDescriptor : public ResourceBuildDescriptor
 {
 	ResourceWrapper<Resource> createResource() override;
 
-	std::vector<AnimationData> data;
+	AnimationData data;
 };
 
 // Resource
@@ -45,18 +54,14 @@ public:
 
 	float getTicksPerSecond() const;
 
-	void build(const std::string& name, float duration, float ticksPerSecond, MeshNodeData& rootNode, std::unordered_map<std::string, std::shared_ptr<Bone>>& bones);
+	void build(const AnimationData& animationData);
 
 	static bool preprocess(const std::string& path);	
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);	
 
 private:
-	std::string m_name;
-	MeshNodeData m_rootNode;
-	std::unordered_map<std::string, std::shared_ptr<Bone>> m_bones;
-	float m_duration = 0;
-	float m_ticksPerSecond = 0;
+	AnimationData m_data;
 };
 
 // Asset

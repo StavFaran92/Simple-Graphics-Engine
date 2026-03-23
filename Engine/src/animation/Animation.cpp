@@ -2,6 +2,8 @@
 
 #include "animation/Bone.h"
 #include "animation/AnimationLoader.h"
+#include "core/Factory.h"
+#include "animation/AnimationManager.h"
 
 Animation::Animation()
 {
@@ -9,8 +11,7 @@ Animation::Animation()
 
 ResourceWrapper<Animation> Animation::load(const std::string& fileLocation, AnimationLoadDescriptor desc)
 {
-	desc.sourcePath = fileLocation;
-	return Engine::get()->getSubSystem<AnimationLoader>()->load(desc);
+	return AssetFactory::getManager(AssetType::ANIMATION)->loadResourceFromDisk(desc).as<Animation>();
 }
 
 void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices)
@@ -43,9 +44,9 @@ void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, g
 	glm::mat4 nodeTransform = nodeData.transformation;
 	glm::mat4 globalTransformation = parentTransform * nodeTransform; //convert bone transform from bone space into parent space (eventually into animated mesh space)
 
-	if (m_bones.find(nodeName) != m_bones.end())
+	if (m_data.bones.find(nodeName) != m_data.bones.end())
 	{
-		auto bone = m_bones[nodeName];
+		auto bone = m_data.bones[nodeName];
 		bone->update(currentTime);
 		nodeTransform = bone->getLocalTransform();
 		globalTransformation = parentTransform * nodeTransform;
@@ -55,7 +56,7 @@ void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, g
 
 	for (int i = 0; i < nodeData.childrenCount; i++)
 	{
-		calculateFinalBoneMatricesHelper(nodeData.children[i], globalTransformation, currentTime, finalBoneMatrices);
+		calculateFinalBoneMatricesHelper(m_data.nodes[nodeData.children[i]], globalTransformation, currentTime, finalBoneMatrices); // TODO fix - unsafe as fuck
 	}
 
 
@@ -63,26 +64,22 @@ void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, g
 
 void Animation::calculateFinalBoneMatrices(float currentTime, std::unordered_map<std::string, glm::mat4>& outFinalBoneMatrices)
 {
-	return calculateFinalBoneMatricesHelper(m_rootNode, glm::mat4(1.0), currentTime, outFinalBoneMatrices);
+	return calculateFinalBoneMatricesHelper(m_data.nodes[0], glm::mat4(1.0), currentTime, outFinalBoneMatrices);
 }
 
 float Animation::getDuration() const
 {
-	return m_duration;
+	return m_data.duration;
 }
 
 float Animation::getTicksPerSecond() const
 {
-	return m_ticksPerSecond;
+	return m_data.ticksPerSecond;
 }
 
-void Animation::build(const std::string& name, float duration, float ticksPerSecond, MeshNodeData& rootNode, std::unordered_map<std::string, std::shared_ptr<Bone>>& bones)
+void Animation::build(const AnimationData& animationData)
 {
-	m_name = name;
-	m_duration = duration;
-	m_ticksPerSecond = ticksPerSecond;
-	m_rootNode = rootNode;
-	m_bones = bones;
+	m_data = animationData;
 }
 
 bool Animation::preprocess(const std::string& path)
@@ -92,7 +89,7 @@ bool Animation::preprocess(const std::string& path)
 
 
 ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource() {
-	return Animation::load(sourcePath, *this);
+	return AssetFactory::getManager(AssetType::ANIMATION)->loadResourceFromDisk(*this);
 }
 
 void AnimationAsset::serialize(nlohmann::json& j) const
@@ -108,4 +105,9 @@ void AnimationAsset::deserialize(const nlohmann::json& j)
 	// No custom fields to restore at the moment; placeholder for future
 	// animation-asset-specific metadata.
 	(void)j;
+}
+
+ResourceWrapper<Resource> AnimationCreateDescriptor::createResource()
+{
+	throw std::exception("Not yet implmeneted.");
 }

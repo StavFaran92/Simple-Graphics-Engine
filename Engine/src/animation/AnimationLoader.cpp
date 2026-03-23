@@ -17,20 +17,26 @@ AnimationLoader::AnimationLoader()
     m_importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);
 }
 
-void readSceneNodeData(MeshNodeData& nodeData, const aiNode* scene)
+int readSceneNodeData(const aiNode* scene, std::vector<MeshNodeData>& nodes)
 {
     assert(src);
 
+    int nodeID = nodes.size();
+
+    MeshNodeData nodeData;
     nodeData.name = scene->mName.data;
     nodeData.transformation = AssimpGLMHelpers::convertMat4ToGLMFormat(scene->mTransformation);
     nodeData.childrenCount = scene->mNumChildren;
+    nodes.push_back(nodeData);
 
     for (int i = 0; i < scene->mNumChildren; i++)
     {
-        MeshNodeData newData;
-        readSceneNodeData(newData, scene->mChildren[i]);
-        nodeData.children.push_back(newData);
+        int childID = readSceneNodeData(scene->mChildren[i], nodes);
+        nodes[nodeID].children.push_back(childID);
     }
+
+    return nodeID;
+    
 }
 
 void readAnimationBones(const aiAnimation* animation, std::unordered_map<std::string, std::shared_ptr<Bone>>& bones)
@@ -74,16 +80,21 @@ void readAnimationBones(const aiAnimation* animation, std::unordered_map<std::st
     }
 }
 
-ResourceWrapper<Animation> AnimationLoader::load(const AnimationLoadDescriptor& aInfo)
+bool AnimationLoader::parseAnimation(const std::string& filepath, AnimationInfo& outAnimInfo)
 {
-    std::string filepath = Engine::get()->getProjectDirectory() + aInfo.sourcePath;
+    // Validate
+    if (!std::filesystem::exists(filepath))
+    {
+        logError("File doesn't exists: " + filepath);
+        return false;
+    }
 
     const aiScene* scene = m_importer.ReadFile(filepath, aiProcess_Triangulate);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        logError("ERROR::ASSIMP::{}", m_importer.GetErrorString());
-        return ResourceWrapper<Animation>::empty;
+        logError("Failed to load animation: {}", m_importer.GetErrorString());
+        return false;
     }
 
     assert(scene && scene->mRootNode && scene->HasAnimations());
@@ -91,24 +102,17 @@ ResourceWrapper<Animation> AnimationLoader::load(const AnimationLoadDescriptor& 
 
     auto aiAnimation = scene->mAnimations[0];
 
-    MeshNodeData rootNode; //todo fix
-    readSceneNodeData(rootNode, scene->mRootNode);
+    std::vector<MeshNodeData> nodes; //todo fix
+    readSceneNodeData(scene->mRootNode, nodes);
 
     std::unordered_map<std::string, std::shared_ptr<Bone>> bones;
     readAnimationBones(aiAnimation, bones);
 
-    ResourceWrapper<Animation> anim = Factory<Animation>::create();
+    outAnimInfo.m_nodes = nodes;
+    outAnimInfo.m_bones = bones;
+    outAnimInfo.m_duration = (float)aiAnimation->mDuration;
+    outAnimInfo.m_ticksPerSecond = (float)aiAnimation->mTicksPerSecond;
+    outAnimInfo.m_name = aiAnimation->mName.C_Str();
 
-    //Animation* anim = new Animation();
-    anim->build(aiAnimation->mName.C_Str(), (float)aiAnimation->mDuration, (float)aiAnimation->mTicksPerSecond, rootNode, bones);
-
-    //Engine::get()->getMemoryPool().add(aInfo.uuid, anim);
-    //auto& res = ResourceWrapper<Animation>(aInfo.uuid);
-
-    return anim;
-}
-
-bool AnimationLoader::parseAnimation(const std::string& fileLocation, AnimationInfo& outAnimInfo)
-{
-    return false;
+    return true;
 }
