@@ -61,6 +61,9 @@ public:
     Bone(const std::vector<KeyPosition>& positions, const std::vector<KeyRotation>& rotations, const std::vector<KeyScale>& scalings);
 	void update(float animationTime);
 	const glm::mat4& getLocalTransform() const;
+	const std::vector<KeyPosition>& getPositions() const;
+	const std::vector<KeyRotation>& getRotations() const;
+	const std::vector<KeyScale>& getScales() const;
 	glm::mat4 interpolatePosition(float animationTime) const;
 	glm::mat4 interpolateRotation(float animationTime) const;
 	glm::mat4 interpolateScale(float animationTime) const;

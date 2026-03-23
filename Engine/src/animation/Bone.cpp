@@ -73,3 +73,18 @@ const glm::mat4& Bone::getLocalTransform() const
 {
 	return m_localTransform;
 }
+
+const std::vector<KeyPosition>& Bone::getPositions() const
+{
+    return m_positions;
+}
+
+const std::vector<KeyRotation>& Bone::getRotations() const
+{
+    return m_rotations;
+}
+
+const std::vector<KeyScale>& Bone::getScales() const
+{
+    return m_scalings;
+}
