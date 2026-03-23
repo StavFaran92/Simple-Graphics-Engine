@@ -186,13 +186,7 @@ void Scene::init(Context* context)
 
 	m_registry = std::make_shared<SGE_Regsitry>();
 	m_registry->registerOnComponentAdded([](const Component& c) {
-		
 		c.registerDependencyListener(onChangedCB);
-		//auto assetDeps = c.gatherDependencies();
-		//for (auto& asset : assetDeps)
-		//{
-		//	asset->registerOnChanged(onChangedCB);
-		//}
 		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
 	});
 

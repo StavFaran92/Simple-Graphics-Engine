@@ -5,6 +5,8 @@
 #include "memory/AssetRecord.h"
 #include "memory/AssetHandle.h"
 
+#include "animation/AnimationLoader.h"
+
 #include <filesystem>
 #include <stdexcept>
 
@@ -22,11 +24,18 @@ Ref<Asset> AnimationTypeManager::deserializeAsset(const nlohmann::json& j)
 
 bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
+	AnimationLoader::AnimationInfo animInfo;
+	if (!Engine::get()->getSubSystem<AnimationLoader>()->parseAnimation(src, animInfo))
+	{
+		logWarning("Failed to import asset: {}", src);
+		return false;
+	}
+
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::ANIMATION;
-	auto animDesc = result.emplaceLoadDesc<AnimationLoadDescriptor>();
-	animDesc->sourcePath = src;
+	auto rootAnimDesc = result.emplaceCreateDesc<AnimationCreateDescriptor>();
+	//rootAnimDesc->data = modelInfo.meshDataList;
 
 	return true;
 }

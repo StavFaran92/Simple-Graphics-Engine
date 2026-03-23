@@ -20,9 +20,30 @@ struct AnimationLoadDescriptor;
 class EngineAPI AnimationLoader : public SubSystem
 {
 public:
+
+	struct MeshNodeData
+	{
+		// convert from parent node space to this node space
+		glm::mat4 transformation;
+		std::string name;
+		int childrenCount;
+		std::vector<MeshNodeData> children;
+	};
+
+	struct AnimationInfo
+	{
+		std::string m_name;
+		MeshNodeData m_rootNode;
+		std::unordered_map<std::string, std::shared_ptr<Bone>> m_bones;
+		float m_duration = 0;
+		float m_ticksPerSecond = 0;
+	};
+
 	AnimationLoader();
 
 	ResourceWrapper<Animation> load(const AnimationLoadDescriptor& aInfo);
+
+	bool parseAnimation(const std::string& fileLocation, AnimationInfo& outAnimInfo);
 
 
 private:

@@ -107,3 +107,8 @@ ResourceWrapper<Animation> AnimationLoader::load(const AnimationLoadDescriptor& 
 
     return anim;
 }
+
+bool AnimationLoader::parseAnimation(const std::string& fileLocation, AnimationInfo& outAnimInfo)
+{
+    return false;
+}
