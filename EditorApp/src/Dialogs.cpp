@@ -383,7 +383,6 @@ void displayLuaScriptCreatorDialog()
 				desc.name = uniqueName.name;
 				desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 				LuaScriptCreateDescriptor createDesc;
-				// TODO: makeResourceCreateDescriptor<LuaScriptCreateDescriptor>()
 				Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 				ImGui::CloseCurrentPopup();
 			}

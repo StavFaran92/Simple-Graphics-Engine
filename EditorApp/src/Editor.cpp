@@ -639,7 +639,7 @@ public:
 
 		
 
-		icons["mesh"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png");
+		icons["model"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png");
 		icons["texture"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png");
 		icons["animation"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-skeleton-100.png");
 		icons["shader"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-pixel-100.png");

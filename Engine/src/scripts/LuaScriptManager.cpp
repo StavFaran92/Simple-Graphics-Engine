@@ -7,6 +7,7 @@
 #include "core/Engine.h"
 
 #include <filesystem>
+#include <fstream>
 
 Ref<Asset> LuaScriptTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
@@ -33,12 +34,36 @@ bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& resul
 
 bool LuaScriptTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
-	return false;
+	std::ofstream os(dst.absolute());
+	if (!os.is_open())
+		return false;
+
+	std::string script = R"(-- Auto-generated Lua script
+
+Script = {}
+
+function Script:create()
+    -- initialization logic
+end
+
+function Script:update(dt)
+    -- update logic
+end
+
+function Script:destroy()
+    -- destroy
+end
+)";
+
+	os << script;
+
+	os.close();
+	return true;
 }
 
 ResourceLoadDescriptor* LuaScriptTypeManager::makeResourceLoadDescriptor()
 {
-	return nullptr;
+	return new LuaScriptLoadDescriptor();
 }
 
 ResourceWrapper<Resource> LuaScriptTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
