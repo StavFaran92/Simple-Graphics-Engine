@@ -7,6 +7,14 @@
 #include "memory/Asset.h"
 #include "geometry/ModelImporter.h"
 
+struct ModelData
+{
+	std::vector<MeshData> m_meshes;
+	std::vector<glm::mat4> m_bonesOffsets;
+	std::unordered_map<std::string, unsigned int> m_bonesNameToIDMap;
+	std::set<int> m_materialSlots{};
+};
+
 struct EngineAPI ModelLoadDescriptor : public ResourceLoadDescriptor
 {
 	ResourceWrapper<Resource> loadResource() override;
@@ -16,7 +24,7 @@ struct EngineAPI ModelCreateDescriptor : public ResourceBuildDescriptor
 {
 	ResourceWrapper<Resource> createResource() override;
 
-	std::vector<MeshData> data;
+	ModelData data;
 };
 
 // Resource

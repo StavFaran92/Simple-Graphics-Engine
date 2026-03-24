@@ -30,7 +30,9 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::MODEL;
 	auto rootModelDesc = result.emplaceCreateDesc<ModelCreateDescriptor>();
-	rootModelDesc->data = modelInfo.meshDataList;
+	rootModelDesc->data.m_meshes = modelInfo.meshDataList;
+	rootModelDesc->data.m_bonesNameToIDMap = modelInfo.bonesNameToIDMap;
+	rootModelDesc->data.m_bonesOffsets = modelInfo.bonesOffsets;
 
 	// Build texture dependency nodes (embedded textures)
 	for (const TextureData& tData : modelInfo.textureDataList)
@@ -98,17 +100,14 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 
 bool ModelTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
-	auto meshGroupDesc = dynamic_cast<const ModelCreateDescriptor*>(&desc);
-	if (!meshGroupDesc)
+	auto modelDesc = dynamic_cast<const ModelCreateDescriptor*>(&desc);
+	if (!modelDesc)
 	{
 		logError("Invalid Descriptor specified.");
 		return false;
 	}
 
-	const std::vector<MeshData>& data = meshGroupDesc->data;
-
-	//MeshExporter::exportMeshes(std::vector<MeshData>{ data }, dst.absolute().string());
-	MeshBinaryLoader::save(data, dst.absolute().string());
+	ModelBinaryLoader::save(modelDesc->data, dst.absolute().string());
 
 	return true;
 }

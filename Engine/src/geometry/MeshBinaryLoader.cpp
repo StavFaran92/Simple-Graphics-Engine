@@ -3,10 +3,18 @@
 #include <fstream>
 
 #include "core/Logger.h"
-#include "geometry/Mesh.h"
+#include "geometry/Model.h"
 
 namespace
 {
+	struct ModelBinaryHeader
+	{
+		uint32_t meshCount = 0;
+		uint32_t bonesOffsetsCount = 0;
+		uint32_t bonesNameToIDCount = 0;
+		uint32_t materialSlotsCount = 0;
+	};
+
 	// Per-mesh header describing vector sizes; kept private to this translation unit.
 	struct MeshBinaryMeshHeader
 	{
@@ -45,24 +53,28 @@ namespace
 } // anonymous namespace
 
 
-bool MeshBinaryLoader::save(const std::vector<MeshData>& meshes, const std::string& targetFile)
+bool ModelBinaryLoader::save(const ModelData& modelData, const std::string& targetFile)
 {
 	std::ofstream file(targetFile, std::ios::binary);
 	if (!file.is_open())
 	{
-		logError("MeshBinaryLoader::save - Failed to open file '{}' for writing", targetFile);
+		logError("ModelBinaryLoader::save - Failed to open file '{}' for writing", targetFile);
 		return false;
 	}
 
-	// Write mesh count
-	uint32_t meshCount = static_cast<uint32_t>(meshes.size());
-	if (!writeAll(file, &meshCount, sizeof(meshCount)))
+	ModelBinaryHeader modelHeader{};
+	modelHeader.meshCount = static_cast<uint32_t>(modelData.m_meshes.size());
+	modelHeader.bonesOffsetsCount = static_cast<uint32_t>(modelData.m_bonesOffsets.size());
+	modelHeader.bonesNameToIDCount = static_cast<uint32_t>(modelData.m_bonesNameToIDMap.size());
+	modelHeader.materialSlotsCount = static_cast<uint32_t>(modelData.m_materialSlots.size());
+
+	if (!writeAll(file, &modelHeader, sizeof(modelHeader)))
 	{
-		logError("MeshBinaryLoader::save - Failed to write mesh count to '{}'", targetFile);
+		logError("ModelBinaryLoader::save - Failed to write model header to '{}'", targetFile);
 		return false;
 	}
 
-	for (const MeshData& mesh : meshes)
+	for (const MeshData& mesh : modelData.m_meshes)
 	{
 		MeshBinaryMeshHeader header{};
 		header.nameLength       = static_cast<uint32_t>(mesh.name.size());
@@ -80,7 +92,7 @@ bool MeshBinaryLoader::save(const std::vector<MeshData>& meshes, const std::stri
 		// Write header
 		if (!writeAll(file, &header, sizeof(header)))
 		{
-			logError("MeshBinaryLoader::save - Failed to write mesh header to '{}'", targetFile);
+			logError("ModelBinaryLoader::save - Failed to write mesh header to '{}'", targetFile);
 			return false;
 		}
 
@@ -89,7 +101,7 @@ bool MeshBinaryLoader::save(const std::vector<MeshData>& meshes, const std::stri
 		{
 			if (!writeAll(file, mesh.name.data(), header.nameLength))
 			{
-				logError("MeshBinaryLoader::save - Failed to write mesh name to '{}'", targetFile);
+				logError("ModelBinaryLoader::save - Failed to write mesh name to '{}'", targetFile);
 				return false;
 			}
 		}
@@ -123,42 +135,58 @@ bool MeshBinaryLoader::save(const std::vector<MeshData>& meshes, const std::stri
 		if (!writeAll(file, &mesh.restTransform, sizeof(mesh.restTransform))) return false;
 	}
 
+	if (!writeAll(file, modelData.m_bonesOffsets.data(),
+		modelData.m_bonesOffsets.size() * sizeof(glm::mat4))) return false;
+
+	for (const auto& [boneName, boneID] : modelData.m_bonesNameToIDMap)
+	{
+		const uint32_t nameLength = static_cast<uint32_t>(boneName.size());
+		if (!writeAll(file, &nameLength, sizeof(nameLength))) return false;
+		if (!writeAll(file, boneName.data(), nameLength)) return false;
+		if (!writeAll(file, &boneID, sizeof(boneID))) return false;
+	}
+
+	for (int slot : modelData.m_materialSlots)
+	{
+		if (!writeAll(file, &slot, sizeof(slot))) return false;
+	}
+
 	return true;
 }
 
 
-bool MeshBinaryLoader::load(const std::string& sourceFile, std::vector<MeshData>& outMeshes)
+bool ModelBinaryLoader::load(const std::string& sourceFile, ModelData& outModelData)
 {
 	std::ifstream file(sourceFile, std::ios::binary);
 	if (!file.is_open())
 	{
-		logError("MeshBinaryLoader::load - Failed to open file '{}' for reading", sourceFile);
-		outMeshes.clear();
+		logError("ModelBinaryLoader::load - Failed to open file '{}' for reading", sourceFile);
+		outModelData = {};
 		return false;
 	}
 
-	uint32_t meshCount = 0;
-	if (!readAll(file, &meshCount, sizeof(meshCount)))
+	ModelBinaryHeader modelHeader{};
+	if (!readAll(file, &modelHeader, sizeof(modelHeader)))
 	{
-		logError("MeshBinaryLoader::load - Failed to read mesh count from '{}'", sourceFile);
-		outMeshes.clear();
+		logError("ModelBinaryLoader::load - Failed to read model header from '{}'", sourceFile);
+		outModelData = {};
 		return false;
 	}
 
-	outMeshes.clear();
-	outMeshes.resize(meshCount);
+	outModelData = {};
+	outModelData.m_meshes.resize(modelHeader.meshCount);
 
-	for (uint32_t i = 0; i < meshCount; ++i)
+	for (uint32_t i = 0; i < modelHeader.meshCount; ++i)
 	{
 		MeshBinaryMeshHeader header{};
 		if (!readAll(file, &header, sizeof(header)))
 		{
-			logError("MeshBinaryLoader::load - Failed to read mesh header from '{}'", sourceFile);
-			outMeshes.clear();
+			logError("ModelBinaryLoader::load - Failed to read mesh header from '{}'", sourceFile);
+			outModelData = {};
 			return false;
 		}
 
-		MeshData& mesh = outMeshes[i];
+		MeshData& mesh = outModelData.m_meshes[i];
 
 		// Read name
 		mesh.name.clear();
@@ -167,8 +195,8 @@ bool MeshBinaryLoader::load(const std::string& sourceFile, std::vector<MeshData>
 			mesh.name.resize(header.nameLength);
 			if (!readAll(file, mesh.name.data(), header.nameLength))
 			{
-				logError("MeshBinaryLoader::load - Failed to read mesh name from '{}'", sourceFile);
-				outMeshes.clear();
+				logError("ModelBinaryLoader::load - Failed to read mesh name from '{}'", sourceFile);
+				outModelData = {};
 				return false;
 			}
 		}
@@ -216,6 +244,36 @@ bool MeshBinaryLoader::load(const std::string& sourceFile, std::vector<MeshData>
 
 		// Rest transform
 		if (!readAll(file, &mesh.restTransform, sizeof(mesh.restTransform))) return false;
+	}
+
+	outModelData.m_bonesOffsets.resize(modelHeader.bonesOffsetsCount);
+	if (!readAll(file, outModelData.m_bonesOffsets.data(),
+		outModelData.m_bonesOffsets.size() * sizeof(glm::mat4)))
+	{
+		outModelData = {};
+		return false;
+	}
+
+	for (uint32_t i = 0; i < modelHeader.bonesNameToIDCount; ++i)
+	{
+		uint32_t nameLength = 0;
+		if (!readAll(file, &nameLength, sizeof(nameLength))) { outModelData = {}; return false; }
+
+		std::string boneName;
+		boneName.resize(nameLength);
+		if (!readAll(file, boneName.data(), nameLength)) { outModelData = {}; return false; }
+
+		unsigned int boneID = 0;
+		if (!readAll(file, &boneID, sizeof(boneID))) { outModelData = {}; return false; }
+
+		outModelData.m_bonesNameToIDMap[boneName] = boneID;
+	}
+
+	for (uint32_t i = 0; i < modelHeader.materialSlotsCount; ++i)
+	{
+		int slot = 0;
+		if (!readAll(file, &slot, sizeof(slot))) { outModelData = {}; return false; }
+		outModelData.m_materialSlots.insert(slot);
 	}
 
 	return true;
