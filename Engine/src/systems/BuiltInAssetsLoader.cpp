@@ -106,7 +106,7 @@ void BuiltInAssetsLoader::loadMeshes()
 
 	{
 		AssetBuildDescriptor desc;
-		desc.aType = AssetType::MESH;
+		desc.aType = AssetType::MODEL;
 		desc.name = "SGE_MESH_BOX";
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
@@ -117,7 +117,7 @@ void BuiltInAssetsLoader::loadMeshes()
 
 	{
 		AssetBuildDescriptor desc;
-		desc.aType = AssetType::MESH;
+		desc.aType = AssetType::MODEL;
 		desc.name = "SGE_MESH_QUAD";
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
@@ -127,7 +127,7 @@ void BuiltInAssetsLoader::loadMeshes()
 
 	{
 		AssetBuildDescriptor desc;
-		desc.aType = AssetType::MESH;
+		desc.aType = AssetType::MODEL;
 		desc.name = "SGE_MESH_SPHERE";
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
@@ -137,7 +137,7 @@ void BuiltInAssetsLoader::loadMeshes()
 
 	{
 		AssetBuildDescriptor desc;
-		desc.aType = AssetType::MESH;
+		desc.aType = AssetType::MODEL;
 		desc.name = "SGE_MESH_GRID";
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
@@ -147,7 +147,7 @@ void BuiltInAssetsLoader::loadMeshes()
 
 	{
 		AssetBuildDescriptor desc;
-		desc.aType = AssetType::MESH;
+		desc.aType = AssetType::MODEL;
 		desc.name = "SGE_MESH_CAMERA";
 		desc.isEngineOwned = true;
 		ModelLoadDescriptor loadDesc;

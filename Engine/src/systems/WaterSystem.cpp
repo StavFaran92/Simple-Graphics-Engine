@@ -25,7 +25,7 @@ Entity WaterSystem::createPool()
 
 	// TODO use grid instead
 	AssetBuildDescriptor meshDesc;
-	meshDesc.aType = AssetType::MESH;
+	meshDesc.aType = AssetType::MODEL;
 	meshDesc.isEngineOwned = true;
 	ModelLoadDescriptor meshLoadDesc;
 	meshLoadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/sd_plane.fbx";

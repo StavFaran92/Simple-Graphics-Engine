@@ -157,7 +157,7 @@ void AssetViewWindow::display()
 
 					int iconID = 0;
 					switch (aInfo.aType) {
-					case AssetType::MESH:     iconID = icons.at("mesh")->getID(); break;
+					case AssetType::MODEL:     iconID = icons.at("model")->getID(); break;
 					case AssetType::TEXTURE:  iconID = icons.at("texture")->getID(); break;
 					case AssetType::ANIMATION:iconID = icons.at("animation")->getID(); break;
 					case AssetType::SHADER:   iconID = icons.at("shader")->getID(); break;

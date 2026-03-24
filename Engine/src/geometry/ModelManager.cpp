@@ -2,7 +2,6 @@
 
 #include "geometry/Model.h"
 #include "geometry/ModelImporter.h"
-#include "geometry/MeshExporter.h"
 #include "geometry/MeshBinaryLoader.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
@@ -27,21 +26,13 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, modelInfo);
 
 	// Build root Model node
-	//std::filesystem::path path(src);
-	//result.name = path.filename().stem().string();
-	//result.createDescriptor.aType = AssetType::MODEL;
-	//result.createDescriptor.sourcePath = src;
-	//result.createDescriptor.makeResourceCreateDescriptor<ModelCreateDescriptor>()->data = modelInfo.meshDataList;
-
-	// Build MeshArray node
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
-	result.assetDesc.aType = AssetType::MESH;
+	result.assetDesc.aType = AssetType::MODEL;
 	auto rootModelDesc = result.emplaceCreateDesc<ModelCreateDescriptor>();
 	rootModelDesc->data = modelInfo.meshDataList;
 
 	// Build texture dependency nodes (embedded textures)
-	//std::map<std::string, std::string> textureNameToSlot; // texture name -> slot name
 	for (const TextureData& tData : modelInfo.textureDataList)
 	{
 		ImportNode textureNode;
@@ -52,7 +43,6 @@ bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
 		textureResourceDesc->textureData = tData;
 		
 		// Store texture node - we'll add it to material dependencies
-		//textureNameToSlot[tData.textureName] = ""; // Will be set when mapping to materials
 		result.dependencies["TEXTURE_" + tData.textureName] = textureNode;
 	}
 

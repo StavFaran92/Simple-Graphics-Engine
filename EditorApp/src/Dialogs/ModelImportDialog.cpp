@@ -36,7 +36,7 @@ bool ModelImportDialog::acceptContent()
 		entity.addComponent<RenderableComponent>();
 
 		AssetBuildDescriptor desc;
-		desc.aType = AssetType::MESH;
+		desc.aType = AssetType::MODEL;
 		desc.name = uniqueName.name;
 		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		ModelLoadDescriptor modelLoadDesc;

@@ -176,7 +176,7 @@ void InspectorWindow::display()
 				meshName = meshComponent.mesh.info().name;
 			}
 
-			addAssetSelectWidget(meshName, AssetType::MESH, [&meshComponent](UUID uuid) {
+			addAssetSelectWidget(meshName, AssetType::MODEL, [&meshComponent](UUID uuid) {
 				meshComponent.mesh = AssetHandle<ModelAsset>(uuid);
 			});
 
@@ -635,7 +635,7 @@ void InspectorWindow::display()
 				meshName = volume.mesh.info().name;
 			}
 
-			addAssetSelectWidget(meshName, AssetType::MESH, [&volume](UUID uuid) {
+			addAssetSelectWidget(meshName, AssetType::MODEL, [&volume](UUID uuid) {
 				volume.mesh = AssetHandle<ModelAsset>(uuid);
 				});
 
