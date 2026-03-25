@@ -74,5 +74,22 @@ void ShaderTypeManager::parse(ResourceLoadDescriptor& desc)
 
 void ShaderTypeManager::parse(ResourceBuildDescriptor& desc)
 {
+	auto shaderDesc = dynamic_cast<ShaderCreateDescriptor*>(&desc);
+	if (!shaderDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return;
+	}
+
+	shaderDesc->code = std::string(R"(
+
+#frag
+
+#version 330
+
+void frag(inout vec3 color)
+{      
+    color = vec3(1.0f, 0.0f, 0.0f);
+})");
 }
 

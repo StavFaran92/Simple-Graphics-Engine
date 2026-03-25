@@ -5,22 +5,7 @@
 
 struct EngineAPI LuaScriptCreateDescriptor : public ResourceBuildDescriptor
 {
-	std::string script = R"(-- Auto-generated Lua script
-
-Script = {}
-
-function Script:create()
-    -- initialization logic
-end
-
-function Script:update(dt)
-    -- update logic
-end
-
-function Script:destroy()
-    -- destroy
-end
-)";
+	std::string script;
 };
 
 struct EngineAPI LuaScriptLoadDescriptor : public ResourceLoadDescriptor

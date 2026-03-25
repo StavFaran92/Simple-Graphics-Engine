@@ -75,6 +75,29 @@ void LuaScriptTypeManager::parse(ResourceLoadDescriptor& desc)
 
 void LuaScriptTypeManager::parse(ResourceBuildDescriptor& desc)
 {
+	auto luaDesc = dynamic_cast<LuaScriptCreateDescriptor*>(&desc);
+	if (!luaDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return;
+	}
+
+	luaDesc->script =  R"(-- Auto-generated Lua script
+
+Script = {}
+
+function Script:create()
+    -- initialization logic
+end
+
+function Script:update(dt)
+    -- update logic
+end
+
+function Script:destroy()
+    -- destroy
+end
+)";
 }
 
 
