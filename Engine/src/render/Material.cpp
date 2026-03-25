@@ -251,16 +251,6 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, Materi
 	return ResourceWrapper<Material>::empty;
 }
 
-ResourceWrapper<Resource> MaterialCreateDescriptor::createResource()
-{
-	return Material::create(data.renderMode); //todo fix
-}
-
-ResourceWrapper<Resource> MaterialLoadDescriptor::loadResource()
-{
-	return Material::load(sourcePath, *this);
-}
-
 //////////////////////////
 // Asset
 //////////////////////////

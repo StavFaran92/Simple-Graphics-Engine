@@ -70,13 +70,10 @@ struct SceneData
 struct EngineAPI SceneCreateDescriptor : public ResourceBuildDescriptor
 {
 	SceneData data;
-
-	ResourceWrapper<Resource> createResource() override;
 };
 
 struct EngineAPI SceneLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
 };
 
 // Resource

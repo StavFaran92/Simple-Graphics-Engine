@@ -594,21 +594,6 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	textureData.textureName = textureName;
 }
 
-#include "texture/TextureBinaryLoader.h"
-ResourceWrapper<Resource> TextureLoadDescriptor::loadResource() 
-{
-	TextureData textureData;
-	TextureBinaryLoader::load(sourcePath, textureData);
-	ResourceWrapper<Texture> texture = Texture::createTexture(textureData);
-	return texture;
-}
-
-ResourceWrapper<Resource> TextureCreateDescriptor::createResource()
-{
-	return Texture::createTexture(textureData);
-}
-
-
 //adi is your love of your life
 
 void TextureAsset::serialize(nlohmann::json& j) const

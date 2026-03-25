@@ -26,16 +26,6 @@ ResourceWrapper<LuaScript> LuaScript::create()
 	return script;
 }
 
-ResourceWrapper<Resource> LuaScriptLoadDescriptor::loadResource()
-{
-	return LuaScript::load(sourcePath, *this);
-}
-
-ResourceWrapper<Resource> LuaScriptCreateDescriptor::createResource()
-{
-	return ResourceWrapper<Resource>();
-}
-
 // ============================================================
 //  LuaScriptAsset (Asset wrapper)
 // ============================================================

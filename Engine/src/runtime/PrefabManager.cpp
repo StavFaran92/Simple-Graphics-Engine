@@ -58,7 +58,14 @@ ResourceLoadDescriptor* PrefabTypeManager::makeResourceLoadDescriptor()
 
 ResourceWrapper<Resource> PrefabTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
-	return ResourceWrapper<Resource>();
+	auto prefabDesc = dynamic_cast<const PrefabLoadDescriptor*>(&desc);
+	if (!prefabDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return ResourceWrapper<Resource>::empty;
+	}
+
+	return Prefab::load(desc.sourcePath, *prefabDesc);
 }
 
 void PrefabTypeManager::parse(ResourceLoadDescriptor& desc)

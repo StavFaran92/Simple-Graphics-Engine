@@ -61,16 +61,6 @@
 #include "systems/VolumetricSystem.h"
 #include "core/Factory.h"
 
-ResourceWrapper<Resource> SceneCreateDescriptor::createResource()
-{
-	return Scene::create();
-}
-
-ResourceWrapper<Resource> SceneLoadDescriptor::loadResource()
-{
-	return Scene::load(sourcePath, *this);
-}
-
 ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
 	desc.sourcePath = fileLocation;

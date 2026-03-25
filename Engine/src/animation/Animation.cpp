@@ -87,11 +87,6 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-
-ResourceWrapper<Resource> AnimationLoadDescriptor::loadResource() {
-	return AssetFactory::getManager(AssetType::ANIMATION)->loadResourceFromDisk(*this);
-}
-
 void AnimationAsset::serialize(nlohmann::json& j) const
 {
 	// Animation assets currently do not expose additional persistent
@@ -107,7 +102,3 @@ void AnimationAsset::deserialize(const nlohmann::json& j)
 	(void)j;
 }
 
-ResourceWrapper<Resource> AnimationCreateDescriptor::createResource()
-{
-	throw std::exception("Not yet implmeneted.");
-}

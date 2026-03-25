@@ -58,7 +58,14 @@ ResourceLoadDescriptor* ShaderTypeManager::makeResourceLoadDescriptor()
 
 ResourceWrapper<Resource> ShaderTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
-	return ResourceWrapper<Resource>();
+	auto shaderDesc = dynamic_cast<const ShaderLoadDescriptor*>(&desc);
+	if (!shaderDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
+	return Shader::load(desc.sourcePath, *shaderDesc);
 }
 
 void ShaderTypeManager::parse(ResourceLoadDescriptor& desc)

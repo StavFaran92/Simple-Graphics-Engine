@@ -126,8 +126,6 @@ struct TextureData
 
 struct EngineAPI TextureLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
-
 	bool genMipMap = false;
 	bool flip = false;
 	bool saveOnDisk = true;
@@ -148,8 +146,6 @@ struct EngineAPI TextureLoadDescriptor : public ResourceLoadDescriptor
 struct EngineAPI TextureCreateDescriptor : public ResourceBuildDescriptor
 {
 	TextureData textureData;
-
-	ResourceWrapper<Resource> createResource() override;
 };
 
 // Resource

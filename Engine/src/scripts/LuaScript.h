@@ -21,13 +21,10 @@ function Script:destroy()
     -- destroy
 end
 )";
-
-	ResourceWrapper<Resource> createResource() override;
 };
 
 struct EngineAPI LuaScriptLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
 };
 
 // Resource

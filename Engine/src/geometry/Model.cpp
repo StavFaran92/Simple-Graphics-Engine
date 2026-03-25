@@ -91,28 +91,6 @@ ResourceWrapper<Model> Model::load(const std::string& fileLocation, ModelLoadDes
 }
 
 #include "geometry/MeshBinaryLoader.h"
-ResourceWrapper<Resource> ModelLoadDescriptor::loadResource() {
-	ModelData modelData;
-	ModelBinaryLoader::load(sourcePath, modelData);
-
-	ResourceWrapper<Model> model = Factory<Model>::create();
-	for (const auto& data : modelData.m_meshes)
-	{
-		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-		MeshBuilder builder(data);
-		builder.build(*mesh.get());
-		model->addMesh(mesh);
-	}
-	model->addBonesInfo(modelData.m_bonesOffsets, modelData.m_bonesNameToIDMap);
-
-	return model;
-}
-
-ResourceWrapper<Resource> ModelCreateDescriptor::createResource()
-{
-	throw std::exception("Not yet implmeneted.");
-	//return MeshGroup::cre(sourcePath, *this);
-}
 
 void ModelAsset::bindDependency(const std::string& slot, UUID dependency)
 {

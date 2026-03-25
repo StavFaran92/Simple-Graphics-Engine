@@ -26,8 +26,6 @@ enum class ShaderOverride : int
 
 struct EngineAPI ShaderCreateDescriptor : public ResourceBuildDescriptor
 {
-	ResourceWrapper<Resource> createResource() override;
-
 	ShaderOverride shaderOverride = ShaderOverride::None;
 
 	std::string code = R"(#vert
@@ -50,8 +48,6 @@ vec3 main()
 
 struct EngineAPI ShaderLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
-
 	ShaderOverride shaderOverride = ShaderOverride::None;
 };
 

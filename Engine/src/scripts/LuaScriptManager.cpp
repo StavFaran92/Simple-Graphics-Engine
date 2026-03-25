@@ -59,7 +59,14 @@ ResourceLoadDescriptor* LuaScriptTypeManager::makeResourceLoadDescriptor()
 
 ResourceWrapper<Resource> LuaScriptTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
-	return ResourceWrapper<Resource>();
+	auto luaDesc = dynamic_cast<const LuaScriptLoadDescriptor*>(&desc);
+	if (!luaDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return ResourceWrapper<Resource>::empty;
+	}
+
+	return LuaScript::load(desc.sourcePath, *luaDesc);
 }
 
 void LuaScriptTypeManager::parse(ResourceLoadDescriptor& desc)

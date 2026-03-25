@@ -89,9 +89,9 @@ public:
     // ============================================================
 
     // Parse serialized asset data -> runtime loading descriptor
-    virtual void parse(ResourceLoadDescriptor& desc) = 0;
+    virtual void parse(ResourceLoadDescriptor& desc) {};
 
     // Parse asset data -> creation descriptor (editor creation)
-    virtual void parse(ResourceBuildDescriptor& desc) = 0;
+    virtual void parse(ResourceBuildDescriptor& desc) {};
 
 };

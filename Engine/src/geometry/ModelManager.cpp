@@ -7,6 +7,8 @@
 #include "memory/AssetRecord.h"
 #include "memory/AssetHandle.h"
 #include "core/Engine.h"
+#include "core/Factory.h"
+#include "geometry/MeshBuilder.h"
 
 Ref<Asset> ModelTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
@@ -119,7 +121,27 @@ ResourceLoadDescriptor* ModelTypeManager::makeResourceLoadDescriptor()
 
 ResourceWrapper<Resource> ModelTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
-	return ResourceWrapper<Resource>();
+	auto modelDesc = dynamic_cast<const ModelLoadDescriptor*>(&desc);
+	if (!modelDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return ResourceWrapper<Resource>::empty;
+	}
+
+	ModelData modelData;
+	ModelBinaryLoader::load(desc.sourcePath, modelData);
+
+	ResourceWrapper<Model> model = Factory<Model>::create();
+	for (const auto& data : modelData.m_meshes)
+	{
+		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
+		MeshBuilder builder(data);
+		builder.build(*mesh.get());
+		model->addMesh(mesh);
+	}
+	model->addBonesInfo(modelData.m_bonesOffsets, modelData.m_bonesNameToIDMap);
+
+	return model;
 }
 
 void ModelTypeManager::parse(ResourceLoadDescriptor& desc)

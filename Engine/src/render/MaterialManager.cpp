@@ -64,7 +64,14 @@ ResourceLoadDescriptor* MaterialTypeManager::makeResourceLoadDescriptor()
 
 ResourceWrapper<Resource> MaterialTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
-	return ResourceWrapper<Resource>();
+	auto materialDesc = dynamic_cast<const MaterialLoadDescriptor*>(&desc);
+	if (!materialDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return ResourceWrapper<Resource>::empty;
+	}
+
+	return Material::load(desc.sourcePath, *materialDesc);
 }
 
 void MaterialTypeManager::parse(ResourceLoadDescriptor& desc)

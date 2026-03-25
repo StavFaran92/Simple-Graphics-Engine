@@ -17,14 +17,11 @@ struct PrefabData
 
 struct EngineAPI PrefabCreateDescriptor : public ResourceBuildDescriptor
 {
-	ResourceWrapper<Resource> createResource() override;
-
 	PrefabData data;
 };
 
 struct EngineAPI PrefabLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
 };
 
 // Resource

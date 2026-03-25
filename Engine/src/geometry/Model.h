@@ -17,13 +17,10 @@ struct ModelData
 
 struct EngineAPI ModelLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
 };
 
 struct EngineAPI ModelCreateDescriptor : public ResourceBuildDescriptor
 {
-	ResourceWrapper<Resource> createResource() override;
-
 	ModelData data;
 };
 

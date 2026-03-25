@@ -166,12 +166,3 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	return root;
 }
 
-ResourceWrapper<Resource> PrefabCreateDescriptor::createResource()
-{
-	return ResourceWrapper<Resource>::empty;//Prefab::create(data.entity);
-}
-
-ResourceWrapper<Resource> PrefabLoadDescriptor::loadResource()
-{
-	return Prefab::load(sourcePath, *this);
-}

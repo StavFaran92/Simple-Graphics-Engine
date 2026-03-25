@@ -30,13 +30,10 @@ struct AnimationData
 
 struct EngineAPI AnimationLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
 };
 
 struct EngineAPI AnimationCreateDescriptor : public ResourceBuildDescriptor
 {
-	ResourceWrapper<Resource> createResource() override;
-
 	AnimationData data;
 };
 

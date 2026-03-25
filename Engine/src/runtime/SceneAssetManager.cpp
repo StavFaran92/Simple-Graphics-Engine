@@ -61,7 +61,14 @@ ResourceLoadDescriptor* SceneAssetManager::makeResourceLoadDescriptor()
 
 ResourceWrapper<Resource> SceneAssetManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
-	return ResourceWrapper<Resource>();
+	auto sceneDesc = dynamic_cast<const SceneLoadDescriptor*>(&desc);
+	if (!sceneDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return ResourceWrapper<Resource>::empty;
+	}
+
+	return Scene::load(desc.sourcePath, *sceneDesc);
 }
 
 void SceneAssetManager::parse(ResourceLoadDescriptor& desc)

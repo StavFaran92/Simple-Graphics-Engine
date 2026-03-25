@@ -9,16 +9,12 @@ struct ResourceLoadDescriptor
 {
 	virtual ~ResourceLoadDescriptor() = default;
 
-	virtual ResourceWrapper<Resource> loadResource() = 0;
-
 	std::string sourcePath;
 };
 
 struct ResourceBuildDescriptor
 {
 	virtual ~ResourceBuildDescriptor() = default;
-
-	virtual ResourceWrapper<Resource> createResource() = 0;
 };
 
 struct AssetBuildDescriptor

@@ -87,13 +87,10 @@ struct MaterialData
 struct EngineAPI MaterialCreateDescriptor : public ResourceBuildDescriptor
 {
 	MaterialData data;
-
-	ResourceWrapper<Resource> createResource() override;
 };
 
 struct EngineAPI MaterialLoadDescriptor : public ResourceLoadDescriptor
 {
-	ResourceWrapper<Resource> loadResource() override;
 };
 
 //Resource

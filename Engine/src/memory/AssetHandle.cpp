@@ -17,7 +17,7 @@ ResourceWrapper<Resource> Test::loadAssetResourceInternal(const AssetRecord& rec
     p.setPath(record.relativefilePath);
     loadDesc->sourcePath = p.absolute().string();
 
-    ResourceWrapper<Resource> resource = loadDesc->loadResource();
+    ResourceWrapper<Resource> resource = AssetFactory::getManager(record.aType)->loadResourceFromDisk(*loadDesc);
 
     if (resource.isEmpty())
     {

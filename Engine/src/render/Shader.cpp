@@ -610,17 +610,6 @@ Shader::~Shader() {
 	//clear();
 }
 
-ResourceWrapper<Resource> ShaderCreateDescriptor::createResource()
-{
-	return ResourceWrapper<Resource>();
-}
-
-
-ResourceWrapper<Resource> ShaderLoadDescriptor::loadResource() 
-{
-	return Shader::load(sourcePath, *this);
-}
-
 // ============================================================
 //  ShaderAsset (Asset wrapper)
 // ============================================================

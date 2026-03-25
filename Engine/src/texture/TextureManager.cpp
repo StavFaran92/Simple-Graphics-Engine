@@ -63,7 +63,16 @@ ResourceLoadDescriptor* TextureTypeManager::makeResourceLoadDescriptor()
 
 ResourceWrapper<Resource> TextureTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
-	return ResourceWrapper<Resource>();
+	auto textureDesc = dynamic_cast<const TextureLoadDescriptor*>(&desc);
+	if (!textureDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return ResourceWrapper<Resource>::empty;
+	}
+
+	TextureData textureData;
+	TextureBinaryLoader::load(desc.sourcePath, textureData);
+	return Texture::createTexture(textureData);
 }
 
 void TextureTypeManager::parse(ResourceLoadDescriptor& desc)
