@@ -27,6 +27,7 @@ public:
 
 	AssetHandle(UUID uuid) : uuid(uuid)
 	{
+		m_cachedAsset = info().asset;
 		//m_resource = resource();
 	};
 
@@ -36,6 +37,8 @@ public:
 			return *this;
 
 		uuid = other.uuid;
+
+		m_cachedAsset = info().asset;
 
 		notifyOnChanged();
 
@@ -53,6 +56,8 @@ public:
 	AssetHandle(const AssetHandle<U>& other)
 	{
 		uuid = other.getUID();
+
+		m_cachedAsset = info().asset;
 		//m_resource = resource();
 	}
 
@@ -68,6 +73,8 @@ public:
 			[this, &record]() {
 				return Test::loadAssetResourceInternal(record, uuid);
 			});
+
+		m_resource_DEBUG = resource;
 
 		return resource.as<ResourceType>();
 	}
@@ -113,7 +120,11 @@ public:
 
 	inline Ref<T> get() const
 	{
-		return std::dynamic_pointer_cast<T>(info().asset);
+		if (!m_cachedAsset)
+		{
+			m_cachedAsset = info().asset;
+		}
+		return std::dynamic_pointer_cast<T>(m_cachedAsset);
 	}
 
 	template <class Archive>
@@ -150,8 +161,11 @@ private:
 
 	std::shared_ptr<OnChangedRegistry> onChangedRegistry = std::make_shared<OnChangedRegistry>();
 
+	mutable Ref<Asset> m_cachedAsset;
+
 	// Used mainly for debug
-	//ResourceWrapper<Resource> m_resource = ResourceWrapper<Resource>::empty;
+	mutable ResourceWrapper<Resource> m_resource_DEBUG = ResourceWrapper<Resource>::empty;
+	
 private:
 	template<typename T>friend class Factory;
 	friend class Assets;
