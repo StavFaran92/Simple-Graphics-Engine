@@ -54,9 +54,9 @@ bool SceneAssetManager::saveResource(const ResourceBuildDescriptor& desc, const 
 	return true;
 }
 
-ResourceLoadDescriptor* SceneAssetManager::makeResourceLoadDescriptor()
+std::unique_ptr<ResourceLoadDescriptor> SceneAssetManager::makeResourceLoadDescriptor()
 {
-	return new SceneLoadDescriptor();
+	return std::make_unique<SceneLoadDescriptor>();
 }
 
 ResourceWrapper<Resource> SceneAssetManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

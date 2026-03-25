@@ -51,9 +51,9 @@ bool ShaderTypeManager::saveResource(const ResourceBuildDescriptor& desc, const 
 	return true;
 }
 
-ResourceLoadDescriptor* ShaderTypeManager::makeResourceLoadDescriptor()
+std::unique_ptr<ResourceLoadDescriptor> ShaderTypeManager::makeResourceLoadDescriptor()
 {
-	return new ShaderLoadDescriptor();
+	return std::make_unique<ShaderLoadDescriptor>();
 }
 
 ResourceWrapper<Resource> ShaderTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

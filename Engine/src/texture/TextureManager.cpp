@@ -56,9 +56,9 @@ bool TextureTypeManager::saveResource(const ResourceBuildDescriptor& desc, const
 	return true;
 }
 
-ResourceLoadDescriptor* TextureTypeManager::makeResourceLoadDescriptor()
+std::unique_ptr<ResourceLoadDescriptor> TextureTypeManager::makeResourceLoadDescriptor()
 {
-	return new TextureLoadDescriptor();
+	return std::make_unique<TextureLoadDescriptor>();
 }
 
 ResourceWrapper<Resource> TextureTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

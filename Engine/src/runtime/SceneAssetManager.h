@@ -16,7 +16,7 @@ public:
 
 	bool saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst) override;
 
-	ResourceLoadDescriptor* makeResourceLoadDescriptor() override;
+	std::unique_ptr<ResourceLoadDescriptor> makeResourceLoadDescriptor() override;
 
 	ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) override;
 

@@ -65,9 +65,9 @@ bool AnimationTypeManager::saveResource(const ResourceBuildDescriptor& desc, con
 	return true;
 }
 
-ResourceLoadDescriptor* AnimationTypeManager::makeResourceLoadDescriptor()
+std::unique_ptr<ResourceLoadDescriptor> AnimationTypeManager::makeResourceLoadDescriptor()
 {
-	return new AnimationLoadDescriptor();
+	return std::make_unique<AnimationLoadDescriptor>();
 }
 
 ResourceWrapper<Resource> AnimationTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

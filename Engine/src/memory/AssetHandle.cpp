@@ -9,7 +9,7 @@
 
 ResourceWrapper<Resource> Test::loadAssetResourceInternal(const AssetRecord& record, UUID uuid)
 {
-    ResourceLoadDescriptor* loadDesc = AssetFactory::getManager(record.aType)->makeResourceLoadDescriptor();
+    std::unique_ptr< ResourceLoadDescriptor> loadDesc = AssetFactory::getManager(record.aType)->makeResourceLoadDescriptor();
 
     assert(loadDesc);
 

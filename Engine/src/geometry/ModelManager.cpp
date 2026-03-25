@@ -114,9 +114,9 @@ bool ModelTypeManager::saveResource(const ResourceBuildDescriptor& desc, const S
 	return true;
 }
 
-ResourceLoadDescriptor* ModelTypeManager::makeResourceLoadDescriptor()
+std::unique_ptr<ResourceLoadDescriptor> ModelTypeManager::makeResourceLoadDescriptor()
 {
-	return new ModelLoadDescriptor();
+	return std::make_unique<ModelLoadDescriptor>();
 }
 
 ResourceWrapper<Resource> ModelTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

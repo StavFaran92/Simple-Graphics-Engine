@@ -51,9 +51,9 @@ bool PrefabTypeManager::saveResource(const ResourceBuildDescriptor& desc, const 
 	return true;
 }
 
-ResourceLoadDescriptor* PrefabTypeManager::makeResourceLoadDescriptor()
+std::unique_ptr<ResourceLoadDescriptor> PrefabTypeManager::makeResourceLoadDescriptor()
 {
-	return new PrefabLoadDescriptor();
+	return std::make_unique<PrefabLoadDescriptor>();
 }
 
 ResourceWrapper<Resource> PrefabTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

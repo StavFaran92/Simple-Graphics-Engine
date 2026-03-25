@@ -52,9 +52,9 @@ bool LuaScriptTypeManager::saveResource(const ResourceBuildDescriptor& desc, con
 	return true;
 }
 
-ResourceLoadDescriptor* LuaScriptTypeManager::makeResourceLoadDescriptor()
+std::unique_ptr<ResourceLoadDescriptor> LuaScriptTypeManager::makeResourceLoadDescriptor()
 {
-	return new LuaScriptLoadDescriptor();
+	return std::make_unique<LuaScriptLoadDescriptor>();
 }
 
 ResourceWrapper<Resource> LuaScriptTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)

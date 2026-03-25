@@ -57,9 +57,9 @@ bool MaterialTypeManager::saveResource(const ResourceBuildDescriptor& desc, cons
 	return true;
 }
 
-ResourceLoadDescriptor* MaterialTypeManager::makeResourceLoadDescriptor()
+std::unique_ptr<ResourceLoadDescriptor> MaterialTypeManager::makeResourceLoadDescriptor()
 {
-	return new MaterialLoadDescriptor();
+	return std::make_unique<MaterialLoadDescriptor>();
 }
 
 ResourceWrapper<Resource> MaterialTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
