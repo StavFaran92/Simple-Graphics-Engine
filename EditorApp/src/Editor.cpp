@@ -412,7 +412,7 @@ class GUI_Helper : public GuiMenu {
 							EditorState::Instance().showTextureCreateWindow = true;
 							
 						}
-						if (ImGui::MenuItem("Shader Override")) {
+						if (ImGui::MenuItem("Shader")) {
 							EditorState::Instance().showShaderCreateWindow = true;
 
 						}

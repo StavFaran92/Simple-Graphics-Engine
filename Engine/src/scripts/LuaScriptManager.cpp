@@ -34,30 +34,21 @@ bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& resul
 
 bool LuaScriptTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
+	auto luaScriptDesc = dynamic_cast<const LuaScriptCreateDescriptor*>(&desc);
+	if (!luaScriptDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
 	std::ofstream os(dst.absolute());
 	if (!os.is_open())
 		return false;
 
-	std::string script = R"(-- Auto-generated Lua script
-
-Script = {}
-
-function Script:create()
-    -- initialization logic
-end
-
-function Script:update(dt)
-    -- update logic
-end
-
-function Script:destroy()
-    -- destroy
-end
-)";
-
-	os << script;
+	os << luaScriptDesc->script;
 
 	os.close();
+
 	return true;
 }
 

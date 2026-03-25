@@ -6,6 +6,7 @@
 #include "memory/AssetHandle.h"
 
 #include <filesystem>
+#include <fstream>
 
 Ref<Asset> ShaderTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
@@ -21,13 +22,33 @@ Ref<Asset> ShaderTypeManager::deserializeAsset(const nlohmann::json& j)
 
 bool ShaderTypeManager::importAsset(const std::string& src, ImportNode& result)
 {
-	// Shader import not implemented
-	return false;
+	std::filesystem::path path(src);
+	result.name = path.filename().stem().string();
+	result.assetDesc.aType = AssetType::SHADER;
+	auto shaderLoadDesc = result.emplaceLoadDesc<ShaderLoadDescriptor>();
+	shaderLoadDesc->sourcePath = src;
+
+	return true;
 }
 
 bool ShaderTypeManager::saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst)
 {
-	return false;
+	auto shaderDesc = dynamic_cast<const ShaderCreateDescriptor*>(&desc);
+	if (!shaderDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
+	std::ofstream os(dst.absolute());
+	if (!os.is_open())
+		return false;
+
+	os << shaderDesc->code;
+
+	os.close();
+
+	return true;
 }
 
 ResourceLoadDescriptor* ShaderTypeManager::makeResourceLoadDescriptor()

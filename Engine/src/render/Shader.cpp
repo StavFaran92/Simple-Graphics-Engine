@@ -490,18 +490,6 @@ void replaceDirective(std::string& source, const std::string& directive, std::st
 	}
 }
 
-ResourceWrapper<Shader> Shader::createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned)
-{
-	ResourceWrapper<Shader> shader = Factory<Shader>::create();
-
-	shader->m_isShaderOverride = true;
-	shader->shaderOverride = shaderOverride;
-	shader->m_glslFilePath = filepath;
-	shader->recompile();
-
-	return shader;
-}
-
 ResourceWrapper<Shader> Shader::load(const std::string& fileLocation, ShaderLoadDescriptor desc)
 {
 	ShaderOverride shaderOverride = desc.shaderOverride;
@@ -516,16 +504,6 @@ ResourceWrapper<Shader> Shader::load(const std::string& fileLocation, ShaderLoad
 
 	return shader;
 }
-
-//Resource<Shader> Shader::load(Resource<Shader> shader, const std::string& filepath, ShaderOverride shaderOverride)
-//{
-//	shader->m_isShaderOverride = true;
-//	shader->shaderOverride = shaderOverride;
-//	shader->m_glslFilePath = filepath;
-//	shader->recompile();
-//
-//	return shader;
-//}
 
 ShaderOverride Shader::getShaderOverrideFromStr(const std::string& shaderOverride)
 {
@@ -632,6 +610,11 @@ Shader::~Shader() {
 	//clear();
 }
 
+ResourceWrapper<Resource> ShaderCreateDescriptor::createResource()
+{
+	return ResourceWrapper<Resource>();
+}
+
 
 ResourceWrapper<Resource> ShaderLoadDescriptor::loadResource() 
 {
@@ -655,3 +638,4 @@ void ShaderAsset::deserialize(const nlohmann::json& j)
 	// Placeholder for future shader-asset specific metadata.
 	(void)j;
 }
+

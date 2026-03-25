@@ -296,7 +296,6 @@ void displayTextureCreatorDialog()
 void displayShaderCreatorDialog()
 {
 	static UniqueNameWidget uniqueName("Name");
-	static FilepathWidget filepath("##Filepath", Constants::g_shaderSupportedFormats, 1);
 	if (EditorState::Instance().showShaderCreateWindow)
 	{
 		ImGui::OpenPopup("CreateShader");
@@ -306,7 +305,6 @@ void displayShaderCreatorDialog()
 	if (ImGui::BeginPopupModal("CreateShader", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		uniqueName.draw();
-		filepath.draw();
 
 		static ShaderOverride shaderOverrideType = ShaderOverride::None;
 
@@ -342,10 +340,9 @@ void displayShaderCreatorDialog()
 			desc.aType = AssetType::SHADER;
 			desc.name = uniqueName.name;
 			desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-			ShaderLoadDescriptor shaderLoadDesc;
-			shaderLoadDesc.sourcePath = filepath.m_filepath;
-			shaderLoadDesc.shaderOverride = shaderOverrideType;
-			Engine::get()->getSubSystem<Assets>()->importAsset(desc, shaderLoadDesc);
+			ShaderCreateDescriptor shaderCreateDesc;
+			shaderCreateDesc.shaderOverride = shaderOverrideType;
+			Engine::get()->getSubSystem<Assets>()->createAsset(desc, shaderCreateDesc);
 			ImGui::CloseCurrentPopup();
 		}
 

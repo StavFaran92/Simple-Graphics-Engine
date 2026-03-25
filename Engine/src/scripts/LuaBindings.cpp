@@ -240,7 +240,7 @@ void bindAssets(sol::state& lua)
         "getShaderOverride", &Shader::getShaderOverride,
         "recompile", &Shader::recompile,
         "getSourceCode", &Shader::getSourceCode,
-        "createOverrideShader", &Shader::createOverrideShader
+        "load", &Shader::load
     );
 
     // todo fix

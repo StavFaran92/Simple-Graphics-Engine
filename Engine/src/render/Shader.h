@@ -24,15 +24,35 @@ enum class ShaderOverride : int
 	PostProcess
 };
 
+struct EngineAPI ShaderCreateDescriptor : public ResourceBuildDescriptor
+{
+	ResourceWrapper<Resource> createResource() override;
+
+	ShaderOverride shaderOverride = ShaderOverride::None;
+
+	std::string code = R"(#vert
+
+#version 330
+
+void main()
+{
+}
+
+#frag
+
+#version 330
+
+vec3 main()
+{      
+    return vec3(1.0f, 0.0f, 0.0f);
+})";
+};
+
 struct EngineAPI ShaderLoadDescriptor : public ResourceLoadDescriptor
 {
 	ResourceWrapper<Resource> loadResource() override;
 
 	ShaderOverride shaderOverride = ShaderOverride::None;
-
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(ShaderLoadDescriptor,
-		shaderOverride
-	);
 };
 
 extern EngineAPI const std::map<ShaderOverride, std::string> shaderOverrideToString;
@@ -51,7 +71,7 @@ public:
 	inline static const std::string ATTRIB_SHADER_OVERRIDE = "shader_override";
 
 public:
-	static ResourceWrapper<Shader> createOverrideShader(const std::string& filepath, ShaderOverride shaderOverride, bool isEngineOwned = false);
+	//static ResourceWrapper<Shader> create(std::string name, ShaderCreateDescriptor desc = {});
 
 	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderLoadDescriptor desc = {});
 

@@ -5,7 +5,22 @@
 
 struct EngineAPI LuaScriptCreateDescriptor : public ResourceBuildDescriptor
 {
-	//MaterialData data;
+	std::string script = R"(-- Auto-generated Lua script
+
+Script = {}
+
+function Script:create()
+    -- initialization logic
+end
+
+function Script:update(dt)
+    -- update logic
+end
+
+function Script:destroy()
+    -- destroy
+end
+)";
 
 	ResourceWrapper<Resource> createResource() override;
 };
