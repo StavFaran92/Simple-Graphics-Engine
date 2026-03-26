@@ -342,6 +342,19 @@ void AssetViewWindow::display()
 						updateScene();
 
 					}
+
+					if (aInfo.aType == AssetType::SHADER && ImGui::Selectable("Recompile"))
+					{
+						AssetHandle<ShaderAsset> shader = assets->getAsset(uuid).as<ShaderAsset>();
+						if (shader.isEmpty())
+						{
+							logWarning("Failed to cast asset to shader asset.");
+							continue;
+						}
+
+						shader.resource()->recompile();
+
+					}
 				}
 
 				
