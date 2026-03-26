@@ -628,3 +628,21 @@ void ShaderAsset::deserialize(const nlohmann::json& j)
 	(void)j;
 }
 
+
+ShaderAsset::ShaderAsset(const ShaderCreateDescriptor& desc)
+{
+	m_shaderOverride = desc.shaderOverride;
+	m_isShaderOverride = m_shaderOverride != ShaderOverride::None;
+}
+
+void ShaderAsset::fillLoadDescriptor(ResourceLoadDescriptor& resourceLoadDesc)
+{
+	auto shaderDesc = dynamic_cast<ShaderLoadDescriptor*>(&resourceLoadDesc);
+	if (!shaderDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return;
+	}
+
+	shaderDesc->shaderOverride = m_shaderOverride;
+}

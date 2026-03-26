@@ -157,8 +157,16 @@ class EngineAPI ShaderAsset : public Asset
 public:
 	using ResourceType = Shader;
 
+	ShaderAsset() = default;
+	ShaderAsset(const ShaderCreateDescriptor&);
+
 	using Asset::Asset;
+
+	void fillLoadDescriptor(ResourceLoadDescriptor& resourceLoadDesc) override;
 
 	void serialize(nlohmann::json& j) const override;
 	void deserialize(const nlohmann::json& j) override;
+
+	ShaderOverride m_shaderOverride;
+	bool m_isShaderOverride = false;
 };

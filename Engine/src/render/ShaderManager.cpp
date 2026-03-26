@@ -10,7 +10,13 @@
 
 Ref<Asset> ShaderTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
-	return createRef< ShaderAsset>();
+	auto shaderDesc = dynamic_cast<const ShaderCreateDescriptor*>(&resourceDesc);
+	if (!shaderDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return nullptr;
+	}
+	return createRef< ShaderAsset>(*shaderDesc);
 }
 
 Ref<Asset> ShaderTypeManager::deserializeAsset(const nlohmann::json& j)
@@ -83,11 +89,19 @@ void ShaderTypeManager::parse(ResourceBuildDescriptor& desc)
 
 	shaderDesc->code = std::string(R"(
 
+#vert
+
+void vert(inout vec3 aPos, inout vec3 aNorm)
+{
+}
+
 #frag
 
-#version 330
-
-void frag(inout vec3 color)
+void frag(inout vec3 color, 
+	inout vec3 normal, 
+	inout float metallic, 
+	inout float roughness, 
+	inout float ao)
 {      
     color = vec3(1.0f, 0.0f, 0.0f);
 })");
