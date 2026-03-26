@@ -258,7 +258,12 @@ void AssetViewWindow::display()
 
 					else if (aInfo.aType == AssetType::LUA_SCRIPT)
 					{
-						openInVSCode(Engine::get()->getProjectDirectory() + "/" + aInfo.relativefilePath);
+						openInVSCode((aInfo.targetDirectory.absolute() / aInfo.relativefilePath).string());
+					}
+
+					else if (aInfo.aType == AssetType::SHADER)
+					{
+						openInVSCode((aInfo.targetDirectory.absolute() / aInfo.relativefilePath).string());
 					}
 				}
 
