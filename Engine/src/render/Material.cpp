@@ -400,3 +400,15 @@ void MaterialAsset::deserialize(const nlohmann::json& j)
 		logError("Failed to deserialize material: {}", e.what());
 	}
 }
+
+void MaterialAsset::fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc)
+{
+	auto materialDesc = dynamic_cast<MaterialCreateDescriptor*>(&resourceBuildDesc);
+	if (!materialDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return;
+	}
+
+	materialDesc->data = data;
+}

@@ -61,6 +61,11 @@ std::unique_ptr<ResourceLoadDescriptor> TextureTypeManager::makeResourceLoadDesc
 	return std::make_unique<TextureLoadDescriptor>();
 }
 
+std::unique_ptr<ResourceBuildDescriptor> TextureTypeManager::makeResourceBuildDescriptor()
+{
+	return std::make_unique<TextureCreateDescriptor>();
+}
+
 ResourceWrapper<Resource> TextureTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto textureDesc = dynamic_cast<const TextureLoadDescriptor*>(&desc);

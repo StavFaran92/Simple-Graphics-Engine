@@ -57,6 +57,11 @@ std::unique_ptr<ResourceLoadDescriptor> LuaScriptTypeManager::makeResourceLoadDe
 	return std::make_unique<LuaScriptLoadDescriptor>();
 }
 
+std::unique_ptr<ResourceBuildDescriptor> LuaScriptTypeManager::makeResourceBuildDescriptor()
+{
+	return std::make_unique<LuaScriptCreateDescriptor>();
+}
+
 ResourceWrapper<Resource> LuaScriptTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto luaDesc = dynamic_cast<const LuaScriptLoadDescriptor*>(&desc);

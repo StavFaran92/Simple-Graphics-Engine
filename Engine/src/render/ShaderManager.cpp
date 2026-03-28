@@ -62,6 +62,11 @@ std::unique_ptr<ResourceLoadDescriptor> ShaderTypeManager::makeResourceLoadDescr
 	return std::make_unique<ShaderLoadDescriptor>();
 }
 
+std::unique_ptr<ResourceBuildDescriptor> ShaderTypeManager::makeResourceBuildDescriptor()
+{
+	return std::make_unique<ShaderCreateDescriptor>();
+}
+
 ResourceWrapper<Resource> ShaderTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto shaderDesc = dynamic_cast<const ShaderLoadDescriptor*>(&desc);

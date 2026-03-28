@@ -17,6 +17,7 @@ public:
 	virtual void bindDependency(const std::string& slot, UUID dependency) {}
 
 	virtual void fillLoadDescriptor(ResourceLoadDescriptor& resourceLoadDesc) {};
+	virtual void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) {};
 	virtual void fillData(ResourceWrapper<Resource> resource) {};
 
 	virtual void serialize(nlohmann::json& j) const = 0;

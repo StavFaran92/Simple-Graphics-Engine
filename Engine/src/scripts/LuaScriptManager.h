@@ -14,6 +14,7 @@ public:
 	bool importAsset(const std::string& src, ImportNode& result) override;
 	bool saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst) override;
 	std::unique_ptr<ResourceLoadDescriptor> makeResourceLoadDescriptor() override;
+	std::unique_ptr<ResourceBuildDescriptor> makeResourceBuildDescriptor() override;
 	ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) override;
 	void parse(ResourceLoadDescriptor& desc) override;
 	void parse(ResourceBuildDescriptor& desc) override;

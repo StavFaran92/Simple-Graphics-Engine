@@ -63,6 +63,11 @@ std::unique_ptr<ResourceLoadDescriptor> MaterialTypeManager::makeResourceLoadDes
 	return std::make_unique<MaterialLoadDescriptor>();
 }
 
+std::unique_ptr<ResourceBuildDescriptor> MaterialTypeManager::makeResourceBuildDescriptor()
+{
+	return std::make_unique<MaterialCreateDescriptor>();
+}
+
 ResourceWrapper<Resource> MaterialTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto materialDesc = dynamic_cast<const MaterialLoadDescriptor*>(&desc);

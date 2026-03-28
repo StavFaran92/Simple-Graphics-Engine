@@ -59,6 +59,11 @@ std::unique_ptr<ResourceLoadDescriptor> SceneAssetManager::makeResourceLoadDescr
 	return std::make_unique<SceneLoadDescriptor>();
 }
 
+std::unique_ptr<ResourceBuildDescriptor> SceneAssetManager::makeResourceBuildDescriptor()
+{
+	return std::make_unique<SceneCreateDescriptor>();
+}
+
 ResourceWrapper<Resource> SceneAssetManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto sceneDesc = dynamic_cast<const SceneLoadDescriptor*>(&desc);

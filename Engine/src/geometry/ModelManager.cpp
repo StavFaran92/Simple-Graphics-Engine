@@ -119,6 +119,11 @@ std::unique_ptr<ResourceLoadDescriptor> ModelTypeManager::makeResourceLoadDescri
 	return std::make_unique<ModelLoadDescriptor>();
 }
 
+std::unique_ptr<ResourceBuildDescriptor> ModelTypeManager::makeResourceBuildDescriptor()
+{
+	return std::make_unique<ModelCreateDescriptor>();
+}
+
 ResourceWrapper<Resource> ModelTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto modelDesc = dynamic_cast<const ModelLoadDescriptor*>(&desc);

@@ -70,6 +70,11 @@ std::unique_ptr<ResourceLoadDescriptor> AnimationTypeManager::makeResourceLoadDe
 	return std::make_unique<AnimationLoadDescriptor>();
 }
 
+std::unique_ptr<ResourceBuildDescriptor> AnimationTypeManager::makeResourceBuildDescriptor()
+{
+	return std::make_unique<AnimationCreateDescriptor>();
+}
+
 ResourceWrapper<Resource> AnimationTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	AnimationData animationData;

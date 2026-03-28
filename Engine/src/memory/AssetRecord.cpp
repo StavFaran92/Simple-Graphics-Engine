@@ -45,6 +45,15 @@ void from_json(const nlohmann::json& j, AssetRecord& r)
 	nlohmann::json jsonAsset = j.at("asset");
 	Ref<Asset> asset = AssetFactory::getManager(r.aType)->deserializeAsset(jsonAsset);
 	r.asset = asset;
+
+	if (r.isEngineOwned)
+	{
+		r.targetDirectory = ScopedPath::EnginePath(r.relativefilePath);
+	}
+	else
+	{
+		r.targetDirectory = ScopedPath::ContentPath(r.relativefilePath);
+	}
 }
 
 AssetRecord::AssetRecord(const AssetBuildDescriptor& assetDesc)

@@ -56,6 +56,11 @@ std::unique_ptr<ResourceLoadDescriptor> PrefabTypeManager::makeResourceLoadDescr
 	return std::make_unique<PrefabLoadDescriptor>();
 }
 
+std::unique_ptr<ResourceBuildDescriptor> PrefabTypeManager::makeResourceBuildDescriptor()
+{
+	return std::make_unique<PrefabCreateDescriptor>();
+}
+
 ResourceWrapper<Resource> PrefabTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto prefabDesc = dynamic_cast<const PrefabLoadDescriptor*>(&desc);

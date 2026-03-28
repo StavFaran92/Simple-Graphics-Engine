@@ -87,6 +87,9 @@ public:
 
 	void fillData(ResourceWrapper<Resource> resource) override;
 
+	void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) override;
+
+
 	void setName(const std::string& name);
 	std::string getName() const;
 

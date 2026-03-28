@@ -137,7 +137,35 @@ void Assets::saveDirtyAssets()
 	{
 		if (assetInfo.isSerializationDirty())
 		{
+			// There is a clear design flaw here,
+			// I have to save asset file AND asset meta data
+			// What I should be doing is store everything: 
+			// metadata and asset data in the asset file and remove the projectassetregistry json entirely.
+
+			// Save asset file
 			AssetHandle<Asset> asset = getAsset(uuid);
+			std::unique_ptr<ResourceBuildDescriptor> buildDesc = AssetFactory::getManager(assetInfo.aType)->makeResourceBuildDescriptor();
+			asset->fillBuildDescriptor(*buildDesc);
+
+			ResourceTypeManager* manager = AssetFactory::getManager(assetInfo.aType);
+			if (!manager)
+			{
+				logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(assetInfo.aType));
+				continue;
+			}
+
+			ScopedPath dest = assetInfo.targetDirectory;
+			dest.setPath(assetInfo.relativefilePath);
+
+			if (!manager->saveResource(*buildDesc, dest))
+			{
+				logError("Failed to save asset type {} to: {}", static_cast<int>(assetInfo.aType), dest.absolute().string());
+				continue;
+			}
+
+			// save asset metadata
+			Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(assetInfo);
+
 			//asset->save(asset.info()); // TODO fix
 			assetInfo.m_isSerializationDirty = false;
 		}

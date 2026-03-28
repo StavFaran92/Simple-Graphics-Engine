@@ -80,6 +80,9 @@ public:
     // Create load descriptor
     virtual std::unique_ptr<ResourceLoadDescriptor> makeResourceLoadDescriptor() = 0;
 
+    // Create build descriptor
+    virtual std::unique_ptr<ResourceBuildDescriptor> makeResourceBuildDescriptor() = 0;
+
     // load the runtime resource
     virtual ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) = 0;
 
