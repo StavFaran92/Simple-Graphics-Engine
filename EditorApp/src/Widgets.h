@@ -22,5 +22,5 @@ bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::f
 class MaterialDataWidget
 {
 public:
-	void draw(const AssetHandle<MaterialAsset>& mat);
+	bool draw(MaterialData& mat);
 };

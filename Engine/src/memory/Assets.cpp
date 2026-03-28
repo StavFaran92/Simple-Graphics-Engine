@@ -135,11 +135,11 @@ void Assets::saveDirtyAssets()
 {
 	for (auto& [uuid, assetInfo] : m_assets)
 	{
-		if (assetInfo.isDirty())
+		if (assetInfo.isSerializationDirty())
 		{
 			AssetHandle<Asset> asset = getAsset(uuid);
 			//asset->save(asset.info()); // TODO fix
-			assetInfo.m_isDirty = false;
+			assetInfo.m_isSerializationDirty = false;
 		}
 	}
 }
@@ -218,6 +218,13 @@ void Assets::makeDirty(UUID uuid)
 {
 	AssetRecord aInfo = getAsset(uuid).info();
 	aInfo.makeDirty();
+	m_assets[uuid] = aInfo;
+}
+
+void Assets::sync(UUID uuid)
+{
+	AssetRecord aInfo = getAsset(uuid).info();
+	aInfo.sync();
 	m_assets[uuid] = aInfo;
 }
 

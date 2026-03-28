@@ -5,6 +5,7 @@
 #include "memory/AssetRecord.h"
 #include "memory/AssetHandle.h"
 #include "core/Engine.h"
+#include "render/MaterialDataParser.h"
 
 #include <fstream>
 #include <cereal/archives/json.hpp>
@@ -80,4 +81,15 @@ void MaterialTypeManager::parse(ResourceLoadDescriptor& desc)
 
 void MaterialTypeManager::parse(ResourceBuildDescriptor& desc)
 {
+	auto materialDesc = dynamic_cast<MaterialCreateDescriptor*>(&desc);
+	if (!materialDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return;
+	}
+
+	if (!materialDesc->data.isParsed())
+	{
+		MaterialDataParser::parse(materialDesc->data);
+	}
 }

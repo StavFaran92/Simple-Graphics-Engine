@@ -472,20 +472,23 @@ void displayProjectSettingsDialog()
 
 void displayMaterialEditDialog()
 {
-	static ResourceWrapper<Material> previousMaterial;
+	static MaterialData previousMaterialData;
 	static MaterialDataWidget materialData;
 	if (EditorState::Instance().showMaterialEditWindow)
 	{
 		ImGui::OpenPopup("Edit Material");
 		
-		previousMaterial = EditorState::Instance().selectedMaterialForEdit.resource()->clone(true);
+		previousMaterialData = EditorState::Instance().selectedMaterialForEdit->data;
 		EditorState::Instance().showMaterialEditWindow = false;
 	}
 	if (ImGui::BeginPopupModal("Edit Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		auto& mat = EditorState::Instance().selectedMaterialForEdit;
 
-		materialData.draw(mat);
+		if (materialData.draw(mat->data))
+		{
+			mat.makeDirty();
+		}
 
 		ImGui::Separator();
 
@@ -500,7 +503,8 @@ void displayMaterialEditDialog()
 
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
-			mat.resource() = previousMaterial;
+			mat->data = previousMaterialData;
+			mat.makeDirty();
 			ImGui::CloseCurrentPopup();
 		}
 

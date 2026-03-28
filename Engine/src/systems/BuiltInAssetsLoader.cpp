@@ -83,7 +83,7 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_DEFAULT;
 		MaterialCreateDescriptor createDesc;
-		createDesc.data.renderMode = MaterialRenderMode::Opaque;
+		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Opaque);
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 	}
 
@@ -93,7 +93,7 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
 		MaterialCreateDescriptor createDesc;
-		createDesc.data.renderMode = MaterialRenderMode::Terrain;
+		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Terrain);
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 	}
 }

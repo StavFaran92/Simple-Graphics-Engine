@@ -10,6 +10,7 @@
 #include "texture/TextureSampler.h"
 #include "memory/Asset.h"
 #include "serialize/CerealHelpers.h"
+#include "render/MaterialData.h"
 
 static const std::string SHADER_PROPERTY_PBR_COLOR_DIFFUSE = "color";
 static const std::string SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR = "roughnessFactor";
@@ -24,65 +25,6 @@ static const std::string SHADER_PROPERTY_PBR_SAMPLER_AO = "samplerAO";
 
 //The material asset defines what the user chose.
 //The material resource defines how to render it efficiently.
-
-enum class MaterialRenderMode : int
-{
-	Opaque,
-	Transparent,
-	Terrain,
-	Skybox,
-	Unlit,
-	UI,
-	Volume,
-	Custom,
-
-	// This must be last
-	None,
-};
-
-struct EditableUniform {
-	std::string uniformName;
-	std::string type;
-	std::string defaultValueRaw;
-	float minValue = std::numeric_limits<float>::lowest();
-	float maxValue = std::numeric_limits<float>::max();
-	Value value;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(uniformName);
-		SERIALIZED_MEMBER(type);
-		SERIALIZED_MEMBER(defaultValueRaw);
-		SERIALIZED_MEMBER(minValue);
-		SERIALIZED_MEMBER(maxValue);
-		SERIALIZED_MEMBER(value);
-	}
-};
-
-struct MaterialData
-{
-	//std::string name;
-	//MaterialRenderMode renderMode = MaterialRenderMode::None;
-	//AssetHandle<ShaderAsset> customShader = AssetHandle<ShaderAsset>::empty; //optional
-
-	//std::map<std::string, Value> uniforms;
-	//std::map<std::string, std::shared_ptr<TextureSampler>> samplers;
-
-	std::string name;
-	MaterialRenderMode renderMode = MaterialRenderMode::None;
-	AssetHandle<ShaderAsset> customShader;
-	std::map<std::string, EditableUniform> uniforms;
-	std::map<std::string, std::shared_ptr<TextureSampler>> samplers;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(name);
-		SERIALIZED_MEMBER(renderMode);
-		SERIALIZED_MEMBER(customShader);
-		SERIALIZED_MEMBER(uniforms);
-		SERIALIZED_MEMBER(samplers);
-	}
-};
 
 struct EngineAPI MaterialCreateDescriptor : public ResourceBuildDescriptor
 {
@@ -181,13 +123,4 @@ public:
 
 	void serialize(nlohmann::json& j) const override;
 	void deserialize(const nlohmann::json& j) override;
-
-private:
-	
-
-	void update();
-
-	void parseUniforms(const std::string& sourceCode);
-
-	void parseFromShader(ResourceWrapper<Shader> shader);
 };

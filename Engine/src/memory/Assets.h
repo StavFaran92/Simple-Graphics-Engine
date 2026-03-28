@@ -47,6 +47,8 @@ public:
 
 	void makeDirty(UUID uuid);
 
+	void sync(UUID uuid);
+
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 
 private:

@@ -151,7 +151,7 @@ public:
 	void init(Context* context);
 
 	void makeDirty();
-	bool isDirty() const;
+	bool isSerializationDirty() const;
 private:
 	// -------------------- Methods -------------------- //
 	friend class Context;

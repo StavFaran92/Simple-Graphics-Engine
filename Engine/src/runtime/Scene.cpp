@@ -302,7 +302,7 @@ void Scene::makeDirty()
 	m_isDirty = true;
 }
 
-bool Scene::isDirty() const
+bool Scene::isSerializationDirty() const
 {
 	return m_isDirty;
 }

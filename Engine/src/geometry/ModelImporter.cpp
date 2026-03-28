@@ -19,6 +19,7 @@
 #include "utils/STBIHelper.h"
 #include "texture/Texture.h"
 #include "geometry/Model.h"
+#include "render/MaterialDataParser.h"
 
 #include "Utils/MikkTSpaceImpl.h"
 
@@ -35,8 +36,8 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, MaterialData& material
 	{
 		if (opacityFactor < 1.f)
 		{
-			materialData.renderMode = MaterialRenderMode::Transparent;
-			materialData.uniforms[SHADER_PROPERTY_PBR_OPACITY_FACTOR].value = opacityFactor;
+			materialData.setMaterialRenderMode(MaterialRenderMode::Transparent);
+			materialData.setUniform(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
 			//mat->setUniformValue(SHADER_PROPERTY_PBR_OPACITY_FACTOR, opacityFactor);
 		}
 
@@ -46,21 +47,21 @@ void extractAiMaterialProperties(const aiMaterial* aiMat, MaterialData& material
 	if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn_SUCCESS)
 	{
 		//mat->setUniformValue(SHADER_PROPERTY_PBR_COLOR_DIFFUSE, glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b));
-		materialData.uniforms[SHADER_PROPERTY_PBR_COLOR_DIFFUSE].value = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+		materialData.setUniform(SHADER_PROPERTY_PBR_COLOR_DIFFUSE, glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b));
 	}
 
 	ai_real rounghnessFactor;
 	if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, rounghnessFactor) == aiReturn_SUCCESS)
 	{
 		//mat->setUniformValue(SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR, rounghnessFactor);
-		materialData.uniforms[SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR].value = rounghnessFactor;
+		materialData.setUniform(SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR, rounghnessFactor);
 	}
 
 	ai_real metallicFactor;
 	if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallicFactor) == aiReturn_SUCCESS)
 	{
 		//mat->setUniformValue(SHADER_PROPERTY_PBR_METALLIC_FACTOR, metallicFactor);
-		materialData.uniforms[SHADER_PROPERTY_PBR_METALLIC_FACTOR].value = metallicFactor;
+		materialData.setUniform(SHADER_PROPERTY_PBR_METALLIC_FACTOR, metallicFactor);
 	}
 
 
@@ -171,7 +172,7 @@ void ModelImporter::parseAiMaterials(const aiScene* scene, ModelImporter::ModelP
 
 		MaterialData materialData;
 		materialData.name = materialName;
-		materialData.renderMode = MaterialRenderMode::Opaque;
+		materialData.setMaterialRenderMode(MaterialRenderMode::Opaque);
 
 		extractAiMaterialProperties(aMaterial, materialData);
 

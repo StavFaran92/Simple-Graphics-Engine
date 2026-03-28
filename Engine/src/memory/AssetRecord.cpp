@@ -69,10 +69,21 @@ bool AssetRecord::isParsed() const
 
 void AssetRecord::makeDirty()
 {
-	m_isDirty = true;
+	m_isSerializationDirty = true;
+	m_isResourceDirty = true;
 }
 
-bool AssetRecord::isDirty() const
+void AssetRecord::sync()
 {
-	return m_isDirty;
+	m_isResourceDirty = false;
+}
+
+bool AssetRecord::isSerializationDirty() const
+{
+	return m_isSerializationDirty;
+}
+
+bool AssetRecord::isResourceDirty() const
+{
+	return m_isResourceDirty;
 }

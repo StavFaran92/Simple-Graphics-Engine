@@ -38,13 +38,17 @@ struct EngineAPI AssetRecord
 	bool isParsed() const;
 
 	void makeDirty();
-	bool isDirty() const;
+	void sync();
+	bool isSerializationDirty() const;
+	bool isResourceDirty() const;
 		
 
 private:
 	friend class Assets;
 
-	bool m_isDirty = false;
+	bool m_isSerializationDirty = false;
+	bool m_isResourceDirty = true;
+
 	bool m_isParsed = false;
 };
 

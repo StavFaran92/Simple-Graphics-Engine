@@ -23,25 +23,9 @@
 
 #include <filesystem>
 #include "memory/AssetHandle.h"
+#include "render/MaterialDataParser.h"
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
-
-ResourceWrapper<Shader> getShaderFromRenderMode(MaterialRenderMode renderMode)
-{
-	switch (renderMode)
-	{
-	case MaterialRenderMode::Opaque:
-		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
-	case MaterialRenderMode::Transparent:
-		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
-	case MaterialRenderMode::Terrain:
-		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);
-	case MaterialRenderMode::Volume:
-		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_VOLUME);
-	}
-
-	return ResourceWrapper<Shader>::empty;
-}
 
 void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ResourceWrapper<Shader>& shader, int slot)
 {
@@ -150,7 +134,7 @@ ResourceWrapper<Shader> Material::getActiveShader() const
 {
 	if (m_renderMode != MaterialRenderMode::Custom)
 	{
-		return getShaderFromRenderMode(m_renderMode);
+		return MaterialDataParser::getShaderFromRenderMode(m_renderMode);
 	}
 	else
 	{
@@ -160,51 +144,6 @@ ResourceWrapper<Shader> Material::getActiveShader() const
 
 void Material::setTexture(const std::string& name, const ResourceWrapper<Texture>& texture)
 {
-}
-
-bool parseEditablePragmaLine(const std::string& line, EditableUniform& editableUniform) {
-	// Check if line contains #pragma editable
-	std::regex pragmaRegex(R"(^\s*#pragma\s+editable)");
-
-	if (!std::regex_search(line, pragmaRegex)) {
-		logWarning("Invalid pragma editable line: {}", line);
-		return false;
-	}
-
-	// Parse default: capture content inside parentheses OR a scalar value
-	std::regex defaultRegex(R"(default\s*=\s*(?:\(([^)]*)\)|([0-9.+-eEfF]+)))");
-	std::regex minRegex(R"(min\s*=\s*([0-9.+-eEfF]+))");
-	std::regex maxRegex(R"(max\s*=\s*([0-9.+-eEfF]+))");
-
-	std::smatch m;
-
-	if (std::regex_search(line, m, defaultRegex)) {
-		// m[1] has parenthesized content, m[2] has scalar
-		editableUniform.defaultValueRaw = m[1].matched ? m[1].str() : m[2].str();
-	}
-
-	if (std::regex_search(line, m, minRegex)) {
-		editableUniform.minValue = std::stof(m[1].str());
-	}
-
-	if (std::regex_search(line, m, maxRegex)) {
-		editableUniform.maxValue = std::stof(m[1].str());
-	}
-
-	return true;
-}
-
-std::vector<float> parseFloatTuple(const std::string& s) {
-	std::vector<float> values;
-	std::regex numRegex(R"([0-9.+-]+)");
-	std::smatch match;
-	std::string copy = s;
-
-	while (std::regex_search(copy, match, numRegex)) {
-		values.push_back(std::stof(match[0].str()));
-		copy = match.suffix();
-	}
-	return values;
 }
 
 void Material::setUniformValue(const std::string& name, const Value& v)
@@ -237,8 +176,8 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, Materi
 	{
 		iarchive(materialData);
 		ResourceWrapper<Material> material = Factory<Material>::create();
-		material->m_renderMode = materialData.renderMode;
-		material->m_customShader = materialData.customShader.resource();
+		material->m_renderMode = materialData.getMaterialRenderMode();
+		material->m_customShader = materialData.getCustomShader().resource();
 		material->m_name = materialData.name;
 		return material;
 
@@ -255,159 +194,9 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, Materi
 // Asset
 //////////////////////////
 
-void MaterialAsset::parseUniforms(const std::string& sourceCode)
-{
-	data.uniforms.clear();
-	data.samplers.clear();
-
-	std::istringstream stream(sourceCode);
-	std::string line;
-
-	auto& uniformProperties = data.uniforms;
-	auto& samplers = data.samplers;
-
-	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
-	EditableUniform pendingMeta;
-	bool isNextLineEditableUniform = false;
-
-	while (std::getline(stream, line)) {
-		// Trim
-		line.erase(0, line.find_first_not_of(" \t"));
-
-		if (line.find("#pragma editable") == 0) {
-			isNextLineEditableUniform = parseEditablePragmaLine(line, pendingMeta);
-			continue;
-		}
-
-		std::smatch match;
-		if (isNextLineEditableUniform && std::regex_search(line, match, uniformRegex)) {
-			std::string type = match[1];
-			std::string name = match[2];
-
-			pendingMeta.uniformName = name;
-			pendingMeta.type = type;
-
-
-
-			// Parse default
-			std::vector<float> defVals = parseFloatTuple(pendingMeta.defaultValueRaw);
-
-			if (type == "float")
-			{
-				pendingMeta.value = defVals.size() > 0 ? defVals[0] : 0.0f;
-				uniformProperties[name] = pendingMeta;
-			}
-			else if (type == "int")
-			{
-				pendingMeta.value = defVals.size() > 0 ? static_cast<int>(defVals[0]) : 0;
-				uniformProperties[name] = pendingMeta;
-			}
-			else if (type == "uint")
-			{
-				pendingMeta.value = defVals.size() > 0 ? static_cast<unsigned int>(defVals[0]) : 0u;
-				uniformProperties[name] = pendingMeta;
-			}
-			else if (type == "vec2")
-			{
-				glm::vec2 val(0.0f);
-				for (size_t i = 0; i < std::min<size_t>(2, defVals.size()); ++i)
-					val[i] = defVals[i];
-				pendingMeta.value = val;
-				uniformProperties[name] = pendingMeta;
-			}
-			else if (type == "vec3")
-			{
-				glm::vec3 val(0.0f);
-				for (size_t i = 0; i < std::min<size_t>(3, defVals.size()); ++i)
-					val[i] = defVals[i];
-				pendingMeta.value = val;
-				uniformProperties[name] = pendingMeta;
-			}
-			else if (type == "vec4")
-			{
-				glm::vec4 val(0.0f);
-				for (size_t i = 0; i < std::min<size_t>(4, defVals.size()); ++i)
-					val[i] = defVals[i];
-				pendingMeta.value = val;
-				uniformProperties[name] = pendingMeta;
-			}
-			else if (type == "mat3")
-			{
-				pendingMeta.value = glm::mat3(1.0f);
-				uniformProperties[name] = pendingMeta;
-			}
-			else if (type == "mat4")
-			{
-				pendingMeta.value = glm::mat4(1.0f);
-				uniformProperties[name] = pendingMeta;
-			}
-			else if (type == "PBR_Sampler")
-			{
-				samplers[name] = std::make_shared<TextureSampler>();
-			}
-
-
-			isNextLineEditableUniform = false;
-		}
-	}
-
-	for (const auto& [name, uniform] : data.uniforms)
-	{
-		data.uniforms[name].value = uniform.value;
-	}
-}
-
-void MaterialAsset::parseFromShader(ResourceWrapper<Shader> shader)
-{
-	std::string sourceCode;
-	ShadersInfo sInfo = shader->getShadersInfo();
-	sourceCode += sInfo.vertexCode + "\n";
-	sourceCode += sInfo.fragmentCode + "\n";
-	sourceCode += sInfo.computeCode + "\n";
-	sourceCode += sInfo.geometryCode + "\n";
-	sourceCode += sInfo.tessControlCode + "\n";
-	sourceCode += sInfo.tessEvaluationCode + "\n";
-
-	parseUniforms(sourceCode);
-}
-
-void MaterialAsset::update()
-{
-	auto oldUniforms = data.uniforms;
-	auto oldSamplers = data.samplers;
-
-	ResourceWrapper<Shader> shader = getActiveShader();
-
-	if (shader.isEmpty())
-		return;
-
-	parseFromShader(shader);
-
-	auto& newSamplers = data.samplers;
-	for (const auto [name, sampler] : oldSamplers)
-	{
-		auto iter = newSamplers.find(name);
-		if (iter != newSamplers.end())
-		{
-			iter->second = sampler;
-		}
-	}
-
-	auto& newUniforms = data.uniforms;
-	for (const auto [name, value] : oldUniforms)
-	{
-		auto iter = newUniforms.find(name);
-		if (iter != newUniforms.end())
-		{
-			iter->second = value;
-		}
-	}
-}
-
 MaterialAsset::MaterialAsset(const MaterialCreateDescriptor& desc)
 {
 	data = desc.data;
-	update();
 }
 
 void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
@@ -457,18 +246,18 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 	std::shared_ptr<TextureSampler> sampler = std::make_shared<TextureSampler>(samplerChannels);
 	sampler->isActive = true;
 	sampler->texture = textureAsset;
-	data.samplers[shaderPropertyName] = sampler;
+	data.setSampler(shaderPropertyName, sampler);
 }
 
 void MaterialAsset::fillData(ResourceWrapper<Resource> resource)
 {
 	auto materialResource = resource.as<Material>();
 	materialResource->m_name = data.name;
-	materialResource->m_renderMode = data.renderMode;
-	materialResource->m_customShader = data.customShader.resource();
-	materialResource->m_samplers = data.samplers;
+	materialResource->m_renderMode = data.getMaterialRenderMode();
+	materialResource->m_customShader = data.getCustomShader().resource();
+	materialResource->m_samplers = data.getSamplers();
 
-	for (const auto& [name, uniform] : data.uniforms)
+	for (const auto& [name, uniform] : data.getUniforms())
 	{
 		materialResource->m_uniformProperties[name] = uniform.value;
 	}
@@ -487,66 +276,65 @@ std::string MaterialAsset::getName() const
 
 void MaterialAsset::setCustomShader(AssetHandle<ShaderAsset>& customShader)
 {
-	data.customShader = customShader;
-	update();
+	data.setCustomShader(customShader);
 }
 
 AssetHandle<ShaderAsset> MaterialAsset::getCustomShader() const
 {
-	return data.customShader;
+	return data.getCustomShader();
 }
 
 void MaterialAsset::setMaterialRenderMode(MaterialRenderMode renderMode)
 {
-	data.renderMode = renderMode;
-	update();
+	data.setMaterialRenderMode(renderMode);;
 }
 
 MaterialRenderMode MaterialAsset::getMaterialRenderMode() const
 {
-	return data.renderMode;
+	return data.getMaterialRenderMode();
 }
 
 void MaterialAsset::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
 {
-	data.samplers[name] = sampler;
+	data.setSampler(name, sampler);
 }
 
 std::shared_ptr<TextureSampler> MaterialAsset::getSampler(const std::string& name)
 {
-	auto it = data.samplers.find(name);
-	return it != data.samplers.end() ? it->second : nullptr;
+	const auto& samplers = data.getSamplers();
+	auto it = samplers.find(name);
+	return it != samplers.end() ? it->second : nullptr;
 }
 
 void MaterialAsset::setSamplerEnabled(const std::string& name, bool isEnabled)
 {
-	auto it = data.samplers.find(name);
-	if (it != data.samplers.end() && it->second)
+	auto sampler = getSampler(name);
+	if (sampler)
 	{
-		it->second->isActive = isEnabled;
+		sampler->isActive = isEnabled;
 	}
 }
 
 void MaterialAsset::setUniformValue(const std::string& name, const Value& v)
 {
-	data.uniforms[name].value = v;
+	data.setUniform(name, v);
 }
 
 Value MaterialAsset::getUniformValue(const std::string& name)
 {
-	auto it = data.uniforms.find(name);
-	return it != data.uniforms.end() ? it->second.value : Value{};
+	auto it = data.getUniforms().find(name);
+	return it != data.getUniforms().end() ? it->second.value : Value{};
 }
 
 ResourceWrapper<Shader> MaterialAsset::getActiveShader() const
 {
-	if (data.renderMode != MaterialRenderMode::Custom)
+	if (data.getMaterialRenderMode() != MaterialRenderMode::Custom)
 	{
-		return getShaderFromRenderMode(data.renderMode);
+		return MaterialDataParser::getShaderFromRenderMode(data.getMaterialRenderMode());
 	}
 	else
 	{
-		return data.customShader.resource();
+		return data.getCustomShader().resource();
 	}
 }
 
@@ -566,12 +354,12 @@ AssetHandle<MaterialAsset> MaterialAsset::clone(bool isEngineOwned) const
 
 std::map<std::string, std::shared_ptr<TextureSampler>> MaterialAsset::getSamplers()
 {
-	return data.samplers;
+	return data.getSamplers();
 }
 
 std::map<std::string, EditableUniform> MaterialAsset::getUniformProperties()
 {
-	return data.uniforms;
+	return data.getUniforms();
 }
 
 void MaterialAsset::serialize(nlohmann::json& j) const

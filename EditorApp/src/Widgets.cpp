@@ -5,6 +5,7 @@
 #include <imgui_stdlib.h>
 #include "tinyfiledialogs.h"
 #include "dialogs/AssetSelectDialog.h"
+#include "render/MaterialData.h"
 
 void addTextureEditWidget(AssetHandle<TextureAsset> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
@@ -201,9 +202,10 @@ bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::f
 
 
 
-void MaterialDataWidget::draw(const AssetHandle<MaterialAsset>& mat)
+bool MaterialDataWidget::draw(MaterialData& data)
 {
-	ImGui::Text(mat->data.name.c_str());
+	bool isChanged = false;
+	ImGui::Text(data.name.c_str());
 
 	ImGui::Dummy(ImVec2(0, 4));
 
@@ -220,7 +222,7 @@ void MaterialDataWidget::draw(const AssetHandle<MaterialAsset>& mat)
 	};
 
 	static MaterialRenderMode currentMode;
-	currentMode = mat->data.renderMode;
+	currentMode = data.getMaterialRenderMode();
 	int currentIndex = static_cast<int>(currentMode);
 
 	if (ImGui::BeginCombo("Render Mode", RenderModeNames[currentIndex])) {
@@ -229,7 +231,8 @@ void MaterialDataWidget::draw(const AssetHandle<MaterialAsset>& mat)
 			if (ImGui::Selectable(RenderModeNames[i], isSelected)) {
 				currentIndex = i;
 				currentMode = static_cast<MaterialRenderMode>(i);
-				mat.get()->setMaterialRenderMode(currentMode);
+				data.setMaterialRenderMode(currentMode);
+				isChanged = true;
 			}
 			if (isSelected)
 				ImGui::SetItemDefaultFocus();
@@ -240,24 +243,25 @@ void MaterialDataWidget::draw(const AssetHandle<MaterialAsset>& mat)
 	if (currentMode == MaterialRenderMode::Custom)
 	{
 		std::string shaderName = "None";
-		if (!mat.get()->getCustomShader().isEmpty())
+		if (!data.getCustomShader().isEmpty())
 		{
-			shaderName = mat.get()->getCustomShader().info().name;
+			shaderName = data.getCustomShader().info().name;
 		}
 
-		addAssetSelectWidget(shaderName, AssetType::SHADER, [mat](UUID uuid) {
-			mat.get()->setCustomShader(AssetHandle<ShaderAsset>(uuid));
+		addAssetSelectWidget(shaderName, AssetType::SHADER, [&data, &isChanged](UUID uuid) {
+			data.setCustomShader(AssetHandle<ShaderAsset>(uuid));
+			isChanged = true;
 		});
 	}
 
 	// Custom Textures Array
 	if (ImGui::CollapsingHeader("Samplers"))
 	{
-		for (auto& [name, sampler] : mat->getSamplers())
+		for (auto& [name, sampler] : data.getSamplers())
 		{
 			ImGui::PushID(name.c_str());
 			ImGui::Text(name.c_str());
-			ImGui::Checkbox("", (bool*)&sampler->isActive);
+			if (ImGui::Checkbox("", (bool*)&sampler->isActive)) { isChanged = true; }
 			ImGui::SameLine();
 			addSamplerEditWidget(sampler, { 40, 40 }, name);
 			ImGui::PopID();
@@ -268,10 +272,11 @@ void MaterialDataWidget::draw(const AssetHandle<MaterialAsset>& mat)
 	// Display Uniforms and Update Shader
 	if (ImGui::CollapsingHeader("Uniforms"))
 	{
-		for (auto& [name, uniform] : mat->getUniformProperties())
+		for (auto& [name, uniform] : data.getUniforms())
 		{
 			ImGui::PushID(name.c_str());
 			bool updated = false; // Track if the value was changed
+			auto value = uniform.value;
 			std::visit([&](auto& v)
 				{
 					using T = std::decay_t<decltype(v)>;
@@ -311,12 +316,13 @@ void MaterialDataWidget::draw(const AssetHandle<MaterialAsset>& mat)
 						for (int i = 0; i < 4; ++i)
 							updated |= ImGui::DragFloat4((name + "##row" + std::to_string(i)).c_str(), &v[i][0], 0.1f);
 					}
-				}, uniform.value);
+				}, value);
 
 			// If the value changed, update the shader
 			if (updated)
 			{
-				mat.get()->setUniformValue(name, uniform.value);
+				data.setUniform(name,value);
+				isChanged = true;
 			}
 
 			ImGui::PopID();
@@ -333,4 +339,5 @@ void MaterialDataWidget::draw(const AssetHandle<MaterialAsset>& mat)
 	//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", TextureType::Metallic);
 	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", TextureType::Roughness);
 	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", TextureType::AmbientOcclusion);
+	return isChanged;
 }

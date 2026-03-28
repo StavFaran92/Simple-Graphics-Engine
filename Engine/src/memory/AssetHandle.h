@@ -76,6 +76,12 @@ public:
 
 		m_resource_DEBUG = resource;
 
+		if (record.isResourceDirty())
+		{
+			record.asset->fillData(resource);
+			Engine::get()->getSubSystem<Assets>()->sync(uuid);
+		}
+
 		return resource.as<ResourceType>();
 	}
 
