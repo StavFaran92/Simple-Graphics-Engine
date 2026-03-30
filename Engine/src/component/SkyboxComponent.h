@@ -4,6 +4,8 @@
 #include "component/ComponentSerializer.h"
 #include "texture/Texture.h"
 
+class Scene;
+
 struct EngineAPI SkyboxComponent : public Component
 {
 	SkyboxComponent() = default;
@@ -20,11 +22,15 @@ struct EngineAPI SkyboxComponent : public Component
 
 	void build();
 
+	void resolve(ResourceWrapper<Scene>& scene) override;
+
 
 	AssetHandle<TextureAsset> originalImage;
 	ResourceWrapper<Texture> cubemapIBL;
 	ResourceWrapper<Texture> cubemap;
 	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
+
+	ResourceWrapper<Scene> m_scene = nullptr;
 };
 
 REGISTER_COMPONENT(SkyboxComponent)

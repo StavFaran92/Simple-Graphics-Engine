@@ -11,7 +11,6 @@ void SkyboxComponent::attachToEntity(std::shared_ptr<Component> c, Entity entity
 	if (auto sc = std::dynamic_pointer_cast<SkyboxComponent>(c))
 	{
 		auto& skyboxComponent = entityHandler.addComponent<SkyboxComponent>(*sc);
-		skyboxComponent.build();
 	}
 }
 
@@ -29,6 +28,8 @@ void SkyboxComponent::build()
 {
 	// TODO check if orig image is cube and support cubemap load
 
+	assert(!m_scene.isEmpty());
+
 	ResourceWrapper<Texture> flippedImage = TextureTransformer::flipVertical(originalImage.resource());
 	ResourceWrapper<Texture> flippedImageGammeCorrected = TextureTransformer::applyGammaCorrection(flippedImage);
 	cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImageGammeCorrected);
@@ -36,12 +37,15 @@ void SkyboxComponent::build()
 	cubemapIBL = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImage);
 	cubemapIBL->generateMipMaps();
 
-	auto scene = Engine::get()->getContext()->getActiveScene().get();
-	auto irradianceMap = IBL::generateIrradianceMap(cubemapIBL, scene);
-	auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemapIBL, scene);
+	auto irradianceMap = IBL::generateIrradianceMap(cubemapIBL);
+	auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemapIBL);
 
-	scene->setIBLData(irradianceMap, prefilterEnvMap);
+	m_scene->setIBLData(irradianceMap, prefilterEnvMap);
+}
 
-	
+void SkyboxComponent::resolve(ResourceWrapper<Scene>& scene)
+{
+	m_scene = scene;
 
+	build();
 }

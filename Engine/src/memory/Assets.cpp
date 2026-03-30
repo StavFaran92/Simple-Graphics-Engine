@@ -119,11 +119,15 @@ void Assets::loadAssetsDatabase()
 		//assetInfo.asset = asset;
 
 		m_assets[assetInfo.uuid] = assetInfo;
+	}
 
+	// Post initialize
+	for (auto& [uuid, record] : m_assets)
+	{
 		// If its a scene we add it to the scene manager
-		if (assetInfo.aType == AssetType::SCENE)
+		if (record.aType == AssetType::SCENE)
 		{
-			AssetHandle<SceneAsset> sceneAsset(assetInfo.uuid);
+			AssetHandle<SceneAsset> sceneAsset(uuid);
 			Engine::get()->getContext()->addScene(sceneAsset);
 		}
 	}

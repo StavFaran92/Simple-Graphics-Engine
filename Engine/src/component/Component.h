@@ -40,6 +40,8 @@ public:
 
 	std::vector<AssetHandle<Asset>> gatherDependencies() const;
 
+	virtual void resolve(ResourceWrapper<Scene>& scene) {};
+
 protected:
 	virtual std::vector<AssetHandle<Asset>*> gatherDependenciesInternal() const;
 };

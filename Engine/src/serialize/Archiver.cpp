@@ -96,36 +96,4 @@ void Archiver::deserializeScene(SerializedScene serializedScene, ResourceWrapper
 	{
 		trans.forceUpdate();
 	}
-
-	
 }
-
-//SerializedContext Archiver::serializeContext(const Context* ctx)
-//{
-//	SerializedContext serializedContext;
-//
-//	for (auto& [sceneID, scene] : ctx->getAllScenes())
-//	{
-//		serializedContext.serializedScenes[sceneID] = serializeScene(scene.get());
-//	}
-//
-//	serializedContext.activeScene = ctx->getActiveSceneID();
-//
-//	return serializedContext;
-//}
-//
-//void Archiver::deserializeContext(SerializedContext serializedContext, Context* ctx)
-//{
-//	ctx->m_scenes.clear();
-//
-//	ctx->m_activeScene = serializedContext.activeScene;
-//
-//	for (auto& [sceneID, serializedScene] : serializedContext.serializedScenes)
-//	{
-//		std::shared_ptr<Scene> scene = std::make_shared<Scene>(ctx);
-//		ctx->m_scenes[sceneID] = scene;
-//		deserializeScene(serializedScene, *scene.get());
-//	}
-//
-//	
-//}

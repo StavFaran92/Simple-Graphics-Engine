@@ -74,7 +74,7 @@ ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDes
 	//std::ifstream is(filepath);
 	//cereal::JSONInputArchive iarchive(is);
 	ResourceWrapper<Scene> scene = Factory<Scene>::create();
-	scene->init(Engine::get()->getContext());
+	scene->init(Engine::get()->getContext(), scene.getUID());
 
 	try
 	{
@@ -94,7 +94,8 @@ ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDes
 
 ResourceWrapper<Scene> Scene::create()
 {
-	auto scene = Factory<Scene>::create(Engine::get()->getContext());
+	auto scene = Factory<Scene>::create();
+	scene->init(Engine::get()->getContext(), scene.getUID());
 	return scene;
 }
 
@@ -166,18 +167,27 @@ void Scene::bindScriptToLayer(entt::registry& reg, entt::entity entity)
 	script.eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
 }
 
-void Scene::init(Context* context)
+void Scene::init(Context* context, ResourceID rid)
 {
 	m_context = context;
+	m_rid = rid;
 
 	static auto onChangedCB = [this](UUID) {
 		makeDirty();
 	};
 
 	m_registry = std::make_shared<SGE_Regsitry>();
-	m_registry->registerOnComponentAdded([](const Component& c) {
+	m_registry->registerOnComponentAdded([rid](Component& c) {
+
+		// The following will be called for each added component
 		c.registerDependencyListener(onChangedCB);
 		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
+
+		ResourceWrapper<Scene> scene = Engine::get()->getResourceManager()->getResource(rid).as<Scene>();
+		if (scene->isReady())
+		{
+			c.resolve(scene);
+		}
 	});
 
 	auto width = Engine::get()->getWindow()->getWidth();
@@ -254,7 +264,7 @@ void Scene::init(Context* context)
 	m_prefilterEnvMap = Texture::createTexture(defaultCubemapData2);
 
 	// Create BRDF look up texture
-	m_BRDFIntegrationLUT = IBL::generateBRDFIntegrationLUT(this);
+	m_BRDFIntegrationLUT = IBL::generateBRDFIntegrationLUT();
 
 	m_skyboxShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SkyboxShader.glsl");
 
@@ -272,6 +282,10 @@ void Scene::init(Context* context)
 	m_highlightMergeShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlightMergeShader.glsl", loadDesc);
 
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
+
+	// Scene is loaded and ready to be used. should come last.
+	logInfo("Scene {} is loaded and ready.", rid);
+	m_isReady = true;
 
 	//std::vector<GLuint> data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // sum = 45
 
@@ -305,6 +319,11 @@ void Scene::makeDirty()
 bool Scene::isSerializationDirty() const
 {
 	return m_isDirty;
+}
+
+bool Scene::isReady() const
+{
+	return m_isReady;
 }
 
 void Scene::update(float deltaTime)
@@ -1119,11 +1138,6 @@ void Scene::onWindowResize(int w, int h)
 void Scene::clear()
 {
 	m_registry->get().clear();
-}
-
-Scene::Scene(Context* context)
-{
-	init(context);
 }
 
 void Scene::close()

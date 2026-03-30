@@ -34,6 +34,24 @@ void ResourceManager::setRootDir(const std::string& rootDir)
 //	return resource;
 //}
 
+ResourceWrapper<Resource> ResourceManager::getResource(ResourceID rid) const
+{
+    {
+        std::scoped_lock lock(cacheMutex);
+
+        auto it = m_resourceCache.find(rid);
+        if (it != m_resourceCache.end())
+        {
+            if (auto existing = it->second)
+            {
+                return existing;
+            }
+        }
+
+        return ResourceWrapper<Resource>::empty;
+    }
+}
+
 ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, const std::function<ResourceWrapper<Resource>(void)>& creationCallback)
 {
     {

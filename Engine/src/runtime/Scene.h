@@ -94,7 +94,6 @@ public:
 public:
 	// -------------------- Methods -------------------- //
 	Scene() = default;
-	Scene(Context* context);
 
 	static ResourceWrapper<Scene> load(const std::string& fileLocation, SceneLoadDescriptor desc = {});
 
@@ -148,10 +147,12 @@ public:
     glm::mat4 getGameCameraView() const;
 
     void onWindowResize(int w, int h);
-	void init(Context* context);
+	void init(Context* context, ResourceID rid);
 
 	void makeDirty();
 	bool isSerializationDirty() const;
+
+	bool isReady() const;
 private:
 	// -------------------- Methods -------------------- //
 	friend class Context;
@@ -171,6 +172,8 @@ private:
 	std::shared_ptr<RenderView> getRenderView(const std::string& name) const;
 
 	void preloadSceneResources();
+
+	ResourceID m_rid = 0;
 
 private:
 	// -------------------- Attributes -------------------- //
@@ -236,6 +239,8 @@ private:
 	std::vector<ResourceWrapper<Resource>> m_cachedResources;;
 
 	bool m_isDirty = false;
+
+	bool m_isReady = false; // False means scene is still loading
 	
 };
 

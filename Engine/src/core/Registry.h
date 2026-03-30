@@ -11,7 +11,7 @@ class Entity;
 class EngineAPI SGE_Regsitry
 {
 public:
-	using Callback = std::function<void(const Component&)>;
+	using Callback = std::function<void(Component&)>;
 
 	entt::registry& get();
 
@@ -43,7 +43,7 @@ public:
 
 	void removeEntity(const Entity& e);
 private:
-	void invokeOnComponentAdded(const Component& c)
+	void invokeOnComponentAdded(Component& c)
 	{
 		if (m_onComponentAddedCallback)
 		{

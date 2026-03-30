@@ -31,7 +31,6 @@ Entity Skybox::createSkybox(const std::string& textureFilepath, TexType texType)
         loadDesc.sourcePath = textureFilepath;
         auto skyboxTexture = Engine::get()->getSubSystem<Assets>()->importAsset(texDesc, loadDesc).as<TextureAsset>();
         auto& skyboxComponent = skyboxEntity.addComponent<SkyboxComponent>(skyboxTexture);
-        skyboxComponent.build();
     }
 
     return skyboxEntity;
@@ -46,10 +45,10 @@ Entity Skybox::createSkyboxHelper(AssetHandle<TextureAsset> cubemap, AssetHandle
     }
 
     // Create irradiance map using created cubemap
-    auto irradianceMap = IBL::generateIrradianceMap(cubemap.resource(), scene);
+    auto irradianceMap = IBL::generateIrradianceMap(cubemap.resource());
 
     // Create prefilter env map using created cubemap
-    auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemap.resource(), scene);
+    auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemap.resource());
 
     scene->setIBLData(irradianceMap, prefilterEnvMap);
 

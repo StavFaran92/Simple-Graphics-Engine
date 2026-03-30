@@ -23,7 +23,7 @@
 
 #include "core/Engine.h"
 
-ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> environmentMap, Scene* scene)
+ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> environmentMap)
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Irradiance map");
 
@@ -110,7 +110,7 @@ ResourceWrapper<Texture> IBL::generateIrradianceMap(ResourceWrapper<Texture> env
 	return irradianceMap;
 }
 
-ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> environmentMap, Scene* scene)
+ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> environmentMap)
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Prefilter Environemnt map");
 
@@ -210,7 +210,7 @@ ResourceWrapper<Texture> IBL::generatePrefilterEnvMap(ResourceWrapper<Texture> e
 	return prefilterEnvMap;
 }
 
-ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT(Scene* scene)
+ResourceWrapper<Texture> IBL::generateBRDFIntegrationLUT()
 {
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate BRDF Integration map");
 
