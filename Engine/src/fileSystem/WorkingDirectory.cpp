@@ -18,7 +18,7 @@ void WorkingDirectory::back()
     std::filesystem::path absoultContentDir = std::filesystem::weakly_canonical(FileSystem::toAbsolute(filesystem->getContentDirectory()));
 	if (absoultePath != absoultContentDir)
 	{
-		m_path.setPath(m_path.relative().parent_path());
+		m_path.setPath("..");
 	}
 }
 

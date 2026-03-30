@@ -214,7 +214,8 @@ void Assets::updateRegistry(const AssetRecord& aInfo)
 	{
 		Engine::get()->getMemoryManagementSystem()->addNameReference(aInfo.name, aInfo.uuid);
 	}
-	Engine::get()->getMemoryManagementSystem()->addPathReference(aInfo.relativefilePath, aInfo.uuid); //TODO maybe use some naming convention here?
+
+	Engine::get()->getMemoryManagementSystem()->addPathReference(aInfo.getScopedPath(), aInfo.uuid); //TODO maybe use some naming convention here?
 	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
 }
 

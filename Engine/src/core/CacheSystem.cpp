@@ -6,7 +6,7 @@
 
 std::string normalizePath(const std::string& input)
 {
-    fs::path p = fs::weakly_canonical(fs::absolute(input));
+    fs::path p = fs::weakly_canonical(Engine::get()->getProjectDirectory()  + "/" + input);
     std::string s = p.generic_string();
 
 #ifdef _WIN32

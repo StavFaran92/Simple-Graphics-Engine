@@ -41,6 +41,8 @@ struct EngineAPI AssetRecord
 	void sync();
 	bool isSerializationDirty() const;
 	bool isResourceDirty() const;
+	std::string getAbsolutePath() const;
+	std::string getScopedPath() const;
 		
 
 private:

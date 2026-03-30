@@ -96,3 +96,17 @@ bool AssetRecord::isResourceDirty() const
 {
 	return m_isResourceDirty;
 }
+
+std::string AssetRecord::getAbsolutePath() const
+{
+	ScopedPath p = isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+	p.setPath(relativefilePath);
+	return p.absolute().string();
+}
+
+std::string AssetRecord::getScopedPath() const
+{
+	ScopedPath p = isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
+	p.setPath(relativefilePath);
+	return p.scoped().string();
+}

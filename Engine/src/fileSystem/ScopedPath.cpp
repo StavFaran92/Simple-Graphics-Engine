@@ -47,7 +47,7 @@ std::filesystem::path ScopedPath::scoped() const
 
 void ScopedPath::setPath(std::filesystem::path path)
 {
-    fs::path candidate = fs::weakly_canonical(FileSystem::toAbsolute(m_root / path));
+    fs::path candidate = fs::weakly_canonical(FileSystem::toAbsolute(m_root / m_path / path));
     fs::path root = fs::weakly_canonical(FileSystem::toAbsolute(m_root));
 
     // Compute relative path
