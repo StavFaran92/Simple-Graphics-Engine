@@ -142,6 +142,11 @@ void SceneManager::stopSimulation()
 
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{
+		cbWrapper.resolve(activeScene);
+	}
+
+	for (auto& cbWrapper : ComponentSerdes::getRegistry())
+	{
 		cbWrapper.postLoad(activeScene);
 	}
 }

@@ -182,6 +182,11 @@ void Transformation::resolve(ResourceWrapper<Scene>& scene)
 	}
 }
 
+void Transformation::postLoad(ResourceWrapper<Scene>& scene)
+{
+	forceUpdate();
+}
+
 void Transformation::setLocalPosition(glm::vec3 pos)
 {
 	localTranslation = pos;

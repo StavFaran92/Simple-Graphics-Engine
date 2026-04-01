@@ -65,6 +65,7 @@ struct SerializerEntry
 	std::string name;
 	SnapshotSerializeFunc serialize;
 	SnapshotDeserializeFunc deserialize;
+	std::function<void(ResourceWrapper<Scene>&)> resolve;
 	std::function<void(ResourceWrapper<Scene>&)> postLoad;
 };
 
@@ -96,10 +97,18 @@ public:
 				snapshot.component<T>(input);
 			};
 
-		entry.postLoad = [](ResourceWrapper<Scene>& scene) { 
+		entry.resolve = [](ResourceWrapper<Scene>& scene) { 
 			for(auto& [entity, c] : scene->getRegistry().get().view<T>().each())
 			{
 				c.resolve(scene);
+				c.registerDependencyListener([scene](UUID uid) { scene.get()->makeDirty(); });
+			}
+		};
+
+		entry.postLoad = [](ResourceWrapper<Scene>& scene) {
+			for (auto& [entity, c] : scene->getRegistry().get().view<T>().each())
+			{
+				c.postLoad(scene);
 			}
 		};
 
