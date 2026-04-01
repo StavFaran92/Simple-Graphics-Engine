@@ -6,6 +6,7 @@
 #include <cereal/types/map.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
 
 #define SERIALIZED_MEMBER(member) archive(CEREAL_NVP(member));
 

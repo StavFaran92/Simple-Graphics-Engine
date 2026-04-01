@@ -69,8 +69,7 @@ static void attachSimple(std::shared_ptr<Component> c, Entity entityHandler)
 #ifndef COMPONENT_SERDES
 	#ifdef ENGINE_BUILD_DLL
 		#define COMPONENT_SERDES(TYPE) \
-			inline ComponentSerializeFnRegister<TYPE> TYPE##_serializeRegister(getComponentIfExists<TYPE>); \
-			inline ComponentDeserializeFnRegister<TYPE> TYPE##_deserializeRegister(TYPE::attachToEntity);
+			inline ComponentSerializeFnRegister<TYPE> TYPE##_serializeRegister;
 	#else
 		#define COMPONENT_SERDES(TYPE)
 	#endif

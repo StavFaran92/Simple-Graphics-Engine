@@ -43,9 +43,9 @@ class ComponentSerializeFnRegister
 public:
 	static_assert(std::is_base_of<Component, T>::value, "T must inherit from Component");
 
-	ComponentSerializeFnRegister(const ComponentSerializer::SerializeFn& fn)
+	ComponentSerializeFnRegister()
 	{
-		ComponentSerializer::registerSerializeFunc(fn);
+		ComponentSerdes::RegisterComponentSerializer<T>();
 	}
 
 	static ComponentSerializeFnRegister<T> staticRegister;
@@ -54,20 +54,56 @@ public:
 template<typename T>
 ComponentSerializeFnRegister<T> ComponentSerializeFnRegister<T>::staticRegister;
 
-// Deserealize
-template<typename T>
-class ComponentDeserializeFnRegister
+#include "cereal/archives/json.hpp"
+#include "serialize/CerealHelpers.h"
+
+using SnapshotSerializeFunc = std::function<void(entt::snapshot&, cereal::JSONOutputArchive&)>;
+using SnapshotDeserializeFunc = std::function<void(entt::snapshot_loader&, cereal::JSONInputArchive&)>;
+
+struct SerializerEntry
 {
-public:
-	static_assert(std::is_base_of<Component, T>::value, "T must inherit from Component");
-
-	ComponentDeserializeFnRegister(const ComponentSerializer::DeserializeFn& fn)
-	{
-		ComponentSerializer::registerDeserializeFunc(fn);
-	}
-
-	static ComponentDeserializeFnRegister<T> staticRegister;
+	std::string name;
+	SnapshotSerializeFunc serialize;
+	SnapshotDeserializeFunc deserialize;
+	std::function<void(ResourceWrapper<Scene>&)> postLoad;
 };
 
-template<typename T>
-ComponentDeserializeFnRegister<T> ComponentDeserializeFnRegister<T>::staticRegister;
+#include "runtime/Scene.h"
+
+class ComponentSerdes
+{
+public:
+	static std::vector<SerializerEntry>& getRegistry()
+	{
+		static std::vector<SerializerEntry> registry;
+		return registry;
+	}
+
+	template<typename T>
+	static void RegisterComponentSerializer()
+	{
+		SerializerEntry entry;
+
+		entry.name = entt::type_name<T>().value(); // quick + dirty
+
+		entry.serialize = [](entt::snapshot& snapshot, cereal::JSONOutputArchive& output)
+			{
+				snapshot.component<T>(output);
+			};
+
+		entry.deserialize = [](entt::snapshot_loader& snapshot, cereal::JSONInputArchive& input)
+			{
+				snapshot.component<T>(input);
+			};
+
+		entry.postLoad = [](ResourceWrapper<Scene>& scene) { 
+			for(auto& [entity, c] : scene->getRegistry().get().view<T>().each())
+			{
+				c.resolve(scene);
+			}
+		};
+
+		getRegistry().push_back(std::move(entry));
+	}
+};
+

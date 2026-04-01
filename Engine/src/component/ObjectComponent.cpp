@@ -10,3 +10,8 @@ void ObjectComponent::attachToEntity(std::shared_ptr<Component> c, Entity entity
 		obj.e.setRegistry(&scene->getRegistry());
 	}
 }
+
+void ObjectComponent::resolve(ResourceWrapper<Scene>& scene)
+{
+	e.setRegistry(&scene->getRegistry());
+}

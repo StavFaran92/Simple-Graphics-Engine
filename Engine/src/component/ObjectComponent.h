@@ -10,6 +10,8 @@ struct EngineAPI ObjectComponent : public Component
 
 	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene);
 
+	void resolve(ResourceWrapper<Scene>& scene) override;
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(name);

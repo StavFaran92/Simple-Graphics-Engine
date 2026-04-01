@@ -4,6 +4,7 @@
 #include "memory/AssetHandle.h"
 #include "serialize/Archiver.h"
 #include "core/Logger.h"
+#include "serialize/CerealHelpers.h"
 
 SceneManager::SceneManager()
 {
@@ -69,13 +70,48 @@ uint32_t SceneManager::getActiveSceneID() const
 	return m_activeScene;
 }
 
+#include "component/Transformation.h"
+
+//template <class Archive>
+//void serialize(Archive& archive, Transformation& transform) {
+//	SERIALIZED_MEMBER(transform.localTranslation);
+//	SERIALIZED_MEMBER(transform.localRotation);
+//	SERIALIZED_MEMBER(transform.localScale);
+//	SERIALIZED_MEMBER(transform.m_parent);
+//	SERIALIZED_MEMBER(transform.entity);
+//	SERIALIZED_MEMBER(transform.root);
+//	SERIALIZED_MEMBER(transform.m_children);
+//}
+
+
+
 void SceneManager::startSimulation()
 {
 	auto activeScene = getActiveScene();
 	if (activeScene.isEmpty())
 		return;
 
-	*m_serializedScene = Archiver::serializeScene(activeScene);
+	//*m_serializedScene = Archiver::serializeScene(activeScene);
+
+	std::ofstream os("test.json");
+	entt::registry& source = activeScene->getRegistry().getRegistry();
+
+	cereal::JSONOutputArchive output{ os };
+
+	entt::snapshot snapshot{ source };
+
+	snapshot.entities(output);
+
+	for (auto& cbWrapper : ComponentSerdes::getRegistry())
+	{
+		cbWrapper.serialize(snapshot, output);
+	}
+
+	//for (auto& compSerializer : compSerializerRegistry)
+	//{
+
+	//}
+
 	activeScene->startSimulation();
 }
 
@@ -86,7 +122,28 @@ void SceneManager::stopSimulation()
 		return;
 
 	activeScene->stopSimulation();
-	Archiver::deserializeScene(*m_serializedScene, activeScene);
+	//Archiver::deserializeScene(*m_serializedScene, activeScene);
+
+
+
+	activeScene->getRegistry().getRegistry().clear();
+
+	entt::registry& destination = activeScene->getRegistry().getRegistry();
+	std::ifstream os("test.json");
+
+	cereal::JSONInputArchive input{ os };
+
+	entt::snapshot_loader snapshot{ destination };
+	snapshot.entities(input);
+	for (auto& cbWrapper : ComponentSerdes::getRegistry())
+	{
+		cbWrapper.deserialize(snapshot, input);
+	}
+
+	for (auto& cbWrapper : ComponentSerdes::getRegistry())
+	{
+		cbWrapper.postLoad(activeScene);
+	}
 }
 
 void SceneManager::close()
