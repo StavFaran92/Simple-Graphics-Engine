@@ -25,8 +25,6 @@ public:
 	const std::map<std::string, AssetHandle<AnimationAsset>>& getAllAnimations() const;
 	std::string getCurrentAnimationName() const;
 
-	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
-
 	template <class Archive>
 	void serialize(Archive& archive) {
 		archive(m_currentAnimation, m_playbackSpeed, m_animations);

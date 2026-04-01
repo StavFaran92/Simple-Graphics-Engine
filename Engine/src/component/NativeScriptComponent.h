@@ -37,7 +37,7 @@ struct EngineAPI NativeScriptComponent : public Component
 		SERIALIZED_MEMBER(script);
 	}
 
-	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
+	void resolve(ResourceWrapper<Scene>& scene) override;
 };
 
 REGISTER_COMPONENT(NativeScriptComponent)

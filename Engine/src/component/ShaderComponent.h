@@ -31,16 +31,6 @@ struct EngineAPI ShaderComponent : public Component
 	void parseFromShader(AssetHandle<ShaderAsset> shader);
 
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
-	{
-		(void)scene;
-		if (auto sc = std::dynamic_pointer_cast<ShaderComponent>(c))
-		{
-			auto& shader = entityHandler.addComponent<ShaderComponent>(*sc);
-			shader.update();
-		}
-	}
-
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_customShader);

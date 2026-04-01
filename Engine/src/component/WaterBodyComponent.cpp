@@ -22,12 +22,3 @@ AssetHandle<MaterialAsset> WaterBodyComponent::getMaterial()
 	AssetHandle<MaterialAsset> mat = meshRenderer.getMaterialBySlot(0); // A water body plane only has single material
 	return mat;
 }
-
-void WaterBodyComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
-{
-	if (auto tc = std::dynamic_pointer_cast<WaterBodyComponent>(c))
-	{
-		tc->entity = entityHandler;
-		entityHandler.addComponent<WaterBodyComponent>(*tc);
-	}
-}

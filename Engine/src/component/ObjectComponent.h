@@ -8,8 +8,6 @@ struct EngineAPI ObjectComponent : public Component
 	ObjectComponent() = default;
 	ObjectComponent(Entity e, const std::string& name) : name(name), e(e) {};
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene);
-
 	void resolve(ResourceWrapper<Scene>& scene) override;
 
 	template <class Archive>

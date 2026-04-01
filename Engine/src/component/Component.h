@@ -82,8 +82,7 @@ static void attachSimple(std::shared_ptr<Component> c, Entity entityHandler)
 
 struct EngineAPI TagComponent : public Component
 {
-        static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
-        std::string tag;
+	std::string tag;
 };
 
 struct EngineAPI InstanceBatch : public Component
@@ -109,7 +108,6 @@ public:
 	std::vector<std::shared_ptr<Transformation>> transformations;
 	ResourceWrapper<Mesh> mesh;
 	unsigned int m_id = 0;
-	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
 private:
 	
 
@@ -120,9 +118,6 @@ private:
 struct TestComp : public Component
 {
 	TestComp() = default;
-
-
-	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
 
 	template <class Archive>
 	void serialize(Archive& archive) {

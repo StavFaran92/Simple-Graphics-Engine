@@ -27,11 +27,7 @@ AssetHandle<LuaScriptAsset>& ScriptComponent::getScript()
 	return script;
 }
 
-void ScriptComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
+void ScriptComponent::resolve(ResourceWrapper<Scene>& scene)
 {
-	if (auto tc = std::dynamic_pointer_cast<ScriptComponent>(c))
-	{
-		auto& script = entityHandler.addComponent<ScriptComponent>(*tc);
-		script.entity.setRegistry(&scene->getRegistry());
-	}
+	entity.setRegistry(&scene->getRegistry());
 }

@@ -22,12 +22,6 @@ struct EngineAPI ImageComponent : public Component
 	float rotate = 0;
 
 	AssetHandle<TextureAsset> image;
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
-	{
-		(void)scene;
-		attachSimple<ImageComponent>(c, entityHandler);
-	}
-
 };
 
 REGISTER_COMPONENT(ImageComponent)

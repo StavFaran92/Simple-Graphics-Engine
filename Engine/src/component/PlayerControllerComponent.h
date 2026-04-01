@@ -7,12 +7,6 @@ struct EngineAPI PlayerController : public Component
 {
 	PlayerController() = default;
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
-	{
-		(void)scene;
-		attachSimple<PlayerController>(c, entityHandler);
-	}
-
 	template <class Archive>
 	void serialize(Archive& archive) {
 	}

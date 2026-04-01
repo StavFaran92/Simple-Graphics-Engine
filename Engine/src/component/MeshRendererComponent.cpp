@@ -26,14 +26,6 @@ AssetHandle<MaterialAsset> MeshRendererComponent::getMaterialBySlot(int slot) co
 	return iter->second;
 }
 
-void MeshRendererComponent::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
-{
-	if (auto tc = std::dynamic_pointer_cast<MeshRendererComponent>(c))
-	{
-		entityHandler.addComponent<MeshRendererComponent>(*tc);
-	}
-}
-
 std::vector<AssetHandle<Asset>*> MeshRendererComponent::gatherDependenciesInternal() const
 {
 	std::vector<AssetHandle<Asset>*> dependencies;

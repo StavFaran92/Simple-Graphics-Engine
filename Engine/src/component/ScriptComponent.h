@@ -24,8 +24,7 @@ public:
 		SERIALIZED_MEMBER(entity);
 	}
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene);
-
+	void resolve(ResourceWrapper<Scene>& scene) override;
 
 	AssetHandle<LuaScriptAsset> script;
 	Entity entity;

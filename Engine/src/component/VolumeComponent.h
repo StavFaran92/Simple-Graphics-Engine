@@ -16,8 +16,6 @@ public:
 		SERIALIZED_MEMBER(material);
 	}
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>&);
-
 	AssetHandle<MaterialAsset> material;
 	AssetHandle<ModelAsset> mesh;
 };

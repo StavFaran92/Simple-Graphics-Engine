@@ -113,7 +113,7 @@ public:
 
 	std::unordered_map<entity_id, Entity> getChildren();
 
-	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
+	void resolve(ResourceWrapper<Scene>& scene) override;
 
 	template <class Archive>
 	void serialize(Archive& archive) {

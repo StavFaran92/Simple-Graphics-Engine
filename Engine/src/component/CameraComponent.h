@@ -7,11 +7,6 @@ struct EngineAPI CameraComponent : public Component
 {
 	CameraComponent() = default;
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>&)
-	{
-		attachSimple<CameraComponent>(c, entityHandler);
-	}
-
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(center);

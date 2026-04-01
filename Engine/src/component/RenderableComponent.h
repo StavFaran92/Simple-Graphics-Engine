@@ -7,12 +7,6 @@ struct EngineAPI RenderableComponent : public Component
 {
 	RenderableComponent() = default;
 
-	static void attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
-	{
-		(void)scene;
-		attachSimple<RenderableComponent>(c, entityHandler);
-	}
-
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(renderTechnique);

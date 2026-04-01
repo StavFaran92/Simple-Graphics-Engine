@@ -32,8 +32,6 @@ public:
 	void SetAttenuation(Attenuation attenuation);
 	Attenuation getAttenuation() const;
 
-	static void attachToEntity(std::shared_ptr<Component>, Entity, ResourceWrapper<Scene>&);
-
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(attenuation);

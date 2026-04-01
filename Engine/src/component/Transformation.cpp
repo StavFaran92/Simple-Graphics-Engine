@@ -169,20 +169,16 @@ std::unordered_map<entity_id, Entity> Transformation::getChildren()
 	return m_children;
 }
 
-void Transformation::attachToEntity(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
+void Transformation::resolve(ResourceWrapper<Scene>& scene)
 {
-	if (auto tc = std::dynamic_pointer_cast<Transformation>(c))
-	{
-		auto& transform = entityHandler.addComponent<Transformation>(*tc);
-		transform.entity.setRegistry(&scene->getRegistry());
-		transform.root.setRegistry(&scene->getRegistry());
-		transform.m_parent.setRegistry(&scene->getRegistry());
+	entity.setRegistry(&scene->getRegistry());
+	root.setRegistry(&scene->getRegistry());
+	m_parent.setRegistry(&scene->getRegistry());
 
-		for (auto [_, entity] : tc->getChildren())
-		{
-			Entity eChild(entity.handler(), &scene->getRegistry());
-			transform.addChild(eChild);
-		}
+	for (auto [_, entity] : getChildren())
+	{
+		Entity eChild(entity.handler(), &scene->getRegistry());
+		addChild(eChild);
 	}
 }
 
