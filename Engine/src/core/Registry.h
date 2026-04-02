@@ -4,9 +4,21 @@
 
 #include "entt/entt.hpp"
 #include "core/Core.h"
+#include "serialize/CerealHelpers.h"
 
 struct Component;
 class Entity;
+
+struct RegistryContext
+{
+	entt::entity gameCamera;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(gameCamera);
+
+	}
+};
 
 class EngineAPI SGE_Regsitry
 {
@@ -45,6 +57,8 @@ public:
 	void fromStream(std::stringstream& stream);
 
 	void removeEntity(const Entity& e);
+
+	RegistryContext& getRegistryContext();
 private:
 	void invokeOnComponentAdded(Component& c)
 	{
@@ -56,4 +70,5 @@ private:
 
 	entt::registry m_registry;
 	Callback m_onComponentAddedCallback;
+	RegistryContext m_context;
 };

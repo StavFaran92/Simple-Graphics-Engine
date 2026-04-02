@@ -39,6 +39,9 @@ std::stringstream SGE_Regsitry::toStream() const
 	std::stringstream ss;
 	{
 		cereal::JSONOutputArchive output{ ss };
+
+		output(m_context);
+
 		snapshot.entities(output);
 
 		for (auto& cbWrapper : ComponentSerdes::getRegistry())
@@ -58,6 +61,8 @@ void SGE_Regsitry::fromStream(std::stringstream& stream)
 
 	cereal::JSONInputArchive input{ stream };
 
+	input(m_context);
+
 	entt::snapshot_loader snapshot{ destination };
 	snapshot.entities(input);
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
@@ -72,4 +77,9 @@ void SGE_Regsitry::removeEntity(const Entity& e)
 	m_registry.destroy(e.handler());
 
 	logDebug("Removed entity: " + std::to_string(id));
+}
+
+RegistryContext& SGE_Regsitry::getRegistryContext()
+{
+	return m_context;
 }
