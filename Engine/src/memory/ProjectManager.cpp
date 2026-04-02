@@ -31,13 +31,12 @@ void ProjectManager::saveProject()
     Archiver::save();
     
     // save active scene
-    SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
+    //SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
     AssetUpdateDescriptor desc;
     SceneCreateDescriptor sceneDesc;
-    sceneDesc.data.m_serializedScene = serializedScene;
+    sceneDesc.data.registryStream = Engine::get()->getContext()->getActiveScene()->getRegistry().toStream();
     UUID uid = Engine::get()->getContext()->getActiveSceneAsset().getUID();
     Engine::get()->getSubSystem<Assets>()->updateAsset(uid, desc, &sceneDesc);
-    //Engine::get()->getContext()->getActiveSceneAsset()->updateAsset(desc);
 
     //Engine::get()->getProjectSettings()->sync();
 }

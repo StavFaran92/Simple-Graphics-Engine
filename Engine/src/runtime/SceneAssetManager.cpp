@@ -9,7 +9,9 @@
 #include <fstream>
 #include <cereal/archives/json.hpp>
 
+#include "component/ComponentSerializer.h"
 
+#include "entt/entt.hpp"
 
 Ref<Asset> SceneAssetManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
@@ -38,18 +40,27 @@ bool SceneAssetManager::saveResource(const ResourceBuildDescriptor& desc, const 
 		return false;
 	}
 
+	//std::ofstream os(path);
+	//cereal::JSONOutputArchive oarchive(os);
+
+	//try
+	//{
+	//	oarchive(sceneDesc->data);
+	//}
+	//catch (const cereal::Exception& e)
+	//{
+	//	logError("Serialization Error occured: {}", e.what());
+	//}
+
 	auto path = dst.absolute();
 	std::ofstream os(path);
-	cereal::JSONOutputArchive oarchive(os);
+	if (!os)
+	{
+		logError("Failed to open file for writing: {}", path.string());
+		return false;
+	}
 
-	try
-	{
-		oarchive(sceneDesc->data);
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Serialization Error occured: {}", e.what());
-	}
+	os << sceneDesc->data.registryStream.rdbuf();
 
 	return true;
 }
@@ -82,4 +93,18 @@ void SceneAssetManager::parse(ResourceLoadDescriptor& desc)
 
 void SceneAssetManager::parse(ResourceBuildDescriptor& desc)
 {
+	auto sceneDesc = dynamic_cast<SceneCreateDescriptor*>(&desc);
+	if (!sceneDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return;
+	}
+
+	std::stringstream& source = sceneDesc->data.registryStream;
+
+	if (source.str().empty())
+	{
+		SGE_Regsitry sgeRegistry{};
+		source = sgeRegistry.toStream();
+	}
 }

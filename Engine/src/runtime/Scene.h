@@ -65,6 +65,8 @@ struct SceneData
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_serializedScene);
 	}
+
+	std::stringstream registryStream;
 };
 
 struct EngineAPI SceneCreateDescriptor : public ResourceBuildDescriptor
@@ -217,8 +219,6 @@ private:
 	//ResourceWrapper<MeshGroup> m_basicBox;
 
 	//Entity m_primaryCamera = Entity::EmptyEntity;
-
-	Entity m_quadUI;
 
 	SerializedScene m_serializedScene;
 

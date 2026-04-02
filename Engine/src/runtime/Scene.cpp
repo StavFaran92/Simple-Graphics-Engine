@@ -60,36 +60,40 @@
 #include "memory/BuiltInResources.h"
 #include "systems/VolumetricSystem.h"
 #include "core/Factory.h"
+#include "memory/BuiltInAssets.h"
 
 ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
-	desc.sourcePath = fileLocation;
-	std::string filepath = desc.sourcePath;
-	std::ifstream is(filepath);
-	cereal::JSONInputArchive iarchive(is);
-
-	//std::string filepath = desc.sourcePath;
-	//auto projectDir = Engine::get()->getProjectDirectory();
-	//filepath = projectDir + filepath;
-	//std::ifstream is(filepath);
-	//cereal::JSONInputArchive iarchive(is);
 	ResourceWrapper<Scene> scene = Factory<Scene>::create();
 	scene->init(Engine::get()->getContext(), scene.getUID());
 
-	try
-	{
-		SceneData sceneData;
-		iarchive(sceneData);
-		Archiver::deserializeScene(sceneData.m_serializedScene, scene);
-		return scene;
+	desc.sourcePath = fileLocation;
+	std::string filepath = desc.sourcePath;
 
-	}
-	catch (const cereal::Exception& e)
+	std::ifstream is(filepath);
+	if (!is)
 	{
-		logError("Deserialization Error occured: {}", e.what());
+		logError("Failed to open file for reading: {}", filepath);
+		return nullptr;
 	}
 
-	return ResourceWrapper<Scene>::empty;
+	std::stringstream ss;
+	ss << is.rdbuf();
+
+	scene->getRegistry().fromStream(ss);
+
+	// Post Load
+	for (auto& cbWrapper : ComponentSerdes::getRegistry())
+	{
+		cbWrapper.resolve(scene);
+	}
+
+	for (auto& cbWrapper : ComponentSerdes::getRegistry())
+	{
+		cbWrapper.postLoad(scene);
+	}
+
+	return scene;
 }
 
 ResourceWrapper<Scene> Scene::create()
@@ -215,10 +219,6 @@ void Scene::init(Context* context, ResourceID rid)
 	m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)width / height, 0.1f, 1000.0f);
 
 	m_defaultUIProjection = glm::ortho(0.0f, (float)Engine::get()->getWindow()->getWidth(), (float)Engine::get()->getWindow()->getHeight(), 0.0f, -1.0f, 1.0f);
-
-	m_quadUI = ShapeFactory::createQuad(&getRegistry());
-	m_quadUI.RemoveComponent<RenderableComponent>();
-	m_quadUI.RemoveComponent<ObjectComponent>();
 
 	m_UIShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/UIShader.glsl");
 	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/OutlineShader.glsl");
@@ -765,7 +765,7 @@ void Scene::draw(float deltaTime)
 						m_highlightEdgeDetectionShader->setUniformValue("uTexelSize", texelSize);
 						m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
 
-						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+						auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -790,7 +790,7 @@ void Scene::draw(float deltaTime)
 
 						graphics->renderView->bind();
 
-						auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+						auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -875,7 +875,7 @@ void Scene::draw(float deltaTime)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		m_UIShader->use();
 		m_UIShader->setProjectionMatrix(m_defaultUIProjection);
-		auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+		auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
 		for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
 		{
@@ -989,7 +989,7 @@ void Scene::draw(float deltaTime)
 				//shader->setUniformValue("cameraLookAt", primaryCamera.front);
 
 				// bind mesh
-				auto vao = m_quadUI.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+				auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
 				// in frag shader i need access to mesh extentes & main texture -> set uniforms
 

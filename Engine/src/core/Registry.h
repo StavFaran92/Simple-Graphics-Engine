@@ -41,6 +41,9 @@ public:
 		return addedComponent;
 	}
 
+	std::stringstream toStream() const;
+	void fromStream(std::stringstream& stream);
+
 	void removeEntity(const Entity& e);
 private:
 	void invokeOnComponentAdded(Component& c)
