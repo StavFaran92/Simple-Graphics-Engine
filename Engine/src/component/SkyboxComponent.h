@@ -15,6 +15,10 @@ struct EngineAPI SkyboxComponent : public Component
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(originalImage);
+		SERIALIZED_MEMBER(m_irradianceMap);
+		SERIALIZED_MEMBER(m_prefilterEnvMap);
+		SERIALIZED_MEMBER(m_cubemap);
+		SERIALIZED_MEMBER(m_isBuilt);
 
 	}
 
@@ -23,13 +27,21 @@ struct EngineAPI SkyboxComponent : public Component
 	void build();
 
 	void resolve(ResourceWrapper<Scene>& scene) override;
+	void postLoad(ResourceWrapper<Scene>& scene) override;
 
 
 	AssetHandle<TextureAsset> originalImage;
 	ResourceWrapper<Texture> cubemapIBL;
 	ResourceWrapper<Texture> cubemap;
+	AssetHandle<TextureAsset> m_prefilterEnvMap;
+
+	//AssetHandle<TextureAsset>
 
 	ResourceWrapper<Scene> m_scene = nullptr;
+
+	bool m_isBuilt = false;
+	AssetHandle<TextureAsset> m_cubemap;
+	AssetHandle<TextureAsset> m_irradianceMap;
 };
 
 REGISTER_COMPONENT(SkyboxComponent)

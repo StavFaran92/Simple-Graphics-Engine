@@ -87,3 +87,23 @@ void TextureTypeManager::parse(ResourceLoadDescriptor& desc)
 void TextureTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }
+
+void TextureTypeManager::extractResourceData(const ResourceWrapper<Resource>& resource, ResourceBuildDescriptor& outDesc)
+{
+	auto texture = resource.as<Texture>();
+	if (!texture)
+	{
+		logError("TextureTypeManager::extractResourceData called with non-texture resource");
+		throw std::runtime_error("Invalid resource type for TextureTypeManager::extractResourceData");
+	}
+
+	// Ensure descriptor type
+	auto* texDesc = dynamic_cast<TextureCreateDescriptor*>(&outDesc);
+	if (!texDesc)
+	{
+		throw std::runtime_error("Invalid descriptor type for TextureTypeManager::extractResourceData");
+	}
+
+	texture->download();
+	texDesc->textureData = texture->getData();
+}

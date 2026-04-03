@@ -629,10 +629,10 @@ void Scene::draw(float deltaTime)
 				graphics->mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh().get();
 				graphics->model = transform.getWorldTransformation();
 
-				if (skybox.cubemap.isEmpty()) continue;
+				if (skybox.m_cubemap.resource().isEmpty()) continue;
 
-				skybox.cubemap.get()->bind();
-				skybox.cubemap.get()->setSlot(0);
+				skybox.m_cubemap.resource().get()->bind();
+				skybox.m_cubemap.resource().get()->setSlot(0);
 
 				auto vao = graphics->mesh->getVAO();
 				RenderCommand::draw(vao);

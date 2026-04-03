@@ -154,6 +154,8 @@ class EngineAPI Texture : public Resource
 public:
 	Texture();
 
+	AssetType getType() const override { return AssetType::TEXTURE; }
+
 	static ResourceWrapper<Texture> createTexture(TextureData& textureData);
 
 	static ResourceWrapper<Texture> createTexture(int width, 
@@ -190,6 +192,11 @@ public:
 	const TextureData& getData() const { return m_data; }
 
 	TextureData& getData() { return m_data; }
+
+	// Download texture pixels from GPU into CPU buffers based on texture target
+	// Allocates/overwrites m_data.data and/or m_data.facesData[] as needed
+	// Returns true on success
+	bool download();
 
 	static TextureFormat getFormatFromChannels(int channels);
 

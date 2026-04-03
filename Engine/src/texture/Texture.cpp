@@ -327,6 +327,7 @@ void Texture::setData(int xoffset, int yoffset, int width, int height, const voi
 void Texture::generateMipMaps()
 {
 	bind();
+	m_data.genMipMap = true;
 	glGenerateMipmap(toGL(m_data.target));
 }
 
@@ -345,6 +346,71 @@ void Texture::unbind() const
 unsigned int Texture::getID() const
 {
 	return m_id;
+}
+
+bool Texture::download()
+{
+	bind();
+
+	const GLenum target = toGL(m_data.target);
+	const GLenum format = toGL(m_data.format);
+	const GLenum type   = toGL(m_data.type);
+
+	const uint32_t bytesPerPixel =
+		TextureUtils::channelCount(m_data.format) *
+		TextureUtils::bytesPerChannel(m_data.type);
+
+	if (m_data.target == TextureTarget::TEXTURE_2D)
+	{
+		const size_t size =
+			static_cast<size_t>(m_data.width) *
+			static_cast<size_t>(m_data.height) *
+			bytesPerPixel;
+
+		if (m_data.data) { free(m_data.data); m_data.data = nullptr; }
+		m_data.data = std::malloc(size);
+		if (!m_data.data) { logError("Texture::download allocation failed (2D)"); return false; }
+
+		glGetTexImage(target, 0, format, type, m_data.data);
+		return true;
+	}
+	else if (m_data.target == TextureTarget::TEXTURE_3D)
+	{
+		const size_t size =
+			static_cast<size_t>(m_data.width) *
+			static_cast<size_t>(m_data.height) *
+			static_cast<size_t>(std::max(1, m_data.depth)) *
+			bytesPerPixel;
+
+		if (m_data.data) { free(m_data.data); m_data.data = nullptr; }
+		m_data.data = std::malloc(size);
+		if (!m_data.data) { logError("Texture::download allocation failed (3D)"); return false; }
+
+		// glGetTexImage works for 3D textures as well
+		glGetTexImage(target, 0, format, type, m_data.data);
+		return true;
+	}
+	else if (m_data.target == TextureTarget::TEXTURE_CUBE_MAP)
+	{
+		// Allocate and fetch each face
+		const size_t faceSize =
+			static_cast<size_t>(m_data.width) *
+			static_cast<size_t>(m_data.height) *
+			bytesPerPixel;
+
+		for (int i = 0; i < 6; ++i)
+		{
+			if (m_data.facesData[i]) { free(m_data.facesData[i]); m_data.facesData[i] = nullptr; }
+			m_data.facesData[i] = std::malloc(faceSize);
+			if (!m_data.facesData[i]) { logError("Texture::download allocation failed (Cubemap face {})", i); return false; }
+
+			glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, type, m_data.facesData[i]);
+		}
+		return true;
+	}
+
+	logError("Texture::download unsupported texture target");
+	return false;
 }
 
 void Texture::ClearTexture()

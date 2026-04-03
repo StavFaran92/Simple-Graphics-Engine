@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include "memory/Ref.h"
+#include <stdexcept>
 
 class Asset;
 class Resource;
@@ -85,6 +86,13 @@ public:
 
     // load the runtime resource
     virtual ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) = 0;
+
+    // Extract build-time data from an in-memory resource
+    // Default throws: only Texture implemented for now
+    virtual void extractResourceData(const ResourceWrapper<Resource>&, ResourceBuildDescriptor&)
+    {
+        throw std::runtime_error("extractResourceData not implemented");
+    }
 
 
     // ============================================================

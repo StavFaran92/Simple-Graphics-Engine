@@ -23,4 +23,6 @@ public:
 	void parse(ResourceLoadDescriptor& desc) override;
 
 	void parse(ResourceBuildDescriptor& desc) override;
+
+	void extractResourceData(const ResourceWrapper<Resource>& resource, ResourceBuildDescriptor& outDesc) override;
 };

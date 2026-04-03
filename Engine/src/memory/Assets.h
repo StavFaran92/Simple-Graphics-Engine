@@ -51,6 +51,8 @@ public:
 
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 
+	AssetHandle<Asset> bakeAssetFromResource(const ResourceWrapper<Resource>& resource, const std::string& name = "", const ScopedPath& targetDirectory = ScopedPath::EnginePath());
+
 private:
 
 	AssetHandle<Asset> createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc);

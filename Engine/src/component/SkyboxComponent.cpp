@@ -24,20 +24,34 @@ void SkyboxComponent::build()
 
 	ResourceWrapper<Texture> flippedImage = TextureTransformer::flipVertical(originalImage.resource());
 	ResourceWrapper<Texture> flippedImageGammeCorrected = TextureTransformer::applyGammaCorrection(flippedImage);
-	cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImageGammeCorrected);
+	auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImageGammeCorrected);
+	m_cubemap = Engine::get()->getSubSystem<Assets>()->bakeAssetFromResource(cubemap).as<TextureAsset>();
 
 	cubemapIBL = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImage);
 	cubemapIBL->generateMipMaps();
 
 	auto irradianceMap = IBL::generateIrradianceMap(cubemapIBL);
+	m_irradianceMap = Engine::get()->getSubSystem<Assets>()->bakeAssetFromResource(irradianceMap).as<TextureAsset>();
+	
 	auto prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemapIBL);
+	m_prefilterEnvMap = Engine::get()->getSubSystem<Assets>()->bakeAssetFromResource(prefilterEnvMap).as<TextureAsset>();
 
-	m_scene->setIBLData(irradianceMap, prefilterEnvMap);
+	m_isBuilt = true;
+
+	
 }
 
 void SkyboxComponent::resolve(ResourceWrapper<Scene>& scene)
 {
 	m_scene = scene;
+}
 
-	build();
+void SkyboxComponent::postLoad(ResourceWrapper<Scene>& scene)
+{
+	if (!m_isBuilt)
+	{
+		build();
+	}
+
+	m_scene->setIBLData(m_irradianceMap.resource(), m_prefilterEnvMap.resource());
 }

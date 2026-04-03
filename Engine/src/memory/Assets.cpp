@@ -525,3 +525,40 @@ void Assets::bindResourceToAsset(UUID uuid, ResourceID resID)
 	newAssetInfo.resourceID = resID;
 	updateAssetInner(newAssetInfo);
 }
+
+AssetHandle<Asset> Assets::bakeAssetFromResource(const ResourceWrapper<Resource>& resource, const std::string& name, const ScopedPath& targetDirectory)
+{
+	AssetType type = resource->getType();
+	
+	ResourceTypeManager* manager = AssetFactory::getManager(type);
+
+	if (!manager)
+	{
+		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(type));
+		return AssetHandle<Asset>::empty;
+	}
+
+	auto buildDesc = manager->makeResourceBuildDescriptor();
+	if (!buildDesc)
+	{
+		logError("Invalid resource build descriptor");
+		return AssetHandle<Asset>::empty;
+	}
+
+	manager->extractResourceData(resource, *buildDesc);
+
+	AssetBuildDescriptor desc;
+	desc.aType = type;
+	desc.name = name;
+	desc.isEngineOwned = targetDirectory.type() == ScopedPath::Type::Engine;
+	desc.targetDirectory = targetDirectory;
+	AssetHandle<Asset> asset = Engine::get()->getSubSystem<Assets>()->createAsset(desc, *buildDesc);
+
+	if (asset.isEmpty())
+	{
+		logError("Failed to create asset from resource.");
+		return AssetHandle<Asset>::empty;
+	}
+
+	return asset;
+}
