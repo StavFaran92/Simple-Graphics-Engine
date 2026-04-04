@@ -48,6 +48,7 @@
 #include "memory/BuiltInResources.h"
 #include "fileSystem/FileSystem.h"
 #include "memory/MemoryPool.h"
+#include "runtime/StartupSceneTemplate.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"
@@ -251,7 +252,8 @@ bool Engine::init(const InitParams& initParams)
     }
     else
     {
-        createStartupScene(m_context, initParams);
+        auto startupScene = StartupSceneTemplate::createStartupScene("Scene_0");
+        m_context->setActiveScene(startupScene.resource()->getID());
         saveProject();
     }
 
@@ -537,11 +539,6 @@ void Engine::handleEvents(bool& quit)
 
     while (SDL_PollEvent(&e) != 0)
     {
-
-
-
-        //m_imguiHandler->proccessEvents(e);
-
         if (e.type == SDL_WINDOWEVENT &&
             (e.window.event == SDL_WINDOWEVENT_RESIZED || e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED))
         {
@@ -558,87 +555,7 @@ void Engine::handleEvents(bool& quit)
             quit = true;
         }
 
-
         m_eventSystem->dispatch(e);
-    }
-}
-
-void Engine::createStartupScene(const std::shared_ptr<Context>& context, const InitParams& initParams)
-{
-    AssetBuildDescriptor desc;
-    desc.name = "Scene_0";
-    desc.aType = AssetType::SCENE;
-    SceneCreateDescriptor sceneDesc;
-    AssetHandle<SceneAsset> sceneAsset = getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
-
-    auto startupScene = sceneAsset.resource();
-
-    //auto startupScene = std::make_shared<Scene>(m_context.get());
-
-    m_context->addScene(sceneAsset);
-    m_context->setActiveScene(startupScene->getID());
-
-    // Add default dir light
-    auto dLight = startupScene->createEntity("Directional light");
-    dLight.addComponent<DirectionalLight>();
-    dLight.getComponent<Transformation>().setLocalRotation(glm::vec3(0, -1, 0));
-
-    auto mainCamera = startupScene->createEntity("Main Camera");
-    mainCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 1000.0f));
-    mainCamera.getComponent<Transformation>().setLocalPosition({10,10,10});
-    mainCamera.getComponent<CameraComponent>().center = {0,0,0};
-    mainCamera.getComponent<CameraComponent>().up = {0,1,0};
-    mainCamera.addComponent<MeshRendererComponent>(BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CAMERA));
-    mainCamera.addComponent<RenderableComponent>();
-
-    m_context->getActiveScene()->setGameCamera(mainCamera);
-
-    // Add default dir light
-    auto eFXAA = startupScene->createEntity("FXAA");
-    auto& postProcess = eFXAA.addComponent<PostProcessComponent>();
-
-
-    AssetBuildDescriptor shaderAssetDesc;
-    shaderAssetDesc.aType = AssetType::SHADER;
-    shaderAssetDesc.name = "FXAAShader";
-    shaderAssetDesc.isEngineOwned = true;
-
-    ShaderLoadDescriptor shaderDesc;
-    shaderDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Shaders/SamplePostProcessShader.glsl";
-    shaderDesc.shaderOverride = ShaderOverride::PostProcess;
-
-    auto FXAAShaderAsset = getSubSystem<Assets>()->importAsset(shaderAssetDesc, shaderDesc);
-
-    postProcess.shader = FXAAShaderAsset.as<ShaderAsset>();
-
-    if (initParams.templateScene)
-    {
-        //Skybox::CreateSkyboxFromEquirectangularMap( "C:/dev/repos/LearnOpenGL/resources/textures/hdr/newport_loft.hdr", context->getActiveScene().get());
-        //Skybox::CreateSkyboxFromCubemap({ SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/right.jpg",
-        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/left.jpg",
-        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/top.jpg",
-        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/bottom.jpg",
-        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/front.jpg",
-        //SGE_ROOT_DIR "Resources/Engine/Textures/Skybox/back.jpg" }, context->getActiveScene().get());
-
-        // todo revert
-        //{
-        //    auto ground = ShapeFactory::createBox(&context->getActiveScene()->getRegistry());
-        //    auto& groundTransfrom = ground.getComponent<Transformation>();
-        //    groundTransfrom.setLocalScale({ 50, .5f, 50 });
-        //    auto& mat = ground.addComponent<MaterialComponent>();
-        //    auto tex = Engine::get()->getSubSystem<Assets>()->importTexture2D(SGE_ROOT_DIR "Resources/Engine/Textures/floor.jpg");
-        //    mat.begin()->get()->setTexture(Texture::Type::Albedo, tex);
-        //    auto& rb = ground.addComponent<RigidBodyComponent>(RigidbodyType::Static, 1.f);
-        //    auto& collisionBox = ground.addComponent<CollisionBoxComponent>(.5f);
-        //}
-
-        {
-            //editorCamera->lookAt(0, 5, 0);
-            //editorCamera->setPosition(25, 225, 35);
-        }
-
-        ShapeFactory::createSphere(&context->getActiveScene()->getRegistry());
     }
 }
 

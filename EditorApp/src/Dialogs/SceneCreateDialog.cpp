@@ -1,6 +1,7 @@
 #include "SceneCreateDialog.h"
 #include "EditorState.h"
 #include "memory/Assets.h"
+#include "runtime/StartupSceneTemplate.h"
 
 SceneCreateDialog::SceneCreateDialog()
 	: DialogBase("SceneCreateDialog")
@@ -25,12 +26,13 @@ bool SceneCreateDialog::acceptContent()
 {
 	if (m_uniqueName.isValid())
 	{
-		AssetBuildDescriptor desc;
-		desc.aType = AssetType::SCENE;
-		desc.name = m_uniqueName.name;
-		desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
-		SceneCreateDescriptor sceneDesc;
-		auto scene = Engine::get()->getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
+		auto scene = StartupSceneTemplate::createStartupScene(m_uniqueName.name);
+		//AssetBuildDescriptor desc;
+		//desc.aType = AssetType::SCENE;
+		//desc.name = m_uniqueName.name;
+		//desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
+		//SceneCreateDescriptor sceneDesc;
+		//auto scene = Engine::get()->getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
 		Engine::get()->getContext()->addScene(scene);
 		return true;
 	}

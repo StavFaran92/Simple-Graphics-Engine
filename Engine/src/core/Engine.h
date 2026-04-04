@@ -160,7 +160,6 @@ protected:
     void SetWindow(std::shared_ptr<Window> window);
     void handleEvents(bool& quit);
 
-    void createStartupScene(const std::shared_ptr<Context>& context, const InitParams& initParams);
 protected:
 
     Engine();
