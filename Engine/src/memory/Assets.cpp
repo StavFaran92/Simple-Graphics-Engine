@@ -5,6 +5,8 @@
 #include "memory/RegisterManagers.h"
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
+#include "utils/RandomNameGenerator.h"
+#include "systems/UniqueNameManager.h"
 
 #include <filesystem>
 
@@ -331,6 +333,19 @@ AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuild
 		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;
 	}
+
+	if (desc.name.empty())
+	{
+		desc.name = RandomNameGenerator::generateName();
+		logInfo("Empty name specified for asset, generating random name {}", desc.name);
+	}
+
+	// TODO i should check for duplicate names here
+	//if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(desc.name, desc.targetDirectory))
+	//{
+	//	logError("Asset ");
+	//	return AssetHandle<Asset>::empty;
+	//}
 
 	// Parse the resource descriptor
 	manager->parse(resourceDesc);

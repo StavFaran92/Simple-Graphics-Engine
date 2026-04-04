@@ -32,7 +32,7 @@ struct EngineAPI SkyboxComponent : public Component
 
 	AssetHandle<TextureAsset> originalImage;
 	ResourceWrapper<Texture> cubemapIBL;
-	ResourceWrapper<Texture> cubemap;
+	//ResourceWrapper<Texture> cubemap;
 	AssetHandle<TextureAsset> m_prefilterEnvMap;
 
 	//AssetHandle<TextureAsset>
