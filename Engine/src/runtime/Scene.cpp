@@ -93,10 +93,6 @@ ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDes
 		cbWrapper.postLoad(scene);
 	}
 
-	
-	Entity gameCamera(scene->getRegistry().getRegistryContext().gameCamera, &scene->getRegistry());
-	scene->setGameCamera(gameCamera);
-
 	return scene;
 }
 
@@ -167,7 +163,6 @@ void Scene::setGameCamera(Entity e)
 {
 	assert(m_renderViews.size() > 0);
 	getRenderView("Game View")->setCamera(e);
-	m_registry->getRegistryContext().gameCamera = e.handler();
 }
 
 void Scene::bindScriptToLayer(entt::registry& reg, entt::entity entity) 

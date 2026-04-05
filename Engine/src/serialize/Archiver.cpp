@@ -31,13 +31,11 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{
-		if (auto c = cbWrapper.serialize_2(e))
+		if (auto c = cbWrapper.serialize(e))
 		{
 			serializedEntity.components.push_back(c);
 		}
 	}
-
-	//ComponentSerializer::serializeComponents(e, serializedEntity.components);
 
 	return serializedEntity;
 }
@@ -51,10 +49,9 @@ Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, ResourceWrapp
 	{
 		for (auto& c : serializedEnt.components)
 		{
-			cbWrapper.deserialize_2(c, entityHandler, scene);
+			cbWrapper.deserialize(c, entityHandler, scene);
 		}
 	}
-	//ComponentSerializer::deserializeComponents(serializedEnt.components, entityHandler, scene);
 
 	return entityHandler;
 
@@ -104,11 +101,4 @@ void Archiver::deserializeScene(SerializedScene serializedScene, ResourceWrapper
 		gameCameraEntity.addComponent<RenderableComponent>();
 	}
 	scene->setGameCamera(gameCameraEntity);
-
-	// We postpone the transform update because at the moment of transform creation not all transforms 
-	// have been created yet.
-	for (auto& [e, trans] : scene->getRegistry().getRegistry().view<Transformation>().each())
-	{
-		trans.forceUpdate();
-	}
 }

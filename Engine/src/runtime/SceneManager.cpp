@@ -78,7 +78,6 @@ void SceneManager::startSimulation()
 		return;
 
 	m_serializedScene = Archiver::serializeScene(activeScene);
-	//m_serializedScene = activeScene->getRegistry().toStream();
 
 	activeScene->startSimulation();
 }
@@ -92,7 +91,6 @@ void SceneManager::stopSimulation()
 	activeScene->stopSimulation();
 
 	Archiver::deserializeScene(m_serializedScene, activeScene);
-	//activeScene->getRegistry().fromStream(m_serializedScene);
 
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{

@@ -58,15 +58,6 @@ std::shared_ptr<Component> getComponentIfExists(const Entity& e)
 	return c;
 }
 
-template<typename T>
-static void attachSimple(std::shared_ptr<Component> c, Entity entityHandler)
-{
-	if (auto tc = std::dynamic_pointer_cast<T>(c))
-	{
-		entityHandler.addComponent<T>(*tc);
-	}
-}
-
 #ifndef COMPONENT_SERDES
 	#ifdef ENGINE_BUILD_DLL
 		#define COMPONENT_SERDES(TYPE) \

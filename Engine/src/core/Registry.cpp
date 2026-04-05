@@ -30,56 +30,10 @@ Entity SGE_Regsitry::createEntity()
 	return entityHandler;
 }
 
-std::stringstream SGE_Regsitry::toStream() const
-{
-	const entt::registry& source = m_registry;
-
-	entt::snapshot snapshot{ source };
-
-	std::stringstream ss;
-	{
-		cereal::JSONOutputArchive output{ ss };
-
-		output(m_context);
-
-		snapshot.entities(output);
-
-		for (auto& cbWrapper : ComponentSerdes::getRegistry())
-		{
-			cbWrapper.serialize(snapshot, output);
-		}
-	}
-
-	return ss;
-}
-
-void SGE_Regsitry::fromStream(std::stringstream& stream)
-{
-	m_registry.clear();
-
-	entt::registry& destination = m_registry;
-
-	cereal::JSONInputArchive input{ stream };
-
-	input(m_context);
-
-	entt::snapshot_loader snapshot{ destination };
-	snapshot.entities(input);
-	for (auto& cbWrapper : ComponentSerdes::getRegistry())
-	{
-		cbWrapper.deserialize(snapshot, input);
-	}
-}
-
 void SGE_Regsitry::removeEntity(const Entity& e)
 {
 	auto id = e.handlerID();
 	m_registry.destroy(e.handler());
 
 	logDebug("Removed entity: " + std::to_string(id));
-}
-
-RegistryContext& SGE_Regsitry::getRegistryContext()
-{
-	return m_context;
 }
