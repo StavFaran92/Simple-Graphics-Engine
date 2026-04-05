@@ -29,7 +29,15 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	SerializedEntity serializedEntity;
 	serializedEntity.entity = e.handler();
 
-	ComponentSerializer::serializeComponents(e, serializedEntity.components);
+	for (auto& cbWrapper : ComponentSerdes::getRegistry())
+	{
+		if (auto c = cbWrapper.serialize_2(e))
+		{
+			serializedEntity.components.push_back(c);
+		}
+	}
+
+	//ComponentSerializer::serializeComponents(e, serializedEntity.components);
 
 	return serializedEntity;
 }
@@ -39,7 +47,14 @@ Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, ResourceWrapp
 	auto e = scene->getRegistry().getRegistry().create(serializedEnt.entity);
 	auto entityHandler = Entity(e, &scene->getRegistry());
 
-	ComponentSerializer::deserializeComponents(serializedEnt.components, entityHandler, scene);
+	for (auto& cbWrapper : ComponentSerdes::getRegistry())
+	{
+		for (auto& c : serializedEnt.components)
+		{
+			cbWrapper.deserialize_2(c, entityHandler, scene);
+		}
+	}
+	//ComponentSerializer::deserializeComponents(serializedEnt.components, entityHandler, scene);
 
 	return entityHandler;
 

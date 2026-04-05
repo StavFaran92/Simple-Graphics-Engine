@@ -58,13 +58,17 @@ ComponentSerializeFnRegister<T> ComponentSerializeFnRegister<T>::staticRegister;
 #include "serialize/CerealHelpers.h"
 
 using SnapshotSerializeFunc = std::function<void(entt::snapshot&, cereal::JSONOutputArchive&)>;
+using SnapshotSerializeFunc_2 = std::function<std::shared_ptr<Component>(const Entity& e)>;
 using SnapshotDeserializeFunc = std::function<void(entt::snapshot_loader&, cereal::JSONInputArchive&)>;
+using SnapshotDeserializeFunc_2 = std::function<void(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)>;
 
 struct SerializerEntry
 {
 	std::string name;
 	SnapshotSerializeFunc serialize;
+	SnapshotSerializeFunc_2 serialize_2;
 	SnapshotDeserializeFunc deserialize;
+	SnapshotDeserializeFunc_2 deserialize_2;
 	std::function<void(ResourceWrapper<Scene>&)> resolve;
 	std::function<void(ResourceWrapper<Scene>&)> postLoad;
 };
@@ -92,9 +96,28 @@ public:
 				snapshot.component<T>(output);
 			};
 
+		entry.serialize_2 = [](const Entity& e)
+			{
+				std::shared_ptr<Component> c;
+				if (e.HasComponent<T>())
+				{
+					c = std::make_shared<T>(e.getComponent<T>());
+				}
+				return c;
+			};
+
 		entry.deserialize = [](entt::snapshot_loader& snapshot, cereal::JSONInputArchive& input)
 			{
 				snapshot.component<T>(input);
+			};
+
+		entry.deserialize_2 = [](std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
+			{
+				if (auto tc = std::dynamic_pointer_cast<T>(c))
+				{
+					scene->getRegistry().get().emplace_or_replace<T>(entityHandler.handler(), *tc);
+					//entityHandler.addComponent<T>(*tc);
+				}
 			};
 
 		entry.resolve = [](ResourceWrapper<Scene>& scene) { 
@@ -115,4 +138,5 @@ public:
 		getRegistry().push_back(std::move(entry));
 	}
 };
+
 

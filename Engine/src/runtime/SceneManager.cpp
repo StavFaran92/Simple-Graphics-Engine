@@ -9,6 +9,7 @@
 
 SceneManager::SceneManager()
 {
+	//m_serializedScene = std::make_shared<SerializedScene>();
 }
 
 bool SceneManager::addScene(const AssetHandle<SceneAsset>& sceneAsset)
@@ -76,7 +77,8 @@ void SceneManager::startSimulation()
 	if (activeScene.isEmpty())
 		return;
 
-	m_serializedScene = activeScene->getRegistry().toStream();
+	m_serializedScene = Archiver::serializeScene(activeScene);
+	//m_serializedScene = activeScene->getRegistry().toStream();
 
 	activeScene->startSimulation();
 }
@@ -89,7 +91,8 @@ void SceneManager::stopSimulation()
 
 	activeScene->stopSimulation();
 
-	activeScene->getRegistry().fromStream(m_serializedScene);
+	Archiver::deserializeScene(m_serializedScene, activeScene);
+	//activeScene->getRegistry().fromStream(m_serializedScene);
 
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{

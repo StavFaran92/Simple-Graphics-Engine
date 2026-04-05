@@ -5,6 +5,7 @@
 #include "core/Core.h"
 #include "memory/ResourceWrapper.h"
 #include "memory/AssetHandle.h"
+#include "serialize/Archiver.h"
 
 class SceneAsset;
 class Scene;
@@ -36,6 +37,6 @@ private:
 	uint32_t m_scenesCounter = 0;
 	std::map<uint32_t, AssetHandle<SceneAsset>> m_scenes;
 	std::map<uint32_t, ResourceWrapper<Scene>> m_scenesCache; // Cache for getAllScenes()
-	//std::shared_ptr<SerializedScene> m_serializedScene;
-	std::stringstream m_serializedScene;
+	SerializedScene m_serializedScene;
+	//std::stringstream m_serializedScene;
 };
