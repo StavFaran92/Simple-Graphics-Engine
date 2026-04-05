@@ -22,7 +22,6 @@
 #include "utils/DebugHelper.h"
 #include "component/MeshRendererComponent.h"
 
-#include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 #include "memory/BuiltInAssets.h"

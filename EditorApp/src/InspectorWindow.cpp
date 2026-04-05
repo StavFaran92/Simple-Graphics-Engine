@@ -727,11 +727,6 @@ void InspectorWindow::display()
 				auto& skybox = state.getSelectedEntity().addComponent<SkyboxComponent>();
 			}
 
-			if (ImGui::MenuItem("Shader"))
-			{
-				auto& shader = state.getSelectedEntity().addComponent<ShaderComponent>();
-			}
-
 			//if (ImGui::MenuItem("Foliage"))
 			//{
 			//	auto& foliage = state.getSelectedEntity().addComponent<FoliageComponent>();

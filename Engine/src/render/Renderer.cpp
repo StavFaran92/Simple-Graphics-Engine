@@ -27,7 +27,6 @@
 
 #include "component/RenderableComponent.h"
 #include "component/ObjectComponent.h"
-#include "component/ShaderComponent.h"
 #include "memory/BuiltInAssets.h"
 #include "memory/BuiltInResources.h"
 

@@ -17,7 +17,6 @@
 #include "texture/Texture.h"
 #include "component/CameraComponent.h"
 #include "component/SkyboxComponent.h"
-#include "component/ShaderComponent.h"
 #include "component/PlayerControllerComponent.h"
 #include "component/PhysicsComponent.h"
 #include "component/ObjectComponent.h"
@@ -50,10 +49,6 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
 
     { "Skybox", [](Entity& e, sol::this_state lua) -> sol::object {
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<SkyboxComponent>()));
-    } },
-
-    { "Shader", [](Entity& e, sol::this_state lua) -> sol::object {
-        return sol::object(lua, sol::in_place, std::ref(e.getComponent<ShaderComponent>()));
     } },
 
     { "PlayerController", [](Entity& e, sol::this_state lua) -> sol::object {

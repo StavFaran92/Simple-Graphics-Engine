@@ -5,15 +5,12 @@
 
 #include "core/Core.h"
 #include "render/Shader.h"
-#include "component/ShaderComponent.h"
 
 class EngineAPI CustomShaderBuilder
 {
 public:
 
 	static CustomShaderBuilder& create(const std::string& filePath, ShaderOverride shaderOverride);
-
-	ShaderComponent build();
 
 private:
 	CustomShaderBuilder(const std::string& filePath, ShaderOverride shaderOverride);

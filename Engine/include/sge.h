@@ -57,7 +57,6 @@
 #include "component/Terrain.h"
 #include "component/PhysicsComponent.h"
 #include "component/MeshRendererComponent.h"
-#include "component/ShaderComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/NativeScriptComponent.h"
 #include "component/RenderableComponent.h"
