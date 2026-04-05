@@ -67,20 +67,20 @@ ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDes
 	ResourceWrapper<Scene> scene = Factory<Scene>::create();
 	scene->init(Engine::get()->getContext(), scene.getUID());
 
-	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
-
 	std::ifstream is(filepath);
-	if (!is)
+	cereal::JSONInputArchive iarchive(is);
+	SceneData sceneData;
+
+	try
 	{
-		logError("Failed to open file for reading: {}", filepath);
-		return nullptr;
+		iarchive(sceneData);
+		Archiver::deserializeScene(sceneData.m_serializedScene, scene);
 	}
-
-	std::stringstream ss;
-	ss << is.rdbuf();
-
-	scene->getRegistry().fromStream(ss);
+	catch (const cereal::Exception& e)
+	{
+		logError("Deserialization Error occured: {}", e.what());
+	}
 
 	// Post Load
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())

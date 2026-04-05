@@ -54,13 +54,16 @@ bool SceneAssetManager::saveResource(const ResourceBuildDescriptor& desc, const 
 
 	auto path = dst.absolute();
 	std::ofstream os(path);
-	if (!os)
-	{
-		logError("Failed to open file for writing: {}", path.string());
-		return false;
-	}
+	cereal::JSONOutputArchive oarchive(os);
 
-	os << sceneDesc->data.registryStream.rdbuf();
+	try
+	{
+		oarchive(sceneDesc->data);
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Serialization Error occured: {}", e.what());
+	}
 
 	return true;
 }
@@ -93,18 +96,18 @@ void SceneAssetManager::parse(ResourceLoadDescriptor& desc)
 
 void SceneAssetManager::parse(ResourceBuildDescriptor& desc)
 {
-	auto sceneDesc = dynamic_cast<SceneCreateDescriptor*>(&desc);
-	if (!sceneDesc)
-	{
-		logError("Invalid Descriptor specified.");
-		return;
-	}
+	//auto sceneDesc = dynamic_cast<SceneCreateDescriptor*>(&desc);
+	//if (!sceneDesc)
+	//{
+	//	logError("Invalid Descriptor specified.");
+	//	return;
+	//}
 
-	std::stringstream& source = sceneDesc->data.registryStream;
+	//std::stringstream& source = sceneDesc->data.registryStream;
 
-	if (source.str().empty())
-	{
-		SGE_Regsitry sgeRegistry{};
-		source = sgeRegistry.toStream();
-	}
+	//if (source.str().empty())
+	//{
+	//	SGE_Regsitry sgeRegistry{};
+	//	source = sgeRegistry.toStream();
+	//}
 }

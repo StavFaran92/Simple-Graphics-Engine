@@ -34,7 +34,9 @@ void ProjectManager::saveProject()
     //SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
     AssetUpdateDescriptor desc;
     SceneCreateDescriptor sceneDesc;
-    sceneDesc.data.registryStream = Engine::get()->getContext()->getActiveScene()->getRegistry().toStream();
+    SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
+    sceneDesc.data.m_serializedScene = serializedScene;
+    //sceneDesc.data.registryStream = Engine::get()->getContext()->getActiveScene()->getRegistry().toStream();
     UUID uid = Engine::get()->getContext()->getActiveSceneAsset().getUID();
     Engine::get()->getSubSystem<Assets>()->updateAsset(uid, desc, &sceneDesc);
 
