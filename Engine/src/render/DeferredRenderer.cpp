@@ -251,6 +251,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 			continue;
 
 		Entity entityHandler{ entity, &scene->getRegistry() };
+		graphics->entity = entityHandler;
 
 		std::string name = entityHandler.getComponent<ObjectComponent>().name;
 		std::string captionGPU = "About to render Entity: '" + name + "'";

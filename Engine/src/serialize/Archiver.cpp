@@ -88,17 +88,5 @@ void Archiver::deserializeScene(SerializedScene serializedScene, ResourceWrapper
 	}
 
 	Entity gameCameraEntity(serializedScene.gameCamera, &scene->getRegistry());
-	if (!gameCameraEntity.valid() || !gameCameraEntity.HasComponent<CameraComponent>())
-	{
-		logWarning("Invalid game camera serialized, creating a new camera.");
-
-		gameCameraEntity = scene->createEntity("Main Camera");
-		gameCameraEntity.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 1000.0f));
-		gameCameraEntity.getComponent<Transformation>().setLocalPosition({ 10,10,10 });
-		gameCameraEntity.getComponent<CameraComponent>().center = { 0,0,0 };
-		gameCameraEntity.getComponent<CameraComponent>().up = { 0,1,0 };
-		gameCameraEntity.addComponent<MeshRendererComponent>().mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CAMERA);
-		gameCameraEntity.addComponent<RenderableComponent>();
-	}
 	scene->setGameCamera(gameCameraEntity);
 }
