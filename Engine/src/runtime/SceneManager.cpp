@@ -94,12 +94,19 @@ void SceneManager::stopSimulation()
 
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{
-		cbWrapper.resolve(activeScene);
+		activeScene->getRegistry().get().each([&](entt::entity e) {
+			Entity entity(e, &activeScene->getRegistry());
+			cbWrapper.resolve(entity, activeScene);
+		});
+
 	}
 
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{
-		cbWrapper.postLoad(activeScene);
+		activeScene->getRegistry().get().each([&](entt::entity e) {
+			Entity entity(e, &activeScene->getRegistry());
+			cbWrapper.postLoad(entity, activeScene);
+		});
 	}
 }
 

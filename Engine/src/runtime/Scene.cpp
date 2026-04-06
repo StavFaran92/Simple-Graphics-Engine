@@ -85,12 +85,19 @@ ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDes
 	// Post Load
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{
-		cbWrapper.resolve(scene);
+		scene->getRegistry().get().each([&](entt::entity e) {
+			Entity entity(e, &scene->getRegistry());
+			cbWrapper.resolve(entity, scene);
+		});
+		
 	}
 
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{
-		cbWrapper.postLoad(scene);
+		scene->getRegistry().get().each([&](entt::entity e) {
+			Entity entity(e, &scene->getRegistry());
+			cbWrapper.postLoad(entity, scene);
+		});
 	}
 
 	return scene;

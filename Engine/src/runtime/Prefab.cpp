@@ -96,7 +96,20 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 
 	for (SerializedEntity& serializedEntity : m_data.m_serializedPrefab)
 	{
+		auto scene = Engine::get()->getContext()->getActiveScene();
+
 		auto& e = Archiver::deserializeEntity(serializedEntity, Engine::get()->getContext()->getActiveScene());
+
+		for (auto& cbWrapper : ComponentSerdes::getRegistry())
+		{
+			cbWrapper.resolve(e, scene);
+		}
+
+		for (auto& cbWrapper : ComponentSerdes::getRegistry())
+		{
+			cbWrapper.postLoad(e, scene);
+		}
+
 		entity_id oldEntityID = e.getComponent<ObjectComponent>().e.handlerID();
 
 		entityIDRemapTable[oldEntityID] = e;

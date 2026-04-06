@@ -30,8 +30,8 @@ struct SerializerEntry
 	std::string name;
 	SnapshotSerializeFunc serialize;
 	SnapshotDeserializeFunc deserialize;
-	std::function<void(ResourceWrapper<Scene>&)> resolve;
-	std::function<void(ResourceWrapper<Scene>&)> postLoad;
+	std::function<void(Entity e, ResourceWrapper<Scene>&)> resolve;
+	std::function<void(Entity e, ResourceWrapper<Scene>&)> postLoad;
 };
 
 class ComponentSerdes
@@ -65,20 +65,27 @@ public:
 				if (auto tc = std::dynamic_pointer_cast<T>(c))
 				{
 					scene->getRegistry().get().emplace_or_replace<T>(entityHandler.handler(), *tc);
+					scene->makeDirty();
 				}
 			};
 
-		entry.resolve = [](ResourceWrapper<Scene>& scene) { 
-			for(auto& [entity, c] : scene->getRegistry().get().view<T>().each())
+		entry.resolve = [](Entity e, ResourceWrapper<Scene>& scene) { 
+			entt::entity entity = e.handler();
+			if (scene->getRegistry().get().all_of<T>(entity))
 			{
+				auto& c = scene->getRegistry().get().get<T>(entity);
+
 				c.resolve(scene);
 				c.registerDependencyListener([scene](UUID uid) { scene.get()->makeDirty(); });
 			}
 		};
 
-		entry.postLoad = [](ResourceWrapper<Scene>& scene) {
-			for (auto& [entity, c] : scene->getRegistry().get().view<T>().each())
+		entry.postLoad = [](Entity e, ResourceWrapper<Scene>& scene) {
+			entt::entity entity = e.handler();
+			if (scene->getRegistry().get().all_of<T>(entity))
 			{
+				auto& c = scene->getRegistry().get().get<T>(entity);
+
 				c.postLoad(scene);
 			}
 		};

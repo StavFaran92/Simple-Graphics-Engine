@@ -3,15 +3,9 @@
 #include "runtime/Scene.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
-#include "memory/AssetHandle.h"
-#include "core/Engine.h"
 
 #include <fstream>
 #include <cereal/archives/json.hpp>
-
-#include "component/ComponentSerializer.h"
-
-#include "entt/entt.hpp"
 
 Ref<Asset> SceneAssetManager::createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc)
 {
