@@ -63,6 +63,7 @@ public:
 
     std::function<void(UUID uuid)> assetTextureSelectCB;
     std::function<void(Entity e)> entitySelectCB;
+    std::function<void(const std::string& scriptName)> scriptSelectCB;
     AssetHandle<TextureAsset> selectedAssetTexture;
 
     std::shared_ptr<TextureSampler> selectedSampler;

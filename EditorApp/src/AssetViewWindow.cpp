@@ -1,6 +1,5 @@
 #include "AssetViewWindow.h"
 
-#include "Dialogs.h"
 #include "EditorState.h"
 
 #ifndef _WIN32
@@ -256,7 +255,7 @@ void AssetViewWindow::display()
 						else
 						{
 							EditorState::Instance().selectedMaterialForEdit = mat;
-							EditorState::Instance().showMaterialEditWindow = true;
+							EditorState::Instance().setState("MaterialEditDialog", true);
 
 						}
 					}

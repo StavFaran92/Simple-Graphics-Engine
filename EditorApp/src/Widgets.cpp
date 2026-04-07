@@ -1,6 +1,5 @@
 #include "Widgets.h"
 
-#include "Dialogs.h"
 #include "EditorState.h"
 #include <imgui_stdlib.h>
 #include "tinyfiledialogs.h"
@@ -17,11 +16,9 @@ void addTextureEditWidget(AssetHandle<TextureAsset> texture, ImVec2 size, std::f
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
 	{
-		ImGui::OpenPopup("EditTexturePopup");
 		EditorState::Instance().assetTextureSelectCB = callback;
+		EditorState::Instance().setState("TextureSelectDialog", true);
 	}
-
-	displayTextureSelectDialog();
 }
 
 void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, const std::string& name)

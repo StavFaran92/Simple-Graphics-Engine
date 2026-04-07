@@ -30,7 +30,6 @@
 #include "InspectorWindow.h"
 #include "SceneHierarchyWindow.h"
 #include "SceneViewWindow.h"
-#include "Dialogs.h"
 #include "Dialogs/MaterialCreateDialog.h"
 #include "Dialogs/ModelImportDialog.h"
 #include "Dialogs/AnimationImportDialog.h"
@@ -39,6 +38,14 @@
 #include "Dialogs/FolderCreateDialog.h"
 #include "Dialogs/AssetSelectDialog.h"
 #include "Dialogs/SceneCreateDialog.h"
+#include "Dialogs/ScriptSelectDialog.h"
+#include "Dialogs/EntitySelectDialog.h"
+#include "Dialogs/TextureSelectDialog.h"
+#include "Dialogs/TextureCreateDialog.h"
+#include "Dialogs/ShaderCreateDialog.h"
+#include "Dialogs/LuaScriptCreateDialog.h"
+#include "Dialogs/ProjectSettingsDialog.h"
+#include "Dialogs/MaterialEditDialog.h"
 
 #include "ImguiHandler.h"
 #include "GUIMenu.h"
@@ -96,6 +103,14 @@ static TextureImportDialog textureImportDialog;
 static LuaScriptImportDialog luaScriptImportDialog;
 static FolderCreateDialog folderCreateDialog;
 static SceneCreateDialog sceneCreateDialog;
+static ScriptSelectDialog scriptSelectDialog;
+static EntitySelectDialog entitySelectDialog;
+static TextureSelectDialog textureSelectDialog;
+static TextureCreateDialog textureCreateDialog;
+static ShaderCreateDialog shaderCreateDialog;
+static LuaScriptCreateDialog luaScriptCreateDialog;
+static ProjectSettingsDialog projectSettingsDialog;
+static MaterialEditDialog materialEditDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -409,17 +424,14 @@ class GUI_Helper : public GuiMenu {
 
 						}
 						if (ImGui::MenuItem("Texture")) {
-							EditorState::Instance().showTextureCreateWindow = true;
-							
+							textureCreateDialog.activate();
 						}
 						if (ImGui::MenuItem("Shader")) {
-							EditorState::Instance().showShaderCreateWindow = true;
-
+							shaderCreateDialog.activate();
 						}
 
 						if (ImGui::MenuItem("Lua Script")) {
-							EditorState::Instance().showLuaScriptCreateWindow = true;
-
+							luaScriptCreateDialog.activate();
 						}
 
 						if (ImGui::MenuItem("Scene")) {
@@ -432,8 +444,7 @@ class GUI_Helper : public GuiMenu {
 				}
 				if (ImGui::BeginMenu("Project")) {
 					if (ImGui::MenuItem("Settings")) {
-						EditorState::Instance().showSettingsWindow = true;
-
+						projectSettingsDialog.activate();
 					}
 					ImGui::EndMenu();
 				}
@@ -482,11 +493,6 @@ class GUI_Helper : public GuiMenu {
 		InspectorWindow::display();
         AssetViewWindow::display();
         RenderConsoleWindow();
-		displayTextureCreatorDialog();
-		displayLuaScriptCreatorDialog();
-		displayShaderCreatorDialog();
-		displayMaterialEditDialog();
-		displayProjectSettingsDialog();
 		EditorState::Instance().displayDialogs();
 
 		DisplayDebugInfoWindow();

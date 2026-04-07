@@ -30,10 +30,11 @@ void DialogBase::footer()
 
 	if (ImGui::Button("Cancel", ImVec2(120, 0)))
 	{
+		cancelContent();
 		EditorState::Instance().setState(m_label, false);
 	}
 
-	ImGui::EndPopup();
+	ImGui::End();
 }
 
 void DialogBase::activate()

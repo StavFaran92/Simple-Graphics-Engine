@@ -6,7 +6,6 @@
 #include "EntityState.h"
 #include "EditorState.h"
 #include "NativeScriptsLoader.h"
-#include "Dialogs.h"
 #include "Widgets.h"
 
 bool g_testRay = false;
@@ -261,17 +260,11 @@ void InspectorWindow::display()
 			// Button to trigger some action
 			if (ImGui::Button("Select Script"))
 			{
-				EditorState::Instance().showScriptSelector = true;
+				EditorState::Instance().scriptSelectCB = [&nsc](const std::string& selectedScript) {
+					nsc.script = std::shared_ptr<ScriptableEntity>(NativeScriptsLoader::instance->getScript(selectedScript));
+				};
+				EditorState::Instance().setState("ScriptSelectDialog", true);
 			}
-
-			std::string selectedScript;
-			displaySelectScriptDialog(selectedScript);
-
-			if (!selectedScript.empty())
-			{
-				nsc.script = std::shared_ptr<ScriptableEntity>(NativeScriptsLoader::instance->getScript(selectedScript));
-			}
-
 			
 
 			// Text display field
