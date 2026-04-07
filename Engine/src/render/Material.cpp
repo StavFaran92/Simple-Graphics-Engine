@@ -138,6 +138,11 @@ ResourceWrapper<Shader> Material::getActiveShader() const
 	}
 	else
 	{
+		if (m_customShader.isEmpty())
+		{
+			logWarning("Invalid custom shader for material {}, using fallback.", m_name);
+			return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+		}
 		return m_customShader;
 	}
 }
