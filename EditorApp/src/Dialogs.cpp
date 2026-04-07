@@ -474,15 +474,14 @@ void displayMaterialEditDialog()
 {
 	static MaterialData previousMaterialData;
 	static MaterialDataWidget materialData;
-	if (EditorState::Instance().showMaterialEditWindow)
+
+	if (EditorState::Instance().showMaterialEditWindow && ImGui::Begin("Edit Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::OpenPopup("Edit Material");
-		
-		previousMaterialData = EditorState::Instance().selectedMaterialForEdit->data;
-		EditorState::Instance().showMaterialEditWindow = false;
-	}
-	if (ImGui::BeginPopupModal("Edit Material", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-	{
+		if (ImGui::IsWindowAppearing())
+		{
+			previousMaterialData = EditorState::Instance().selectedMaterialForEdit->data;
+		}
+
 		auto& mat = EditorState::Instance().selectedMaterialForEdit;
 
 		if (materialData.draw(mat->data))
@@ -496,7 +495,7 @@ void displayMaterialEditDialog()
 		{
 			//Material::updateAsset(mat, {});
 			//mat->updateAsset({}); // TODO fix
-			ImGui::CloseCurrentPopup();
+			EditorState::Instance().showMaterialEditWindow = false;
 		}
 
 		ImGui::SameLine();
@@ -505,9 +504,9 @@ void displayMaterialEditDialog()
 		{
 			mat->data = previousMaterialData;
 			mat.makeDirty();
-			ImGui::CloseCurrentPopup();
+			EditorState::Instance().showMaterialEditWindow = false;
 		}
 
-		ImGui::EndPopup();
+		ImGui::End();
 	}
 }

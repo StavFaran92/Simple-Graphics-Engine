@@ -7,7 +7,6 @@ class DialogBase
 public:
 	DialogBase(const std::string& label);
 	virtual ~DialogBase() = default;
-	void appear();
 	void draw();
 	void header();
 	void footer();

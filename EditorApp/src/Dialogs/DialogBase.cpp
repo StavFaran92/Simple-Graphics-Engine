@@ -10,16 +10,6 @@ DialogBase::DialogBase(const std::string& label)
 	EditorState::Instance().addDialogDisplay(this);
 }
 
-void DialogBase::appear()
-{
-	if (EditorState::Instance().getState(m_label))
-	{
-		appearContent();
-		ImGui::OpenPopup(m_label.c_str());
-		EditorState::Instance().setState(m_label, false);
-	}
-}
-
 void DialogBase::header()
 {
 	headerContent();
@@ -33,14 +23,14 @@ void DialogBase::footer()
 	{
 		if (acceptContent())
 		{
-			ImGui::CloseCurrentPopup();
+			EditorState::Instance().setState(m_label, false);
 		}
 	}
 	ImGui::SameLine();
 
 	if (ImGui::Button("Cancel", ImVec2(120, 0)))
 	{
-		ImGui::CloseCurrentPopup();
+		EditorState::Instance().setState(m_label, false);
 	}
 
 	ImGui::EndPopup();
@@ -53,8 +43,22 @@ void DialogBase::activate()
 
 void DialogBase::draw()
 {
-	if (ImGui::BeginPopupModal(m_label.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	// Center dialog
+	ImGui::SetNextWindowPos(
+		ImGui::GetMainViewport()->GetCenter(),
+		ImGuiCond_Appearing,
+		ImVec2(0.5f, 0.5f));
+
+	if (EditorState::Instance().getState(m_label) && ImGui::Begin(m_label.c_str(), nullptr, 
+		ImGuiWindowFlags_AlwaysAutoResize  | 
+		ImGuiWindowFlags_NoDocking | 
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoCollapse))
 	{
+		if (ImGui::IsWindowAppearing())
+		{
+			appearContent();
+		}
 		header();
 		drawContent();
 		footer();
@@ -63,6 +67,5 @@ void DialogBase::draw()
 
 void DialogBase::display()
 {
-	appear();
 	draw();
 }
