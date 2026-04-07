@@ -616,16 +616,14 @@ Shader::~Shader() {
 
 void ShaderAsset::serialize(nlohmann::json& j) const
 {
-	// ShaderAsset currently does not hold additional persistent data
-	// beyond what is stored in the shader resource and asset record.
-	// Keep this explicit and empty for forward compatibility.
-	j = nlohmann::json::object();
+	j["shader_override"] = m_shaderOverride;
+	j["is_shader_override"] = m_isShaderOverride;
 }
 
 void ShaderAsset::deserialize(const nlohmann::json& j)
 {
-	// Placeholder for future shader-asset specific metadata.
-	(void)j;
+	j.at("shader_override").get_to(m_shaderOverride);
+	j.at("is_shader_override").get_to(m_isShaderOverride);
 }
 
 
