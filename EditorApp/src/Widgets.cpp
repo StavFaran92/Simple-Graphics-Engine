@@ -199,9 +199,8 @@ bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::f
 
 
 
-bool MaterialDataWidget::draw(MaterialData& data)
+void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const MaterialData&)>& onChangedCB)
 {
-	bool isChanged = false;
 	ImGui::Text(data.name.c_str());
 
 	ImGui::Dummy(ImVec2(0, 4));
@@ -229,7 +228,7 @@ bool MaterialDataWidget::draw(MaterialData& data)
 				currentIndex = i;
 				currentMode = static_cast<MaterialRenderMode>(i);
 				data.setMaterialRenderMode(currentMode);
-				isChanged = true;
+				if(onChangedCB) onChangedCB(data);
 			}
 			if (isSelected)
 				ImGui::SetItemDefaultFocus();
@@ -245,9 +244,9 @@ bool MaterialDataWidget::draw(MaterialData& data)
 			shaderName = data.getCustomShader().info().name;
 		}
 
-		addAssetSelectWidget(shaderName, AssetType::SHADER, [&data, &isChanged](UUID uuid) {
+		addAssetSelectWidget(shaderName, AssetType::SHADER, [&data, onChangedCB](UUID uuid) {
 			data.setCustomShader(AssetHandle<ShaderAsset>(uuid));
-			isChanged = true;
+			if (onChangedCB) onChangedCB(data);
 		});
 	}
 
@@ -258,7 +257,7 @@ bool MaterialDataWidget::draw(MaterialData& data)
 		{
 			ImGui::PushID(name.c_str());
 			ImGui::Text(name.c_str());
-			if (ImGui::Checkbox("", (bool*)&sampler->isActive)) { isChanged = true; }
+			if (ImGui::Checkbox("", (bool*)&sampler->isActive)) { if (onChangedCB) onChangedCB(data); }
 			ImGui::SameLine();
 			addSamplerEditWidget(sampler, { 40, 40 }, name);
 			ImGui::PopID();
@@ -319,7 +318,7 @@ bool MaterialDataWidget::draw(MaterialData& data)
 			if (updated)
 			{
 				data.setUniform(name,value);
-				isChanged = true;
+				if (onChangedCB) onChangedCB(data);
 			}
 
 			ImGui::PopID();
@@ -336,5 +335,4 @@ bool MaterialDataWidget::draw(MaterialData& data)
 	//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", TextureType::Metallic);
 	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", TextureType::Roughness);
 	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", TextureType::AmbientOcclusion);
-	return isChanged;
 }

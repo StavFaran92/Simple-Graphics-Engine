@@ -20,7 +20,8 @@ void MaterialCreateDialog::drawContent()
 {
 	m_uniqueName.draw();
 	ImGui::Separator();
-	m_matData.draw(m_tempData);
+
+	m_matData.draw(m_tempData, nullptr);
 	ImGui::Separator();
 }
 

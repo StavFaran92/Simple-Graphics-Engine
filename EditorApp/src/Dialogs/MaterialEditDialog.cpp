@@ -24,10 +24,11 @@ void MaterialEditDialog::drawContent()
 		return;
 	}
 
-	if (m_materialData.draw(mat->data))
-	{
-		mat.makeDirty();
-	}
+	static auto onChangedCB = [](const MaterialData&) {
+		EditorState::Instance().selectedMaterialForEdit.makeDirty();
+	};
+
+	m_materialData.draw(mat->data, onChangedCB);
 	ImGui::Separator();
 }
 
