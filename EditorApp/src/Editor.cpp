@@ -479,6 +479,7 @@ class GUI_Helper : public GuiMenu {
 
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
 			ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
+			ImGui::DockBuilderDockWindow("Debug Info", dock_id_right);
             ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
             ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
             ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
@@ -493,9 +494,9 @@ class GUI_Helper : public GuiMenu {
 		InspectorWindow::display();
         AssetViewWindow::display();
         RenderConsoleWindow();
+		DisplayDebugInfoWindow();
 		EditorState::Instance().displayDialogs();
 
-		DisplayDebugInfoWindow();
 		
 	}
 };
@@ -613,11 +614,6 @@ public:
 		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
 
-		//auto scene = Engine::get()->getContext()->getActiveScene();
-
-		//// store Default scene camera
-		//g_primaryCamera = scene->getGameCamera();
-
 		// set Editor camera as active camera
 		auto editorCamera = m_editorRegistry->createEntity();
 		editorCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 3000.0f));
@@ -634,16 +630,7 @@ public:
 			});
 
 		setupScene();
-
-		////g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView(0, 0, 300, 200, g_primaryCamera);
-		////g_previewWindowID = Engine::get()->getContext()->getActiveScene()->addRenderView("Game Preview", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), g_primaryCamera);
-		//Engine::get()->getContext()->getActiveScene()->addRenderView("Editor View", 0, 0, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), editorCamera);
-		//g_previewWindowID = Engine::get()->getContext()->getActiveScene()->getGameRenderViewFrameBufferID();
-		////Engine::get()->getContext()->getActiveScene()->setActiveRenderView("Editor View");
-
 		updateScene();
-
-		
 
 		icons["model"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-cube-100.png");
 		icons["texture"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-image-100.png");
