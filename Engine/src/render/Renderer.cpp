@@ -257,6 +257,9 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
 
             graphics->shader = graphics->material->getActiveShader();
             graphics->shader->use();
+            // Ensure per-entity uniforms (including animation) are set for custom shaders
+            graphics->entity = entityHandler;
+            prepareEntityForRender(entityHandler);
             glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
             graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
             setUniforms();
