@@ -288,9 +288,7 @@ void AssetViewWindow::display()
 					{
 						UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
 						auto& asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
-						std::string path = asset.info().relativefilePath;
 						asset.erase();
-						std::filesystem::remove(Engine::get()->getProjectDirectory() + "/" + path);
 					}
 					else
 					{

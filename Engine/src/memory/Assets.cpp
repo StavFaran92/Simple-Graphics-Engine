@@ -267,8 +267,10 @@ void Assets::deleteAsset(UUID uuid)
 {
 	auto asset = getAsset(uuid);
 	AssetRecord aInfo = asset.info();
-	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.relativefilePath);
+	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.getScopedPath());
+	Engine::get()->getMemoryManagementSystem()->removeNameReference(aInfo.name);
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
+	std::filesystem::remove(aInfo.getAbsolutePath());
 	m_assets.erase(aInfo.uuid);
 }
 
