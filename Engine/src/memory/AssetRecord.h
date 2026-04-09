@@ -5,7 +5,6 @@
 #include "memory/UUID.h"
 #include "core/Configurations.h"
 #include "AssetDescriptors.h"
-#include "cereal/types/memory.hpp"
 #include "memory/Ref.h"
 
 class Asset;
@@ -21,9 +20,8 @@ struct EngineAPI AssetRecord
 	AssetType aType = AssetType::NONE;
 	bool isEngineOwned = false;
 	bool isTransient = false;
-	ScopedPath targetDirectory;
 	std::string assetDirectory;
-	std::string relativefilePath;
+	std::string ext;
 	Ref<Asset> asset;
 	ResourceID resourceID = 0;
 
@@ -42,7 +40,8 @@ struct EngineAPI AssetRecord
 	bool isSerializationDirty() const;
 	bool isResourceDirty() const;
 	std::string getAbsolutePath() const;
-	std::string getScopedPath() const;
+	ScopedPath getScopedPath() const;
+	std::string getFilename() const;
 		
 
 private:

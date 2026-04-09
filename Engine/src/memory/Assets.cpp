@@ -25,11 +25,7 @@ void Assets::addAsset(AssetRecord& aInfo)
 		logError("Invalid asset type specified!");
 		return;
 	}
-	if (aInfo.relativefilePath.empty())
-	{
-		logError("Non transient asset must have a file path specified.");
-		return;
-	}
+
 	if (aInfo.uuid.empty())
 	{
 		logError("Asset must have a UUID");
@@ -160,8 +156,7 @@ void Assets::saveDirtyAssets()
 				continue;
 			}
 
-			ScopedPath dest = assetInfo.targetDirectory;
-			dest.setPath(assetInfo.relativefilePath);
+			ScopedPath dest = assetInfo.getScopedPath();
 
 			if (!manager->saveResource(*buildDesc, dest))
 			{
@@ -217,7 +212,7 @@ void Assets::updateRegistry(const AssetRecord& aInfo)
 		Engine::get()->getMemoryManagementSystem()->addNameReference(aInfo.name, aInfo.uuid);
 	}
 
-	Engine::get()->getMemoryManagementSystem()->addPathReference(aInfo.getScopedPath(), aInfo.uuid); //TODO maybe use some naming convention here?
+	Engine::get()->getMemoryManagementSystem()->addPathReference(aInfo.getScopedPath().scoped().string(), aInfo.uuid); //TODO maybe use some naming convention here?
 	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
 }
 
@@ -267,7 +262,7 @@ void Assets::deleteAsset(UUID uuid)
 {
 	auto asset = getAsset(uuid);
 	AssetRecord aInfo = asset.info();
-	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.getScopedPath());
+	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.getScopedPath().scoped().string());
 	Engine::get()->getMemoryManagementSystem()->removeNameReference(aInfo.name);
 	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
 	std::filesystem::remove(aInfo.getAbsolutePath());
@@ -294,35 +289,6 @@ ScopedPath calculateAssetDestinationPath(
 
 	return p;
 }
-
-//ScopedPath calculateAssetDestinationPathCreate(const AssetBuildDescriptor& desc)
-//{
-//	// Determine root
-//	ScopedPath p = desc.isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
-//
-//	// determine relative folder
-//	std::filesystem::path relativefolder;
-//	if (!desc.assetDirectory.empty())
-//	{
-//		relativefolder = desc.assetDirectory;
-//	}
-//
-//	assert(desc.aType != AssetType::NONE);
-//	assert(!desc.name.empty());
-//
-//	// determine file name
-//	auto& path = std::filesystem::path(desc.name);
-//	std::string name = path.filename().string();
-//
-//	// determine externsion
-//	std::string ext = getExtensionFromType(desc.aType);
-//
-//	std::filesystem::path filename = name + ext;
-//
-//	p.setPath(relativefolder / filename);
-//
-//	return p;
-//}
 
 AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
 {
@@ -373,8 +339,8 @@ AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuild
 
 	AssetRecord record(desc);
 	record.parse();
-	record.relativefilePath = dest.relative().string();
 	record.asset = asset;
+	record.ext = getExtensionFromType(type);
 	addAsset(record);
 
 	return AssetHandle<Asset>(record.uuid);
@@ -452,7 +418,6 @@ void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDe
 	}
 
 	AssetRecord newRecord = record;
-	newRecord.relativefilePath = dest.relative().string();
 	updateAssetInner(newRecord);
 }
 
@@ -578,4 +543,24 @@ AssetHandle<Asset> Assets::bakeAssetFromResource(const ResourceWrapper<Resource>
 	}
 
 	return asset;
+}
+
+void Assets::renameAsset(UUID uuid, const std::string& newName)
+{
+	auto asset = getAsset(uuid);
+	AssetRecord aInfo = asset.info();
+
+	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.getScopedPath().scoped().string());
+	Engine::get()->getMemoryManagementSystem()->removeNameReference(aInfo.name);
+	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
+
+	// Build new path (keep same directory + extension)
+	std::filesystem::path oldPath = aInfo.getAbsolutePath();
+	std::filesystem::path newPath = oldPath.parent_path() / (newName + oldPath.extension().string());
+
+	// Rename on disk
+	std::filesystem::rename(oldPath, newPath);
+
+	aInfo.name = newName;
+	updateAssetInner(aInfo);
 }

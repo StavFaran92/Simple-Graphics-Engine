@@ -1,12 +1,9 @@
 #include "memory/AssetRecord.h"
 
-#include "core/Engine.h"
 #include "memory/Assets.h"
-#include "memory/AssetHandle.h"
 #include "fileSystem/ScopedPath.h"
 #include "memory/AssetFactory.h"
 #include "memory/Asset.h"
-#include "core/Logger.h"
 
 nlohmann::json serializeAsset(const Ref<Asset>& asset)
 {
@@ -14,8 +11,6 @@ nlohmann::json serializeAsset(const Ref<Asset>& asset)
 	asset->serialize(j);
 	return j;
 }
-
-
 
 // Serialization (to JSON)
 void to_json(nlohmann::json& j, const AssetRecord& r)
@@ -27,7 +22,7 @@ void to_json(nlohmann::json& j, const AssetRecord& r)
 		{"aType", r.aType},
 		{"isEngineOwned", r.isEngineOwned},
 		{"assetDirectory", r.assetDirectory},
-		{"relativefilePath", r.relativefilePath},
+		{"ext", r.ext},
 		{"asset", serializeAsset(r.asset)}
 	};
 }
@@ -39,21 +34,12 @@ void from_json(const nlohmann::json& j, AssetRecord& r)
 	j.at("sourcePath").get_to(r.sourcePath);
 	j.at("aType").get_to(r.aType);
 	j.at("isEngineOwned").get_to(r.isEngineOwned);
+	j.at("ext").get_to(r.ext);
 	j.at("assetDirectory").get_to(r.assetDirectory);
-	j.at("relativefilePath").get_to(r.relativefilePath);
 
 	nlohmann::json jsonAsset = j.at("asset");
 	Ref<Asset> asset = AssetFactory::getManager(r.aType)->deserializeAsset(jsonAsset);
 	r.asset = asset;
-
-	if (r.isEngineOwned)
-	{
-		r.targetDirectory = ScopedPath::EnginePath(r.relativefilePath);
-	}
-	else
-	{
-		r.targetDirectory = ScopedPath::ContentPath(r.relativefilePath);
-	}
 }
 
 AssetRecord::AssetRecord(const AssetBuildDescriptor& assetDesc)
@@ -61,7 +47,7 @@ AssetRecord::AssetRecord(const AssetBuildDescriptor& assetDesc)
 	name = assetDesc.name;
 	aType = assetDesc.aType;
 	isEngineOwned = assetDesc.isEngineOwned;
-	targetDirectory = assetDesc.targetDirectory;
+	assetDirectory = assetDesc.assetDirectory;
 
 	uuid = UUID::generate_uuid_v4();
 }
@@ -99,14 +85,17 @@ bool AssetRecord::isResourceDirty() const
 
 std::string AssetRecord::getAbsolutePath() const
 {
-	ScopedPath p = isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
-	p.setPath(relativefilePath);
-	return p.absolute().string();
+	return getScopedPath().absolute().string();
 }
 
-std::string AssetRecord::getScopedPath() const
+ScopedPath AssetRecord::getScopedPath() const
 {
 	ScopedPath p = isEngineOwned ? ScopedPath::EnginePath() : ScopedPath::ContentPath();
-	p.setPath(relativefilePath);
-	return p.scoped().string();
+	p.setPath(std::filesystem::path(assetDirectory) / getFilename());
+	return p;
+}
+
+std::string AssetRecord::getFilename() const
+{
+	return name + ext;
 }

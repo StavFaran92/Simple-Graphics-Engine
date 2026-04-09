@@ -32,7 +32,7 @@ void AssetSelectDialog::drawContent()
 
 		// Draw gray part
 		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255));
-		std::string grayText = "(" + assetList[i]->relativefilePath + ")";
+		std::string grayText = "(" + assetList[i]->getScopedPath().scoped().string() + ")";
 		ImGui::TextUnformatted(grayText.c_str());
 
 		ImGui::PopStyleColor();

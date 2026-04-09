@@ -19,6 +19,8 @@ public:
 
 	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDescriptor* resourceDesc = nullptr);
 
+	void renameAsset(UUID uuid, const std::string& newName);
+
 	void deleteAsset(UUID uuid);
 
 	std::string getAlias(UUID uid) const;

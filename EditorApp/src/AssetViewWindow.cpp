@@ -230,7 +230,7 @@ void AssetViewWindow::display()
 					ImGui::TextUnformatted(aInfo.name.c_str());
 					ImGui::Separator();
 					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
-					ImGui::Text("Path: %s", aInfo.relativefilePath.c_str());
+					ImGui::Text("Path: %s", aInfo.getScopedPath().scoped().string().c_str());
 					ImGui::Text("UUID: %s", aInfo.uuid.str().c_str());
 					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);				
 
@@ -279,7 +279,8 @@ void AssetViewWindow::display()
 
 				if (ImGui::Selectable("Rename"))
 				{
-					logDebug("Not yet implemented");
+					UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
+					Engine::get()->getSubSystem<Assets>()->renameAsset(uuid, "test");
 				}
 
 				if (ImGui::Selectable("Delete"))
