@@ -6,6 +6,8 @@
 #include <unistd.h>
 #endif
 
+UUID g_moveAssetUID;
+
 void openInVSCode(const std::string& path)
 {
 #ifndef _WIN32
@@ -85,6 +87,25 @@ void AssetViewWindow::display()
 
 	// Scrollable region
 	ImGui::BeginChild("FileBrowserScrollingRegion", ImVec2(0, 0), false);
+
+	if (ImGui::BeginPopupContextWindow("test"))
+	{
+		if (ImGui::Selectable("Move here"))
+		{
+			if (!Engine::get()->getSubSystem<Assets>()->hasAsset(g_moveAssetUID))
+			{
+				logWarning("Invalid asset specified.");
+
+			}
+			else
+			{
+				ScopedPath targetDirectory = cwd.path();
+				Engine::get()->getSubSystem<Assets>()->moveAsset(g_moveAssetUID, targetDirectory);
+			}
+		}
+
+		ImGui::EndPopup();
+	}
 
 	const int columns = 6; // number of thumbnails per row
 	if (ImGui::BeginTable("FileBrowserGrid", columns))
@@ -281,6 +302,11 @@ void AssetViewWindow::display()
 				{
 					UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
 					Engine::get()->getSubSystem<Assets>()->renameAsset(uuid, "test");
+				}
+
+				if (ImGui::Selectable("Move"))
+				{
+					g_moveAssetUID = getUIDFromFilename(cwd, fMetadata.filename);
 				}
 
 				if (ImGui::Selectable("Delete"))

@@ -564,3 +564,26 @@ void Assets::renameAsset(UUID uuid, const std::string& newName)
 	aInfo.name = newName;
 	updateAssetInner(aInfo);
 }
+
+void Assets::moveAsset(UUID uuid, const ScopedPath& newDirectory)
+{
+	auto asset = getAsset(uuid);
+	AssetRecord aInfo = asset.info();
+
+	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.getScopedPath().scoped().string());
+	Engine::get()->getContext()->getProjectAssetRegistry()->removeAssetRegistry(aInfo);
+
+	auto oldPath = aInfo.getAbsolutePath();
+
+	aInfo.assetDirectory = newDirectory.relative().string();
+
+	auto newPath = aInfo.getAbsolutePath();
+
+	Engine::get()->getMemoryManagementSystem()->addPathReference(aInfo.getScopedPath().scoped().string(), aInfo.uuid);
+
+	// Rename on disk
+	std::filesystem::rename(oldPath, newPath);
+
+	m_assets[aInfo.uuid] = aInfo;
+	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
+}
