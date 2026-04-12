@@ -567,6 +567,13 @@ void Assets::renameAsset(UUID uuid, const std::string& newName)
 
 void Assets::moveAsset(UUID uuid, const ScopedPath& newDirectory)
 {
+	//TODO fix
+	//if (std::filesystem::exists(newDirectory.absolute()))
+	//{
+	//	logWarning("Cannot overwrite existing asset.");
+	//	return;
+	//}
+
 	auto asset = getAsset(uuid);
 	AssetRecord aInfo = asset.info();
 
