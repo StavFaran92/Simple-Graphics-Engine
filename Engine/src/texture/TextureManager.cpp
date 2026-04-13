@@ -23,13 +23,13 @@ Ref<Asset> TextureTypeManager::deserializeAsset(const nlohmann::json& j)
 	return asset;
 }
 
-bool TextureTypeManager::importAsset(const std::string& src, ImportNode& result)
+bool TextureTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)
 {
 	// TODO fix, what the hell is going on here?
 	TextureData textureData;
-	Texture::extractTextureDataFromFile(src, textureData);
+	Texture::extractTextureDataFromFile(loadDesc.sourcePath, textureData);
 
-	std::filesystem::path path(src);
+	std::filesystem::path path(loadDesc.sourcePath);
 	result.name = path.filename().stem().string();
 	result.assetDesc.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::TEXTURE;

@@ -21,7 +21,7 @@ Ref<Asset> PrefabTypeManager::deserializeAsset(const nlohmann::json& j)
 	return asset;
 }
 
-bool PrefabTypeManager::importAsset(const std::string& src, ImportNode& result)
+bool PrefabTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)
 {
 	// Prefab import not implemented
 	return false;

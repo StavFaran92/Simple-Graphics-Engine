@@ -363,7 +363,7 @@ AssetHandle<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadD
 	ImportNode importNode;
 	importNode.assetDesc = desc;
 
-	if (!manager->importAsset(resourceDesc.sourcePath, importNode))
+	if (!manager->importAsset(resourceDesc, importNode))
 	{
 		logError("Failed to import asset type {}", static_cast<int>(type));
 		return AssetHandle<Asset>::empty;

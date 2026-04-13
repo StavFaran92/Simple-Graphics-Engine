@@ -28,7 +28,7 @@ Ref<Asset> MaterialTypeManager::deserializeAsset(const nlohmann::json& j)
 	return asset;
 }
 
-bool MaterialTypeManager::importAsset(const std::string& src, ImportNode& result)
+bool MaterialTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)
 {
 	// Material import not implemented
 	return false;

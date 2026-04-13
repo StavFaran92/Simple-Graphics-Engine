@@ -11,7 +11,7 @@ public:
 
 	Ref<Asset> deserializeAsset(const nlohmann::json& j) override;
 
-	bool importAsset(const std::string& src, ImportNode& result) override;
+	bool importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result) override;
 	bool saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst) override;
 	std::unique_ptr<ResourceLoadDescriptor> makeResourceLoadDescriptor() override;
 	std::unique_ptr<ResourceBuildDescriptor> makeResourceBuildDescriptor() override;

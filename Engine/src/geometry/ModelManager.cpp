@@ -22,13 +22,13 @@ Ref<Asset> ModelTypeManager::deserializeAsset(const nlohmann::json& j)
 	return asset;
 }
 
-bool ModelTypeManager::importAsset(const std::string& src, ImportNode& result)
+bool ModelTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)
 {
 	ModelImporter::ModelInfo modelInfo;
-	Engine::get()->getSubSystem<ModelImporter>()->parseModel(src, modelInfo);
+	Engine::get()->getSubSystem<ModelImporter>()->parseModel(loadDesc.sourcePath, modelInfo);
 
 	// Build root Model node
-	std::filesystem::path path(src);
+	std::filesystem::path path(loadDesc.sourcePath);
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::MODEL;
 	auto rootModelDesc = result.emplaceCreateDesc<ModelCreateDescriptor>();

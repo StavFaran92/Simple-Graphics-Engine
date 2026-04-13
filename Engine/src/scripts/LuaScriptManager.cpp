@@ -21,13 +21,13 @@ Ref<Asset> LuaScriptTypeManager::deserializeAsset(const nlohmann::json& j)
 	return asset;
 }
 
-bool LuaScriptTypeManager::importAsset(const std::string& src, ImportNode& result)
+bool LuaScriptTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)
 {
-	std::filesystem::path path(src);
+	std::filesystem::path path(loadDesc.sourcePath);
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::LUA_SCRIPT;
 	auto luaLoadDesc = result.emplaceLoadDesc<LuaScriptLoadDescriptor>();
-	luaLoadDesc->sourcePath = src; 
+	luaLoadDesc->sourcePath = loadDesc.sourcePath;
 
 	return true;
 }

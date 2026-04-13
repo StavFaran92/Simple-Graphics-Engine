@@ -63,7 +63,7 @@ public:
     virtual Ref<Asset> createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc) = 0;
 
     // Import asset into the engine
-    virtual bool importAsset(const std::string& src, ImportNode& result) = 0;
+    virtual bool importAsset(const ResourceLoadDescriptor& src, ImportNode& result) = 0;
 
     // Save resource data on disk
     virtual bool saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst) = 0;

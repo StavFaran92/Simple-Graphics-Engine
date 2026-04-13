@@ -8,6 +8,7 @@
 #include "component/MeshRendererComponent.h"
 #include "component/RenderableComponent.h"
 #include "component/WaterBodyComponent.h"
+#include "component/Transformation.h"
 
 WaterSystem::WaterSystem()
 {
@@ -20,6 +21,9 @@ Entity WaterSystem::createPool()
 	auto& waterBodyComponent = waterBodyEntity.addComponent<WaterBodyComponent>(waterBodyEntity);
 
 	auto waterBodyNestedImpl = Engine::get()->getContext()->getActiveScene()->createEntity("NestedImpl");
+	auto& transform = waterBodyNestedImpl.getComponent<Transformation>();
+	transform.scale(glm::vec3{ 10, 10, 1 });
+	transform.rotate(glm::vec3{ 3.14 / 2.f, 0, 0 });
 	waterBodyNestedImpl.setParent(waterBodyEntity);
 
 	// TODO use grid instead
@@ -46,6 +50,8 @@ Entity WaterSystem::createPool()
 	materialDesc.isEngineOwned = true;
 	// TODO: MaterialCreateDescriptor with renderMode = Custom, customShader = shaderAsset
 	MaterialCreateDescriptor materialCreateDesc;
+	materialCreateDesc.data.setMaterialRenderMode(MaterialRenderMode::Custom);
+	materialCreateDesc.data.setCustomShader(shaderAsset);
 	auto materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(materialDesc, materialCreateDesc).as<MaterialAsset>();
 
 	meshRendererComponent.setMaterial(0, materialAsset);

@@ -25,16 +25,16 @@ Ref<Asset> AnimationTypeManager::deserializeAsset(const nlohmann::json& j)
 	return asset;
 }
 
-bool AnimationTypeManager::importAsset(const std::string& src, ImportNode& result)
+bool AnimationTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)
 {
 	AnimationLoader::AnimationInfo animInfo;
-	if (!Engine::get()->getSubSystem<AnimationLoader>()->parseAnimation(src, animInfo))
+	if (!Engine::get()->getSubSystem<AnimationLoader>()->parseAnimation(loadDesc.sourcePath, animInfo))
 	{
-		logWarning("Failed to import asset: {}", src);
+		logWarning("Failed to import asset: {}", loadDesc.sourcePath);
 		return false;
 	}
 
-	std::filesystem::path path(src);
+	std::filesystem::path path(loadDesc.sourcePath);
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::ANIMATION;
 	auto rootAnimDesc = result.emplaceCreateDesc<AnimationCreateDescriptor>();

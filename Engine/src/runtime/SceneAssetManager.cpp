@@ -19,7 +19,7 @@ Ref<Asset> SceneAssetManager::deserializeAsset(const nlohmann::json& j)
 	return asset;
 }
 
-bool SceneAssetManager::importAsset(const std::string& src, ImportNode& result)
+bool SceneAssetManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)
 {
 	// Scene import not implemented
 	return false;

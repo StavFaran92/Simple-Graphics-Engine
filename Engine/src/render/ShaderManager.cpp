@@ -27,15 +27,24 @@ Ref<Asset> ShaderTypeManager::deserializeAsset(const nlohmann::json& j)
 	return asset;
 }
 
-bool ShaderTypeManager::importAsset(const std::string& src, ImportNode& result)
+bool ShaderTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)
 {
-	std::filesystem::path path(src);
+	std::filesystem::path path(loadDesc.sourcePath);
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::SHADER;
 	auto shaderCreateDesc = result.emplaceCreateDesc<ShaderCreateDescriptor>();
 
-	std::string code = Engine::get()->getShaderLoader()->readShader(src);
+	std::string code = Engine::get()->getShaderLoader()->readShader(loadDesc.sourcePath);
 	shaderCreateDesc->code = code;
+
+	auto shaderDesc = dynamic_cast<const ShaderLoadDescriptor*>(&loadDesc);
+	if (!shaderDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return false;
+	}
+
+	shaderCreateDesc->shaderOverride = shaderDesc->shaderOverride;
 
 	return true;
 }
@@ -88,30 +97,6 @@ void ShaderTypeManager::parse(ResourceLoadDescriptor& desc)
 
 void ShaderTypeManager::parse(ResourceBuildDescriptor& desc)
 {
-	auto shaderDesc = dynamic_cast<ShaderCreateDescriptor*>(&desc);
-	if (!shaderDesc)
-	{
-		logError("Invalid Descriptor specified.");
-		return;
-	}
 
-	shaderDesc->code = std::string(R"(
-
-#vert
-
-void vert(inout vec3 aPos, inout vec3 aNorm)
-{
-}
-
-#frag
-
-void frag(inout vec3 color, 
-	inout vec3 normal, 
-	inout float metallic, 
-	inout float roughness, 
-	inout float ao)
-{      
-    color = vec3(1.0f, 0.0f, 0.0f);
-})");
 }
 

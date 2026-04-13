@@ -28,7 +28,24 @@ struct EngineAPI ShaderCreateDescriptor : public ResourceBuildDescriptor
 {
 	ShaderOverride shaderOverride = ShaderOverride::None;
 
-	std::string code;
+	std::string code = std::string(R"(
+
+#vert
+
+void vert(inout vec3 aPos, inout vec3 aNorm)
+{
+}
+
+#frag
+
+void frag(inout vec3 color, 
+	inout vec3 normal, 
+	inout float metallic, 
+	inout float roughness, 
+	inout float ao)
+{      
+    color = vec3(1.0f, 0.0f, 0.0f);
+})");;
 };
 
 struct EngineAPI ShaderLoadDescriptor : public ResourceLoadDescriptor
