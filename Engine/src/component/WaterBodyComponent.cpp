@@ -22,3 +22,8 @@ AssetHandle<MaterialAsset> WaterBodyComponent::getMaterial()
 	AssetHandle<MaterialAsset> mat = meshRenderer.getMaterialBySlot(0); // A water body plane only has single material
 	return mat;
 }
+
+void WaterBodyComponent::resolve(ResourceWrapper<Scene>& scene)
+{
+	entity.setRegistry(&scene->getRegistry());
+}

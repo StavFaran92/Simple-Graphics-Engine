@@ -12,6 +12,7 @@ struct EngineAPI WaterBodyComponent : public Component
 	WaterBodyComponent(Entity entity);
 
 	AssetHandle<MaterialAsset> getMaterial();
+	void resolve(ResourceWrapper<Scene>& scene) override;
 
 	template <class Archive>
 	void serialize(Archive& archive) {

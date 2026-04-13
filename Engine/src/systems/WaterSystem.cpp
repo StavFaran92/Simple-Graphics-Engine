@@ -75,6 +75,12 @@ void WaterSystem::drawWaterBody(const WaterBodyComponent& waterBody)
 void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody)
 {
 	auto& materialResource = waterBody.getMaterial().resource();
+
+	if (materialResource.isEmpty())
+	{
+		logError("WaterBody Resource is empty.");
+		return;
+	}
 	materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal);
 
 	materialResource->setUniformValue("uWave1Speed", waterBody.wave1Speed);
