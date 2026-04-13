@@ -59,7 +59,8 @@ void DebugHelper::drawLine(const glm::vec3& p1, const glm::vec3& p2, const glm::
 	glDrawArrays(GL_LINES, 0, 2);
 
 	// Revert to previous shader
-	graphics->shader->use();
+	if(graphics->shader)
+		graphics->shader->use();
 }
 
 void DebugHelper::drawTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3)

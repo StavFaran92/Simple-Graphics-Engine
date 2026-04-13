@@ -46,8 +46,9 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	materialDesc.aType = AssetType::MATERIAL;
 	materialDesc.name = "cloudsMaterial";
 	materialDesc.isEngineOwned = true;
-	// TODO: MaterialCreateDescriptor with renderMode = Custom, customShader = shaderAsset
 	MaterialCreateDescriptor matDesc;
+	matDesc.data.setMaterialRenderMode(MaterialRenderMode::Custom);
+	matDesc.data.setCustomShader(shaderAsset);
 	auto materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(materialDesc, matDesc).as<MaterialAsset>();
 
 	cloudVolumeComponent.material = materialAsset;
