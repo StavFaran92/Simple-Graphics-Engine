@@ -4,6 +4,7 @@
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
 #include "memory/AssetHandle.h"
+#include "render/ShaderLoader.h"
 
 #include <filesystem>
 #include <fstream>
@@ -31,8 +32,10 @@ bool ShaderTypeManager::importAsset(const std::string& src, ImportNode& result)
 	std::filesystem::path path(src);
 	result.name = path.filename().stem().string();
 	result.assetDesc.aType = AssetType::SHADER;
-	auto shaderLoadDesc = result.emplaceLoadDesc<ShaderLoadDescriptor>();
-	shaderLoadDesc->sourcePath = src;
+	auto shaderCreateDesc = result.emplaceCreateDesc<ShaderCreateDescriptor>();
+
+	std::string code = Engine::get()->getShaderLoader()->readShader(src);
+	shaderCreateDesc->code = code;
 
 	return true;
 }
