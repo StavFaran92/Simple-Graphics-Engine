@@ -98,7 +98,7 @@ public:
 	void build();
 
 	std::vector<std::shared_ptr<Transformation>> transformations;
-	ResourceWrapper<Mesh> mesh;
+	std::shared_ptr<Mesh> mesh;
 	unsigned int m_id = 0;
 private:
 	

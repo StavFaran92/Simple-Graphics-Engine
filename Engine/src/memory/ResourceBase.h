@@ -8,6 +8,8 @@ class ResourceWrapper;
 class Resource
 {
 public:
+	using ResourceType = Resource;
+
 	Resource() = default;
 	virtual ~Resource() = default;
 

@@ -10,6 +10,8 @@ template<typename T>
 class ResourceWrapper
 {
 public:
+    using ResourceT = typename T::ResourceType;
+
     static ResourceWrapper<T> empty;
     static constexpr ResourceID emptyID = 0;
 
@@ -31,20 +33,20 @@ public:
     ~ResourceWrapper() = default;
 
     // Access
-    T* operator->()
+    ResourceT* operator->()
     {
         return get();
     }
 
-    const T* operator->() const
+    const ResourceT* operator->() const
     {
         return get();
     }
 
-    T* get() const
+    ResourceT* get() const
     {
         return m_resource
-            ? static_cast<T*>(m_resource.get())
+            ? static_cast<ResourceT*>(m_resource.get())
             : nullptr;
     }
 
@@ -64,7 +66,7 @@ public:
     }
 
     // Upcast (Derived -> Base)
-    template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
+    template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, ResourceT*>>>
     ResourceWrapper(const ResourceWrapper<U>& other)
         : m_resource(other.m_resource), m_id(other.m_id)
     {

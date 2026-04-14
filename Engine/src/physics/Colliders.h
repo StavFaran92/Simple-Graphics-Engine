@@ -86,7 +86,7 @@ struct CollisionMesh : public Collider
 	}
 
 	bool isConvex = false;
-	ResourceWrapper<Mesh> mesh = ResourceWrapper<Mesh>::empty;
+	std::shared_ptr<Mesh> mesh;
 };
 
 struct CollisionTerrain : Collider

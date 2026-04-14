@@ -25,7 +25,7 @@ struct EngineAPI ModelCreateDescriptor : public ResourceBuildDescriptor
 };
 
 // Resource
-class EngineAPI Model : public Resource
+class EngineAPI ModelResource : public Resource
 {
 public:
 	static ResourceWrapper<Model> load(const std::string& fileLocation, ModelLoadDescriptor desc = {});
@@ -56,8 +56,6 @@ private:
 class EngineAPI ModelAsset : public Asset
 {
 public:
-	using ResourceType = Model;
-
 	ModelAsset() = default;
 
 	void bindDependency(const std::string& slot, UUID dependency) override;
@@ -67,6 +65,12 @@ public:
 	// Inherited via Asset
 	void serialize(nlohmann::json& j) const override;
 	void deserialize(const nlohmann::json& j) override;
+};
+
+struct Model
+{
+	using AssetType = ModelAsset;
+	using ResourceType = ModelResource;
 };
 
 CEREAL_REGISTER_TYPE(ModelAsset);

@@ -35,7 +35,7 @@ struct MeshData
  * it can be used to manipulate an existing Mesh data or to generate one yourself.
  * It should be used with the MeshBuilder class.
  */
-class EngineAPI Mesh : public Resource
+class EngineAPI Mesh
 {
 public:
 	// -------------------- Methods -------------------- //
