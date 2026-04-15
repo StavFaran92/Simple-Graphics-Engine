@@ -53,7 +53,7 @@ class SubSystem;
 class DeferredRenderer;
 class Renderer;
 struct EngineConfig;
-template<typename T>class ResourceWrapper;
+template<typename T>class ResourceRef;
 template<typename T>class Factory;
 template<typename T>class MemoryPool;
 

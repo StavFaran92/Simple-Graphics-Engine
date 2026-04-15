@@ -31,7 +31,7 @@
 #include "geometry/Sphere.h"
 #include "core/Configurations.h"
 #include "geometry/ModelImporter.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "runtime/Entity.h"
 #include "geometry/ShapeFactory.h"
 #include "component/Component.h"

@@ -3,7 +3,7 @@
 #include "texture/Texture.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "render/Shader.h"
 
 #include "GL/glew.h"

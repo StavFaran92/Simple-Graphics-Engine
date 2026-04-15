@@ -3,7 +3,7 @@
 #include "render/Material.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "core/Engine.h"
 #include "core/Logger.h"
 #include "render/MaterialDataParser.h"
@@ -69,13 +69,13 @@ std::unique_ptr<ResourceBuildDescriptor> MaterialTypeManager::makeResourceBuildD
 	return std::make_unique<MaterialCreateDescriptor>();
 }
 
-ResourceWrapper<Resource> MaterialTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceRef<Resource> MaterialTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto materialDesc = dynamic_cast<const MaterialLoadDescriptor*>(&desc);
 	if (!materialDesc)
 	{
 		logError("Invalid Descriptor specified.");
-		return ResourceWrapper<Resource>::empty;
+		return ResourceRef<Resource>::empty;
 	}
 
 	return Material::load(desc.sourcePath, *materialDesc);

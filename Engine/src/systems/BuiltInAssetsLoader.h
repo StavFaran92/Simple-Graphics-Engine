@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 class BuiltInAssetsLoader
 {

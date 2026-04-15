@@ -4,7 +4,7 @@
 
 #include "core/Engine.h"
 #include "core/Core.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 #include <glm/glm.hpp>
 

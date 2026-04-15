@@ -11,7 +11,7 @@
 #include "render/ShaderLoader.h"
 #include "core/Engine.h"
 #include "texture/Texture.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "core/Factory.h"
 #include "memory/Assets.h"
 #include "memory/AssetLoader.h"

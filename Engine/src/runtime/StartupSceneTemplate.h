@@ -1,6 +1,6 @@
 #pragma once
 
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "runtime/Scene.h"
 #include "core/Core.h"
 

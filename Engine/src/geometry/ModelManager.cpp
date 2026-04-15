@@ -5,7 +5,7 @@
 #include "geometry/MeshBinaryLoader.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "core/Engine.h"
 #include "core/Factory.h"
 #include "geometry/MeshBuilder.h"
@@ -124,13 +124,13 @@ std::unique_ptr<ResourceBuildDescriptor> ModelTypeManager::makeResourceBuildDesc
 	return std::make_unique<ModelCreateDescriptor>();
 }
 
-ResourceWrapper<Resource> ModelTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceRef<Resource> ModelTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto modelDesc = dynamic_cast<const ModelLoadDescriptor*>(&desc);
 	if (!modelDesc)
 	{
 		logError("Invalid Descriptor specified.");
-		return ResourceWrapper<Resource>::empty;
+		return ResourceRef<Resource>::empty;
 	}
 
 	ModelData modelData;

@@ -8,7 +8,7 @@
 class Entity;
 class SGE_Regsitry;
 class Model;
-template<typename>class ResourceWrapper;
+template<typename>class ResourceRef;
 
 class EngineAPI ShapeFactory
 {

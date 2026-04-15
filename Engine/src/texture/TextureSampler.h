@@ -1,7 +1,7 @@
 #pragma once
 
 #include "texture/Texture.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "core/Core.h"
 
 class EngineAPI TextureSampler

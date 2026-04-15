@@ -13,7 +13,7 @@ class Sphere;
 class Object3D;
 class Context;
 template<typename> class ObjectHandler;
-template<typename> class ResourceWrapper;
+template<typename> class ResourceRef;
 
 class EngineAPI Application
 {

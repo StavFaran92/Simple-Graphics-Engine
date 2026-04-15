@@ -72,13 +72,13 @@ std::unique_ptr<ResourceBuildDescriptor> SceneAssetManager::makeResourceBuildDes
 	return std::make_unique<SceneCreateDescriptor>();
 }
 
-ResourceWrapper<Resource> SceneAssetManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceRef<Resource> SceneAssetManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto sceneDesc = dynamic_cast<const SceneLoadDescriptor*>(&desc);
 	if (!sceneDesc)
 	{
 		logError("Invalid Descriptor specified.");
-		return ResourceWrapper<Resource>::empty;
+		return ResourceRef<Resource>::empty;
 	}
 
 	return Scene::load(desc.sourcePath, *sceneDesc);

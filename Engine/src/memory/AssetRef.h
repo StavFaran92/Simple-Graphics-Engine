@@ -1,6 +1,6 @@
 #pragma once
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "memory/AssetRecord.h"
 
 class Asset;
@@ -8,9 +8,9 @@ class Asset;
 class EngineAPI AssetHandleImpl
 {
 public:
-	static ResourceWrapper<Resource> loadAssetResourceInternal(const AssetRecord& record, UUID uuid);
+	static ResourceRef<Resource> loadAssetResourceInternal(const AssetRecord& record, UUID uuid);
 	static const AssetRecord& getInfo(UUID uuid);
-	static ResourceWrapper<Resource> createOrGetCachedResource(const AssetRecord& record, UUID uuid);
+	static ResourceRef<Resource> createOrGetCachedResource(const AssetRecord& record, UUID uuid);
 	static void syncAsset(UUID uuid);
 	static void deleteAsset(UUID uuid);
 	static void makeAssetDirty(UUID uuid);
@@ -18,23 +18,23 @@ public:
 };
 
 template<typename T>
-class AssetHandle
+class AssetRef
 { 
 	static_assert(std::is_base_of_v<Asset, T>,
-		"AssetHandle<T>: T must derive from Asset");
+		"AssetRef<T>: T must derive from Asset");
 public:
 	using ResourceType = typename T::ResourceType;
 
-	static AssetHandle<T> empty;
+	static AssetRef<T> empty;
 
-	AssetHandle() = default;
+	AssetRef() = default;
 
-	AssetHandle(UUID uuid) : uuid(uuid)
+	AssetRef(UUID uuid) : uuid(uuid)
 	{
 		m_cachedAsset = info().asset;
 	};
 
-	AssetHandle& operator=(const AssetHandle& other)
+	AssetRef& operator=(const AssetRef& other)
 	{
 		if (uuid == other.uuid)
 			return *this;
@@ -49,24 +49,24 @@ public:
 	}
 
 	template<typename U/*, typename = std::enable_if_t<std::is_convertible_v<T*, U*>>*/>
-	AssetHandle<U> as() const
+	AssetRef<U> as() const
 	{
-		return AssetHandle<U>(uuid);
+		return AssetRef<U>(uuid);
 	}
 
 	// Upcast (texture -> asset)
 	template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
-	AssetHandle(const AssetHandle<U>& other)
+	AssetRef(const AssetRef<U>& other)
 	{
 		uuid = other.getUID();
 
 		m_cachedAsset = info().asset;
 	}
 
-	ResourceWrapper<ResourceType> resource() const
+	ResourceRef<ResourceType> resource() const
 	{
 		if (isEmpty())
-			return ResourceWrapper<ResourceType>::empty;
+			return ResourceRef<ResourceType>::empty;
 
 		const AssetRecord& record = info();
 
@@ -136,7 +136,7 @@ public:
 		SERIALIZED_MEMBER(uuid);
 	}
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetHandle, uuid);
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRef, uuid);
 
 
 	void registerOnChanged(std::function<void(UUID)> cb)
@@ -169,7 +169,7 @@ private:
 	mutable Ref<Asset> m_cachedAsset;
 
 	// Used mainly for debug
-	mutable ResourceWrapper<Resource> m_resource_DEBUG = ResourceWrapper<Resource>::empty;
+	mutable ResourceRef<Resource> m_resource_DEBUG = ResourceRef<Resource>::empty;
 	
 private:
 	template<typename T>friend class Factory;
@@ -177,5 +177,5 @@ private:
 };
 
 template<typename T>
-inline AssetHandle<T> AssetHandle<T>::empty;
+inline AssetRef<T> AssetRef<T>::empty;
 

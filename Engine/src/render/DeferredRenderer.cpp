@@ -1,6 +1,6 @@
 #include "render/DeferredRenderer.h"
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "gl/glew.h"
 #include "core/Engine.h"
 #include "core/Window.h"

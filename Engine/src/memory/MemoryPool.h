@@ -29,8 +29,8 @@ public:
     }
 
 private:
-    template<class T>friend class ResourceWrapper;
-    template<class T>friend class AssetHandle;
+    template<class T>friend class ResourceRef;
+    template<class T>friend class AssetRef;
 
     T* get(ResourceID id)
     {

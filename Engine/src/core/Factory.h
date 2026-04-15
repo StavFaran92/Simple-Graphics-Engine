@@ -6,14 +6,14 @@
 #include "memory/ResourceBase.h"
 #include "core/Engine.h"
 
-template<typename T> class ResourceWrapper;
+template<typename T> class ResourceRef;
 
 template<typename T>
 class Factory
 {
 public:
     template<typename... Args>
-    static ResourceWrapper<T> create(Args&&... args)
+    static ResourceRef<T> create(Args&&... args)
     {
         ResourceID id = Resource::getNewResourceID();
         return Engine::get()->getResourceManager()->create<T>(id, args...);

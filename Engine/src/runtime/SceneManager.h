@@ -3,7 +3,7 @@
 #include <map>
 #include <memory>
 #include "core/Core.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "memory/AssetAliases.h"
 #include "serialize/Archiver.h"
 

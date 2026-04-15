@@ -8,7 +8,7 @@
 #include "core/Window.h"
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "ui/Input.h"
 #include "render/IRenderer.h"
 #include "camera/ICamera.h"

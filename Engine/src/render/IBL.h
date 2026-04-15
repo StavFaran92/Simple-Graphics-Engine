@@ -1,7 +1,7 @@
 #pragma once
 
 class Scene;
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "texture/Texture.h"
 
 class IBL

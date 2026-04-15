@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "render/Shader.h"
 #include "texture/Texture.h"
 

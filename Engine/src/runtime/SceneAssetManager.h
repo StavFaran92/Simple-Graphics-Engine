@@ -20,7 +20,7 @@ public:
 
 	std::unique_ptr<ResourceBuildDescriptor> makeResourceBuildDescriptor() override;
 
-	ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) override;
+	ResourceRef<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) override;
 
 	void parse(ResourceLoadDescriptor& desc) override;
 

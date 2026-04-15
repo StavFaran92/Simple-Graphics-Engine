@@ -3,7 +3,7 @@
 #include "scripts/LuaScript.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "core/Engine.h"
 #include "core/Logger.h"
 
@@ -63,13 +63,13 @@ std::unique_ptr<ResourceBuildDescriptor> LuaScriptTypeManager::makeResourceBuild
 	return std::make_unique<LuaScriptCreateDescriptor>();
 }
 
-ResourceWrapper<Resource> LuaScriptTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceRef<Resource> LuaScriptTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto luaDesc = dynamic_cast<const LuaScriptLoadDescriptor*>(&desc);
 	if (!luaDesc)
 	{
 		logError("Invalid Descriptor specified.");
-		return ResourceWrapper<Resource>::empty;
+		return ResourceRef<Resource>::empty;
 	}
 
 	return LuaScript::load(desc.sourcePath, *luaDesc);

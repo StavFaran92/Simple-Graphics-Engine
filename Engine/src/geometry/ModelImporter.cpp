@@ -7,7 +7,7 @@
 #include "core/Logger.h"
 #include <filesystem>
 #include "geometry/MeshBuilder.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "render/Material.h"
 #include "component/Component.h"
 #include "render/Shader.h"

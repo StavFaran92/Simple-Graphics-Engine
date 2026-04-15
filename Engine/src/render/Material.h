@@ -5,7 +5,7 @@
 #include "core/Core.h"
 #include "memory/AssetAliases.h"
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "render/Shader.h"
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
@@ -86,7 +86,7 @@ public:
 
 	void bindDependency(const std::string& slot, UUID dependency) override;
 
-	void fillData(ResourceWrapper<Resource> resource) override;
+	void fillData(ResourceRef<Resource> resource) override;
 
 	void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) override;
 

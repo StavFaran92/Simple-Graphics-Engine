@@ -2,7 +2,7 @@
 
 #include "memory/AssetRecord.h"
 #include "memory/AssetDescriptors.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include <map>
 #include <memory>
 #include <string>
@@ -85,11 +85,11 @@ public:
     virtual std::unique_ptr<ResourceBuildDescriptor> makeResourceBuildDescriptor() = 0;
 
     // load the runtime resource
-    virtual ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) = 0;
+    virtual ResourceRef<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) = 0;
 
     // Extract build-time data from an in-memory resource
     // Default throws: only Texture implemented for now
-    virtual void extractResourceData(const ResourceWrapper<Resource>&, ResourceBuildDescriptor&)
+    virtual void extractResourceData(const ResourceRef<Resource>&, ResourceBuildDescriptor&)
     {
         throw std::runtime_error("extractResourceData not implemented");
     }

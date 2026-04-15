@@ -18,11 +18,11 @@ public:
 	std::unique_ptr<ResourceLoadDescriptor> makeResourceLoadDescriptor() override;
 	std::unique_ptr<ResourceBuildDescriptor> makeResourceBuildDescriptor() override;
 
-	ResourceWrapper<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) override;
+	ResourceRef<Resource> loadResourceFromDisk(ResourceLoadDescriptor& desc) override;
 
 	void parse(ResourceLoadDescriptor& desc) override;
 
 	void parse(ResourceBuildDescriptor& desc) override;
 
-	void extractResourceData(const ResourceWrapper<Resource>& resource, ResourceBuildDescriptor& outDesc) override;
+	void extractResourceData(const ResourceRef<Resource>& resource, ResourceBuildDescriptor& outDesc) override;
 };

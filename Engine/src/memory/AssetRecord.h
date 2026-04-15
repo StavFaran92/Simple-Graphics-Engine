@@ -10,7 +10,7 @@
 class Asset;
 
 template<typename T>
-class AssetHandle;
+class AssetRef;
 
 struct EngineAPI AssetRecord
 {

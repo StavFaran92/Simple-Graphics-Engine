@@ -8,7 +8,7 @@
 #include "render/RenderBufferObject.h"
 
 #include "texture/Texture.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 class VolumeComponent;
 class Scene;

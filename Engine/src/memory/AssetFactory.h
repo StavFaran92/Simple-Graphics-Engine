@@ -6,7 +6,7 @@
 class AssetFactory
 {
 public:
-	using LoadFn = std::function<AssetHandle<Asset>(AssetRecord&)>;
+	using LoadFn = std::function<AssetRef<Asset>(AssetRecord&)>;
 
 	// Register a resource type manager for a specific asset type.
 	static void registerManager(AssetType aType, std::shared_ptr<ResourceTypeManager> manager);

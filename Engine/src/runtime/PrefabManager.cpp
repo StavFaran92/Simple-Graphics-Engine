@@ -3,7 +3,7 @@
 #include "runtime/Prefab.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "core/Engine.h"
 
 #include <fstream>
@@ -61,13 +61,13 @@ std::unique_ptr<ResourceBuildDescriptor> PrefabTypeManager::makeResourceBuildDes
 	return std::make_unique<PrefabCreateDescriptor>();
 }
 
-ResourceWrapper<Resource> PrefabTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceRef<Resource> PrefabTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto prefabDesc = dynamic_cast<const PrefabLoadDescriptor*>(&desc);
 	if (!prefabDesc)
 	{
 		logError("Invalid Descriptor specified.");
-		return ResourceWrapper<Resource>::empty;
+		return ResourceRef<Resource>::empty;
 	}
 
 	return Prefab::load(desc.sourcePath, *prefabDesc);

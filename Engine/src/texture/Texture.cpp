@@ -6,7 +6,7 @@
 #include "core/Logger.h"
 #include "core/Configurations.h"
 #include "core/Engine.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "core/Factory.h"
 
 #include "utils/EXRLoader.h"

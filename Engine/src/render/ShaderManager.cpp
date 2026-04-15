@@ -3,7 +3,7 @@
 #include "render/Shader.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "render/ShaderLoader.h"
 #include "core/Engine.h"
 #include "core/Logger.h"
@@ -81,7 +81,7 @@ std::unique_ptr<ResourceBuildDescriptor> ShaderTypeManager::makeResourceBuildDes
 	return std::make_unique<ShaderCreateDescriptor>();
 }
 
-ResourceWrapper<Resource> ShaderTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceRef<Resource> ShaderTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto shaderDesc = dynamic_cast<const ShaderLoadDescriptor*>(&desc);
 	if (!shaderDesc)

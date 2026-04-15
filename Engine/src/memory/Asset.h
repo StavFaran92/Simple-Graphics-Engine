@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 
 class EngineAPI Asset
 {
@@ -17,7 +17,7 @@ public:
 
 	virtual void fillLoadDescriptor(ResourceLoadDescriptor& resourceLoadDesc) {};
 	virtual void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) {};
-	virtual void fillData(ResourceWrapper<Resource> resource) {};
+	virtual void fillData(ResourceRef<Resource> resource) {};
 
 	virtual void serialize(nlohmann::json& j) const = 0;
 	virtual void deserialize(const nlohmann::json& j) = 0;

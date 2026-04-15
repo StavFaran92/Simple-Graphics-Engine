@@ -2,7 +2,7 @@
 
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "render/Shader.h"
 
 class PostProcessComponent : public Component

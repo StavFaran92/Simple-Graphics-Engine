@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "memory/Assets.h"
 #include "core/Engine.h"
 
@@ -31,7 +31,7 @@ class BuiltInAssets
 {
 public:
 	template<typename T>
-	static AssetHandle<T> get(const UUID& uuid)
+	static AssetRef<T> get(const UUID& uuid)
 	{
 		if (!Engine::get()->getSubSystem<Assets>()->hasAsset(uuid))
 		{
@@ -42,13 +42,13 @@ public:
 	}
 
 	template<typename T>
-	static AssetHandle<T> getByName(const std::string& name)
+	static AssetRef<T> getByName(const std::string& name)
 	{
 		return Engine::get()->getSubSystem<Assets>()->getAssetFromName(name).as<T>();
 	}
 
 	template<typename T>
-	static AssetHandle<T> getByPath(const std::string& path)
+	static AssetRef<T> getByPath(const std::string& path)
 	{
 		return Engine::get()->getSubSystem<Assets>()->getAssetFromPath(path).as<T>();
 	}

@@ -1357,7 +1357,7 @@ std::shared_ptr<RenderView> Scene::getRenderView(const std::string& name) const
 
 void Scene::preloadSceneResources()
 {
-	std::vector<ResourceWrapper<Resource>> newCachedResources;
+	std::vector<ResourceRef<Resource>> newCachedResources;
 
 	// Hack, I need THIS scene but cannot access it ATM
 	SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
@@ -1365,7 +1365,7 @@ void Scene::preloadSceneResources()
 	{
 		for (auto& c : e.components)
 		{
-			std::vector<AssetHandle<Asset>> assets = c->gatherDependencies();
+			std::vector<AssetRef<Asset>> assets = c->gatherDependencies();
 			for (auto asset : assets)
 			{
 				newCachedResources.push_back(asset.resource());

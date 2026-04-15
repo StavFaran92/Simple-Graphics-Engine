@@ -3,7 +3,7 @@
 #include "texture/Texture.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "core/Engine.h"
 #include "core/Logger.h"
 #include "utils/EXRLoader.h"
@@ -67,13 +67,13 @@ std::unique_ptr<ResourceBuildDescriptor> TextureTypeManager::makeResourceBuildDe
 	return std::make_unique<TextureCreateDescriptor>();
 }
 
-ResourceWrapper<Resource> TextureTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceRef<Resource> TextureTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	auto textureDesc = dynamic_cast<const TextureLoadDescriptor*>(&desc);
 	if (!textureDesc)
 	{
 		logError("Invalid Descriptor specified.");
-		return ResourceWrapper<Resource>::empty;
+		return ResourceRef<Resource>::empty;
 	}
 
 	TextureData textureData;
@@ -89,7 +89,7 @@ void TextureTypeManager::parse(ResourceBuildDescriptor& desc)
 {
 }
 
-void TextureTypeManager::extractResourceData(const ResourceWrapper<Resource>& resource, ResourceBuildDescriptor& outDesc)
+void TextureTypeManager::extractResourceData(const ResourceRef<Resource>& resource, ResourceBuildDescriptor& outDesc)
 {
 	auto texture = resource.as<Texture>();
 	if (!texture)

@@ -34,7 +34,7 @@ void ResourceManager::setRootDir(const std::string& rootDir)
 //	return resource;
 //}
 
-ResourceWrapper<Resource> ResourceManager::getResource(ResourceID rid) const
+ResourceRef<Resource> ResourceManager::getResource(ResourceID rid) const
 {
     {
         std::scoped_lock lock(cacheMutex);
@@ -48,11 +48,11 @@ ResourceWrapper<Resource> ResourceManager::getResource(ResourceID rid) const
             }
         }
 
-        return ResourceWrapper<Resource>::empty;
+        return ResourceRef<Resource>::empty;
     }
 }
 
-ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, const std::function<ResourceWrapper<Resource>(void)>& creationCallback)
+ResourceRef<Resource> ResourceManager::createOrGetCached(ResourceID id, const std::function<ResourceRef<Resource>(void)>& creationCallback)
 {
     {
         std::scoped_lock lock(cacheMutex);
@@ -68,11 +68,11 @@ ResourceWrapper<Resource> ResourceManager::createOrGetCached(ResourceID id, cons
     }
 
     // Create outside the lock (important)
-    ResourceWrapper<Resource> created = creationCallback();
+    ResourceRef<Resource> created = creationCallback();
 
     if (created.isEmpty())
     {
-        return ResourceWrapper<Resource>::empty;
+        return ResourceRef<Resource>::empty;
     }
 
     {

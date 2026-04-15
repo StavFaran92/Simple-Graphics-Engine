@@ -16,7 +16,7 @@
 #include "memory/AssetDescriptors.h"
 #include "memory/Asset.h"
 #include "memory/AssetAliases.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 
 class Model;
@@ -238,7 +238,7 @@ private:
 
 	ShaderResourceRef m_sampleComputeShader;
 
-	std::vector<ResourceWrapper<Resource>> m_cachedResources;;
+	std::vector<ResourceRef<Resource>> m_cachedResources;;
 
 	bool m_isDirty = false;
 

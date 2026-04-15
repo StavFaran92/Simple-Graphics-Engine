@@ -1,7 +1,7 @@
 #pragma once
 
-#include "memory/ResourceWrapper.h"
-#include "memory/AssetHandle.h"
+#include "memory/ResourceRef.h"
+#include "memory/AssetRef.h"
 
 class Texture;
 class TextureAsset;
@@ -20,26 +20,26 @@ class PrefabAsset;
 class Scene;
 class SceneAsset;
 
-using TextureAssetRef = AssetHandle<TextureAsset>;
-using TextureResourceRef = ResourceWrapper<Texture>;
+using TextureAssetRef = AssetRef<TextureAsset>;
+using TextureResourceRef = ResourceRef<Texture>;
 
-using ShaderAssetRef = AssetHandle<ShaderAsset>;
-using ShaderResourceRef = ResourceWrapper<Shader>;
+using ShaderAssetRef = AssetRef<ShaderAsset>;
+using ShaderResourceRef = ResourceRef<Shader>;
 
-using MaterialAssetRef = AssetHandle<MaterialAsset>;
-using MaterialResourceRef = ResourceWrapper<Material>;
+using MaterialAssetRef = AssetRef<MaterialAsset>;
+using MaterialResourceRef = ResourceRef<Material>;
 
-using ModelAssetRef = AssetHandle<ModelAsset>;
-using ModelResourceRef = ResourceWrapper<Model>;
+using ModelAssetRef = AssetRef<ModelAsset>;
+using ModelResourceRef = ResourceRef<Model>;
 
-using AnimationAssetRef = AssetHandle<AnimationAsset>;
-using AnimationResourceRef = ResourceWrapper<Animation>;
+using AnimationAssetRef = AssetRef<AnimationAsset>;
+using AnimationResourceRef = ResourceRef<Animation>;
 
-using LuaScriptAssetRef = AssetHandle<LuaScriptAsset>;
-using LuaScriptResourceRef = ResourceWrapper<LuaScript>;
+using LuaScriptAssetRef = AssetRef<LuaScriptAsset>;
+using LuaScriptResourceRef = ResourceRef<LuaScript>;
 
-using PrefabAssetRef = AssetHandle<PrefabAsset>;
-using PrefabResourceRef = ResourceWrapper<Prefab>;
+using PrefabAssetRef = AssetRef<PrefabAsset>;
+using PrefabResourceRef = ResourceRef<Prefab>;
 
-using SceneAssetRef = AssetHandle<SceneAsset>;
-using SceneResourceRef = ResourceWrapper<Scene>;
+using SceneAssetRef = AssetRef<SceneAsset>;
+using SceneResourceRef = ResourceRef<Scene>;

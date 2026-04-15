@@ -4,7 +4,7 @@
 #include "core/Core.h"
 #include "memory/AssetAliases.h"
 #include "geometry/Mesh.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "memory/Asset.h"
 #include "render/Material.h"
 #include "geometry/ModelImporter.h"

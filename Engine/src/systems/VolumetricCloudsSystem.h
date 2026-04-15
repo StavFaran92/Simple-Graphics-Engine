@@ -4,7 +4,7 @@
 #include "runtime/Entity.h"
 #include "systems/SubSystem.h"
 #include "texture/Texture.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 struct VolumetricCloudsComponent;
 

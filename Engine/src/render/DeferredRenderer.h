@@ -4,7 +4,7 @@
 
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "runtime/Entity.h"
 #include "core/Window.h"
 #include "core/Configurations.h"

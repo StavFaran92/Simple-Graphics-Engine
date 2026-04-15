@@ -8,7 +8,7 @@
 #include "core/Logger.h"
 #include "core/Engine.h"
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 const std::string SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM = "SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM";
 const std::string SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT = "SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT";
@@ -31,20 +31,20 @@ public:
 	BuiltInResources();
 
 	template<typename T>
-	ResourceWrapper<T> getInner(const std::string& name)
+	ResourceRef<T> getInner(const std::string& name)
 	{
 		auto it = m_resources.find(name);
 		if (it == m_resources.end())
 		{
 			logError("Could not find resource {}" , name);
-			return ResourceWrapper<T>::empty;
+			return ResourceRef<T>::empty;
 		}
 
 		return it->second.as<T>();
 	}
 
 	template<typename T>
-	static ResourceWrapper<T> get(const std::string& name)
+	static ResourceRef<T> get(const std::string& name)
 	{
 		return Engine::get()->getSubSystem<BuiltInResources>()->getInner<T>(name);
 	}
@@ -52,5 +52,5 @@ public:
 	void loadAllResources();
 
 private:
-	std::unordered_map<std::string, ResourceWrapper<Resource>> m_resources;
+	std::unordered_map<std::string, ResourceRef<Resource>> m_resources;
 };

@@ -48,19 +48,19 @@ void Assets::updateAssetInner(AssetRecord& aInfo)
 	logInfo("Successfully Updated asset: '" + aInfo.name + "'.");
 }
 
-std::vector<AssetHandle<Asset>> Assets::getAllAssetsOfType(AssetType aType) const
+std::vector<AssetRef<Asset>> Assets::getAllAssetsOfType(AssetType aType) const
 {
 	if (aType == AssetType::NONE)
 	{
 		logError("Invalid asset type specified!");
 		return {};
 	}
-	std::vector<AssetHandle<Asset>> result;
+	std::vector<AssetRef<Asset>> result;
 	for (const auto& [uuid, info] :m_assets)
 	{
 		if (info.aType == aType)
 		{
-			AssetHandle<Asset> asset = getAsset(uuid);
+			AssetRef<Asset> asset = getAsset(uuid);
 			result.push_back(asset);
 		}
 	}
@@ -74,7 +74,7 @@ std::vector<const AssetRecord*> Assets::getAllRecordsOfType(AssetType aType) con
 	const auto& handles = getAllAssetsOfType(aType);
 	records.reserve(handles.size());
 
-	for (const AssetHandle<Asset>& handle : handles)
+	for (const AssetRef<Asset>& handle : handles)
 	{
 		records.push_back(&getInfo(handle.getUID()));
 	}
@@ -82,12 +82,12 @@ std::vector<const AssetRecord*> Assets::getAllRecordsOfType(AssetType aType) con
 	return records;
 }
 
-std::vector<AssetHandle<Asset>> Assets::getAllAssets() const
+std::vector<AssetRef<Asset>> Assets::getAllAssets() const
 {
-	std::vector<AssetHandle<Asset>> result;
+	std::vector<AssetRef<Asset>> result;
 	for (const auto& [uuid, info] : m_assets)
 	{
-		AssetHandle<Asset> asset = getAsset(uuid);
+		AssetRef<Asset> asset = getAsset(uuid);
 		result.push_back(asset);
 	}
 	return result;
@@ -146,7 +146,7 @@ void Assets::saveDirtyAssets()
 			// metadata and asset data in the asset file and remove the projectassetregistry json entirely.
 
 			// Save asset file
-			AssetHandle<Asset> asset = getAsset(uuid);
+			AssetRef<Asset> asset = getAsset(uuid);
 			std::unique_ptr<ResourceBuildDescriptor> buildDesc = AssetFactory::getManager(assetInfo.aType)->makeResourceBuildDescriptor();
 			asset->fillBuildDescriptor(*buildDesc);
 
@@ -174,12 +174,12 @@ void Assets::saveDirtyAssets()
 	}
 }
 
-AssetHandle<Asset> Assets::getAsset(UUID uuid) const
+AssetRef<Asset> Assets::getAsset(UUID uuid) const
 {
 	auto iter = m_assets.find(uuid);
 	if (iter != m_assets.end())
 	{
-		return AssetHandle<Asset>(uuid);
+		return AssetRef<Asset>(uuid);
 	}
 	logWarning("Could not locate asset: {}", uuid);
 	return {};
@@ -228,12 +228,12 @@ std::string Assets::getAlias(UUID uid) const
 
 }
 
-AssetHandle<Asset> Assets::getAssetFromPath(const std::string& path) const
+AssetRef<Asset> Assets::getAssetFromPath(const std::string& path) const
 {
 	return Engine::get()->getMemoryManagementSystem()->getUUIDFromPath(path);
 }
 
-AssetHandle<Asset> Assets::getAssetFromName(const std::string& name) const
+AssetRef<Asset> Assets::getAssetFromName(const std::string& name) const
 {
 	return Engine::get()->getMemoryManagementSystem()->getUUIDFromName(name);
 }
@@ -291,7 +291,7 @@ ScopedPath calculateAssetDestinationPath(
 	return p;
 }
 
-AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
+AssetRef<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuildDescriptor& resourceDesc)
 {
 	AssetType type = desc.aType;
 
@@ -300,7 +300,7 @@ AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuild
 	if (!manager)
 	{
 		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(type));
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	if (desc.name.empty())
@@ -328,14 +328,14 @@ AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuild
 	if(!manager->saveResource(resourceDesc, dest))
 	{
 		logError("Failed to save asset type {} to: {}", static_cast<int>(type), dest.absolute().string());
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	Ref<Asset> asset = manager->createAsset(desc, resourceDesc);
 	if (!asset)
 	{
 		logError("Failed to create asset of type {}", static_cast<int>(type));
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	AssetRecord record(desc);
@@ -344,10 +344,10 @@ AssetHandle<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuild
 	record.ext = getExtensionFromType(type);
 	addAsset(record);
 
-	return AssetHandle<Asset>(record.uuid);
+	return AssetRef<Asset>(record.uuid);
 }
 
-AssetHandle<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadDescriptor& resourceDesc)
+AssetRef<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadDescriptor& resourceDesc)
 {
 	AssetType type = desc.aType;
 
@@ -355,7 +355,7 @@ AssetHandle<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadD
 	if (!manager)
 	{
 		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(type));
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	// Parse the resource descriptor
@@ -367,7 +367,7 @@ AssetHandle<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadD
 	if (!manager->importAsset(resourceDesc, importNode))
 	{
 		logError("Failed to import asset type {}", static_cast<int>(type));
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	// If asset is composed of multiple assets place them all in a dedicated directory
@@ -376,7 +376,7 @@ AssetHandle<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadD
 		desc.assetDirectory = desc.name;
 	}
 
-	AssetHandle<Asset> handle = createAssetAndChildrenFromNodeRecursive(importNode, desc);
+	AssetRef<Asset> handle = createAssetAndChildrenFromNodeRecursive(importNode, desc);
 
 	if (handle.isEmpty())
 	{
@@ -422,7 +422,7 @@ void Assets::updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDe
 	updateAssetInner(newRecord);
 }
 
-AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc)
+AssetRef<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc)
 {
 	ResourceTypeManager* manager =
 		AssetFactory::getManager(node.assetDesc.aType);
@@ -431,10 +431,10 @@ AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, co
 	{
 		logError("No ResourceTypeManager registered for asset type {}",
 			static_cast<int>(node.assetDesc.aType));
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
-	AssetHandle<Asset> created;
+	AssetRef<Asset> created;
 
 	AssetBuildDescriptor nodeDesc = node.assetDesc;
 	nodeDesc.assetDirectory = rootDesc.assetDirectory;
@@ -446,7 +446,7 @@ AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, co
 		if (!node.createDesc)
 		{
 			logError("ImportNode '{}' is missing createDesc", node.name);
-			return AssetHandle<Asset>::empty;
+			return AssetRef<Asset>::empty;
 		}
 		created = createAsset(nodeDesc, *node.createDesc);
 	}
@@ -455,7 +455,7 @@ AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, co
 		if (!node.loadDesc)
 		{
 			logError("ImportNode '{}' is missing loadDesc", node.name);
-			return AssetHandle<Asset>::empty;
+			return AssetRef<Asset>::empty;
 		}
 		created = importAsset(nodeDesc, *node.loadDesc);
 	}
@@ -463,27 +463,27 @@ AssetHandle<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, co
 	if (created.isEmpty())
 	{
 		logWarning("Failed to create asset '{}' from import node", node.name);
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	return created;
 }
 
-AssetHandle<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc)
+AssetRef<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc)
 {
 	// 1) Create this node
-	AssetHandle<Asset> created = createAssetsFromImportNode(node, rootDesc);
+	AssetRef<Asset> created = createAssetsFromImportNode(node, rootDesc);
 
 	if (created.isEmpty())
 	{
 		logWarning("Failed to create asset '{}' from import node", node.name);
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	// 2) Recursively create and bind dependencies
 	for (const auto& [slotName, childNode] : node.dependencies)
 	{
-		AssetHandle<Asset> child = createAssetAndChildrenFromNodeRecursive(childNode, rootDesc);
+		AssetRef<Asset> child = createAssetAndChildrenFromNodeRecursive(childNode, rootDesc);
 
 		if (child.isEmpty())
 		{
@@ -509,7 +509,7 @@ void Assets::bindResourceToAsset(UUID uuid, ResourceID resID)
 	updateAssetInner(newAssetInfo);
 }
 
-AssetHandle<Asset> Assets::bakeAssetFromResource(const ResourceWrapper<Resource>& resource, const std::string& name, const ScopedPath& targetDirectory)
+AssetRef<Asset> Assets::bakeAssetFromResource(const ResourceRef<Resource>& resource, const std::string& name, const ScopedPath& targetDirectory)
 {
 	AssetType type = resource->getType();
 	
@@ -518,14 +518,14 @@ AssetHandle<Asset> Assets::bakeAssetFromResource(const ResourceWrapper<Resource>
 	if (!manager)
 	{
 		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(type));
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	auto buildDesc = manager->makeResourceBuildDescriptor();
 	if (!buildDesc)
 	{
 		logError("Invalid resource build descriptor");
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	manager->extractResourceData(resource, *buildDesc);
@@ -535,12 +535,12 @@ AssetHandle<Asset> Assets::bakeAssetFromResource(const ResourceWrapper<Resource>
 	desc.name = name;
 	desc.isEngineOwned = targetDirectory.type() == ScopedPath::Type::Engine;
 	desc.targetDirectory = targetDirectory;
-	AssetHandle<Asset> asset = Engine::get()->getSubSystem<Assets>()->createAsset(desc, *buildDesc);
+	AssetRef<Asset> asset = Engine::get()->getSubSystem<Assets>()->createAsset(desc, *buildDesc);
 
 	if (asset.isEmpty())
 	{
 		logError("Failed to create asset from resource.");
-		return AssetHandle<Asset>::empty;
+		return AssetRef<Asset>::empty;
 	}
 
 	return asset;

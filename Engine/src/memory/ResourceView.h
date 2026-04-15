@@ -1,6 +1,6 @@
 #pragma once
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 #include <memory>
 
@@ -16,8 +16,8 @@ public:
         return !m_weak.expired();
     }
 
-    ResourceWrapper<T> lock() const {
-        if(!isValid()) return ResourceWrapper<T>::empty;
+    ResourceRef<T> lock() const {
+        if(!isValid()) return ResourceRef<T>::empty;
 
         std::shared_ptr<T> sptr = m_weak.lock();
         

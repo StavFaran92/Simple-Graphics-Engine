@@ -3,7 +3,7 @@
 #include "animation/Animation.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/AssetRecord.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 
 #include "animation/AnimationLoader.h"
 
@@ -76,7 +76,7 @@ std::unique_ptr<ResourceBuildDescriptor> AnimationTypeManager::makeResourceBuild
 	return std::make_unique<AnimationCreateDescriptor>();
 }
 
-ResourceWrapper<Resource> AnimationTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
+ResourceRef<Resource> AnimationTypeManager::loadResourceFromDisk(ResourceLoadDescriptor& desc)
 {
 	AnimationData animationData;
 	AnimationBinaryLoader::load(desc.sourcePath, animationData);

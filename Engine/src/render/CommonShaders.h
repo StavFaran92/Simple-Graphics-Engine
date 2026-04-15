@@ -3,7 +3,7 @@
 #include <memory>
 #include <map>
 #include "render/Shader.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 class CommonShaders
 {

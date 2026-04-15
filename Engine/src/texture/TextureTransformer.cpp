@@ -1,6 +1,6 @@
 #include "texture/TextureTransformer.h"
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "texture/Texture.h"
 #include "render/Shader.h"
 #include "render/FrameBufferObject.h"

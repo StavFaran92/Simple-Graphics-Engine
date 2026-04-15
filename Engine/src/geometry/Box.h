@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/Core.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 #include "geometry/Model.h"
 

@@ -3,7 +3,7 @@
 #include "render/VertexLayout.h"
 #include "render/VertexArrayObject.h"
 #include "render/Shader.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 class WireframeGrid
 {

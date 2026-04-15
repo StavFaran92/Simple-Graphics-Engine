@@ -37,13 +37,13 @@ public:
 
 	void registerDependencyListener(const std::function<void(UUID)>& onChangedCB) const;
 
-	std::vector<AssetHandle<Asset>> gatherDependencies() const;
+	std::vector<AssetRef<Asset>> gatherDependencies() const;
 
 	virtual void resolve(SceneResourceRef& scene) {};
 	virtual void postLoad(SceneResourceRef& scene) {};
 
 protected:
-	virtual std::vector<AssetHandle<Asset>*> gatherDependenciesInternal() const;
+	virtual std::vector<AssetRef<Asset>*> gatherDependenciesInternal() const;
 };
 
 template<typename T>
@@ -81,7 +81,7 @@ struct EngineAPI InstanceBatch : public Component
 public:
 	InstanceBatch();
 
-	InstanceBatch(const std::vector< std::shared_ptr<Transformation>>& transformations, ResourceWrapper<Mesh> mesh);
+	InstanceBatch(const std::vector< std::shared_ptr<Transformation>>& transformations, ResourceRef<Mesh> mesh);
 	
 
 	void addTransformation(const std::shared_ptr<Transformation>& transformation);
@@ -97,7 +97,7 @@ public:
 	void build();
 
 	std::vector<std::shared_ptr<Transformation>> transformations;
-	ResourceWrapper<Mesh> mesh;
+	ResourceRef<Mesh> mesh;
 	unsigned int m_id = 0;
 private:
 	

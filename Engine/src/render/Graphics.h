@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "runtime/Entity.h"
 #include "systems/SubSystem.h"
 #include "memory/AssetAliases.h"

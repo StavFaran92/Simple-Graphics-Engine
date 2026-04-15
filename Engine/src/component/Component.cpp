@@ -10,7 +10,7 @@ InstanceBatch::InstanceBatch()
 	glGenBuffers(1, &m_id);
 }
 
-InstanceBatch::InstanceBatch(const std::vector<std::shared_ptr<Transformation>>& transformations, ResourceWrapper<Mesh> mesh)
+InstanceBatch::InstanceBatch(const std::vector<std::shared_ptr<Transformation>>& transformations, ResourceRef<Mesh> mesh)
 	: mesh(mesh), transformations(transformations)
 {
 	glGenBuffers(1, &m_id);
@@ -87,9 +87,9 @@ void Component::registerDependencyListener(const std::function<void(UUID)>& onCh
 	}
 }
 
-std::vector<AssetHandle<Asset>> Component::gatherDependencies() const
+std::vector<AssetRef<Asset>> Component::gatherDependencies() const
 {
-	std::vector<AssetHandle<Asset>> result;
+	std::vector<AssetRef<Asset>> result;
 	auto assetDependencies = gatherDependenciesInternal();
 	for (auto asset : assetDependencies)
 	{
@@ -98,7 +98,7 @@ std::vector<AssetHandle<Asset>> Component::gatherDependencies() const
 	return result;
 }
 
-std::vector<AssetHandle<Asset>*> Component::gatherDependenciesInternal() const
+std::vector<AssetRef<Asset>*> Component::gatherDependenciesInternal() const
 {
 	return {};
 }

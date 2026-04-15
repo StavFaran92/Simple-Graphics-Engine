@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "core/Configurations.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "core/Logger.h"
 
 class EngineAPI ResourceManager
@@ -20,19 +20,19 @@ public:
 
     int decRef(ResourceID uuid);
 
-    ResourceWrapper<Resource> getResource(ResourceID) const;
+    ResourceRef<Resource> getResource(ResourceID) const;
 
     //ResourceWrapper<Resource> loadResource(const std::string& fileLocation, ResourceLoadDescriptor& desc);
 
-    ResourceWrapper<Resource> createOrGetCached(ResourceID id, const std::function<ResourceWrapper<Resource>(void)>& creationCallback);
+    ResourceRef<Resource> createOrGetCached(ResourceID id, const std::function<ResourceRef<Resource>(void)>& creationCallback);
 
     template<typename T, typename... Args>
-    ResourceWrapper<T> create(ResourceID id, Args&&... args)
+    ResourceRef<T> create(ResourceID id, Args&&... args)
     {
         static_assert(std::is_base_of_v<Resource, T>);
 
         auto obj = std::make_shared<T>(std::forward<Args>(args)...);
-        auto& resource = ResourceWrapper<T>(obj, id);
+        auto& resource = ResourceRef<T>(obj, id);
 
         logDebug("Create new resource: {}", id);
 
@@ -50,5 +50,5 @@ public:
 private:
 	std::string m_rootResourceDir;
 
-    std::unordered_map<ResourceID, ResourceWrapper<Resource>> m_resourceCache; // todo - should be weak ref
+    std::unordered_map<ResourceID, ResourceRef<Resource>> m_resourceCache; // todo - should be weak ref
 };

@@ -3,7 +3,7 @@
 #include "core/Configurations.h"
 
 template<typename T>
-class ResourceWrapper;
+class ResourceRef;
 
 class Resource
 {

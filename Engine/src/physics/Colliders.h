@@ -7,7 +7,7 @@
 #include <cereal/cereal.hpp>
 #include "serialize/CerealHelpers.h"
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 class Mesh;
 
@@ -86,7 +86,7 @@ struct CollisionMesh : public Collider
 	}
 
 	bool isConvex = false;
-	ResourceWrapper<Mesh> mesh = ResourceWrapper<Mesh>::empty;
+	ResourceRef<Mesh> mesh = ResourceRef<Mesh>::empty;
 };
 
 struct CollisionTerrain : Collider

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "component/Component.h"
 #include "core/Core.h"
 #include "component/ComponentSerializer.h"

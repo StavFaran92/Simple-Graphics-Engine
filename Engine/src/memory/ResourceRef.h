@@ -7,28 +7,28 @@
 #include "memory/ResourceBase.h"
 
 template<typename T>
-class ResourceWrapper
+class ResourceRef
 {
 public:
-    static ResourceWrapper<T> empty;
+    static ResourceRef<T> empty;
     static constexpr ResourceID emptyID = 0;
 
-    ResourceWrapper() = default;
-    ResourceWrapper(std::nullptr_t) {}
+    ResourceRef() = default;
+    ResourceRef(std::nullptr_t) {}
 
     // Copy ctor
-    ResourceWrapper(const ResourceWrapper&) = default;
+    ResourceRef(const ResourceRef&) = default;
 
     // Copy assign
-    ResourceWrapper& operator=(const ResourceWrapper&) = default;
+    ResourceRef& operator=(const ResourceRef&) = default;
 
     // Move ctor
-    ResourceWrapper(ResourceWrapper&&) noexcept = default;
+    ResourceRef(ResourceRef&&) noexcept = default;
 
     // Move assign
-    ResourceWrapper& operator=(ResourceWrapper&&) noexcept = default;
+    ResourceRef& operator=(ResourceRef&&) noexcept = default;
 
-    ~ResourceWrapper() = default;
+    ~ResourceRef() = default;
 
     // Access
     T* operator->()
@@ -65,26 +65,26 @@ public:
 
     // Upcast (Derived -> Base)
     template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
-    ResourceWrapper(const ResourceWrapper<U>& other)
+    ResourceRef(const ResourceRef<U>& other)
         : m_resource(other.m_resource), m_id(other.m_id)
     {
     }
 
     // Downcast (Base -> Derived)
     template<typename U>
-    ResourceWrapper<U> as() const
+    ResourceRef<U> as() const
     {
-        return ResourceWrapper<U>(m_resource, m_id);
+        return ResourceRef<U>(m_resource, m_id);
     }
 
 private:
     // Construct from shared_ptr
-    explicit ResourceWrapper(std::shared_ptr<Resource> resource, ResourceID id)
+    explicit ResourceRef(std::shared_ptr<Resource> resource, ResourceID id)
         : m_resource(std::move(resource)), m_id(id)
     {
     }
 
-    template<typename U> friend class ResourceWrapper;
+    template<typename U> friend class ResourceRef;
     friend class ResourceManager;
 
     std::shared_ptr<Resource> m_resource;
@@ -92,4 +92,4 @@ private:
 };
 
 template<typename T>
-ResourceWrapper<T> ResourceWrapper<T>::empty{};
+ResourceRef<T> ResourceRef<T>::empty{};

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

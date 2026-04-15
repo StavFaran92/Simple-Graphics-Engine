@@ -1,6 +1,6 @@
 #pragma once
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "geometry/Model.h"
 #include "component/FoliageField.h"
 #include "systems/SubSystem.h"

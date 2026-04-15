@@ -1,6 +1,6 @@
 #pragma once
 #include "render/Shader.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "texture/Texture.h"
 #include "core/Core.h"
 

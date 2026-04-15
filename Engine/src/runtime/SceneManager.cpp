@@ -1,7 +1,7 @@
 #include "runtime/SceneManager.h"
 
 #include "runtime/Scene.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "serialize/Archiver.h"
 #include "core/Logger.h"
 #include "serialize/CerealHelpers.h"

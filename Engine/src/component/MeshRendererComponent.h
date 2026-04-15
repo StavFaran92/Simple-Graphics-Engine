@@ -57,7 +57,7 @@ struct EngineAPI MeshRendererComponent : public Component
 	RenderTechnique renderTechnique = RenderTechnique::Deferred;
 
 protected:
-	std::vector<AssetHandle<Asset>*> gatherDependenciesInternal() const override;
+	std::vector<AssetRef<Asset>*> gatherDependenciesInternal() const override;
 };
 
 REGISTER_COMPONENT(MeshRendererComponent)

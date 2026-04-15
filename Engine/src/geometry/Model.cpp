@@ -117,7 +117,7 @@ void ModelAsset::bindDependency(const std::string& slot, UUID dependency)
 	int index = std::stoi(slot.substr(pos, end - pos));
 
 	// Fetch the asset
-	AssetHandle<Asset> generic =
+	AssetRef<Asset> generic =
 		Engine::get()->getSubSystem<Assets>()->getAsset(dependency);
 
 	MaterialAssetRef material = generic.as<MaterialAsset>();

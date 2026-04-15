@@ -1,7 +1,7 @@
 #include "systems/Skybox.h"
 
 #include "geometry/Box.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "memory/Assets.h"
 #include "runtime/Context.h"
 #include "core/Engine.h"

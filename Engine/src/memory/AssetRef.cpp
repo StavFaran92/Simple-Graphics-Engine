@@ -1,13 +1,13 @@
-#include "AssetHandle.h"
+#include "AssetRef.h"
 
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "memory/AssetRecord.h"
 #include "core/Engine.h"
 #include "memory/ResourceManager.h"
 #include "memory/AssetFactory.h"
 #include "memory/Asset.h"
 
-ResourceWrapper<Resource> AssetHandleImpl::loadAssetResourceInternal(const AssetRecord& record, UUID uuid)
+ResourceRef<Resource> AssetHandleImpl::loadAssetResourceInternal(const AssetRecord& record, UUID uuid)
 {
     std::unique_ptr< ResourceLoadDescriptor> loadDesc = AssetFactory::getManager(record.aType)->makeResourceLoadDescriptor();
 
@@ -17,12 +17,12 @@ ResourceWrapper<Resource> AssetHandleImpl::loadAssetResourceInternal(const Asset
 
     loadDesc->sourcePath = record.getAbsolutePath();
 
-    ResourceWrapper<Resource> resource = AssetFactory::getManager(record.aType)->loadResourceFromDisk(*loadDesc);
+    ResourceRef<Resource> resource = AssetFactory::getManager(record.aType)->loadResourceFromDisk(*loadDesc);
 
     if (resource.isEmpty())
     {
         logError("Failed to load resource: {}", uuid.str());
-        return ResourceWrapper<Resource>::empty;
+        return ResourceRef<Resource>::empty;
     }
 
     record.asset->fillData(resource);
@@ -37,7 +37,7 @@ const AssetRecord& AssetHandleImpl::getInfo(UUID uuid)
     return Engine::get()->getSubSystem<Assets>()->getInfo(uuid);
 }
 
-ResourceWrapper<Resource> AssetHandleImpl::createOrGetCachedResource(const AssetRecord& record, UUID uuid)
+ResourceRef<Resource> AssetHandleImpl::createOrGetCachedResource(const AssetRecord& record, UUID uuid)
 {
     return Engine::get()->getResourceManager()->createOrGetCached(
         record.resourceID,

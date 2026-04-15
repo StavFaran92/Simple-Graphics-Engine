@@ -24,7 +24,7 @@ class TextureHandler;
 class Model;
 class ModelLoadDescriptor;
 class Scene;
-template<typename T>class ResourceWrapper;
+template<typename T>class ResourceRef;
 
 namespace Assimp
 {

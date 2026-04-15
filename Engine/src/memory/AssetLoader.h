@@ -1,7 +1,7 @@
 #pragma once 
 
 #include <string>
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "Asset.h"
 #include <filesystem>
 

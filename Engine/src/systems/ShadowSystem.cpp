@@ -1,7 +1,7 @@
 #include "systems/ShadowSystem.h"
 
 #include "render/FrameBufferObject.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/ResourceRef.h"
 #include "gl/glew.h"
 #include "core/Logger.h"
 #include "runtime/Scene.h"

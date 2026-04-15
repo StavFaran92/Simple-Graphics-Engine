@@ -22,7 +22,7 @@
 #include "memory/Assets.h"
 
 #include <filesystem>
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "render/MaterialDataParser.h"
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
@@ -254,7 +254,7 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 	data.setSampler(shaderPropertyName, sampler);
 }
 
-void MaterialAsset::fillData(ResourceWrapper<Resource> resource)
+void MaterialAsset::fillData(ResourceRef<Resource> resource)
 {
 	auto materialResource = resource.as<Material>();
 	materialResource->m_name = data.name;

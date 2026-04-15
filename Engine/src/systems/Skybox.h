@@ -2,7 +2,7 @@
 
 #include "core/Core.h"
 #include "runtime/Entity.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetRef.h"
 #include "texture/Texture.h"
 
 class TextureHandler;

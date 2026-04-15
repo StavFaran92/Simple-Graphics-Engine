@@ -13,9 +13,9 @@ class EngineAPI Assets : public SubSystem
 public:
 	Assets();
 
-	AssetHandle<Asset> createAsset(AssetBuildDescriptor& desc, ResourceBuildDescriptor& resourceDesc);
+	AssetRef<Asset> createAsset(AssetBuildDescriptor& desc, ResourceBuildDescriptor& resourceDesc);
 
-	AssetHandle<Asset> importAsset(AssetBuildDescriptor& desc, ResourceLoadDescriptor& resourceDesc);
+	AssetRef<Asset> importAsset(AssetBuildDescriptor& desc, ResourceLoadDescriptor& resourceDesc);
 
 	void updateAsset(UUID uuid, AssetUpdateDescriptor& desc, ResourceBuildDescriptor* resourceDesc = nullptr);
 
@@ -27,11 +27,11 @@ public:
 
 	std::string getAlias(UUID uid) const;
 
-	std::vector<AssetHandle<Asset>> getAllAssetsOfType(AssetType aType) const;
+	std::vector<AssetRef<Asset>> getAllAssetsOfType(AssetType aType) const;
 
 	std::vector<const AssetRecord*> getAllRecordsOfType(AssetType aType) const;
 
-	std::vector<AssetHandle<Asset>> getAllAssets() const;
+	std::vector<AssetRef<Asset>> getAllAssets() const;
 
 	std::vector<const AssetRecord*> getAllRecords() const;
 
@@ -39,11 +39,11 @@ public:
 
 	void saveDirtyAssets();
 
-	AssetHandle<Asset> getAssetFromPath(const std::string& path) const;
+	AssetRef<Asset> getAssetFromPath(const std::string& path) const;
 
-	AssetHandle<Asset> getAssetFromName(const std::string& name) const;
+	AssetRef<Asset> getAssetFromName(const std::string& name) const;
 
-	AssetHandle<Asset> getAsset(UUID uuid) const;
+	AssetRef<Asset> getAsset(UUID uuid) const;
 
 	const AssetRecord& getInfo(UUID uuid) const;
 
@@ -55,13 +55,13 @@ public:
 
 	void bindResourceToAsset(UUID uuid, ResourceID resID);
 
-	AssetHandle<Asset> bakeAssetFromResource(const ResourceWrapper<Resource>& resource, const std::string& name = "", const ScopedPath& targetDirectory = ScopedPath::EnginePath());
+	AssetRef<Asset> bakeAssetFromResource(const ResourceRef<Resource>& resource, const std::string& name = "", const ScopedPath& targetDirectory = ScopedPath::EnginePath());
 
 private:
 
-	AssetHandle<Asset> createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc);
+	AssetRef<Asset> createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc);
 
-	AssetHandle<Asset> createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc);
+	AssetRef<Asset> createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc);
 
 	void updateRegistry(const AssetRecord& aInfo);
 
