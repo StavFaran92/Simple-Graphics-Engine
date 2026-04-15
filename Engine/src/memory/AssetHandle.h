@@ -2,7 +2,8 @@
 
 #include "memory/ResourceWrapper.h"
 #include "memory/AssetRecord.h"
-#include "memory/Asset.h"
+
+class Asset;
 
 class EngineAPI AssetHandleImpl
 {
@@ -31,7 +32,6 @@ public:
 	AssetHandle(UUID uuid) : uuid(uuid)
 	{
 		m_cachedAsset = info().asset;
-		//m_resource = resource();
 	};
 
 	AssetHandle& operator=(const AssetHandle& other)
@@ -61,7 +61,6 @@ public:
 		uuid = other.getUID();
 
 		m_cachedAsset = info().asset;
-		//m_resource = resource();
 	}
 
 	ResourceWrapper<ResourceType> resource() const
@@ -113,12 +112,12 @@ public:
 	{
 	}
 
-	Ref<T> operator->()
+	inline Ref<T> operator->()
 	{
 		return get();
 	}
 
-	Ref<T> operator->() const
+	inline Ref<T> operator->() const
 	{
 		return get();
 	}
@@ -157,6 +156,7 @@ private:
 		}
 	}
 private:
+
 	UUID uuid = EMPTY_UUID;
 
 	struct OnChangedRegistry
@@ -174,11 +174,6 @@ private:
 private:
 	template<typename T>friend class Factory;
 	friend class Assets;
-
-	//static AssetHandle<T> promoteToAsset(const ResourceWrapper<T>& resource)
-	//{
-	//	return AssetHandle<T>(resource.getUID());
-	//}
 };
 
 template<typename T>

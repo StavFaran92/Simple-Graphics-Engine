@@ -5,6 +5,7 @@
 #include "core/Engine.h"
 #include "memory/ResourceManager.h"
 #include "memory/AssetFactory.h"
+#include "memory/Asset.h"
 
 ResourceWrapper<Resource> AssetHandleImpl::loadAssetResourceInternal(const AssetRecord& record, UUID uuid)
 {
