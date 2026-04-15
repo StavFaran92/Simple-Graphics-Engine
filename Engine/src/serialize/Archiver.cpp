@@ -40,7 +40,7 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	return serializedEntity;
 }
 
-Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, ResourceWrapper<Scene>& scene)
+Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, SceneResourceRef& scene)
 {
 	auto e = scene->getRegistry().getRegistry().create(serializedEnt.entity);
 	auto entityHandler = Entity(e, &scene->getRegistry());
@@ -57,7 +57,7 @@ Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, ResourceWrapp
 
 }
 
-SerializedScene Archiver::serializeScene(ResourceWrapper<Scene>& scene)
+SerializedScene Archiver::serializeScene(SceneResourceRef& scene)
 {
 	SerializedScene serializedScene;
 
@@ -78,7 +78,7 @@ SerializedScene Archiver::serializeScene(ResourceWrapper<Scene>& scene)
 	return serializedScene;
 }
 
-void Archiver::deserializeScene(SerializedScene serializedScene, ResourceWrapper<Scene>& scene)
+void Archiver::deserializeScene(SerializedScene serializedScene, SceneResourceRef& scene)
 {
 	//scene.getRegistry().getRegistry().clear();
 

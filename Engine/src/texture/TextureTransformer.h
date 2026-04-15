@@ -1,14 +1,13 @@
 #pragma once
 
-template<typename T> class ResourceWrapper;
-class Texture;
+#include "memory/AssetAliases.h"
 
 class TextureTransformer
 {
 public:
-	static ResourceWrapper<Texture> flipVertical(ResourceWrapper<Texture> texture);
-	static void flipVertical(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture);
+	static TextureResourceRef flipVertical(TextureResourceRef texture);
+	static void flipVertical(TextureResourceRef srcTexture, TextureResourceRef& dstTexture);
 
-	static ResourceWrapper<Texture> applyGammaCorrection(ResourceWrapper<Texture> texture);
-	static void applyGammaCorrection(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture);
+	static TextureResourceRef applyGammaCorrection(TextureResourceRef texture);
+	static void applyGammaCorrection(TextureResourceRef srcTexture, TextureResourceRef& dstTexture);
 };

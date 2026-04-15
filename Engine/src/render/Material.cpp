@@ -27,10 +27,10 @@
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
 
-void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ResourceWrapper<Shader>& shader, int slot)
+void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ShaderResourceRef& shader, int slot)
 {
 	// if texture is empty use dummy texture
-	AssetHandle<TextureAsset> texture;
+	TextureAssetRef texture;
 	if (!sampler || sampler->texture.isEmpty())
 	{
 		texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
@@ -59,7 +59,7 @@ void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler>
 
 void Material::use()
 {
-	ResourceWrapper<Shader> shader = getActiveShader();
+	ShaderResourceRef shader = getActiveShader();
 
 	if (shader.isEmpty())
 	{
@@ -111,14 +111,14 @@ Value Material::getUniformValue(const std::string& name)
 	return it != m_uniformProperties.end() ? it->second : Value{};
 }
 
-ResourceWrapper<Material> Material::create(MaterialRenderMode renderMode)
+MaterialResourceRef Material::create(MaterialRenderMode renderMode)
 {
 	auto mat = Factory<Material>::create();
 	mat->m_renderMode = renderMode;
 	return mat;
 }
 
-ResourceWrapper<Material> Material::clone(bool isEngineOwned) const
+MaterialResourceRef Material::clone(bool isEngineOwned) const
 {
 	auto newMaterial = Material::create(m_renderMode);
 
@@ -130,7 +130,7 @@ ResourceWrapper<Material> Material::clone(bool isEngineOwned) const
 	return newMaterial;
 }
 
-ResourceWrapper<Shader> Material::getActiveShader() const
+ShaderResourceRef Material::getActiveShader() const
 {
 	if (m_renderMode != MaterialRenderMode::Custom)
 	{
@@ -147,7 +147,7 @@ ResourceWrapper<Shader> Material::getActiveShader() const
 	}
 }
 
-void Material::setTexture(const std::string& name, const ResourceWrapper<Texture>& texture)
+void Material::setTexture(const std::string& name, const TextureResourceRef& texture)
 {
 }
 
@@ -166,7 +166,7 @@ MaterialRenderMode Material::getRenderMode() const
 	return m_renderMode;
 }
 
-ResourceWrapper<Material> Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)
+MaterialResourceRef Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
@@ -175,12 +175,12 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, Materi
 	std::ifstream is(filepath);
 	cereal::JSONInputArchive iarchive(is);
 	MaterialData materialData;
-	//ResourceWrapper<Material> material = Factory<Material>::create();
+	//MaterialResourceRef material = Factory<Material>::create();
 
 	try
 	{
 		iarchive(materialData);
-		ResourceWrapper<Material> material = Factory<Material>::create();
+		MaterialResourceRef material = Factory<Material>::create();
 		material->m_renderMode = materialData.getMaterialRenderMode();
 		material->m_customShader = materialData.getCustomShader().resource();
 		material->m_name = materialData.name;
@@ -192,7 +192,7 @@ ResourceWrapper<Material> Material::load(const std::string& fileLocation, Materi
 		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	return ResourceWrapper<Material>::empty;
+	return MaterialResourceRef::empty;
 }
 
 //////////////////////////
@@ -241,7 +241,7 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 	}
 
 	// Cast dependency to TextureAsset
-	AssetHandle<TextureAsset> textureAsset(dependency);
+	TextureAssetRef textureAsset(dependency);
 	if (textureAsset.isEmpty())
 	{
 		logWarning("MaterialAsset::bindDependency: Dependency is not a TextureAsset for slot '{}'", slot);
@@ -279,12 +279,12 @@ std::string MaterialAsset::getName() const
 	return data.name;
 }
 
-void MaterialAsset::setCustomShader(AssetHandle<ShaderAsset>& customShader)
+void MaterialAsset::setCustomShader(ShaderAssetRef& customShader)
 {
 	data.setCustomShader(customShader);
 }
 
-AssetHandle<ShaderAsset> MaterialAsset::getCustomShader() const
+ShaderAssetRef MaterialAsset::getCustomShader() const
 {
 	return data.getCustomShader();
 }
@@ -331,7 +331,7 @@ Value MaterialAsset::getUniformValue(const std::string& name)
 	return it != data.getUniforms().end() ? it->second.value : Value{};
 }
 
-ResourceWrapper<Shader> MaterialAsset::getActiveShader() const
+ShaderResourceRef MaterialAsset::getActiveShader() const
 {
 	if (data.getMaterialRenderMode() != MaterialRenderMode::Custom)
 	{
@@ -343,7 +343,7 @@ ResourceWrapper<Shader> MaterialAsset::getActiveShader() const
 	}
 }
 
-AssetHandle<MaterialAsset> MaterialAsset::clone(bool isEngineOwned) const
+MaterialAssetRef MaterialAsset::clone(bool isEngineOwned) const
 {
 	AssetBuildDescriptor desc;
 	desc.aType = AssetType::MATERIAL;
@@ -353,7 +353,7 @@ AssetHandle<MaterialAsset> MaterialAsset::clone(bool isEngineOwned) const
 	MaterialCreateDescriptor materialDesc;
 	materialDesc.data = data;
 	
-	AssetHandle<MaterialAsset> cloned = Engine::get()->getSubSystem<Assets>()->createAsset(desc, materialDesc).as<MaterialAsset>();
+	MaterialAssetRef cloned = Engine::get()->getSubSystem<Assets>()->createAsset(desc, materialDesc).as<MaterialAsset>();
 	return cloned;
 }
 

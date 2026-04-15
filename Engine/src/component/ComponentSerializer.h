@@ -23,15 +23,15 @@ template<typename T>
 ComponentSerializeFnRegister<T> ComponentSerializeFnRegister<T>::staticRegister;
 
 using SnapshotSerializeFunc = std::function<std::shared_ptr<Component>(const Entity& e)>;
-using SnapshotDeserializeFunc = std::function<void(std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)>;
+using SnapshotDeserializeFunc = std::function<void(std::shared_ptr<Component> c, Entity entityHandler, SceneResourceRef& scene)>;
 
 struct SerializerEntry
 {
 	std::string name;
 	SnapshotSerializeFunc serialize;
 	SnapshotDeserializeFunc deserialize;
-	std::function<void(Entity e, ResourceWrapper<Scene>&)> resolve;
-	std::function<void(Entity e, ResourceWrapper<Scene>&)> postLoad;
+	std::function<void(Entity e, SceneResourceRef&)> resolve;
+	std::function<void(Entity e, SceneResourceRef&)> postLoad;
 };
 
 class ComponentSerdes
@@ -60,7 +60,7 @@ public:
 				return c;
 			};
 
-		entry.deserialize = [](std::shared_ptr<Component> c, Entity entityHandler, ResourceWrapper<Scene>& scene)
+		entry.deserialize = [](std::shared_ptr<Component> c, Entity entityHandler, SceneResourceRef& scene)
 			{
 				if (auto tc = std::dynamic_pointer_cast<T>(c))
 				{
@@ -69,7 +69,7 @@ public:
 				}
 			};
 
-		entry.resolve = [](Entity e, ResourceWrapper<Scene>& scene) { 
+		entry.resolve = [](Entity e, SceneResourceRef& scene) { 
 			entt::entity entity = e.handler();
 			if (scene->getRegistry().get().all_of<T>(entity))
 			{
@@ -80,7 +80,7 @@ public:
 			}
 		};
 
-		entry.postLoad = [](Entity e, ResourceWrapper<Scene>& scene) {
+		entry.postLoad = [](Entity e, SceneResourceRef& scene) {
 			entt::entity entity = e.handler();
 			if (scene->getRegistry().get().all_of<T>(entity))
 			{

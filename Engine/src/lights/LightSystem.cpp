@@ -8,6 +8,7 @@
 #include "lights/PointLight.h"
 #include "component/Transformation.h"
 #include "render/Graphics.h"
+#include "core/Engine.h"
 
 #define NR_POINT_LIGHTS 32
 #define NR_DIR_LIGHTS 8

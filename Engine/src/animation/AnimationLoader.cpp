@@ -8,6 +8,7 @@
 #include "memory/Assets.h"
 #include "animation/Animation.h"
 #include <filesystem>
+#include "core/Engine.h"
 
 AnimationLoader::AnimationLoader()
 {

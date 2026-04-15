@@ -19,5 +19,5 @@ public:
 	void prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds);
 
 private:
-	ResourceWrapper<Texture> m_noiseTexture;
+	TextureResourceRef m_noiseTexture;
 };

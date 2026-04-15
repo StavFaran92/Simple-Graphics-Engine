@@ -5,6 +5,7 @@
 #include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
 #include "systems/SubSystem.h"
+#include "memory/AssetAliases.h"
 
 class Scene;
 class Context;
@@ -39,18 +40,18 @@ public:
 
 	Entity entity = Entity::EmptyEntity;
 	Mesh* mesh = nullptr;
-	ResourceWrapper<Shader> shader = nullptr;
-	ResourceWrapper<Material> material = nullptr;
+	ShaderResourceRef shader = nullptr;
+	MaterialResourceRef material = nullptr;
 
 	// MVP
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
 
-	ResourceWrapper<Texture> irradianceMap = nullptr;
-	ResourceWrapper<Texture> prefilterEnvMap = nullptr;
-	ResourceWrapper<Texture> brdfLUT = nullptr;
-	ResourceWrapper<Texture> shadowMap = nullptr;
+	TextureResourceRef irradianceMap = nullptr;
+	TextureResourceRef prefilterEnvMap = nullptr;
+	TextureResourceRef brdfLUT = nullptr;
+	TextureResourceRef shadowMap = nullptr;
 	glm::mat4 lightSpaceMatrix;
 	Frustum* frustum = nullptr;
 	std::shared_ptr<RenderView> renderView;

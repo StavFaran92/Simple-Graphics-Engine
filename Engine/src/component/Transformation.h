@@ -113,8 +113,8 @@ public:
 
 	std::unordered_map<entity_id, Entity> getChildren();
 
-	void resolve(ResourceWrapper<Scene>& scene) override;
-	void postLoad(ResourceWrapper<Scene>& scene) override;
+	void resolve(SceneResourceRef& scene) override;
+	void postLoad(SceneResourceRef& scene) override;
 
 	template <class Archive>
 	void serialize(Archive& archive) {

@@ -63,7 +63,7 @@ public:
 
 	//struct LastImportedMaterials
 	//{
-	//	std::map<int, AssetHandle<MaterialAsset>> materials;
+	//	std::map<int, MaterialAssetRef> materials;
 	//};
 
 	
@@ -71,8 +71,8 @@ public:
 	//struct ModelInfo
 	//{
 	//	ResourceWrapper<MeshGroup> mesh;
-	//	std::map<int, ResourceWrapper<Material>> materials;
-	//	std::vector<ResourceWrapper<Texture>> textures;
+	//	std::map<int, MaterialResourceRef> materials;
+	//	std::vector<TextureResourceRef> textures;
 
 	//	std::map<std::string, std::string> materialInfo;
 	//};

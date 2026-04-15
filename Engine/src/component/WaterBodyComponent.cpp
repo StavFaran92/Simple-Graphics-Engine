@@ -10,20 +10,20 @@ WaterBodyComponent::WaterBodyComponent(Entity entity)
 
 }
 
-AssetHandle<MaterialAsset> WaterBodyComponent::getMaterial()
+MaterialAssetRef WaterBodyComponent::getMaterial()
 {
 	if (!entity.valid())
 	{
 		logWarning("Invalid Entity set in water body");
-		return AssetHandle<MaterialAsset>::empty;
+		return MaterialAssetRef::empty;
 	}
 
 	MeshRendererComponent& meshRenderer = entity.getComponentInChildren<MeshRendererComponent>(false); // todo fix this is unsafe (getComponentInChildren itself is)
-	AssetHandle<MaterialAsset> mat = meshRenderer.getMaterialBySlot(0); // A water body plane only has single material
+	MaterialAssetRef mat = meshRenderer.getMaterialBySlot(0); // A water body plane only has single material
 	return mat;
 }
 
-void WaterBodyComponent::resolve(ResourceWrapper<Scene>& scene)
+void WaterBodyComponent::resolve(SceneResourceRef& scene)
 {
 	entity.setRegistry(&scene->getRegistry());
 }

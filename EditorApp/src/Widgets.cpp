@@ -6,7 +6,7 @@
 #include "dialogs/AssetSelectDialog.h"
 #include "render/MaterialData.h"
 
-void addTextureEditWidget(AssetHandle<TextureAsset> texture, ImVec2 size, std::function<void(UUID uuid)> callback)
+void addTextureEditWidget(TextureAssetRef texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
 	int texID = 0;
 	if (!texture.isEmpty())
@@ -50,7 +50,7 @@ void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, 
 
 		ImGui::Text("Texture");
 		addTextureEditWidget(EditorState::Instance().selectedSampler->texture, ImVec2{ 150, 150 }, [=](UUID uuid) {
-			EditorState::Instance().selectedSampler->texture = AssetHandle<TextureAsset>(uuid);
+			EditorState::Instance().selectedSampler->texture = TextureAssetRef(uuid);
 			});
 
 		ImGui::Spacing();
@@ -245,7 +245,7 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 		}
 
 		addAssetSelectWidget(shaderName, AssetType::SHADER, [&data, onChangedCB](UUID uuid) {
-			data.setCustomShader(AssetHandle<ShaderAsset>(uuid));
+			data.setCustomShader(ShaderAssetRef(uuid));
 			if (onChangedCB) onChangedCB(data);
 		});
 	}

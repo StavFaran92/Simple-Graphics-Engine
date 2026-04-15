@@ -58,7 +58,7 @@ struct EngineAPI FoliageField
 	float width = 10;
 	float height = 10;
 	//float heightScale = 1;
-	//AssetHandle<TextureAsset> foliageHeightMap;
+	//TextureAssetRef foliageHeightMap;
 
 	bool isActive = false;
 

@@ -19,7 +19,7 @@ static const int MAX_TEXTURE_COUNT = 4;
 
 struct TextureBlend
 {
-	AssetHandle<TextureAsset> texture;
+	TextureAssetRef texture;
 	float blend = 0;
 	float scaleX = 1;
 	float scaleY = 1;
@@ -37,10 +37,10 @@ public:
 
 	static Entity createTerrain(int width, int height);
 
-	ResourceWrapper<Model> getMesh() const;
+	ModelResourceRef getMesh() const;
 
-	void setHeightmap(AssetHandle<TextureAsset> heightmap);
-	ResourceWrapper<Texture> getHeightmap() const;
+	void setHeightmap(TextureAssetRef heightmap);
+	TextureResourceRef getHeightmap() const;
 
 	bool getHeightAtPoint(float x, float y, float& outHeight) const;
 
@@ -50,12 +50,12 @@ public:
 
 	void setPixel(int x, int y, unsigned char value);
 
-	void setTexture(int index, AssetHandle<TextureAsset> texture);
+	void setTexture(int index, TextureAssetRef texture);
 	void setTextureScaleX(int index, float scaleX);
 	void setTextureScaleY(int index, float scaleY);
 	void setTextureBlend(int index, float val);
 
-	AssetHandle<TextureAsset>& getTexture(int index);
+	TextureAssetRef& getTexture(int index);
 	float getTextureBlend(int index) const;
 	glm::vec2 getTextureScale(int index) const;
 
@@ -89,20 +89,20 @@ public:
 
 	std::vector<TextureBlend> m_textureBlends {  };
 
-	AssetHandle<MaterialAsset> m_material;
+	MaterialAssetRef m_material;
 
 	FoliageField m_foliageField;
 
 private:
 	static Terrain createTerrainComponent(int width, int height);
-	AssetHandle<TextureAsset> generateHeightmap(int width, int height);
+	TextureAssetRef generateHeightmap(int width, int height);
 private:
 	int m_width = 100;
 	int m_height = 100;
-	AssetHandle<TextureAsset> m_heightmap;
+	TextureAssetRef m_heightmap;
 	std::vector<float> m_heightDataCPU;
 
-	AssetHandle<ModelAsset> m_mesh;
+	ModelAssetRef m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
 
 	

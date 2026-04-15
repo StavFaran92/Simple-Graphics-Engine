@@ -3,13 +3,14 @@
 #include "animation/Bone.h"
 #include "animation/AnimationLoader.h"
 #include "core/Factory.h"
+#include "memory/AssetFactory.h"
 #include "animation/AnimationManager.h"
 
 Animation::Animation()
 {
 }
 
-ResourceWrapper<Animation> Animation::load(const std::string& fileLocation, AnimationLoadDescriptor desc)
+AnimationResourceRef Animation::load(const std::string& fileLocation, AnimationLoadDescriptor desc)
 {
 	return AssetFactory::getManager(AssetType::ANIMATION)->loadResourceFromDisk(desc).as<Animation>();
 }

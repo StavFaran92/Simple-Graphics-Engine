@@ -13,7 +13,7 @@ public:
 	TerrainMaterial() = default;
 	~TerrainMaterial() = default;
 
-	const std::vector<ResourceWrapper<Texture>>& getAllTextures() const;
+	const std::vector<TextureResourceRef>& getAllTextures() const;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -21,5 +21,5 @@ public:
 	}
 
 protected:
-	std::vector<ResourceWrapper<Texture>> m_textures;
+	std::vector<TextureResourceRef> m_textures;
 };

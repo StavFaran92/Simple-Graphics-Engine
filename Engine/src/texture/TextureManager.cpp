@@ -5,6 +5,7 @@
 #include "memory/AssetRecord.h"
 #include "memory/AssetHandle.h"
 #include "core/Engine.h"
+#include "core/Logger.h"
 #include "utils/EXRLoader.h"
 #include "utils/STBIHelper.h"
 #include "texture/TextureBinaryLoader.h"

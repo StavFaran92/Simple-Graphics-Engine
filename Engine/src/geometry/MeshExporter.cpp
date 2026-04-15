@@ -22,7 +22,7 @@ void MeshExporter::exportMesh(const std::string& name, const std::string& target
 	exporter.Export(scene, "collada", savedFilePath);
 }
 
-void MeshExporter::exportMesh(const AssetHandle<ModelAsset>& meshGroup)
+void MeshExporter::exportMesh(const ModelAssetRef& meshGroup)
 {
     // Broken
     // 

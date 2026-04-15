@@ -19,13 +19,13 @@ MaterialRenderMode MaterialData::getMaterialRenderMode() const
 	return m_renderMode;
 }
 
-void MaterialData::setCustomShader(AssetHandle<ShaderAsset>& customShader)
+void MaterialData::setCustomShader(ShaderAssetRef& customShader)
 {
 	m_customShader = customShader;
 	update();
 }
 
-AssetHandle<ShaderAsset> MaterialData::getCustomShader() const
+ShaderAssetRef MaterialData::getCustomShader() const
 {
 	return m_customShader;
 }

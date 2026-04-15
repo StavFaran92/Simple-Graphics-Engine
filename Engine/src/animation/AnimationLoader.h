@@ -35,7 +35,7 @@ public:
 
 	AnimationLoader();
 
-	ResourceWrapper<Animation> load(const AnimationLoadDescriptor& aInfo);
+	AnimationResourceRef load(const AnimationLoadDescriptor& aInfo);
 
 	bool parseAnimation(const std::string& fileLocation, AnimationInfo& outAnimInfo);
 

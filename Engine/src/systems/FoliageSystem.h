@@ -21,17 +21,17 @@ public:
 	void drawFoliage(Terrain& terrain);
 
 private:
-	ResourceWrapper<Model> m_grassBlade;
+	ModelResourceRef m_grassBlade;
 	int count = 0;
-	ResourceWrapper<Shader> m_foliageQuadShader;
+	ShaderResourceRef m_foliageQuadShader;
 
 	unsigned int m_foliagePatchesSSBO;
 	unsigned int m_visibleFoliagePatchesSSBO;
 	unsigned int m_finalFoliageLocationsSSBO;
 
-	ResourceWrapper<Shader> m_sampleComputeShader;
-	ResourceWrapper<Shader> m_frustumCullComputeShader;
-	ResourceWrapper<Shader> m_populateGrassComputeShader;
+	ShaderResourceRef m_sampleComputeShader;
+	ShaderResourceRef m_frustumCullComputeShader;
+	ShaderResourceRef m_populateGrassComputeShader;
 	unsigned int m_atomicCounterBuffer;
 	unsigned int m_frustumUBO;
 	unsigned int m_randomPatchSampleUBO;
@@ -46,9 +46,9 @@ private:
 
 	//std::vector<glm::mat4>foliageRandomTransforms;
 	std::vector<glm::vec3>foliageRandomLocations;
-	ResourceWrapper<Texture>grassTexture;
-	ResourceWrapper<Texture>windNoise;
-	ResourceWrapper<Texture>noiseTexture;
+	TextureResourceRef grassTexture;
+	TextureResourceRef windNoise;
+	TextureResourceRef noiseTexture;
 
 	int maxFoliageViewDistance = 100;
 	int minFoliageQuadViewDistance = 50;

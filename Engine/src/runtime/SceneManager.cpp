@@ -12,7 +12,7 @@ SceneManager::SceneManager()
 	//m_serializedScene = std::make_shared<SerializedScene>();
 }
 
-bool SceneManager::addScene(const AssetHandle<SceneAsset>& sceneAsset)
+bool SceneManager::addScene(const SceneAssetRef& sceneAsset)
 {
 	auto scene = sceneAsset.resource();
 	
@@ -27,23 +27,23 @@ bool SceneManager::addScene(const AssetHandle<SceneAsset>& sceneAsset)
 	return true;
 }
 
-bool SceneManager::removeScene(const AssetHandle<SceneAsset>& scene)
+bool SceneManager::removeScene(const SceneAssetRef& scene)
 {
 	return false;
 }
 
-ResourceWrapper<Scene> SceneManager::getActiveScene() const
+SceneResourceRef SceneManager::getActiveScene() const
 {
 	if (m_activeScene == -1 || m_activeScene >= m_scenes.size())
-		return ResourceWrapper<Scene>::empty;
+		return SceneResourceRef::empty;
 
 	return m_scenes.at(m_activeScene).resource();
 }
 
-AssetHandle<SceneAsset> SceneManager::getActiveSceneAsset() const
+SceneAssetRef SceneManager::getActiveSceneAsset() const
 {
 	if (m_activeScene == -1)
-		return AssetHandle<SceneAsset>::empty;
+		return SceneAssetRef::empty;
 
 	return m_scenes.at(m_activeScene);
 }
@@ -61,7 +61,7 @@ void SceneManager::setActiveScene(uint32_t index)
 	m_scenes.at(m_activeScene).resource()->onActivate();
 }
 
-const std::map<uint32_t, ResourceWrapper<Scene>>& SceneManager::getAllScenes() const
+const std::map<uint32_t, SceneResourceRef>& SceneManager::getAllScenes() const
 {
 	return m_scenesCache;
 }

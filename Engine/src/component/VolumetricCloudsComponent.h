@@ -11,7 +11,7 @@ struct EngineAPI VolumetricCloudsComponent : public Component
 	VolumetricCloudsComponent() = default;
 	VolumetricCloudsComponent(Entity entity);
 
-	AssetHandle<MaterialAsset> getMaterial();
+	MaterialAssetRef getMaterial();
 
 	template <class Archive>
 	void serialize(Archive& archive) {

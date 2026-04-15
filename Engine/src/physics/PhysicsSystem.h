@@ -63,5 +63,5 @@ private:
 
 	bool m_isInit = false;
 
-	ResourceWrapper<Shader> m_debugVisualizeShader;
+	ShaderResourceRef m_debugVisualizeShader;
 };

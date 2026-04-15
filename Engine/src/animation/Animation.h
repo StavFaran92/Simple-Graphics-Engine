@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include "glm/glm.hpp"
+#include "memory/AssetAliases.h"
 #include "memory/Asset.h"
 
 class Bone;
@@ -41,7 +42,7 @@ struct EngineAPI AnimationCreateDescriptor : public ResourceBuildDescriptor
 class EngineAPI Animation : public Resource
 {
 public:
-	static ResourceWrapper<Animation> load(const std::string& fileLocation, AnimationLoadDescriptor desc = {});
+	static AnimationResourceRef load(const std::string& fileLocation, AnimationLoadDescriptor desc = {});
 
 	Animation();
 

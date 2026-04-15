@@ -4,7 +4,7 @@
 #include <string>
 
 #include "core/Core.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/AssetAliases.h"
 #include "memory/Asset.h"
 
 using json = nlohmann::json;
@@ -156,9 +156,9 @@ public:
 
 	AssetType getType() const override { return AssetType::TEXTURE; }
 
-	static ResourceWrapper<Texture> createTexture(TextureData& textureData);
+	static TextureResourceRef createTexture(TextureData& textureData);
 
-	static ResourceWrapper<Texture> createTexture(int width, 
+	static TextureResourceRef createTexture(int width, 
 													int height, 
 													int channels, 
 													TextureInternalFormat internalFormat, 
@@ -168,11 +168,11 @@ public:
 													TextureWrap wrap = TextureWrap::Clamp, 
 													void* data = nullptr);
 
-	static ResourceWrapper<Texture> createTexture(int width, int height, TextureSemantic usage, void* data = nullptr);
+	static TextureResourceRef createTexture(int width, int height, TextureSemantic usage, void* data = nullptr);
 
-	static ResourceWrapper<Texture> load(const std::string& fileLocation, TextureLoadDescriptor desc = {});
+	static TextureResourceRef load(const std::string& fileLocation, TextureLoadDescriptor desc = {});
 
-	ResourceWrapper<Texture> clone() const; 
+	TextureResourceRef clone() const; 
 
 	int getWidth() const;
 	int getHeight() const;

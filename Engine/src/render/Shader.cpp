@@ -55,7 +55,7 @@ void Shader::bindUniformBlockToBindPoint(const std::string& uniformBlockName, in
 	glUniformBlockBinding(m_id, uniformBlockIndex, bindPointIndex);
 }
 
-void Shader::setTextureInShader(ResourceWrapper<Texture> texture, const std::string& uniform, int slot)
+void Shader::setTextureInShader(TextureResourceRef texture, const std::string& uniform, int slot)
 {
 	texture.get()->setSlot(slot);
 	texture.get()->bind();
@@ -490,13 +490,13 @@ void replaceDirective(std::string& source, const std::string& directive, std::st
 	}
 }
 
-ResourceWrapper<Shader> Shader::load(const std::string& fileLocation, ShaderLoadDescriptor desc)
+ShaderResourceRef Shader::load(const std::string& fileLocation, ShaderLoadDescriptor desc)
 {
 	ShaderOverride shaderOverride = desc.shaderOverride;
 
 	std::string filepath = fileLocation;
 
-	ResourceWrapper<Shader> shader = Factory<Shader>::create();
+	ShaderResourceRef shader = Factory<Shader>::create();
 	shader->m_isShaderOverride = shaderOverride != ShaderOverride::None;
 	shader->shaderOverride = shaderOverride;
 	shader->m_glslFilePath = filepath;

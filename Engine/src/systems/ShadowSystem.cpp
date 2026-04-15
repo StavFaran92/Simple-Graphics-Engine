@@ -214,7 +214,7 @@ void ShadowSystem::renderToDepthMap()
 	glCullFace(GL_BACK);
 }
 
-ResourceWrapper<Texture> ShadowSystem::getShadowMap() const
+TextureResourceRef ShadowSystem::getShadowMap() const
 {
 	return m_depthMapTexture;
 }

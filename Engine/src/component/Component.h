@@ -5,6 +5,7 @@
 #include "core/Core.h"
 #include "physics/Colliders.h"
 #include "serialize/CerealHelpers.h"
+#include "memory/AssetAliases.h"
 
 /**
 HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
@@ -16,13 +17,11 @@ HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
 	- Add component deseralize in Archiver::deserializeEntity
 */
 
-class Scene;
 class Mesh;
 class Entity;
 class Transformation;
 class Asset;
 class UUID;
-template<typename T> class AssetHandle;
 
 
 
@@ -40,8 +39,8 @@ public:
 
 	std::vector<AssetHandle<Asset>> gatherDependencies() const;
 
-	virtual void resolve(ResourceWrapper<Scene>& scene) {};
-	virtual void postLoad(ResourceWrapper<Scene>& scene) {};
+	virtual void resolve(SceneResourceRef& scene) {};
+	virtual void postLoad(SceneResourceRef& scene) {};
 
 protected:
 	virtual std::vector<AssetHandle<Asset>*> gatherDependenciesInternal() const;

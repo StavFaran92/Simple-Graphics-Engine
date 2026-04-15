@@ -3,9 +3,9 @@
 
 #include "core/Core.h"
 
-#include "memory/ResourceWrapper.h"
 #include "runtime/Entity.h"
 #include "systems/SubSystem.h"
+#include "memory/AssetAliases.h"
 
 class FrameBufferObject;
 class RenderBufferObject;
@@ -34,8 +34,8 @@ public:
 
 private:
 	std::shared_ptr<FrameBufferObject> m_frameBuffer;
-	ResourceWrapper<Texture> m_targetTexture;
-	ResourceWrapper<Shader> m_pickingShader;
+	TextureResourceRef m_targetTexture;
+	ShaderResourceRef m_pickingShader;
 
 	int m_selectedObject = -1;
 };

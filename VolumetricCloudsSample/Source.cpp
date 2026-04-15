@@ -20,7 +20,7 @@ public:
 		shaderDesc.origFilePath = "../../VolumetricCloudsSample/Resources/Content/Shaders/BasicShader.glsl";
 		AssetWrapper<Shader> shaderAsset = Engine::get()->getSubSystem<Assets>()->createAsset(shader, shaderDesc).as<Shader>();
 
-		ResourceWrapper<Material> material = Material::create(MaterialRenderMode::Custom);
+		MaterialResourceRef material = Material::create(MaterialRenderMode::Custom);
 		material->setCustomShader(shaderAsset);
 
 		MaterialImportSettings desc;

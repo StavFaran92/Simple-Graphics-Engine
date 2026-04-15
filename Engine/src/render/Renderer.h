@@ -2,7 +2,7 @@
 #include "render/IRenderer.h"
 
 #include "core/Core.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/AssetAliases.h"
 
 // forward declerations
 class ICamera;
@@ -37,6 +37,6 @@ private:
 protected:
 	bool m_wireFrameMode = false;
 
-	//ResourceWrapper<Shader> m_pbrShader = nullptr;
-	ResourceWrapper<Model> m_quad = nullptr;
+	//ShaderResourceRef m_pbrShader = nullptr;
+	ModelResourceRef m_quad = nullptr;
 };

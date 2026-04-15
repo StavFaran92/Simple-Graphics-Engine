@@ -17,7 +17,7 @@
 
 
 
-ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularToCubemap(ResourceWrapper<Texture> equirectangularTexture)
+TextureResourceRef EquirectangularToCubemapConverter::fromEquirectangularToCubemap(TextureResourceRef equirectangularTexture)
 {
 	//equirectangularTexture = TextureTransformer::flipVertical(equirectangularTexture);
 
@@ -102,7 +102,7 @@ ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromEquirectangularT
 	return cubemap;
 }
 
-ResourceWrapper<Texture> EquirectangularToCubemapConverter::fromCubemapToEquirectangular(ResourceWrapper<Texture> cubemapTexture)
+TextureResourceRef EquirectangularToCubemapConverter::fromCubemapToEquirectangular(TextureResourceRef cubemapTexture)
 {
 	auto cubemapToEquirectangularShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/CubemapToEquirectangular.glsl");
 

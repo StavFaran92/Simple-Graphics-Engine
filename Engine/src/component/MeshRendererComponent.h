@@ -3,25 +3,26 @@
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
 #include "geometry/Model.h"
+#include "core/Engine.h"
 
 struct EngineAPI MeshRendererComponent : public Component
 {
-	MeshRendererComponent(AssetHandle<ModelAsset> mesh);
+	MeshRendererComponent(ModelAssetRef mesh);
 	MeshRendererComponent() = default;
 
-	void addMaterial(const AssetHandle<MaterialAsset>& mat)
+	void addMaterial(const MaterialAssetRef& mat)
 	{
 		m_material[count++] = mat;
 	}
 
-	void setMaterial(int index, const AssetHandle<MaterialAsset>& mat)
+	void setMaterial(int index, const MaterialAssetRef& mat)
 	{
 		m_material[index] = mat;
 	}
 
-	AssetHandle<MaterialAsset> getMaterialBySlot(int slot) const;
+	MaterialAssetRef getMaterialBySlot(int slot) const;
 
-	ResourceWrapper<Material> at(int index)
+	MaterialResourceRef at(int index)
 	{
 		auto iter = m_material.find(index);
 		if (iter == m_material.end())
@@ -42,10 +43,10 @@ struct EngineAPI MeshRendererComponent : public Component
 
 	
 
-	AssetHandle<ModelAsset> mesh = AssetHandle<ModelAsset>::empty;
+	ModelAssetRef mesh = ModelAssetRef::empty;
 
 	int count = 0;
-	std::unordered_map<int, AssetHandle<MaterialAsset>> m_material;
+	std::unordered_map<int, MaterialAssetRef> m_material;
 
 	enum class RenderTechnique : int
 	{

@@ -36,9 +36,9 @@ public:
 
 	void drawAABB(const AABB& aabb, const glm::vec3& color = { 1,1,1 }, float thickness = 1);
 
-    void registerTextureForDebug(const std::string& name, ResourceWrapper<Texture> texture);
+    void registerTextureForDebug(const std::string& name, TextureResourceRef texture);
 
-    const std::map<std::string, ResourceWrapper<Texture>>& getDebugTextures() const;
+    const std::map<std::string, TextureResourceRef>& getDebugTextures() const;
 
 private:
     // Private constructor to prevent direct instantiation
@@ -49,8 +49,8 @@ private:
 
     std::shared_ptr<VertexArrayObject> m_vao;
     std::shared_ptr<VertexBufferObject> m_pointVBO;
-    ResourceWrapper<Shader> m_pointShader;
-    ResourceWrapper<Shader> m_lineShader;
+    ShaderResourceRef m_pointShader;
+    ShaderResourceRef m_lineShader;
 
-    std::map<std::string, ResourceWrapper<Texture>> m_debugTextures;
+    std::map<std::string, TextureResourceRef> m_debugTextures;
 };

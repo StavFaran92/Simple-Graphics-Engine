@@ -519,7 +519,7 @@ std::string Engine::getProjectDirectory() const
     return m_projectDirectory;
 }
 
-ResourceWrapper<Material> Engine::getDefaultMaterial() const
+MaterialResourceRef Engine::getDefaultMaterial() const
 {
     return BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
 }

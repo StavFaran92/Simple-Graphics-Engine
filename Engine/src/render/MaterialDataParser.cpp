@@ -151,7 +151,7 @@ void MaterialDataParser::parseUniforms(const std::string& sourceCode, MaterialDa
 	}
 }
 
-void MaterialDataParser::parseFromShader(ResourceWrapper<Shader> shader, MaterialData& data)
+void MaterialDataParser::parseFromShader(ShaderResourceRef shader, MaterialData& data)
 {
 	std::string sourceCode;
 	ShadersInfo sInfo = shader->getShadersInfo();
@@ -165,7 +165,7 @@ void MaterialDataParser::parseFromShader(ResourceWrapper<Shader> shader, Materia
 	parseUniforms(sourceCode, data);
 }
 
-ResourceWrapper<Shader> MaterialDataParser::getShaderFromRenderMode(MaterialRenderMode renderMode)
+ShaderResourceRef MaterialDataParser::getShaderFromRenderMode(MaterialRenderMode renderMode)
 {
 	switch (renderMode)
 	{
@@ -179,10 +179,10 @@ ResourceWrapper<Shader> MaterialDataParser::getShaderFromRenderMode(MaterialRend
 		return BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_VOLUME);
 	}
 
-	return ResourceWrapper<Shader>::empty;
+	return ShaderResourceRef::empty;
 }
 
-ResourceWrapper<Shader> MaterialDataParser::getActiveShader(const MaterialData& data)
+ShaderResourceRef MaterialDataParser::getActiveShader(const MaterialData& data)
 {
 	if (data.m_renderMode != MaterialRenderMode::Custom)
 	{
@@ -199,7 +199,7 @@ void MaterialDataParser::parse(MaterialData& data)
 	auto oldUniforms = data.m_uniforms;
 	auto oldSamplers = data.m_samplers;
 
-	ResourceWrapper<Shader> shader = getActiveShader(data);
+	ShaderResourceRef shader = getActiveShader(data);
 
 	if (shader.isEmpty())
 	{

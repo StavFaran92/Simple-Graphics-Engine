@@ -7,7 +7,7 @@
 class EngineAPI TexturePainter
 {
 public:
-    void setTexture(const ResourceWrapper<Texture>& tex);
+    void setTexture(const TextureResourceRef& tex);
 
     void setBrushRadius(float r);
     float getBrushRadius() const;
@@ -22,7 +22,7 @@ public:
     std::vector<float> readTextureData();
 
 private:
-    ResourceWrapper<Texture> m_texture;
+    TextureResourceRef m_texture;
     float m_brushRadius = 10.0f;
     float m_brushStrength = .1f;
 

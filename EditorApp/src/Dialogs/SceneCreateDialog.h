@@ -5,6 +5,7 @@
 
 #include "Widgets/UniqueNameWidget.h"
 #include "Widgets/FilepathWidget.h"
+#include "memory/AssetAliases.h"
 
 class SceneCreateDialog : public DialogBase
 {
@@ -17,5 +18,5 @@ public:
 	void cancelContent() override;
 
 	UniqueNameWidget m_uniqueName{ "Name" };
-	ResourceWrapper<Scene> m_tempScene;
+	SceneResourceRef m_tempScene;
 };

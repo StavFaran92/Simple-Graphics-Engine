@@ -14,7 +14,7 @@ void CommonShaders::close()
 	m_shaders.clear();
 }
 
-ResourceWrapper<Shader> CommonShaders::getShader(ShaderType sType) const
+ShaderResourceRef CommonShaders::getShader(ShaderType sType) const
 {
-	return ResourceWrapper<Shader>();
+	return ShaderResourceRef();
 }

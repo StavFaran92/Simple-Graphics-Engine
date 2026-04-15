@@ -4,7 +4,7 @@
 #include <memory>
 #include "core/Core.h"
 #include "memory/ResourceWrapper.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetAliases.h"
 
 class Model;
 class Shader;
@@ -38,8 +38,8 @@ class EngineAPI Context
 public:
 	Context(const std::shared_ptr<ProjectAssetRegistry>& par);
 
-	bool addScene(const AssetHandle<SceneAsset>& scene);
-	bool removeScene(const AssetHandle<SceneAsset>& scene);
+	bool addScene(const SceneAssetRef& scene);
+	bool removeScene(const SceneAssetRef& scene);
 
 	Window* getWindow() const;
 	//ImguiHandler* getImguiHandler() const;
@@ -47,9 +47,9 @@ public:
 	EventSystem* getEventSystem() const;
 	//Resource<Material> getDefaultMaterial() const;
 
-	ResourceWrapper<Scene> getActiveScene() const;
+	SceneResourceRef getActiveScene() const;
 
-	AssetHandle<SceneAsset> getActiveSceneAsset() const;
+	SceneAssetRef getActiveSceneAsset() const;
 
 	void startSimulation();
 
@@ -64,7 +64,7 @@ public:
 
 	//Resource<Texture> getDummyTexture();
 
-	const std::map<uint32_t, ResourceWrapper<Scene>>& getAllScenes() const;
+	const std::map<uint32_t, SceneResourceRef>& getAllScenes() const;
 	uint32_t getActiveSceneID() const;
 
 	SceneManager* getSceneManager() const;

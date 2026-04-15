@@ -105,12 +105,12 @@ void DebugHelper::drawAABB(const AABB& aabb, const glm::vec3& color, float thick
 	dbg.drawLine(corners[3], corners[7], color, thickness);
 }
 
-void DebugHelper::registerTextureForDebug(const std::string& name, ResourceWrapper<Texture> texture)
+void DebugHelper::registerTextureForDebug(const std::string& name, TextureResourceRef texture)
 {
 	m_debugTextures[name] = texture;
 }
 
-const std::map<std::string, ResourceWrapper<Texture>>& DebugHelper::getDebugTextures() const
+const std::map<std::string, TextureResourceRef>& DebugHelper::getDebugTextures() const
 {
 	return m_debugTextures;
 }

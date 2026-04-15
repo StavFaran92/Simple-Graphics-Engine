@@ -9,6 +9,7 @@
 
 #include "animation/AnimationBinaryLoader.h"
 #include "core/Factory.h"
+#include "core/Engine.h"
 
 #include <filesystem>
 #include <stdexcept>
@@ -80,7 +81,7 @@ ResourceWrapper<Resource> AnimationTypeManager::loadResourceFromDisk(ResourceLoa
 	AnimationData animationData;
 	AnimationBinaryLoader::load(desc.sourcePath, animationData);
 
-	ResourceWrapper<Animation> animation = Factory<Animation>::create();
+	AnimationResourceRef animation = Factory<Animation>::create();
 	animation->build(animationData);
 	return animation;
 }

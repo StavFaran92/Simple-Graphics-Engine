@@ -20,7 +20,7 @@ public:
 
 	std::shared_ptr<FrameBufferObject> m_renderTargetFBO;
 	std::shared_ptr<RenderBufferObject> m_renderTargetRBO;
-	ResourceWrapper<Texture> m_renderTargetTexture = ResourceWrapper<Texture>::empty;
+	TextureResourceRef m_renderTargetTexture = TextureResourceRef::empty;
 };
 
 class RenderView
@@ -37,11 +37,11 @@ public:
 	void setCamera(const Entity& camera);
 
 	unsigned int getRenderTargetTextureID() const;
-	ResourceWrapper<Texture> getRenderTargetTexture() const;
+	TextureResourceRef getRenderTargetTexture() const;
 
     unsigned int getRenderTargetFrameBufferID() const;
 
-    void setTexture(ResourceWrapper<Texture> texture);
+    void setTexture(TextureResourceRef texture);
 
     void resize(int w, int h);
 

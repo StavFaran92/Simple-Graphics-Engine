@@ -8,6 +8,7 @@
 #include "component/Terrain.h"
 #include <algorithm>
 #include "runtime/Scene.h"
+#include "core/Engine.h"
 
 void FoliageField::build(int newW, int newH)
 {
@@ -25,7 +26,7 @@ void FoliageField::build(int newW, int newH)
 
 	//std::vector<float> data(height * width, 0.f);
 	//tData.data = data.data();
-	//ResourceWrapper<Texture> foliageSpreadMap = Texture::create2DTextureFromBuffer(tData);
+	//TextureResourceRef foliageSpreadMap = Texture::create2DTextureFromBuffer(tData);
 
 	//AssetBuildDescriptor desc;
 	//desc.isEngineOwned = true;

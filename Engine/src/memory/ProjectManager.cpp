@@ -17,7 +17,7 @@ void ProjectManager::loadProject(const std::string& filePath, std::shared_ptr<Co
     Archiver::load();
 
     //UUID uid activeSceneID = Engine::get()->getProjectSettings()->get<int>("active_scene");
-    //AssetHandle<SceneAsset> activeSceneAsset(uid);
+    //SceneAssetRef activeSceneAsset(uid);
     //activeSceneAsset.resource()->getID()
     //Engine::get()->getContext()->setActiveScene()
 }

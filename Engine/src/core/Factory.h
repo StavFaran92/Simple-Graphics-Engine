@@ -4,6 +4,7 @@
 #include "memory/ResourceManager.h"
 #include "memory/MemoryManager.h"
 #include "memory/ResourceBase.h"
+#include "core/Engine.h"
 
 template<typename T> class ResourceWrapper;
 

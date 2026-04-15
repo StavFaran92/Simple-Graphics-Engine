@@ -2,14 +2,17 @@
 
 #include "memory/ResourceWrapper.h"
 #include "memory/AssetRecord.h"
-#include "core/Engine.h"
-#include "memory/ResourceManager.h"
 #include "memory/Asset.h"
 
-class EngineAPI Test
+class EngineAPI AssetHandleImpl
 {
 public:
 	static ResourceWrapper<Resource> loadAssetResourceInternal(const AssetRecord& record, UUID uuid);
+	static const AssetRecord& getInfo(UUID uuid);
+	static ResourceWrapper<Resource> createOrGetCachedResource(const AssetRecord& record, UUID uuid);
+	static void syncAsset(UUID uuid);
+	static void deleteAsset(UUID uuid);
+	static void makeAssetDirty(UUID uuid);
 
 };
 
@@ -68,18 +71,14 @@ public:
 
 		const AssetRecord& record = info();
 
-		auto resource = Engine::get()->getResourceManager()->createOrGetCached(
-			record.resourceID,
-			[this, &record]() {
-				return Test::loadAssetResourceInternal(record, uuid);
-			});
+		auto resource = AssetHandleImpl::createOrGetCachedResource(record, uuid);
 
 		m_resource_DEBUG = resource;
 
 		if (record.isResourceDirty())
 		{
 			record.asset->fillData(resource);
-			Engine::get()->getSubSystem<Assets>()->sync(uuid);
+			AssetHandleImpl::syncAsset(uuid);
 		}
 
 		return resource.as<ResourceType>();
@@ -87,12 +86,12 @@ public:
 
 	void erase()
 	{
-		Engine::get()->getSubSystem<Assets>()->deleteAsset(uuid);
+		AssetHandleImpl::deleteAsset(uuid);
 	}
 
 	void makeDirty()
 	{
-		Engine::get()->getSubSystem<Assets>()->makeDirty(uuid);
+		AssetHandleImpl::makeAssetDirty(uuid);
 	}
 
 	UUID getUID() const
@@ -107,7 +106,7 @@ public:
 
 	const AssetRecord& info() const
 	{
-		return Engine::get()->getSubSystem<Assets>()->getInfo(uuid);
+		return AssetHandleImpl::getInfo(uuid);
 	}
 
 	void reimportAsset()

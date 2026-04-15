@@ -2,8 +2,9 @@
 
 #include "scripts/ScriptSystem.h"
 #include "runtime/Scene.h"
+#include "core/Engine.h"
 
-ScriptComponent::ScriptComponent(const AssetHandle<LuaScriptAsset>& script)
+ScriptComponent::ScriptComponent(const LuaScriptAssetRef& script)
 	: script(script)
 {
 
@@ -22,12 +23,12 @@ bool ScriptComponent::isValid() const
 	return !script.isEmpty();
 }
 
-AssetHandle<LuaScriptAsset>& ScriptComponent::getScript()
+LuaScriptAssetRef& ScriptComponent::getScript()
 {
 	return script;
 }
 
-void ScriptComponent::resolve(ResourceWrapper<Scene>& scene)
+void ScriptComponent::resolve(SceneResourceRef& scene)
 {
 	entity.setRegistry(&scene->getRegistry());
 }

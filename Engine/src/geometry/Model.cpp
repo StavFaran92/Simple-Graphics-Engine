@@ -2,10 +2,10 @@
 
 #include "geometry/ModelImporter.h"
 
-#include "geometry/MeshExporter.h"
 #include "core/Factory.h"
 #include "core/Engine.h"
 #include "geometry/MeshBuilder.h"
+#include "memory/Assets.h"
 
 void Model::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
@@ -68,12 +68,12 @@ int Model::getMaterialCount() const
 }
 
 
-ResourceWrapper<Model> Model::load(const std::string& fileLocation, ModelLoadDescriptor desc)
+ModelResourceRef Model::load(const std::string& fileLocation, ModelLoadDescriptor desc)
 {
 	ModelImporter::ModelInfo modelInfo;
 	Engine::get()->getSubSystem<ModelImporter>()->parseModel(fileLocation, modelInfo);
 
-	ResourceWrapper<Model> model = Factory<Model>::create();
+	ModelResourceRef model = Factory<Model>::create();
 	for (const auto& data : modelInfo.meshDataList)
 	{
 		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
@@ -120,7 +120,7 @@ void ModelAsset::bindDependency(const std::string& slot, UUID dependency)
 	AssetHandle<Asset> generic =
 		Engine::get()->getSubSystem<Assets>()->getAsset(dependency);
 
-	AssetHandle<MaterialAsset> material = generic.as<MaterialAsset>();
+	MaterialAssetRef material = generic.as<MaterialAsset>();
 
 	if (material.isEmpty())
 	{

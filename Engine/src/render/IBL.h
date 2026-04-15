@@ -7,7 +7,7 @@ class Scene;
 class IBL
 {
 public:
-	static ResourceWrapper<Texture> generateIrradianceMap(ResourceWrapper<Texture> cubemap);
-	static ResourceWrapper<Texture> generatePrefilterEnvMap(ResourceWrapper<Texture> cubemap);
-	static ResourceWrapper<Texture> generateBRDFIntegrationLUT();
+	static TextureResourceRef generateIrradianceMap(TextureResourceRef cubemap);
+	static TextureResourceRef generatePrefilterEnvMap(TextureResourceRef cubemap);
+	static TextureResourceRef generateBRDFIntegrationLUT();
 };

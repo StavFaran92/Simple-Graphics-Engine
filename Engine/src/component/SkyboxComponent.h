@@ -10,7 +10,7 @@ struct EngineAPI SkyboxComponent : public Component
 {
 	SkyboxComponent() = default;
 
-	SkyboxComponent(AssetHandle<TextureAsset> skyboxImage);
+	SkyboxComponent(TextureAssetRef skyboxImage);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -22,26 +22,26 @@ struct EngineAPI SkyboxComponent : public Component
 
 	}
 
-	void setSkybox(AssetHandle<TextureAsset> image);
+	void setSkybox(TextureAssetRef image);
 
 	void build();
 
-	void resolve(ResourceWrapper<Scene>& scene) override;
-	void postLoad(ResourceWrapper<Scene>& scene) override;
+	void resolve(SceneResourceRef& scene) override;
+	void postLoad(SceneResourceRef& scene) override;
 
 
-	AssetHandle<TextureAsset> originalImage;
-	ResourceWrapper<Texture> cubemapIBL;
-	//ResourceWrapper<Texture> cubemap;
-	AssetHandle<TextureAsset> m_prefilterEnvMap;
+	TextureAssetRef originalImage;
+	TextureResourceRef cubemapIBL;
+	//TextureResourceRef cubemap;
+	TextureAssetRef m_prefilterEnvMap;
 
-	//AssetHandle<TextureAsset>
+	//TextureAssetRef
 
-	ResourceWrapper<Scene> m_scene = nullptr;
+	SceneResourceRef m_scene = nullptr;
 
 	bool m_isBuilt = false;
-	AssetHandle<TextureAsset> m_cubemap;
-	AssetHandle<TextureAsset> m_irradianceMap;
+	TextureAssetRef m_cubemap;
+	TextureAssetRef m_irradianceMap;
 };
 
 REGISTER_COMPONENT(SkyboxComponent)

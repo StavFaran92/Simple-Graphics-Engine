@@ -70,9 +70,9 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 
 	m_renderTargetFBO->bind();
 
-	ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+	TextureResourceRef renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 
-	//ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+	//TextureResourceRef renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 	//renderView->swapToAdditionalTarget();
 	//renderView->bind();
 	RenderCommand::clear();
@@ -105,7 +105,7 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	mat->use();
 
 	// bind mesh
-	ResourceWrapper<Model> mesh;
+	ModelResourceRef mesh;
 	if (!volume.mesh.isEmpty())
 	{
 		mesh = volume.mesh.resource(); // will not work for hierarchical meshes

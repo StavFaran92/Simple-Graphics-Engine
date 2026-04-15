@@ -7,6 +7,7 @@
 #include "runtime/Scene.h"
 #include "utils/RandomNameGenerator.h"
 #include "systems/UniqueNameManager.h"
+#include "core/Engine.h"
 
 #include <filesystem>
 
@@ -125,7 +126,7 @@ void Assets::loadAssetsDatabase()
 		// If its a scene we add it to the scene manager
 		if (record.aType == AssetType::SCENE)
 		{
-			AssetHandle<SceneAsset> sceneAsset(uuid);
+			SceneAssetRef sceneAsset(uuid);
 			Engine::get()->getContext()->addScene(sceneAsset);
 		}
 	}

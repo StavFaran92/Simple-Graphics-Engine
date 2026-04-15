@@ -3,11 +3,11 @@
 class Scene;
 class Texture;
 
-#include "memory/ResourceWrapper.h"
+#include "memory/AssetAliases.h"
 
 class EquirectangularToCubemapConverter
 {
 public:
-	static ResourceWrapper<Texture> fromEquirectangularToCubemap(ResourceWrapper<Texture> equirectangularTexture);
-	static ResourceWrapper<Texture> fromCubemapToEquirectangular(ResourceWrapper<Texture> cubemapTexture);
+	static TextureResourceRef fromEquirectangularToCubemap(TextureResourceRef equirectangularTexture);
+	static TextureResourceRef fromCubemapToEquirectangular(TextureResourceRef cubemapTexture);
 };

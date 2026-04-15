@@ -128,9 +128,9 @@ void Texture::copyBufferIntoInternalBuffer(void*& data, size_t bufferSize)
 	data = newBuffer;
 }
 
-ResourceWrapper<Texture> Texture::createTexture(TextureData& textureData)
+TextureResourceRef Texture::createTexture(TextureData& textureData)
 {
-	ResourceWrapper<Texture> texture = Factory<Texture>::create();
+	TextureResourceRef texture = Factory<Texture>::create();
 
 	const uint32_t bytesPerPixel =
 		TextureUtils::channelCount(textureData.format) *
@@ -161,7 +161,7 @@ ResourceWrapper<Texture> Texture::createTexture(TextureData& textureData)
 	return texture;
 }
 
-ResourceWrapper<Texture> Texture::createTexture(int width, int height, int channels, TextureInternalFormat internalFormat, TextureFormat format, TextureType type, TextureFilter filter, TextureWrap wrap, void* data)
+TextureResourceRef Texture::createTexture(int width, int height, int channels, TextureInternalFormat internalFormat, TextureFormat format, TextureType type, TextureFilter filter, TextureWrap wrap, void* data)
 {
 	TextureData textureData;
 	textureData.target = TextureTarget::TEXTURE_2D;
@@ -178,7 +178,7 @@ ResourceWrapper<Texture> Texture::createTexture(int width, int height, int chann
 	return createTexture(textureData);
 }
 
-ResourceWrapper<Texture> Texture::createTexture(int width, int height, TextureSemantic usage, void* data)
+TextureResourceRef Texture::createTexture(int width, int height, TextureSemantic usage, void* data)
 {
 	TextureInternalFormat internalFormat = getInternalFormatFromUsage(usage);
 	TextureFormat format = TextureFormat::RGBA;
@@ -432,7 +432,7 @@ Texture::~Texture()
 	ClearTexture();
 }
 
-ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureLoadDescriptor desc)
+TextureResourceRef Texture::load(const std::string& fileLocation, TextureLoadDescriptor desc)
 {
 	std::string filepath = fileLocation;
 
@@ -445,18 +445,18 @@ ResourceWrapper<Texture> Texture::load(const std::string& fileLocation, TextureL
 	assert(textureData.data);
 
 	// Create texture resource
-	ResourceWrapper<Texture> texture = Factory<Texture>::create();
+	TextureResourceRef texture = Factory<Texture>::create();
 	texture->build(textureData);
 
 	return texture;
 }
 
-ResourceWrapper<Texture> Texture::clone() const
+TextureResourceRef Texture::clone() const
 {
 	if (m_data.target == TextureTarget::TEXTURE_3D)
 	{
 		logError("Clone is not supported for 3D textures");
-		return ResourceWrapper<Texture>::empty;
+		return TextureResourceRef::empty;
 	}
 
 	TextureData newTextureData(m_data);
@@ -472,13 +472,13 @@ ResourceWrapper<Texture> Texture::clone() const
 	if (!newTextureData.data)
 	{
 		logError("Texture clone: allocation failed.");
-		return ResourceWrapper<Texture>::empty;
+		return TextureResourceRef::empty;
 	}
 
 	// Copy raw pixel data
 	std::memcpy(newTextureData.data, m_data.data, bufferSize);
 
-	ResourceWrapper<Texture> clonedTexture = Texture::createTexture(newTextureData);
+	TextureResourceRef clonedTexture = Texture::createTexture(newTextureData);
 
 	if (clonedTexture.isEmpty())
 	{
@@ -536,7 +536,7 @@ void Texture::extractTextureDataFromSettings(const TextureLoadDescriptor& settin
 
 
 
-//ResourceWrapper<Texture> Texture::importTexture3D(const std::string& fileLocation)
+//TextureResourceRef Texture::importTexture3D(const std::string& fileLocation)
 //{
 	// TODO fix
 

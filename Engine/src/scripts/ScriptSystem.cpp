@@ -7,6 +7,7 @@
 
 #include "scripts/LuaBindings.h"
 #include "runtime/Entity.h"
+#include "core/Engine.h"
 
 struct LuaState
 {

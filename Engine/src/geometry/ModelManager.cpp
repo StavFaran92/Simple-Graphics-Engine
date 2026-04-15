@@ -136,7 +136,7 @@ ResourceWrapper<Resource> ModelTypeManager::loadResourceFromDisk(ResourceLoadDes
 	ModelData modelData;
 	ModelBinaryLoader::load(desc.sourcePath, modelData);
 
-	ResourceWrapper<Model> model = Factory<Model>::create();
+	ModelResourceRef model = Factory<Model>::create();
 	for (const auto& data : modelData.m_meshes)
 	{
 		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();

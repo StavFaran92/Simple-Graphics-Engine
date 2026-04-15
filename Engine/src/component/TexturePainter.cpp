@@ -2,7 +2,7 @@
 
 #include "memory/BuiltInResources.h"
 
-void TexturePainter::setTexture(const ResourceWrapper<Texture>& tex)
+void TexturePainter::setTexture(const TextureResourceRef& tex)
 {
     m_texture = tex;
 }
@@ -36,7 +36,7 @@ void TexturePainter::applyBrush(int pixelX, int pixelY)
     int w = m_texture->getWidth();
     int h = m_texture->getHeight();
 
-    ResourceWrapper<Shader> texturePaintShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TEXTURE_BRUSH_DEFORM);
+    ShaderResourceRef texturePaintShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TEXTURE_BRUSH_DEFORM);
     texturePaintShader->use();
     texturePaintShader->setUniformValue("brushCenter", glm::vec2((float)pixelX, (float)pixelY));
     texturePaintShader->setUniformValue("brushRadius", m_brushRadius);

@@ -87,11 +87,11 @@ public:
 
 	static SerializedEntity serializeEntity(Entity e);
 
-	static Entity deserializeEntity(SerializedEntity serializedEnt, ResourceWrapper<Scene>& scene);
+	static Entity deserializeEntity(SerializedEntity serializedEnt, SceneResourceRef& scene);
 
-	static SerializedScene serializeScene(ResourceWrapper<Scene>& scene);
+	static SerializedScene serializeScene(SceneResourceRef& scene);
 
-	static void deserializeScene(SerializedScene serializedScene, ResourceWrapper<Scene>& scene);
+	static void deserializeScene(SerializedScene serializedScene, SceneResourceRef& scene);
 
 	//static SerializedContext serializeContext(const Context* ctx);
 

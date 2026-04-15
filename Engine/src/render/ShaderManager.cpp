@@ -5,6 +5,8 @@
 #include "memory/AssetRecord.h"
 #include "memory/AssetHandle.h"
 #include "render/ShaderLoader.h"
+#include "core/Engine.h"
+#include "core/Logger.h"
 
 #include <filesystem>
 #include <fstream>

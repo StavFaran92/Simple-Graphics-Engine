@@ -3,16 +3,16 @@
 #include "core/Factory.h"
 
 
-ResourceWrapper<LuaScript> LuaScript::load(const std::string& fileLocation, LuaScriptLoadDescriptor desc)
+LuaScriptResourceRef LuaScript::load(const std::string& fileLocation, LuaScriptLoadDescriptor desc)
 {
-	ResourceWrapper<LuaScript> luaScript = Factory<LuaScript>::create();
+	LuaScriptResourceRef luaScript = Factory<LuaScript>::create();
 	luaScript->filepath = fileLocation;
 	return luaScript;
 }
 
-ResourceWrapper<LuaScript> LuaScript::create()
+LuaScriptResourceRef LuaScript::create()
 {
-	ResourceWrapper<LuaScript> script = Factory<LuaScript>::create();
+	LuaScriptResourceRef script = Factory<LuaScript>::create();
 
 	static int counter = 0;
 	std::string name = "temp_script_" + std::to_string(counter++) + ".lua";

@@ -21,12 +21,12 @@ public:
 
     void close();
 
-    ResourceWrapper<Shader> getShader(ShaderType sType) const;
+    ShaderResourceRef getShader(ShaderType sType) const;
 
     CommonShaders(const CommonShaders& other) = delete;
     CommonShaders& operator=(const CommonShaders& other) = delete;
 
 private:
-    std::map<ShaderType, ResourceWrapper<Shader>> m_shaders;
+    std::map<ShaderType, ShaderResourceRef> m_shaders;
     
 };

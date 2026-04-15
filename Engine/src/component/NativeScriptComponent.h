@@ -37,7 +37,7 @@ struct EngineAPI NativeScriptComponent : public Component
 		SERIALIZED_MEMBER(script);
 	}
 
-	void resolve(ResourceWrapper<Scene>& scene) override;
+	void resolve(SceneResourceRef& scene) override;
 };
 
 REGISTER_COMPONENT(NativeScriptComponent)

@@ -15,6 +15,8 @@
 #include "runtime/Context.h"
 #include "scripts/LuaScript.h"
 #include "texture/Texture.h"
+#include "memory/Assets.h"
+#include "core/Engine.h"
 #include "component/CameraComponent.h"
 #include "component/SkyboxComponent.h"
 #include "component/PlayerControllerComponent.h"
@@ -91,7 +93,7 @@ void bindComponents(sol::state& lua)
     lua.new_usertype<Animator>("Animator",
         "playAnimation", sol::overload(
             [](Animator& self, const std::string& name) { self.playAnimation(name); },
-            [](Animator& self, AssetHandle<AnimationAsset> animation) { self.playAnimation(animation); }
+            [](Animator& self, AnimationAssetRef animation) { self.playAnimation(animation); }
         ),
         "setPlaybackSpeed", &Animator::setPlaybackSpeed,
         "addAnimation", &Animator::addAnimation,
@@ -239,27 +241,27 @@ void bindAssets(sol::state& lua)
     );
 
     // todo fix
-    //lua.new_usertype<ResourceWrapper<Prefab>>("Prefab",
+    //lua.new_usertype<PrefabResourceRef>("Prefab",
     //    sol::factories(
     //        [](int value) {
     //            // your custom UUID creation from int
-    //            return ResourceWrapper<Prefab>(UUID(value));
+    //            return PrefabResourceRef(UUID(value));
     //        }
     //    ),
     //    // Instance methods
-    //    "save", [](ResourceWrapper<Prefab>& self) {
+    //    "save", [](PrefabResourceRef& self) {
     //        self->save(self, {});
     //    },
-    //    "instansiate", [](ResourceWrapper<Prefab>& self, glm::vec3 position) {
+    //    "instansiate", [](PrefabResourceRef& self, glm::vec3 position) {
     //        self->Instansiate(position);
     //    },
 
     //    // Static methods wrapped as lambdas inside new_usertype
     //    "create", [](const Entity& e) {
-    //        return Prefab::create(e); // returns ResourceWrapper<Prefab>
+    //        return Prefab::create(e); // returns PrefabResourceRef
     //    },
     //    "import", [](const std::string& path) {
-    //        return PrefabAsset::import(path, {}); // returns ResourceWrapper<Prefab>
+    //        return PrefabAsset::import(path, {}); // returns PrefabResourceRef
     //    }
     //);
 

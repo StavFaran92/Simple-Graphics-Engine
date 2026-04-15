@@ -11,6 +11,7 @@
 #include "runtime/Scene.h"
 
 #include "memory/BuiltInAssets.h"
+#include "core/Engine.h"
 
 #include "GL/glew.h"
 
@@ -21,7 +22,7 @@ Entity Terrain::createTerrain(int width, int height)
 	return terrainEntity;
 }
 
-AssetHandle<TextureAsset> Terrain::generateHeightmap(int width, int height)
+TextureAssetRef Terrain::generateHeightmap(int width, int height)
 {
 	m_heightDataCPU = std::vector<float>(width * height, 0.0f);
 
@@ -75,7 +76,7 @@ Terrain Terrain::createTerrainComponent(int width, int height)
 	return terrain; // todo fix
 }
 
-ResourceWrapper<Model> Terrain::getMesh() const
+ModelResourceRef Terrain::getMesh() const
 {
 	return m_mesh.resource();
 }
@@ -85,14 +86,14 @@ float Terrain::getScale() const
 	return m_scale;
 }
 
-void Terrain::setHeightmap(AssetHandle<TextureAsset> heightmap)
+void Terrain::setHeightmap(TextureAssetRef heightmap)
 {
 	m_heightmap = heightmap;
 
 	build();
 }
 
-ResourceWrapper<Texture> Terrain::getHeightmap() const
+TextureResourceRef Terrain::getHeightmap() const
 {
 	return m_heightmap.resource();
 }
@@ -107,7 +108,7 @@ int Terrain::getHeight() const
 	return m_height;
 }
 
-void Terrain::setTexture(int index, AssetHandle<TextureAsset> texture)
+void Terrain::setTexture(int index, TextureAssetRef texture)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
@@ -151,12 +152,12 @@ void Terrain::setTextureBlend(int index, float val)
 	m_textureBlends[index].blend = val;
 }
 
-AssetHandle<TextureAsset>& Terrain::getTexture(int index)
+TextureAssetRef& Terrain::getTexture(int index)
 {
 	if (index > m_textureBlends.size() - 1)
 	{
 		logWarning("Invalid texture index specified: " + std::to_string(index));
-		return AssetHandle<TextureAsset>::empty;
+		return TextureAssetRef::empty;
 	}
 
 	return m_textureBlends.at(index).texture;

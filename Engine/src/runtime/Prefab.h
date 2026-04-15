@@ -1,6 +1,7 @@
 #pragma once
 
 #include "memory/Asset.h"
+#include "memory/AssetAliases.h"
 #include "core/Core.h"
 #include "runtime/Entity.h"
 #include "serialize/Archiver.h"
@@ -28,8 +29,8 @@ struct EngineAPI PrefabLoadDescriptor : public ResourceLoadDescriptor
 class EngineAPI Prefab : public Resource
 {
 public:
-	static ResourceWrapper<Prefab> load(const std::string& fileLocation, PrefabLoadDescriptor desc = {});
-	static ResourceWrapper<Prefab> create(const Entity& e);
+	static PrefabResourceRef load(const std::string& fileLocation, PrefabLoadDescriptor desc = {});
+	static PrefabResourceRef create(const Entity& e);
 
 	Entity Instansiate(glm::vec3 position = glm::vec3{ 0.0f });
 

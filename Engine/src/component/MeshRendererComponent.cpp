@@ -5,7 +5,7 @@
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
 
-MeshRendererComponent::MeshRendererComponent(AssetHandle<ModelAsset> mesh)
+MeshRendererComponent::MeshRendererComponent(ModelAssetRef mesh)
 	: mesh(mesh)
 {
 	int materialCount = mesh.resource()->getMaterialCount();
@@ -15,13 +15,13 @@ MeshRendererComponent::MeshRendererComponent(AssetHandle<ModelAsset> mesh)
 	}
 }
 
-AssetHandle<MaterialAsset> MeshRendererComponent::getMaterialBySlot(int slot) const
+MaterialAssetRef MeshRendererComponent::getMaterialBySlot(int slot) const
 {
 	auto iter = m_material.find(slot);
 	if (iter == m_material.end())
 	{
 		logWarning("Could not find material in slot {}", std::to_string(slot));
-		return AssetHandle<MaterialAsset>::empty;
+		return MaterialAssetRef::empty;
 	}
 	return iter->second;
 }

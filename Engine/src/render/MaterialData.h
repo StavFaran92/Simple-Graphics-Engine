@@ -52,9 +52,9 @@ public:
 
 	MaterialRenderMode getMaterialRenderMode() const;
 
-	void setCustomShader(AssetHandle<ShaderAsset>& customShader);
+	void setCustomShader(ShaderAssetRef& customShader);
 
-	AssetHandle<ShaderAsset> getCustomShader() const;
+	ShaderAssetRef getCustomShader() const;
 
 	const std::map<std::string, EditableUniform>& getUniforms() const;
 
@@ -82,7 +82,7 @@ private:
 
 	bool m_isParsed = false;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::Opaque;
-	AssetHandle<ShaderAsset> m_customShader;
+	ShaderAssetRef m_customShader;
 	std::map<std::string, EditableUniform> m_uniforms;
 	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
 };

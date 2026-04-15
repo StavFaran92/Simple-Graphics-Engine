@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include "core/Core.h"
+#include "memory/AssetAliases.h"
 
 #include "memory/ResourceWrapper.h"
 #include "render/Shader.h"
@@ -42,18 +43,18 @@ public:
 	Material() = default;
 	~Material() = default;
 
-	static ResourceWrapper<Material> create(MaterialRenderMode renderMode);
+	static MaterialResourceRef create(MaterialRenderMode renderMode);
 
-	static ResourceWrapper<Material> load(const std::string& fileLocation, MaterialLoadDescriptor desc = {});
+	static MaterialResourceRef load(const std::string& fileLocation, MaterialLoadDescriptor desc = {});
 
 	void use();
 	void release();
 
 	std::string getName() const;
 	MaterialRenderMode getRenderMode() const;
-	ResourceWrapper<Shader> getActiveShader() const;
+	ShaderResourceRef getActiveShader() const;
 
-	void setTexture(const std::string& name, const ResourceWrapper<Texture>& texture);
+	void setTexture(const std::string& name, const TextureResourceRef& texture);
 
 	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
 	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
@@ -61,13 +62,13 @@ public:
 	void setUniformValue(const std::string& name, const Value& v);
 	Value getUniformValue(const std::string& name);
 
-	ResourceWrapper<Material> clone(bool isEngineOwned) const;
+	MaterialResourceRef clone(bool isEngineOwned) const;
 
 private:
 	friend class MaterialAsset;
 
 	std::string m_name;
-	ResourceWrapper<Shader> m_customShader;
+	ShaderResourceRef m_customShader;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 
 	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
@@ -93,8 +94,8 @@ public:
 	void setName(const std::string& name);
 	std::string getName() const;
 
-	void setCustomShader(AssetHandle<ShaderAsset>& customShader);
-	AssetHandle<ShaderAsset> getCustomShader() const;
+	void setCustomShader(ShaderAssetRef& customShader);
+	ShaderAssetRef getCustomShader() const;
 
 	void setMaterialRenderMode(MaterialRenderMode renderMode);
 	MaterialRenderMode getMaterialRenderMode() const;
@@ -112,9 +113,9 @@ public:
 
 	MaterialData data;
 
-	ResourceWrapper<Shader> getActiveShader() const;
+	ShaderResourceRef getActiveShader() const;
 
-	AssetHandle<MaterialAsset> clone(bool isEngineOwned) const;
+	MaterialAssetRef clone(bool isEngineOwned) const;
 
 	
 	//std::map<std::string, EditableUniform> m_uniformProperties;

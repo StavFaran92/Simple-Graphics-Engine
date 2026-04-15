@@ -18,7 +18,7 @@
 #include "component/RenderableComponent.h"
 #include "core/Logger.h"
 
-ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture)
+TextureResourceRef TextureTransformer::flipVertical(TextureResourceRef srcTexture)
 {
 	auto dstTexture = srcTexture->clone();
 	//auto dstTexture = Texture::createTexture(srcTexture.get()->getData());
@@ -26,7 +26,7 @@ ResourceWrapper<Texture> TextureTransformer::flipVertical(ResourceWrapper<Textur
 	return dstTexture;
 }
 
-void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture)
+void TextureTransformer::flipVertical(TextureResourceRef srcTexture, TextureResourceRef& dstTexture)
 {
 	auto shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/FlipTextureShader.glsl");
 
@@ -66,14 +66,14 @@ void TextureTransformer::flipVertical(ResourceWrapper<Texture> srcTexture, Resou
 	RenderCommand::draw(vao);
 }
 
-ResourceWrapper<Texture> TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTexture)
+TextureResourceRef TextureTransformer::applyGammaCorrection(TextureResourceRef srcTexture)
 {
 	auto dstTexture = srcTexture->clone();
 	applyGammaCorrection(srcTexture, dstTexture);
 	return dstTexture;
 }
 
-void TextureTransformer::applyGammaCorrection(ResourceWrapper<Texture> srcTexture, ResourceWrapper<Texture>& dstTexture)
+void TextureTransformer::applyGammaCorrection(TextureResourceRef srcTexture, TextureResourceRef& dstTexture)
 {
 	auto shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/ApplyGammaCorrectionShader.glsl");
 

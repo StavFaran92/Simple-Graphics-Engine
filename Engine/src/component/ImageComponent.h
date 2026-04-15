@@ -7,7 +7,7 @@ struct EngineAPI ImageComponent : public Component
 {
 	ImageComponent() = default;
 
-	ImageComponent(AssetHandle<TextureAsset> image) : image(image) {}
+	ImageComponent(TextureAssetRef image) : image(image) {}
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -21,7 +21,7 @@ struct EngineAPI ImageComponent : public Component
 	glm::vec2 position;
 	float rotate = 0;
 
-	AssetHandle<TextureAsset> image;
+	TextureAssetRef image;
 };
 
 REGISTER_COMPONENT(ImageComponent)

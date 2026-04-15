@@ -27,7 +27,7 @@ public:
 private:
 	std::shared_ptr<FrameBufferObject> m_renderTargetFBO;
 	std::shared_ptr<RenderBufferObject> m_renderTargetRBO;
-	ResourceWrapper<Texture> m_renderTargetTexture = ResourceWrapper<Texture>::empty;
+	TextureResourceRef m_renderTargetTexture = TextureResourceRef::empty;
 
-	ResourceWrapper<Shader> m_renderVolumeIntoSceneShader;
+	ShaderResourceRef m_renderVolumeIntoSceneShader;
 };

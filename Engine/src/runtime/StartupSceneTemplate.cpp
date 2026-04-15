@@ -9,13 +9,13 @@
 #include "lights/DirectionalLight.h"
 #include "memory/BuiltInAssets.h"
 
-AssetHandle<SceneAsset> StartupSceneTemplate::createStartupScene(const std::string& name)
+SceneAssetRef StartupSceneTemplate::createStartupScene(const std::string& name)
 {
     AssetBuildDescriptor desc;
     desc.name = name;
     desc.aType = AssetType::SCENE;
     SceneCreateDescriptor sceneDesc;
-    AssetHandle<SceneAsset> sceneAsset = Engine::get()->getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
+    SceneAssetRef sceneAsset = Engine::get()->getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
 
     auto startupScene = sceneAsset.resource();
 

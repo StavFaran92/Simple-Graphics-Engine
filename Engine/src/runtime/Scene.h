@@ -15,6 +15,8 @@
 #include "serialize/Archiver.h"
 #include "memory/AssetDescriptors.h"
 #include "memory/Asset.h"
+#include "memory/AssetAliases.h"
+#include "memory/ResourceWrapper.h"
 
 
 class Model;
@@ -97,9 +99,9 @@ public:
 	// -------------------- Methods -------------------- //
 	Scene() = default;
 
-	static ResourceWrapper<Scene> load(const std::string& fileLocation, SceneLoadDescriptor desc = {});
+	static SceneResourceRef load(const std::string& fileLocation, SceneLoadDescriptor desc = {});
 
-	static ResourceWrapper<Scene> create();
+	static SceneResourceRef create();
 
 	void onActivate();
 	void onDeactivate();
@@ -120,7 +122,7 @@ public:
 
 	void displayWireframeMesh(Entity e);
 
-	void setIBLData(ResourceWrapper<Texture> irradianceMap, ResourceWrapper<Texture> prefilterEnvMap);
+	void setIBLData(TextureResourceRef irradianceMap, TextureResourceRef prefilterEnvMap);
 
 	//int getRenderTarget() const;
 
@@ -197,7 +199,7 @@ private:
 
 	bool m_isSimulationActive = false;
 
-	ResourceWrapper<Shader> m_tempOutlineShader = nullptr;
+	ShaderResourceRef m_tempOutlineShader = nullptr;
 
 	//CameraComponent* m_activeCamera = nullptr;
 
@@ -210,11 +212,11 @@ private:
 	//std::shared_ptr<RenderBufferObject> m_renderTargetRBO;
 	//Resource<Texture> m_renderTargetTexture;
 
-	ResourceWrapper<Texture> m_irradianceMap;
-	ResourceWrapper<Texture> m_prefilterEnvMap;
-	ResourceWrapper<Texture> m_BRDFIntegrationLUT;
-	ResourceWrapper<Shader> m_skyboxShader;
-	ResourceWrapper<Shader> m_UIShader;
+	TextureResourceRef m_irradianceMap;
+	TextureResourceRef m_prefilterEnvMap;
+	TextureResourceRef m_BRDFIntegrationLUT;
+	ShaderResourceRef m_skyboxShader;
+	ShaderResourceRef m_UIShader;
 
 	//ResourceWrapper<MeshGroup> m_basicBox;
 
@@ -228,13 +230,13 @@ private:
 
 	std::shared_ptr<RenderView> m_highlightRenderView;
 
-	ResourceWrapper<Shader> m_highlightMaskShader;
-	ResourceWrapper<Shader> m_highlightEdgeDetectionShader;
-	ResourceWrapper<Shader> m_highlightMergeShader;
+	ShaderResourceRef m_highlightMaskShader;
+	ShaderResourceRef m_highlightEdgeDetectionShader;
+	ShaderResourceRef m_highlightMergeShader;
 
 	std::shared_ptr<WireframeGrid> m_wireframeGrid;
 
-	ResourceWrapper<Shader> m_sampleComputeShader;
+	ShaderResourceRef m_sampleComputeShader;
 
 	std::vector<ResourceWrapper<Resource>> m_cachedResources;;
 

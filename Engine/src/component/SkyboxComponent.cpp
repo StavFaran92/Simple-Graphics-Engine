@@ -5,13 +5,15 @@
 #include "utils/EquirectangularToCubemapConverter.h"
 #include "render/IBL.h"
 #include "texture/TextureTransformer.h"
+#include "core/Engine.h"
+#include "memory/Assets.h"
 
-SkyboxComponent::SkyboxComponent(AssetHandle<TextureAsset> skyboxImage)
+SkyboxComponent::SkyboxComponent(TextureAssetRef skyboxImage)
 {
 	setSkybox(skyboxImage);
 }
 
-void SkyboxComponent::setSkybox(AssetHandle<TextureAsset> image)
+void SkyboxComponent::setSkybox(TextureAssetRef image)
 {
 	originalImage = image;
 }
@@ -22,8 +24,8 @@ void SkyboxComponent::build()
 
 	assert(!m_scene.isEmpty());
 
-	ResourceWrapper<Texture> flippedImage = TextureTransformer::flipVertical(originalImage.resource());
-	ResourceWrapper<Texture> flippedImageGammeCorrected = TextureTransformer::applyGammaCorrection(flippedImage);
+	TextureResourceRef flippedImage = TextureTransformer::flipVertical(originalImage.resource());
+	TextureResourceRef flippedImageGammeCorrected = TextureTransformer::applyGammaCorrection(flippedImage);
 	auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImageGammeCorrected);
 	m_cubemap = Engine::get()->getSubSystem<Assets>()->bakeAssetFromResource(cubemap).as<TextureAsset>();
 
@@ -41,12 +43,12 @@ void SkyboxComponent::build()
 	
 }
 
-void SkyboxComponent::resolve(ResourceWrapper<Scene>& scene)
+void SkyboxComponent::resolve(SceneResourceRef& scene)
 {
 	m_scene = scene;
 }
 
-void SkyboxComponent::postLoad(ResourceWrapper<Scene>& scene)
+void SkyboxComponent::postLoad(SceneResourceRef& scene)
 {
 	if (!m_isBuilt)
 	{

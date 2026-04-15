@@ -10,11 +10,11 @@ class EngineAPI ScriptComponent : public Component
 {
 public:
 	ScriptComponent() = default;
-	ScriptComponent(const AssetHandle<LuaScriptAsset>& script);
+	ScriptComponent(const LuaScriptAssetRef& script);
 	void loadScript();
 
 	bool isValid() const;
-	AssetHandle<LuaScriptAsset>& getScript();
+	LuaScriptAssetRef& getScript();
 
 	//std::string filepath;
 
@@ -24,9 +24,9 @@ public:
 		SERIALIZED_MEMBER(entity);
 	}
 
-	void resolve(ResourceWrapper<Scene>& scene) override;
+	void resolve(SceneResourceRef& scene) override;
 
-	AssetHandle<LuaScriptAsset> script;
+	LuaScriptAssetRef script;
 	Entity entity;
 
 

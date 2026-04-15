@@ -364,7 +364,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	// bind textures
 	// Todo solve slots issue
-	ResourceWrapper<Shader> lightPassShaderResource = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT);
+	ShaderResourceRef lightPassShaderResource = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT);
 	lightPassShaderResource->use();
 	lightPassShaderResource->setTextureInShader(m_positionTexture, "gPosition", 0);
 	lightPassShaderResource->setTextureInShader(m_normalTexture, "gNormal", 1);

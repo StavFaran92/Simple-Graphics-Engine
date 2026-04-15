@@ -319,7 +319,7 @@ void AssetViewWindow::display()
 
 						if (aInfo.aType == AssetType::MATERIAL)
 						{
-							AssetHandle<MaterialAsset> mat = AssetHandle<MaterialAsset>(uuid);
+							MaterialAssetRef mat = MaterialAssetRef(uuid);
 							if (mat.isEmpty())
 								logError("Asset cast to material failed.");
 							else
@@ -390,7 +390,7 @@ void AssetViewWindow::display()
 
 						if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
 						{
-							AssetHandle<PrefabAsset> prefab = assets->getAsset(uuid).as<PrefabAsset>();
+							PrefabAssetRef prefab = assets->getAsset(uuid).as<PrefabAsset>();
 							if (prefab.isEmpty())
 								logWarning("Failed to cast asset to prefab asset.");
 							else
@@ -402,7 +402,7 @@ void AssetViewWindow::display()
 
 						if (aInfo.aType == AssetType::SCENE && ImGui::Selectable("Open"))
 						{
-							AssetHandle<SceneAsset> scene = assets->getAsset(uuid).as<SceneAsset>();
+							SceneAssetRef scene = assets->getAsset(uuid).as<SceneAsset>();
 							if (scene.isEmpty())
 								logWarning("Failed to cast asset to scene asset.");
 							else
@@ -415,7 +415,7 @@ void AssetViewWindow::display()
 
 						if (aInfo.aType == AssetType::SHADER && ImGui::Selectable("Recompile"))
 						{
-							AssetHandle<ShaderAsset> shader = assets->getAsset(uuid).as<ShaderAsset>();
+							ShaderAssetRef shader = assets->getAsset(uuid).as<ShaderAsset>();
 							if (shader.isEmpty())
 								logWarning("Failed to cast asset to shader asset.");
 							else

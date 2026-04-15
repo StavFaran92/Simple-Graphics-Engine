@@ -5,7 +5,7 @@
 #include "render/FrameBufferObject.h"
 #include "render/IRenderer.h"
 #include "runtime/Entity.h"
-#include "memory/ResourceWrapper.h"
+#include "memory/AssetAliases.h"
 
 class Shader;
 class Scene;
@@ -27,7 +27,7 @@ public:
 
 	void renderToDepthMap();
 
-	ResourceWrapper<Texture> getShadowMap() const;
+	TextureResourceRef getShadowMap() const;
 	glm::mat4 getLightSpaceMat() const;
 private:
 	bool m_isInit = false;
@@ -36,8 +36,8 @@ private:
 
 	FrameBufferObject m_fbo;
 	//Scene* m_scene = nullptr;
-	ResourceWrapper<Shader> m_simpleDepthShader = nullptr;
-	ResourceWrapper<Texture> m_depthMapTexture = nullptr;
+	ShaderResourceRef m_simpleDepthShader = nullptr;
+	TextureResourceRef m_depthMapTexture = nullptr;
 
 	//Context* m_context = nullptr;
 

@@ -16,8 +16,8 @@ public:
 		SERIALIZED_MEMBER(material);
 	}
 
-	AssetHandle<MaterialAsset> material;
-	AssetHandle<ModelAsset> mesh;
+	MaterialAssetRef material;
+	ModelAssetRef mesh;
 };
 
 REGISTER_COMPONENT(VolumeComponent)

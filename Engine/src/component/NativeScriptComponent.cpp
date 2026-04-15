@@ -2,7 +2,7 @@
 
 #include "runtime/Scene.h"
 
-void NativeScriptComponent::resolve(ResourceWrapper<Scene>& scene)
+void NativeScriptComponent::resolve(SceneResourceRef& scene)
 {
 	script->entity.setRegistry(&scene->getRegistry());
 }

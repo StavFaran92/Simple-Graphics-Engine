@@ -10,15 +10,15 @@ VolumetricCloudsComponent::VolumetricCloudsComponent(Entity entity)
 
 }
 
-AssetHandle<MaterialAsset> VolumetricCloudsComponent::getMaterial()
+MaterialAssetRef VolumetricCloudsComponent::getMaterial()
 {
 	if (!entity.valid())
 	{
 		logWarning("Invalid Entity set in water body");
-		return AssetHandle<MaterialAsset>::empty;
+		return MaterialAssetRef::empty;
 	}
 
 	VolumeComponent& volumeComponent = entity.getComponentInChildren<VolumeComponent>();
-	AssetHandle<MaterialAsset>& mat = volumeComponent.material;
+	MaterialAssetRef& mat = volumeComponent.material;
 	return mat;
 }

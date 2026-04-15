@@ -4,6 +4,7 @@
 
 #include "memory/AssetHandle.h"
 #include "memory/Assets.h"
+#include "core/Engine.h"
 
 const std::string SGE_TEXTURE_WHITE = "SGE_TEXTURE_WHITE";
 const std::string SGE_TEXTURE_BLACK = "SGE_TEXTURE_BLACK";

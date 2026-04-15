@@ -16,7 +16,7 @@
 #include "component/Transformation.h"
 #include "runtime/Context.h"
 
-ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoadDescriptor desc)
+PrefabResourceRef Prefab::load(const std::string& fileLocation, PrefabLoadDescriptor desc)
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
@@ -29,7 +29,7 @@ ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoad
 	{
 		PrefabData data;
 		iarchive(data);
-		ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
+		PrefabResourceRef prefab = Factory<Prefab>::create();
 		prefab->m_data = data;
 		return prefab;
 
@@ -39,7 +39,7 @@ ResourceWrapper<Prefab> Prefab::load(const std::string& fileLocation, PrefabLoad
 		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	return ResourceWrapper<Prefab>::empty;
+	return PrefabResourceRef::empty;
 }
 
 PrefabData Prefab::serializeEntityToPrefabData(const Entity& e)
@@ -62,9 +62,9 @@ void Prefab::serializeEntityToPrefabDataHelper(const Entity& e, PrefabData& pref
 	}
 }
 
-ResourceWrapper<Prefab> Prefab::create(const Entity& e)
+PrefabResourceRef Prefab::create(const Entity& e)
 {
-	ResourceWrapper<Prefab> prefab = Factory<Prefab>::create();
+	PrefabResourceRef prefab = Factory<Prefab>::create();
 	PrefabData prefabData = serializeEntityToPrefabData(e);
 	prefab->m_data = prefabData;
 

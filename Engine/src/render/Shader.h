@@ -5,6 +5,7 @@
 #include <memory>
 #include <variant>
 #include "memory/Asset.h"
+#include "memory/AssetAliases.h"
 
 #include "core/Core.h"
 
@@ -56,7 +57,6 @@ struct EngineAPI ShaderLoadDescriptor : public ResourceLoadDescriptor
 extern EngineAPI const std::map<ShaderOverride, std::string> shaderOverrideToString;
 
 struct ShadersInfo;
-template<typename> class ResourceWrapper;
 class Texture;
 template<typename> class AssetTraits;
 
@@ -69,9 +69,9 @@ public:
 	inline static const std::string ATTRIB_SHADER_OVERRIDE = "shader_override";
 
 public:
-	//static ResourceWrapper<Shader> create(std::string name, ShaderCreateDescriptor desc = {});
+	//static ShaderResourceRef create(std::string name, ShaderCreateDescriptor desc = {});
 
-	static ResourceWrapper<Shader> load(const std::string& fileLocation, ShaderLoadDescriptor desc = {});
+	static ShaderResourceRef load(const std::string& fileLocation, ShaderLoadDescriptor desc = {});
 
 	void use();
 
@@ -97,7 +97,7 @@ public:
 
 	void bindUniformBlockToBindPoint(const std::string& uniformBlockName, int bindPointIndex);
 
-	void setTextureInShader(ResourceWrapper<Texture> texture, const std::string& uniform, int slot);
+	void setTextureInShader(TextureResourceRef texture, const std::string& uniform, int slot);
 
 	bool build();
 

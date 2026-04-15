@@ -30,22 +30,22 @@ void Context::init()
 	
 }
 
-bool Context::addScene(const AssetHandle<SceneAsset>& sceneAsset)
+bool Context::addScene(const SceneAssetRef& sceneAsset)
 {
 	return m_sceneManager->addScene(sceneAsset);
 }
 
-bool Context::removeScene(const AssetHandle<SceneAsset>& scene)
+bool Context::removeScene(const SceneAssetRef& scene)
 {
 	return m_sceneManager->removeScene(scene);
 }
 
-ResourceWrapper<Scene> Context::getActiveScene() const
+SceneResourceRef Context::getActiveScene() const
 {
 	return m_sceneManager->getActiveScene();
 }
 
-AssetHandle<SceneAsset> Context::getActiveSceneAsset() const
+SceneAssetRef Context::getActiveSceneAsset() const
 {
 	return m_sceneManager->getActiveSceneAsset();
 }
@@ -80,7 +80,7 @@ void Context::setActiveScene(uint32_t index)
 //	return m_dummyTexture;
 //}
 
-const std::map<uint32_t, ResourceWrapper<Scene>>& Context::getAllScenes() const
+const std::map<uint32_t, SceneResourceRef>& Context::getAllScenes() const
 {
 	return m_sceneManager->getAllScenes();
 }

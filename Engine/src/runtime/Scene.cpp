@@ -62,9 +62,9 @@
 #include "core/Factory.h"
 #include "memory/BuiltInAssets.h"
 
-ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
+SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
-	ResourceWrapper<Scene> scene = Factory<Scene>::create();
+	SceneResourceRef scene = Factory<Scene>::create();
 	scene->init(Engine::get()->getContext(), scene.getUID());
 
 	std::string filepath = desc.sourcePath;
@@ -103,7 +103,7 @@ ResourceWrapper<Scene> Scene::load(const std::string& fileLocation, SceneLoadDes
 	return scene;
 }
 
-ResourceWrapper<Scene> Scene::create()
+SceneResourceRef Scene::create()
 {
 	auto scene = Factory<Scene>::create();
 	scene->init(Engine::get()->getContext(), scene.getUID());
@@ -154,7 +154,7 @@ void Scene::displayWireframeMesh(Entity e)
 	}
 }
 
-void Scene::setIBLData(ResourceWrapper<Texture> irradianceMap, ResourceWrapper<Texture> prefilterEnvMap)
+void Scene::setIBLData(TextureResourceRef irradianceMap, TextureResourceRef prefilterEnvMap)
 {
 	m_irradianceMap = irradianceMap;
 	m_prefilterEnvMap = prefilterEnvMap;
@@ -194,7 +194,7 @@ void Scene::init(Context* context, ResourceID rid)
 		c.registerDependencyListener(onChangedCB);
 		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
 
-		ResourceWrapper<Scene> scene = Engine::get()->getResourceManager()->getResource(rid).as<Scene>();
+		SceneResourceRef scene = Engine::get()->getResourceManager()->getResource(rid).as<Scene>();
 		if (scene->isReady())
 		{
 			c.resolve(scene);
@@ -549,7 +549,7 @@ void Scene::draw(float deltaTime)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Terrain render pass");
 
-			ResourceWrapper<Shader> terrainShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);;
+			ShaderResourceRef terrainShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TERRAIN);;
 			terrainShader->use();
 
 			// Render terrain
@@ -559,7 +559,7 @@ void Scene::draw(float deltaTime)
 				if (terrain.m_material.isEmpty())
 					continue;
 
-				ResourceWrapper<Texture> heightmap = terrain.getHeightmap();
+				TextureResourceRef heightmap = terrain.getHeightmap();
 
 				if (heightmap.isEmpty())
 					continue;
@@ -697,7 +697,7 @@ void Scene::draw(float deltaTime)
 				if ((entity_id)entity == selectedObject)
 				{
 					Entity e(entity, &getRegistry());
-					ResourceWrapper<Model> mesh;
+					ModelResourceRef mesh;
 					auto meshRenderer = e.tryGetComponent<MeshRendererComponent>();
 					if (meshRenderer)
 					{
@@ -782,7 +782,7 @@ void Scene::draw(float deltaTime)
 						glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Highlight Pass 3 - Merge");
 
 						// 3rd pass
-						ResourceWrapper<Texture> mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
+						TextureResourceRef mainSceneRenderTargetTexture = graphics->renderView->getRenderTargetTexture();
 						m_highlightRenderView->swapBackToMainTargetWithCopy(); // todo optimize (i should fetch the secondary texture instead)
 						auto& edgeDetectedTexture = m_highlightRenderView->getRenderTargetTexture(); // todo fix
 						auto width = Engine::get()->getWindow()->getWidth();
@@ -963,7 +963,7 @@ void Scene::draw(float deltaTime)
 			// Render Post Process Effects
 			for (auto&& [entity, postProcess] : m_registry->get().view<PostProcessComponent>().each())
 			{
-				ResourceWrapper<Texture> renderTargetTexture = graphics->renderView->getRenderTargetTexture();
+				TextureResourceRef renderTargetTexture = graphics->renderView->getRenderTargetTexture();
 				renderView->swapToAdditionalTarget();
 				renderView->bind();
 				RenderCommand::clear();

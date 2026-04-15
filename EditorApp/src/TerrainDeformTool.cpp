@@ -10,7 +10,7 @@ void TerrainDeformTool::onActivate()
 	if (!g_activeTerrain)
 		return;
 
-	ResourceWrapper<Texture> heightmap = g_activeTerrain->getHeightmap();
+	TextureResourceRef heightmap = g_activeTerrain->getHeightmap();
 	m_texturePainter.setTexture(heightmap);
 }
 

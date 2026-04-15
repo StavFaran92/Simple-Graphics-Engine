@@ -10,6 +10,7 @@
 #include "core/Core.h"
 #include "memory/UUID.h"
 #include "core/GUILayer.h"
+#include "memory/AssetAliases.h"
 
 
 class Context;
@@ -107,7 +108,7 @@ public:
     void saveProject();
     std::string getProjectDirectory() const;
 
-    ResourceWrapper<Material> getDefaultMaterial() const;
+    MaterialResourceRef getDefaultMaterial() const;
 
     void reloadEngineConfig();
 

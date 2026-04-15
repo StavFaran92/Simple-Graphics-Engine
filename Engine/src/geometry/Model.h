@@ -2,9 +2,11 @@
 
 #include <vector>
 #include "core/Core.h"
+#include "memory/AssetAliases.h"
 #include "geometry/Mesh.h"
 #include "memory/ResourceWrapper.h"
 #include "memory/Asset.h"
+#include "render/Material.h"
 #include "geometry/ModelImporter.h"
 
 struct ModelData
@@ -28,7 +30,7 @@ struct EngineAPI ModelCreateDescriptor : public ResourceBuildDescriptor
 class EngineAPI Model : public Resource
 {
 public:
-	static ResourceWrapper<Model> load(const std::string& fileLocation, ModelLoadDescriptor desc = {});
+	static ModelResourceRef load(const std::string& fileLocation, ModelLoadDescriptor desc = {});
 
 	void addMesh(const std::shared_ptr<Mesh>& mesh);
 
@@ -62,7 +64,7 @@ public:
 
 	void bindDependency(const std::string& slot, UUID dependency) override;
 
-	std::map<int, AssetHandle<MaterialAsset>> m_materials;
+	std::map<int, MaterialAssetRef> m_materials;
 
 	// Inherited via Asset
 	void serialize(nlohmann::json& j) const override;

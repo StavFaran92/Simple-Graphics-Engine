@@ -7,5 +7,5 @@
 class EngineAPI StartupSceneTemplate
 {
 public:
-	static AssetHandle<SceneAsset> createStartupScene(const std::string& name);
+	static SceneAssetRef createStartupScene(const std::string& name);
 };

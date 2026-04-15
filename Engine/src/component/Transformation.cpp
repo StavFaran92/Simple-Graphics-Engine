@@ -169,7 +169,7 @@ std::unordered_map<entity_id, Entity> Transformation::getChildren()
 	return m_children;
 }
 
-void Transformation::resolve(ResourceWrapper<Scene>& scene)
+void Transformation::resolve(SceneResourceRef& scene)
 {
 	entity.setRegistry(&scene->getRegistry());
 	root.setRegistry(&scene->getRegistry());
@@ -182,7 +182,7 @@ void Transformation::resolve(ResourceWrapper<Scene>& scene)
 	}
 }
 
-void Transformation::postLoad(ResourceWrapper<Scene>& scene)
+void Transformation::postLoad(SceneResourceRef& scene)
 {
 	forceUpdate();
 }

@@ -8,7 +8,7 @@ class EngineAPI MaterialDataParser
 public:
 	static void parse(MaterialData& data);
 
-	static ResourceWrapper<Shader> getShaderFromRenderMode(MaterialRenderMode renderMode);
+	static ShaderResourceRef getShaderFromRenderMode(MaterialRenderMode renderMode);
 
 private:
 	static bool parseEditablePragmaLine(const std::string& line, EditableUniform& editableUniform);
@@ -17,8 +17,8 @@ private:
 
 	static void parseUniforms(const std::string& sourceCode, MaterialData& data);
 
-	static void parseFromShader(ResourceWrapper<Shader> shader, MaterialData& data);
+	static void parseFromShader(ShaderResourceRef shader, MaterialData& data);
 
-	static ResourceWrapper<Shader> getActiveShader(const MaterialData& data);
+	static ShaderResourceRef getActiveShader(const MaterialData& data);
 
 };

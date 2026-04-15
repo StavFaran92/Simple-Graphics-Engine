@@ -32,10 +32,10 @@ public:
 
     //static Entity CreateSkyboxFromCubemap(const SkyboxFaces& faces, Scene* scene = nullptr);
 
-    //static Entity loadSkybox(AssetHandle<TextureAsset> texture, Entity& entity, Scene* scene = nullptr);
+    //static Entity loadSkybox(TextureAssetRef texture, Entity& entity, Scene* scene = nullptr);
 
 private:
-    static Entity createSkyboxHelper(AssetHandle<TextureAsset> cubemap, AssetHandle<TextureAsset> equirectangularMap, Entity& entity, Scene* scene);
+    static Entity createSkyboxHelper(TextureAssetRef cubemap, TextureAssetRef equirectangularMap, Entity& entity, Scene* scene);
 
     
 private:

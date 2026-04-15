@@ -2,6 +2,7 @@
 
 #include "core/Core.h"
 #include "memory/Asset.h"
+#include "memory/AssetAliases.h"
 
 struct EngineAPI LuaScriptCreateDescriptor : public ResourceBuildDescriptor
 {
@@ -16,9 +17,9 @@ struct EngineAPI LuaScriptLoadDescriptor : public ResourceLoadDescriptor
 class EngineAPI LuaScript : public Resource
 {
 public:
-	static ResourceWrapper<LuaScript> load(const std::string& fileLocation, LuaScriptLoadDescriptor desc = {});
+	static LuaScriptResourceRef load(const std::string& fileLocation, LuaScriptLoadDescriptor desc = {});
 
-	static ResourceWrapper<LuaScript> create();
+	static LuaScriptResourceRef create();
 
 	std::string filepath;
 };

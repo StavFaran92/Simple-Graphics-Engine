@@ -3,7 +3,6 @@
 #include <string>
 
 #include "memory/AssetHandle.h"
-#include "AssetFactory.h"
 
 class EngineAPI Asset
 {

@@ -9,7 +9,7 @@ class PostProcessComponent : public Component
 {
 public:
 
-	AssetHandle<ShaderAsset> shader;
+	ShaderAssetRef shader;
 
 	template <class Archive>
 	void serialize(Archive& archive) {

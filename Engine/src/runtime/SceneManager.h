@@ -4,7 +4,7 @@
 #include <memory>
 #include "core/Core.h"
 #include "memory/ResourceWrapper.h"
-#include "memory/AssetHandle.h"
+#include "memory/AssetAliases.h"
 #include "serialize/Archiver.h"
 
 class SceneAsset;
@@ -16,15 +16,15 @@ class EngineAPI SceneManager
 public:
 	SceneManager();
 
-	bool addScene(const AssetHandle<SceneAsset>& scene);
-	bool removeScene(const AssetHandle<SceneAsset>& scene);
+	bool addScene(const SceneAssetRef& scene);
+	bool removeScene(const SceneAssetRef& scene);
 
-	ResourceWrapper<Scene> getActiveScene() const;
-	AssetHandle<SceneAsset> getActiveSceneAsset() const;
+	SceneResourceRef getActiveScene() const;
+	SceneAssetRef getActiveSceneAsset() const;
 
 	void setActiveScene(uint32_t index);
 
-	const std::map<uint32_t, ResourceWrapper<Scene>>& getAllScenes() const;
+	const std::map<uint32_t, SceneResourceRef>& getAllScenes() const;
 	uint32_t getActiveSceneID() const;
 
 	void startSimulation();
@@ -35,8 +35,8 @@ public:
 private:
 	int m_activeScene = 0;
 	uint32_t m_scenesCounter = 0;
-	std::map<uint32_t, AssetHandle<SceneAsset>> m_scenes;
-	std::map<uint32_t, ResourceWrapper<Scene>> m_scenesCache; // Cache for getAllScenes()
+	std::map<uint32_t, SceneAssetRef> m_scenes;
+	std::map<uint32_t, SceneResourceRef> m_scenesCache; // Cache for getAllScenes()
 	SerializedScene m_serializedScene;
 	//std::stringstream m_serializedScene;
 };

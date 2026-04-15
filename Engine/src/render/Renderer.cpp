@@ -288,7 +288,7 @@ void Renderer::renderSceneUsingCustomShader(Scene* scene)
  //           continue;
 
  //       }
- //       ResourceWrapper<Shader> shader = shaderComponent.m_customShader.resource();
+ //       ShaderResourceRef shader = shaderComponent.m_customShader.resource();
  //       shader->use();
  //       graphics->shader = shader;
 

@@ -57,5 +57,5 @@ public:
 	}
 
 	std::shared_ptr<VertexArrayObject> vao;
-	ResourceWrapper<Shader> shader;
+	ShaderResourceRef shader;
 };
