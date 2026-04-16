@@ -247,6 +247,9 @@ AssetRef<Asset> Assets::getAssetFromName(const std::string& name) const
 
 void Assets::makeDirty(UUID uuid)
 {
+	if (!hasAsset(uuid))
+		return;
+
 	AssetRecord aInfo = getAsset(uuid).info();
 	aInfo.makeDirty();
 	m_assets[uuid] = aInfo;
@@ -254,6 +257,9 @@ void Assets::makeDirty(UUID uuid)
 
 void Assets::sync(UUID uuid)
 {
+	if (!hasAsset(uuid))
+		return;
+
 	AssetRecord aInfo = getAsset(uuid).info();
 	aInfo.sync();
 	m_assets[uuid] = aInfo;
@@ -261,6 +267,9 @@ void Assets::sync(UUID uuid)
 
 void Assets::deleteAsset(UUID uuid)
 {
+	if (!hasAsset(uuid))
+		return;
+
 	auto asset = getAsset(uuid);
 	AssetRecord aInfo = asset.info();
 	Engine::get()->getMemoryManagementSystem()->removePathReference(aInfo.getScopedPath().scoped().string());
