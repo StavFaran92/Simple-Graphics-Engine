@@ -6,6 +6,7 @@
 #include <optional>
 #include <unordered_set>
 #include <vector>
+#include "menus/CreateMenu.h"
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -290,7 +291,9 @@ void AssetViewWindow::display()
 				const size_t selCount = s_assetViewSelectedIndices.size();
 				if (selCount == 0)
 				{
-					if (ImGui::Selectable("Move here"))
+					CreateMenu::display();
+
+					if (ImGui::MenuItem("Move here")) 
 					{
 						for (auto uid : g_moveAssetUIDList)
 						{
@@ -304,7 +307,6 @@ void AssetViewWindow::display()
 								Engine::get()->getSubSystem<Assets>()->moveAsset(uid, targetDirectory);
 							}
 						}
-
 					}
 				}
 				else if (selCount == 1)
@@ -319,7 +321,7 @@ void AssetViewWindow::display()
 
 						if (aInfo.aType == AssetType::MATERIAL)
 						{
-							MaterialAssetRef mat = MaterialAssetRef(uuid);
+							MaterialAssetRef mat(uuid);
 							if (mat.isEmpty())
 								logError("Asset cast to material failed.");
 							else

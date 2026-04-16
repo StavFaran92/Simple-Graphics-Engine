@@ -14,8 +14,9 @@ void EditorState::init()
 bool EditorState::getState(const std::string& state)
 {
     if (auto it = m_states.find(state); it != m_states.end())
+    {
         return it->second;
-
+    }
     return false;
 }
 
@@ -33,7 +34,7 @@ void EditorState::addDialogDisplay(DialogBase* dialog)
 
 void EditorState::displayDialogs()
 {
-    for (auto dialog : m_dialogs)
+    for (auto* dialog : m_dialogs)
     {
         dialog->display();
     }

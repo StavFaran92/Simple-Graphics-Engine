@@ -17,6 +17,7 @@
 
 #include "EditorCamera.h"
 #include "EditorState.h"
+#include "EditorContext.h"
 
 #include <imgui_stdlib.h>
 #include "core/Logger.h"
@@ -31,21 +32,9 @@
 #include "SceneHierarchyWindow.h"
 #include "SceneViewWindow.h"
 #include "Dialogs/MaterialCreateDialog.h"
-#include "Dialogs/ModelImportDialog.h"
-#include "Dialogs/AnimationImportDialog.h"
-#include "Dialogs/TextureImportDialog.h"
-#include "Dialogs/LuaScriptImportDialog.h"
-#include "Dialogs/FolderCreateDialog.h"
 #include "Dialogs/AssetSelectDialog.h"
-#include "Dialogs/SceneCreateDialog.h"
-#include "Dialogs/ScriptSelectDialog.h"
-#include "Dialogs/EntitySelectDialog.h"
-#include "Dialogs/TextureSelectDialog.h"
-#include "Dialogs/TextureCreateDialog.h"
-#include "Dialogs/ShaderCreateDialog.h"
-#include "Dialogs/LuaScriptCreateDialog.h"
-#include "Dialogs/ProjectSettingsDialog.h"
-#include "Dialogs/MaterialEditDialog.h"
+#include "menus/CreateMenu.h"
+
 
 #include "ImguiHandler.h"
 #include "GUIMenu.h"
@@ -95,22 +84,6 @@ inline ImVec4 LogLevelToColor(spdlog::level::level_enum level)
 static std::vector<Message> g_consoleLog;
 static std::mutex g_consoleMutex;
 static bool g_scrollConsole = false;
-
-static MaterialCreateDialog materialCreateDialog;
-static ModelImportDialog modelImportDialog;
-static AnimationImportDialog animationImportDialog;
-static TextureImportDialog textureImportDialog;
-static LuaScriptImportDialog luaScriptImportDialog;
-static FolderCreateDialog folderCreateDialog;
-static SceneCreateDialog sceneCreateDialog;
-static ScriptSelectDialog scriptSelectDialog;
-static EntitySelectDialog entitySelectDialog;
-static TextureSelectDialog textureSelectDialog;
-static TextureCreateDialog textureCreateDialog;
-static ShaderCreateDialog shaderCreateDialog;
-static LuaScriptCreateDialog luaScriptCreateDialog;
-static ProjectSettingsDialog projectSettingsDialog;
-static MaterialEditDialog materialEditDialog;
 
 static void appendConsoleLog(spdlog::level::level_enum level, const std::string& msg)
 {
@@ -372,16 +345,16 @@ class GUI_Helper : public GuiMenu {
 				}
 				if (ImGui::BeginMenu("Import")) {
 					if (ImGui::MenuItem("Model")) {
-						modelImportDialog.activate();
+						EditorContext::Instance().modelImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Texture")) {
-						textureImportDialog.activate();
+						EditorContext::Instance().textureImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Animation")) {
-						animationImportDialog.activate();
+						EditorContext::Instance().animationImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Lua Script")) {
-						luaScriptImportDialog.activate();
+						EditorContext::Instance().luaScriptImportDialog.activate();
 					}
 					ImGui::EndMenu();
 				}
@@ -412,39 +385,14 @@ class GUI_Helper : public GuiMenu {
 					ImGui::EndMenu(); // End of File dropdown
 				}
 				if (ImGui::BeginMenu("Edit")) {
-					if (ImGui::BeginMenu("Create")) {
-						if (ImGui::MenuItem("Folder")) {
-							folderCreateDialog.activate();
-							//EditorState::Instance().showMaterialCreateWindow = true;
+					
+					CreateMenu::display();
 
-						}
-						if (ImGui::MenuItem("Material")) {
-							materialCreateDialog.activate();
-							//EditorState::Instance().showMaterialCreateWindow = true;
-
-						}
-						if (ImGui::MenuItem("Texture")) {
-							textureCreateDialog.activate();
-						}
-						if (ImGui::MenuItem("Shader")) {
-							shaderCreateDialog.activate();
-						}
-
-						if (ImGui::MenuItem("Lua Script")) {
-							luaScriptCreateDialog.activate();
-						}
-
-						if (ImGui::MenuItem("Scene")) {
-							sceneCreateDialog.activate();
-
-						}
-						ImGui::EndMenu();
-					}
 					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu("Project")) {
 					if (ImGui::MenuItem("Settings")) {
-						projectSettingsDialog.activate();
+						EditorContext::Instance().projectSettingsDialog.activate();
 					}
 					ImGui::EndMenu();
 				}

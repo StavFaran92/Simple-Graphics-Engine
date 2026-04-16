@@ -6,7 +6,6 @@
 #include "sge.h"
 
 #include "EditorTool.h"
-
 class DialogBase;
 
 class EditorState {
@@ -51,9 +50,7 @@ public:
 
     bool getState(const std::string& state);
     bool setState(const std::string& state, bool enabled);
-
     void addDialogDisplay(DialogBase* dialog);
-
     void displayDialogs();
 
     void setActiveEditorTool(EditorTool::Type tool);
@@ -104,7 +101,6 @@ private:
     std::unordered_map<std::string, bool> m_states;
 
     WorkingDirectory cwd;
-
     std::vector<DialogBase*> m_dialogs;
 
     EditorTool::Type m_activeEditorToolType = EditorTool::Type::None;
