@@ -336,3 +336,4 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", TextureType::Roughness);
 	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", TextureType::AmbientOcclusion);
 }
+
