@@ -186,7 +186,8 @@ void AssetInspectorWindow::display()
 	}
 	case AssetType::MATERIAL:
 	{
-		MaterialAssetRef material = currentAssetEdit.as<MaterialAsset>();
+		static MaterialAssetRef material;
+		material = currentAssetEdit.as<MaterialAsset>();
 		if (material.isEmpty())
 		{
 			ImGui::TextColored(ImVec4(1.f, 0.3f, 0.3f, 1.f), "Failed to load material.");
@@ -194,7 +195,7 @@ void AssetInspectorWindow::display()
 		}
 
 		static MaterialDataWidget materialWidget;
-		materialWidget.draw(material->data, [&material](const MaterialData&) {
+		materialWidget.draw(material->data, [](const MaterialData&) {
 			material.makeDirty();
 		});
 		break;
