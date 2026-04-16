@@ -103,3 +103,8 @@ void AnimationAsset::deserialize(const nlohmann::json& j)
 	(void)j;
 }
 
+
+const AnimationData& Animation::getData() const
+{
+	return m_data;
+}

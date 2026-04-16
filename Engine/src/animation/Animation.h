@@ -54,6 +54,8 @@ public:
 
 	void build(const AnimationData& animationData);
 
+	const AnimationData& getData() const;
+
 	static bool preprocess(const std::string& path);	
 private:
 	void calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, glm::mat4 parentTransform, float currentTime, std::unordered_map<std::string, glm::mat4>& finalBoneMatrices);	

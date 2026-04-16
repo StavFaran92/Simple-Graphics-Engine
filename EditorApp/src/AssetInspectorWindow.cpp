@@ -5,11 +5,6 @@
 
 #include <fstream>
 #include <sstream>
-#include <thread>
-
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 
 namespace
 {
@@ -47,17 +42,9 @@ const char* textureTargetToString(TextureTarget target)
 
 void openInVSCode(const std::string& path)
 {
-#ifndef _WIN32
-	if (fork() == 0) {
-		execlp("code", "code", path.c_str(), (char*)nullptr);
-		_exit(0);
-	}
-#else
-	std::thread([path]() {
-		std::string command = "code \"" + path + "\"";
-		std::system(command.c_str());
-		}).detach();
-#endif
+	// Windows-focused (this project currently targets Windows).
+	std::string command = "code \"" + path + "\"";
+	std::system(command.c_str());
 }
 
 std::string getShaderStagesLabel(const ShadersInfo& shadersInfo)
@@ -125,6 +112,26 @@ std::string getFileSnippet(const std::string& filePath, int maxLines = 50)
 		output << "\n... (truncated)";
 
 	return output.str();
+}
+
+void displayAnimationNodeTree(const AnimationData& animData, int nodeIndex)
+{
+	if (nodeIndex < 0 || nodeIndex >= (int)animData.nodes.size())
+		return;
+
+	const MeshNodeData& node = animData.nodes[nodeIndex];
+
+	ImGuiTreeNodeFlags flags = node.children.empty() ? ImGuiTreeNodeFlags_Leaf : 0;
+	bool isOpen = ImGui::TreeNodeEx((void*)(intptr_t)nodeIndex, flags, "%s", node.name.c_str());
+
+	if (isOpen)
+	{
+		for (int childIndex : node.children)
+		{
+			displayAnimationNodeTree(animData, childIndex);
+		}
+		ImGui::TreePop();
+	}
 }
 }
 
@@ -215,6 +222,12 @@ void AssetInspectorWindow::display()
 		{
 			openInVSCode(info.getAbsolutePath());
 		}
+		ImGui::SameLine();
+		if (ImGui::Button("Recompile"))
+		{
+			// Recompile from disk and refreshes the internal source/stage info.
+			shader->recompile();
+		}
 
 		ImGui::Separator();
 		ImGui::Text("Source snippet:");
@@ -248,6 +261,74 @@ void AssetInspectorWindow::display()
 		ImGui::TextUnformatted(snippet.c_str());
 		ImGui::PopTextWrapPos();
 		ImGui::EndChild();
+		break;
+	}
+	case AssetType::MODEL:
+	{
+		ModelAssetRef modelAsset = currentAssetEdit.as<ModelAsset>();
+		ModelResourceRef modelRes = modelAsset.resource();
+		if (modelAsset.isEmpty() || modelRes.isEmpty())
+		{
+			ImGui::TextColored(ImVec4(1.f, 0.3f, 0.3f, 1.f), "Failed to load model resource.");
+			break;
+		}
+
+		ImGui::Text("Meshes: %zu", modelRes->getMeshes().size());
+		ImGui::Text("Vertices: %zu", modelRes->getNumOfVertices());
+		ImGui::Text("Materials (slots): %d", modelRes->getMaterialCount());
+		ImGui::Text("Bone offsets: %zu", modelRes->getBoneOffsets().size());
+		ImGui::Separator();
+
+		if (ImGui::CollapsingHeader("Materials (UIDs, readonly)"))
+		{
+			for (const auto& [slot, matAsset] : modelAsset->m_materials)
+			{
+				if (matAsset.isEmpty())
+					continue;
+
+				ImGui::PushID(slot);
+				std::string matUID = matAsset.info().uuid.str();
+				std::string matName = matAsset->data.name;
+				ImGui::Text("Slot %d: \n\tName: %s, UID: %s", slot, matName.c_str(), matUID.c_str());
+
+				ImGui::PopID();
+			}
+		}
+		break;
+	}
+	case AssetType::ANIMATION:
+	{
+		AnimationAssetRef animAsset = currentAssetEdit.as<AnimationAsset>();
+		AnimationResourceRef animRes = animAsset.resource();
+		if (animAsset.isEmpty() || animRes.isEmpty())
+		{
+			ImGui::TextColored(ImVec4(1.f, 0.3f, 0.3f, 1.f), "Failed to load animation resource.");
+			break;
+		}
+
+		const float durationTicks = animRes->getDuration();
+		const float ticksPerSecond = animRes->getTicksPerSecond();
+		const float durationSeconds = ticksPerSecond > 0.f ? (durationTicks / ticksPerSecond) : 0.f;
+		const AnimationData& animData = animRes->getData();
+
+		ImGui::Text("Timeline: 0 .. %.3f ticks (%.3f sec)", durationTicks, durationSeconds);
+		ImGui::Text("Ticks/sec: %.3f", ticksPerSecond);
+		ImGui::Text("Nodes: %zu", animData.nodes.size());
+		ImGui::Text("Bones: %zu", animData.bones.size());
+		ImGui::Separator();
+
+		if (ImGui::CollapsingHeader("Node tree", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (animData.nodes.empty())
+			{
+				ImGui::TextDisabled("No nodes.");
+			}
+			else
+			{
+				displayAnimationNodeTree(animData, 0);
+			}
+		}
+
 		break;
 	}
 	default:
