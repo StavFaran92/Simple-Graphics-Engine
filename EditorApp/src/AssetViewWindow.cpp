@@ -69,6 +69,7 @@ void AssetViewWindow::display()
 	{
 		s_assetViewSelectedIndices.clear();
 		s_assetViewLastCwd = cwd.string();
+		EditorState::Instance().currentAssetEdit = AssetRef<Asset>::empty;
 	}
 	//std::filesystem::path rel = std::filesystem::relative(cwd, Engine::get()->getProjectDirectory());
 	//if (rel == ".") rel = "";
@@ -266,6 +267,28 @@ void AssetViewWindow::display()
 
 		if (!earlyTableBreak)
 		{
+			auto syncCurrentAssetEdit = [&]() {
+				auto& currentAssetEdit = EditorState::Instance().currentAssetEdit;
+				currentAssetEdit = AssetRef<Asset>::empty;
+
+				if (s_assetViewSelectedIndices.size() != 1)
+					return;
+
+				const int selectedIndex = (int)*s_assetViewSelectedIndices.begin();
+				if (selectedIndex < 0 || selectedIndex >= (int)fileMetadataTable.size())
+					return;
+
+				const FileMetadata& meta = fileMetadataTable[selectedIndex];
+				if (meta.isDirectory)
+					return;
+
+				UUID uid = getUIDFromFilename(cwd, meta.filename);
+				if (!assets->hasAsset(uid))
+					return;
+
+				currentAssetEdit = assets->getAsset(uid);
+			};
+
 			ImGuiIO& io = ImGui::GetIO();
 			const bool childHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
 
@@ -283,6 +306,7 @@ void AssetViewWindow::display()
 				{
 					s_assetViewSelectedIndices.clear();
 					s_assetViewSelectedIndices.insert(rmbHit);
+					syncCurrentAssetEdit();
 				}
 			}
 
@@ -514,6 +538,7 @@ void AssetViewWindow::display()
 							s_assetViewSelectedIndices = std::move(picked);
 						}
 					}
+					syncCurrentAssetEdit();
 				}
 				else
 				{
@@ -540,10 +565,12 @@ void AssetViewWindow::display()
 							s_assetViewSelectedIndices.clear();
 							s_assetViewSelectedIndices.insert(hit);
 						}
+						syncCurrentAssetEdit();
 					}
 					else if (!io.KeyCtrl)
 					{
 						s_assetViewSelectedIndices.clear();
+						syncCurrentAssetEdit();
 					}
 				}
 				s_assetViewLmbTracking = false;

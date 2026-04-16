@@ -66,6 +66,7 @@ public:
     std::shared_ptr<TextureSampler> selectedSampler;
     std::shared_ptr<TextureSampler> previousSampler;
 
+    AssetRef<Asset> currentAssetEdit;
     MaterialAssetRef selectedMaterialForEdit;
 
     struct Rect2D {

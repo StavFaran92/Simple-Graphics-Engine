@@ -29,6 +29,7 @@
 
 #include "EntityState.h"
 #include "InspectorWindow.h"
+#include "AssetInspectorWindow.h"
 #include "SceneHierarchyWindow.h"
 #include "SceneViewWindow.h"
 #include "Dialogs/MaterialCreateDialog.h"
@@ -427,7 +428,7 @@ class GUI_Helper : public GuiMenu {
 
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
 			ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-			ImGui::DockBuilderDockWindow("Debug Info", dock_id_right);
+			ImGui::DockBuilderDockWindow("AssetInspector", dock_id_right);
             ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
             ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
             ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
@@ -440,6 +441,7 @@ class GUI_Helper : public GuiMenu {
 		SceneViewWindow::display();
 		SceneHierarchyWindow::display();
 		InspectorWindow::display();
+		AssetInspectorWindow::display();
         AssetViewWindow::display();
         RenderConsoleWindow();
 		DisplayDebugInfoWindow();
