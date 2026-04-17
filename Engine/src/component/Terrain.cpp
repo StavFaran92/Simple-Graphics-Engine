@@ -15,6 +15,17 @@
 
 #include "GL/glew.h"
 
+void Terrain::postLoad(SceneResourceRef& scene)
+{
+	auto heightmapResource = m_heightmap.resource();
+	heightmapResource->download();
+	//float* src = static_cast<float*>(heightmapResource->getData().data);
+	//size_t count = heightmapResource->getWidth() * heightmapResource->getHeight();
+
+	//m_heightDataCPU.assign(src, src + count);
+
+}
+
 Entity Terrain::createTerrain(int width, int height)
 {
 	auto terrainEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Terrain");
@@ -24,14 +35,14 @@ Entity Terrain::createTerrain(int width, int height)
 
 TextureAssetRef Terrain::generateHeightmap(int width, int height)
 {
-	m_heightDataCPU = std::vector<float>(width * height, 0.0f);
+	auto heightDataCPU = std::vector<float>(width * height, 0.0f);
 
 	TextureData tData;
 	tData.target = TextureTarget::TEXTURE_2D;
 	tData.width = width;
 	tData.height = height;
 	tData.channels = 1;
-	tData.data = m_heightDataCPU.data();
+	tData.data = heightDataCPU.data();
 	tData.internalFormat = TextureInternalFormat::R32F;
 	tData.format = TextureFormat::RED;
 	tData.type = TextureType::FLOAT;
@@ -191,11 +202,10 @@ int Terrain::getTextureCount() const
 	return m_textureCount;
 }
 
-std::array<float, 4> getCornersSafe(
-	const std::vector<float>& pixels,
+std::array<float, 4> Terrain::getCornersSafe(
 	int floorX, int floorY,
 	int stride, int width, int height
-) {
+) const {
 	auto getIndex = [&](int x, int y) -> int {
 		return (y * stride + x);
 		};
@@ -209,12 +219,12 @@ std::array<float, 4> getCornersSafe(
 
 	auto safe = [&](int idx) -> float {
 		if (idx >= 0 && idx < totalBytes) {
-			return pixels[idx];
+			return ((float*)m_heightmap.resource()->getData().data)[idx];
 		}
 		else {
 			if (indexP0 >= 0)
 			{
-				return pixels[indexP0];
+				return ((float*)m_heightmap.resource()->getData().data)[indexP0];
 			}
 			else
 			{
@@ -277,7 +287,6 @@ bool Terrain::getHeightAtPoint(float x, float y, float& outHeight) const
 	//     P2  |_______\|  P3
 
 	auto [P0, P1, P2, P3] = getCornersSafe(
-		m_heightDataCPU,
 		floorX, floorY,
 		stride,
 		m_heightmap.resource().get()->getWidth(),
@@ -347,24 +356,7 @@ void Terrain::syncHeightmap()
 		return;
 
 	auto res = m_heightmap.resource();
-
-	// If CPU buffer size is not the same as GPU buffer size reallocate
-	if (m_heightDataCPU.size() != res->getWidth() * res->getHeight())
-	{
-		m_heightDataCPU = std::vector<float>(res->getWidth() * res->getHeight(), 0.0f);
-	}
-
-	res->bind();
-
-	glGetTexImage(
-		GL_TEXTURE_2D,
-		0,
-		toGL(res->getData().format),
-		toGL(res->getData().type),
-		m_heightDataCPU.data()
-	);
-
-	m_heightmap.resource()->getData().data = m_heightDataCPU.data();
+	res->download();
 	m_heightmap.makeDirty();
 }
 

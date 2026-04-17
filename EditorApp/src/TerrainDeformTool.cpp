@@ -51,6 +51,8 @@ bool TerrainDeformTool::onEvent(SDL_Event e)
 		glm::vec2 offsetPos = glm::vec2(m_currentResult.position.x, m_currentResult.position.z);
 		offsetPos.x += g_activeTerrain->getWidth() * .5f;
 		offsetPos.y += g_activeTerrain->getHeight() * .5f;
+
+		// Paint on the texture using compute
 		m_texturePainter.applyBrush(offsetPos.x, offsetPos.y);
 
 		g_activeTerrain->syncHeightmap();

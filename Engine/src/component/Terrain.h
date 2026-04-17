@@ -35,6 +35,8 @@ class EngineAPI Terrain : public Component
 public:
 	Terrain() = default;
 
+	void postLoad(SceneResourceRef& scene ) override;
+
 	static Entity createTerrain(int width, int height);
 
 	ModelResourceRef getMesh() const;
@@ -69,6 +71,7 @@ public:
 	
 	void build();
 
+	// Sync texture GPU data to the CPU data
 	void syncHeightmap();
 
 	RayHit raycast(const Ray& ray, float maxDistance = 10000.0f);
@@ -96,11 +99,15 @@ public:
 private:
 	static Terrain createTerrainComponent(int width, int height);
 	TextureAssetRef generateHeightmap(int width, int height);
+	std::array<float, 4> getCornersSafe(
+		int floorX, int floorY,
+		int stride, int width, int height
+	) const;
 private:
 	int m_width = 100;
 	int m_height = 100;
 	TextureAssetRef m_heightmap;
-	std::vector<float> m_heightDataCPU;
+	//std::vector<float> m_heightDataCPU;
 
 	ModelAssetRef m_mesh;
 	//std::shared_ptr<TextureArray> m_textures;
