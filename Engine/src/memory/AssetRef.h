@@ -8,12 +8,7 @@ class Asset;
 class EngineAPI AssetHandleImpl
 {
 public:
-	static ResourceRef<Resource> loadAssetResourceInternal(const AssetRecord& record, UUID uuid);
 	static const AssetRecord& getInfo(UUID uuid);
-	static ResourceRef<Resource> createOrGetCachedResource(const AssetRecord& record, UUID uuid);
-	static void syncAsset(UUID uuid);
-	static void deleteAsset(UUID uuid);
-	static void makeAssetDirty(UUID uuid);
 
 };
 
