@@ -192,6 +192,7 @@ void Scene::init(Context* context, ResourceID rid)
 
 		// The following will be called for each added component
 		c.registerDependencyListener(onChangedCB);
+		logDebug("Scene {} register on component {}", std::to_string(rid), c.getName());
 		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
 
 		SceneResourceRef scene = Engine::get()->getResourceManager()->getResource(rid).as<Scene>();

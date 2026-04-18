@@ -16,6 +16,8 @@ public:
 
 	virtual void useLight(Shader& shader, int index);
 
+	std::string getName() override { return "Light"; }
+
 	void SetAmbientIntensity(float intensity);
 	void SetDiffuseIntensity(float intensity);
 	void SetColor(glm::vec3 color);

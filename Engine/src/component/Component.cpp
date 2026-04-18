@@ -5,6 +5,11 @@
 #include <GL/glew.h>
 #include "render/VertexArrayObject.h"
 
+std::string InstanceBatch::getName()
+{
+	return "InstanceBatch";
+}
+
 InstanceBatch::InstanceBatch()
 {
 	glGenBuffers(1, &m_id);

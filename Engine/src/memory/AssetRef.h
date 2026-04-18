@@ -31,7 +31,7 @@ public:
 
 	AssetRef(UUID uuid) : uuid(uuid)
 	{
-		get();
+		m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
 	};
 
 	AssetRef& operator=(const AssetRef& other)
@@ -40,7 +40,7 @@ public:
 			return *this;
 
 		uuid = other.uuid;
-		get();
+		m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
 
 		notifyOnChanged();
 
@@ -58,7 +58,7 @@ public:
 	AssetRef(const AssetRef<U>& other)
 	{
 		uuid = other.getUID();
-		get();
+		m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
 	}
 
 	UUID getUID() const
@@ -122,6 +122,7 @@ public:
 		{
 			m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
 		}
+		assert(uuid == m_cachedAsset->getUID());
 		return m_cachedAsset;
 	}
 

@@ -9,6 +9,8 @@ struct EngineAPI ImageComponent : public Component
 
 	ImageComponent(TextureAssetRef image) : image(image) {}
 
+	std::string getName() override { return "ImageComponent"; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(image);

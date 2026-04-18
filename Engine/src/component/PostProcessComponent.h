@@ -8,6 +8,7 @@
 class PostProcessComponent : public Component
 {
 public:
+	std::string getName() override { return "PostProcessComponent"; }
 
 	ShaderAssetRef shader;
 

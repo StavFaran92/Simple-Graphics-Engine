@@ -36,6 +36,8 @@ public:
 	{
 		return uuid == EMPTY_UUID;
 	}
+
+	UUID getUID() const;
 	
 
 protected:

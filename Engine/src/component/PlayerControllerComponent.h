@@ -7,6 +7,8 @@ struct EngineAPI PlayerController : public Component
 {
 	PlayerController() = default;
 
+	std::string getName() override { return "PlayerController"; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 	}

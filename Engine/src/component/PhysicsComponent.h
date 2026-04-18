@@ -9,6 +9,8 @@ struct EngineAPI PhysicsComponent : public Component
 
 	PhysicsComponent() = default;
 
+	std::string getName() override { return "PhysicsComponent"; }
+
 	void addForce(glm::vec3 force);
 	void setForce(glm::vec3 force);
 

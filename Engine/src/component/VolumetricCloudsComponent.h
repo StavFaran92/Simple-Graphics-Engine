@@ -11,6 +11,8 @@ struct EngineAPI VolumetricCloudsComponent : public Component
 	VolumetricCloudsComponent() = default;
 	VolumetricCloudsComponent(Entity entity);
 
+	std::string getName() override { return "VolumetricCloudsComponent"; }
+
 	MaterialAssetRef getMaterial();
 
 	template <class Archive>

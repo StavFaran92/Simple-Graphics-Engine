@@ -10,6 +10,8 @@ struct EngineAPI MeshRendererComponent : public Component
 	MeshRendererComponent(ModelAssetRef mesh);
 	MeshRendererComponent() = default;
 
+	std::string getName() override { return "MeshRendererComponent"; }
+
 	void addMaterial(const MaterialAssetRef& mat)
 	{
 		m_material[count++] = mat;

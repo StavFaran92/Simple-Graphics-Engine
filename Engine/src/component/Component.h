@@ -39,6 +39,8 @@ public:
 
 	std::vector<AssetRef<Asset>> gatherDependencies() const;
 
+
+	virtual std::string getName() = 0;
 	virtual void resolve(SceneResourceRef& scene) {};
 	virtual void postLoad(SceneResourceRef& scene) {};
 
@@ -73,6 +75,7 @@ std::shared_ptr<Component> getComponentIfExists(const Entity& e)
 
 struct EngineAPI TagComponent : public Component
 {
+	std::string getName() override { return "TagComponent"; }
 	std::string tag;
 };
 
@@ -96,6 +99,8 @@ public:
 
 	void build();
 
+	std::string getName() override;
+
 	std::vector<std::shared_ptr<Transformation>> transformations;
 	ResourceRef<Mesh> mesh;
 	unsigned int m_id = 0;
@@ -109,6 +114,8 @@ private:
 struct TestComp : public Component
 {
 	TestComp() = default;
+
+	std::string getName() override { return "TestComp"; }
 
 	template <class Archive>
 	void serialize(Archive& archive) {

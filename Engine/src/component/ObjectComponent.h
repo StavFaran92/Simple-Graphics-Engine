@@ -8,6 +8,8 @@ struct EngineAPI ObjectComponent : public Component
 	ObjectComponent() = default;
 	ObjectComponent(Entity e, const std::string& name) : name(name), e(e) {};
 
+	std::string getName() override { return "ObjectComponent"; }
+
 	void resolve(SceneResourceRef& scene) override;
 
 	template <class Archive>

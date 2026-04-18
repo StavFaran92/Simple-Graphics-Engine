@@ -7,6 +7,9 @@
 struct EngineAPI NativeScriptComponent : public Component
 {
 	NativeScriptComponent() = default;
+
+	std::string getName() override { return "NativeScriptComponent"; }
+
 	std::shared_ptr<ScriptableEntity> script = nullptr;
 	Entity entity = Entity::EmptyEntity;
 

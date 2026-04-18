@@ -11,6 +11,8 @@ class EngineAPI ScriptComponent : public Component
 public:
 	ScriptComponent() = default;
 	ScriptComponent(const LuaScriptAssetRef& script);
+
+	std::string getName() override { return "ScriptComponent"; }
 	void loadScript();
 
 	bool isValid() const;

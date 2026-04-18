@@ -116,6 +116,8 @@ public:
 	void resolve(SceneResourceRef& scene) override;
 	void postLoad(SceneResourceRef& scene) override;
 
+	std::string getName() override { return "Transformation"; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(localTranslation); 

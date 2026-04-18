@@ -10,6 +10,8 @@ class EngineAPI VolumeComponent : public Component
 public:
 	VolumeComponent() = default;
 
+	std::string getName() override { return "VolumeComponent"; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(mesh);

@@ -13,6 +13,9 @@ class EngineAPI Animator : public Component
 public:
 	Animator() = default;
 	Animator(AnimationAssetRef animation);
+
+	std::string getName() override { return "Animator"; }
+
 	void update(float dt);
 	void getFinalBoneMatrices(const Model* meshCollection, std::vector<glm::mat4>& outFinalBoneMatrices) const;
 	void playAnimation(AnimationAssetRef animation);

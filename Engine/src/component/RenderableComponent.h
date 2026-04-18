@@ -7,6 +7,8 @@ struct EngineAPI RenderableComponent : public Component
 {
 	RenderableComponent() = default;
 
+	std::string getName() override { return "RenderableComponent"; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(renderTechnique);

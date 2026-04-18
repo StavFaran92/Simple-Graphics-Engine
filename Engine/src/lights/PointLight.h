@@ -29,6 +29,8 @@ public:
 
 	void useLight(Shader& shader, int index);
 
+	std::string getName() override { return "PointLight"; }
+
 	void SetAttenuation(Attenuation attenuation);
 	Attenuation getAttenuation() const;
 

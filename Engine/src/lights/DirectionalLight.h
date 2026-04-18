@@ -17,6 +17,8 @@ public:
 
 	void useLight(Shader& shader, int index) override;
 
+	std::string getName() override { return "DirectionalLight"; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(color);

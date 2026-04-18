@@ -7,6 +7,8 @@ struct EngineAPI CameraComponent : public Component
 {
 	CameraComponent() = default;
 
+	std::string getName() override { return "CameraComponent"; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(center);

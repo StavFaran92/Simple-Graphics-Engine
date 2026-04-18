@@ -12,6 +12,8 @@ struct EngineAPI SkyboxComponent : public Component
 
 	SkyboxComponent(TextureAssetRef skyboxImage);
 
+	std::string getName() override { return "SkyboxComponent"; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(originalImage);

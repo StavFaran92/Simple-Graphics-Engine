@@ -77,3 +77,8 @@ ResourceRef<Resource> Asset::resource() const
 
 	return resource;
 }
+
+UUID Asset::getUID() const
+{
+    return uuid;
+}

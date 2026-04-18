@@ -35,6 +35,8 @@ class EngineAPI Terrain : public Component
 public:
 	Terrain() = default;
 
+	std::string getName() override { return "Terrain"; }
+
 	void postLoad(SceneResourceRef& scene ) override;
 
 	static Entity createTerrain(int width, int height);

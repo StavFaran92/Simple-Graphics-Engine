@@ -11,6 +11,8 @@ struct EngineAPI WaterBodyComponent : public Component
 	WaterBodyComponent() = default;
 	WaterBodyComponent(Entity entity);
 
+	std::string getName() override { return "WaterBodyComponent"; }
+
 	MaterialAssetRef getMaterial();
 	void resolve(SceneResourceRef& scene) override;
 
