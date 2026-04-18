@@ -241,6 +241,8 @@ public:
 
 	using Asset::Asset;
 
+	void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) override;
+
 	void serialize(nlohmann::json& j) const override;
 	void deserialize(const nlohmann::json& j) override;
 };

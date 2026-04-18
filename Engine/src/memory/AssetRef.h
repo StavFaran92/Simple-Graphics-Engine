@@ -31,7 +31,7 @@ public:
 
 	AssetRef(UUID uuid) : uuid(uuid)
 	{
-		m_cachedAsset = info().asset;
+		get();
 	};
 
 	AssetRef& operator=(const AssetRef& other)
@@ -40,8 +40,7 @@ public:
 			return *this;
 
 		uuid = other.uuid;
-
-		m_cachedAsset = info().asset;
+		get();
 
 		notifyOnChanged();
 
@@ -59,38 +58,7 @@ public:
 	AssetRef(const AssetRef<U>& other)
 	{
 		uuid = other.getUID();
-
-		m_cachedAsset = info().asset;
-	}
-
-	ResourceRef<ResourceType> resource() const
-	{
-		if (isEmpty())
-			return ResourceRef<ResourceType>::empty;
-
-		const AssetRecord& record = info();
-
-		auto resource = AssetHandleImpl::createOrGetCachedResource(record, uuid);
-
-		m_resource_DEBUG = resource;
-
-		if (record.isResourceDirty())
-		{
-			record.asset->fillData(resource);
-			AssetHandleImpl::syncAsset(uuid);
-		}
-
-		return resource.as<ResourceType>();
-	}
-
-	void erase()
-	{
-		AssetHandleImpl::deleteAsset(uuid);
-	}
-
-	void makeDirty()
-	{
-		AssetHandleImpl::makeAssetDirty(uuid);
+		get();
 	}
 
 	UUID getUID() const
@@ -105,11 +73,37 @@ public:
 
 	const AssetRecord& info() const
 	{
+		if (isEmpty())
+		{
+			static AssetRecord emptyRecord;
+			return emptyRecord;
+		}
+
 		return AssetHandleImpl::getInfo(uuid);
 	}
 
-	void reimportAsset()
+	ResourceRef<ResourceType> resource() const
 	{
+		if (isEmpty())
+			return ResourceRef<ResourceType>::empty;
+
+		return get()->resource().as<ResourceType>();
+	}
+
+	void erase()
+	{
+		if (isEmpty())
+			return;
+
+		get()->deleteAsset();
+	}
+
+	void makeDirty()
+	{
+		if (isEmpty())
+			return;
+
+		get()->makeAssetDirty();
 	}
 
 	inline Ref<T> operator->()
@@ -126,9 +120,9 @@ public:
 	{
 		if (!m_cachedAsset)
 		{
-			m_cachedAsset = info().asset;
+			m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
 		}
-		return std::dynamic_pointer_cast<T>(m_cachedAsset);
+		return m_cachedAsset;
 	}
 
 	template <class Archive>
@@ -166,7 +160,7 @@ private:
 
 	std::shared_ptr<OnChangedRegistry> onChangedRegistry = std::make_shared<OnChangedRegistry>();
 
-	mutable Ref<Asset> m_cachedAsset;
+	mutable Ref<T> m_cachedAsset;
 
 	// Used mainly for debug
 	mutable ResourceRef<Resource> m_resource_DEBUG = ResourceRef<Resource>::empty;

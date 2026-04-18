@@ -86,7 +86,7 @@ public:
 
 	void bindDependency(const std::string& slot, UUID dependency) override;
 
-	void fillData(ResourceRef<Resource> resource) override;
+	void fillData(ResourceRef<Resource> resource) const override;
 
 	void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) override;
 

@@ -353,6 +353,8 @@ AssetRef<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuildDes
 	record.ext = getExtensionFromType(type);
 	addAsset(record);
 
+	asset->uuid = record.uuid;
+
 	return AssetRef<Asset>(record.uuid);
 }
 
@@ -603,4 +605,9 @@ void Assets::moveAsset(UUID uuid, const ScopedPath& newDirectory)
 
 	m_assets[aInfo.uuid] = aInfo;
 	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(aInfo);
+}
+
+void Assets::reimportAsset(UUID uuid)
+{
+	throw std::runtime_error("Not yet implemented.");
 }

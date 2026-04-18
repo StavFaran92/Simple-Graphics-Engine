@@ -365,7 +365,7 @@ void AssetViewWindow::display()
 						if (!fMetadata.isDirectory)
 						{
 							UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
-							Engine::get()->getSubSystem<Assets>()->getAsset(uuid).reimportAsset();
+							Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
 						}
 					}
 

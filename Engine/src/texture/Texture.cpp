@@ -662,6 +662,20 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 
 //adi is your love of your life
 
+void TextureAsset::fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc)
+{
+	const TextureData& data = resource().as<Texture>()->getData();
+
+	auto textureDesc = dynamic_cast<TextureCreateDescriptor*>(&resourceBuildDesc);
+	if (!textureDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return;
+	}
+
+	textureDesc->textureData = data;
+}
+
 void TextureAsset::serialize(nlohmann::json& j) const
 {
 	// Texture assets currently do not have additional persistent data

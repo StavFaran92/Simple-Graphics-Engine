@@ -254,7 +254,7 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 	data.setSampler(shaderPropertyName, sampler);
 }
 
-void MaterialAsset::fillData(ResourceRef<Resource> resource)
+void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 {
 	auto materialResource = resource.as<Material>();
 	materialResource->m_name = data.name;

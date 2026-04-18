@@ -21,6 +21,8 @@ public:
 
 	void renameAsset(UUID uuid, const std::string& newName);
 
+	void reimportAsset(UUID uuid);
+
 	void moveAsset(UUID uuid, const ScopedPath& newDirectory);
 
 	void deleteAsset(UUID uuid);

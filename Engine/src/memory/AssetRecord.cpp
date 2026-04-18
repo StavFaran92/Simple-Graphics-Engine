@@ -39,6 +39,7 @@ void from_json(const nlohmann::json& j, AssetRecord& r)
 
 	nlohmann::json jsonAsset = j.at("asset");
 	Ref<Asset> asset = AssetFactory::getManager(r.aType)->deserializeAsset(jsonAsset);
+	asset->uuid = r.uuid;
 	r.asset = asset;
 }
 
