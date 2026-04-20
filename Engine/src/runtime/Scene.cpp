@@ -61,6 +61,7 @@
 #include "systems/VolumetricSystem.h"
 #include "core/Factory.h"
 #include "memory/BuiltInAssets.h"
+#include "core/Trace.h"
 
 SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
@@ -192,6 +193,7 @@ void Scene::init(Context* context, ResourceID rid)
 
 		// The following will be called for each added component
 		c.registerDependencyListener(onChangedCB);
+		Trace::dependencyEdge(0, std::to_string(rid), c.getName());
 		logDebug("Scene {} register on component {}", std::to_string(rid), c.getName());
 		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
 

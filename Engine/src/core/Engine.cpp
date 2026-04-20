@@ -9,6 +9,7 @@
 #include "core/EventSystem.h"
 #include "geometry/ModelImporter.h"
 #include "core/Logger.h"
+#include "core/TraceLogger.h"
 #include "core/CacheSystem.h"
 #include "systems/TimeManager.h"
 #include "physics/PhysicsSystem.h"
@@ -63,6 +64,7 @@ Engine* Engine::instance = nullptr;
 bool Engine::init(const InitParams& initParams)
 {
     Logger::init("test.log");
+    TraceLogger::init();
 
     if (m_isInit)
     {
@@ -408,6 +410,8 @@ void Engine::close()
     }
 
     m_window->close();
+
+    TraceLogger::shutdown();
 
     m_isInit = false;
 
