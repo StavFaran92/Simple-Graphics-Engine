@@ -350,7 +350,7 @@ void Engine::run(Application* app)
 
         deltaTime = ((NOW - LAST) / (double)SDL_GetPerformanceFrequency());
 
-        system->setDeltaTime(deltaTime);
+        system->tick(deltaTime);
 
         //Handle events on queue
         handleEvents(quit);

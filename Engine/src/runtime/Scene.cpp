@@ -190,11 +190,9 @@ void Scene::init(Context* context, ResourceID rid)
 
 	m_registry = std::make_shared<SGE_Regsitry>();
 	m_registry->registerOnComponentAdded([rid](Component& c) {
-
+		
 		// The following will be called for each added component
 		c.registerDependencyListener(onChangedCB);
-		Trace::dependencyEdge(0, std::to_string(rid), c.getName());
-		logDebug("Scene {} register on component {}", std::to_string(rid), c.getName());
 		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
 
 		SceneResourceRef scene = Engine::get()->getResourceManager()->getResource(rid).as<Scene>();

@@ -4,12 +4,12 @@
 
 #include "core/Core.h"
 
-#include <nlohmann/json.hpp>
+class UUID;
 
 class EngineAPI Trace
 {
 public:
-	static void dependencyEdge(int frame, const std::string& from, const std::string& to);
+	static void assetDependency(const UUID& from, const UUID& to);
 
 	// Add more trace helpers here (same pattern: build json, TraceLogger::instance().log(j))
 };

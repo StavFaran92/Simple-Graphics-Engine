@@ -4,6 +4,9 @@
 #include "runtime/Scene.h"
 #include <GL/glew.h>
 #include "render/VertexArrayObject.h"
+#include "core/Trace.h"
+#include "core/Engine.h"
+#include "runtime/Context.h"
 
 std::string InstanceBatch::getName()
 {
@@ -85,10 +88,13 @@ void InstanceBatch::build()
 
 void Component::registerDependencyListener(const std::function<void(UUID)>& onChangedCB) const
 {
+	//auto activeScene = Engine::get()->getContext()->getActiveSceneAsset();
+
 	auto assetDeps = gatherDependenciesInternal();
 	for (auto& asset : assetDeps)
 	{
 		asset->registerOnChanged(onChangedCB);
+		Trace::assetDependency(0, asset->getUID());
 	}
 }
 

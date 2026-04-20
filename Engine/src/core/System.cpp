@@ -17,15 +17,21 @@ double System::getDeltaTime() const
 	return m_deltaTime;
 }
 
+uint64_t System::getFrameCount() const
+{
+	return m_frameCount;
+}
+
 unsigned int System::getTriangleCount() const
 {
 	return m_triangleCount;
 }
 
-void System::setDeltaTime(double deltaTime)
+void System::tick(double deltaTime)
 {
 	m_fps = 1.0 / deltaTime;
 	m_deltaTime = deltaTime;
+	++m_frameCount;
 }
 
 void System::reset()
