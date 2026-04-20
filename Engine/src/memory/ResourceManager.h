@@ -13,16 +13,7 @@ public:
 	std::string getRootDir() const;
 	void setRootDir(const std::string& rootDir);
 
-    int getRefCount(ResourceID uuid) const;
-
-
-    int incRef(ResourceID uuid);
-
-    int decRef(ResourceID uuid);
-
     ResourceRef<Resource> getResource(ResourceID) const;
-
-    //ResourceWrapper<Resource> loadResource(const std::string& fileLocation, ResourceLoadDescriptor& desc);
 
     ResourceRef<Resource> createOrGetCached(ResourceID id, const std::function<ResourceRef<Resource>(void)>& creationCallback);
 
@@ -40,12 +31,6 @@ public:
 
         return resource;
     }
-
-
-
-
-
-
 
 private:
 	std::string m_rootResourceDir;

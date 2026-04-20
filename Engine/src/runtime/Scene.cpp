@@ -116,6 +116,11 @@ void Scene::onActivate()
 	preloadSceneResources();
 }
 
+void Scene::onDeactivate()
+{
+	m_cachedResources.clear();
+}
+
 struct PlaneGPU {
 	glm::vec3 normal;
 	float d;
@@ -192,10 +197,10 @@ void Scene::init(Context* context, ResourceID rid)
 	m_registry->registerOnComponentAdded([rid](Component& c) {
 		
 		// The following will be called for each added component
-		c.registerDependencyListener(onChangedCB);
+		SceneResourceRef scene = Engine::get()->getResourceManager()->getResource(rid).as<Scene>();
+		c.registerSceneDependency(scene);
 		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
 
-		SceneResourceRef scene = Engine::get()->getResourceManager()->getResource(rid).as<Scene>();
 		if (scene->isReady())
 		{
 			c.resolve(scene);

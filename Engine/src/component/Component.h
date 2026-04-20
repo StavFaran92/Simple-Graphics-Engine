@@ -35,7 +35,8 @@ public:
 	void serialize(Archive& archive) {
 	}
 
-	void registerDependencyListener(const std::function<void(UUID)>& onChangedCB) const;
+	void registerSceneDependency(SceneResourceRef& scene) const;
+	void removeSceneDependency(SceneResourceRef& scene) const;
 
 	std::vector<AssetRef<Asset>> gatherDependencies() const;
 

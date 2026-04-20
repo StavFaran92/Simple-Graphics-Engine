@@ -86,15 +86,25 @@ void InstanceBatch::build()
 	//glVertexAttribDivisor(9, 1);
 }
 
-void Component::registerDependencyListener(const std::function<void(UUID)>& onChangedCB) const
+void Component::registerSceneDependency(SceneResourceRef& scene) const
 {
-	//auto activeScene = Engine::get()->getContext()->getActiveSceneAsset();
-
 	auto assetDeps = gatherDependenciesInternal();
 	for (auto& asset : assetDeps)
 	{
-		asset->registerOnChanged(onChangedCB);
-		Trace::assetDependency(0, asset->getUID());
+		asset->registerOnChangedListener([scene](UUID)mutable {
+			scene->makeDirty();
+		});
+		Trace::addSceneAssetMonitor(scene, asset->getUID());
+	}
+}
+
+void Component::removeSceneDependency(SceneResourceRef& scene) const
+{
+	auto assetDeps = gatherDependenciesInternal();
+	for (auto& asset : assetDeps)
+	{
+		asset->removeOnChangedListener();
+		Trace::removeSceneAssetMonitor(scene, asset->getUID());
 	}
 }
 

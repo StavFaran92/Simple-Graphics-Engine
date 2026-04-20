@@ -76,7 +76,7 @@ public:
 				auto& c = scene->getRegistry().get().get<T>(entity);
 
 				c.resolve(scene);
-				c.registerDependencyListener([scene](UUID uid) { scene.get()->makeDirty(); });
+				c.registerSceneDependency(scene);
 			}
 		};
 

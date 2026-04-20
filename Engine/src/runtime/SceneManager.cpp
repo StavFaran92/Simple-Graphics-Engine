@@ -56,6 +56,9 @@ void SceneManager::setActiveScene(uint32_t index)
 		return;
 	}
 
+	if (m_activeScene != -1)
+		m_scenes.at(m_activeScene).resource()->onDeactivate();
+
 	m_activeScene = index;
 
 	m_scenes.at(m_activeScene).resource()->onActivate();

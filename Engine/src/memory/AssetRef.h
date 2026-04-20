@@ -129,32 +129,29 @@ public:
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRef, uuid);
 
 
-	void registerOnChanged(std::function<void(UUID)> cb)
+	void registerOnChangedListener(const std::function<void(UUID)>& cb)
 	{
-		onChangedRegistry->listeners.push_back(std::move(cb));
+		onChangedListener = cb;
+	}
+
+	void removeOnChangedListener()
+	{
+		onChangedListener = nullptr;
 	}
 
 private:
 	void notifyOnChanged()
 	{
-		if (onChangedRegistry->listeners.size() > 0)
+		if (onChangedListener)
 		{
-			for (auto& cb : onChangedRegistry->listeners)
-			{
-				cb(uuid);
-			}
+			onChangedListener(uuid);
 		}
 	}
 private:
 
 	UUID uuid = EMPTY_UUID;
 
-	struct OnChangedRegistry
-	{
-		std::vector<std::function<void(UUID)>> listeners;
-	};
-
-	std::shared_ptr<OnChangedRegistry> onChangedRegistry = std::make_shared<OnChangedRegistry>();
+	std::function<void(UUID)> onChangedListener;
 
 	mutable Ref<T> m_cachedAsset;
 
