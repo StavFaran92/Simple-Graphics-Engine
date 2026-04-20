@@ -142,6 +142,7 @@ bool Engine::init(const InitParams& initParams)
 
     m_eventSystem = std::make_shared<EventSystem>();
     m_eventLayerStack = std::make_shared<EventLayerStack>();
+    auto system = new System(); // TODO change to systemAnalytics
 
     std::shared_ptr<GameLayer> gameEventLayer = std::make_shared<GameLayer>();
     gameEventLayer->setEnabled(false);
@@ -194,7 +195,6 @@ bool Engine::init(const InitParams& initParams)
     auto modelImporter = new ModelImporter();
     auto animationLoader = new AnimationLoader();
     auto graphics = new Graphics();
-    auto system = new System(); // TODO change to systemAnalytics
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
     auto uniqueNameManager = new UniqueNameManager();

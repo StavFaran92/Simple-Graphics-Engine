@@ -6,6 +6,7 @@
 #include "core/Configurations.h"
 #include "memory/ResourceRef.h"
 #include "core/Logger.h"
+#include "core/Trace.h"
 
 class EngineAPI ResourceManager
 {
@@ -26,6 +27,8 @@ public:
         auto& resource = ResourceRef<T>(obj, id);
 
         logDebug("Create new resource: {}", id);
+
+        Trace::createNewResource(id, typeid(T).name());
 
         m_resourceCache[id] = resource;
 

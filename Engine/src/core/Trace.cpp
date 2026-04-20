@@ -31,3 +31,17 @@ void Trace::removeSceneAssetMonitor(const SceneResourceRef& scene, const UUID& u
 	};
 	TraceLogger::writeJsonLine(j);
 }
+
+void Trace::createNewResource(ResourceID id, const std::string& type)
+{
+	auto frame = Engine::get()->getSubSystem<System>()->getFrameCount();
+
+	nlohmann::json j = {
+		{"frame", frame},
+		{"system", "resource_view"},
+		{"type", "add_resource"},
+		{"id", id},
+		{"resource_type", type}
+	};
+	TraceLogger::writeJsonLine(j);
+}
