@@ -42,9 +42,10 @@ ResourceRef<Resource> ResourceManager::getResource(ResourceID rid) const
         auto it = m_resourceCache.find(rid);
         if (it != m_resourceCache.end())
         {
-            if (auto existing = it->second)
+            auto existing = it->second;
+            if (!existing.expired())
             {
-                return existing;
+                return ResourceRef<Resource>(existing.lock(), rid);
             }
         }
 
@@ -60,9 +61,10 @@ ResourceRef<Resource> ResourceManager::createOrGetCached(ResourceID id, const st
         auto it = m_resourceCache.find(id);
         if (it != m_resourceCache.end())
         {
-            if (auto existing = it->second)
+            auto existing = it->second;
+            if (!existing.expired())
             {
-                return existing;
+                return ResourceRef<Resource>(existing.lock(), id);
             }
         }
     }
@@ -80,12 +82,13 @@ ResourceRef<Resource> ResourceManager::createOrGetCached(ResourceID id, const st
 
         // Another thread might have beaten us to it
         auto& slot = m_resourceCache[created.getUID()];
-        if (auto existing = slot)
+        auto existing = slot;
+        if (!existing.expired())
         {
-            return existing;
+            return ResourceRef<Resource>(existing.lock(), created.getUID());
         }
 
-        slot = created;
+        slot = created.m_resource;
     }
 
     return created;

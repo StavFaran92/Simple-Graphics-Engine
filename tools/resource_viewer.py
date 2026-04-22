@@ -14,6 +14,7 @@ Requires Python 3.8+ (stdlib only unless watchdog is installed).
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
 import sys
@@ -44,6 +45,9 @@ class TraceState:
     """Merged view of resource_view and scene_monitor lines."""
 
     resources: dict[int, dict] = field(default_factory=dict)
+    destroyed_resources: dict[int, dict] = field(default_factory=dict)
+    last_added_resources: dict[int, dict] = field(default_factory=dict)
+    last_added_frame: int = -1
     # scene_asset_id -> set of resource ids this scene depends on
     scene_deps: dict[int, set[int]] = field(default_factory=dict)
     parse_errors: int = 0
@@ -52,13 +56,34 @@ class TraceState:
         system = obj.get("system")
         typ = obj.get("type")
         frame = obj.get("frame", 0)
+        global_time = obj.get("global_time", 0)
 
-        if system == "resource_view" and typ == "add_resource":
+        if system == "resource_view":
             rid = obj.get("id")
-            if rid is not None:
-                self.resources[int(rid)] = {
+            if rid is not None and typ == "add_resource":
+                rid_i = int(rid)
+                frame_i = int(frame) if frame is not None else 0
+                payload = {
+                    "resource_type": obj.get("resource_type", ""),
+                    "last_frame": frame_i,
+                    "global_time": int(global_time) if global_time is not None else 0,
+                }
+                self.resources[rid_i] = payload
+                if frame_i > self.last_added_frame:
+                    self.last_added_frame = frame_i
+                    self.last_added_resources.clear()
+                    self.last_added_resources[rid_i] = payload
+                elif frame_i == self.last_added_frame:
+                    self.last_added_resources[rid_i] = payload
+                self.destroyed_resources.pop(rid_i, None)
+            elif rid is not None and typ == "destroy_resource":
+                rid_i = int(rid)
+                self.resources.pop(rid_i, None)
+                self.last_added_resources.pop(rid_i, None)
+                self.destroyed_resources[rid_i] = {
                     "resource_type": obj.get("resource_type", ""),
                     "last_frame": int(frame) if frame is not None else 0,
+                    "global_time": int(global_time) if global_time is not None else 0,
                 }
         elif system == "scene_monitor" and typ == "add_dependency":
             scene = obj.get("scene")
@@ -143,28 +168,15 @@ class ResourceViewerApp:
         paned = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
         paned.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
 
-        # --- Active resources ---
-        lf_res = ttk.LabelFrame(paned, text="Active resources", padding=4)
+        # --- Resource tabs (active / destroyed / last added) ---
+        lf_res = ttk.LabelFrame(paned, text="Resources", padding=4)
         paned.add(lf_res, weight=1)
-        cols = ("id", "type", "frame")
-        self.tree_res = ttk.Treeview(
-            lf_res, columns=cols, show="headings", height=20, selectmode=tk.BROWSE
-        )
-        self.tree_res.heading("id", text="Resource ID")
-        self.tree_res.heading("type", text="Type")
-        self.tree_res.heading("frame", text="Last frame")
-        self.tree_res.column("id", width=100, anchor=tk.E)
-        self.tree_res.column("type", width=280, anchor=tk.W)
-        self.tree_res.column("frame", width=100, anchor=tk.E)
-        sy1 = ttk.Scrollbar(lf_res, orient=tk.VERTICAL, command=self.tree_res.yview)
-        self.tree_res.configure(yscrollcommand=sy1.set)
-        self.tree_res.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        sy1.pack(side=tk.RIGHT, fill=tk.Y)
+        self.tabs = ttk.Notebook(lf_res)
+        self.tabs.pack(fill=tk.BOTH, expand=True)
 
-        try:
-            self.tree_res.configure(font=("Consolas", 10))
-        except tk.TclError:
-            pass
+        self.tree_res_active = self._build_resource_tree(self.tabs, "Active resources")
+        self.tree_res_destroyed = self._build_resource_tree(self.tabs, "Destroyed resources")
+        self.tree_res_last_added = self._build_resource_tree(self.tabs, "Last added resources")
 
         # --- Scene dependencies (parent = scene, children = resource ids) ---
         lf_scene = ttk.LabelFrame(paned, text="Scene asset dependencies", padding=4)
@@ -183,6 +195,31 @@ class ResourceViewerApp:
 
         self.status = ttk.Label(self.root, text="", relief=tk.SUNKEN, anchor=tk.W)
         self.status.pack(fill=tk.X, side=tk.BOTTOM, padx=4, pady=2)
+
+    def _build_resource_tree(self, parent: ttk.Notebook, title: str) -> ttk.Treeview:
+        frame = ttk.Frame(parent)
+        parent.add(frame, text=title)
+        cols = ("id", "type", "frame", "global_time")
+        tree = ttk.Treeview(
+            frame, columns=cols, show="headings", height=20, selectmode=tk.BROWSE
+        )
+        tree.heading("id", text="Resource ID")
+        tree.heading("type", text="Type")
+        tree.heading("frame", text="Last frame")
+        tree.heading("global_time", text="Global time")
+        tree.column("id", width=100, anchor=tk.E)
+        tree.column("type", width=220, anchor=tk.W)
+        tree.column("frame", width=100, anchor=tk.E)
+        tree.column("global_time", width=180, anchor=tk.E)
+        sy = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscrollcommand=sy.set)
+        tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        sy.pack(side=tk.RIGHT, fill=tk.Y)
+        try:
+            tree.configure(font=("Consolas", 10))
+        except tk.TclError:
+            pass
+        return tree
 
     def _parse_and_apply_lines(self, text_lines: list[str], reset_state: bool) -> None:
         if reset_state:
@@ -249,15 +286,9 @@ class ResourceViewerApp:
         self._process_full_reload()
 
     def _refresh_trees(self) -> None:
-        for item in self.tree_res.get_children():
-            self.tree_res.delete(item)
-        for rid in sorted(self.state.resources.keys()):
-            r = self.state.resources[rid]
-            self.tree_res.insert(
-                "",
-                tk.END,
-                values=(rid, r.get("resource_type", ""), r.get("last_frame", "")),
-            )
+        self._refresh_resource_tree(self.tree_res_active, self.state.resources)
+        self._refresh_resource_tree(self.tree_res_destroyed, self.state.destroyed_resources)
+        self._refresh_resource_tree(self.tree_res_last_added, self.state.last_added_resources)
 
         for item in self.tree_scene.get_children():
             self.tree_scene.delete(item)
@@ -277,6 +308,38 @@ class ResourceViewerApp:
                     text=f"  → resource {rid}",
                     values=(rid,),
                 )
+
+    def _refresh_resource_tree(self, tree: ttk.Treeview, data: dict[int, dict]) -> None:
+        for item in tree.get_children():
+            tree.delete(item)
+        for rid in sorted(
+            data.keys(),
+            key=lambda rid: (data[rid].get("global_time", 0), rid),
+            reverse=True,
+        ):
+            r = data[rid]
+            tree.insert(
+                "",
+                tk.END,
+                values=(
+                    rid,
+                    r.get("resource_type", ""),
+                    r.get("last_frame", ""),
+                    self._format_global_time(r.get("global_time", 0)),
+                ),
+            )
+
+    @staticmethod
+    def _format_global_time(global_time_us: int) -> str:
+        try:
+            us = int(global_time_us)
+            if us <= 0:
+                return ""
+            ts = us / 1_000_000.0
+            dt_obj = dt.datetime.fromtimestamp(ts)
+            return dt_obj.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        except (TypeError, ValueError, OSError, OverflowError):
+            return str(global_time_us)
 
     def _set_status(self, msg: str) -> None:
         ts = time.strftime("%H:%M:%S")
@@ -371,13 +434,32 @@ def main() -> int:
     parser.add_argument(
         "jsonl",
         type=Path,
-        help="Path to the .jsonl trace file (must exist).",
+        nargs="?",
+        help="Path to the .jsonl trace file (optional; if omitted, uses latest .jsonl in tools folder).",
     )
     args = parser.parse_args()
-    path: Path = args.jsonl
-    if not path.is_file():
-        print(f"Error: not a file or does not exist: {path}", file=sys.stderr)
-        return 1
+    if args.jsonl is None:
+        tools_dir = Path(__file__).resolve().parent
+        repo_root = tools_dir.parent
+        fallback_dir = repo_root / "build" / "EditorApp" / "logs"
+
+        candidates = (
+            [p for p in fallback_dir.glob("*.jsonl") if p.is_file()]
+            if fallback_dir.is_dir()
+            else []
+        )
+        if not candidates:
+            print(
+                f"Error: no .jsonl files found in logs folder: {fallback_dir}",
+                file=sys.stderr,
+            )
+            return 1
+        path = max(candidates, key=lambda p: p.stat().st_mtime)
+    else:
+        path = args.jsonl
+        if not path.is_file():
+            print(f"Error: not a file or does not exist: {path}", file=sys.stderr)
+            return 1
 
     app = ResourceViewerApp(path)
     app.run()

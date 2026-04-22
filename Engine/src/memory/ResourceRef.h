@@ -85,6 +85,7 @@ private:
     }
 
     template<typename U> friend class ResourceRef;
+    template<typename U> friend class ResourceView;
     friend class ResourceManager;
 
     std::shared_ptr<Resource> m_resource;

@@ -5,6 +5,7 @@
 #include "memory/AssetRef.h"
 #include "memory/Assets.h"
 #include "core/Engine.h"
+#include "core/Logger.h"
 
 const std::string SGE_TEXTURE_WHITE = "SGE_TEXTURE_WHITE";
 const std::string SGE_TEXTURE_BLACK = "SGE_TEXTURE_BLACK";
@@ -30,26 +31,50 @@ const std::string SGE_MATERIAL_TERRAIN_DEFAULT = "SGE_MATERIAL_TERRAIN_DEFAULT";
 class BuiltInAssets
 {
 public:
-	template<typename T>
-	static AssetRef<T> get(const UUID& uuid)
-	{
-		if (!Engine::get()->getSubSystem<Assets>()->hasAsset(uuid))
-		{
-			logWarning("Could not find asset {}", uuid.str());
-			return {};
-		}
-		return Engine::get()->getSubSystem<Assets>()->getAsset(uuid).data().as<T>();
-	}
+    template<typename T>
+    static AssetRef<T> get(const UUID& uuid)
+    {
+        auto& cache = getCache();
 
-	template<typename T>
-	static AssetRef<T> getByName(const std::string& name)
-	{
-		return Engine::get()->getSubSystem<Assets>()->getAssetFromName(name).as<T>();
-	}
+        // If not cached -> load + pin resource
+        if (cache.find(uuid) == cache.end())
+        {
+            if (!Engine::get()->getSubSystem<Assets>()->hasAsset(uuid))
+            {
+                logWarning("Could not find asset {}", uuid.str());
+                return {};
+            }
 
-	template<typename T>
-	static AssetRef<T> getByPath(const std::string& path)
-	{
-		return Engine::get()->getSubSystem<Assets>()->getAssetFromPath(path).as<T>();
-	}
+            auto asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
+
+            // Force creation + pin lifetime
+            cache[uuid] = asset.resource();
+        }
+
+        // Always return fresh AssetRef
+        return Engine::get()->getSubSystem<Assets>()->getAsset(uuid).as<T>();
+    }
+
+    template<typename T>
+    static AssetRef<T> getByName(const std::string& name)
+    {
+        auto asset = Engine::get()->getSubSystem<Assets>()->getAssetFromName(name);
+
+        return get<T>(asset.getUID());
+    }
+
+    template<typename T>
+    static AssetRef<T> getByPath(const std::string& path)
+    {
+        auto asset = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(path);
+
+        return get<T>(asset.getUID());
+    }
+
+private:
+    static std::unordered_map<UUID, ResourceRef<Resource>>& getCache()
+    {
+        static std::unordered_map<UUID, ResourceRef<Resource>> cache;
+        return cache;
+    }
 };

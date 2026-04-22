@@ -12,6 +12,11 @@ public:
         : m_weak(ptr) {
     }
 
+    ResourceView(const ResourceRef<T>& ref)
+        : m_weak(std::static_pointer_cast<T>(ref.m_resource)),
+          m_id(ref.m_id) {
+    }
+
     bool isValid() const noexcept {
         return !m_weak.expired();
     }
@@ -20,9 +25,12 @@ public:
         if(!isValid()) return ResourceRef<T>::empty;
 
         std::shared_ptr<T> sptr = m_weak.lock();
-        
+        if (!sptr) return ResourceRef<T>::empty;
+
+        return ResourceRef<T>(std::static_pointer_cast<Resource>(sptr), m_id);
     }
 
 private:
     std::weak_ptr<T> m_weak;
+    ResourceID m_id = ResourceRef<T>::emptyID;
 };

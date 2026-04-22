@@ -44,6 +44,9 @@ struct EngineAPI SkyboxComponent : public Component
 	bool m_isBuilt = false;
 	TextureAssetRef m_cubemap;
 	TextureAssetRef m_irradianceMap;
+
+protected:
+	std::vector<AssetRef<Asset>*> gatherDependenciesInternal() const override;
 };
 
 REGISTER_COMPONENT(SkyboxComponent)

@@ -143,6 +143,8 @@ bool Engine::init(const InitParams& initParams)
     m_eventSystem = std::make_shared<EventSystem>();
     m_eventLayerStack = std::make_shared<EventLayerStack>();
     auto system = new System(); // TODO change to systemAnalytics
+    m_timeManager = std::make_shared<TimeManager>();
+    m_randomSystem = std::make_shared<RandomNumberGenerator>();
 
     std::shared_ptr<GameLayer> gameEventLayer = std::make_shared<GameLayer>();
     gameEventLayer->setEnabled(false);
@@ -198,14 +200,6 @@ bool Engine::init(const InitParams& initParams)
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
     auto uniqueNameManager = new UniqueNameManager();
-
-    
-
-    m_timeManager = std::make_shared<TimeManager>();
-
-    m_randomSystem = std::make_shared<RandomNumberGenerator>();
-
-    
 
     // Create or Load project asset registry
     std::shared_ptr<ProjectAssetRegistry> par;
