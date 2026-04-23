@@ -35,5 +35,10 @@ void SGE_Regsitry::removeEntity(const Entity& e)
 	auto id = e.handlerID();
 	m_registry.destroy(e.handler());
 
+	if (m_onComponentRemovedCallback)
+	{
+		m_onComponentRemovedCallback();
+	}
+
 	logDebug("Removed entity: " + std::to_string(id));
 }

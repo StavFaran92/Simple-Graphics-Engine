@@ -146,6 +146,8 @@ bool Engine::init(const InitParams& initParams)
     m_timeManager = std::make_shared<TimeManager>();
     m_randomSystem = std::make_shared<RandomNumberGenerator>();
 
+    Trace::setProjectRootFolder(m_projectDirectory);
+
     std::shared_ptr<GameLayer> gameEventLayer = std::make_shared<GameLayer>();
     gameEventLayer->setEnabled(false);
     m_eventSystem->pushLayer(gameEventLayer);

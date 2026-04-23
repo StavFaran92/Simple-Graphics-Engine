@@ -210,7 +210,7 @@ public:
     void RemoveComponent()
     {
         assert(valid() && "Invalid entity.");
-        m_registry->getRegistry().remove<T>(m_entity);
+        m_registry->removeComponent<T>(m_entity);
 
         m_components.erase(typeid(T).name());
 

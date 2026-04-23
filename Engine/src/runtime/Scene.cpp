@@ -207,6 +207,11 @@ void Scene::init(Context* context, ResourceID rid)
 		}
 	});
 
+	m_registry->registerOnComponentRemoved([]() {
+		onChangedCB(EMPTY_UUID);
+		
+	});
+
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
 

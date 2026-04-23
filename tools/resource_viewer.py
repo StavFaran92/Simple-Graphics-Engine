@@ -48,8 +48,10 @@ class TraceState:
     destroyed_resources: dict[int, dict] = field(default_factory=dict)
     last_added_resources: dict[int, dict] = field(default_factory=dict)
     last_added_frame: int = -1
-    # scene_asset_id -> set of resource ids this scene depends on
+    # scene_asset_id -> set of asset ids this scene depends on
     scene_deps: dict[int, set[int]] = field(default_factory=dict)
+    # asset_id -> asset view payload (future-proof for additional asset data)
+    assets: dict[int, dict] = field(default_factory=dict)
     parse_errors: int = 0
 
     def apply_line(self, obj: dict) -> None:
@@ -85,14 +87,60 @@ class TraceState:
                     "last_frame": int(frame) if frame is not None else 0,
                     "global_time": int(global_time) if global_time is not None else 0,
                 }
-        elif system == "scene_monitor" and typ == "add_dependency":
+        elif system == "scene_monitor" and typ in {"add_dependency", "remove_dependency"}:
             scene = obj.get("scene")
-            to_id = obj.get("to")
-            if scene is not None and to_id is not None:
+            # Prefer explicit field, but support older traces that used "to".
+            dep_asset_id = obj.get("asset_id", obj.get("to"))
+            if scene is not None and dep_asset_id is not None:
                 sid = int(scene)
                 if sid not in self.scene_deps:
                     self.scene_deps[sid] = set()
-                self.scene_deps[sid].add(int(to_id))
+                dep_id = int(dep_asset_id)
+                if typ == "add_dependency":
+                    self.scene_deps[sid].add(dep_id)
+                else:
+                    self.scene_deps[sid].discard(dep_id)
+                    if not self.scene_deps[sid]:
+                        self.scene_deps.pop(sid, None)
+        elif system == "asset_view":
+            frame_i = int(frame) if frame is not None else 0
+            gtime_i = int(global_time) if global_time is not None else 0
+
+            if typ == "add_asset":
+                aid_raw = obj.get("id")
+                if aid_raw is None:
+                    return
+                aid = int(aid_raw)
+                existing = self.assets.get(aid, {})
+                self.assets[aid] = {
+                    "resource_id": existing.get("resource_id", ""),
+                    "name": obj.get("name", ""),
+                    "asset_type": obj.get("asset_type", ""),
+                    "owner": obj.get("owner", ""),
+                    "source": obj.get("source", ""),
+                    "ext": obj.get("ext", ""),
+                    "path": obj.get("path", ""),
+                    "last_frame": frame_i,
+                    "global_time": gtime_i,
+                }
+            elif typ == "bind_resource":
+                aid_raw = obj.get("asset_id")
+                rid = obj.get("resource_id")
+                if aid_raw is None or rid is None:
+                    return
+                aid = int(aid_raw)
+                existing = self.assets.get(aid, {})
+                self.assets[aid] = {
+                    "resource_id": int(rid),
+                    "name": existing.get("name", ""),
+                    "asset_type": existing.get("asset_type", ""),
+                    "owner": existing.get("owner", ""),
+                    "source": existing.get("source", ""),
+                    "ext": existing.get("ext", ""),
+                    "dir": existing.get("dir", ""),
+                    "last_frame": frame_i,
+                    "global_time": gtime_i,
+                }
 
 
 class JsonlTailReader:
@@ -168,6 +216,54 @@ class ResourceViewerApp:
         paned = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
         paned.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
 
+        # --- Assets view (same top level as Resources) ---
+        lf_assets = ttk.LabelFrame(paned, text="Assets view", padding=4)
+        paned.add(lf_assets, weight=1)
+        asset_split = ttk.PanedWindow(lf_assets, orient=tk.VERTICAL)
+        asset_split.pack(fill=tk.BOTH, expand=True)
+
+        assets_top = ttk.Frame(asset_split)
+        assets_bottom = ttk.LabelFrame(asset_split, text="Asset details", padding=4)
+        asset_split.add(assets_top, weight=4)
+        asset_split.add(assets_bottom, weight=1)
+
+        self.tree_assets = ttk.Treeview(
+            assets_top,
+            columns=("asset_id", "asset_name", "resource_id", "frame", "global_time"),
+            show="headings",
+            height=20,
+            selectmode=tk.BROWSE,
+        )
+        self.tree_assets.heading("asset_id", text="Asset ID")
+        self.tree_assets.heading("asset_name", text="Asset Name")
+        self.tree_assets.heading("resource_id", text="Bound Resource ID")
+        self.tree_assets.heading("frame", text="Last frame")
+        self.tree_assets.heading("global_time", text="Global time")
+        self.tree_assets.column("asset_id", width=120, anchor=tk.E)
+        self.tree_assets.column("asset_name", width=200, anchor=tk.W)
+        self.tree_assets.column("resource_id", width=160, anchor=tk.E)
+        self.tree_assets.column("frame", width=100, anchor=tk.E)
+        self.tree_assets.column("global_time", width=180, anchor=tk.E)
+        sy3 = ttk.Scrollbar(assets_top, orient=tk.VERTICAL, command=self.tree_assets.yview)
+        self.tree_assets.configure(yscrollcommand=sy3.set)
+        self.tree_assets.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        sy3.pack(side=tk.RIGHT, fill=tk.Y)
+        self.tree_assets.bind("<<TreeviewSelect>>", self._on_asset_selected)
+        self.tree_assets.bind("<Double-1>", self._on_asset_double_click)
+        try:
+            self.tree_assets.configure(font=("Consolas", 10))
+        except tk.TclError:
+            pass
+
+        self.asset_details_var = tk.StringVar(value="Select an asset to view details.")
+        self.asset_details_label = ttk.Label(
+            assets_bottom,
+            textvariable=self.asset_details_var,
+            anchor=tk.W,
+            justify=tk.LEFT,
+        )
+        self.asset_details_label.pack(fill=tk.BOTH, expand=True)
+
         # --- Resource tabs (active / destroyed / last added) ---
         lf_res = ttk.LabelFrame(paned, text="Resources", padding=4)
         paned.add(lf_res, weight=1)
@@ -178,20 +274,21 @@ class ResourceViewerApp:
         self.tree_res_destroyed = self._build_resource_tree(self.tabs, "Destroyed resources")
         self.tree_res_last_added = self._build_resource_tree(self.tabs, "Last added resources")
 
-        # --- Scene dependencies (parent = scene, children = resource ids) ---
-        lf_scene = ttk.LabelFrame(paned, text="Scene asset dependencies", padding=4)
+        # --- Scene dependencies (parent = scene, children = asset ids) ---
+        lf_scene = ttk.LabelFrame(paned, text="Scene dependencies", padding=4)
         paned.add(lf_scene, weight=1)
         self.tree_scene = ttk.Treeview(
-            lf_scene, columns=("rid",), show="tree headings", height=20
+            lf_scene, columns=("asset_id",), show="tree headings", height=20
         )
-        self.tree_scene.heading("#0", text="Scene / Resource")
-        self.tree_scene.heading("rid", text="Resource ID")
+        self.tree_scene.heading("#0", text="Scene / Asset")
+        self.tree_scene.heading("asset_id", text="Asset ID")
         self.tree_scene.column("#0", width=200, anchor=tk.W)
-        self.tree_scene.column("rid", width=120, anchor=tk.E)
+        self.tree_scene.column("asset_id", width=120, anchor=tk.E)
         sy2 = ttk.Scrollbar(lf_scene, orient=tk.VERTICAL, command=self.tree_scene.yview)
         self.tree_scene.configure(yscrollcommand=sy2.set)
         self.tree_scene.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         sy2.pack(side=tk.RIGHT, fill=tk.Y)
+        self.tree_scene.bind("<Double-1>", self._on_scene_dependency_double_click)
 
         self.status = ttk.Label(self.root, text="", relief=tk.SUNKEN, anchor=tk.W)
         self.status.pack(fill=tk.X, side=tk.BOTTOM, padx=4, pady=2)
@@ -289,6 +386,7 @@ class ResourceViewerApp:
         self._refresh_resource_tree(self.tree_res_active, self.state.resources)
         self._refresh_resource_tree(self.tree_res_destroyed, self.state.destroyed_resources)
         self._refresh_resource_tree(self.tree_res_last_added, self.state.last_added_resources)
+        self._refresh_assets_tree()
 
         for item in self.tree_scene.get_children():
             self.tree_scene.delete(item)
@@ -305,9 +403,130 @@ class ResourceViewerApp:
                 self.tree_scene.insert(
                     parent,
                     tk.END,
-                    text=f"  → resource {rid}",
+                    text=f"  -> asset {rid}",
                     values=(rid,),
                 )
+
+    def _refresh_assets_tree(self) -> None:
+        for item in self.tree_assets.get_children():
+            self.tree_assets.delete(item)
+        for aid in sorted(
+            self.state.assets.keys(),
+            key=lambda aid: (self.state.assets[aid].get("global_time", 0), aid),
+            reverse=True,
+        ):
+            a = self.state.assets[aid]
+            asset_name = a.get("name", "")
+            rid = a.get("resource_id", "")
+            self.tree_assets.insert(
+                "",
+                tk.END,
+                values=(
+                    aid,
+                    asset_name,
+                    rid,
+                    a.get("last_frame", ""),
+                    self._format_global_time(a.get("global_time", 0)),
+                ),
+            )
+
+    def _on_asset_selected(self, _event=None) -> None:
+        selection = self.tree_assets.selection()
+        if not selection:
+            self.asset_details_var.set("Select an asset to view details.")
+            return
+        item = self.tree_assets.item(selection[0])
+        values = item.get("values", [])
+        if len(values) < 5:
+            self.asset_details_var.set("Select an asset to view details.")
+            return
+        try:
+            asset_id = int(values[0])
+        except (TypeError, ValueError):
+            self.asset_details_var.set("Select an asset to view details.")
+            return
+        asset = self.state.assets.get(asset_id, {})
+        self.asset_details_var.set(
+            f"Asset ID: {values[0]}\n"
+            f"Name: {values[1] or '-'}\n"
+            f"Type: {asset.get('asset_type', '') or '-'}\n"
+            f"Owner: {asset.get('owner', '') or '-'}\n"
+            f"Source: {asset.get('source', '') or '-'}\n"
+            f"Ext: {asset.get('ext', '') or '-'}\n"
+            f"Path: {asset.get('path', '') or '-'}\n"
+            f"Bound Resource ID: {values[2]}\n"
+            f"Last frame: {values[3]}\n"
+            f"Global time: {values[4]}"
+        )
+
+    def _on_asset_double_click(self, event) -> None:
+        row_id = self.tree_assets.identify_row(event.y)
+        if not row_id:
+            return
+        item = self.tree_assets.item(row_id)
+        values = item.get("values", [])
+        if len(values) < 3:
+            return
+        try:
+            resource_id = int(values[2])
+        except (TypeError, ValueError):
+            self._set_status("Selected asset has no bound resource.")
+            return
+        self._select_active_resource_in_view(resource_id)
+
+    def _on_scene_dependency_double_click(self, event) -> None:
+        row_id = self.tree_scene.identify_row(event.y)
+        if not row_id:
+            return
+        item = self.tree_scene.item(row_id)
+        values = item.get("values", [])
+        if not values:
+            return
+        try:
+            asset_id = int(values[0])
+        except (TypeError, ValueError):
+            return
+        self._select_asset_in_view(asset_id)
+
+    def _select_asset_in_view(self, asset_id: int) -> None:
+        for item_id in self.tree_assets.get_children():
+            item = self.tree_assets.item(item_id)
+            values = item.get("values", [])
+            if not values:
+                continue
+            try:
+                current_asset_id = int(values[0])
+            except (TypeError, ValueError):
+                continue
+            if current_asset_id == asset_id:
+                self.tree_assets.selection_set(item_id)
+                self.tree_assets.focus(item_id)
+                self.tree_assets.see(item_id)
+                self._on_asset_selected()
+                self._set_status(f"Selected asset {asset_id} from scene dependency.")
+                return
+        self._set_status(f"Asset {asset_id} not found in assets view.")
+
+    def _select_active_resource_in_view(self, resource_id: int) -> None:
+        for item_id in self.tree_res_active.get_children():
+            item = self.tree_res_active.item(item_id)
+            values = item.get("values", [])
+            if not values:
+                continue
+            try:
+                current_resource_id = int(values[0])
+            except (TypeError, ValueError):
+                continue
+            if current_resource_id == resource_id:
+                self.tabs.select(self.tree_res_active.master)
+                self.tree_res_active.selection_set(item_id)
+                self.tree_res_active.focus(item_id)
+                self.tree_res_active.see(item_id)
+                self._set_status(
+                    f"Selected active resource {resource_id} from asset binding."
+                )
+                return
+        self._set_status(f"Resource {resource_id} is not active.")
 
     def _refresh_resource_tree(self, tree: ttk.Treeview, data: dict[int, dict]) -> None:
         for item in tree.get_children():

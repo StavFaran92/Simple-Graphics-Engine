@@ -8,6 +8,7 @@
 #include "utils/RandomNameGenerator.h"
 #include "systems/UniqueNameManager.h"
 #include "core/Engine.h"
+#include "core/Trace.h"
 
 #include <filesystem>
 
@@ -355,6 +356,8 @@ AssetRef<Asset> Assets::createAsset(AssetBuildDescriptor& desc, ResourceBuildDes
 
 	asset->uuid = record.uuid;
 
+	Trace::createAsset(asset->uuid, record);
+
 	return AssetRef<Asset>(record.uuid);
 }
 
@@ -518,6 +521,8 @@ void Assets::bindResourceToAsset(UUID uuid, ResourceID resID)
 	AssetRecord newAssetInfo = getInfo(uuid);
 	newAssetInfo.resourceID = resID;
 	updateAssetInner(newAssetInfo);
+
+	Trace::bindResourceToAsset(uuid, resID);
 }
 
 AssetRef<Asset> Assets::bakeAssetFromResource(const ResourceRef<Resource>& resource, const std::string& name, const ScopedPath& targetDirectory)

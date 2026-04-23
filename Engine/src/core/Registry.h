@@ -13,6 +13,7 @@ class EngineAPI SGE_Regsitry
 {
 public:
 	using Callback = std::function<void(Component&)>;
+	using OnComponentEraseCallback = std::function<void()>;
 
 	entt::registry& get();
 
@@ -25,6 +26,13 @@ public:
 	{
 		m_onComponentAddedCallback = callback;
 	}
+
+	void registerOnComponentRemoved(const OnComponentEraseCallback& callback)
+	{
+		m_onComponentRemovedCallback = callback;
+	}
+
+
 
 	template<typename T>
 	T& addComponent(entt::entity e, T* component)
@@ -42,6 +50,16 @@ public:
 		return addedComponent;
 	}
 
+	template<typename T>
+	void removeComponent(entt::entity e)
+	{
+		m_registry.remove<T>(e);
+		if (m_onComponentRemovedCallback)
+		{
+			m_onComponentRemovedCallback();
+		}
+	}
+
 	void removeEntity(const Entity& e);
 private:
 	void invokeOnComponentAdded(Component& c)
@@ -54,4 +72,5 @@ private:
 
 	entt::registry m_registry;
 	Callback m_onComponentAddedCallback;
+	OnComponentEraseCallback m_onComponentRemovedCallback;
 };
