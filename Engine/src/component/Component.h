@@ -6,6 +6,7 @@
 #include "physics/Colliders.h"
 #include "serialize/CerealHelpers.h"
 #include "memory/AssetAliases.h"
+#include "memory/Observable.h"
 
 /**
 HOW TO ADD A NEW SERIALIZED COMPONENT GUIDE
@@ -46,7 +47,7 @@ public:
 	virtual void postLoad(SceneResourceRef& scene) {};
 
 protected:
-	virtual std::vector<AssetRef<Asset>*> gatherDependenciesInternal() const;
+	virtual std::vector<Observable<AssetRef<Asset>>> gatherDependenciesInternal() const;
 };
 
 template<typename T>

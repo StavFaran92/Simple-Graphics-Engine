@@ -5,6 +5,7 @@
 #include "component/ComponentSerializer.h"
 #include "serialize/CerealHelpers.h"
 #include "render/Material.h"
+#include "memory/Observable.h"
 
 struct EngineAPI WaterBodyComponent : public Component
 {
@@ -35,6 +36,7 @@ struct EngineAPI WaterBodyComponent : public Component
 	Entity entity = Entity::EmptyEntity;
 
 	std::shared_ptr<TextureSampler> waterBodyNormal;
+	Observable<std::shared_ptr<TextureSampler>> waterBodyNormal2;
 
 	glm::vec2 wave1Speed{ 0.1, 0.01 };
 	glm::vec2 wave2Speed{ 0.01, -0.1 };

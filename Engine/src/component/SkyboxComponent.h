@@ -32,21 +32,22 @@ struct EngineAPI SkyboxComponent : public Component
 	void postLoad(SceneResourceRef& scene) override;
 
 
-	TextureAssetRef originalImage;
 	TextureResourceRef cubemapIBL;
 	//TextureResourceRef cubemap;
-	TextureAssetRef m_prefilterEnvMap;
 
 	//TextureAssetRef
 
 	SceneResourceRef m_scene = nullptr;
 
 	bool m_isBuilt = false;
+
+	TextureAssetRef m_prefilterEnvMap;
+	TextureAssetRef originalImage;
 	TextureAssetRef m_cubemap;
 	TextureAssetRef m_irradianceMap;
 
 protected:
-	std::vector<AssetRef<Asset>*> gatherDependenciesInternal() const override;
+	std::vector<Observable<AssetRef<Asset>>> gatherDependenciesInternal() const override;
 };
 
 REGISTER_COMPONENT(SkyboxComponent)

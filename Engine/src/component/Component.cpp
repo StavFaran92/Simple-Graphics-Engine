@@ -91,20 +91,20 @@ void Component::registerSceneDependency(SceneResourceRef& scene) const
 	auto assetDeps = gatherDependenciesInternal();
 	for (auto& asset : assetDeps)
 	{
-		asset->registerOnChangedListener([scene](UUID)mutable {
+		asset.registerOnChangedListener([scene]()mutable {
 			scene->makeDirty();
 		});
-		Trace::addSceneAssetMonitor(scene, asset->getUID());
+		Trace::addSceneAssetMonitor(scene, asset.get()->getUID());
 	}
 }
 
 void Component::removeSceneDependency(SceneResourceRef& scene) const
 {
 	auto assetDeps = gatherDependenciesInternal();
-	for (auto& asset : assetDeps)
+	for (auto& observer : assetDeps)
 	{
-		asset->removeOnChangedListener();
-		Trace::removeSceneAssetMonitor(scene, asset->getUID());
+		observer.removeOnChangedListener();
+		Trace::removeSceneAssetMonitor(scene, observer.get()->getUID());
 	}
 }
 
@@ -114,12 +114,12 @@ std::vector<AssetRef<Asset>> Component::gatherDependencies() const
 	auto assetDependencies = gatherDependenciesInternal();
 	for (auto asset : assetDependencies)
 	{
-		result.push_back(*asset);
+		result.push_back(asset.get());
 	}
 	return result;
 }
 
-std::vector<AssetRef<Asset>*> Component::gatherDependenciesInternal() const
+std::vector<Observable<AssetRef<Asset>>> Component::gatherDependenciesInternal() const
 {
 	return {};
 }

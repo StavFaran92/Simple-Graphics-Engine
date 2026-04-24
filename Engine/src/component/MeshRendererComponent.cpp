@@ -26,18 +26,18 @@ MaterialAssetRef MeshRendererComponent::getMaterialBySlot(int slot) const
 	return iter->second;
 }
 
-std::vector<AssetRef<Asset>*> MeshRendererComponent::gatherDependenciesInternal() const
+std::vector<Observable<AssetRef<Asset>>> MeshRendererComponent::gatherDependenciesInternal() const
 {
-	std::vector<AssetRef<Asset>*> dependencies;
-	dependencies.push_back((AssetRef<Asset>*) &mesh);
-	for (auto& [name, mat] : m_material)
-	{
-		dependencies.push_back((AssetRef<Asset>*) &mat);
-		auto samplers = mat->getSamplers();
-		for (const auto& [sName, sampler] : samplers)
-		{
-			dependencies.push_back((AssetRef<Asset>*) &sampler->texture);
-		}
-	}
+	std::vector<Observable<AssetRef<Asset>>> dependencies;
+	//dependencies.push_back((AssetRef<Asset>*) &mesh);
+	//for (auto& [name, mat] : m_material)
+	//{
+	//	dependencies.push_back((AssetRef<Asset>*) &mat);
+	//	auto samplers = mat->getSamplers();
+	//	for (const auto& [sName, sampler] : samplers)
+	//	{
+	//		dependencies.push_back((AssetRef<Asset>*) &sampler->texture);
+	//	}
+	//}
 	return dependencies;
 }
