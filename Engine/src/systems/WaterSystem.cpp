@@ -81,9 +81,8 @@ void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody)
 		logError("WaterBody Resource is empty.");
 		return;
 	}
-	waterBody.waterBodyNormal2.get()->channelCount = 3;
 
-	materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal);
+	materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal.get());
 
 	materialResource->setUniformValue("uWave1Speed", waterBody.wave1Speed);
 	materialResource->setUniformValue("uWave2Speed", waterBody.wave2Speed);
