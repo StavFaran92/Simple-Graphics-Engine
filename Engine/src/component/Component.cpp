@@ -86,27 +86,27 @@ void InstanceBatch::build()
 	//glVertexAttribDivisor(9, 1);
 }
 
-void Component::registerSceneDependency(SceneResourceRef& scene) const
-{
-	auto assetDeps = gatherDependenciesInternal();
-	for (auto& asset : assetDeps)
-	{
-		asset.registerOnChangedListener([scene]()mutable {
-			scene->makeDirty();
-		});
-		Trace::addSceneAssetMonitor(scene, asset.get()->getUID());
-	}
-}
-
-void Component::removeSceneDependency(SceneResourceRef& scene) const
-{
-	auto assetDeps = gatherDependenciesInternal();
-	for (auto& observer : assetDeps)
-	{
-		observer.removeOnChangedListener();
-		Trace::removeSceneAssetMonitor(scene, observer.get()->getUID());
-	}
-}
+//void Component::registerSceneDependency(SceneResourceRef& scene) const
+//{
+//	auto assetDeps = gatherDependenciesInternal();
+//	for (auto& asset : assetDeps)
+//	{
+//		asset.registerOnChangedListener([scene]()mutable {
+//			scene->makeDirty();
+//		});
+//		Trace::addSceneAssetMonitor(scene, asset.get()->getUID());
+//	}
+//}
+//
+//void Component::removeSceneDependency(SceneResourceRef& scene) const
+//{
+//	auto assetDeps = gatherDependenciesInternal();
+//	for (auto& observer : assetDeps)
+//	{
+//		observer.removeOnChangedListener();
+//		Trace::removeSceneAssetMonitor(scene, observer.get()->getUID());
+//	}
+//}
 
 std::vector<AssetRef<Asset>> Component::gatherDependencies() const
 {
@@ -114,12 +114,12 @@ std::vector<AssetRef<Asset>> Component::gatherDependencies() const
 	auto assetDependencies = gatherDependenciesInternal();
 	for (auto asset : assetDependencies)
 	{
-		result.push_back(asset.get());
+		result.push_back(asset);
 	}
 	return result;
 }
 
-std::vector<Observable<AssetRef<Asset>>> Component::gatherDependenciesInternal() const
+std::vector<AssetRef<Asset>> Component::gatherDependenciesInternal() const
 {
 	return {};
 }

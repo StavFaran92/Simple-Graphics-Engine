@@ -76,7 +76,6 @@ public:
 				auto& c = scene->getRegistry().get().get<T>(entity);
 
 				c.resolve(scene);
-				c.registerSceneDependency(scene);
 			}
 		};
 

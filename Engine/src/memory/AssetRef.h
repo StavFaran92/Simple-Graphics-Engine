@@ -37,7 +37,7 @@ public:
 		uuid = other.uuid;
 		m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
 
-		notifyOnChanged();
+		m_version++;
 
 		return *this;
 	}
@@ -121,6 +121,11 @@ public:
 		return m_cachedAsset;
 	}
 
+	uint64_t getVersion() const
+	{
+		return m_version;
+	}
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(uuid);
@@ -128,28 +133,11 @@ public:
 
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRef, uuid);
 
-
-	void registerOnChangedListener(const std::function<void(UUID)>& cb)
-	{
-		onChangedListener = cb;
-	}
-
-	void removeOnChangedListener()
-	{
-		onChangedListener = nullptr;
-	}
-
-private:
-	void notifyOnChanged()
-	{
-		if (onChangedListener)
-		{
-			onChangedListener(uuid);
-		}
-	}
 private:
 
 	UUID uuid = EMPTY_UUID;
+
+	uint64_t m_version = 1;
 
 	std::function<void(UUID)> onChangedListener;
 

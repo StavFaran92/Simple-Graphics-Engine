@@ -238,7 +238,13 @@ private:
 
 	ShaderResourceRef m_sampleComputeShader;
 
-	std::vector<ResourceRef<Resource>> m_cachedResources;;
+
+	struct CachedResource
+	{
+		ResourceRef<Resource> resource;
+		uint64_t version = 0;
+	};
+	std::unordered_map<UUID, CachedResource> m_cachedResources;;
 
 	bool m_isDirty = false;
 

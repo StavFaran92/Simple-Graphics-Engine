@@ -36,8 +36,8 @@ public:
 	void serialize(Archive& archive) {
 	}
 
-	void registerSceneDependency(SceneResourceRef& scene) const;
-	void removeSceneDependency(SceneResourceRef& scene) const;
+	//void registerSceneDependency(SceneResourceRef& scene) const;
+	//void removeSceneDependency(SceneResourceRef& scene) const;
 
 	std::vector<AssetRef<Asset>> gatherDependencies() const;
 
@@ -47,7 +47,7 @@ public:
 	virtual void postLoad(SceneResourceRef& scene) {};
 
 protected:
-	virtual std::vector<Observable<AssetRef<Asset>>> gatherDependenciesInternal() const;
+	virtual std::vector<AssetRef<Asset>> gatherDependenciesInternal() const;
 };
 
 template<typename T>

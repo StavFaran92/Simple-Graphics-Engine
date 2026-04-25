@@ -58,12 +58,12 @@ void SkyboxComponent::postLoad(SceneResourceRef& scene)
 	m_scene->setIBLData(m_irradianceMap.resource(), m_prefilterEnvMap.resource());
 }
 
-std::vector<Observable<AssetRef<Asset>>> SkyboxComponent::gatherDependenciesInternal() const
+std::vector<AssetRef<Asset>> SkyboxComponent::gatherDependenciesInternal() const
 {
-	std::vector<Observable<AssetRef<Asset>>> dependencies;
-	//dependencies.push_back(m_cubemap.as<AssetRef<Asset>>());
-	//dependencies.push_back(m_irradianceMap.as<AssetRef<Asset>>());
-	//dependencies.push_back(m_prefilterEnvMap.as<AssetRef<Asset>>());
-	//dependencies.push_back(originalImage.as<AssetRef<Asset>>());
+	std::vector<AssetRef<Asset>> dependencies;
+	dependencies.push_back(m_cubemap);
+	dependencies.push_back(m_irradianceMap);
+	dependencies.push_back(m_prefilterEnvMap);
+	dependencies.push_back(originalImage);
 	return dependencies;
 }

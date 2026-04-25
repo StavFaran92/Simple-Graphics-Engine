@@ -189,17 +189,17 @@ void Scene::init(Context* context, ResourceID rid)
 	m_context = context;
 	m_rid = rid;
 
-	static auto onChangedCB = [this](UUID) {
-		makeDirty();
-	};
+	//static auto onChangedCB = [this](UUID) {
+	//	makeDirty();
+	//};
 
 	m_registry = std::make_shared<SGE_Regsitry>();
 	m_registry->registerOnComponentAdded([rid](Component& c) {
 		
 		// The following will be called for each added component
 		SceneResourceRef scene = Engine::get()->getResourceManager()->getResource(rid).as<Scene>();
-		c.registerSceneDependency(scene);
-		onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
+		//c.registerSceneDependency(scene);
+		//onChangedCB(EMPTY_UUID); //for now use empty uid as im not sure it will be needed
 
 		if (scene->isReady())
 		{
@@ -208,7 +208,7 @@ void Scene::init(Context* context, ResourceID rid)
 	});
 
 	m_registry->registerOnComponentRemoved([]() {
-		onChangedCB(EMPTY_UUID);
+		//onChangedCB(EMPTY_UUID);
 		
 	});
 
@@ -346,6 +346,8 @@ bool Scene::isReady() const
 
 void Scene::update(float deltaTime)
 {
+	preloadSceneResources();
+
 	for (auto&& [entity, transform] : m_registry->get().view<Transformation>().each())
 	{
 		transform.update();
@@ -405,11 +407,11 @@ void Scene::update(float deltaTime)
 		}
 	}
 
-	if (m_isDirty)
-	{
-		preloadSceneResources();
-		m_isDirty = false;
-	}
+	//if (m_isDirty)
+	//{
+	//	preloadSceneResources();
+	//	m_isDirty = false;
+	//}
 }
 
 void Scene::draw(float deltaTime)
@@ -1368,8 +1370,6 @@ std::shared_ptr<RenderView> Scene::getRenderView(const std::string& name) const
 
 void Scene::preloadSceneResources()
 {
-	std::vector<ResourceRef<Resource>> newCachedResources;
-
 	// Hack, I need THIS scene but cannot access it ATM
 	SerializedScene serializedScene = Archiver::serializeScene(Engine::get()->getContext()->getActiveScene());
 	for (auto& e : serializedScene.serializedEntities)
@@ -1377,17 +1377,15 @@ void Scene::preloadSceneResources()
 		for (auto& c : e.components)
 		{
 			std::vector<AssetRef<Asset>> assets = c->gatherDependencies();
-			for (auto asset : assets)
+			for (auto& asset : assets)
 			{
-				newCachedResources.push_back(asset.resource());
+				if (m_cachedResources[asset.getUID()].version != asset.getVersion())
+				{
+					m_cachedResources[asset.getUID()] = Scene::CachedResource{ asset.resource(), asset.getVersion() };
+				}
 			}
 		}
 	}
-
-	// After the above collection its safe to clear the resources as 1 ref resources will not be cleaned (ref by the new list)
-	m_cachedResources = newCachedResources;
-
-	m_isDirty = false;
 }
 
 bool Scene::isSimulationActive() const

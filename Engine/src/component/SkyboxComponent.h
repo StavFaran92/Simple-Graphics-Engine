@@ -47,7 +47,7 @@ struct EngineAPI SkyboxComponent : public Component
 	TextureAssetRef m_irradianceMap;
 
 protected:
-	std::vector<Observable<AssetRef<Asset>>> gatherDependenciesInternal() const override;
+	std::vector<AssetRef<Asset>> gatherDependenciesInternal() const override;
 };
 
 REGISTER_COMPONENT(SkyboxComponent)
