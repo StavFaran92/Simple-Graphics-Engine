@@ -30,18 +30,18 @@
 void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ShaderResourceRef& shader, int slot)
 {
 	// if texture is empty use dummy texture
-	TextureAssetRef texture;
+	TextureResourceRef texture;
 	if (!sampler || sampler->texture.isEmpty())
 	{
-		texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE); // maybe use disgusting pink texture?
+		texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource(); // maybe use disgusting pink texture?
 	}
 	else
 	{
-		texture = sampler->texture;
+		texture = sampler->texture.resource();
 	}
 
-	texture.resource()->setSlot(slot);
-	texture.resource()->bind();
+	texture->setSlot(slot);
+	texture->bind();
 
 	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
 	shader->setUniformValue(name + ".texture", slot);

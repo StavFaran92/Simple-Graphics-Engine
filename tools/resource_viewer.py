@@ -38,6 +38,7 @@ except ImportError:
 # --- Tkinter (stdlib) --------------------------------------------------
 import tkinter as tk
 from tkinter import ttk
+import tkinter.font as tkfont
 
 
 @dataclass
@@ -48,8 +49,8 @@ class TraceState:
     destroyed_resources: dict[int, dict] = field(default_factory=dict)
     last_added_resources: dict[int, dict] = field(default_factory=dict)
     last_added_frame: int = -1
-    # scene_asset_id -> set of asset ids this scene depends on
-    scene_deps: dict[int, set[int]] = field(default_factory=dict)
+    # scene_resource_id -> {asset_id -> asset_version}
+    scene_cache: dict[int, dict[int, int]] = field(default_factory=dict)
     # asset_id -> asset view payload (future-proof for additional asset data)
     assets: dict[int, dict] = field(default_factory=dict)
     parse_errors: int = 0
@@ -87,21 +88,26 @@ class TraceState:
                     "last_frame": int(frame) if frame is not None else 0,
                     "global_time": int(global_time) if global_time is not None else 0,
                 }
-        elif system == "scene_monitor" and typ in {"add_dependency", "remove_dependency"}:
-            scene = obj.get("scene")
-            # Prefer explicit field, but support older traces that used "to".
-            dep_asset_id = obj.get("asset_id", obj.get("to"))
-            if scene is not None and dep_asset_id is not None:
-                sid = int(scene)
-                if sid not in self.scene_deps:
-                    self.scene_deps[sid] = set()
-                dep_id = int(dep_asset_id)
-                if typ == "add_dependency":
-                    self.scene_deps[sid].add(dep_id)
-                else:
-                    self.scene_deps[sid].discard(dep_id)
-                    if not self.scene_deps[sid]:
-                        self.scene_deps.pop(sid, None)
+        elif system == "scene_monitor" and typ == "version_update":
+            scene_id = obj.get("scene_resource_id")
+            if scene_id is None:
+                # Accept likely naming variants from trace producers.
+                scene_id = obj.get("sceneResurceID")
+            if scene_id is None:
+                scene_id = obj.get("scene_resource")
+            if scene_id is None:
+                scene_id = obj.get("scene_id")
+            asset_id = obj.get("asset_id")
+            asset_version = obj.get("asset_version")
+            if asset_id is None or asset_version is None:
+                return
+            # If scene id is not emitted yet, group under a synthetic bucket.
+            sid = -1 if scene_id is None else int(scene_id)
+            aid = int(asset_id)
+            version = int(asset_version)
+            if sid not in self.scene_cache:
+                self.scene_cache[sid] = {}
+            self.scene_cache[sid][aid] = version
         elif system == "asset_view":
             frame_i = int(frame) if frame is not None else 0
             gtime_i = int(global_time) if global_time is not None else 0
@@ -193,13 +199,18 @@ class ResourceViewerApp:
         self._watch_mode = "poll"
         self._observer: Optional[Observer] = None
         self._poll_after_id: Optional[str] = None
+        self._did_initial_content_fit = False
 
         self.root = tk.Tk()
         self.root.title("Resource viewer (JSONL)")
-        self.root.geometry("1000x640")
+        self._set_initial_window_size()
 
         self._build_ui()
         self._process_full_reload()
+
+    def _set_initial_window_size(self) -> None:
+        # Start with a modest size; after first data refresh we fit to content.
+        self.root.geometry("980x620")
 
     def _build_ui(self) -> None:
         top = ttk.Frame(self.root, padding=4)
@@ -246,7 +257,7 @@ class ResourceViewerApp:
         self.tree_assets.column("global_time", width=180, anchor=tk.E)
         sy3 = ttk.Scrollbar(assets_top, orient=tk.VERTICAL, command=self.tree_assets.yview)
         self.tree_assets.configure(yscrollcommand=sy3.set)
-        self.tree_assets.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.tree_assets.pack(side=tk.LEFT, fill=tk.Y, expand=False, anchor=tk.NW)
         sy3.pack(side=tk.RIGHT, fill=tk.Y)
         self.tree_assets.bind("<<TreeviewSelect>>", self._on_asset_selected)
         self.tree_assets.bind("<Double-1>", self._on_asset_double_click)
@@ -274,21 +285,23 @@ class ResourceViewerApp:
         self.tree_res_destroyed = self._build_resource_tree(self.tabs, "Destroyed resources")
         self.tree_res_last_added = self._build_resource_tree(self.tabs, "Last added resources")
 
-        # --- Scene dependencies (parent = scene, children = asset ids) ---
-        lf_scene = ttk.LabelFrame(paned, text="Scene dependencies", padding=4)
+        # --- Scene version cache (parent = scene, children = asset/version rows) ---
+        lf_scene = ttk.LabelFrame(paned, text="Scene cache", padding=4)
         paned.add(lf_scene, weight=1)
         self.tree_scene = ttk.Treeview(
-            lf_scene, columns=("asset_id",), show="tree headings", height=20
+            lf_scene, columns=("asset_id", "asset_version"), show="tree headings", height=20
         )
-        self.tree_scene.heading("#0", text="Scene / Asset")
+        self.tree_scene.heading("#0", text="Scene / Cache entry")
         self.tree_scene.heading("asset_id", text="Asset ID")
+        self.tree_scene.heading("asset_version", text="Version")
         self.tree_scene.column("#0", width=200, anchor=tk.W)
         self.tree_scene.column("asset_id", width=120, anchor=tk.E)
+        self.tree_scene.column("asset_version", width=100, anchor=tk.E)
         sy2 = ttk.Scrollbar(lf_scene, orient=tk.VERTICAL, command=self.tree_scene.yview)
         self.tree_scene.configure(yscrollcommand=sy2.set)
-        self.tree_scene.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.tree_scene.pack(side=tk.LEFT, fill=tk.Y, expand=False, anchor=tk.NW)
         sy2.pack(side=tk.RIGHT, fill=tk.Y)
-        self.tree_scene.bind("<Double-1>", self._on_scene_dependency_double_click)
+        self.tree_scene.bind("<Double-1>", self._on_scene_cache_double_click)
 
         self.status = ttk.Label(self.root, text="", relief=tk.SUNKEN, anchor=tk.W)
         self.status.pack(fill=tk.X, side=tk.BOTTOM, padx=4, pady=2)
@@ -310,7 +323,7 @@ class ResourceViewerApp:
         tree.column("global_time", width=180, anchor=tk.E)
         sy = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=tree.yview)
         tree.configure(yscrollcommand=sy.set)
-        tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        tree.pack(side=tk.LEFT, fill=tk.Y, expand=False, anchor=tk.NW)
         sy.pack(side=tk.RIGHT, fill=tk.Y)
         try:
             tree.configure(font=("Consolas", 10))
@@ -390,22 +403,44 @@ class ResourceViewerApp:
 
         for item in self.tree_scene.get_children():
             self.tree_scene.delete(item)
-        for sid in sorted(self.state.scene_deps.keys()):
-            deps = self.state.scene_deps[sid]
+        for sid in sorted(self.state.scene_cache.keys()):
+            deps = self.state.scene_cache[sid]
+            scene_label = "Unknown scene" if sid < 0 else f"Scene resource {sid}"
             parent = self.tree_scene.insert(
                 "",
                 tk.END,
-                text=f"Scene asset {sid}",
-                values=("",),
+                text=scene_label,
+                values=("", ""),
                 open=True,
             )
-            for rid in sorted(deps):
+            for aid in sorted(deps.keys()):
                 self.tree_scene.insert(
                     parent,
                     tk.END,
-                    text=f"  -> asset {rid}",
-                    values=(rid,),
+                    text=f"  -> asset {aid}",
+                    values=(aid, deps[aid]),
                 )
+
+        self._auto_size_tree_columns(self.tree_assets, min_width=70, max_width=420)
+        self._auto_size_tree_columns(self.tree_res_active, min_width=70, max_width=420)
+        self._auto_size_tree_columns(self.tree_res_destroyed, min_width=70, max_width=420)
+        self._auto_size_tree_columns(self.tree_res_last_added, min_width=70, max_width=420)
+        self._auto_size_tree_columns(self.tree_scene, include_tree_column=True, min_width=70, max_width=420)
+
+        if not self._did_initial_content_fit:
+            self._fit_window_to_content_once()
+            self._did_initial_content_fit = True
+
+    def _fit_window_to_content_once(self) -> None:
+        self.root.update_idletasks()
+        req_w = self.root.winfo_reqwidth()
+        req_h = self.root.winfo_reqheight()
+        screen_w = self.root.winfo_screenwidth()
+        screen_h = self.root.winfo_screenheight()
+
+        width = min(max(req_w + 24, 820), int(screen_w * 0.95))
+        height = min(max(req_h + 24, 540), int(screen_h * 0.95))
+        self.root.geometry(f"{width}x{height}")
 
     def _refresh_assets_tree(self) -> None:
         for item in self.tree_assets.get_children():
@@ -474,7 +509,7 @@ class ResourceViewerApp:
             return
         self._select_active_resource_in_view(resource_id)
 
-    def _on_scene_dependency_double_click(self, event) -> None:
+    def _on_scene_cache_double_click(self, event) -> None:
         row_id = self.tree_scene.identify_row(event.y)
         if not row_id:
             return
@@ -547,6 +582,57 @@ class ResourceViewerApp:
                     self._format_global_time(r.get("global_time", 0)),
                 ),
             )
+
+    def _auto_size_tree_columns(
+        self,
+        tree: ttk.Treeview,
+        include_tree_column: bool = False,
+        min_width: int = 60,
+        max_width: int = 500,
+        padding: int = 18,
+    ) -> None:
+        try:
+            font = tkfont.nametofont(tree.cget("font"))
+        except tk.TclError:
+            font = tkfont.nametofont("TkDefaultFont")
+
+        columns_to_measure = list(tree["columns"])
+        if include_tree_column:
+            columns_to_measure = ["#0"] + columns_to_measure
+
+        for col in columns_to_measure:
+            heading_text = tree.heading(col).get("text", "")
+            max_px = font.measure(str(heading_text))
+
+            for item_id in tree.get_children(""):
+                max_px = max(max_px, self._measure_tree_cell(tree, item_id, col, font))
+
+            width = max(min_width, min(max_width, max_px + padding))
+            tree.column(col, width=width, stretch=False)
+
+    def _measure_tree_cell(
+        self,
+        tree: ttk.Treeview,
+        item_id: str,
+        col: str,
+        font: tkfont.Font,
+    ) -> int:
+        item = tree.item(item_id)
+        if col == "#0":
+            text = item.get("text", "")
+        else:
+            values = item.get("values", [])
+            columns = list(tree["columns"])
+            try:
+                idx = columns.index(col)
+            except ValueError:
+                idx = -1
+            text = values[idx] if idx >= 0 and idx < len(values) else ""
+
+        max_px = font.measure(str(text))
+        for child_id in tree.get_children(item_id):
+            max_px = max(max_px, self._measure_tree_cell(tree, child_id, col, font))
+        return max_px
 
     @staticmethod
     def _format_global_time(global_time_us: int) -> str:

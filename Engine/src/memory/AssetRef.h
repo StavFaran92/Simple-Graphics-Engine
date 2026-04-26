@@ -54,6 +54,7 @@ public:
 	{
 		uuid = other.getUID();
 		m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
+		m_version = other.getVersion();
 	}
 
 	UUID getUID() const

@@ -6,38 +6,6 @@
 #include "systems/TimeManager.h"
 #include "memory/Assets.h"
 
-void Trace::addSceneAssetMonitor(const SceneResourceRef& scene, const UUID& uid)
-{
-	auto frame = Engine::get()->getSubSystem<System>()->getFrameCount();
-	auto globalTime = Engine::get()->getSubSystem<TimeManager>()->getCurrentTime(TimeManager::Duration::MicroSeconds);
-
-	nlohmann::json j = {
-		{"frame", frame},
-		{"global_time", globalTime},
-		{"system", "scene_monitor"},
-		{"type", "add_dependency"},
-		{"scene", scene.getUID()},
-		{"asset_id", uid}
-	};
-	TraceLogger::writeJsonLine(j);
-}
-
-void Trace::removeSceneAssetMonitor(const SceneResourceRef& scene, const UUID& uid)
-{
-	auto frame = Engine::get()->getSubSystem<System>()->getFrameCount();
-	auto globalTime = Engine::get()->getSubSystem<TimeManager>()->getCurrentTime(TimeManager::Duration::MicroSeconds);
-
-	nlohmann::json j = {
-		{"frame", frame},
-		{"global_time", globalTime},
-		{"system", "scene_monitor"},
-		{"type", "remove_dependency"},
-		{"scene", scene.getUID()},
-		{"asset_id", uid}
-	};
-	TraceLogger::writeJsonLine(j);
-}
-
 void Trace::destroyResource(ResourceID id, const std::string& type)
 {
 	auto frame = Engine::get()->getSubSystem<System>()->getFrameCount();
@@ -118,6 +86,23 @@ void Trace::setProjectRootFolder(const std::string& projectFolder)
 		{"system", "asset_view"},
 		{"type", "project_folder"},
 		{"folder", projectFolder}
+	};
+	TraceLogger::writeJsonLine(j);
+}
+
+void Trace::updateSceneResourceVersionCache(ResourceID sceneResurceID, UUID assetID, uint64_t assetVersion)
+{
+	auto frame = Engine::get()->getSubSystem<System>()->getFrameCount();
+	auto globalTime = Engine::get()->getSubSystem<TimeManager>()->getCurrentTime(TimeManager::Duration::MicroSeconds);
+
+	nlohmann::json j = {
+		{"frame", frame},
+		{"global_time", globalTime},
+		{"system", "scene_monitor"},
+		{"type", "version_update"},
+		{"scene_id", sceneResurceID},
+		{"asset_id", assetID},
+		{"asset_version", assetVersion}
 	};
 	TraceLogger::writeJsonLine(j);
 }

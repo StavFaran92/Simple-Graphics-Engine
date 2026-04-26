@@ -1381,7 +1381,13 @@ void Scene::preloadSceneResources()
 			{
 				if (m_cachedResources[asset.getUID()].version != asset.getVersion())
 				{
-					m_cachedResources[asset.getUID()] = Scene::CachedResource{ asset.resource(), asset.getVersion() };
+					auto cachedResource = Scene::CachedResource{
+						asset.resource(),
+						asset.getVersion()
+					};
+					m_cachedResources[asset.getUID()] = cachedResource;
+
+					Trace::updateSceneResourceVersionCache(m_rid, asset.getUID(), asset.getVersion());
 				}
 			}
 		}
