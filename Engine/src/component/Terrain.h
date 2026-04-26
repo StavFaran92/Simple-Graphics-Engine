@@ -9,8 +9,6 @@
 #include "component/FoliageField.h"
 
 #include "utils/Math3D.h"
-#include "texture/Texture.h"
-#include "render/Material.h"
 #include "geometry/Model.h"
 
 class Entity;
@@ -98,6 +96,9 @@ public:
 
 	FoliageField m_foliageField;
 
+protected:
+	std::vector<AssetRef<Asset>> gatherDependenciesInternal() const override;
+
 private:
 	static Terrain createTerrainComponent(int width, int height);
 	TextureAssetRef generateHeightmap(int width, int height);
@@ -108,13 +109,10 @@ private:
 private:
 	int m_width = 100;
 	int m_height = 100;
+
 	TextureAssetRef m_heightmap;
-	//std::vector<float> m_heightDataCPU;
-
 	ModelAssetRef m_mesh;
-	//std::shared_ptr<TextureArray> m_textures;
 
-	
 };
 
 REGISTER_COMPONENT(Terrain)

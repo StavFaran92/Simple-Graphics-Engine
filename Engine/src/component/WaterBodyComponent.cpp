@@ -27,3 +27,14 @@ void WaterBodyComponent::resolve(SceneResourceRef& scene)
 {
 	entity.setRegistry(&scene->getRegistry());
 }
+
+std::vector<AssetRef<Asset>> WaterBodyComponent::gatherDependenciesInternal() const
+{
+	std::vector<AssetRef<Asset>> dependencies;
+
+	if (waterBodyNormal)
+	{
+		dependencies.push_back(waterBodyNormal->texture);
+	}
+	return dependencies;
+}

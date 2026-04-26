@@ -61,6 +61,19 @@ TextureAssetRef Terrain::generateHeightmap(int width, int height)
 	return heightmap;
 }
 
+std::vector<AssetRef<Asset>> Terrain::gatherDependenciesInternal() const
+{
+	std::vector<AssetRef<Asset>> dependencies;
+	dependencies.push_back(m_heightmap);
+	dependencies.push_back(m_mesh);
+	dependencies.push_back(m_material);
+	for (auto& blend : m_textureBlends)
+	{
+		dependencies.push_back(blend.texture);
+	}
+	return dependencies;
+}
+
 Terrain Terrain::createTerrainComponent(int width, int height)
 {
 	auto& meshCollection = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_GRID);//Grid::generateGrid(10, 10, false);

@@ -36,7 +36,6 @@ struct EngineAPI WaterBodyComponent : public Component
 	Entity entity = Entity::EmptyEntity;
 
 	std::shared_ptr<TextureSampler> waterBodyNormal;
-	//OBSERVABLE(std::shared_ptr<TextureSampler>, waterBodyNormal);
 
 	glm::vec2 wave1Speed{ 0.1, 0.01 };
 	glm::vec2 wave2Speed{ 0.01, -0.1 };
@@ -50,6 +49,8 @@ struct EngineAPI WaterBodyComponent : public Component
 	glm::vec3 colorB{ 0.0, 0.05938, 0.135417 };
 
 	float opacity = 1.0;
+protected:
+	std::vector<AssetRef<Asset>> gatherDependenciesInternal() const override;
 };
 
 REGISTER_COMPONENT(WaterBodyComponent)
