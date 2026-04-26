@@ -11,13 +11,13 @@ public:
 
 	static uint32_t channelCount(TextureFormat format);
 
-	static void* createBlankTextureBuffer2D(
+	static ImageBuffer createBlankTextureBuffer2D(
 		uint32_t width,
 		uint32_t height,
 		TextureFormat format,
 		TextureType type);
 
-	static void* createBlankTextureBuffer3D(
+	static ImageBuffer createBlankTextureBuffer3D(
 		uint32_t width,
 		uint32_t height,
 		uint32_t depth,

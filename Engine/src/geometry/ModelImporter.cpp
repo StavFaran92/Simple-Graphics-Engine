@@ -575,7 +575,7 @@ void ModelImporter::parseAiTexture(const aiScene* scene,
 		textureData.type = TextureType::UNSIGNED_BYTE;
 		textureData.filter = TextureFilter::Linear;
 		textureData.wrap = TextureWrap::Repeat;
-		textureData.data = pixelData;
+		textureData.data = ImageBuffer{ pixelData, (size_t)width * height * channels };
 		textureData.textureName = textureName;
 
 		if (!textureName.empty())

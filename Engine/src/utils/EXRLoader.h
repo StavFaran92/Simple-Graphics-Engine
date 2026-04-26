@@ -2,10 +2,12 @@
 
 #include <string>
 
+#include "memory/ImageBuffer.h"
+
 class EXRLoader
 {
 public:
-	static bool loadSingleChannelEXR(const std::string& filename, int& width, int& height, void*& outData);
+	static bool loadSingleChannelEXR(const std::string& filename, int& width, int& height, ImageBuffer& outData);
 
 	static bool saveSingleChannelEXR(const std::string& filename, int width, int height, const void* data);
 

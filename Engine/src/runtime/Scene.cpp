@@ -267,7 +267,7 @@ void Scene::init(Context* context, ResourceID rid)
 	static unsigned char FULL_WHITE[3] = { 255, 255, 255 };
 	for (int i = 0; i < 6; i++)
 	{
-		defaultCubemapData.facesData[i] = FULL_WHITE;
+		defaultCubemapData.facesData[i] = ImageBuffer(FULL_WHITE, 3);
 	}
 	m_irradianceMap = Texture::createTexture(defaultCubemapData);
 
@@ -285,7 +285,7 @@ void Scene::init(Context* context, ResourceID rid)
 	defaultCubemapData2.genMipMap = false;
 	for (int i = 0; i < 6; i++)
 	{
-		defaultCubemapData2.facesData[i] = FULL_WHITE;
+		defaultCubemapData2.facesData[i] = ImageBuffer(FULL_WHITE, 3);
 	}
 	m_prefilterEnvMap = Texture::createTexture(defaultCubemapData2);
 

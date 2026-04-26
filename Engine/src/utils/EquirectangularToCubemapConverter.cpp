@@ -40,7 +40,6 @@ TextureResourceRef EquirectangularToCubemapConverter::fromEquirectangularToCubem
 	textureData.filter = TextureFilter::Linear;
 	textureData.wrap = TextureWrap::Clamp;
 	textureData.genMipMap = true;
-	textureData.data = nullptr;
 	auto cubemap = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 512, 512 };
@@ -125,7 +124,6 @@ TextureResourceRef EquirectangularToCubemapConverter::fromCubemapToEquirectangul
 	textureData.type = TextureType::UNSIGNED_BYTE;
 	textureData.filter = TextureFilter::Linear;
 	textureData.wrap = TextureWrap::Clamp;
-	textureData.data = nullptr;
 	auto equirectnagular = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ outputWidth, outputHeight };

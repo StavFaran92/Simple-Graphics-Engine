@@ -6,6 +6,7 @@
 #include "core/Core.h"
 #include "memory/AssetAliases.h"
 #include "memory/Asset.h"
+#include "memory/ImageBuffer.h"
 
 using json = nlohmann::json;
 
@@ -120,8 +121,8 @@ struct TextureData
 
 	int depth = 0; // Only apply to texture3D
 
-	void* data = nullptr;
-	void* facesData[6]{ nullptr }; //only apply to Cubemap
+	ImageBuffer data;
+	ImageBuffer facesData[6]; //only apply to Cubemap
 };
 
 struct EngineAPI TextureLoadDescriptor : public ResourceLoadDescriptor
@@ -159,16 +160,19 @@ public:
 	static TextureResourceRef createTexture(TextureData& textureData);
 
 	static TextureResourceRef createTexture(int width, 
-													int height, 
-													int channels, 
-													TextureInternalFormat internalFormat, 
-													TextureFormat format, 
-													TextureType type, 
-													TextureFilter filter = TextureFilter::Linear, 
-													TextureWrap wrap = TextureWrap::Clamp, 
-													void* data = nullptr);
+		int height, 
+		int channels, 
+		TextureInternalFormat internalFormat, 
+		TextureFormat format, 
+		TextureType type, 
+		TextureFilter filter = TextureFilter::Linear, 
+		TextureWrap wrap = TextureWrap::Clamp, 
+		const ImageBuffer& data = {});
 
-	static TextureResourceRef createTexture(int width, int height, TextureSemantic usage, void* data = nullptr);
+	static TextureResourceRef createTexture(int width, 
+		int height, 
+		TextureSemantic usage, 
+		const ImageBuffer& data = {});
 
 	static TextureResourceRef load(const std::string& fileLocation, TextureLoadDescriptor desc = {});
 

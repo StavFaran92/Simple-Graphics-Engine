@@ -42,7 +42,7 @@ TextureAssetRef Terrain::generateHeightmap(int width, int height)
 	tData.width = width;
 	tData.height = height;
 	tData.channels = 1;
-	tData.data = heightDataCPU.data();
+	tData.data = heightDataCPU;
 	tData.internalFormat = TextureInternalFormat::R32F;
 	tData.format = TextureFormat::RED;
 	tData.type = TextureType::FLOAT;
@@ -232,12 +232,12 @@ std::array<float, 4> Terrain::getCornersSafe(
 
 	auto safe = [&](int idx) -> float {
 		if (idx >= 0 && idx < totalBytes) {
-			return ((float*)m_heightmap.resource()->getData().data)[idx];
+			return m_heightmap.resource()->getData().data.getFloatData()[idx];
 		}
 		else {
 			if (indexP0 >= 0)
 			{
-				return ((float*)m_heightmap.resource()->getData().data)[indexP0];
+				return m_heightmap.resource()->getData().data.getFloatData()[indexP0];
 			}
 			else
 			{

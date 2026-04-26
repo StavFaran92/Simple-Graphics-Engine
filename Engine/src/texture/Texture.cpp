@@ -68,7 +68,7 @@ void Texture::setTextureParameters(const TextureData& tData)
 
 void Texture::fillTextureBufferIfNeeded(TextureData& tData)
 {
-	if (!tData.data)
+	if (tData.data.empty())
 	{
 		if (tData.target == TextureTarget::TEXTURE_2D)
 		{
@@ -142,18 +142,7 @@ TextureResourceRef Texture::createTexture(TextureData& textureData)
 		static_cast<size_t>(std::max(1, textureData.depth)) *
 		bytesPerPixel;
 
-	if (textureData.data)
-	{
-		copyBufferIntoInternalBuffer(textureData.data, bufferSize);
-	}
-	if (textureData.facesData[0])
-	{
-		for (int i = 0; i < 6; i++)
-		{
-			copyBufferIntoInternalBuffer(textureData.facesData[i], bufferSize);
-		}
-	}
-	else if (textureData.fillEmpty)
+	if (textureData.fillEmpty)
 	{
 		fillTextureBufferIfNeeded(textureData);
 	}
@@ -161,7 +150,15 @@ TextureResourceRef Texture::createTexture(TextureData& textureData)
 	return texture;
 }
 
-TextureResourceRef Texture::createTexture(int width, int height, int channels, TextureInternalFormat internalFormat, TextureFormat format, TextureType type, TextureFilter filter, TextureWrap wrap, void* data)
+TextureResourceRef Texture::createTexture(int width, 
+	int height, 
+	int channels, 
+	TextureInternalFormat internalFormat, 
+	TextureFormat format, 
+	TextureType type, 
+	TextureFilter filter, 
+	TextureWrap wrap, 
+	const ImageBuffer& data)
 {
 	TextureData textureData;
 	textureData.target = TextureTarget::TEXTURE_2D;
@@ -178,7 +175,7 @@ TextureResourceRef Texture::createTexture(int width, int height, int channels, T
 	return createTexture(textureData);
 }
 
-TextureResourceRef Texture::createTexture(int width, int height, TextureSemantic usage, void* data)
+TextureResourceRef Texture::createTexture(int width, int height, TextureSemantic usage, const ImageBuffer& data)
 {
 	TextureInternalFormat internalFormat = getInternalFormatFromUsage(usage);
 	TextureFormat format = TextureFormat::RGBA;
@@ -262,7 +259,7 @@ void Texture::build(const TextureData& textureData)
 			0,
 			toGL(textureData.format),
 			toGL(textureData.type),
-			textureData.data);
+			textureData.data.data());
 	}
 	else if (textureData.target == TextureTarget::TEXTURE_CUBE_MAP)
 	{
@@ -275,7 +272,7 @@ void Texture::build(const TextureData& textureData)
 				m_data.height, 0, 
 				toGL(textureData.format),
 				toGL(textureData.type),
-				textureData.facesData[i]);
+				textureData.facesData[i].data());
 		}
 	}
 	else if (textureData.target == TextureTarget::TEXTURE_3D)
@@ -289,7 +286,7 @@ void Texture::build(const TextureData& textureData)
 			0, 
 			toGL(textureData.format),
 			toGL(textureData.type),
-			textureData.data);
+			textureData.data.data());
 	}
 	else {
 		logError("Unsupported texture format.");
@@ -367,11 +364,9 @@ bool Texture::download()
 			static_cast<size_t>(m_data.height) *
 			bytesPerPixel;
 
-		if (m_data.data) { free(m_data.data); m_data.data = nullptr; }
-		m_data.data = std::malloc(size);
-		if (!m_data.data) { logError("Texture::download allocation failed (2D)"); return false; }
+		m_data.data.resize(size);
+		glGetTexImage(target, 0, format, type, m_data.data.data());
 
-		glGetTexImage(target, 0, format, type, m_data.data);
 		return true;
 	}
 	else if (m_data.target == TextureTarget::TEXTURE_3D)
@@ -382,12 +377,8 @@ bool Texture::download()
 			static_cast<size_t>(std::max(1, m_data.depth)) *
 			bytesPerPixel;
 
-		if (m_data.data) { free(m_data.data); m_data.data = nullptr; }
-		m_data.data = std::malloc(size);
-		if (!m_data.data) { logError("Texture::download allocation failed (3D)"); return false; }
-
-		// glGetTexImage works for 3D textures as well
-		glGetTexImage(target, 0, format, type, m_data.data);
+		m_data.data.resize(size);
+		glGetTexImage(target, 0, format, type, m_data.data.data());
 		return true;
 	}
 	else if (m_data.target == TextureTarget::TEXTURE_CUBE_MAP)
@@ -400,11 +391,8 @@ bool Texture::download()
 
 		for (int i = 0; i < 6; ++i)
 		{
-			if (m_data.facesData[i]) { free(m_data.facesData[i]); m_data.facesData[i] = nullptr; }
-			m_data.facesData[i] = std::malloc(faceSize);
-			if (!m_data.facesData[i]) { logError("Texture::download allocation failed (Cubemap face {})", i); return false; }
-
-			glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, type, m_data.facesData[i]);
+			m_data.facesData[i].getBytes().resize(faceSize);
+			glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, type, m_data.facesData[i].getBytes().data());
 		}
 		return true;
 	}
@@ -416,15 +404,6 @@ bool Texture::download()
 void Texture::ClearTexture()
 {
 	glDeleteTextures(1, &m_id);
-
-	if (m_data.data)
-		free(m_data.data);
-
-	for (int i = 0; i < 6; i++)
-	{
-		if (m_data.facesData[i]) 
-			free(m_data.facesData[i]);
-	}
 }
 
 Texture::~Texture()
@@ -468,15 +447,7 @@ TextureResourceRef Texture::clone() const
 	const size_t bufferSize = size;
 
 	// Allocate new buffer
-	newTextureData.data = std::malloc(bufferSize);
-	if (!newTextureData.data)
-	{
-		logError("Texture clone: allocation failed.");
-		return TextureResourceRef::empty;
-	}
-
-	// Copy raw pixel data
-	std::memcpy(newTextureData.data, m_data.data, bufferSize);
+	newTextureData.data = m_data.data;
 
 	TextureResourceRef clonedTexture = Texture::createTexture(newTextureData);
 
@@ -625,7 +596,7 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 		textureData.data = STBIHelper::loadImageFloat(fileLocation, &textureData.width, &textureData.height, &textureData.channels);
 		textureData.type = TextureType::FLOAT;
 
-		float* pixels = static_cast<float*>(textureData.data);
+		float* pixels = textureData.data.getFloatData();
 
 		bool detectedOverflowRadianceValues = false;
 		for (int i = 0; i < textureData.width * textureData.height * textureData.channels; ++i) {
@@ -649,7 +620,7 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	}
 
 	// load validation
-	if (!textureData.data)
+	if (textureData.data.empty())
 	{
 		logError("Failed to load file: {}", fileLocation);
 	}

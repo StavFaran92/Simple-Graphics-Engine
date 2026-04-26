@@ -57,7 +57,6 @@ bool ObjectPicker::init()
 	textureData.type = TextureType::UNSIGNED_INT;
 	textureData.filter = TextureFilter::Nearest;
 	textureData.wrap = TextureWrap::Clamp;
-	textureData.data = nullptr;
 	m_targetTexture = Texture::createTexture(textureData);
 	m_frameBuffer->attachTexture(m_targetTexture.get()->getID());
 

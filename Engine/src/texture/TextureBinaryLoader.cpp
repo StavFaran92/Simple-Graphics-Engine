@@ -28,8 +28,8 @@ namespace
 		uint8_t flip = 0;
 		uint8_t fillEmpty = 0;
 
-		uint64_t dataSize = 0;       // Size of pixel data in bytes
-		uint64_t facesDataSize[6]{}; // Size of each cubemap face data (if applicable)
+		uint64_t dataSize = 0;         // Size of pixel data in bytes
+		uint64_t facesDataSize[6]{};   // Size of each cubemap face data (if applicable)
 	};
 
 	inline bool writeAll(std::ofstream& file, const void* data, std::size_t size)
@@ -46,31 +46,6 @@ namespace
 			return true;
 		file.read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(size));
 		return static_cast<bool>(file);
-	}
-
-	// Calculate pixel data size based on dimensions and type
-	inline std::size_t calculateDataSize(int width, int height, int channels, TextureType type)
-	{
-		std::size_t bytesPerChannel = 0;
-		switch (type)
-		{
-		case TextureType::BYTE:
-		case TextureType::UNSIGNED_BYTE:
-			bytesPerChannel = 1;
-			break;
-		case TextureType::SHORT:
-		case TextureType::UNSIGNED_SHORT:
-			bytesPerChannel = 2;
-			break;
-		case TextureType::INT:
-		case TextureType::UNSIGNED_INT:
-		case TextureType::FLOAT:
-			bytesPerChannel = 4;
-			break;
-		}
-
-		return static_cast<std::size_t>(width) * static_cast<std::size_t>(height) *
-		       static_cast<std::size_t>(channels) * bytesPerChannel;
 	}
 
 } // anonymous namespace
@@ -101,34 +76,22 @@ bool TextureBinaryLoader::save(const TextureData& texture, const std::string& ta
 	header.flip = texture.flip ? 1 : 0;
 	header.fillEmpty = texture.fillEmpty ? 1 : 0;
 
-	// Calculate data sizes
+	// Sizes come from the managed buffers; header matches bytes written.
 	if (texture.target == TextureTarget::TEXTURE_CUBE_MAP)
 	{
-		// Cubemap: calculate size for each face
 		for (int i = 0; i < 6; ++i)
 		{
-			if (texture.facesData[i] != nullptr)
+			if (!texture.facesData[i].empty())
 			{
-				header.facesDataSize[i] = calculateDataSize(
-					texture.width, texture.height, texture.channels, texture.type);
+				header.facesDataSize[i] = static_cast<uint64_t>(texture.facesData[i].size());
 			}
 		}
 	}
 	else
 	{
-		// 2D or 3D texture: single data buffer
-		if (texture.data != nullptr)
+		if (!texture.data.empty())
 		{
-			if (texture.target == TextureTarget::TEXTURE_3D)
-			{
-				header.dataSize = calculateDataSize(
-					texture.width, texture.height, texture.depth * texture.channels, texture.type);
-			}
-			else
-			{
-				header.dataSize = calculateDataSize(
-					texture.width, texture.height, texture.channels, texture.type);
-			}
+			header.dataSize = static_cast<uint64_t>(texture.data.size());
 		}
 	}
 
@@ -152,12 +115,17 @@ bool TextureBinaryLoader::save(const TextureData& texture, const std::string& ta
 	// Write pixel data
 	if (texture.target == TextureTarget::TEXTURE_CUBE_MAP)
 	{
-		// Write each cubemap face
 		for (int i = 0; i < 6; ++i)
 		{
-			if (header.facesDataSize[i] > 0 && texture.facesData[i] != nullptr)
+			if (header.facesDataSize[i] > 0)
 			{
-				if (!writeAll(file, texture.facesData[i], header.facesDataSize[i]))
+				if (texture.facesData[i].size() != static_cast<std::size_t>(header.facesDataSize[i]))
+				{
+					logError(
+						"TextureBinaryLoader::save - Cubemap face {} size mismatch for '{}'", i, targetFile);
+					return false;
+				}
+				if (!writeAll(file, texture.facesData[i].data(), static_cast<std::size_t>(header.facesDataSize[i])))
 				{
 					logError("TextureBinaryLoader::save - Failed to write cubemap face {} to '{}'", i, targetFile);
 					return false;
@@ -167,10 +135,14 @@ bool TextureBinaryLoader::save(const TextureData& texture, const std::string& ta
 	}
 	else
 	{
-		// Write single data buffer
-		if (header.dataSize > 0 && texture.data != nullptr)
+		if (header.dataSize > 0)
 		{
-			if (!writeAll(file, texture.data, header.dataSize))
+			if (texture.data.size() != static_cast<std::size_t>(header.dataSize))
+			{
+				logError("TextureBinaryLoader::save - Texture data size mismatch for '{}'", targetFile);
+				return false;
+			}
+			if (!writeAll(file, texture.data.data(), static_cast<std::size_t>(header.dataSize)))
 			{
 				logError("TextureBinaryLoader::save - Failed to write texture data to '{}'", targetFile);
 				return false;
@@ -225,74 +197,40 @@ bool TextureBinaryLoader::load(const std::string& sourceFile, TextureData& outTe
 	outTexture.flip = (header.flip != 0);
 	outTexture.fillEmpty = (header.fillEmpty != 0);
 
-	// Allocate and read pixel data
+	outTexture.data.clear();
+	for (int i = 0; i < 6; ++i)
+	{
+		outTexture.facesData[i].clear();
+	}
+
 	if (outTexture.target == TextureTarget::TEXTURE_CUBE_MAP)
 	{
-		// Read each cubemap face
 		for (int i = 0; i < 6; ++i)
 		{
 			if (header.facesDataSize[i] > 0)
 			{
-				outTexture.facesData[i] = std::malloc(header.facesDataSize[i]);
-				if (outTexture.facesData[i] == nullptr)
-				{
-					logError("TextureBinaryLoader::load - Failed to allocate memory for cubemap face {} from '{}'", i, sourceFile);
-					// Clean up already allocated faces
-					for (int j = 0; j < i; ++j)
-					{
-						if (outTexture.facesData[j] != nullptr)
-						{
-							std::free(outTexture.facesData[j]);
-							outTexture.facesData[j] = nullptr;
-						}
-					}
-					return false;
-				}
-
-				if (!readAll(file, outTexture.facesData[i], header.facesDataSize[i]))
+				std::size_t n = static_cast<std::size_t>(header.facesDataSize[i]);
+				outTexture.facesData[i].resize(n);
+				if (!readAll(file, (void*)outTexture.facesData[i].data(), n))
 				{
 					logError("TextureBinaryLoader::load - Failed to read cubemap face {} from '{}'", i, sourceFile);
-					// Clean up
-					for (int j = 0; j <= i; ++j)
-					{
-						if (outTexture.facesData[j] != nullptr)
-						{
-							std::free(outTexture.facesData[j]);
-							outTexture.facesData[j] = nullptr;
-						}
-					}
 					return false;
 				}
-			}
-			else
-			{
-				outTexture.facesData[i] = nullptr;
 			}
 		}
 	}
 	else
 	{
-		// Read single data buffer
 		if (header.dataSize > 0)
 		{
-			outTexture.data = std::malloc(header.dataSize);
-			if (outTexture.data == nullptr)
-			{
-				logError("TextureBinaryLoader::load - Failed to allocate memory for texture data from '{}'", sourceFile);
-				return false;
-			}
-
-			if (!readAll(file, outTexture.data, header.dataSize))
+			std::size_t n = static_cast<std::size_t>(header.dataSize);
+			outTexture.data.resize(n);
+			if (!readAll(file, (void*)outTexture.data.data(), n))
 			{
 				logError("TextureBinaryLoader::load - Failed to read texture data from '{}'", sourceFile);
-				std::free(outTexture.data);
-				outTexture.data = nullptr;
+				outTexture.data.clear();
 				return false;
 			}
-		}
-		else
-		{
-			outTexture.data = nullptr;
 		}
 	}
 

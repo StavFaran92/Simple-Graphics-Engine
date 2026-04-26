@@ -52,7 +52,8 @@ uint32_t TextureUtils::channelCount(TextureFormat format)
 	}
 }
 
-void* TextureUtils::createBlankTextureBuffer2D(uint32_t width,
+ImageBuffer TextureUtils::createBlankTextureBuffer2D(
+	uint32_t width,
 	uint32_t height,
 	TextureFormat format,
 	TextureType type)
@@ -60,11 +61,11 @@ void* TextureUtils::createBlankTextureBuffer2D(uint32_t width,
 	const uint32_t bpp = channelCount(format) * bytesPerChannel(type);
 	const size_t size = static_cast<size_t>(width) * height * bpp;
 
-	uint8_t* buffer = new uint8_t[size](); // zero-initialized
-	return buffer;
+	return ImageBuffer{ std::vector<uint8_t>(size, 0 )}; // zero-initialized
 }
 
-void* TextureUtils::createBlankTextureBuffer3D(uint32_t width,
+ImageBuffer TextureUtils::createBlankTextureBuffer3D(
+	uint32_t width,
 	uint32_t height,
 	uint32_t depth,
 	TextureFormat format,
@@ -73,6 +74,5 @@ void* TextureUtils::createBlankTextureBuffer3D(uint32_t width,
 	const uint32_t bpp = channelCount(format) * bytesPerChannel(type);
 	const size_t size = static_cast<size_t>(width) * height * depth * bpp;
 
-	uint8_t* buffer = new uint8_t[size](); // zero-initialized
-	return static_cast<void*>(buffer);
+	return ImageBuffer{ std::vector<uint8_t>(size, 0) }; // zero-initialized
 }

@@ -39,7 +39,6 @@ bool TextureCreateDialog::acceptContent()
 	textureData.type = TextureType::UNSIGNED_BYTE;
 	textureData.filter = TextureFilter::Linear;
 	textureData.wrap = TextureWrap::Clamp;
-	textureData.data = nullptr;
 	textureData.fillEmpty = true;
 
 	AssetBuildDescriptor desc;

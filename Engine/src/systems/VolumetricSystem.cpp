@@ -36,7 +36,6 @@ bool VolumetricSystem::init()
 	textureData.type = TextureType::FLOAT;
 	textureData.filter = TextureFilter::Linear;
 	textureData.wrap = TextureWrap::Clamp;
-	textureData.data = nullptr;
 	m_renderTargetTexture = Texture::createTexture(textureData);
 	m_renderTargetFBO->attachTexture(m_renderTargetTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
 

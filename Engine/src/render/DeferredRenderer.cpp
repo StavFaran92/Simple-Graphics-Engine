@@ -128,8 +128,11 @@ bool DeferredRenderer::setupSSAO(int width, int height)
 		TextureType::FLOAT, 
 		TextureFilter::Nearest,
 		TextureWrap::Repeat,
-		&ssaoNoise[0]
-		);
+		ImageBuffer{
+			reinterpret_cast<const unsigned char*>(ssaoNoise.data()),
+			ssaoNoise.size() * sizeof(glm::vec3)
+		}
+	);
 
 	// Initialize SSAO FBO
 	m_ssaoFBO.bind();

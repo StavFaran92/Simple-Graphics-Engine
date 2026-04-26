@@ -31,7 +31,7 @@ void BuiltInAssetsLoader::loadTextures()
 		createDesc.textureData.width = 1;
 		createDesc.textureData.height = 1;
 		createDesc.textureData.channels = 3;
-		createDesc.textureData.data = whiteColor;
+		createDesc.textureData.data = ImageBuffer(whiteColor, 3);
 		createDesc.textureData.internalFormat = TextureInternalFormat::RGB;
 		createDesc.textureData.format = TextureFormat::RGB;
 		createDesc.textureData.type = TextureType::UNSIGNED_BYTE;
@@ -53,7 +53,7 @@ void BuiltInAssetsLoader::loadTextures()
 		createDesc.textureData.width = 1;
 		createDesc.textureData.height = 1;
 		createDesc.textureData.channels = 3;
-		createDesc.textureData.data = blackColor;
+		createDesc.textureData.data = ImageBuffer(blackColor, 3);
 		createDesc.textureData.internalFormat = TextureInternalFormat::RGB;
 		createDesc.textureData.format = TextureFormat::RGB;
 		createDesc.textureData.type = TextureType::UNSIGNED_BYTE;

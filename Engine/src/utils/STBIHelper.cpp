@@ -27,36 +27,39 @@ bool STBIHelper::isHDR(const std::string& filename)
 	return stbi_is_hdr(filename.c_str()) != 0;
 }
 
-void* STBIHelper::loadImageFloat(const std::string& filename, int* x, int* y, int* comp)
+std::vector<uint8_t> STBIHelper::loadImageFloat(
+	const std::string& filename,
+	int* x, int* y, int* comp)
 {
 	float* data = stbi_loadf(filename.c_str(), x, y, comp, 0);
 	if (!data)
-		return nullptr;
+		return {};
 
 	size_t count = static_cast<size_t>(*x)
 		* static_cast<size_t>(*y)
 		* static_cast<size_t>(*comp);
 
-	float* buffer = new float[count];
-	std::memcpy(buffer, data, count * sizeof(float));
+	std::vector<uint8_t> buffer(count * sizeof(float));
+	std::memcpy(buffer.data(), data, buffer.size());
 
 	stbi_image_free(data);
 	return buffer;
 }
 
-void* STBIHelper::loadImage(const std::string& filename,
+std::vector<uint8_t> STBIHelper::loadImage(
+	const std::string& filename,
 	int* x, int* y, int* comp)
 {
 	unsigned char* data = stbi_load(filename.c_str(), x, y, comp, 0);
 	if (!data)
-		return nullptr;
+		return {};
 
 	size_t count = static_cast<size_t>(*x)
 		* static_cast<size_t>(*y)
 		* static_cast<size_t>(*comp);
 
-	unsigned char* buffer = new unsigned char[count];
-	std::memcpy(buffer, data, count * sizeof(unsigned char));
+	std::vector<uint8_t> buffer(count);
+	std::memcpy(buffer.data(), data, count);
 
 	stbi_image_free(data);
 	return buffer;

@@ -13,7 +13,7 @@ public:
 
 	static bool isHDR(const std::string& filename);
 
-	static void* loadImageFloat(const std::string& filename, int* x, int* y, int* comp);
+	static std::vector<uint8_t>loadImageFloat(const std::string& filename, int* x, int* y, int* comp);
 
-	static void* loadImage(const std::string& filename, int* x, int* y, int* comp);
+	static std::vector<uint8_t> loadImage(const std::string& filename, int* x, int* y, int* comp);
 };

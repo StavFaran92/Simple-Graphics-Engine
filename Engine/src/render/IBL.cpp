@@ -46,7 +46,6 @@ TextureResourceRef IBL::generateIrradianceMap(TextureResourceRef environmentMap)
 	textureData.filter = TextureFilter::Linear;
 	textureData.wrap = TextureWrap::Clamp;
 	textureData.genMipMap = false;
-	textureData.data = nullptr;
 	auto irradianceMap = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 32, 32 };
@@ -133,7 +132,6 @@ TextureResourceRef IBL::generatePrefilterEnvMap(TextureResourceRef environmentMa
 	textureData2.filter = TextureFilter::Linear;
 	textureData2.wrap = TextureWrap::Clamp;
 	textureData2.genMipMap = true;
-	textureData2.data = nullptr;
 	auto prefilterEnvMap = Texture::createTexture(textureData2);
 
 	RenderBufferObject rbo{ 128, 128 };
@@ -232,7 +230,6 @@ TextureResourceRef IBL::generateBRDFIntegrationLUT()
 	textureData.type = TextureType::FLOAT;
 	textureData.filter = TextureFilter::Linear;
 	textureData.wrap = TextureWrap::Clamp;
-	textureData.data = nullptr;
 	auto lut = Texture::createTexture(textureData);
 
 	RenderBufferObject rbo{ 512, 512 };

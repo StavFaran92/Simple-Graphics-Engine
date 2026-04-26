@@ -5,7 +5,11 @@
 #define TINYEXR_IMPLEMENTATION
 #include "tinyexr.h"
 
-bool EXRLoader::loadSingleChannelEXR(const std::string& filename, int& width, int& height, void*& outData)
+bool EXRLoader::loadSingleChannelEXR(
+	const std::string& filename,
+	int& width,
+	int& height,
+	ImageBuffer& outData)
 {
 	EXRVersion version;
 	if (ParseEXRVersionFromFile(&version, filename.c_str()) != 0) {
@@ -48,11 +52,13 @@ bool EXRLoader::loadSingleChannelEXR(const std::string& filename, int& width, in
 
 	width = image.width;
 	height = image.height;
-	int pixelCount = width * height;
 
-	float* buffer = new float[pixelCount];
-	std::memcpy(buffer, image.images[0], pixelCount * sizeof(float));
-	outData = static_cast<void*>(buffer);
+	size_t pixelCount = static_cast<size_t>(width) * height;
+
+	// Allocate vector for float data (stored as bytes)
+	outData.getBytes().resize(pixelCount * sizeof(float));
+
+	std::memcpy(outData.getBytes().data(), image.images[0], outData.getBytes().size());
 
 	FreeEXRImage(&image);
 	FreeEXRHeader(&header);

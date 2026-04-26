@@ -231,7 +231,7 @@ void PhysicsSystem::createTerrainActor(Scene* scene, entt::entity entity)
             physx::PxHeightFieldSample* currentSample = (physx::PxHeightFieldSample*)currentByte;
 
             // we flip the row and col order, I have no idea why physx accept the data like that
-            auto a = static_cast<uint8_t*>(heightmapData.data)[(column * heightmapData.width + row) * heightmapData.channels]; 
+            auto a = heightmapData.data.data()[(column * heightmapData.width + row) * heightmapData.channels]; 
             currentSample->height = static_cast<int16_t>(a/* * 2^8*/); // we use the full range of the height map field
 
             currentSample->clearTessFlag();
@@ -530,7 +530,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
                 physx::PxHeightFieldSample* currentSample = (physx::PxHeightFieldSample*)currentByte;
 
                 // we flip the row and col order, I have no idea why physx accept the data like that
-                auto a = static_cast<uint8_t*>(heightmapData.data)[(column * heightmapData.width + row) * heightmapData.channels];
+                auto a = heightmapData.data.data()[(column * heightmapData.width + row) * heightmapData.channels];
                 currentSample->height = static_cast<int16_t>(a/* * 2^8*/); // we use the full range of the height map field
 
                 currentSample->clearTessFlag();
