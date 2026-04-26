@@ -83,7 +83,7 @@ SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescripto
 		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	// Post Load
+	// Resolve
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{
 		scene->getRegistry().get().each([&](entt::entity e) {
@@ -93,6 +93,7 @@ SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescripto
 		
 	}
 
+	// Post Load
 	for (auto& cbWrapper : ComponentSerdes::getRegistry())
 	{
 		scene->getRegistry().get().each([&](entt::entity e) {
@@ -204,6 +205,13 @@ void Scene::init(Context* context, ResourceID rid)
 		if (scene->isReady())
 		{
 			c.resolve(scene);
+			c.onInit(scene);
+		}
+		else
+		{
+			// TODO should handle the case where I add a component and the scene is not yet ready so the component might enter invalid state
+			logWarning("Component entered scene without proper init, this might cause issues..");
+
 		}
 	});
 

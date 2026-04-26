@@ -31,6 +31,7 @@ struct SerializerEntry
 	SnapshotSerializeFunc serialize;
 	SnapshotDeserializeFunc deserialize;
 	std::function<void(Entity e, SceneResourceRef&)> resolve;
+	std::function<void(Entity e, SceneResourceRef&)> onInit;
 	std::function<void(Entity e, SceneResourceRef&)> postLoad;
 };
 
@@ -76,6 +77,16 @@ public:
 				auto& c = scene->getRegistry().get().get<T>(entity);
 
 				c.resolve(scene);
+			}
+		};
+
+		entry.onInit = [](Entity e, SceneResourceRef& scene) {
+			entt::entity entity = e.handler();
+			if (scene->getRegistry().get().all_of<T>(entity))
+			{
+				auto& c = scene->getRegistry().get().get<T>(entity);
+
+				c.onInit(scene);
 			}
 		};
 

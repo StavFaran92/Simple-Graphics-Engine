@@ -48,6 +48,12 @@ void SkyboxComponent::resolve(SceneResourceRef& scene)
 	m_scene = scene;
 }
 
+void SkyboxComponent::onInit(SceneResourceRef& scene)
+{
+	build();
+	m_scene->setIBLData(m_irradianceMap.resource(), m_prefilterEnvMap.resource());
+}
+
 void SkyboxComponent::postLoad(SceneResourceRef& scene)
 {
 	if (!m_isBuilt)
