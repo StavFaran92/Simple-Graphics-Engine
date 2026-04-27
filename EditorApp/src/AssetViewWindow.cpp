@@ -69,7 +69,7 @@ void AssetViewWindow::display()
 	{
 		s_assetViewSelectedIndices.clear();
 		s_assetViewLastCwd = cwd.string();
-		EditorState::Instance().currentAssetEdit = AssetRef<Asset>::empty;
+		EditorState::Instance().clearAssetSelection();
 	}
 	//std::filesystem::path rel = std::filesystem::relative(cwd, Engine::get()->getProjectDirectory());
 	//if (rel == ".") rel = "";
@@ -268,8 +268,7 @@ void AssetViewWindow::display()
 		if (!earlyTableBreak)
 		{
 			auto syncCurrentAssetEdit = [&]() {
-				auto& currentAssetEdit = EditorState::Instance().currentAssetEdit;
-				currentAssetEdit = AssetRef<Asset>::empty;
+				EditorState::Instance().clearAssetSelection();
 
 				if (s_assetViewSelectedIndices.size() != 1)
 					return;
@@ -286,7 +285,9 @@ void AssetViewWindow::display()
 				if (!assets->hasAsset(uid))
 					return;
 
-				currentAssetEdit = assets->getAsset(uid);
+				AssetRef<Asset> asset = assets->getAsset(uid);
+				EditorState::Instance().selectAssetForEdit(asset);
+
 			};
 
 			ImGuiIO& io = ImGui::GetIO();

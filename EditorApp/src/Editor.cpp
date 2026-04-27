@@ -594,10 +594,10 @@ public:
 
 	void update(float deltaTime) override
 	{
-		
-			g_editorCamera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
-			g_editorCamera.getComponent<Transformation>().update();
+		g_editorCamera.getComponent<NativeScriptComponent>().script->onUpdate(deltaTime);
+		g_editorCamera.getComponent<Transformation>().update();
 
+		EditorState::Instance().update();
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
 	

@@ -141,7 +141,7 @@ void AssetInspectorWindow::display()
 		~ImGuiWindowFlags_NoScrollbar &
 		~ImGuiWindowFlags_NoScrollWithMouse);
 
-	auto& currentAssetEdit = EditorState::Instance().currentAssetEdit;
+	auto& currentAssetEdit = EditorState::Instance().getSelectedAsset();
 	if (currentAssetEdit.isEmpty())
 	{
 		ImGui::TextDisabled("No asset selected");

@@ -17,6 +17,7 @@ public:
     }
 
     void init();
+    void update();
 
     bool showLightCreatorWindow = false;
     bool showModelInspectorWindow = false;
@@ -56,6 +57,10 @@ public:
     void setActiveEditorTool(EditorTool::Type tool);
     EditorTool::Type getActiveToolType() const;
     std::shared_ptr<EditorTool> getActiveEditorTool();
+
+    void selectAssetForEdit(const AssetRef<Asset>& asset);
+    AssetRef<Asset> getSelectedAsset() const;
+    void clearAssetSelection();
     
 
     std::function<void(UUID uuid)> assetTextureSelectCB;
@@ -66,8 +71,9 @@ public:
     std::shared_ptr<TextureSampler> selectedSampler;
     std::shared_ptr<TextureSampler> previousSampler;
 
-    AssetRef<Asset> currentAssetEdit;
     MaterialAssetRef selectedMaterialForEdit;
+
+    
 
     struct Rect2D {
         glm::vec2 min;
@@ -103,6 +109,9 @@ private:
 
     WorkingDirectory cwd;
     std::vector<DialogBase*> m_dialogs;
+
+    AssetRef<Asset> currentAssetEdit;
+    std::vector<ResourceRef<Resource>> resourceCache;
 
     EditorTool::Type m_activeEditorToolType = EditorTool::Type::None;
     std::shared_ptr<EditorTool> m_activeEditorTool;
