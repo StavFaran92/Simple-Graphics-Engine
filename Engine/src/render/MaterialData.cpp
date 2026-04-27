@@ -45,12 +45,12 @@ bool MaterialData::setUniform(const std::string& name, const Value& value)
 	return true;
 }
 
-const std::map<std::string, std::shared_ptr<TextureSampler>>& MaterialData::getSamplers() const
+const std::map<std::string, std::shared_ptr<TextureSamplerAsset>>& MaterialData::getSamplers() const
 {
 	return m_samplers;
 }
 
-void MaterialData::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
+void MaterialData::setSampler(const std::string& name, std::shared_ptr<TextureSamplerAsset> sampler)
 {
 	auto it = m_samplers.find(name);
 	if (it != m_samplers.end())

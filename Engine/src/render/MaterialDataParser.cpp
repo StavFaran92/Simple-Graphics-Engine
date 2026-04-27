@@ -137,7 +137,7 @@ void MaterialDataParser::parseUniforms(const std::string& sourceCode, MaterialDa
 			}
 			else if (type == "PBR_Sampler")
 			{
-				samplers[name] = std::make_shared<TextureSampler>();
+				samplers[name] = std::make_shared<TextureSamplerAsset>();
 			}
 
 

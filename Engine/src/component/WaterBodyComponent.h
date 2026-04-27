@@ -35,7 +35,7 @@ struct EngineAPI WaterBodyComponent : public Component
 
 	Entity entity = Entity::EmptyEntity;
 
-	std::shared_ptr<TextureSampler> waterBodyNormal;
+	std::shared_ptr<TextureSamplerAsset> waterBodyNormal;
 
 	glm::vec2 wave1Speed{ 0.1, 0.01 };
 	glm::vec2 wave2Speed{ 0.01, -0.1 };

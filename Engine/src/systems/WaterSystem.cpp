@@ -61,7 +61,7 @@ Entity WaterSystem::createPool()
 	TextureLoadDescriptor waterNormalLoadDesc;
 	waterNormalLoadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/water_new_height.png";
 	auto waterNormal = Engine::get()->getSubSystem<Assets>()->importAsset(waterNormalDesc, waterNormalLoadDesc).as<TextureAsset>();
-	auto waterNormalSampler = std::make_shared<TextureSampler>(1);
+	auto waterNormalSampler = std::make_shared<TextureSamplerAsset>(1);
 	waterNormalSampler->texture = waterNormal;
 	waterBodyComponent.waterBodyNormal = waterNormalSampler;
 

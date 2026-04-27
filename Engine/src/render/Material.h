@@ -102,10 +102,10 @@ public:
 	void setMaterialRenderMode(MaterialRenderMode renderMode);
 	MaterialRenderMode getMaterialRenderMode() const;
 
-	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
-	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
+	void setSampler(const std::string& name, std::shared_ptr<TextureSamplerAsset> sampler);
+	std::shared_ptr<TextureSamplerAsset> getSampler(const std::string& name);
 
-	std::map<std::string, std::shared_ptr<TextureSampler>> getSamplers() const;
+	std::map<std::string, std::shared_ptr<TextureSamplerAsset>> getSamplers() const;
 	std::map<std::string, EditableUniform> getUniformProperties();
 
 	void setSamplerEnabled(const std::string& name, bool isEnabled);

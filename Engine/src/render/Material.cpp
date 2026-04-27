@@ -37,7 +37,7 @@ void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler>
 	}
 	else
 	{
-		texture = sampler->texture.resource();
+		texture = sampler->texture;
 	}
 
 	texture->setSlot(slot);
@@ -46,15 +46,15 @@ void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler>
 	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
 	shader->setUniformValue(name + ".texture", slot);
 
-	shader->setUniformValue(name + ".isActive", sampler->isActive);
-	shader->setUniformValue(name + ".xOffset", sampler ? sampler->xOffset : 0.0f);
-	shader->setUniformValue(name + ".yOffset", sampler ? sampler->yOffset : 0.0f);
-	shader->setUniformValue(name + ".xScale", sampler ? sampler->xScale : 1.0f);
-	shader->setUniformValue(name + ".yScale", sampler ? sampler->yScale : 1.0f);
-	shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->channelMaskR : 1);
-	shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->channelCount > 1 ? sampler->channelMaskG : 0) : 0);
-	shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->channelCount > 2 ? sampler->channelMaskB : 0) : 0);
-	shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->channelCount > 3 ? sampler->channelMaskA : 0) : 0);
+	shader->setUniformValue(name + ".isActive", sampler->state.isActive);
+	shader->setUniformValue(name + ".xOffset", sampler ? sampler->state.xOffset : 0.0f);
+	shader->setUniformValue(name + ".yOffset", sampler ? sampler->state.yOffset : 0.0f);
+	shader->setUniformValue(name + ".xScale", sampler ? sampler->state.xScale : 1.0f);
+	shader->setUniformValue(name + ".yScale", sampler ? sampler->state.yScale : 1.0f);
+	shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->state.channelMaskR : 1);
+	shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->state.channelCount > 1 ? sampler->state.channelMaskG : 0) : 0);
+	shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->state.channelCount > 2 ? sampler->state.channelMaskB : 0) : 0);
+	shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->state.channelCount > 3 ? sampler->state.channelMaskA : 0) : 0);
 }
 
 void Material::use()
@@ -248,8 +248,8 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 		return;
 	}
 	
-	std::shared_ptr<TextureSampler> sampler = std::make_shared<TextureSampler>(samplerChannels);
-	sampler->isActive = true;
+	auto sampler = std::make_shared<TextureSamplerAsset>(samplerChannels);
+	sampler->state.isActive = true;
 	sampler->texture = textureAsset;
 	data.setSampler(shaderPropertyName, sampler);
 }
@@ -260,7 +260,14 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 	materialResource->m_name = data.name;
 	materialResource->m_renderMode = data.getMaterialRenderMode();
 	materialResource->m_customShader = data.getCustomShader().resource();
-	materialResource->m_samplers = data.getSamplers();
+
+	for (const auto& [name, sampler] : data.getSamplers())
+	{
+		auto textureSamplerResource = std::make_shared<TextureSampler>();
+		textureSamplerResource->texture = sampler->texture.resource();
+		textureSamplerResource->state = sampler->state;
+		materialResource->m_samplers[name] = textureSamplerResource;
+	}
 
 	for (const auto& [name, uniform] : data.getUniforms())
 	{
@@ -299,12 +306,12 @@ MaterialRenderMode MaterialAsset::getMaterialRenderMode() const
 	return data.getMaterialRenderMode();
 }
 
-void MaterialAsset::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
+void MaterialAsset::setSampler(const std::string& name, std::shared_ptr<TextureSamplerAsset> sampler)
 {
 	data.setSampler(name, sampler);
 }
 
-std::shared_ptr<TextureSampler> MaterialAsset::getSampler(const std::string& name)
+std::shared_ptr<TextureSamplerAsset> MaterialAsset::getSampler(const std::string& name)
 {
 	const auto& samplers = data.getSamplers();
 	auto it = samplers.find(name);
@@ -316,7 +323,7 @@ void MaterialAsset::setSamplerEnabled(const std::string& name, bool isEnabled)
 	auto sampler = getSampler(name);
 	if (sampler)
 	{
-		sampler->isActive = isEnabled;
+		sampler->state.isActive = isEnabled;
 	}
 }
 
@@ -357,7 +364,7 @@ MaterialAssetRef MaterialAsset::clone(bool isEngineOwned) const
 	return cloned;
 }
 
-std::map<std::string, std::shared_ptr<TextureSampler>> MaterialAsset::getSamplers() const
+std::map<std::string, std::shared_ptr<TextureSamplerAsset>> MaterialAsset::getSamplers() const
 {
 	return data.getSamplers();
 }

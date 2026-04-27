@@ -60,9 +60,9 @@ public:
 
 	bool setUniform(const std::string& name, const Value& value);
 
-	const std::map<std::string, std::shared_ptr<TextureSampler>>& getSamplers() const;
+	const std::map<std::string, std::shared_ptr<TextureSamplerAsset>>& getSamplers() const;
 
-	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
+	void setSampler(const std::string& name, std::shared_ptr<TextureSamplerAsset> sampler);
 
 	bool isParsed() const;
 
@@ -84,5 +84,5 @@ private:
 	MaterialRenderMode m_renderMode = MaterialRenderMode::Opaque;
 	ShaderAssetRef m_customShader;
 	std::map<std::string, EditableUniform> m_uniforms;
-	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
+	std::map<std::string, std::shared_ptr<TextureSamplerAsset>> m_samplers;
 };

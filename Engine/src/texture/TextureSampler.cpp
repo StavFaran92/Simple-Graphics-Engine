@@ -3,8 +3,8 @@
 
 #include "memory/BuiltInAssets.h"
 
-TextureSampler::TextureSampler(int channelCount)
-	: texture( BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE)),
-	channelCount(channelCount)
+TextureSamplerAsset::TextureSamplerAsset(int channelCount)
 {
+	texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE);
+	state.channelCount = channelCount;
 }
