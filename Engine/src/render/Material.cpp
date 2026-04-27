@@ -357,7 +357,7 @@ MaterialAssetRef MaterialAsset::clone(bool isEngineOwned) const
 	return cloned;
 }
 
-std::map<std::string, std::shared_ptr<TextureSampler>> MaterialAsset::getSamplers()
+std::map<std::string, std::shared_ptr<TextureSampler>> MaterialAsset::getSamplers() const
 {
 	return data.getSamplers();
 }
@@ -416,4 +416,15 @@ void MaterialAsset::fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDe
 	}
 
 	materialDesc->data = data;
+}
+
+std::vector<AssetRef<Asset>> MaterialAsset::gatherDependencies() const
+{
+	std::vector<AssetRef<Asset>> dependencies;
+	auto samplers = getSamplers();
+	for (const auto& [sName, sampler] : samplers)
+	{
+		dependencies.push_back(sampler->texture);
+	}
+	return dependencies;
 }

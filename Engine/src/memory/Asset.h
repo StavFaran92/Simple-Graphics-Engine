@@ -22,6 +22,8 @@ public:
 	virtual void serialize(nlohmann::json& j) const = 0;
 	virtual void deserialize(const nlohmann::json& j) = 0;
 
+	virtual std::vector<AssetRef<Asset>> gatherDependencies() const { return {}; };
+
 	void syncAsset() const;
 
 	void deleteAsset();

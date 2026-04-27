@@ -90,6 +90,8 @@ public:
 
 	void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) override;
 
+	std::vector<AssetRef<Asset>> gatherDependencies() const override;
+
 
 	void setName(const std::string& name);
 	std::string getName() const;
@@ -103,7 +105,7 @@ public:
 	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
 	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
 
-	std::map<std::string, std::shared_ptr<TextureSampler>> getSamplers();
+	std::map<std::string, std::shared_ptr<TextureSampler>> getSamplers() const;
 	std::map<std::string, EditableUniform> getUniformProperties();
 
 	void setSamplerEnabled(const std::string& name, bool isEnabled);
