@@ -13,18 +13,6 @@ void EditorState::init()
 
 void EditorState::update()
 {
-    if (!currentAssetEdit.isEmpty())
-    {
-        // add resource and asset dependencies to cache
-        EditorState::Instance().resourceCache.clear();
-        EditorState::Instance().resourceCache.push_back(currentAssetEdit.resource());
-        auto assetDependencies = currentAssetEdit->gatherDependencies();
-        for (auto& dep : assetDependencies)
-        {
-            EditorState::Instance().resourceCache.push_back(dep.resource());
-        }
-
-    }
 }
 
 bool EditorState::getState(const std::string& state)
@@ -86,13 +74,7 @@ void EditorState::selectAssetForEdit(const AssetRef<Asset>& asset)
     currentAssetEdit = asset;
 
     // add resource and asset dependencies to cache
-    EditorState::Instance().resourceCache.clear();
-    EditorState::Instance().resourceCache.push_back(currentAssetEdit.resource());
-    auto assetDependencies = currentAssetEdit->gatherDependencies();
-    for (auto& dep : assetDependencies)
-    {
-        EditorState::Instance().resourceCache.push_back(dep.resource());
-    }
+    EditorState::Instance().resourceCache = currentAssetEdit.resource();
 }
 
 AssetRef<Asset> EditorState::getSelectedAsset() const
@@ -103,7 +85,7 @@ AssetRef<Asset> EditorState::getSelectedAsset() const
 void EditorState::clearAssetSelection()
 {
     currentAssetEdit = AssetRef<Asset>::empty;
-    EditorState::Instance().resourceCache.clear();
+    resourceCache = ResourceRef<Resource>::empty;
 }
 
 WorkingDirectory& EditorState::getWorkingDir()

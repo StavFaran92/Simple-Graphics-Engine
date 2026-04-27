@@ -68,8 +68,8 @@ public:
     std::function<void(const std::string& scriptName)> scriptSelectCB;
     TextureAssetRef selectedAssetTexture;
 
-    std::shared_ptr<TextureSampler> selectedSampler;
-    std::shared_ptr<TextureSampler> previousSampler;
+    std::shared_ptr<TextureSamplerAsset> selectedSampler;
+    std::shared_ptr<TextureSamplerAsset> previousSampler;
 
     MaterialAssetRef selectedMaterialForEdit;
 
@@ -111,7 +111,7 @@ private:
     std::vector<DialogBase*> m_dialogs;
 
     AssetRef<Asset> currentAssetEdit;
-    std::vector<ResourceRef<Resource>> resourceCache;
+    ResourceRef<Resource> resourceCache;
 
     EditorTool::Type m_activeEditorToolType = EditorTool::Type::None;
     std::shared_ptr<EditorTool> m_activeEditorTool;

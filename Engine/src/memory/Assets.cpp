@@ -3,6 +3,7 @@
 #include "core/CacheSystem.h"
 #include "memory/AssetFactory.h"
 #include "memory/RegisterManagers.h"
+#include "memory/ResourceManager.h"
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
 #include "utils/RandomNameGenerator.h"
@@ -615,4 +616,17 @@ void Assets::moveAsset(UUID uuid, const ScopedPath& newDirectory)
 void Assets::reimportAsset(UUID uuid)
 {
 	throw std::runtime_error("Not yet implemented.");
+}
+
+void Assets::syncAllAssets()
+{
+	for (auto& [uuid, record] : m_assets)
+	{
+		if (record.isResourceDirty() && Engine::get()->getResourceManager()->isResourceValid(record.resourceID))
+		{
+			record.asset->fillData(record.asset->resource());
+			sync(uuid);
+		}
+	}
+
 }

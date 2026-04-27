@@ -41,6 +41,8 @@ public:
 
 	void saveDirtyAssets();
 
+	void syncAllAssets();
+
 	AssetRef<Asset> getAssetFromPath(const std::string& path) const;
 
 	AssetRef<Asset> getAssetFromName(const std::string& name) const;

@@ -35,10 +35,18 @@ struct EngineAPI AssetRecord
 	void parse();
 	bool isParsed() const;
 
+	// Makes the asset both resource dirty and serialization dirty.
 	void makeDirty();
+
+	// Resource now matches the asset's changes and is therefore not dirty anymore.
 	void sync();
+
+	// This means the Asset has changed but the file data on disk does not contains the asset changes.
 	bool isSerializationDirty() const;
+
+	// This means the Asset has changed and therefore the resource is not updated with the changes.
 	bool isResourceDirty() const;
+
 	std::string getAbsolutePath() const;
 	ScopedPath getScopedPath() const;
 	std::string getFilename() const;

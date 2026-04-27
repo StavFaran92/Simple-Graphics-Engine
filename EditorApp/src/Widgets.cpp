@@ -21,7 +21,7 @@ void addTextureEditWidget(TextureAssetRef texture, ImVec2 size, std::function<vo
 	}
 }
 
-void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, const std::string& name)
+void addSamplerEditWidget(std::shared_ptr<TextureSamplerAsset> sampler, ImVec2 size, const std::string& name)
 {
 	ImGui::PushID(name.c_str());
 
@@ -35,7 +35,7 @@ void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, 
 	{
 		ImGui::OpenPopup("EditSamplerPopup");
 		EditorState::Instance().selectedSampler = sampler;
-		EditorState::Instance().previousSampler = std::make_shared<TextureSampler>(*sampler.get());
+		EditorState::Instance().previousSampler = std::make_shared<TextureSamplerAsset>(*sampler.get());
 	}
 
 	if (ImGui::BeginPopup("EditSamplerPopup"))
@@ -57,12 +57,12 @@ void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, 
 
 		static int* currentChannelMask[4];
 
-		currentChannelMask[0] = &EditorState::Instance().selectedSampler->channelMaskR;
-		currentChannelMask[1] = &EditorState::Instance().selectedSampler->channelMaskG;
-		currentChannelMask[2] = &EditorState::Instance().selectedSampler->channelMaskB;
-		currentChannelMask[3] = &EditorState::Instance().selectedSampler->channelMaskA;
+		currentChannelMask[0] = &EditorState::Instance().selectedSampler->state.channelMaskR;
+		currentChannelMask[1] = &EditorState::Instance().selectedSampler->state.channelMaskG;
+		currentChannelMask[2] = &EditorState::Instance().selectedSampler->state.channelMaskB;
+		currentChannelMask[3] = &EditorState::Instance().selectedSampler->state.channelMaskA;
 
-		for (int i = 0; i < EditorState::Instance().selectedSampler->channelCount; i++)
+		for (int i = 0; i < EditorState::Instance().selectedSampler->state.channelCount; i++)
 		{
 			ImGui::PushID(&currentChannelMask[i]);
 			displayChannelSelectWidget(currentChannelMask[i]);
@@ -71,13 +71,13 @@ void addSamplerEditWidget(std::shared_ptr<TextureSampler> sampler, ImVec2 size, 
 
 		ImGui::Spacing();
 
-		ImGui::DragFloat("xoffset", &EditorState::Instance().selectedSampler->xOffset, .1f);
-		ImGui::DragFloat("yoffset", &EditorState::Instance().selectedSampler->yOffset, .1f);
+		ImGui::DragFloat("xoffset", &EditorState::Instance().selectedSampler->state.xOffset, .1f);
+		ImGui::DragFloat("yoffset", &EditorState::Instance().selectedSampler->state.yOffset, .1f);
 
 		ImGui::Spacing();
 
-		ImGui::DragFloat("xScale", &EditorState::Instance().selectedSampler->xScale, .1f);
-		ImGui::DragFloat("yScale", &EditorState::Instance().selectedSampler->yScale, .1f);
+		ImGui::DragFloat("xScale", &EditorState::Instance().selectedSampler->state.xScale, .1f);
+		ImGui::DragFloat("yScale", &EditorState::Instance().selectedSampler->state.yScale, .1f);
 
 		ImGui::Separator();
 
@@ -257,7 +257,7 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 		{
 			ImGui::PushID(name.c_str());
 			ImGui::Text(name.c_str());
-			if (ImGui::Checkbox("", (bool*)&sampler->isActive)) { if (onChangedCB) onChangedCB(data); }
+			if (ImGui::Checkbox("", (bool*)&sampler->state.isActive)) { if (onChangedCB) onChangedCB(data); }
 			ImGui::SameLine();
 			addSamplerEditWidget(sampler, { 40, 40 }, name);
 			ImGui::PopID();

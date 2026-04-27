@@ -53,6 +53,20 @@ ResourceRef<Resource> ResourceManager::getResource(ResourceID rid) const
     }
 }
 
+bool ResourceManager::isResourceValid(ResourceID rid) const
+{
+    auto it = m_resourceCache.find(rid);
+    if (it != m_resourceCache.end())
+    {
+        auto existing = it->second;
+        if (!existing.expired())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 ResourceRef<Resource> ResourceManager::createOrGetCached(ResourceID id, const std::function<ResourceRef<Resource>(void)>& creationCallback)
 {
     {

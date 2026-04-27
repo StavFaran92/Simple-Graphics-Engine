@@ -48,7 +48,7 @@ public:
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(texture);
-		SERIALIZED_MEMBER(isActive);
+		SERIALIZED_MEMBER(state.isActive);
 		SERIALIZED_MEMBER(state.channelMaskR);
 		SERIALIZED_MEMBER(state.channelMaskG);
 		SERIALIZED_MEMBER(state.channelMaskB);

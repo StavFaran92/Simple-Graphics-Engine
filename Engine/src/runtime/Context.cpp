@@ -15,6 +15,7 @@
 #include "render/Material.h"
 #include "serialize/ProjectAssetRegistry.h"
 #include "render/Graphics.h"
+#include "memory/Assets.h"
 
 Context::Context(const std::shared_ptr<ProjectAssetRegistry>& par)
 {
@@ -114,6 +115,8 @@ RenderMode Context::getRenderMode() const
 
 void Context::update(float deltaTime)
 {
+	Engine::get()->getSubSystem<Assets>()->syncAllAssets();
+
 	auto activeScene = m_sceneManager->getActiveScene();
 	if (activeScene.isEmpty())
 		return;

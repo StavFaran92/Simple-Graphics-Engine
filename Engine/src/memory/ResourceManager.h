@@ -16,6 +16,8 @@ public:
 
     ResourceRef<Resource> getResource(ResourceID) const;
 
+    bool isResourceValid(ResourceID) const;
+
     ResourceRef<Resource> createOrGetCached(ResourceID id, const std::function<ResourceRef<Resource>(void)>& creationCallback);
 
     template<typename T, typename... Args>
