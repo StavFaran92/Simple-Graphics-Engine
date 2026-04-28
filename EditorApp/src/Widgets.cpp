@@ -4,12 +4,8 @@
 #include <imgui_stdlib.h>
 #include "tinyfiledialogs.h"
 #include "dialogs/AssetSelectDialog.h"
-#include "dialogs/EditSamplerDialog.h"
+#include "DialogManager.h"
 #include "render/MaterialData.h"
-
-// TODO fix
-extern AssetSelectDialog assetSelectDialog;
-extern EditSamplerDialog editSamplerDialog;
 
 void addTextureEditWidget(TextureAssetRef texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
@@ -21,8 +17,8 @@ void addTextureEditWidget(TextureAssetRef texture, ImVec2 size, std::function<vo
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
 	{
-		EditorState::Instance().assetTextureSelectCB = callback;
-		EditorState::Instance().setState("TextureSelectDialog", true);
+		DialogManager::Instance().textureSelectDialog.onAcceptCB = callback;
+		DialogManager::Instance().textureSelectDialog.activate();
 	}
 }
 
@@ -38,9 +34,9 @@ void addSamplerEditWidget(std::shared_ptr<TextureSamplerAsset> sampler, ImVec2 s
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
 	{
-		editSamplerDialog.sampler = sampler;
-		editSamplerDialog.onAcceptCB = onAccpetCB;
-		editSamplerDialog.activate();
+		DialogManager::Instance().editSamplerDialog.sampler = sampler;
+		DialogManager::Instance().editSamplerDialog.onAcceptCB = onAccpetCB;
+		DialogManager::Instance().editSamplerDialog.activate();
 	}
 
 	ImGui::SameLine();
@@ -131,9 +127,9 @@ bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::f
 
 	if (ImGui::Button(name.c_str(), ImVec2(width, 0)))
 	{
-		assetSelectDialog.assetType = aType;
-		assetSelectDialog.onAccpetCB = onAccpetCB;
-		assetSelectDialog.activate();
+		DialogManager::Instance().assetSelectDialog.assetType = aType;
+		DialogManager::Instance().assetSelectDialog.onAccpetCB = onAccpetCB;
+		DialogManager::Instance().assetSelectDialog.activate();
 	}
 
 	return false;

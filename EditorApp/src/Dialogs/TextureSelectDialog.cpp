@@ -58,9 +58,9 @@ bool TextureSelectDialog::acceptContent()
 	const auto& textureRecordList = assets->getAllRecordsOfType(AssetType::TEXTURE);
 	if (m_selectedTextureIndex >= 0 && m_selectedTextureIndex < static_cast<int>(textureRecordList.size()))
 	{
-		if (EditorState::Instance().assetTextureSelectCB)
+		if (onAcceptCB)
 		{
-			EditorState::Instance().assetTextureSelectCB(textureRecordList[m_selectedTextureIndex]->uuid);
+			onAcceptCB(textureRecordList[m_selectedTextureIndex]->uuid);
 		}
 	}
 	return true;

@@ -18,13 +18,14 @@
 #include "Dialogs/LuaScriptCreateDialog.h"
 #include "Dialogs/ProjectSettingsDialog.h"
 #include "Dialogs/MaterialEditDialog.h"
+#include "Dialogs/EditSamplerDialog.h"
 
-class EditorContext
+class DialogManager
 {
 public:
-    static EditorContext& Instance()
+    static DialogManager& Instance()
     {
-        static EditorContext instance;
+        static DialogManager instance;
         return instance;
     }
 
@@ -43,12 +44,14 @@ public:
     LuaScriptCreateDialog luaScriptCreateDialog;
     ProjectSettingsDialog projectSettingsDialog;
     MaterialEditDialog materialEditDialog;
+    EditSamplerDialog editSamplerDialog;
+    AssetSelectDialog assetSelectDialog;
 
-    EditorContext(const EditorContext&) = delete;
-    EditorContext& operator=(const EditorContext&) = delete;
-    EditorContext(EditorContext&&) = delete;
-    EditorContext& operator=(EditorContext&&) = delete;
+    DialogManager(const DialogManager&) = delete;
+    DialogManager& operator=(const DialogManager&) = delete;
+    DialogManager(DialogManager&&) = delete;
+    DialogManager& operator=(DialogManager&&) = delete;
 
 private:
-    EditorContext() = default;
+    DialogManager() = default;
 };

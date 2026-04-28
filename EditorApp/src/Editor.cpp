@@ -17,7 +17,7 @@
 
 #include "EditorCamera.h"
 #include "EditorState.h"
-#include "EditorContext.h"
+#include "DialogManager.h"
 
 #include <imgui_stdlib.h>
 #include "core/Logger.h"
@@ -42,9 +42,6 @@
 #include "GUIMenu.h"
 
 extern bool g_testRay;
-
-AssetSelectDialog assetSelectDialog;
-EditSamplerDialog editSamplerDialog;
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
@@ -348,16 +345,16 @@ class GUI_Helper : public GuiMenu {
 				}
 				if (ImGui::BeginMenu("Import")) {
 					if (ImGui::MenuItem("Model")) {
-						EditorContext::Instance().modelImportDialog.activate();
+						DialogManager::Instance().modelImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Texture")) {
-						EditorContext::Instance().textureImportDialog.activate();
+						DialogManager::Instance().textureImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Animation")) {
-						EditorContext::Instance().animationImportDialog.activate();
+						DialogManager::Instance().animationImportDialog.activate();
 					}
 					if (ImGui::MenuItem("Lua Script")) {
-						EditorContext::Instance().luaScriptImportDialog.activate();
+						DialogManager::Instance().luaScriptImportDialog.activate();
 					}
 					ImGui::EndMenu();
 				}
@@ -395,7 +392,7 @@ class GUI_Helper : public GuiMenu {
 				}
 				if (ImGui::BeginMenu("Project")) {
 					if (ImGui::MenuItem("Settings")) {
-						EditorContext::Instance().projectSettingsDialog.activate();
+						DialogManager::Instance().projectSettingsDialog.activate();
 					}
 					ImGui::EndMenu();
 				}

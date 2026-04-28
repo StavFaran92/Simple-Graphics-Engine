@@ -3,34 +3,34 @@
 #include <imgui.h>
 
 #include "EditorState.h"
-#include "EditorContext.h"
+#include "DialogManager.h"
 
 void CreateMenu::display()
 {
 	if (ImGui::BeginMenu("Create")) {
 		if (ImGui::MenuItem("Folder")) {
-			EditorContext::Instance().folderCreateDialog.activate();
+			DialogManager::Instance().folderCreateDialog.activate();
 			//EditorState::Instance().showMaterialCreateWindow = true;
 
 		}
 		if (ImGui::MenuItem("Material")) {
-			EditorContext::Instance().materialCreateDialog.activate();
+			DialogManager::Instance().materialCreateDialog.activate();
 			//EditorState::Instance().showMaterialCreateWindow = true;
 
 		}
 		if (ImGui::MenuItem("Texture")) {
-			EditorContext::Instance().textureCreateDialog.activate();
+			DialogManager::Instance().textureCreateDialog.activate();
 		}
 		if (ImGui::MenuItem("Shader")) {
-			EditorContext::Instance().shaderCreateDialog.activate();
+			DialogManager::Instance().shaderCreateDialog.activate();
 		}
 
 		if (ImGui::MenuItem("Lua Script")) {
-			EditorContext::Instance().luaScriptCreateDialog.activate();
+			DialogManager::Instance().luaScriptCreateDialog.activate();
 		}
 
 		if (ImGui::MenuItem("Scene")) {
-			EditorContext::Instance().sceneCreateDialog.activate();
+			DialogManager::Instance().sceneCreateDialog.activate();
 
 		}
 		ImGui::EndMenu();
