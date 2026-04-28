@@ -42,6 +42,7 @@ public:
     float* getFloatData();
 
     size_t size() const;
+    size_t count() const;
     bool empty() const;
 
     DataType getType() const;

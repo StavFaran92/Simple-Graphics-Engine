@@ -112,6 +112,11 @@ float* ImageBuffer::getFloatData()
 
 size_t ImageBuffer::size() const
 {
+    return m_data.size();
+}
+
+size_t ImageBuffer::count() const
+{
     if (m_type == DataType::FLOAT32)
         return m_data.size() / sizeof(float);
     return m_data.size();
