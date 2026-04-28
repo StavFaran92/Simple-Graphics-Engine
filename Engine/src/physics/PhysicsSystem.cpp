@@ -231,7 +231,7 @@ void PhysicsSystem::createTerrainActor(Scene* scene, entt::entity entity)
             physx::PxHeightFieldSample* currentSample = (physx::PxHeightFieldSample*)currentByte;
 
             // we flip the row and col order, I have no idea why physx accept the data like that
-            auto a = heightmapData.data.data()[(column * heightmapData.width + row) * heightmapData.channels]; 
+            auto a = heightmapData.data.getFloatData()[(column * heightmapData.width + row) * heightmapData.channels]; 
             currentSample->height = static_cast<int16_t>(a/* * 2^8*/); // we use the full range of the height map field
 
             currentSample->clearTessFlag();
@@ -244,7 +244,7 @@ void PhysicsSystem::createTerrainActor(Scene* scene, entt::entity entity)
         logError("createHeightField failed!");
         return;
     }
-    // create shape for heightfield		
+    // create shape for heightfield		s
     //PxTransform pose(PxVec3(-(heightFieldDesc.nbRows * terrain.getHeight()) / 2.0f,
     //    0.0f,
     //    -((PxReal)heightFieldDesc.nbColumns * terrain.getWidth()) / 2.0f),
@@ -530,8 +530,8 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
                 physx::PxHeightFieldSample* currentSample = (physx::PxHeightFieldSample*)currentByte;
 
                 // we flip the row and col order, I have no idea why physx accept the data like that
-                auto a = heightmapData.data.data()[(column * heightmapData.width + row) * heightmapData.channels];
-                currentSample->height = static_cast<int16_t>(a/* * 2^8*/); // we use the full range of the height map field
+                auto a = heightmapData.data.getFloatData()[(column * heightmapData.width + row) * heightmapData.channels];
+                currentSample->height = static_cast<int16_t>(a * 256); // we use the full range of the height map field
 
                 currentSample->clearTessFlag();
                 currentByte += heightFieldDesc.samples.stride;
