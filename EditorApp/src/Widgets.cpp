@@ -21,7 +21,7 @@ void addTextureEditWidget(TextureAssetRef texture, ImVec2 size, std::function<vo
 	}
 }
 
-void addSamplerEditWidget(std::shared_ptr<TextureSamplerAsset> sampler, ImVec2 size, const std::string& name)
+void addSamplerEditWidget(std::shared_ptr<TextureSamplerAsset> sampler, ImVec2 size, const std::string& name, const std::function<void(UUID)>& onAccpetCB)
 {
 	ImGui::PushID(name.c_str());
 
@@ -83,6 +83,11 @@ void addSamplerEditWidget(std::shared_ptr<TextureSamplerAsset> sampler, ImVec2 s
 
 		if (ImGui::Button("OK"))
 		{
+			if (!EditorState::Instance().selectedSampler->texture.isEmpty())
+			{
+				onAccpetCB(EditorState::Instance().selectedSampler->texture.getUID());
+
+			}
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -228,7 +233,8 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 				currentIndex = i;
 				currentMode = static_cast<MaterialRenderMode>(i);
 				data.setMaterialRenderMode(currentMode);
-				if(onChangedCB) onChangedCB(data);
+				if(onChangedCB) 
+					onChangedCB(data);
 			}
 			if (isSelected)
 				ImGui::SetItemDefaultFocus();
@@ -246,7 +252,8 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 
 		addAssetSelectWidget(shaderName, AssetType::SHADER, [&data, onChangedCB](UUID uuid) {
 			data.setCustomShader(ShaderAssetRef(uuid));
-			if (onChangedCB) onChangedCB(data);
+			if (onChangedCB) 
+				onChangedCB(data);
 		});
 	}
 
@@ -257,9 +264,16 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 		{
 			ImGui::PushID(name.c_str());
 			ImGui::Text(name.c_str());
-			if (ImGui::Checkbox("", (bool*)&sampler->state.isActive)) { if (onChangedCB) onChangedCB(data); }
+			if (ImGui::Checkbox("", (bool*)&sampler->state.isActive)) 
+			{ 
+				if (onChangedCB) 
+					onChangedCB(data); 
+			}
 			ImGui::SameLine();
-			addSamplerEditWidget(sampler, { 40, 40 }, name);
+			addSamplerEditWidget(sampler, { 40, 40 }, name, [&data, onChangedCB](UUID uuid) {
+				if (onChangedCB)
+					onChangedCB(data);
+				});
 			ImGui::PopID();
 		}
 

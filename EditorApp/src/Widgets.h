@@ -9,7 +9,7 @@ class AssetSelectDialog;
 
 void addTextureEditWidget(TextureAssetRef texture, ImVec2 size, std::function<void(UUID uuid)> callback);
 
-void addSamplerEditWidget(std::shared_ptr<TextureSamplerAsset> sampler, ImVec2 size, const std::string& name);
+void addSamplerEditWidget(std::shared_ptr<TextureSamplerAsset> sampler, ImVec2 size, const std::string& name, const std::function<void(UUID)>& onAccpetCB = {});
 
 void displayChannelSelectWidget(int*& currentChannel);
 
