@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sge.h"
+
 #include "DialogBase.h"
 
 class TextureSelectDialog : public DialogBase
@@ -13,4 +15,5 @@ public:
 
 private:
 	int m_selectedTextureIndex = -1;
+	TextureResourceRef displayTexture;
 };
