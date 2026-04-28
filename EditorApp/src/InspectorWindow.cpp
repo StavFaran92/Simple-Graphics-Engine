@@ -444,9 +444,14 @@ void InspectorWindow::display()
 					ImGui::DragInt("Height", newHeight, 1, 1, 8192);
 					ImGui::DragFloat("scale", &terrain.m_scale);
 
-					addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
-						terrain.setHeightmap(TextureAssetRef(uuid));
+					static bool useCustomHeightmap = false;
+					ImGui::Checkbox("Custom Heightmap", &useCustomHeightmap);
+					if (useCustomHeightmap)
+					{
+						addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
+							terrain.setHeightmap(TextureAssetRef(uuid));
 						});
+					}
 
 					// Check if rebuild is needed
 					bool needsRebuild =
@@ -481,11 +486,16 @@ void InspectorWindow::display()
 						if (!terrain.m_material.isEmpty())
 						{
 							matName = terrain.m_material.info().name;
+
+							if (terrain.m_material->getMaterialRenderMode() != MaterialRenderMode::Terrain)
+							{
+								ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Material type is not Terrain compatible!");
+							}
 						}
 
 						addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uuid) {
 							terrain.m_material = MaterialAssetRef(uuid);
-							});
+						});
 					}
 
 					bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainDeformer;
