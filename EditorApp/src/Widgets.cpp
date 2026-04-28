@@ -4,7 +4,12 @@
 #include <imgui_stdlib.h>
 #include "tinyfiledialogs.h"
 #include "dialogs/AssetSelectDialog.h"
+#include "dialogs/EditSamplerDialog.h"
 #include "render/MaterialData.h"
+
+// TODO fix
+extern AssetSelectDialog assetSelectDialog;
+extern EditSamplerDialog editSamplerDialog;
 
 void addTextureEditWidget(TextureAssetRef texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
@@ -33,73 +38,9 @@ void addSamplerEditWidget(std::shared_ptr<TextureSamplerAsset> sampler, ImVec2 s
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
 	{
-		ImGui::OpenPopup("EditSamplerPopup");
-		EditorState::Instance().selectedSampler = sampler;
-		EditorState::Instance().previousSampler = std::make_shared<TextureSamplerAsset>(*sampler.get());
-	}
-
-	if (ImGui::BeginPopup("EditSamplerPopup"))
-	{
-		if (!EditorState::Instance().selectedSampler)
-		{
-			logError("Selected sampler cannot be null.");
-			ImGui::EndPopup();
-			return;
-		}
-		auto assets = Engine::get()->getSubSystem<Assets>();
-
-		ImGui::Text("Texture");
-		addTextureEditWidget(EditorState::Instance().selectedSampler->texture, ImVec2{ 150, 150 }, [=](UUID uuid) {
-			EditorState::Instance().selectedSampler->texture = TextureAssetRef(uuid);
-			});
-
-		ImGui::Spacing();
-
-		static int* currentChannelMask[4];
-
-		currentChannelMask[0] = &EditorState::Instance().selectedSampler->state.channelMaskR;
-		currentChannelMask[1] = &EditorState::Instance().selectedSampler->state.channelMaskG;
-		currentChannelMask[2] = &EditorState::Instance().selectedSampler->state.channelMaskB;
-		currentChannelMask[3] = &EditorState::Instance().selectedSampler->state.channelMaskA;
-
-		for (int i = 0; i < EditorState::Instance().selectedSampler->state.channelCount; i++)
-		{
-			ImGui::PushID(&currentChannelMask[i]);
-			displayChannelSelectWidget(currentChannelMask[i]);
-			ImGui::PopID();
-		}
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat("xoffset", &EditorState::Instance().selectedSampler->state.xOffset, .1f);
-		ImGui::DragFloat("yoffset", &EditorState::Instance().selectedSampler->state.yOffset, .1f);
-
-		ImGui::Spacing();
-
-		ImGui::DragFloat("xScale", &EditorState::Instance().selectedSampler->state.xScale, .1f);
-		ImGui::DragFloat("yScale", &EditorState::Instance().selectedSampler->state.yScale, .1f);
-
-		ImGui::Separator();
-
-		if (ImGui::Button("OK"))
-		{
-			if (!EditorState::Instance().selectedSampler->texture.isEmpty())
-			{
-				onAccpetCB(EditorState::Instance().selectedSampler->texture.getUID());
-
-			}
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel"))
-		{
-			*sampler = *EditorState::Instance().previousSampler;
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::EndPopup();
+		editSamplerDialog.sampler = sampler;
+		editSamplerDialog.onAcceptCB = onAccpetCB;
+		editSamplerDialog.activate();
 	}
 
 	ImGui::SameLine();
@@ -183,9 +124,6 @@ void displayColoredLabelWidget(const char* label)
 
 	ImGui::Dummy(ImVec2(0.0f, 2.0f)); // Add a vertical gap
 }
-
-// TODO fix
-extern AssetSelectDialog assetSelectDialog;
 
 bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& onAccpetCB)
 {

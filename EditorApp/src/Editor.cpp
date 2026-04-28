@@ -34,6 +34,7 @@
 #include "SceneViewWindow.h"
 #include "Dialogs/MaterialCreateDialog.h"
 #include "Dialogs/AssetSelectDialog.h"
+#include "Dialogs/EditSamplerDialog.h"
 #include "menus/CreateMenu.h"
 
 
@@ -43,6 +44,7 @@
 extern bool g_testRay;
 
 AssetSelectDialog assetSelectDialog;
+EditSamplerDialog editSamplerDialog;
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
