@@ -33,8 +33,6 @@ std::vector<AssetRef<Asset>> MeshRendererComponent::gatherDependenciesInternal()
 	for (auto& [name, mat] : m_material)
 	{
 		dependencies.push_back(mat);
-		auto& materialDependencies = mat->gatherDependencies();
-		dependencies.insert(dependencies.end(), materialDependencies.begin(), materialDependencies.end());
 	}
 	return dependencies;
 }

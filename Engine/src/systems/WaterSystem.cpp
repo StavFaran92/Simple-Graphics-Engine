@@ -82,7 +82,7 @@ void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody)
 		return;
 	}
 
-	//materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal);
+	materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal->resolve());
 
 	materialResource->setUniformValue("uWave1Speed", waterBody.wave1Speed);
 	materialResource->setUniformValue("uWave2Speed", waterBody.wave2Speed);

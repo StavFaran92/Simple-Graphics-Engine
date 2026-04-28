@@ -45,6 +45,8 @@ public:
 	TextureAssetRef texture;
 	SamplerState state;
 
+	std::shared_ptr<TextureSampler> resolve() const;
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(texture);

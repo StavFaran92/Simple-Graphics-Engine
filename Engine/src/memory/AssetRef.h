@@ -128,8 +128,14 @@ public:
 	}
 
 	template <class Archive>
-	void serialize(Archive& archive) {
+	void save(Archive& archive) const {
 		SERIALIZED_MEMBER(uuid);
+	}
+
+	template <class Archive>
+	void load(Archive& archive) {
+		SERIALIZED_MEMBER(uuid);
+		m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
 	}
 
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(AssetRef, uuid);
