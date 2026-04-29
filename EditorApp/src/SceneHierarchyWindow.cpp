@@ -296,7 +296,7 @@ void SceneHierarchyWindow::display()
 
 			if (ImGui::MenuItem("Terrain"))
 			{
-				Entity e = Terrain::createTerrain(100, 100);
+				Entity e = Terrain::createTerrain(1000, 1000);
 				updateScene();
 				state.selectEntity(sceneObjects[0].e);
 			}

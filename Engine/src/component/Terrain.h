@@ -107,8 +107,8 @@ private:
 		int stride, int width, int height
 	) const;
 private:
-	int m_width = 100;
-	int m_height = 100;
+	int m_width = 1000;
+	int m_height = 1000;
 
 	TextureAssetRef m_heightmap;
 	ModelAssetRef m_mesh;

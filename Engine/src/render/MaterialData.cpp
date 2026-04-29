@@ -1,6 +1,8 @@
 #include "render/MaterialData.h"
 #include "render/MaterialDataParser.h"
 
+#include "core/Logger.h"
+
 void MaterialData::update()
 {
 	MaterialDataParser::parse(*this);
@@ -56,6 +58,10 @@ void MaterialData::setSampler(const std::string& name, std::shared_ptr<TextureSa
 	if (it != m_samplers.end())
 	{
 		it->second = sampler;
+	}
+	else
+	{
+		logWarning("Invalid sampler entry: {}", name);
 	}
 }
 

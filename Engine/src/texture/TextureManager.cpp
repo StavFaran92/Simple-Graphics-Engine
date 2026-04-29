@@ -32,7 +32,7 @@ bool TextureTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, Imp
 
 	std::filesystem::path path(loadDesc.sourcePath);
 	result.name = path.filename().stem().string();
-	result.assetDesc.name = path.filename().stem().string();
+	result.assetDesc.name = result.assetDesc.name.empty() ? path.filename().stem().string() : result.assetDesc.name;
 	result.assetDesc.aType = AssetType::TEXTURE;
 	//result.assetDesc.sourcePath = src;
 	auto texCreateDesc = result.emplaceCreateDesc<TextureCreateDescriptor>();

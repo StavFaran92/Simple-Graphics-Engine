@@ -72,6 +72,16 @@ void BuiltInAssetsLoader::loadTextures()
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg";
 		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
 	}
+
+	{
+		AssetBuildDescriptor desc;
+		desc.aType = AssetType::TEXTURE;
+		desc.isEngineOwned = true;
+		desc.name = "SGE_TEXTURE_CHECKERBOARD";
+		TextureLoadDescriptor loadDesc;
+		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/checkerboard.jpg";
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
+	}
 }
 
 void BuiltInAssetsLoader::loadMaterials()
@@ -94,6 +104,10 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
 		MaterialCreateDescriptor createDesc;
 		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Terrain);
+		auto sampler = std::make_shared<TextureSamplerAsset>();
+		sampler->texture = BuiltInAssets::getByName<TextureAsset>("SGE_TEXTURE_CHECKERBOARD");
+		sampler->state.isActive = true;
+		createDesc.data.setSampler("samplerAlbedo", sampler);
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
 	}
 }

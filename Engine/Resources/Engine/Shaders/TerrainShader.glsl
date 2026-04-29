@@ -221,7 +221,7 @@ uniform float aoFactor;
 #pragma editable (default=(1.0, 1.0, 1.0))
 uniform vec3 color;
 
-#pragma editable (default=(1.0, 1.0))
+#pragma editable (default=(100.0, 100.0))
 uniform vec2 globalUV;
 
 in float height;
