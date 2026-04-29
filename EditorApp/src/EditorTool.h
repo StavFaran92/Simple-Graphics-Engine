@@ -13,6 +13,7 @@ public:
         TransformTool,
         FoliagePainter,
         TerrainDeformer,
+        TerrainPainter,
     };
 public:
     virtual ~EditorTool() = default;

@@ -7,6 +7,7 @@
 #include "EditorState.h"
 #include "NativeScriptsLoader.h"
 #include "Widgets.h"
+#include "TerrainPaintTool.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -428,7 +429,7 @@ void InspectorWindow::display()
 
 			if (ImGui::BeginTabBar("TerrainTabs"))
 			{
-				if (ImGui::BeginTabItem("Layers"))
+				if (ImGui::BeginTabItem("Properties"))
 				{
 					
 
@@ -498,24 +499,6 @@ void InspectorWindow::display()
 						});
 					}
 
-					bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainDeformer;
-
-					if (isActive)
-					{
-						ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
-					}
-
-					if (ImGui::Button("Terrain Deformer"))
-					{
-						g_activeTerrain = &terrain;
-						EditorState::Instance().setActiveEditorTool(isActive ? EditorTool::Type::None : EditorTool::Type::TerrainDeformer);
-					}
-
-					if (isActive)
-					{
-						ImGui::PopStyleColor();
-					}
-
 					ImGui::EndTabItem();
 				}
 
@@ -565,6 +548,135 @@ void InspectorWindow::display()
 					//	EditorState::Instance().setActiveEditorTool(EditorTool::Type::FoliagePainter);
 
 					//}
+
+					ImGui::EndTabItem();
+				}
+
+				if (ImGui::BeginTabItem("Painter"))
+				{
+					static const char* toolNames[] = { "None", "Deformer", "Painter" };
+					static const EditorTool::Type toolTypes[] = { EditorTool::Type::None, EditorTool::Type::TerrainDeformer, EditorTool::Type::TerrainPainter };
+
+					EditorTool::Type activeTool = EditorState::Instance().getActiveToolType();
+					int currentIndex = 0;
+					for (int i = 0; i < IM_ARRAYSIZE(toolTypes); i++)
+					{
+						if (toolTypes[i] == activeTool)
+						{
+							currentIndex = i;
+							break;
+						}
+					}
+
+					if (ImGui::BeginCombo("Tool", toolNames[currentIndex]))
+					{
+						for (int i = 0; i < IM_ARRAYSIZE(toolNames); i++)
+						{
+							bool isSelected = (i == currentIndex);
+							if (ImGui::Selectable(toolNames[i], isSelected))
+							{
+								g_activeTerrain = &terrain;
+								EditorState::Instance().setActiveEditorTool(toolTypes[i]);
+							}
+							if (isSelected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+
+					if (EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainPainter)
+					{
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Text("Layers");
+					ImGui::Spacing();
+
+					static std::vector<TerrainPaintLayer> s_layers { TerrainPaintLayer{ "Layer 1" } };
+					static int selectedLayerIndex = 0;
+					auto& layers = s_layers;
+
+					// Clamp selection in case layers changed
+					if (selectedLayerIndex >= (int)layers.size())
+						selectedLayerIndex = (int)layers.size() - 1;
+
+					for (int i = 0; i < (int)layers.size(); i++)
+					{
+						ImGui::PushID(i);
+
+						bool isSelected = (i == selectedLayerIndex);
+						ImGui::Bullet();
+						ImGui::SameLine();
+
+						std::string label = layers[i].name;
+						if (!layers[i].material.isEmpty())
+							label += " [" + layers[i].material.info().name + "]";
+
+						if (ImGui::Selectable(label.c_str(), isSelected))
+							selectedLayerIndex = i;
+
+						if (isSelected)
+						{
+							ImGui::Indent();
+
+							ImGui::InputText("Name", &layers[i].name);
+
+							std::string matName = layers[i].material.isEmpty() ? "None" : layers[i].material.info().name;
+							addAssetSelectWidget(matName, AssetType::MATERIAL, [&layers, i](UUID uuid) {
+								layers[i].material = MaterialAssetRef(uuid);
+							});
+
+							ImGui::Unindent();
+						}
+
+						ImGui::PopID();
+					}
+
+					ImGui::Spacing();
+
+					// Add button
+					if (ImGui::Button("+"))
+					{
+						TerrainPaintLayer newLayer;
+						newLayer.name = "Layer " + std::to_string(layers.size() + 1);
+						layers.push_back(newLayer);
+					}
+
+					ImGui::SameLine();
+
+					// Remove button — disabled when only 1 layer or the selected layer would be removed
+					bool canRemove = layers.size() > 1;
+					ImGui::BeginDisabled(!canRemove);
+					if (ImGui::Button("-"))
+					{
+						layers.erase(layers.begin() + selectedLayerIndex);
+						if (selectedLayerIndex >= (int)layers.size())
+							selectedLayerIndex = (int)layers.size() - 1;
+					}
+					ImGui::EndDisabled();
+
+					ImGui::SameLine();
+
+					// Move up
+					ImGui::BeginDisabled(selectedLayerIndex == 0);
+					if (ImGui::Button("^"))
+					{
+						std::swap(layers[selectedLayerIndex], layers[selectedLayerIndex - 1]);
+						selectedLayerIndex--;
+					}
+					ImGui::EndDisabled();
+
+					ImGui::SameLine();
+
+					// Move down
+					ImGui::BeginDisabled(selectedLayerIndex >= (int)layers.size() - 1);
+					if (ImGui::Button("v"))
+					{
+						std::swap(layers[selectedLayerIndex], layers[selectedLayerIndex + 1]);
+						selectedLayerIndex++;
+					}
+					ImGui::EndDisabled();
+
+					} // TerrainPainter active
 
 					ImGui::EndTabItem();
 				}
