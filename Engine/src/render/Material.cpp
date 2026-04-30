@@ -254,6 +254,8 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 	data.setSampler(shaderPropertyName, sampler);
 }
 
+#include "texture/TextureTransformer.h"
+
 void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 {
 	auto materialResource = resource.as<Material>();
@@ -261,13 +263,73 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 	materialResource->m_renderMode = data.getMaterialRenderMode();
 	materialResource->m_customShader = data.getCustomShader().resource();
 
-	for (const auto& [name, sampler] : data.getSamplers())
+	if (data.getMaterialRenderMode() == MaterialRenderMode::Terrain)
 	{
-		auto textureSamplerResource = std::make_shared<TextureSampler>();
-		textureSamplerResource->texture = sampler->texture.resource();
-		textureSamplerResource->state = sampler->state;
-		materialResource->m_samplers[name] = textureSamplerResource;
+		auto albedoIter = data.getSamplers().find("samplerAlbedo");
+		auto normalIter = data.getSamplers().find("samplerNormal");
+		if (albedoIter != data.getSamplers().end() && normalIter != data.getSamplers().end())
+		{
+			TextureResourceRef albedo = albedoIter->second->resolve()->texture;
+			TextureResourceRef normal = normalIter->second->resolve()->texture;
+			TextureResourceRef output = TextureTransformer::packTextures(
+				albedo, 0, 
+				albedo, 1, 
+				albedo, 2, 
+				normal, 0);
+
+			{
+				auto textureSamplerResource = std::make_shared<TextureSampler>();
+				textureSamplerResource->texture = output;
+				textureSamplerResource->state.isActive = true;
+				textureSamplerResource->state.channelCount = 4;
+				materialResource->m_samplers["texturePack0"] = textureSamplerResource;
+			}
+		}
+
+
+
+		auto metalnessIter = data.getSamplers().find("samplerMetalness");
+		auto roughnessIter = data.getSamplers().find("samplerRoughness");
+		auto aoIter = data.getSamplers().find("samplerAO");
+
+		if (metalnessIter != data.getSamplers().end() &&
+			roughnessIter != data.getSamplers().end() &&
+			aoIter != data.getSamplers().end() &&
+			normalIter != data.getSamplers().end())
+		{
+			TextureResourceRef metalness = metalnessIter->second->resolve()->texture;
+			TextureResourceRef roughness = roughnessIter->second->resolve()->texture;
+			TextureResourceRef ao = aoIter->second->resolve()->texture;
+			TextureResourceRef normal = normalIter->second->resolve()->texture;
+
+			TextureResourceRef output = TextureTransformer::packTextures(
+				metalness, 0,
+				roughness, 0,
+				ao, 0,
+				normal, 1);
+
+			{
+				auto textureSamplerResource = std::make_shared<TextureSampler>();
+				textureSamplerResource->texture = output;
+				textureSamplerResource->state.isActive = true;
+				textureSamplerResource->state.channelCount = 4;
+				materialResource->m_samplers["texturePack1"] = textureSamplerResource;
+			}
+		}
+
 	}
+	else
+	{
+		for (const auto& [name, sampler] : data.getSamplers())
+		{
+
+			auto textureSamplerResource = std::make_shared<TextureSampler>();
+			textureSamplerResource->texture = sampler->texture.resource();
+			textureSamplerResource->state = sampler->state;
+			materialResource->m_samplers[name] = textureSamplerResource;
+		}
+	}
+
 
 	for (const auto& [name, uniform] : data.getUniforms())
 	{
