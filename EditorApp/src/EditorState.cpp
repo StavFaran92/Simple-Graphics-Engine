@@ -70,6 +70,11 @@ std::shared_ptr<EditorTool> EditorState::getActiveEditorTool()
     return m_activeEditorTool;
 }
 
+std::shared_ptr<EditorTool> EditorState::getEditorTool(EditorTool::Type type)
+{
+    return getTool(type);
+}
+
 void EditorState::selectAssetForEdit(const AssetRef<Asset>& asset)
 {
     currentAssetEdit = asset;

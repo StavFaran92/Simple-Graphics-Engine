@@ -57,6 +57,7 @@ public:
     void setActiveEditorTool(EditorTool::Type tool);
     EditorTool::Type getActiveToolType() const;
     std::shared_ptr<EditorTool> getActiveEditorTool();
+    std::shared_ptr<EditorTool> getEditorTool(EditorTool::Type type);
 
     void selectAssetForEdit(const AssetRef<Asset>& asset);
     AssetRef<Asset> getSelectedAsset() const;

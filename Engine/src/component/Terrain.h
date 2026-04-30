@@ -28,6 +28,18 @@ struct TextureBlend
 	}
 };
 
+struct TerrainLayer
+{
+	std::string name = "Layer";
+	MaterialAssetRef material;
+	TextureAssetRef mask;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		archive(name, material, mask);
+	}
+};
+
 class EngineAPI Terrain : public Component
 {
 public:
@@ -76,6 +88,13 @@ public:
 
 	RayHit raycast(const Ray& ray, float maxDistance = 10000.0f);
 
+	void addLayer();
+	void removeLayer(int index);
+	void swapLayers(int a, int b);
+	TerrainLayer& getLayer(int index);
+	const TerrainLayer& getLayer(int index) const;
+	const std::vector<TerrainLayer>& getLayers() const;
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_mesh);
@@ -85,6 +104,7 @@ public:
 		SERIALIZED_MEMBER(m_scale);
 		SERIALIZED_MEMBER(m_material);
 		SERIALIZED_MEMBER(m_foliageField);
+		SERIALIZED_MEMBER(m_layers);
 	}
 
 	float m_scale = 1.0f;
@@ -112,6 +132,8 @@ private:
 
 	TextureAssetRef m_heightmap;
 	ModelAssetRef m_mesh;
+
+	std::vector<TerrainLayer> m_layers;
 
 };
 

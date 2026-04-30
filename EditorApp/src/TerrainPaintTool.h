@@ -8,14 +8,6 @@
 #include "component/Terrain.h"
 #include "sge.h"
 
-#include <string>
-
-struct TerrainPaintLayer
-{
-    std::string name = "Layer";
-    MaterialAssetRef material;
-};
-
 class TerrainPaintTool : public EditorTool
 {
 public:

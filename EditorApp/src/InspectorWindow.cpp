@@ -7,7 +7,6 @@
 #include "EditorState.h"
 #include "NativeScriptsLoader.h"
 #include "Widgets.h"
-#include "TerrainPaintTool.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -591,9 +590,8 @@ void InspectorWindow::display()
 					ImGui::Text("Layers");
 					ImGui::Spacing();
 
-					static std::vector<TerrainPaintLayer> s_layers { TerrainPaintLayer{ "Layer 1" } };
 					static int selectedLayerIndex = 0;
-					auto& layers = s_layers;
+					const auto& layers = terrain.getLayers();
 
 					// Clamp selection in case layers changed
 					if (selectedLayerIndex >= (int)layers.size())
@@ -607,9 +605,10 @@ void InspectorWindow::display()
 						ImGui::Bullet();
 						ImGui::SameLine();
 
-						std::string label = layers[i].name;
-						if (!layers[i].material.isEmpty())
-							label += " [" + layers[i].material.info().name + "]";
+						const auto& layer = terrain.getLayer(i);
+						std::string label = layer.name;
+						if (!layer.material.isEmpty())
+							label += " [" + layer.material.info().name + "]";
 
 						if (ImGui::Selectable(label.c_str(), isSelected))
 							selectedLayerIndex = i;
@@ -617,14 +616,11 @@ void InspectorWindow::display()
 						if (isSelected)
 						{
 							ImGui::Indent();
-
-							ImGui::InputText("Name", &layers[i].name);
-
-							std::string matName = layers[i].material.isEmpty() ? "None" : layers[i].material.info().name;
-							addAssetSelectWidget(matName, AssetType::MATERIAL, [&layers, i](UUID uuid) {
-								layers[i].material = MaterialAssetRef(uuid);
+							auto& layer = terrain.getLayer(i);
+							std::string matName = layer.material.isEmpty() ? "None" : layer.material.info().name;
+							addAssetSelectWidget(matName, AssetType::MATERIAL, [&layer](UUID uuid) {
+								layer.material = MaterialAssetRef(uuid);
 							});
-
 							ImGui::Unindent();
 						}
 
@@ -636,21 +632,18 @@ void InspectorWindow::display()
 					// Add button
 					if (ImGui::Button("+"))
 					{
-						TerrainPaintLayer newLayer;
-						newLayer.name = "Layer " + std::to_string(layers.size() + 1);
-						layers.push_back(newLayer);
+						terrain.addLayer();
 					}
 
 					ImGui::SameLine();
 
-					// Remove button — disabled when only 1 layer or the selected layer would be removed
-					bool canRemove = layers.size() > 1;
-					ImGui::BeginDisabled(!canRemove);
+					// Remove button — disabled when only 1 layer remains
+					ImGui::BeginDisabled(layers.size() <= 1);
 					if (ImGui::Button("-"))
 					{
-						layers.erase(layers.begin() + selectedLayerIndex);
-						if (selectedLayerIndex >= (int)layers.size())
-							selectedLayerIndex = (int)layers.size() - 1;
+						terrain.removeLayer(selectedLayerIndex);
+						if (selectedLayerIndex >= (int)terrain.getLayers().size())
+							selectedLayerIndex = (int)terrain.getLayers().size() - 1;
 					}
 					ImGui::EndDisabled();
 
@@ -660,7 +653,7 @@ void InspectorWindow::display()
 					ImGui::BeginDisabled(selectedLayerIndex == 0);
 					if (ImGui::Button("^"))
 					{
-						std::swap(layers[selectedLayerIndex], layers[selectedLayerIndex - 1]);
+						terrain.swapLayers(selectedLayerIndex, selectedLayerIndex - 1);
 						selectedLayerIndex--;
 					}
 					ImGui::EndDisabled();
@@ -671,7 +664,7 @@ void InspectorWindow::display()
 					ImGui::BeginDisabled(selectedLayerIndex >= (int)layers.size() - 1);
 					if (ImGui::Button("v"))
 					{
-						std::swap(layers[selectedLayerIndex], layers[selectedLayerIndex + 1]);
+						terrain.swapLayers(selectedLayerIndex, selectedLayerIndex + 1);
 						selectedLayerIndex++;
 					}
 					ImGui::EndDisabled();

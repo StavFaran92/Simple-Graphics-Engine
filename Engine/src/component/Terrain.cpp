@@ -460,3 +460,39 @@ RayHit Terrain::raycast(const Ray& ray, float maxDistance)
 
 	return result;
 }
+
+void Terrain::addLayer()
+{
+	TerrainLayer layer;
+	layer.name = "Layer " + std::to_string(m_layers.size() + 1);
+	m_layers.push_back(layer);
+}
+
+void Terrain::removeLayer(int index)
+{
+	if (index < 0 || index >= (int)m_layers.size())
+		return;
+	m_layers.erase(m_layers.begin() + index);
+}
+
+void Terrain::swapLayers(int a, int b)
+{
+	if (a < 0 || b < 0 || a >= (int)m_layers.size() || b >= (int)m_layers.size())
+		return;
+	std::swap(m_layers[a], m_layers[b]);
+}
+
+TerrainLayer& Terrain::getLayer(int index)
+{
+	return m_layers[index];
+}
+
+const TerrainLayer& Terrain::getLayer(int index) const
+{
+	return m_layers[index];
+}
+
+const std::vector<TerrainLayer>& Terrain::getLayers() const
+{
+	return m_layers;
+}
