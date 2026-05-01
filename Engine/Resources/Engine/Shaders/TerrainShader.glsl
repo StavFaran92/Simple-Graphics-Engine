@@ -193,6 +193,8 @@ uniform samplerCube gIrradianceMap;
 uniform samplerCube gPrefilterEnvMap;
 uniform sampler2D gBRDFIntegrationLUT;
 uniform sampler2D gShadowMap;
+uniform PBR_Sampler texturePack0;
+uniform PBR_Sampler texturePack1;
 
 #pragma editable
 uniform PBR_Sampler samplerAlbedo;
@@ -245,13 +247,57 @@ vec4 sampleFromTexture(int textureIndex, vec2 uv)
     return vec4(0.0); // Return black if index is out of bounds
 }
 
+void sampleTerrainPBR(
+    in mat3 TBN,
+    in vec3 normalIn,
+    in vec3 color,
+    in float metallicFactor,
+    in float roughnessFactor,
+	in vec2 uv,
+
+    in PBR_Sampler samplerTexturePack0,
+    in PBR_Sampler samplerTexturePack1,
+
+    out vec3 outNormal,
+    out vec3 outAlbedo,
+    out vec3 outMRA
+)
+{
+    vec4 texPack0 = texture(samplerTexturePack0.texture, uv);
+    vec4 texPack1 = texture(samplerTexturePack1.texture, uv);
+    vec3 albedo = texPack0.rgb;
+    float nx = texPack0.a;
+    float ny = texPack1.a;
+    float nz = sqrt(1.0 - nx*nx - ny*ny);
+    vec3 normal = vec3(nx, ny, nz);
+    float metallic = texPack1.r;
+    float roughness = texPack1.g;
+    float ao = texPack1.b;
+
+    outNormal = (TBN * (normal * 2.0 - 1.0));
+                                       
+
+    vec3 albedoTex = albedo;
+    outAlbedo = albedoTex * color;
+    outAlbedo = pow(outAlbedo, vec3(2.2)); // Gamma correction
+
+    float metallicTex = metallic;
+    outMRA.r = metallicTex * metallicFactor;
+
+    float roughnessTex = roughness;
+    outMRA.g = roughnessTex * roughnessFactor;
+
+    float aoTex = ao;
+    outMRA.b = aoTex;
+}
+
 void main()
 {
     mat3 TBN = mat3(tangent, bitangent, fragNormal);
     vec3 normal;
     vec3 albedo;
     vec3 MRA;
-    samplePBR(
+    sampleTerrainPBR(
 		// Input
 		TBN,
 		fragNormal,
@@ -260,11 +306,8 @@ void main()
 		roughnessFactor,
         texCoord * globalUV,
         
-		samplerNormal,
-		samplerAlbedo,
-		samplerMetallic, // todo fix
-		samplerRoughness,
-		samplerAO,
+		texturePack0,
+		texturePack1,
 
 		// Output
 		normal,

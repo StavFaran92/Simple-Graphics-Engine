@@ -134,6 +134,8 @@ TextureResourceRef TextureTransformer::packTextures(
 	tData.channels = 4;
 	tData.height = src0.get()->getHeight();
 	tData.width = src0.get()->getWidth();
+	tData.internalFormat = TextureInternalFormat::RGBA8;
+	tData.format = TextureFormat::RGBA;
 	TextureResourceRef outputTexture = Texture::createTexture(tData);
 
 	fbo.attachTexture(outputTexture->getID());

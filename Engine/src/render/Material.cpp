@@ -26,6 +26,7 @@
 #include "render/MaterialDataParser.h"
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
+#include "debug/RenderDocDebugHelper.h"
 
 void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ShaderResourceRef& shader, int slot)
 {
@@ -263,8 +264,19 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 	materialResource->m_renderMode = data.getMaterialRenderMode();
 	materialResource->m_customShader = data.getCustomShader().resource();
 
+	for (const auto& [name, sampler] : data.getSamplers())
+	{
+
+		auto textureSamplerResource = std::make_shared<TextureSampler>();
+		textureSamplerResource->texture = sampler->texture.resource();
+		textureSamplerResource->state = sampler->state;
+		materialResource->m_samplers[name] = textureSamplerResource;
+	}
+
 	if (data.getMaterialRenderMode() == MaterialRenderMode::Terrain)
 	{
+		//RenderDocDebugHelper::startFrameCapture();
+
 		auto albedoIter = data.getSamplers().find("samplerAlbedo");
 		auto normalIter = data.getSamplers().find("samplerNormal");
 		if (albedoIter != data.getSamplers().end() && normalIter != data.getSamplers().end())
@@ -317,17 +329,8 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 			}
 		}
 
-	}
-	else
-	{
-		for (const auto& [name, sampler] : data.getSamplers())
-		{
+		//RenderDocDebugHelper::stopFrameCapture();
 
-			auto textureSamplerResource = std::make_shared<TextureSampler>();
-			textureSamplerResource->texture = sampler->texture.resource();
-			textureSamplerResource->state = sampler->state;
-			materialResource->m_samplers[name] = textureSamplerResource;
-		}
 	}
 
 

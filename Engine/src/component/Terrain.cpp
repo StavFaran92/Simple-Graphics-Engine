@@ -67,9 +67,10 @@ std::vector<AssetRef<Asset>> Terrain::gatherDependenciesInternal() const
 	dependencies.push_back(m_heightmap);
 	dependencies.push_back(m_mesh);
 	dependencies.push_back(m_material);
-	for (auto& blend : m_textureBlends)
+	for (auto& layer : m_layers)
 	{
-		dependencies.push_back(blend.texture);
+		dependencies.push_back(layer.material);
+		dependencies.push_back(layer.mask);
 	}
 	return dependencies;
 }
