@@ -176,16 +176,6 @@ void main()
 #include ../../../../Engine/Resources/Engine/Shaders/include/PBR.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/Shadows.glsl
 
-uniform int textureCount;
-
-uniform sampler2D texture_0;
-uniform sampler2D texture_1;
-uniform sampler2D texture_2;
-uniform sampler2D texture_3;
-
-uniform float textureBlend[4];
-uniform vec2 textureScale[4];
-
 uniform float scale;
 
 uniform vec3 cameraPos;
@@ -195,6 +185,7 @@ uniform sampler2D gBRDFIntegrationLUT;
 uniform sampler2D gShadowMap;
 uniform PBR_Sampler texturePack0;
 uniform PBR_Sampler texturePack1;
+uniform int layerCount;
 
 #pragma editable
 uniform PBR_Sampler samplerAlbedo;

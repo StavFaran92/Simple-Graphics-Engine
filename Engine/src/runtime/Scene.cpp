@@ -593,6 +593,7 @@ void Scene::draw(float deltaTime)
 				terrainShader->setUniformValue("height", terrain.getHeight());
 				terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
 				terrainShader->setUniformValue("cameraPos", graphics->cameraPos);
+				terrainShader->setUniformValue("layerCount", (int)terrain.getLayers().size());
 				terrainShader->bindUniformBlockToBindPoint("Time", 0);
 				terrainShader->bindUniformBlockToBindPoint("Lights", 1);
 				terrainShader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 0);
