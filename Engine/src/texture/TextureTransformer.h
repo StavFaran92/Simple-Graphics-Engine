@@ -11,7 +11,7 @@ public:
 	static TextureResourceRef applyGammaCorrection(TextureResourceRef texture);
 	static void applyGammaCorrection(TextureResourceRef srcTexture, TextureResourceRef& dstTexture);
 
-	static TextureResourceRef texturePack(
+	static TextureResourceRef packTextures(
 		TextureResourceRef src0, int channel0,
 		TextureResourceRef src1, int channel1,
 		TextureResourceRef src2, int channel2,

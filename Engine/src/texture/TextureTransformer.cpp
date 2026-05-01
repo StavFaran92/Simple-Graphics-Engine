@@ -17,6 +17,7 @@
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 #include "core/Logger.h"
+#include "memory/BuiltInAssets.h"
 
 TextureResourceRef TextureTransformer::flipVertical(TextureResourceRef srcTexture)
 {
@@ -113,13 +114,13 @@ void TextureTransformer::applyGammaCorrection(TextureResourceRef srcTexture, Tex
 	RenderCommand::draw(vao);
 }
 
-TextureResourceRef TextureTransformer::texturePack(
+TextureResourceRef TextureTransformer::packTextures(
 	TextureResourceRef src0, int channel0, 
 	TextureResourceRef src1, int channel1, 
 	TextureResourceRef src2, int channel2, 
 	TextureResourceRef src3, int channel3)
 {
-	auto shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/ApplyGammaCorrectionShader.glsl");
+	auto shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PackTexturesShader.glsl");
 
 	// Generate FBO 
 	FrameBufferObject fbo;
@@ -129,30 +130,50 @@ TextureResourceRef TextureTransformer::texturePack(
 	RenderBufferObject rbo{ src0.get()->getWidth(), src0.get()->getHeight() };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
 
+	TextureData tData;
+	tData.channels = 4;
+	tData.height = src0.get()->getHeight();
+	tData.width = src0.get()->getWidth();
+	TextureResourceRef outputTexture = Texture::createTexture(tData);
+
+	fbo.attachTexture(outputTexture->getID());
+
 	if (!fbo.isComplete())
 	{
 		logError("FBO is not complete!");
-		return;
+		return TextureResourceRef::empty;
 	}
 
 	// set viewport
 	glViewport(0, 0, src0.get()->getWidth(), src0.get()->getHeight());
 
 	shader->use();
-	shader->setUniformValue("source", 0);
+	shader->setUniformValue("channel0", channel0);
+	shader->setUniformValue("channel1", channel1);
+	shader->setUniformValue("channel2", channel2);
+	shader->setUniformValue("channel3", channel3);
 
-	srcTexture.get()->setSlot(0);
-	srcTexture.get()->bind();
+	src0->setSlot(0);
+	src0->bind();
+	shader->setUniformValue("sampler0", 0);
 
-	fbo.attachTexture(dstTexture.get()->getID());
+	src1->setSlot(1);
+	src1->bind();
+	shader->setUniformValue("sampler1", 1);
 
-	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
-	quad.RemoveComponent<RenderableComponent>();
-	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+	src2->setSlot(2);
+	src2->bind();
+	shader->setUniformValue("sampler2", 2);
+
+	src3->setSlot(3);
+	src3->bind();
+	shader->setUniformValue("sampler3", 3);
 
 	RenderCommand::clear();
 
 	// render to quad
-	RenderCommand::draw(vao);
+	auto quad = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource();
+	RenderCommand::draw(quad->getPrimaryMesh()->getVAO());
+
+	return outputTexture;
 }

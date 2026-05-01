@@ -288,7 +288,7 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 
 
 
-		auto metalnessIter = data.getSamplers().find("samplerMetalness");
+		auto metalnessIter = data.getSamplers().find("samplerMetallic");
 		auto roughnessIter = data.getSamplers().find("samplerRoughness");
 		auto aoIter = data.getSamplers().find("samplerAO");
 
