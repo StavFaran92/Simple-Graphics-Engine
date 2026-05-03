@@ -5,6 +5,7 @@
 #include "core/Engine.h"
 #include "memory/ResourceManager.h"
 #include "memory/AssetFactory.h"
+#include "memory/FrameAccessTable.h"
 //
 //Asset::Asset(const AssetBuildDescriptor& desc)
 //	:m_createDesc (desc)
@@ -68,6 +69,8 @@ ResourceRef<Resource> Asset::resource() const
 		[&record, this]() {
 			return loadAssetResourceInternal(record, uuid);
 		});
+
+    Engine::get()->getSubSystem<FrameAccessTable>()->onResourceAccessed(resource);
 
 	if (record.isResourceDirty())
 	{

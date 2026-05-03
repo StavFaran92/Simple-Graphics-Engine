@@ -120,6 +120,7 @@ public:
     template<typename T> 
     void registerSubSystem(const T* subSystem)
     {
+        static_assert(std::is_base_of_v<SubSystem, T>, "T must be a SubSystem");
         m_subSystems[typeid(T*)] = (SubSystem*)subSystem;
     }
 

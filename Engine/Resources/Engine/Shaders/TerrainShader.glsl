@@ -226,18 +226,6 @@ in vec3 bitangent;
 
 out vec4 FragColor;
 
-vec4 sampleFromTexture(int textureIndex, vec2 uv)
-{
-    uv *= textureScale[textureIndex];
-
-    if (textureIndex == 0)  return texture(texture_0, uv);
-    else if (textureIndex == 1) return texture(texture_1, uv);
-    else if (textureIndex == 2) return texture(texture_2, uv);
-    else if (textureIndex == 3) return texture(texture_3, uv);
-
-    return vec4(0.0); // Return black if index is out of bounds
-}
-
 void sampleTerrainPBR(
     in mat3 TBN,
     in vec3 normalIn,

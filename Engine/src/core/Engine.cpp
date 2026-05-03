@@ -33,6 +33,7 @@
 #include "core/EventLayerStack.h"
 #include "core/EngineConfig.h"
 #include "render/DeferredRenderer.h"
+#include "memory/FrameAccessTable.h"
 
 #include "systems/FoliageSystem.h"
 #include "systems/WaterSystem.h"
@@ -191,6 +192,7 @@ bool Engine::init(const InitParams& initParams)
     //    return false;
     //}
 
+    auto frameAcessTable = new FrameAccessTable(5);
     auto builtInResources = new BuiltInResources();
     auto assets = new Assets();
 
@@ -378,6 +380,9 @@ void Engine::run(Application* app)
         glPopDebugGroup();
 
         m_window->SwapBuffer();
+
+        // Advance frame for the access table to evict old resources
+        getSubSystem<FrameAccessTable>()->nextFrame();
 
         system->reset();
 

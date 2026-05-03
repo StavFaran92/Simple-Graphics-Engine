@@ -26,7 +26,7 @@ void TextureSelectDialog::drawContent()
 	if (m_selectedTextureIndex != -1 && m_selectedTextureIndex < static_cast<int>(textureRecordList.size()))
 	{
 		TextureAssetRef textureHandle(textureRecordList.at(m_selectedTextureIndex)->uuid);
-		displayTexture = textureHandle.resource();
+		TextureResourceRef displayTexture = textureHandle.resource();
 		ImGui::Image(reinterpret_cast<ImTextureID>(displayTexture.get()->getID()), ImVec2(150, 150), ImVec2(0, 1), ImVec2(1, 0));
 	}
 

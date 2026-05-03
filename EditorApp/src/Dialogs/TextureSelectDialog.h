@@ -16,5 +16,5 @@ public:
 	std::function<void(UUID)> onAcceptCB;
 private:
 	int m_selectedTextureIndex = -1;
-	TextureResourceRef displayTexture;
+	//TextureResourceRef displayTexture;
 };
