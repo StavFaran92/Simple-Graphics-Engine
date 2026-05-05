@@ -19,6 +19,8 @@ private:
 
 	static void parseFromShader(ShaderResourceRef shader, MaterialData& data);
 
+	static void parseExternalShaderProperties(MaterialRenderMode renderMode, MaterialData& data);
+
 	static ShaderResourceRef getActiveShader(const MaterialData& data);
 
 };

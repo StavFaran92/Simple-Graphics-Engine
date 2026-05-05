@@ -97,12 +97,5 @@ void MaterialTypeManager::parse(ResourceBuildDescriptor& desc)
 	if (!materialDesc->data.isParsed())
 	{
 		MaterialDataParser::parse(materialDesc->data);
-
-		if (materialDesc->data.getMaterialRenderMode() == MaterialRenderMode::Terrain)
-		{
-			PropertySchema albedoSamplerProperty(MaterialPropertyType::SAMPLER);
-			albedoSamplerProperty.defaultValue = std::make_shared<TextureSamplerAsset>();
-			materialDesc->data.getLayout().addProperty("albedo", albedoSamplerProperty);
-		}
 	}
 }

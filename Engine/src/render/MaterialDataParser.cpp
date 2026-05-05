@@ -195,28 +195,42 @@ ShaderResourceRef MaterialDataParser::getActiveShader(const MaterialData& data)
 	}
 }
 
+void MaterialDataParser::parseExternalShaderProperties(MaterialRenderMode renderMode, MaterialData& data)
+{
+	if (renderMode == MaterialRenderMode::Custom)
+		return;
+
+	if (renderMode == MaterialRenderMode::Terrain)
+	{
+		PropertySchema albedoSamplerProperty(MaterialPropertyType::SAMPLER);
+		albedoSamplerProperty.defaultValue = std::make_shared<TextureSamplerAsset>();
+		data.getLayout().addProperty("albedo", albedoSamplerProperty);
+	}
+}
+
 void MaterialDataParser::parse(MaterialData& data)
 {
 	auto oldProperties = data.getLayout().getAllProperties();
+	data.getLayout().clear();
 
 	ShaderResourceRef shader = getActiveShader(data);
 
 	if (shader.isEmpty())
 	{
-		data.getLayout().clear();
 		return;
 	}
 
 	parseFromShader(shader, data);
 
-	auto& layout = data.getLayout();
+	parseExternalShaderProperties(data.getMaterialRenderMode(), data);
+
 	auto& newProperties = data.getLayout().getAllProperties();
 	for (const auto [name, value] : oldProperties)
 	{
 		auto iter = newProperties.find(name);
 		if (iter != newProperties.end())
 		{
-			layout.addProperty(name, value);
+			data.getLayout().addProperty(name, value);
 		}
 	}
 }

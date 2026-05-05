@@ -183,36 +183,17 @@ uniform samplerCube gIrradianceMap;
 uniform samplerCube gPrefilterEnvMap;
 uniform sampler2D gBRDFIntegrationLUT;
 uniform sampler2D gShadowMap;
-uniform PBR_Sampler texturePack0;
-uniform PBR_Sampler texturePack1;
+
 uniform int layerCount;
 
-#pragma editable
-uniform PBR_Sampler samplerAlbedo;
+struct TerrainLayer
+{
+    PBR_Sampler texturePack0;
+    PBR_Sampler texturePack1;
+    vec2 uv;
+};
 
-#pragma editable
-uniform PBR_Sampler samplerNormal;
-
-#pragma editable
-uniform PBR_Sampler samplerRoughness;
-
-#pragma editable
-uniform PBR_Sampler samplerMetallic;
-
-#pragma editable
-uniform PBR_Sampler samplerAO;
-
-#pragma editable (default=1.0)
-uniform float roughnessFactor;
-
-#pragma editable (default=0.0)
-uniform float metallicFactor;
-
-#pragma editable (default=0.0)
-uniform float aoFactor;
-
-#pragma editable (default=(1.0, 1.0, 1.0))
-uniform vec3 color;
+uniform TerrainLayer terrainLayers[4];
 
 #pragma editable (default=(100.0, 100.0))
 uniform vec2 globalUV;
@@ -229,9 +210,6 @@ out vec4 FragColor;
 void sampleTerrainPBR(
     in mat3 TBN,
     in vec3 normalIn,
-    in vec3 color,
-    in float metallicFactor,
-    in float roughnessFactor,
 	in vec2 uv,
 
     in PBR_Sampler samplerTexturePack0,
@@ -257,14 +235,14 @@ void sampleTerrainPBR(
                                        
 
     vec3 albedoTex = albedo;
-    outAlbedo = albedoTex * color;
+    outAlbedo = albedoTex;// * color;
     outAlbedo = pow(outAlbedo, vec3(2.2)); // Gamma correction
 
     float metallicTex = metallic;
-    outMRA.r = metallicTex * metallicFactor;
+    outMRA.r = metallicTex;// * metallicFactor;
 
     float roughnessTex = roughness;
-    outMRA.g = roughnessTex * roughnessFactor;
+    outMRA.g = roughnessTex;// * roughnessFactor;
 
     float aoTex = ao;
     outMRA.b = aoTex;
@@ -280,13 +258,10 @@ void main()
 		// Input
 		TBN,
 		fragNormal,
-		color,
-		metallicFactor,
-		roughnessFactor,
         texCoord * globalUV,
         
-		texturePack0,
-		texturePack1,
+		terrainLayers[0].texturePack0,
+		terrainLayers[0].texturePack1,
 
 		// Output
 		normal,
