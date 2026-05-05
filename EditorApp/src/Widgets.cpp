@@ -194,8 +194,10 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 	// Custom Textures Array
 	if (ImGui::CollapsingHeader("Samplers"))
 	{
-		for (auto& [name, sampler] : data.getSamplers())
+		for (auto& [name, value] : data.getAllProptiesOfType(MaterialPropertyType::SAMPLER))
 		{
+			auto sampler = std::get<std::shared_ptr<TextureSamplerAsset>>(value);
+
 			ImGui::PushID(name.c_str());
 			ImGui::Text(name.c_str());
 			if (ImGui::Checkbox("", (bool*)&sampler->state.isActive)) 
@@ -216,11 +218,13 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 	// Display Uniforms and Update Shader
 	if (ImGui::CollapsingHeader("Uniforms"))
 	{
-		for (auto& [name, uniform] : data.getUniforms())
+		for (auto& [name, value] : data.getAllProperties())
 		{
+			if (std::holds_alternative<std::shared_ptr<TextureSamplerAsset>>(value))
+				continue;
+
 			ImGui::PushID(name.c_str());
 			bool updated = false; // Track if the value was changed
-			auto value = uniform.value;
 			std::visit([&](auto& v)
 				{
 					using T = std::decay_t<decltype(v)>;
@@ -265,8 +269,9 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 			// If the value changed, update the shader
 			if (updated)
 			{
-				data.setUniform(name,value);
-				if (onChangedCB) onChangedCB(data);
+				data.setProperty(name,value);
+				if (onChangedCB) 
+					onChangedCB(data);
 			}
 
 			ImGui::PopID();

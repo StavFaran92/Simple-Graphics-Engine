@@ -92,7 +92,6 @@ public:
 
 	std::vector<AssetRef<Asset>> gatherDependencies() const override;
 
-
 	void setName(const std::string& name);
 	std::string getName() const;
 
@@ -102,18 +101,19 @@ public:
 	void setMaterialRenderMode(MaterialRenderMode renderMode);
 	MaterialRenderMode getMaterialRenderMode() const;
 
-	void setSampler(const std::string& name, std::shared_ptr<TextureSamplerAsset> sampler);
-	std::shared_ptr<TextureSamplerAsset> getSampler(const std::string& name);
+	const MaterialLayout& getLayout() const;
 
-	std::map<std::string, std::shared_ptr<TextureSamplerAsset>> getSamplers() const;
-	std::map<std::string, EditableUniform> getUniformProperties();
+	void setProperty(const std::string& name, const Value& v);
+	Value getProperty(const std::string& name) const;
+	std::unordered_map<std::string, Value> getAllProperties() const;
+	std::unordered_map<std::string, Value> getAllProptiesOfType(MaterialPropertyType type) const;
 
-	void setSamplerEnabled(const std::string& name, bool isEnabled);
-
-	void setUniformValue(const std::string& name, const Value& v);
-	Value getUniformValue(const std::string& name);
-
-	MaterialData data;
+	template<typename T>
+	T getProperty(const std::string& name) const
+	{
+		Value property = getProperty(name);
+		return std::get<T>(property);
+	}
 
 	ShaderResourceRef getActiveShader() const;
 
@@ -129,4 +129,7 @@ public:
 
 	void serialize(nlohmann::json& j) const override;
 	void deserialize(const nlohmann::json& j) override;
+	
+	MaterialData data;
+	
 };

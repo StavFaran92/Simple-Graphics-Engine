@@ -4,7 +4,7 @@
 
 #include <regex>
 
-bool MaterialDataParser::parseEditablePragmaLine(const std::string& line, EditableUniform& editableUniform) {
+bool MaterialDataParser::parseEditablePragmaLine(const std::string& line, PropertySchema& editableUniform) {
 	// Check if line contains #pragma editable
 	std::regex pragmaRegex(R"(^\s*#pragma\s+editable)");
 
@@ -51,17 +51,16 @@ std::vector<float> MaterialDataParser::parseFloatTuple(const std::string& s) {
 
 void MaterialDataParser::parseUniforms(const std::string& sourceCode, MaterialData& data)
 {
-	data.m_uniforms.clear();
-	data.m_samplers.clear();
+	data.getLayout().clear();
+	auto& layout = data.getLayout();
 
 	std::istringstream stream(sourceCode);
 	std::string line;
 
-	auto& uniformProperties = data.m_uniforms;
-	auto& samplers = data.m_samplers;
+	//auto& uniformProperties = data.m_properties;
 
 	std::regex uniformRegex(R"(uniform\s+(\w+)\s+(\w+)\s*;)");
-	EditableUniform pendingMeta;
+	PropertySchema pendingMeta;
 	bool isNextLineEditableUniform = false;
 
 	while (std::getline(stream, line)) {
@@ -78,76 +77,78 @@ void MaterialDataParser::parseUniforms(const std::string& sourceCode, MaterialDa
 			std::string type = match[1];
 			std::string name = match[2];
 
-			pendingMeta.uniformName = name;
-			pendingMeta.type = type;
-
-
+			pendingMeta.name = name;
 
 			// Parse default
 			std::vector<float> defVals = parseFloatTuple(pendingMeta.defaultValueRaw);
 
 			if (type == "float")
 			{
-				pendingMeta.value = defVals.size() > 0 ? defVals[0] : 0.0f;
-				uniformProperties[name] = pendingMeta;
+				pendingMeta.type = MaterialPropertyType::FLOAT;
+				pendingMeta.defaultValue = defVals.size() > 0 ? defVals[0] : 0.0f;
+				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "int")
 			{
-				pendingMeta.value = defVals.size() > 0 ? static_cast<int>(defVals[0]) : 0;
-				uniformProperties[name] = pendingMeta;
+				pendingMeta.type = MaterialPropertyType::INT;
+				pendingMeta.defaultValue = defVals.size() > 0 ? static_cast<int>(defVals[0]) : 0;
+				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "uint")
 			{
-				pendingMeta.value = defVals.size() > 0 ? static_cast<unsigned int>(defVals[0]) : 0u;
-				uniformProperties[name] = pendingMeta;
+				pendingMeta.type = MaterialPropertyType::UINT;
+				pendingMeta.defaultValue = defVals.size() > 0 ? static_cast<unsigned int>(defVals[0]) : 0u;
+				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "vec2")
 			{
+				pendingMeta.type = MaterialPropertyType::VEC2;
 				glm::vec2 val(0.0f);
 				for (size_t i = 0; i < std::min<size_t>(2, defVals.size()); ++i)
 					val[i] = defVals[i];
-				pendingMeta.value = val;
-				uniformProperties[name] = pendingMeta;
+				pendingMeta.defaultValue = val;
+				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "vec3")
 			{
+				pendingMeta.type = MaterialPropertyType::VEC3;
 				glm::vec3 val(0.0f);
 				for (size_t i = 0; i < std::min<size_t>(3, defVals.size()); ++i)
 					val[i] = defVals[i];
-				pendingMeta.value = val;
-				uniformProperties[name] = pendingMeta;
+				pendingMeta.defaultValue = val;
+				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "vec4")
 			{
+				pendingMeta.type = MaterialPropertyType::VEC4;
 				glm::vec4 val(0.0f);
 				for (size_t i = 0; i < std::min<size_t>(4, defVals.size()); ++i)
 					val[i] = defVals[i];
-				pendingMeta.value = val;
-				uniformProperties[name] = pendingMeta;
+				pendingMeta.defaultValue = val;
+				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "mat3")
 			{
-				pendingMeta.value = glm::mat3(1.0f);
-				uniformProperties[name] = pendingMeta;
+				pendingMeta.type = MaterialPropertyType::MAT3;
+				pendingMeta.defaultValue = glm::mat3(1.0f);
+				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "mat4")
 			{
-				pendingMeta.value = glm::mat4(1.0f);
-				uniformProperties[name] = pendingMeta;
+				pendingMeta.type = MaterialPropertyType::MAT4;
+				pendingMeta.defaultValue = glm::mat4(1.0f);
+				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "PBR_Sampler")
 			{
-				samplers[name] = std::make_shared<TextureSamplerAsset>();
+				pendingMeta.type = MaterialPropertyType::SAMPLER;
+				pendingMeta.defaultValue = std::make_shared<TextureSamplerAsset>();
+				layout.addProperty(name, pendingMeta);
 			}
 
 
 			isNextLineEditableUniform = false;
 		}
-	}
-
-	for (const auto& [name, uniform] : data.m_uniforms)
-	{
-		data.m_uniforms[name].value = uniform.value;
 	}
 }
 
@@ -196,37 +197,26 @@ ShaderResourceRef MaterialDataParser::getActiveShader(const MaterialData& data)
 
 void MaterialDataParser::parse(MaterialData& data)
 {
-	auto oldUniforms = data.m_uniforms;
-	auto oldSamplers = data.m_samplers;
+	auto oldProperties = data.getLayout().getAllProperties();
 
 	ShaderResourceRef shader = getActiveShader(data);
 
 	if (shader.isEmpty())
 	{
-		data.m_uniforms.clear();
-		data.m_samplers.clear();
+		data.getLayout().clear();
 		return;
 	}
 
 	parseFromShader(shader, data);
 
-	auto& newSamplers = data.m_samplers;
-	for (const auto [name, sampler] : oldSamplers)
+	auto& layout = data.getLayout();
+	auto& newProperties = data.getLayout().getAllProperties();
+	for (const auto [name, value] : oldProperties)
 	{
-		auto iter = newSamplers.find(name);
-		if (iter != newSamplers.end())
+		auto iter = newProperties.find(name);
+		if (iter != newProperties.end())
 		{
-			iter->second = sampler;
-		}
-	}
-
-	auto& newUniforms = data.m_uniforms;
-	for (const auto [name, value] : oldUniforms)
-	{
-		auto iter = newUniforms.find(name);
-		if (iter != newUniforms.end())
-		{
-			iter->second = value;
+			layout.addProperty(name, value);
 		}
 	}
 }

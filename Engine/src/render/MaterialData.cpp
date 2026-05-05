@@ -32,40 +32,80 @@ ShaderAssetRef MaterialData::getCustomShader() const
 	return m_customShader;
 }
 
-const std::map<std::string, EditableUniform>& MaterialData::getUniforms() const
+MaterialLayout& MaterialData::getLayout()
 {
-	return m_uniforms;
+	return m_layout;
 }
 
-bool MaterialData::setUniform(const std::string& name, const Value& value)
+const MaterialLayout& MaterialData::getLayout() const
 {
-	auto it = m_uniforms.find(name);
-	if (it == m_uniforms.end())
-		return false;
-
-	it->second.value = value;
-	return true;
-}
-
-const std::map<std::string, std::shared_ptr<TextureSamplerAsset>>& MaterialData::getSamplers() const
-{
-	return m_samplers;
-}
-
-void MaterialData::setSampler(const std::string& name, std::shared_ptr<TextureSamplerAsset> sampler)
-{
-	auto it = m_samplers.find(name);
-	if (it != m_samplers.end())
-	{
-		it->second = sampler;
-	}
-	else
-	{
-		logWarning("Invalid sampler entry: {}", name);
-	}
+	return m_layout;
 }
 
 bool MaterialData::isParsed() const
 {
 	return m_isParsed;
+}
+
+const std::map<std::string, PropertySchema>& MaterialLayout::getAllProperties() const
+{
+	return m_propertySchemas;
+}
+
+void MaterialLayout::addProperty(const std::string& name, const PropertySchema& value)
+{
+	m_propertySchemas[name] = value;
+}
+
+void MaterialLayout::clear()
+{
+	m_propertySchemas.clear();
+}
+
+bool MaterialLayout::hasProperty(const std::string& name) const
+{
+	return m_propertySchemas.find(name) != m_propertySchemas.end();
+}
+
+
+void MaterialData::setProperty(const std::string& name, const Value& v)
+{
+	if (getLayout().hasProperty(name))
+	{
+		// TODO clip to min max
+		m_properties[name] = v;
+	}
+}
+
+Value MaterialData::getProperty(const std::string& name) const
+{
+	auto iter = m_properties.find(name);
+	if (iter != m_properties.end())
+		return iter->second;
+
+	// Fall back to schema default so the variant holds the correct type
+	auto schemaIter = m_layout.getAllProperties().find(name);
+	if (schemaIter != m_layout.getAllProperties().end())
+		return schemaIter->second.defaultValue;
+
+	return Value{};
+}
+
+std::unordered_map<std::string, Value> MaterialData::getAllProperties() const
+{
+	std::unordered_map<std::string, Value> result;
+	for (auto& [name, _] : m_layout.getAllProperties())
+		result[name] = getProperty(name);
+	return result;
+}
+
+std::unordered_map<std::string, Value> MaterialData::getAllProptiesOfType(MaterialPropertyType type) const
+{
+	std::unordered_map<std::string, Value> result;
+	for (auto& [name, schema] : m_layout.getAllProperties())
+	{
+		if (schema.type == type)
+			result[name] = getProperty(name);
+	}
+	return result;
 }

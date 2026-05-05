@@ -14,6 +14,8 @@
 #include <nlohmann/json.hpp>
 #include "render/ShadersInfo.h"
 
+class TextureSamplerAsset;
+
 using json = nlohmann::json;
 
 enum class ShaderOverride : int
@@ -60,7 +62,7 @@ struct ShadersInfo;
 class Texture;
 template<typename> class AssetTraits;
 
-using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned int, glm::mat3, glm::mat4>;
+using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned int, glm::mat3, glm::mat4, std::shared_ptr<TextureSamplerAsset>>;
 
 // Resource
 class EngineAPI Shader : public Resource, std::enable_shared_from_this<Shader>

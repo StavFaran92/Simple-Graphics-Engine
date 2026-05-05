@@ -23,25 +23,63 @@ enum class MaterialRenderMode : int
 	None,
 };
 
-struct EditableUniform {
-	std::string uniformName;
-	std::string type;
+enum class MaterialPropertyType
+{
+	INT,
+	UINT,
+	FLOAT,
+	VEC2,
+	VEC3,
+	VEC4,
+	MAT3,
+	MAT4,
+	SAMPLER,
+
+	// Must be last
+	TOTAL_SIZE
+};
+
+struct PropertySchema {
+	PropertySchema() : type(MaterialPropertyType::FLOAT) {};
+	PropertySchema(MaterialPropertyType type)
+		: type(type)
+	{
+	}
+
+	std::string name;
+	MaterialPropertyType type;
 	std::string defaultValueRaw;
 	float minValue = std::numeric_limits<float>::lowest();
 	float maxValue = std::numeric_limits<float>::max();
-	Value value;
+	Value defaultValue;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(uniformName);
+		SERIALIZED_MEMBER(name);
 		SERIALIZED_MEMBER(type);
 		SERIALIZED_MEMBER(defaultValueRaw);
 		SERIALIZED_MEMBER(minValue);
 		SERIALIZED_MEMBER(maxValue);
-		SERIALIZED_MEMBER(value);
+		SERIALIZED_MEMBER(defaultValue);
 	}
 };
 
+class MaterialLayout
+{
+public:
+	const std::map<std::string, PropertySchema>& getAllProperties() const;
+	void addProperty(const std::string& name, const PropertySchema& schema);
+	bool hasProperty(const std::string& name) const;
+	void clear();
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(m_propertySchemas);
+	}
+
+private:
+	std::map<std::string, PropertySchema> m_propertySchemas;
+};
 
 class EngineAPI MaterialData
 {
@@ -49,20 +87,18 @@ public:
 	std::string name;
 
 	void setMaterialRenderMode(MaterialRenderMode renderMode);
-
 	MaterialRenderMode getMaterialRenderMode() const;
 
 	void setCustomShader(ShaderAssetRef& customShader);
-
 	ShaderAssetRef getCustomShader() const;
 
-	const std::map<std::string, EditableUniform>& getUniforms() const;
+	MaterialLayout& getLayout();
+	const MaterialLayout& getLayout() const;
 
-	bool setUniform(const std::string& name, const Value& value);
-
-	const std::map<std::string, std::shared_ptr<TextureSamplerAsset>>& getSamplers() const;
-
-	void setSampler(const std::string& name, std::shared_ptr<TextureSamplerAsset> sampler);
+	void setProperty(const std::string& name, const Value& v);
+	Value getProperty(const std::string& name) const;
+	std::unordered_map<std::string, Value> getAllProperties() const;
+	std::unordered_map<std::string, Value> getAllProptiesOfType(MaterialPropertyType type) const;
 
 	bool isParsed() const;
 
@@ -71,8 +107,8 @@ public:
 		SERIALIZED_MEMBER(name);
 		SERIALIZED_MEMBER(m_renderMode);
 		SERIALIZED_MEMBER(m_customShader);
-		SERIALIZED_MEMBER(m_uniforms);
-		SERIALIZED_MEMBER(m_samplers);
+		SERIALIZED_MEMBER(m_layout);
+		SERIALIZED_MEMBER(m_properties);
 	}
 
 private:
@@ -83,6 +119,6 @@ private:
 	bool m_isParsed = false;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::Opaque;
 	ShaderAssetRef m_customShader;
-	std::map<std::string, EditableUniform> m_uniforms;
-	std::map<std::string, std::shared_ptr<TextureSamplerAsset>> m_samplers;
+	MaterialLayout m_layout;
+	std::unordered_map<std::string, Value> m_properties;
 };

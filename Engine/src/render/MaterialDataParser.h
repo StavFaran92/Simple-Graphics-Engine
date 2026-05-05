@@ -11,7 +11,7 @@ public:
 	static ShaderResourceRef getShaderFromRenderMode(MaterialRenderMode renderMode);
 
 private:
-	static bool parseEditablePragmaLine(const std::string& line, EditableUniform& editableUniform);
+	static bool parseEditablePragmaLine(const std::string& line, PropertySchema& editableUniform);
 
 	static std::vector<float> parseFloatTuple(const std::string& s);
 

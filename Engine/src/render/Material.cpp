@@ -27,6 +27,7 @@
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
 #include "debug/RenderDocDebugHelper.h"
+#include "texture/TextureTransformer.h"
 
 void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ShaderResourceRef& shader, int slot)
 {
@@ -252,10 +253,8 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 	auto sampler = std::make_shared<TextureSamplerAsset>(samplerChannels);
 	sampler->state.isActive = true;
 	sampler->texture = textureAsset;
-	data.setSampler(shaderPropertyName, sampler);
+	setProperty(shaderPropertyName, sampler);
 }
-
-#include "texture/TextureTransformer.h"
 
 void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 {
@@ -264,25 +263,37 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 	materialResource->m_renderMode = data.getMaterialRenderMode();
 	materialResource->m_customShader = data.getCustomShader().resource();
 
-	for (const auto& [name, sampler] : data.getSamplers())
+	for (const auto& [name, spec] :data.getLayout().getAllProperties())
 	{
+		Value value = getProperty(name);
 
-		auto textureSamplerResource = std::make_shared<TextureSampler>();
-		textureSamplerResource->texture = sampler->texture.resource();
-		textureSamplerResource->state = sampler->state;
-		materialResource->m_samplers[name] = textureSamplerResource;
+		if (spec.type == MaterialPropertyType::SAMPLER)
+		{
+			auto sampler = std::get<std::shared_ptr<TextureSamplerAsset>>(value);
+			auto textureSamplerResource = std::make_shared<TextureSampler>();
+			textureSamplerResource->texture = sampler->texture.resource();
+			textureSamplerResource->state = sampler->state;
+			materialResource->m_samplers[name] = textureSamplerResource;
+
+		}
+		else
+		{
+			materialResource->m_uniformProperties[name] = value;
+		}
+
+
 	}
 
 	if (data.getMaterialRenderMode() == MaterialRenderMode::Terrain)
 	{
 		//RenderDocDebugHelper::startFrameCapture();
 
-		auto albedoIter = data.getSamplers().find("samplerAlbedo");
-		auto normalIter = data.getSamplers().find("samplerNormal");
-		if (albedoIter != data.getSamplers().end() && normalIter != data.getSamplers().end())
+		auto albedoSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerAlbedo");
+		auto normalSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerNormal");
+		if (albedoSampler && normalSampler)
 		{
-			TextureResourceRef albedo = albedoIter->second->resolve()->texture;
-			TextureResourceRef normal = normalIter->second->resolve()->texture;
+			TextureResourceRef albedo = albedoSampler->resolve()->texture;
+			TextureResourceRef normal = normalSampler->resolve()->texture;
 			TextureResourceRef output = TextureTransformer::packTextures(
 				albedo, 0, 
 				albedo, 1, 
@@ -300,19 +311,16 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 
 
 
-		auto metalnessIter = data.getSamplers().find("samplerMetallic");
-		auto roughnessIter = data.getSamplers().find("samplerRoughness");
-		auto aoIter = data.getSamplers().find("samplerAO");
+		auto metallicSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerMetallic");
+		auto roughnessSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerRoughness");
+		auto aoSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerAO");
 
-		if (metalnessIter != data.getSamplers().end() &&
-			roughnessIter != data.getSamplers().end() &&
-			aoIter != data.getSamplers().end() &&
-			normalIter != data.getSamplers().end())
+		if (metallicSampler && metallicSampler && aoSampler)
 		{
-			TextureResourceRef metalness = metalnessIter->second->resolve()->texture;
-			TextureResourceRef roughness = roughnessIter->second->resolve()->texture;
-			TextureResourceRef ao = aoIter->second->resolve()->texture;
-			TextureResourceRef normal = normalIter->second->resolve()->texture;
+			TextureResourceRef metalness = metallicSampler->resolve()->texture;
+			TextureResourceRef roughness = roughnessSampler->resolve()->texture;
+			TextureResourceRef ao = aoSampler->resolve()->texture;
+			TextureResourceRef normal = normalSampler->resolve()->texture;
 
 			TextureResourceRef output = TextureTransformer::packTextures(
 				metalness, 0,
@@ -331,12 +339,6 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 
 		//RenderDocDebugHelper::stopFrameCapture();
 
-	}
-
-
-	for (const auto& [name, uniform] : data.getUniforms())
-	{
-		materialResource->m_uniformProperties[name] = uniform.value;
 	}
 	
 }
@@ -371,36 +373,29 @@ MaterialRenderMode MaterialAsset::getMaterialRenderMode() const
 	return data.getMaterialRenderMode();
 }
 
-void MaterialAsset::setSampler(const std::string& name, std::shared_ptr<TextureSamplerAsset> sampler)
+const MaterialLayout& MaterialAsset::getLayout() const
 {
-	data.setSampler(name, sampler);
+	return data.getLayout();
 }
 
-std::shared_ptr<TextureSamplerAsset> MaterialAsset::getSampler(const std::string& name)
+void MaterialAsset::setProperty(const std::string& name, const Value& v)
 {
-	const auto& samplers = data.getSamplers();
-	auto it = samplers.find(name);
-	return it != samplers.end() ? it->second : nullptr;
+	data.setProperty(name, v);
 }
 
-void MaterialAsset::setSamplerEnabled(const std::string& name, bool isEnabled)
+Value MaterialAsset::getProperty(const std::string& name) const
 {
-	auto sampler = getSampler(name);
-	if (sampler)
-	{
-		sampler->state.isActive = isEnabled;
-	}
+	return data.getProperty(name);
 }
 
-void MaterialAsset::setUniformValue(const std::string& name, const Value& v)
+std::unordered_map<std::string, Value> MaterialAsset::getAllProperties() const
 {
-	data.setUniform(name, v);
+	return data.getAllProperties();
 }
 
-Value MaterialAsset::getUniformValue(const std::string& name)
+std::unordered_map<std::string, Value> MaterialAsset::getAllProptiesOfType(MaterialPropertyType type) const
 {
-	auto it = data.getUniforms().find(name);
-	return it != data.getUniforms().end() ? it->second.value : Value{};
+	return data.getAllProptiesOfType(type);
 }
 
 ShaderResourceRef MaterialAsset::getActiveShader() const
@@ -427,16 +422,6 @@ MaterialAssetRef MaterialAsset::clone(bool isEngineOwned) const
 	
 	MaterialAssetRef cloned = Engine::get()->getSubSystem<Assets>()->createAsset(desc, materialDesc).as<MaterialAsset>();
 	return cloned;
-}
-
-std::map<std::string, std::shared_ptr<TextureSamplerAsset>> MaterialAsset::getSamplers() const
-{
-	return data.getSamplers();
-}
-
-std::map<std::string, EditableUniform> MaterialAsset::getUniformProperties()
-{
-	return data.getUniforms();
 }
 
 void MaterialAsset::serialize(nlohmann::json& j) const
@@ -493,9 +478,10 @@ void MaterialAsset::fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDe
 std::vector<AssetRef<Asset>> MaterialAsset::gatherDependencies() const
 {
 	std::vector<AssetRef<Asset>> dependencies;
-	auto samplers = getSamplers();
-	for (const auto& [sName, sampler] : samplers)
+	auto samplers = getAllProptiesOfType(MaterialPropertyType::SAMPLER);
+	for (const auto& [sName, _] : samplers)
 	{
+		auto sampler = getProperty<std::shared_ptr<TextureSamplerAsset>>(sName);
 		dependencies.push_back(sampler->texture);
 	}
 	return dependencies;

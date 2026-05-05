@@ -104,11 +104,12 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
 		MaterialCreateDescriptor createDesc;
 		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Terrain);
+		auto materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc).as<MaterialAsset>();
+
 		auto sampler = std::make_shared<TextureSamplerAsset>();
 		sampler->texture = BuiltInAssets::getByName<TextureAsset>("SGE_TEXTURE_CHECKERBOARD");
 		sampler->state.isActive = true;
-		createDesc.data.setSampler("samplerAlbedo", sampler);
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
+		materialAsset->setProperty("samplerAlbedo", sampler);
 	}
 }
 
