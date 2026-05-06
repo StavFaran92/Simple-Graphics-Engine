@@ -190,10 +190,11 @@ struct TerrainLayer
 {
     PBR_Sampler texturePack0;
     PBR_Sampler texturePack1;
+    PBR_Sampler opacityMask;
     vec2 uv;
 };
 
-uniform TerrainLayer terrainLayers[4];
+uniform TerrainLayer terrainLayers[3];
 
 #pragma editable (default=(100.0, 100.0))
 uniform vec2 globalUV;
@@ -212,16 +213,15 @@ void sampleTerrainPBR(
     in vec3 normalIn,
 	in vec2 uv,
 
-    in PBR_Sampler samplerTexturePack0,
-    in PBR_Sampler samplerTexturePack1,
+    in TerrainLayer terrainLayer,
 
     out vec3 outNormal,
     out vec3 outAlbedo,
     out vec3 outMRA
 )
 {
-    vec4 texPack0 = texture(samplerTexturePack0.texture, uv);
-    vec4 texPack1 = texture(samplerTexturePack1.texture, uv);
+    vec4 texPack0 = texture(terrainLayer.texturePack0.texture, uv);
+    vec4 texPack1 = texture(terrainLayer.texturePack1.texture, uv);
     vec3 albedo = texPack0.rgb;
     float nx = texPack0.a;
     float ny = texPack1.a;
@@ -251,33 +251,51 @@ void sampleTerrainPBR(
 void main()
 {
     mat3 TBN = mat3(tangent, bitangent, fragNormal);
-    vec3 normal;
-    vec3 albedo;
-    vec3 MRA;
-    sampleTerrainPBR(
-		// Input
-		TBN,
-		fragNormal,
-        texCoord * globalUV,
-        
-		terrainLayers[0].texturePack0,
-		terrainLayers[0].texturePack1,
 
-		// Output
-		normal,
-		albedo,
-		MRA
-	);
+    vec3 totalAlbedo;
+    vec3 totalNormal;
+    vec3 totalMRA;
+    float opacityLeft = 1.0;
+    int layerIndex = layerCount;
+    while(layerIndex >= 0 && opacityLeft > 0.0)
+    {
+        float opacity = min(texture(terrainLayers[layerIndex].opacityMask.texture, texCoord).r, opacityLeft);
+
+        vec3 normal;
+        vec3 albedo;
+        vec3 MRA;
+        sampleTerrainPBR(
+            // Input
+            TBN,
+            fragNormal,
+            texCoord * globalUV,
+            
+            terrainLayers[layerIndex],
+
+            // Output
+            normal,
+            albedo,
+            MRA
+        );
+
+        totalAlbedo += opacity * albedo;
+        totalNormal += opacity * normal;
+        totalMRA += opacity * MRA;
+
+        opacityLeft -= opacity;
+        layerIndex--;
+    }
+
 
     vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
     float shadow = calculateShadows(fragPosInLightSpace, gShadowMap);
 
     vec3 color = calculatePBR(
-                albedo,
-                normal,
-                MRA.r,
-                MRA.g,
-                MRA.b,
+                totalAlbedo,
+                totalNormal,
+                totalMRA.r,
+                totalMRA.g,
+                totalMRA.b,
                 cameraPos,
                 fragPos,
                 shadow,

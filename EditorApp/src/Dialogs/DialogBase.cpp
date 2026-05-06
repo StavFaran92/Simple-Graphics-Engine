@@ -53,7 +53,7 @@ void DialogBase::draw()
 	if (EditorState::Instance().getState(m_label) && ImGui::Begin(m_label.c_str(), nullptr, 
 		ImGuiWindowFlags_AlwaysAutoResize  | 
 		ImGuiWindowFlags_NoDocking | 
-		ImGuiWindowFlags_NoScrollbar |
+		//ImGuiWindowFlags_NoScrollbar |
 		ImGuiWindowFlags_NoCollapse))
 	{
 		if (ImGui::IsWindowAppearing())

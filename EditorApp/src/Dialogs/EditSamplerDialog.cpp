@@ -27,7 +27,7 @@ void EditSamplerDialog::drawContent()
 	}
 
 	ImGui::Text("Texture");
-	addTextureEditWidget(sampler->texture, ImVec2{ 150, 150 }, [this](UUID uuid) {
+	addTextureEditWidget("Texture", sampler->texture, ImVec2{ 150, 150 }, [this](UUID uuid) {
 		sampler->texture = TextureAssetRef(uuid);
 	});
 

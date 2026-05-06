@@ -9,6 +9,7 @@
 
 const std::string SGE_TEXTURE_WHITE = "SGE_TEXTURE_WHITE";
 const std::string SGE_TEXTURE_BLACK = "SGE_TEXTURE_BLACK";
+const std::string SGE_TEXTURE_CHECKERBOARD = "SGE_TEXTURE_CHECKERBOARD";
 
 const std::string SGE_MESH_GRID = "SGE_MESH_GRID";
 const std::string SGE_MESH_BOX = "SGE_MESH_BOX";

@@ -68,7 +68,7 @@ void Material::use()
 
 	shader->use();
 
-	int slot = 8;
+	int slot = 7;
 
 	// Set samplers
 	for (const auto& [name, sampler] : m_samplers)
@@ -286,11 +286,15 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 		//RenderDocDebugHelper::startFrameCapture();
 
 		auto& whiteTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
+		auto& blackTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_BLACK).resource();
+		auto& checkerboarcTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_CHECKERBOARD).resource();
 
+		int layerIndex = 0;
 		for (auto& [layerName, value] : data.getAllProptiesOfType(MaterialPropertyType::TERRAIN_LAYER))
 		{
 			auto layer = std::get<std::shared_ptr<TerrainLayerAsset>>(value);
 
+			// Set Texture Pack 0
 			auto albedo = layer->albedoTexture.isEmpty() ? whiteTexture : layer->albedoTexture.resource();
 			auto normal = layer->normalTexture.isEmpty() ? whiteTexture : layer->normalTexture.resource();
 			
@@ -305,10 +309,11 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 				textureSamplerResource.texture = texturePack0;
 				textureSamplerResource.state.isActive = true;
 				textureSamplerResource.state.channelCount = 4;
-				auto samplerName = layerName + "[0].texturePack0"; // TODO fix
+				auto samplerName = layerName + ".texturePack0";
 				materialResource->m_samplers[samplerName] = textureSamplerResource;
 			}
 
+			// Set Texture Pack 1
 			auto metalness = layer->metallicTexture.isEmpty() ? whiteTexture : layer->metallicTexture.resource();
 			auto roughness = layer->roughnessTexture.isEmpty() ? whiteTexture : layer->roughnessTexture.resource();
 			auto ao = layer->aoTexture.isEmpty() ? whiteTexture : layer->aoTexture.resource();
@@ -324,10 +329,21 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 				textureSamplerResource.texture = texturePack1;
 				textureSamplerResource.state.isActive = true;
 				textureSamplerResource.state.channelCount = 4;
-				auto samplerName = layerName + "[0].texturePack1"; // TODO fix
+				auto samplerName = layerName + ".texturePack1";
 				materialResource->m_samplers[samplerName] = textureSamplerResource;
 			}
 
+			// Set Opacity mask
+			{
+				TextureSampler textureSamplerResource;
+				textureSamplerResource.texture = layer->mask.isEmpty() ? checkerboarcTexture : layer->mask.resource();
+				textureSamplerResource.state.isActive = true;
+				textureSamplerResource.state.channelCount = 1;
+				auto samplerName = layerName + ".opacityMask";
+				materialResource->m_samplers[samplerName] = textureSamplerResource;
+			}
+
+			layerIndex++;
 		}
 
 		

@@ -204,9 +204,12 @@ void MaterialDataParser::parseExternalShaderProperties(MaterialRenderMode render
 
 	if (renderMode == MaterialRenderMode::Terrain)
 	{
-		PropertySchema terrainLayerProperty(MaterialPropertyType::TERRAIN_LAYER);
-		terrainLayerProperty.defaultValue = std::make_shared<TerrainLayerAsset>();
-		data.getLayout().addProperty("terrainLayers", terrainLayerProperty);
+		for (int i = 0; i < 3; i++)
+		{
+			PropertySchema terrainLayerProperty(MaterialPropertyType::TERRAIN_LAYER);
+			terrainLayerProperty.defaultValue = std::make_shared<TerrainLayerAsset>();
+			data.getLayout().addProperty("terrainLayers[" + std::to_string(i) + "]", terrainLayerProperty);
+		}
 	}
 }
 

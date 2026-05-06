@@ -316,7 +316,7 @@ void InspectorWindow::display()
 			});
 
 		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
-			addTextureEditWidget(skybox.originalImage, { 50, 50 }, [&](UUID uuid) {
+			addTextureEditWidget("Skybox", skybox.originalImage, { 50, 50 }, [&](UUID uuid) {
 				skybox.setSkybox(TextureAssetRef(uuid));
 			});
 
@@ -328,7 +328,7 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
-			addTextureEditWidget(image.image, { 50, 50 }, [&](UUID uuid) {
+			addTextureEditWidget("Image", image.image, { 50, 50 }, [&](UUID uuid) {
 				image.image = TextureAssetRef(uuid);
 				});
 			ImGui::DragFloat("posX", &image.position.x);
@@ -590,76 +590,71 @@ void InspectorWindow::display()
 						ImGui::Text("Layers");
 						ImGui::Spacing();
 
-						std::string matName = terrain.m_material.isEmpty() ? "None" : terrain.m_material.info().name;
-						addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uuid) {
-							terrain.m_material = MaterialAssetRef(uuid);
-						});
+						static int selectedLayerIndex = 0;
+						const auto& layers = terrain.getLayers();
 
-					static int selectedLayerIndex = 0;
-					const auto& layers = terrain.getLayers();
+						// Clamp selection in case layers changed
+						if (selectedLayerIndex >= (int)layers.size())
+							selectedLayerIndex = (int)layers.size() - 1;
 
-					// Clamp selection in case layers changed
-					if (selectedLayerIndex >= (int)layers.size())
-						selectedLayerIndex = (int)layers.size() - 1;
+						for (int i = 0; i < (int)layers.size(); i++)
+						{
+							ImGui::PushID(i);
 
-					for (int i = 0; i < (int)layers.size(); i++)
-					{
-						ImGui::PushID(i);
+							bool isSelected = (i == selectedLayerIndex);
+							ImGui::Bullet();
+							ImGui::SameLine();
 
-						bool isSelected = (i == selectedLayerIndex);
-						ImGui::Bullet();
+							const auto& layer = terrain.getLayer(i);
+							std::string label = layer.name;
+
+							if (ImGui::Selectable(label.c_str(), isSelected))
+								selectedLayerIndex = i;
+
+							ImGui::PopID();
+						}
+
+						ImGui::Spacing();
+
+						// Add button
+						if (ImGui::Button("+"))
+						{
+							terrain.addLayer();
+						}
+
 						ImGui::SameLine();
 
-						const auto& layer = terrain.getLayer(i);
-						std::string label = layer.name;
+						// Remove button — disabled when only 1 layer remains
+						ImGui::BeginDisabled(layers.size() <= 1);
+						if (ImGui::Button("-"))
+						{
+							terrain.removeLayer(selectedLayerIndex);
+							if (selectedLayerIndex >= (int)terrain.getLayers().size())
+								selectedLayerIndex = (int)terrain.getLayers().size() - 1;
+						}
+						ImGui::EndDisabled();
 
-						if (ImGui::Selectable(label.c_str(), isSelected))
-							selectedLayerIndex = i;
+						ImGui::SameLine();
 
-						ImGui::PopID();
-					}
+						// Move up
+						ImGui::BeginDisabled(selectedLayerIndex == 0);
+						if (ImGui::Button("^"))
+						{
+							terrain.swapLayers(selectedLayerIndex, selectedLayerIndex - 1);
+							selectedLayerIndex--;
+						}
+						ImGui::EndDisabled();
 
-					ImGui::Spacing();
+						ImGui::SameLine();
 
-					// Add button
-					if (ImGui::Button("+"))
-					{
-						terrain.addLayer();
-					}
-
-					ImGui::SameLine();
-
-					// Remove button — disabled when only 1 layer remains
-					ImGui::BeginDisabled(layers.size() <= 1);
-					if (ImGui::Button("-"))
-					{
-						terrain.removeLayer(selectedLayerIndex);
-						if (selectedLayerIndex >= (int)terrain.getLayers().size())
-							selectedLayerIndex = (int)terrain.getLayers().size() - 1;
-					}
-					ImGui::EndDisabled();
-
-					ImGui::SameLine();
-
-					// Move up
-					ImGui::BeginDisabled(selectedLayerIndex == 0);
-					if (ImGui::Button("^"))
-					{
-						terrain.swapLayers(selectedLayerIndex, selectedLayerIndex - 1);
-						selectedLayerIndex--;
-					}
-					ImGui::EndDisabled();
-
-					ImGui::SameLine();
-
-					// Move down
-					ImGui::BeginDisabled(selectedLayerIndex >= (int)layers.size() - 1);
-					if (ImGui::Button("v"))
-					{
-						terrain.swapLayers(selectedLayerIndex, selectedLayerIndex + 1);
-						selectedLayerIndex++;
-					}
-					ImGui::EndDisabled();
+						// Move down
+						ImGui::BeginDisabled(selectedLayerIndex >= (int)layers.size() - 1);
+						if (ImGui::Button("v"))
+						{
+							terrain.swapLayers(selectedLayerIndex, selectedLayerIndex + 1);
+							selectedLayerIndex++;
+						}
+						ImGui::EndDisabled();
 
 					} // TerrainPainter active
 
