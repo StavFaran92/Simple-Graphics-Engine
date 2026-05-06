@@ -336,7 +336,21 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 			// Set Opacity mask
 			{
 				TextureSampler textureSamplerResource;
-				textureSamplerResource.texture = layer->mask.isEmpty() ? checkerboarcTexture : layer->mask.resource();
+
+				// TODO remove
+				if (layerIndex == 0)
+				{
+					textureSamplerResource.texture = whiteTexture;
+				}
+				else if (layerIndex == 1)
+				{
+					textureSamplerResource.texture = checkerboarcTexture;
+				}
+				else
+				{
+					textureSamplerResource.texture = layer->mask.isEmpty() ? blackTexture : layer->mask.resource();
+				}
+				
 				textureSamplerResource.state.isActive = true;
 				textureSamplerResource.state.channelCount = 1;
 				auto samplerName = layerName + ".opacityMask";

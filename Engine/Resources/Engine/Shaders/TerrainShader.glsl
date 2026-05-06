@@ -257,9 +257,9 @@ void main()
     vec3 totalMRA;
     float opacityLeft = 1.0;
     int layerIndex = layerCount;
-    while(layerIndex >= 0 && opacityLeft > 0.0)
+    while(layerIndex > 0 && opacityLeft > 0.0)
     {
-        float opacity = min(texture(terrainLayers[layerIndex].opacityMask.texture, texCoord).r, opacityLeft);
+        float opacity = min(texture(terrainLayers[layerIndex-1].opacityMask.texture, texCoord).r, opacityLeft);
 
         vec3 normal;
         vec3 albedo;
@@ -270,7 +270,7 @@ void main()
             fragNormal,
             texCoord * globalUV,
             
-            terrainLayers[layerIndex],
+            terrainLayers[layerIndex-1],
 
             // Output
             normal,
