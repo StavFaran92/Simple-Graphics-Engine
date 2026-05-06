@@ -585,10 +585,15 @@ void InspectorWindow::display()
 
 					if (EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainPainter)
 					{
-					ImGui::Spacing();
-					ImGui::Separator();
-					ImGui::Text("Layers");
-					ImGui::Spacing();
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Text("Layers");
+						ImGui::Spacing();
+
+						std::string matName = terrain.m_material.isEmpty() ? "None" : terrain.m_material.info().name;
+						addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uuid) {
+							terrain.m_material = MaterialAssetRef(uuid);
+						});
 
 					static int selectedLayerIndex = 0;
 					const auto& layers = terrain.getLayers();
@@ -607,22 +612,9 @@ void InspectorWindow::display()
 
 						const auto& layer = terrain.getLayer(i);
 						std::string label = layer.name;
-						if (!layer.material.isEmpty())
-							label += " [" + layer.material.info().name + "]";
 
 						if (ImGui::Selectable(label.c_str(), isSelected))
 							selectedLayerIndex = i;
-
-						if (isSelected)
-						{
-							ImGui::Indent();
-							auto& layer = terrain.getLayer(i);
-							std::string matName = layer.material.isEmpty() ? "None" : layer.material.info().name;
-							addAssetSelectWidget(matName, AssetType::MATERIAL, [&layer](UUID uuid) {
-								layer.material = MaterialAssetRef(uuid);
-							});
-							ImGui::Unindent();
-						}
 
 						ImGui::PopID();
 					}

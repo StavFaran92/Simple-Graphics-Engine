@@ -69,7 +69,11 @@ std::vector<AssetRef<Asset>> Terrain::gatherDependenciesInternal() const
 	dependencies.push_back(m_material);
 	for (auto& layer : m_layers)
 	{
-		dependencies.push_back(layer.material);
+		dependencies.push_back(layer.albedoTexture);
+		dependencies.push_back(layer.normalTexture);
+		dependencies.push_back(layer.metallicTexture);
+		dependencies.push_back(layer.roughnessTexture);
+		dependencies.push_back(layer.aoTexture);
 		dependencies.push_back(layer.mask);
 	}
 	return dependencies;
@@ -464,7 +468,7 @@ RayHit Terrain::raycast(const Ray& ray, float maxDistance)
 
 void Terrain::addLayer()
 {
-	TerrainLayer layer;
+	TerrainLayerAsset layer;
 	layer.name = "Layer " + std::to_string(m_layers.size() + 1);
 	m_layers.push_back(layer);
 }
@@ -483,17 +487,17 @@ void Terrain::swapLayers(int a, int b)
 	std::swap(m_layers[a], m_layers[b]);
 }
 
-TerrainLayer& Terrain::getLayer(int index)
+TerrainLayerAsset& Terrain::getLayer(int index)
 {
 	return m_layers[index];
 }
 
-const TerrainLayer& Terrain::getLayer(int index) const
+const TerrainLayerAsset& Terrain::getLayer(int index) const
 {
 	return m_layers[index];
 }
 
-const std::vector<TerrainLayer>& Terrain::getLayers() const
+const std::vector<TerrainLayerAsset>& Terrain::getLayers() const
 {
 	return m_layers;
 }

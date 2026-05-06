@@ -78,9 +78,6 @@ std::shared_ptr<EditorTool> EditorState::getEditorTool(EditorTool::Type type)
 void EditorState::selectAssetForEdit(const AssetRef<Asset>& asset)
 {
     currentAssetEdit = asset;
-
-    // add resource and asset dependencies to cache
-    EditorState::Instance().resourceCache = currentAssetEdit.resource();
 }
 
 AssetRef<Asset> EditorState::getSelectedAsset() const
@@ -91,7 +88,6 @@ AssetRef<Asset> EditorState::getSelectedAsset() const
 void EditorState::clearAssetSelection()
 {
     currentAssetEdit = AssetRef<Asset>::empty;
-    resourceCache = ResourceRef<Resource>::empty;
 }
 
 WorkingDirectory& EditorState::getWorkingDir()

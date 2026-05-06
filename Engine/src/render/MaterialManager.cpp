@@ -7,6 +7,7 @@
 #include "core/Engine.h"
 #include "core/Logger.h"
 #include "render/MaterialDataParser.h"
+#include "render/TerrainLayer.h"
 
 #include <fstream>
 #include <cereal/archives/json.hpp>

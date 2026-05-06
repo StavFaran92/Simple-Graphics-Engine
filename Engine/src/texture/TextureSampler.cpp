@@ -9,10 +9,10 @@ TextureSamplerAsset::TextureSamplerAsset(int channelCount)
 	state.channelCount = channelCount;
 }
 
-std::shared_ptr<TextureSampler> TextureSamplerAsset::resolve() const
+TextureSampler TextureSamplerAsset::resolve() const
 {
-	auto sampler = std::make_shared<TextureSampler>();
-	sampler->state = state;
-	sampler->texture = texture.resource();
+	TextureSampler sampler;
+	sampler.state = state;
+	sampler.texture = texture.resource();
 	return sampler;
 }

@@ -6,6 +6,7 @@
 #include "dialogs/AssetSelectDialog.h"
 #include "DialogManager.h"
 #include "render/MaterialData.h"
+#include "render/TerrainLayer.h"
 
 void addTextureEditWidget(TextureAssetRef texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
@@ -192,9 +193,10 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 	}
 
 	// Custom Textures Array
-	if (ImGui::CollapsingHeader("Samplers"))
+	auto& samplers = data.getAllProptiesOfType(MaterialPropertyType::SAMPLER);
+	if (samplers.size() > 0 && ImGui::CollapsingHeader("Samplers"))
 	{
-		for (auto& [name, value] : data.getAllProptiesOfType(MaterialPropertyType::SAMPLER))
+		for (auto& [name, value] : samplers)
 		{
 			auto sampler = std::get<std::shared_ptr<TextureSamplerAsset>>(value);
 
@@ -213,6 +215,69 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 			ImGui::PopID();
 		}
 
+	}
+
+	if (data.getMaterialRenderMode() == MaterialRenderMode::Terrain && ImGui::CollapsingHeader("Terrain Layers"))
+	{
+		const ImVec2 texSize{ 40, 40 };
+
+		for (auto& [name, value] : data.getAllProptiesOfType(MaterialPropertyType::TERRAIN_LAYER))
+		{
+			auto layer = std::get<std::shared_ptr<TerrainLayerAsset>>(value);
+
+			ImGui::PushID(name.c_str());
+			ImGui::Indent();
+
+			if (ImGui::CollapsingHeader(name.c_str()))
+			{
+				ImGui::Indent();
+
+				ImGui::Text("Albedo");
+				addTextureEditWidget(layer->albedoTexture, texSize, [&data, name, layer, onChangedCB](UUID uuid) {
+					layer->albedoTexture = TextureAssetRef(uuid);
+					data.setProperty(name, layer);
+					if (onChangedCB) 
+						onChangedCB(data);
+				});
+
+				ImGui::Text("Normal");
+				addTextureEditWidget(layer->normalTexture, texSize, [&data, name, layer, onChangedCB](UUID uuid) {
+					layer->normalTexture = TextureAssetRef(uuid);
+					data.setProperty(name, layer);
+					if (onChangedCB) 
+						onChangedCB(data);
+				});
+
+				ImGui::Text("Metallic");
+				addTextureEditWidget(layer->metallicTexture, texSize, [&data, name, layer, onChangedCB](UUID uuid) {
+					layer->metallicTexture = TextureAssetRef(uuid);
+					data.setProperty(name, layer);
+					if (onChangedCB) 
+						onChangedCB(data);
+				});
+
+				ImGui::Text("Roughness");
+				addTextureEditWidget(layer->roughnessTexture, texSize, [&data, name, layer, onChangedCB](UUID uuid) {
+					layer->roughnessTexture = TextureAssetRef(uuid);
+					data.setProperty(name, layer);
+					if (onChangedCB) 
+						onChangedCB(data);
+				});
+
+				ImGui::Text("AO");
+				addTextureEditWidget(layer->aoTexture, texSize, [&data, name, layer, onChangedCB](UUID uuid) {
+					layer->aoTexture = TextureAssetRef(uuid);
+					data.setProperty(name, layer);
+					if (onChangedCB) 
+						onChangedCB(data);
+				});
+
+				ImGui::Unindent();
+			}
+			ImGui::Unindent();
+
+			ImGui::PopID();
+		}
 	}
 
 	// Display Uniforms and Update Shader
@@ -278,15 +343,5 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 		}
 	}
 
-	//ImGui::ColorEdit3("Base Color", glm::value_ptr(mat.get()->colorDiffuse));
-	//ImGui::DragFloat("Metallic", &mat.get()->metallicFactor, 0.01f, 0.0f, 1.0f);
-	//ImGui::DragFloat("Roughness", &mat.get()->roughnessFactor, 0.01f, 0.0f, 1.0f);
-	//ImGui::DragFloat("Opacity", &mat.get()->opacityFactor, 0.01f, 0.0f, 1.0f);
-
-	//addSamplerEditWidget(mat, { 40, 40 }, "Albedo", TextureType::Albedo);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Normal", TextureType::Normal);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Metallic", TextureType::Metallic);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Roughness", TextureType::Roughness);
-	//addSamplerEditWidget(mat, { 40, 40 }, "Ambient Occlusion", TextureType::AmbientOcclusion);
 }
 

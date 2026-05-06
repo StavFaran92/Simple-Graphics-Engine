@@ -14,7 +14,10 @@
 #include <nlohmann/json.hpp>
 #include "render/ShadersInfo.h"
 
+#include "MaterialProperty.h"
+
 class TextureSamplerAsset;
+class TerrainLayerAsset;
 
 using json = nlohmann::json;
 
@@ -61,8 +64,6 @@ extern EngineAPI const std::map<ShaderOverride, std::string> shaderOverrideToStr
 struct ShadersInfo;
 class Texture;
 template<typename> class AssetTraits;
-
-using Value = std::variant<float, glm::vec2, glm::vec3, glm::vec4, int, unsigned int, glm::mat3, glm::mat4, std::shared_ptr<TextureSamplerAsset>>;
 
 // Resource
 class EngineAPI Shader : public Resource, std::enable_shared_from_this<Shader>

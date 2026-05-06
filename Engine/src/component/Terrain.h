@@ -10,6 +10,7 @@
 
 #include "utils/Math3D.h"
 #include "geometry/Model.h"
+#include "render/TerrainLayer.h"
 
 class Entity;
 
@@ -25,18 +26,6 @@ struct TextureBlend
 	template <class Archive>
 	void serialize(Archive& archive) {
 		archive(texture, blend, scaleX, scaleY);
-	}
-};
-
-struct TerrainLayer
-{
-	std::string name = "Layer";
-	MaterialAssetRef material;
-	TextureAssetRef mask;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		archive(name, material, mask);
 	}
 };
 
@@ -91,9 +80,9 @@ public:
 	void addLayer();
 	void removeLayer(int index);
 	void swapLayers(int a, int b);
-	TerrainLayer& getLayer(int index);
-	const TerrainLayer& getLayer(int index) const;
-	const std::vector<TerrainLayer>& getLayers() const;
+	TerrainLayerAsset& getLayer(int index);
+	const TerrainLayerAsset& getLayer(int index) const;
+	const std::vector<TerrainLayerAsset>& getLayers() const;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -133,7 +122,7 @@ private:
 	TextureAssetRef m_heightmap;
 	ModelAssetRef m_mesh;
 
-	std::vector<TerrainLayer> m_layers;
+	std::vector<TerrainLayerAsset> m_layers;
 
 };
 

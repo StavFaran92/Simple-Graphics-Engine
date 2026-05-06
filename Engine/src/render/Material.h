@@ -12,6 +12,9 @@
 #include "memory/Asset.h"
 #include "serialize/CerealHelpers.h"
 #include "render/MaterialData.h"
+#include "render/TerrainLayer.h"
+#include "texture/TextureSampler.h"
+
 
 static const std::string SHADER_PROPERTY_PBR_COLOR_DIFFUSE = "color";
 static const std::string SHADER_PROPERTY_PBR_ROUGHNESS_FACTOR = "roughnessFactor";
@@ -56,13 +59,11 @@ public:
 
 	void setTexture(const std::string& name, const TextureResourceRef& texture);
 
-	void setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler);
-	std::shared_ptr<TextureSampler> getSampler(const std::string& name);
+	void setSampler(const std::string& name, const TextureSampler& sampler);
+	TextureSampler getSampler(const std::string& name);
 
 	void setUniformValue(const std::string& name, const Value& v);
 	Value getUniformValue(const std::string& name);
-
-	MaterialResourceRef clone(bool isEngineOwned) const;
 
 private:
 	friend class MaterialAsset;
@@ -71,8 +72,9 @@ private:
 	ShaderResourceRef m_customShader;
 	MaterialRenderMode m_renderMode = MaterialRenderMode::None;
 
-	std::map<std::string, std::shared_ptr<TextureSampler>> m_samplers;
-	std::map<std::string, Value> m_uniformProperties;
+	std::unordered_map<std::string, TerrainLayer> m_terrainLayers;
+	std::unordered_map<std::string, TextureSampler> m_samplers;
+	std::unordered_map<std::string, Value> m_uniforms;
 };
 
 // Asset

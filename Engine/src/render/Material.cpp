@@ -24,39 +24,36 @@
 #include <filesystem>
 #include "memory/AssetRef.h"
 #include "render/MaterialDataParser.h"
+#include "render/TerrainLayer.h"
 #include "texture/Texture.h"
 #include "texture/TextureSampler.h"
 #include "debug/RenderDocDebugHelper.h"
 #include "texture/TextureTransformer.h"
 
-void useSamplerInShader(const std::string& name, std::shared_ptr<TextureSampler> sampler, ShaderResourceRef& shader, int slot)
+void useSamplerInShader(const std::string& name, const TextureSampler& sampler, ShaderResourceRef& shader, int slot)
 {
 	// if texture is empty use dummy texture
-	TextureResourceRef texture;
-	if (!sampler || sampler->texture.isEmpty())
-	{
-		texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource(); // maybe use disgusting pink texture?
-	}
-	else
-	{
-		texture = sampler->texture;
-	}
-
+	TextureResourceRef texture = sampler.texture;
 	texture->setSlot(slot);
 	texture->bind();
 
 	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
 	shader->setUniformValue(name + ".texture", slot);
 
-	shader->setUniformValue(name + ".isActive", sampler->state.isActive);
-	shader->setUniformValue(name + ".xOffset", sampler ? sampler->state.xOffset : 0.0f);
-	shader->setUniformValue(name + ".yOffset", sampler ? sampler->state.yOffset : 0.0f);
-	shader->setUniformValue(name + ".xScale", sampler ? sampler->state.xScale : 1.0f);
-	shader->setUniformValue(name + ".yScale", sampler ? sampler->state.yScale : 1.0f);
-	shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->state.channelMaskR : 1);
-	shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->state.channelCount > 1 ? sampler->state.channelMaskG : 0) : 0);
-	shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->state.channelCount > 2 ? sampler->state.channelMaskB : 0) : 0);
-	shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->state.channelCount > 3 ? sampler->state.channelMaskA : 0) : 0);
+	shader->setUniformValue(name + ".isActive", sampler.state.isActive);
+	shader->setUniformValue(name + ".xOffset", sampler.state.xOffset);
+	shader->setUniformValue(name + ".yOffset", sampler.state.yOffset);
+	shader->setUniformValue(name + ".xScale", sampler.state.xScale);
+	shader->setUniformValue(name + ".yScale", sampler.state.yScale);
+	shader->setUniformValue(name + ".channelMaskR", sampler.state.channelMaskR);
+	shader->setUniformValue(name + ".channelMaskG", sampler.state.channelCount > 1 ? sampler.state.channelMaskG : 0);
+	shader->setUniformValue(name + ".channelMaskB", sampler.state.channelCount > 2 ? sampler.state.channelMaskB : 0);
+	shader->setUniformValue(name + ".channelMaskA", sampler.state.channelCount > 3 ? sampler.state.channelMaskA : 0);
+
+	//shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->state.channelMaskR : 1);
+	//shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->state.channelCount > 1 ? sampler->state.channelMaskG : 0) : 0);
+	//shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->state.channelCount > 2 ? sampler->state.channelMaskB : 0) : 0);
+	//shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->state.channelCount > 3 ? sampler->state.channelMaskA : 0) : 0);
 }
 
 void Material::use()
@@ -71,7 +68,7 @@ void Material::use()
 
 	shader->use();
 
-	int slot = 0;
+	int slot = 8;
 
 	// Set samplers
 	for (const auto& [name, sampler] : m_samplers)
@@ -81,7 +78,7 @@ void Material::use()
 	}
 
 	// Set uniforms
-	for (const auto& [name, value] : m_uniformProperties)
+	for (const auto& [name, value] : m_uniforms)
 	{
 		shader->setUniformValue(name, value);
 	}
@@ -96,21 +93,21 @@ void Material::release()
 	}
 }
 
-std::shared_ptr<TextureSampler> Material::getSampler(const std::string& name)
+TextureSampler Material::getSampler(const std::string& name)
 {
 	auto it = m_samplers.find(name);
-	return it != m_samplers.end() ? it->second : nullptr;
+	return it != m_samplers.end() ? it->second : TextureSampler{};
 }
 
-void Material::setSampler(const std::string& name, std::shared_ptr<TextureSampler> sampler)
+void Material::setSampler(const std::string& name, const TextureSampler& sampler)
 {
 	m_samplers[name] = sampler;
 }
 
 Value Material::getUniformValue(const std::string& name)
 {
-	auto it = m_uniformProperties.find(name);
-	return it != m_uniformProperties.end() ? it->second : Value{};
+	auto it = m_uniforms.find(name);
+	return it != m_uniforms.end() ? it->second : Value{};
 }
 
 MaterialResourceRef Material::create(MaterialRenderMode renderMode)
@@ -120,17 +117,17 @@ MaterialResourceRef Material::create(MaterialRenderMode renderMode)
 	return mat;
 }
 
-MaterialResourceRef Material::clone(bool isEngineOwned) const
-{
-	auto newMaterial = Material::create(m_renderMode);
-
-	newMaterial->m_samplers = m_samplers;
-	newMaterial->m_uniformProperties = m_uniformProperties;
-	newMaterial->m_customShader = m_customShader;
-	newMaterial->m_name = m_name;
-
-	return newMaterial;
-}
+//MaterialResourceRef Material::clone(bool isEngineOwned) const
+//{
+//	auto newMaterial = Material::create(m_renderMode);
+//
+//	newMaterial->m_samplers = m_samplers;
+//	newMaterial->m_uniformProperties = m_uniformProperties;
+//	newMaterial->m_customShader = m_customShader;
+//	newMaterial->m_name = m_name;
+//
+//	return newMaterial;
+//}
 
 ShaderResourceRef Material::getActiveShader() const
 {
@@ -155,7 +152,7 @@ void Material::setTexture(const std::string& name, const TextureResourceRef& tex
 
 void Material::setUniformValue(const std::string& name, const Value& v)
 {
-	m_uniformProperties[name] = v;
+	m_uniforms[name] = v;
 }
 
 std::string Material::getName() const
@@ -270,15 +267,15 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 		if (spec.type == MaterialPropertyType::SAMPLER)
 		{
 			auto sampler = std::get<std::shared_ptr<TextureSamplerAsset>>(value);
-			auto textureSamplerResource = std::make_shared<TextureSampler>();
-			textureSamplerResource->texture = sampler->texture.resource();
-			textureSamplerResource->state = sampler->state;
+			TextureSampler textureSamplerResource;
+			textureSamplerResource.texture = sampler->texture.resource();
+			textureSamplerResource.state = sampler->state;
 			materialResource->m_samplers[name] = textureSamplerResource;
 
 		}
 		else
 		{
-			materialResource->m_uniformProperties[name] = value;
+			materialResource->m_uniforms[name] = value;
 		}
 
 
@@ -288,54 +285,52 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 	{
 		//RenderDocDebugHelper::startFrameCapture();
 
-		auto albedoSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerAlbedo");
-		auto normalSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerNormal");
-		if (albedoSampler && normalSampler)
+		auto& whiteTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
+
+		for (auto& [layerName, value] : data.getAllProptiesOfType(MaterialPropertyType::TERRAIN_LAYER))
 		{
-			TextureResourceRef albedo = albedoSampler->resolve()->texture;
-			TextureResourceRef normal = normalSampler->resolve()->texture;
-			TextureResourceRef output = TextureTransformer::packTextures(
-				albedo, 0, 
-				albedo, 1, 
-				albedo, 2, 
+			auto layer = std::get<std::shared_ptr<TerrainLayerAsset>>(value);
+
+			auto albedo = layer->albedoTexture.isEmpty() ? whiteTexture : layer->albedoTexture.resource();
+			auto normal = layer->normalTexture.isEmpty() ? whiteTexture : layer->normalTexture.resource();
+			
+			TextureResourceRef texturePack0 = TextureTransformer::packTextures(
+				albedo, 0,
+				albedo, 1,
+				albedo, 2,
 				normal, 0);
 
 			{
-				auto textureSamplerResource = std::make_shared<TextureSampler>();
-				textureSamplerResource->texture = output;
-				textureSamplerResource->state.isActive = true;
-				textureSamplerResource->state.channelCount = 4;
-				materialResource->m_samplers["texturePack0"] = textureSamplerResource;
+				TextureSampler textureSamplerResource;
+				textureSamplerResource.texture = texturePack0;
+				textureSamplerResource.state.isActive = true;
+				textureSamplerResource.state.channelCount = 4;
+				auto samplerName = layerName + "[0].texturePack0"; // TODO fix
+				materialResource->m_samplers[samplerName] = textureSamplerResource;
 			}
-		}
 
+			auto metalness = layer->metallicTexture.isEmpty() ? whiteTexture : layer->metallicTexture.resource();
+			auto roughness = layer->roughnessTexture.isEmpty() ? whiteTexture : layer->roughnessTexture.resource();
+			auto ao = layer->aoTexture.isEmpty() ? whiteTexture : layer->aoTexture.resource();
 
-
-		auto metallicSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerMetallic");
-		auto roughnessSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerRoughness");
-		auto aoSampler = getProperty<std::shared_ptr<TextureSamplerAsset>>("samplerAO");
-
-		if (metallicSampler && metallicSampler && aoSampler)
-		{
-			TextureResourceRef metalness = metallicSampler->resolve()->texture;
-			TextureResourceRef roughness = roughnessSampler->resolve()->texture;
-			TextureResourceRef ao = aoSampler->resolve()->texture;
-			TextureResourceRef normal = normalSampler->resolve()->texture;
-
-			TextureResourceRef output = TextureTransformer::packTextures(
+			TextureResourceRef texturePack1 = TextureTransformer::packTextures(
 				metalness, 0,
 				roughness, 0,
 				ao, 0,
 				normal, 1);
 
 			{
-				auto textureSamplerResource = std::make_shared<TextureSampler>();
-				textureSamplerResource->texture = output;
-				textureSamplerResource->state.isActive = true;
-				textureSamplerResource->state.channelCount = 4;
-				materialResource->m_samplers["texturePack1"] = textureSamplerResource;
+				TextureSampler textureSamplerResource;
+				textureSamplerResource.texture = texturePack1;
+				textureSamplerResource.state.isActive = true;
+				textureSamplerResource.state.channelCount = 4;
+				auto samplerName = layerName + "[0].texturePack1"; // TODO fix
+				materialResource->m_samplers[samplerName] = textureSamplerResource;
 			}
+
 		}
+
+		
 
 		//RenderDocDebugHelper::stopFrameCapture();
 

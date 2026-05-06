@@ -1,5 +1,7 @@
 #include "render/MaterialDataParser.h"
 
+#include "render/TerrainLayer.h"
+
 #include "memory/BuiltInResources.h"
 
 #include <regex>
@@ -202,9 +204,9 @@ void MaterialDataParser::parseExternalShaderProperties(MaterialRenderMode render
 
 	if (renderMode == MaterialRenderMode::Terrain)
 	{
-		PropertySchema albedoSamplerProperty(MaterialPropertyType::SAMPLER);
-		albedoSamplerProperty.defaultValue = std::make_shared<TextureSamplerAsset>();
-		data.getLayout().addProperty("albedo", albedoSamplerProperty);
+		PropertySchema terrainLayerProperty(MaterialPropertyType::TERRAIN_LAYER);
+		terrainLayerProperty.defaultValue = std::make_shared<TerrainLayerAsset>();
+		data.getLayout().addProperty("terrainLayers", terrainLayerProperty);
 	}
 }
 

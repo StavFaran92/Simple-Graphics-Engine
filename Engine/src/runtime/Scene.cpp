@@ -602,61 +602,7 @@ void Scene::draw(float deltaTime)
 				terrainShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 3);
 				terrainShader->setTextureInShader(heightmap, "heightMap", 4);
 
-				int slot = 5;
-				for (auto& layer : terrain.getLayers())
-				{
-					auto mat = layer.material.resource();
-
-					if (mat.isEmpty())
-						continue;
-
-					// Set samplers
-					{
-						auto sampler = mat->getSampler("texturePack0");
-						sampler->texture->setSlot(slot);
-						sampler->texture->bind();
-
-						// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-						terrainShader->setUniformValue("texturePack0.texture", slot);
-
-						terrainShader->setUniformValue("texturePack0.isActive", sampler->state.isActive);
-						terrainShader->setUniformValue("texturePack0.xOffset", sampler ? sampler->state.xOffset : 0.0f);
-						terrainShader->setUniformValue("texturePack0.yOffset", sampler ? sampler->state.yOffset : 0.0f);
-						terrainShader->setUniformValue("texturePack0.xScale", sampler ? sampler->state.xScale : 1.0f);
-						terrainShader->setUniformValue("texturePack0.yScale", sampler ? sampler->state.yScale : 1.0f);
-						terrainShader->setUniformValue("texturePack0.channelMaskR", sampler ? sampler->state.channelMaskR : 1);
-						terrainShader->setUniformValue("texturePack0.channelMaskG", sampler ? (sampler->state.channelCount > 1 ? sampler->state.channelMaskG : 0) : 0);
-						terrainShader->setUniformValue("texturePack0.channelMaskB", sampler ? (sampler->state.channelCount > 2 ? sampler->state.channelMaskB : 0) : 0);
-						terrainShader->setUniformValue("texturePack0.channelMaskA", sampler ? (sampler->state.channelCount > 3 ? sampler->state.channelMaskA : 0) : 0);
-					}
-
-					slot++;
-					{
-						auto sampler = mat->getSampler("texturePack1");
-						sampler->texture->setSlot(slot);
-						sampler->texture->bind();
-
-						// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-						terrainShader->setUniformValue("texturePack1.texture", slot);
-
-						terrainShader->setUniformValue("texturePack1.isActive", sampler->state.isActive);
-						terrainShader->setUniformValue("texturePack1.xOffset", sampler ? sampler->state.xOffset : 0.0f);
-						terrainShader->setUniformValue("texturePack1.yOffset", sampler ? sampler->state.yOffset : 0.0f);
-						terrainShader->setUniformValue("texturePack1.xScale", sampler ? sampler->state.xScale : 1.0f);
-						terrainShader->setUniformValue("texturePack1.yScale", sampler ? sampler->state.yScale : 1.0f);
-						terrainShader->setUniformValue("texturePack1.channelMaskR", sampler ? sampler->state.channelMaskR : 1);
-						terrainShader->setUniformValue("texturePack1.channelMaskG", sampler ? (sampler->state.channelCount > 1 ? sampler->state.channelMaskG : 0) : 0);
-						terrainShader->setUniformValue("texturePack1.channelMaskB", sampler ? (sampler->state.channelCount > 2 ? sampler->state.channelMaskB : 0) : 0);
-						terrainShader->setUniformValue("texturePack1.channelMaskA", sampler ? (sampler->state.channelCount > 3 ? sampler->state.channelMaskA : 0) : 0);
-					}
-					slot++;
-
-					// Set uniforms
-					terrainShader->setUniformValue("globalUV", mat->getUniformValue("globalUV"));
-					terrainShader->setUniformValue("color", mat->getUniformValue("color"));
-					terrainShader->setUniformValue("roughnessFactor", mat->getUniformValue("roughnessFactor"));
-					terrainShader->setUniformValue("metallicFactor", mat->getUniformValue("metallicFactor"));
-				}
+				terrain.m_material.resource()->use();
 
 				//int textureCount = terrain.getTextureCount();
 				//m_terrainShader->setUniformValue("textureCount", textureCount);

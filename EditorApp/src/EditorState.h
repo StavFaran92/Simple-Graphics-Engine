@@ -112,7 +112,7 @@ private:
     std::vector<DialogBase*> m_dialogs;
 
     AssetRef<Asset> currentAssetEdit;
-    ResourceRef<Resource> resourceCache;
+    //ResourceRef<Resource> resourceCache;
 
     EditorTool::Type m_activeEditorToolType = EditorTool::Type::None;
     std::shared_ptr<EditorTool> m_activeEditorTool;

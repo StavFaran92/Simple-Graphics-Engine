@@ -5,8 +5,7 @@
 #include "render/Shader.h"
 #include "texture/TextureSampler.h"
 
-#include <map>
-#include <string>
+#include "MaterialProperty.h"
 
 enum class MaterialRenderMode : int
 {
@@ -21,64 +20,6 @@ enum class MaterialRenderMode : int
 
 	// This must be last
 	None,
-};
-
-enum class MaterialPropertyType
-{
-	INT,
-	UINT,
-	FLOAT,
-	VEC2,
-	VEC3,
-	VEC4,
-	MAT3,
-	MAT4,
-	SAMPLER,
-
-	// Must be last
-	TOTAL_SIZE
-};
-
-struct PropertySchema {
-	PropertySchema() : type(MaterialPropertyType::FLOAT) {};
-	PropertySchema(MaterialPropertyType type)
-		: type(type)
-	{
-	}
-
-	std::string name;
-	MaterialPropertyType type;
-	std::string defaultValueRaw;
-	float minValue = std::numeric_limits<float>::lowest();
-	float maxValue = std::numeric_limits<float>::max();
-	Value defaultValue;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(name);
-		SERIALIZED_MEMBER(type);
-		SERIALIZED_MEMBER(defaultValueRaw);
-		SERIALIZED_MEMBER(minValue);
-		SERIALIZED_MEMBER(maxValue);
-		SERIALIZED_MEMBER(defaultValue);
-	}
-};
-
-class MaterialLayout
-{
-public:
-	const std::map<std::string, PropertySchema>& getAllProperties() const;
-	void addProperty(const std::string& name, const PropertySchema& schema);
-	bool hasProperty(const std::string& name) const;
-	void clear();
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(m_propertySchemas);
-	}
-
-private:
-	std::map<std::string, PropertySchema> m_propertySchemas;
 };
 
 class EngineAPI MaterialData
