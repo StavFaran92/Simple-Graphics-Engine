@@ -498,7 +498,9 @@ void Terrain::addLayer()
 	auto layerMask = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc).as<TextureAsset>();
 
 
-
+	auto tLayer = m_material->getProperty<std::shared_ptr<TerrainLayerAsset>>("terrainLayers[1]");
+	tLayer->mask = layerMask;
+	m_material->setProperty("terrainLayers[1]", tLayer);
 
 
 
