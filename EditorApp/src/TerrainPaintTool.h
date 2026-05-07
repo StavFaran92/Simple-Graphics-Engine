@@ -24,7 +24,7 @@ public:
         return "TerrainPainterTool";
     }
 
-    void selectLayer(int index) { m_selectedLayerIndex = index; }
+    void selectLayer(int index);
     int getSelectedLayer() const { return m_selectedLayerIndex; }
     void clampSelection(size_t layerCount) {
         if (m_selectedLayerIndex >= (int)layerCount)

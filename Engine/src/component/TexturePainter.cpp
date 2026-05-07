@@ -26,14 +26,13 @@ float TexturePainter::getBrushStrength() const
 {
     return m_brushStrength;
 }
-#include "debug/RenderDocDebugHelper.h"
+
 void TexturePainter::applyBrush(int pixelX, int pixelY)
 {
 
     if (m_texture.isEmpty())
         return;
 
-    RenderDocDebugHelper::startFrameCapture();
     GLuint texID = m_texture->getID();
     int w = m_texture->getWidth();
     int h = m_texture->getHeight();
@@ -52,7 +51,6 @@ void TexturePainter::applyBrush(int pixelX, int pixelY)
     glDispatchCompute(groupX, groupY, 1);
 
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    RenderDocDebugHelper::stopFrameCapture();
 }
 
 std::vector<float> TexturePainter::readTextureData()

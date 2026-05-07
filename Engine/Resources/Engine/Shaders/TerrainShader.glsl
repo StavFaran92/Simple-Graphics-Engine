@@ -1,6 +1,6 @@
 #vert
 
-#version 410 core
+#version 420 core
                                                                                     
 layout (location = 0) in vec3 aPos;  
 layout (location = 2) in vec2 aTexCoords;                                        
@@ -21,7 +21,7 @@ void main()
 
 #tesc
 
-#version 410 core
+#version 420 core
 
 // Number of vertices in a patch
 layout (vertices=4) out;
@@ -78,7 +78,7 @@ void main()
 
 #tese
 
-#version 410 core
+#version 420 core
 
 layout (quads, fractional_odd_spacing, ccw) in;
 
@@ -167,7 +167,7 @@ void main()
 
 #frag
 
-#version 410 core
+#version 420 core
 
 #include ../../../../Engine/Resources/Engine/Shaders/include/defines.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
@@ -193,7 +193,7 @@ struct TerrainLayer
     vec2 uv;
 };
 
-uniform sampler2D terrainLayerMask[3];
+layout(binding = 5) uniform sampler2D terrainLayerMask[3];
 
 uniform TerrainLayer terrainLayers[3];
 

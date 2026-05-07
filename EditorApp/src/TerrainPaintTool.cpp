@@ -77,3 +77,17 @@ bool TerrainPaintTool::onEvent(SDL_Event e)
 
     return false;
 }
+
+void TerrainPaintTool::selectLayer(int index)
+{
+    if (index > g_activeTerrain->getLayerCount() || index < 0)
+    {
+        logWarning("Invalid layer specified: {}", index);
+        return;
+    }
+
+    m_selectedLayerIndex = index;
+
+    auto layerMask = g_activeTerrain->getLayer(m_selectedLayerIndex);
+    m_texturePainter.setTexture(layerMask.mask.resource());
+}

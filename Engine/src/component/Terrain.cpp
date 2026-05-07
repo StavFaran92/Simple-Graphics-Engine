@@ -95,6 +95,8 @@ Terrain Terrain::createTerrainComponent(int width, int height)
 		terrain.m_textureBlends.push_back(blend);
 	}
 
+	terrain.addLayer();
+
 
 	terrain.m_material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_TERRAIN_DEFAULT);
 	return terrain; // todo fix
@@ -463,7 +465,7 @@ RayHit Terrain::raycast(const Ray& ray, float maxDistance)
 
 void Terrain::addLayer()
 {
-	if (getLayerCount() > MAX_LAYER_COUNT)
+	if (getLayerCount() >= MAX_LAYER_COUNT)
 		return;
 
 	LayerMask layer;
