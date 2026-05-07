@@ -68,7 +68,7 @@ void Material::use()
 
 	shader->use();
 
-	int slot = 7;
+	int slot = 8;
 
 	// Set samplers
 	for (const auto& [name, sampler] : m_samplers)
@@ -334,16 +334,16 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 			}
 
 			// Set Opacity mask
-			{
-				TextureSampler textureSamplerResource;
+			//{
+			//	TextureSampler textureSamplerResource;
 
-				textureSamplerResource.texture = layer->mask.isEmpty() ? blackTexture : layer->mask.resource();
-				
-				textureSamplerResource.state.isActive = true;
-				textureSamplerResource.state.channelCount = 1;
-				auto samplerName = layerName + ".opacityMask";
-				materialResource->m_samplers[samplerName] = textureSamplerResource;
-			}
+			//	textureSamplerResource.texture = layer->mask.isEmpty() ? blackTexture : layer->mask.resource();
+			//	
+			//	textureSamplerResource.state.isActive = true;
+			//	textureSamplerResource.state.channelCount = 1;
+			//	auto samplerName = layerName + ".opacityMask";
+			//	materialResource->m_samplers[samplerName] = textureSamplerResource;
+			//}
 
 			layerIndex++;
 		}

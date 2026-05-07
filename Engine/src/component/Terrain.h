@@ -29,9 +29,23 @@ struct TextureBlend
 	}
 };
 
+struct LayerMask
+{
+	std::string name;
+	TextureAssetRef mask;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(name);
+		SERIALIZED_MEMBER(mask);
+	}
+};
+
 class EngineAPI Terrain : public Component
 {
 public:
+	static inline const int MAX_LAYER_COUNT = 3;
+
 	Terrain() = default;
 
 	std::string getName() override { return "Terrain"; }
@@ -80,9 +94,9 @@ public:
 	void addLayer();
 	void removeLayer(int index);
 	void swapLayers(int a, int b);
-	TerrainLayerAsset& getLayer(int index);
-	const TerrainLayerAsset& getLayer(int index) const;
-	const std::vector<TerrainLayerAsset>& getLayers() const;
+	LayerMask getLayer(int index);
+	//const std::vector<LayerMask>& getLayers() const;
+	const int getLayerCount() const;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -93,7 +107,7 @@ public:
 		SERIALIZED_MEMBER(m_scale);
 		SERIALIZED_MEMBER(m_material);
 		SERIALIZED_MEMBER(m_foliageField);
-		SERIALIZED_MEMBER(m_layers);
+		SERIALIZED_MEMBER(m_layerMasks);
 	}
 
 	float m_scale = 1.0f;
@@ -122,7 +136,7 @@ private:
 	TextureAssetRef m_heightmap;
 	ModelAssetRef m_mesh;
 
-	std::vector<TerrainLayerAsset> m_layers;
+	std::vector<LayerMask> m_layerMasks;
 
 };
 

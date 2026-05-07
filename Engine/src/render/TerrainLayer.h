@@ -24,7 +24,7 @@ struct TerrainLayerAsset
 	TextureAssetRef metallicTexture;
 	TextureAssetRef roughnessTexture;
 	TextureAssetRef aoTexture;
-	TextureAssetRef mask;
+	//TextureAssetRef mask;
 	glm::vec2 uv;
 
 	template <class Archive>
@@ -35,7 +35,6 @@ struct TerrainLayerAsset
 		SERIALIZED_MEMBER(metallicTexture);
 		SERIALIZED_MEMBER(roughnessTexture);
 		SERIALIZED_MEMBER(aoTexture);
-		SERIALIZED_MEMBER(mask);
 		SERIALIZED_MEMBER(uv);
 	}
 };

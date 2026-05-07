@@ -190,9 +190,10 @@ struct TerrainLayer
 {
     PBR_Sampler texturePack0;
     PBR_Sampler texturePack1;
-    PBR_Sampler opacityMask;
     vec2 uv;
 };
+
+uniform sampler2D terrainLayerMask[3];
 
 uniform TerrainLayer terrainLayers[3];
 
@@ -252,14 +253,14 @@ void main()
 {
     mat3 TBN = mat3(tangent, bitangent, fragNormal);
 
-    vec3 totalAlbedo;
-    vec3 totalNormal;
-    vec3 totalMRA;
+    vec3 totalAlbedo = vec3(0.0);
+    vec3 totalNormal = vec3(0.0);
+    vec3 totalMRA    = vec3(0.0);
     float opacityLeft = 1.0;
     int layerIndex = layerCount;
     while(layerIndex > 0 && opacityLeft > 0.0)
     {
-        float opacity = min(texture(terrainLayers[layerIndex-1].opacityMask.texture, texCoord).r, opacityLeft);
+        float opacity = min(texture(terrainLayerMask[layerIndex-1], texCoord).r, opacityLeft);
 
         vec3 normal;
         vec3 albedo;

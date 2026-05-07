@@ -21,6 +21,8 @@ public:
     // Read back the entire texture into CPU memory (for serialization)
     std::vector<float> readTextureData();
 
+    TextureResourceRef getBoundTexture();
+
 private:
     TextureResourceRef m_texture;
     float m_brushRadius = 10.0f;

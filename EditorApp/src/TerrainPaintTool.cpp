@@ -13,8 +13,11 @@ void TerrainPaintTool::onActivate()
     //if (g_activeTerrain->getLayers().size() < 2)
     //    return;
 
-    auto tLayer = g_activeTerrain->m_material->getProperty<std::shared_ptr<TerrainLayerAsset>>("terrainLayers[1]");
-    m_texturePainter.setTexture(tLayer->mask.resource());
+    auto layerMask = g_activeTerrain->getLayer(m_selectedLayerIndex);
+    m_texturePainter.setTexture(layerMask.mask.resource());
+    //m_texturePainter.setBrushRadius(2.f);
+
+
 }
 
 void TerrainPaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
@@ -60,9 +63,14 @@ bool TerrainPaintTool::onEvent(SDL_Event e)
         // Paint on the texture using compute
         m_texturePainter.applyBrush(offsetPos.x, offsetPos.y);
 
+        //g_activeTerrain->getLayer(m_selectedLayerIndex).mask.resource()->download();
+        //g_activeTerrain->getLayer(m_selectedLayerIndex).mask.makeDirty();
+
         //auto res = g_activeTerrain->m_material->getProperty<std::shared_ptr<TerrainLayerAsset>>("terrainLayers[1]")->mask.resource();
         //res->download();
-        g_activeTerrain->m_material.makeDirty();
+        //g_activeTerrain->m_material.makeDirty();
+
+
 
         return true;
     }

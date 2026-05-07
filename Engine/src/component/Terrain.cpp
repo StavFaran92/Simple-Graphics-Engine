@@ -67,13 +67,8 @@ std::vector<AssetRef<Asset>> Terrain::gatherDependenciesInternal() const
 	dependencies.push_back(m_heightmap);
 	dependencies.push_back(m_mesh);
 	dependencies.push_back(m_material);
-	for (auto& layer : m_layers)
+	for (auto& layer : m_layerMasks)
 	{
-		dependencies.push_back(layer.albedoTexture);
-		dependencies.push_back(layer.normalTexture);
-		dependencies.push_back(layer.metallicTexture);
-		dependencies.push_back(layer.roughnessTexture);
-		dependencies.push_back(layer.aoTexture);
 		dependencies.push_back(layer.mask);
 	}
 	return dependencies;
@@ -468,8 +463,11 @@ RayHit Terrain::raycast(const Ray& ray, float maxDistance)
 
 void Terrain::addLayer()
 {
-	TerrainLayerAsset layer;
-	layer.name = "Layer " + std::to_string(m_layers.size() + 1);
+	if (getLayerCount() > MAX_LAYER_COUNT)
+		return;
+
+	LayerMask layer;
+	layer.name = "Layer " + std::to_string(m_layerMasks.size());
 
 
 
@@ -484,7 +482,7 @@ void Terrain::addLayer()
 	tData.internalFormat = TextureInternalFormat::R32F;
 	tData.format = TextureFormat::RED;
 	tData.type = TextureType::FLOAT;
-	tData.textureName = "SGE_TERRAIN_LAYER_" + std::to_string(m_layers.size() + 1);
+	tData.textureName = "SGE_TERRAIN_LAYER_" + std::to_string(m_layerMasks.size());
 	tData.filter = TextureFilter::Linear;
 	tData.wrap = TextureWrap::Clamp;
 	tData.fillEmpty = false;
@@ -497,42 +495,51 @@ void Terrain::addLayer()
 	createDesc.textureData = tData;
 	auto layerMask = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc).as<TextureAsset>();
 
-
-	auto tLayer = m_material->getProperty<std::shared_ptr<TerrainLayerAsset>>("terrainLayers[1]");
-	tLayer->mask = layerMask;
-	m_material->setProperty("terrainLayers[1]", tLayer);
-
-
-
 	layer.mask = layerMask;
-	m_layers.push_back(layer);
+
+	m_layerMasks.push_back(layer);
+
+	//auto tLayer = m_material->getProperty<std::shared_ptr<TerrainLayerAsset>>("terrainLayers[1]");
+	//tLayer->mask = layerMask;
+	//m_material->setProperty("terrainLayers[1]", tLayer);
+
+
+
+	//layer.mask = layerMask;
+	//m_layers.push_back(layer);
 }
 
 void Terrain::removeLayer(int index)
 {
-	if (index < 0 || index >= (int)m_layers.size())
+	if (index < 0 || index >= (int)m_layerMasks.size())
 		return;
-	m_layers.erase(m_layers.begin() + index);
+	m_layerMasks.erase(m_layerMasks.begin() + index);
 }
 
 void Terrain::swapLayers(int a, int b)
 {
-	if (a < 0 || b < 0 || a >= (int)m_layers.size() || b >= (int)m_layers.size())
+	if (a < 0 || b < 0 || a >= (int)m_layerMasks.size() || b >= (int)m_layerMasks.size())
 		return;
-	std::swap(m_layers[a], m_layers[b]);
+	std::swap(m_layerMasks[a], m_layerMasks[b]);
 }
 
-TerrainLayerAsset& Terrain::getLayer(int index)
+LayerMask Terrain::getLayer(int index)
 {
-	return m_layers[index];
+	if (index >= m_layerMasks.size())
+	{
+		logWarning("Invalid terrain layer: {}", index);
+		return {"empty", TextureAssetRef::empty};
+	}
+
+	return m_layerMasks[index];
 }
 
-const TerrainLayerAsset& Terrain::getLayer(int index) const
-{
-	return m_layers[index];
-}
+//const std::vector<TextureResourceRef>& Terrain::getLayers() const
+//{
+//	return m_layers;
+//}
 
-const std::vector<TerrainLayerAsset>& Terrain::getLayers() const
+const int Terrain::getLayerCount() const
 {
-	return m_layers;
+	return m_layerMasks.size();
 }

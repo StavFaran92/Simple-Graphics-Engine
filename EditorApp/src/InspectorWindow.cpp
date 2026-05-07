@@ -6,7 +6,9 @@
 #include "EntityState.h"
 #include "EditorState.h"
 #include "NativeScriptsLoader.h"
+#include "TerrainPaintTool.h"
 #include "Widgets.h"
+#include "TerrainPaintTool.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -585,31 +587,34 @@ void InspectorWindow::display()
 
 					if (EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainPainter)
 					{
+						auto terrainPainter = std::static_pointer_cast<TerrainPaintTool>(
+							EditorState::Instance().getEditorTool(EditorTool::Type::TerrainPainter));
+						
+						
+
 						ImGui::Spacing();
 						ImGui::Separator();
 						ImGui::Text("Layers");
 						ImGui::Spacing();
 
-						static int selectedLayerIndex = 0;
-						const auto& layers = terrain.getLayers();
+						int layerCount = terrain.getLayerCount();
 
 						// Clamp selection in case layers changed
-						if (selectedLayerIndex >= (int)layers.size())
-							selectedLayerIndex = (int)layers.size() - 1;
+						terrainPainter->clampSelection(layerCount);
 
-						for (int i = 0; i < (int)layers.size(); i++)
+						for (int i = 0; i < layerCount; i++)
 						{
 							ImGui::PushID(i);
 
-							bool isSelected = (i == selectedLayerIndex);
+							bool isSelected = (i == terrainPainter->getSelectedLayer());
 							ImGui::Bullet();
 							ImGui::SameLine();
 
-							const auto& layer = terrain.getLayer(i);
+							const LayerMask& layer = terrain.getLayer(i);
 							std::string label = layer.name;
 
 							if (ImGui::Selectable(label.c_str(), isSelected))
-								selectedLayerIndex = i;
+								terrainPainter->selectLayer(i);
 
 							ImGui::PopID();
 						}
@@ -625,34 +630,35 @@ void InspectorWindow::display()
 						ImGui::SameLine();
 
 						// Remove button — disabled when only 1 layer remains
-						ImGui::BeginDisabled(layers.size() <= 1);
+						ImGui::BeginDisabled(layerCount <= 1);
 						if (ImGui::Button("-"))
 						{
-							terrain.removeLayer(selectedLayerIndex);
-							if (selectedLayerIndex >= (int)terrain.getLayers().size())
-								selectedLayerIndex = (int)terrain.getLayers().size() - 1;
+							terrain.removeLayer(terrainPainter->getSelectedLayer());
+							terrainPainter->clampSelection(terrain.getLayerCount());
 						}
 						ImGui::EndDisabled();
 
 						ImGui::SameLine();
 
 						// Move up
-						ImGui::BeginDisabled(selectedLayerIndex == 0);
+						ImGui::BeginDisabled(terrainPainter->getSelectedLayer() == 0);
 						if (ImGui::Button("^"))
 						{
-							terrain.swapLayers(selectedLayerIndex, selectedLayerIndex - 1);
-							selectedLayerIndex--;
+							int sel = terrainPainter->getSelectedLayer();
+							terrain.swapLayers(sel, sel - 1);
+							terrainPainter->selectLayer(sel - 1);
 						}
 						ImGui::EndDisabled();
 
 						ImGui::SameLine();
 
 						// Move down
-						ImGui::BeginDisabled(selectedLayerIndex >= (int)layers.size() - 1);
+						ImGui::BeginDisabled(terrainPainter->getSelectedLayer() >= layerCount - 1);
 						if (ImGui::Button("v"))
 						{
-							terrain.swapLayers(selectedLayerIndex, selectedLayerIndex + 1);
-							selectedLayerIndex++;
+							int sel = terrainPainter->getSelectedLayer();
+							terrain.swapLayers(sel, sel + 1);
+							terrainPainter->selectLayer(sel + 1);
 						}
 						ImGui::EndDisabled();
 

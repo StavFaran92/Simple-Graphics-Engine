@@ -593,7 +593,7 @@ void Scene::draw(float deltaTime)
 				terrainShader->setUniformValue("height", terrain.getHeight());
 				terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
 				terrainShader->setUniformValue("cameraPos", graphics->cameraPos);
-				terrainShader->setUniformValue("layerCount", (int)terrain.getLayers().size());
+				terrainShader->setUniformValue("layerCount", terrain.getLayerCount());
 				terrainShader->bindUniformBlockToBindPoint("Time", 0);
 				terrainShader->bindUniformBlockToBindPoint("Lights", 1);
 				terrainShader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 0);
@@ -601,6 +601,13 @@ void Scene::draw(float deltaTime)
 				terrainShader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 2);
 				terrainShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 3);
 				terrainShader->setTextureInShader(heightmap, "heightMap", 4);
+
+				for (int i = 0; i < terrain.getLayerCount(); i++)
+				{
+					auto& mask = terrain.getLayer(i).mask.resource();
+					auto name = "terrainLayerMask[" + std::to_string(i) + "]";
+					terrainShader->setTextureInShader(mask, name, 5 + i);
+				}
 
 				terrain.m_material.resource()->use();
 
