@@ -7,6 +7,14 @@ extern Terrain* g_activeTerrain;
 
 void TerrainPaintTool::onActivate()
 {
+    if (!g_activeTerrain)
+        return;
+
+    if (g_activeTerrain->getLayers().size() < 2)
+        return;
+
+    TerrainLayerAsset tLayer = g_activeTerrain->getLayer(1);
+    m_texturePainter.setTexture(tLayer.mask.resource());
 }
 
 void TerrainPaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
@@ -43,5 +51,21 @@ void TerrainPaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 
 bool TerrainPaintTool::onEvent(SDL_Event e)
 {
+    if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+    {
+        glm::vec2 offsetPos = glm::vec2(m_currentResult.position.x, m_currentResult.position.z);
+        offsetPos.x += g_activeTerrain->getWidth() * .5f;
+        offsetPos.y += g_activeTerrain->getHeight() * .5f;
+
+        // Paint on the texture using compute
+        m_texturePainter.applyBrush(offsetPos.x, offsetPos.y);
+
+        auto res = g_activeTerrain->getLayer(1).mask.resource();
+        res->download();
+        g_activeTerrain->getLayer(1).mask.makeDirty();
+
+        return true;
+    }
+
     return false;
 }

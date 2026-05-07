@@ -470,6 +470,39 @@ void Terrain::addLayer()
 {
 	TerrainLayerAsset layer;
 	layer.name = "Layer " + std::to_string(m_layers.size() + 1);
+
+
+
+
+
+
+	TextureData tData;
+	tData.target = TextureTarget::TEXTURE_2D;
+	tData.width = m_width;
+	tData.height = m_height;
+	tData.channels = 1;
+	tData.internalFormat = TextureInternalFormat::R32F;
+	tData.format = TextureFormat::RED;
+	tData.type = TextureType::FLOAT;
+	tData.textureName = "SGE_TERRAIN_LAYER_" + std::to_string(m_layers.size() + 1);
+	tData.filter = TextureFilter::Linear;
+	tData.wrap = TextureWrap::Clamp;
+	tData.fillEmpty = false;
+
+	AssetBuildDescriptor desc;
+	desc.aType = AssetType::TEXTURE;
+	desc.name = tData.textureName;
+	desc.isEngineOwned = true;
+	TextureCreateDescriptor createDesc;
+	createDesc.textureData = tData;
+	auto layerMask = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc).as<TextureAsset>();
+
+
+
+
+
+
+	layer.mask = layerMask;
 	m_layers.push_back(layer);
 }
 

@@ -337,19 +337,7 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 			{
 				TextureSampler textureSamplerResource;
 
-				// TODO remove
-				if (layerIndex == 0)
-				{
-					textureSamplerResource.texture = whiteTexture;
-				}
-				else if (layerIndex == 1)
-				{
-					textureSamplerResource.texture = checkerboarcTexture;
-				}
-				else
-				{
-					textureSamplerResource.texture = layer->mask.isEmpty() ? blackTexture : layer->mask.resource();
-				}
+				textureSamplerResource.texture = layer->mask.isEmpty() ? blackTexture : layer->mask.resource();
 				
 				textureSamplerResource.state.isActive = true;
 				textureSamplerResource.state.channelCount = 1;
