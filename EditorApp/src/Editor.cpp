@@ -1,10 +1,6 @@
 #include "EntryPoint.h"
 #include "sge.h"
 
-#include "commdlg.h"
-
-#include <filesystem>
-
 #include "imgui_internal.h"
 
 #include "tinyfiledialogs.h"
@@ -19,7 +15,6 @@
 #include "EditorState.h"
 #include "DialogManager.h"
 
-#include <imgui_stdlib.h>
 #include "core/Logger.h"
 #include <vector>
 #include <mutex>
@@ -32,9 +27,6 @@
 #include "AssetInspectorWindow.h"
 #include "SceneHierarchyWindow.h"
 #include "SceneViewWindow.h"
-#include "Dialogs/MaterialCreateDialog.h"
-#include "Dialogs/AssetSelectDialog.h"
-#include "Dialogs/EditSamplerDialog.h"
 #include "menus/CreateMenu.h"
 
 
@@ -344,6 +336,58 @@ class GUI_Helper : public GuiMenu {
 					Engine::get()->saveProject();
 				}
 				if (ImGui::BeginMenu("Import")) {
+					if (ImGui::MenuItem("New Asset")) {
+						const char* filepath = tinyfd_openFileDialog(
+							"Select an asset to load",
+							"",
+							NULL,
+							NULL,
+							"",
+							1);
+
+						if (filepath)
+						{
+							std::vector<std::string> files;
+							std::stringstream ss(filepath);
+							std::string token;
+							while (std::getline(ss, token, '|'))
+								files.push_back(token);
+
+							static const std::unordered_set<std::string> textureExts = { ".png", ".jpg", ".bmp", ".hdr", ".exr" };
+
+							for (const auto& file : files)
+							{
+								std::filesystem::path path(file);
+								std::string ext = path.extension().string();
+								std::string stem = path.filename().stem().string();
+								std::string uniqueName = Engine::get()->getSubSystem<UniqueNameManager>()->suggestUniqueName(stem, EditorState::Instance().getWorkingDir().path());
+
+								AssetBuildDescriptor desc;
+								desc.name = uniqueName;
+								desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
+
+								if (ext == ".lua")
+								{
+									desc.aType = AssetType::LUA_SCRIPT;
+									LuaScriptLoadDescriptor loadDesc;
+									loadDesc.sourcePath = file;
+									Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
+								}
+								else if (textureExts.count(ext))
+								{
+									desc.aType = AssetType::TEXTURE;
+									TextureLoadDescriptor texDesc;
+									texDesc.sourcePath = file;
+									texDesc.usage = TextureSemantic::Color;
+									Engine::get()->getSubSystem<Assets>()->importAsset(desc, texDesc);
+								}
+								else
+								{
+									logWarning("Import not implemented for extension: " + ext);
+								}
+							}
+						}
+					}
 					if (ImGui::MenuItem("Model")) {
 						DialogManager::Instance().modelImportDialog.activate();
 					}

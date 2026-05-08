@@ -554,10 +554,15 @@ void Engine::handleEvents(bool& quit)
             }
         }
 
-        //User requests quit
         if (e.type == SDL_QUIT)
         {
             quit = true;
+        }
+
+        if (e.type == SDL_DROPFILE)
+        {
+            logInfo("File dropped: {}", e.drop.file);
+            SDL_free(e.drop.file);
         }
 
         m_eventSystem->dispatch(e);
