@@ -33,8 +33,20 @@ public:
             m_selectedLayerIndex = 0;
     }
 
+    enum class DrawMode { Draw, Erase };
+
+    void setBrushRadius(float r) { m_texturePainter.setBrushRadius(r); }
+    float getBrushRadius() const { return m_texturePainter.getBrushRadius(); }
+
+    void setBrushStrength(float s) { m_texturePainter.setBrushStrength(s); }
+    float getBrushStrength() const { return m_texturePainter.getBrushStrength(); }
+
+    void setDrawMode(DrawMode mode);
+    DrawMode getDrawMode() const { return m_drawMode; }
+
 private:
     int m_selectedLayerIndex = 0;
     RayHit m_currentResult;
     TexturePainter m_texturePainter;
+    DrawMode m_drawMode = DrawMode::Draw;
 };

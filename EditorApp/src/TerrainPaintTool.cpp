@@ -91,3 +91,17 @@ void TerrainPaintTool::selectLayer(int index)
     auto layerMask = g_activeTerrain->getLayer(m_selectedLayerIndex);
     m_texturePainter.setTexture(layerMask.mask.resource());
 }
+
+void TerrainPaintTool::setDrawMode(DrawMode mode)
+{
+    m_drawMode = mode;
+
+    if (mode == DrawMode::Draw)
+    {
+        m_texturePainter.setDrawMode(TexturePainter::DrawMode::Add);
+    }
+    else if (mode == DrawMode::Erase)
+    {
+        m_texturePainter.setDrawMode(TexturePainter::DrawMode::Subtract);
+    }
+}

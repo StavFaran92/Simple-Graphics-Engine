@@ -27,6 +27,16 @@ float TexturePainter::getBrushStrength() const
     return m_brushStrength;
 }
 
+void TexturePainter::setDrawMode(DrawMode mode)
+{
+    m_drawMode = mode;
+}
+
+TexturePainter::DrawMode TexturePainter::getDrawMode() const
+{
+    return m_drawMode;
+}
+
 void TexturePainter::applyBrush(int pixelX, int pixelY)
 {
 
@@ -37,11 +47,13 @@ void TexturePainter::applyBrush(int pixelX, int pixelY)
     int w = m_texture->getWidth();
     int h = m_texture->getHeight();
 
+    float brushStrength = (m_drawMode == DrawMode::Add) ? m_brushStrength : -m_brushStrength;
+
     ShaderResourceRef texturePaintShader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_TEXTURE_BRUSH_DEFORM);
     texturePaintShader->use();
     texturePaintShader->setUniformValue("brushCenter", glm::vec2((float)pixelX, (float)pixelY));
     texturePaintShader->setUniformValue("brushRadius", m_brushRadius);
-    texturePaintShader->setUniformValue("brushStrength", m_brushStrength);
+    texturePaintShader->setUniformValue("brushStrength", brushStrength);
 
     glBindImageTexture(0, texID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 

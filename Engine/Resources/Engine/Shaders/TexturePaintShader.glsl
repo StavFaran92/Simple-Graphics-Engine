@@ -24,5 +24,7 @@ void main()
     float h = imageLoad(target, pix).r;
     h += brushStrength * falloff;
 
+    h = clamp(h, 0.0, 1.0);
+
     imageStore(target, pix, vec4(h, 0, 0, 0));
 }

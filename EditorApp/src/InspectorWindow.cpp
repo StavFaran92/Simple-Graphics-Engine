@@ -662,6 +662,26 @@ void InspectorWindow::display()
 						}
 						ImGui::EndDisabled();
 
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Text("Brush");
+						ImGui::Spacing();
+
+						static const char* drawModeNames[] = { "Draw", "Erase" };
+						int drawMode = (int)terrainPainter->getDrawMode();
+						if (ImGui::Combo("Mode", &drawMode, drawModeNames, IM_ARRAYSIZE(drawModeNames)))
+							terrainPainter->setDrawMode((TerrainPaintTool::DrawMode)drawMode);
+
+						float radius = terrainPainter->getBrushRadius();
+						if (ImGui::SliderFloat("Radius", &radius, 1.0f, 50.0f))
+							terrainPainter->setBrushRadius(radius);
+
+						float strength = terrainPainter->getBrushStrength();
+						if (ImGui::SliderFloat("Strength", &strength, 0.0f, 1.0f))
+							terrainPainter->setBrushStrength(strength);
+
+						
+
 					} // TerrainPainter active
 
 					ImGui::EndTabItem();

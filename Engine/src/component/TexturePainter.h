@@ -7,6 +7,12 @@
 class EngineAPI TexturePainter
 {
 public:
+    enum class DrawMode
+    {
+        Add,
+        Subtract
+    };
+
     void setTexture(const TextureResourceRef& tex);
 
     void setBrushRadius(float r);
@@ -15,8 +21,13 @@ public:
     void setBrushStrength(float s);
     float getBrushStrength()const;
 
+    void setDrawMode(DrawMode mode);
+    DrawMode getDrawMode() const;
+
     // brushCenter is in pixel coordinates
     void applyBrush(int pixelX, int pixelY);
+
+
 
     // Read back the entire texture into CPU memory (for serialization)
     std::vector<float> readTextureData();
@@ -27,5 +38,7 @@ private:
     TextureResourceRef m_texture;
     float m_brushRadius = 10.0f;
     float m_brushStrength = .1f;
+
+    DrawMode m_drawMode = DrawMode::Add;
 
 };
