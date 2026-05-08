@@ -63,8 +63,9 @@ bool TerrainPaintTool::onEvent(SDL_Event e)
         // Paint on the texture using compute
         m_texturePainter.applyBrush(offsetPos.x, offsetPos.y);
 
-        //g_activeTerrain->getLayer(m_selectedLayerIndex).mask.resource()->download();
-        //g_activeTerrain->getLayer(m_selectedLayerIndex).mask.makeDirty();
+        // TODO should move to on mouse released
+        g_activeTerrain->getLayer(m_selectedLayerIndex).mask.resource()->download();
+        g_activeTerrain->getLayer(m_selectedLayerIndex).mask.makeDirty();
 
         //auto res = g_activeTerrain->m_material->getProperty<std::shared_ptr<TerrainLayerAsset>>("terrainLayers[1]")->mask.resource();
         //res->download();
