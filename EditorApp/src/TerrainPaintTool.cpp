@@ -87,6 +87,10 @@ void TerrainPaintTool::selectLayer(int index)
         return;
     }
 
+    // cannot alter base layer
+    if (index == 0)
+        return;
+
     m_selectedLayerIndex = index;
 
     auto layerMask = g_activeTerrain->getLayer(m_selectedLayerIndex);

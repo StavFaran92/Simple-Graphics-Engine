@@ -95,7 +95,11 @@ Terrain Terrain::createTerrainComponent(int width, int height)
 		terrain.m_textureBlends.push_back(blend);
 	}
 
-	terrain.addLayer();
+	// Add built in default layer
+	LayerMask layer;
+	layer.name = "Layer 0";
+	layer.mask = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE);
+	terrain.m_layerMasks.push_back(layer);
 
 
 	terrain.m_material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_TERRAIN_DEFAULT);
@@ -513,16 +517,9 @@ void Terrain::addLayer()
 
 void Terrain::removeLayer(int index)
 {
-	if (index < 0 || index >= (int)m_layerMasks.size())
+	if (index < 1 || index >= (int)m_layerMasks.size())
 		return;
 	m_layerMasks.erase(m_layerMasks.begin() + index);
-}
-
-void Terrain::swapLayers(int a, int b)
-{
-	if (a < 0 || b < 0 || a >= (int)m_layerMasks.size() || b >= (int)m_layerMasks.size())
-		return;
-	std::swap(m_layerMasks[a], m_layerMasks[b]);
 }
 
 LayerMask Terrain::getLayer(int index)

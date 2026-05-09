@@ -22,6 +22,7 @@ struct EngineAPI AssetRecord
 	bool isTransient = false;
 	std::string assetDirectory;
 	std::string ext;
+	AssetVisibility visibility = AssetVisibility::Public; //only relevant for engine assets
 	Ref<Asset> asset;
 	ResourceID resourceID = 0;
 
@@ -46,6 +47,8 @@ struct EngineAPI AssetRecord
 
 	// This means the Asset has changed and therefore the resource is not updated with the changes.
 	bool isResourceDirty() const;
+
+	bool isVisible() const;
 
 	std::string getAbsolutePath() const;
 	ScopedPath getScopedPath() const;

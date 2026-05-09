@@ -19,4 +19,5 @@ public:
 	int selectedAssetIndex = -1;
 	AssetType assetType = AssetType::NONE;
 	std::function<void(UUID)> onAccpetCB;
+	std::vector<AssetRecord> currentDisplayedAssetList;
 };

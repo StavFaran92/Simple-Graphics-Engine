@@ -26,6 +26,7 @@ void BuiltInAssetsLoader::loadTextures()
 		desc.aType = AssetType::TEXTURE;
 		desc.name = "SGE_TEXTURE_WHITE";
 		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
 		TextureCreateDescriptor createDesc;
 		createDesc.textureData.target = TextureTarget::TEXTURE_2D;
 		createDesc.textureData.width = 1;
@@ -48,6 +49,7 @@ void BuiltInAssetsLoader::loadTextures()
 		desc.aType = AssetType::TEXTURE;
 		desc.name = "SGE_TEXTURE_BLACK";
 		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
 		TextureCreateDescriptor createDesc;
 		createDesc.textureData.target = TextureTarget::TEXTURE_2D;
 		createDesc.textureData.width = 1;
@@ -67,6 +69,7 @@ void BuiltInAssetsLoader::loadTextures()
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
 		desc.name = "SGE_TEXTURE_GRASS";
 		TextureLoadDescriptor loadDesc;
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg";
@@ -87,6 +90,7 @@ void BuiltInAssetsLoader::loadTextures()
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
 		desc.name = "SGE_TEXTURE_TERRAIN_CHECKERBOARD";
 		TextureLoadDescriptor loadDesc;
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/checkerboard.jpg";
@@ -102,6 +106,7 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.aType = AssetType::MATERIAL;
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_DEFAULT;
+		desc.visibility = AssetVisibility::Public;
 		MaterialCreateDescriptor createDesc;
 		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Opaque);
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
@@ -112,6 +117,7 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.aType = AssetType::MATERIAL;
 		desc.isEngineOwned = true;
 		desc.name = SGE_MATERIAL_TERRAIN_DEFAULT;
+		desc.visibility = AssetVisibility::Public;
 		MaterialCreateDescriptor createDesc;
 		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Terrain);
 		auto materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc).as<MaterialAsset>();
@@ -134,6 +140,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.aType = AssetType::MODEL;
 		desc.name = "SGE_MESH_BOX";
 		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
 		ModelCreateDescriptor meshDesc;
 		meshDesc.data.m_meshes = std::vector<MeshData>{ Box::createMesh()->getMeshData() };
 
@@ -145,6 +152,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.aType = AssetType::MODEL;
 		desc.name = "SGE_MESH_QUAD";
 		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
 		ModelCreateDescriptor meshDesc;
 		meshDesc.data.m_meshes = std::vector<MeshData>{ Quad::createMesh()->getMeshData() };
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
@@ -155,6 +163,7 @@ void BuiltInAssetsLoader::loadMeshes()
 		desc.aType = AssetType::MODEL;
 		desc.name = "SGE_MESH_SPHERE";
 		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
 		ModelCreateDescriptor meshDesc;
 		meshDesc.data.m_meshes = std::vector<MeshData>{ Sphere::createMesh(1, 36, 36)->getMeshData() };
 		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);

@@ -638,30 +638,6 @@ void InspectorWindow::display()
 						}
 						ImGui::EndDisabled();
 
-						ImGui::SameLine();
-
-						// Move up
-						ImGui::BeginDisabled(terrainPainter->getSelectedLayer() == 0);
-						if (ImGui::Button("^"))
-						{
-							int sel = terrainPainter->getSelectedLayer();
-							terrain.swapLayers(sel, sel - 1);
-							terrainPainter->selectLayer(sel - 1);
-						}
-						ImGui::EndDisabled();
-
-						ImGui::SameLine();
-
-						// Move down
-						ImGui::BeginDisabled(terrainPainter->getSelectedLayer() >= layerCount - 1);
-						if (ImGui::Button("v"))
-						{
-							int sel = terrainPainter->getSelectedLayer();
-							terrain.swapLayers(sel, sel + 1);
-							terrainPainter->selectLayer(sel + 1);
-						}
-						ImGui::EndDisabled();
-
 						ImGui::Spacing();
 						ImGui::Separator();
 						ImGui::Text("Brush");

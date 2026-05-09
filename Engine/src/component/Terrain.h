@@ -93,9 +93,7 @@ public:
 
 	void addLayer();
 	void removeLayer(int index);
-	void swapLayers(int a, int b);
 	LayerMask getLayer(int index);
-	//const std::vector<LayerMask>& getLayers() const;
 	const int getLayerCount() const;
 
 	template <class Archive>

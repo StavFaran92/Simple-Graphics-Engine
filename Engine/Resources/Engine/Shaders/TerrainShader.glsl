@@ -260,7 +260,8 @@ void main()
     int layerIndex = layerCount;
     while(layerIndex > 0 && opacityLeft > 0.0)
     {
-        float opacity = min(texture(terrainLayerMask[layerIndex-1], texCoord).r, opacityLeft);
+        // If base layer use left opacity (base is always full)
+        float opacity = (layerIndex == 1) ? opacityLeft : min(texture(terrainLayerMask[layerIndex-1], texCoord).r, opacityLeft);       
 
         vec3 normal;
         vec3 albedo;

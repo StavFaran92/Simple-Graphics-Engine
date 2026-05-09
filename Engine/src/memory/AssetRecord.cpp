@@ -23,6 +23,7 @@ void to_json(nlohmann::json& j, const AssetRecord& r)
 		{"isEngineOwned", r.isEngineOwned},
 		{"assetDirectory", r.assetDirectory},
 		{"ext", r.ext},
+		{"visibility", r.visibility},
 		{"asset", serializeAsset(r.asset)}
 	};
 }
@@ -34,6 +35,7 @@ void from_json(const nlohmann::json& j, AssetRecord& r)
 	j.at("sourcePath").get_to(r.sourcePath);
 	j.at("aType").get_to(r.aType);
 	j.at("isEngineOwned").get_to(r.isEngineOwned);
+	j.at("visibility").get_to(r.visibility);
 	j.at("ext").get_to(r.ext);
 	j.at("assetDirectory").get_to(r.assetDirectory);
 
@@ -49,6 +51,7 @@ AssetRecord::AssetRecord(const AssetBuildDescriptor& assetDesc)
 	aType = assetDesc.aType;
 	isEngineOwned = assetDesc.isEngineOwned;
 	assetDirectory = assetDesc.assetDirectory;
+	visibility = assetDesc.visibility;
 
 	uuid = UUID::generate_uuid_v4();
 }
@@ -82,6 +85,11 @@ bool AssetRecord::isSerializationDirty() const
 bool AssetRecord::isResourceDirty() const
 {
 	return m_isResourceDirty;
+}
+
+bool AssetRecord::isVisible() const
+{
+	return !(isEngineOwned && visibility == AssetVisibility::Internal);
 }
 
 std::string AssetRecord::getAbsolutePath() const
