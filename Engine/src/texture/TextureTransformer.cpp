@@ -127,13 +127,16 @@ TextureResourceRef TextureTransformer::packTextures(
 
 	fbo.bind();
 
-	RenderBufferObject rbo{ src0.get()->getWidth(), src0.get()->getHeight() };
+	int maxWidth  = std::max({ src0.get()->getWidth(),  src1.get()->getWidth(),  src2.get()->getWidth(),  src3.get()->getWidth() });
+	int maxHeight = std::max({ src0.get()->getHeight(), src1.get()->getHeight(), src2.get()->getHeight(), src3.get()->getHeight() });
+
+	RenderBufferObject rbo{ maxWidth, maxHeight };
 	fbo.attachRenderBuffer(rbo.GetID(), FrameBufferObject::AttachmentType::Depth);
 
 	TextureData tData;
 	tData.channels = 4;
-	tData.height = src0.get()->getHeight();
-	tData.width = src0.get()->getWidth();
+	tData.height = maxHeight;
+	tData.width = maxWidth;
 	tData.internalFormat = TextureInternalFormat::RGBA8;
 	tData.format = TextureFormat::RGBA;
 	TextureResourceRef outputTexture = Texture::createTexture(tData);
@@ -147,7 +150,7 @@ TextureResourceRef TextureTransformer::packTextures(
 	}
 
 	// set viewport
-	glViewport(0, 0, src0.get()->getWidth(), src0.get()->getHeight());
+	glViewport(0, 0, maxWidth, maxHeight);
 
 	shader->use();
 	shader->setUniformValue("channel0", channel0);

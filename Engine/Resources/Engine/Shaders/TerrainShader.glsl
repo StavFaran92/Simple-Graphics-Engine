@@ -183,6 +183,7 @@ uniform samplerCube gIrradianceMap;
 uniform samplerCube gPrefilterEnvMap;
 uniform sampler2D gBRDFIntegrationLUT;
 uniform sampler2D gShadowMap;
+layout(binding = 5) uniform sampler2D noise;
 
 uniform int layerCount;
 
@@ -193,7 +194,7 @@ struct TerrainLayer
     vec2 uv;
 };
 
-layout(binding = 5) uniform sampler2D terrainLayerMask[3];
+layout(binding = 6) uniform sampler2D terrainLayerMask[3];
 
 uniform TerrainLayer terrainLayers[3];
 
@@ -209,6 +210,30 @@ in vec3 bitangent;
 
 out vec4 FragColor;
 
+float sum( vec4 v ) { return v.x+v.y+v.z+v.w; }
+
+vec4 textureNoTile(sampler2D tex, in vec2 uv)
+{
+    float k = texture( noise, 0.005 * uv ).x; // cheap (cache friendly) lookup
+    
+    vec2 duvdx = dFdx( uv );
+    vec2 duvdy = dFdy( uv );
+    
+    float l = k*8.0;
+    float f = fract(l);
+    
+    float ia = floor(l);
+    float ib = ia + 1.0;
+    
+    vec2 offa = sin(vec2(3.0,7.0)*ia); // can replace with any other hash
+    vec2 offb = sin(vec2(3.0,7.0)*ib); // can replace with any other hash
+
+    vec4 cola = textureGrad( tex, uv + offa, duvdx, duvdy );
+    vec4 colb = textureGrad( tex, uv + offb, duvdx, duvdy );
+    
+    return mix( cola, colb, smoothstep(0.2,0.8,f-0.1*sum(cola-colb)) );
+}
+
 void sampleTerrainPBR(
     in mat3 TBN,
     in vec3 normalIn,
@@ -221,8 +246,8 @@ void sampleTerrainPBR(
     out vec3 outMRA
 )
 {
-    vec4 texPack0 = texture(terrainLayer.texturePack0.texture, uv);
-    vec4 texPack1 = texture(terrainLayer.texturePack1.texture, uv);
+    vec4 texPack0 = textureNoTile(terrainLayer.texturePack0.texture, uv);
+    vec4 texPack1 = textureNoTile(terrainLayer.texturePack1.texture, uv);
     vec3 albedo = texPack0.rgb;
     float nx = texPack0.a;
     float ny = texPack1.a;
@@ -260,8 +285,17 @@ void main()
     int layerIndex = layerCount;
     while(layerIndex > 0 && opacityLeft > 0.0)
     {
+        float opacity;
         // If base layer use left opacity (base is always full)
-        float opacity = (layerIndex == 1) ? opacityLeft : min(texture(terrainLayerMask[layerIndex-1], texCoord).r, opacityLeft);       
+        if(layerIndex == 1)
+        {
+            opacity = opacityLeft;
+        }
+        else
+        {
+            float sampledOpacity = texture(terrainLayerMask[layerIndex-1], texCoord).r;
+            opacity = min(sampledOpacity, opacityLeft);  
+        }    
 
         vec3 normal;
         vec3 albedo;

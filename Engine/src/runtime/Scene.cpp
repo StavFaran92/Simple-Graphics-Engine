@@ -602,11 +602,14 @@ void Scene::draw(float deltaTime)
 				terrainShader->setTextureInShader(graphics->shadowMap, "gShadowMap", 3);
 				terrainShader->setTextureInShader(heightmap, "heightMap", 4);
 
+				auto tileNoise = BuiltInAssets::getByName<TextureAsset>("SGE_TEXTURE_TILE_NOISE").resource();
+				terrainShader->setTextureInShader(tileNoise, "tileNoise", 5);
+
 				for (int i = 0; i < terrain.getLayerCount(); i++)
 				{
 					auto& mask = terrain.getLayer(i).mask.resource();
 					auto name = "terrainLayerMask[" + std::to_string(i) + "]";
-					terrainShader->setTextureInShader(mask, name, 5 + i);
+					terrainShader->setTextureInShader(mask, name, 6 + i);
 				}
 
 				terrain.m_material.resource()->use();

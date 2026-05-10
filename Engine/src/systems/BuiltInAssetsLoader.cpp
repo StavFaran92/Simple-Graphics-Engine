@@ -96,6 +96,16 @@ void BuiltInAssetsLoader::loadTextures()
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/checkerboard.jpg";
 		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
 	}
+
+	{
+		AssetBuildDescriptor desc;
+		desc.aType = AssetType::TEXTURE;
+		desc.isEngineOwned = true;
+		desc.name = "SGE_TEXTURE_TILE_NOISE";
+		TextureLoadDescriptor loadDesc;
+		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/texTileNoise.png";
+		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
+	}
 }
 
 void BuiltInAssetsLoader::loadMaterials()

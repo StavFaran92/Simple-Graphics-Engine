@@ -68,7 +68,7 @@ void Material::use()
 
 	shader->use();
 
-	int slot = 8;
+	int slot = 9;
 
 	// Set samplers
 	for (const auto& [name, sampler] : m_samplers)
