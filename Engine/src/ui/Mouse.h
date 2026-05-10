@@ -65,7 +65,7 @@ private:
 	MouseState m_state;
 };
 
-class EngineAPI GameMouse : public Mouse, SubSystem
+class EngineAPI GameMouse : public Mouse, public SubSystem
 {
 public:
 	GameMouse();

@@ -37,7 +37,7 @@ private:
 	int m_length = 0;
 };
 
-class EngineAPI GameKeyboard : public Keyboard, SubSystem
+class EngineAPI GameKeyboard : public Keyboard, public SubSystem
 {
 public:
 	GameKeyboard();

@@ -26,6 +26,7 @@
 
 #include "component/ImageComponent.h"
 #include "physics/Physics.h"
+#include "core/System.h"
 
 #include "core/Window.h"
 #include "ui/Mouse.h"
@@ -367,7 +368,9 @@ void bindUI(sol::state& lua)
 
     lua.new_usertype<GameKeyboard>("Keyboard",
         sol::no_constructor,
-        "get", []() { return std::ref(*Engine::get()->getSubSystem<GameKeyboard>()); },
+        "get", []() { 
+            return std::ref(*Engine::get()->getSubSystem<GameKeyboard>());
+        },
 
         // Methods
         "getKeyState", &GameKeyboard::getKeyState,
@@ -501,7 +504,7 @@ void bindAll(sol::state& lua)
 
     
 
-    lua.set_function("getActiveScene", []() { return  Engine::get()->getContext()->getActiveScene(); });
+    lua.set_function("getActiveScene", []() { return  std::ref(*Engine::get()->getContext()->getActiveScene().get()); });
     lua.set_function("assets", []() { return std::ref(*Engine::get()->getSubSystem<Assets>()); });
 
 }

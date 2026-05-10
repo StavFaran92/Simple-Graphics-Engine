@@ -97,10 +97,14 @@ void ScriptSystem::callUpdate(float dt)
 {
     for (auto& script : impl_->scripts)
     {
-        sol::function fn = script.script["update"];
+        sol::protected_function fn = script.script["update"];
         if (fn.valid())
         {
-            fn(script.script, script.entity, dt);
+            sol::protected_function_result result = fn(script.script, script.entity, dt);
+            if (!result.valid()) {
+                sol::error err = result;
+                logError("Lua Error: {}", err.what());
+            }
         }
     }
 }

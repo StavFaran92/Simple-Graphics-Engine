@@ -50,7 +50,7 @@ AssetRecord::AssetRecord(const AssetBuildDescriptor& assetDesc)
 	name = assetDesc.name;
 	aType = assetDesc.aType;
 	isEngineOwned = assetDesc.isEngineOwned;
-	assetDirectory = assetDesc.assetDirectory;
+	assetDirectory = (assetDesc.targetDirectory.relative() / assetDesc.assetDirectory).string();
 	visibility = assetDesc.visibility;
 
 	uuid = UUID::generate_uuid_v4();
