@@ -436,6 +436,7 @@ void bindAll(sol::state& lua)
             sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator*)
         ),
         sol::meta_function::division, sol::resolve<glm::vec3(const glm::vec3&, float)>(glm::operator/),
+        sol::meta_function::unary_minus, [](const glm::vec3& v) { return -v; },
         sol::meta_function::to_string, [](const glm::vec3& v) {
             return "vec3(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")";
         },
