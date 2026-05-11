@@ -109,6 +109,22 @@ void ScriptSystem::callUpdate(float dt)
     }
 }
 
+void ScriptSystem::callOnEvent(SDL_Event e)
+{
+    for (auto& script : impl_->scripts)
+    {
+        sol::protected_function fn = script.script["onEvent"];
+        if (fn.valid())
+        {
+            sol::protected_function_result result = fn(script.script, script.entity, e);
+            if (!result.valid()) {
+                sol::error err = result;
+                logError("Lua Error: {}", err.what());
+            }
+        }
+    }
+}
+
 void ScriptSystem::callDestroy()
 {
     for (auto& script : impl_->scripts)

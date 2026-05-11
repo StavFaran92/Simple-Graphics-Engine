@@ -337,6 +337,13 @@ void Scene::init(Context* context, ResourceID rid)
 	//logInfo("Sum is: {}", result);
 }
 
+bool Scene::onEvent(SDL_Event e)
+{
+	Engine::get()->getSubSystem<ScriptSystem>()->callOnEvent(e);
+
+	return false;
+}
+
 void Scene::makeDirty()
 {
 	m_isDirty = true;
