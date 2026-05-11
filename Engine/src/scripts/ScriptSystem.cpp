@@ -8,6 +8,7 @@
 #include "scripts/LuaBindings.h"
 #include "runtime/Entity.h"
 #include "core/Engine.h"
+#include "core/Event.h"
 
 struct LuaState
 {
@@ -116,7 +117,7 @@ void ScriptSystem::callOnEvent(SDL_Event e)
         sol::protected_function fn = script.script["onEvent"];
         if (fn.valid())
         {
-            sol::protected_function_result result = fn(script.script, script.entity, e);
+            sol::protected_function_result result = fn(script.script, Event());
             if (!result.valid()) {
                 sol::error err = result;
                 logError("Lua Error: {}", err.what());

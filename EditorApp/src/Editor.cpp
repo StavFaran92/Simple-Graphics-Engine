@@ -292,6 +292,12 @@ void DisplayDebugInfoWindow()
 		Engine::get()->getSubSystem<Graphics>()->reloadShaders();
 	}
 
+	if (ImGui::Button("Trigger mock event"))
+	{
+		SDL_Event e;
+		Engine::get()->getEventSystem()->dispatch(e);
+	}
+
 	ImGui::End();
 }
 

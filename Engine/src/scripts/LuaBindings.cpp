@@ -27,6 +27,7 @@
 #include "component/ImageComponent.h"
 #include "physics/Physics.h"
 #include "core/System.h"
+#include "core/Event.h"
 
 #include "core/Window.h"
 #include "ui/Mouse.h"
@@ -503,6 +504,13 @@ void bindAll(sol::state& lua)
         // Methods
         "width", &Window::getWidth,
         "height", &Window::getHeight
+    );
+
+    lua.new_usertype<Event>("Event",
+        sol::no_constructor,
+
+        // Methods
+        "getName", & Event::getName
     );
 
 

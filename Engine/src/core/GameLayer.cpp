@@ -4,6 +4,10 @@
 #include "core/Engine.h"
 #include "core/Logger.h"
 
+// todo remove 
+#include "runtime/Context.h"
+#include "runtime/Scene.h"
+
 bool GameLayer::handleEvent(SDL_Event e)
 {
     if (!m_isEnabled) 
@@ -24,6 +28,8 @@ bool GameLayer::handleEvent(SDL_Event e)
             }
         }
     }
+
+    Engine::get()->getContext()->getActiveScene()->onEvent(e);
 
     return false;
 }
