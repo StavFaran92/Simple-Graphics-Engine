@@ -96,3 +96,8 @@ const std::map<std::string, AnimationAssetRef>& Animator::getAllAnimations() con
 {
 	return m_animations;
 }
+
+std::string Animator::getCurrentAnimationName() const
+{
+	return m_currentAnimationName;
+}

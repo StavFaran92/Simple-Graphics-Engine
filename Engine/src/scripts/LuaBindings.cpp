@@ -41,6 +41,10 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<Transformation>()));
     } },
 
+    { "Animator", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<Animator>()));
+    } },
+
     {
         "Camera", [](Entity& e, sol::this_state lua) -> sol::object {
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<CameraComponent>()));
@@ -100,8 +104,8 @@ void bindComponents(sol::state& lua)
         "addAnimation", &Animator::addAnimation,
         "removeAnimation", &Animator::removeAnimation,
         "getAnimation", &Animator::getAnimation,
-        "getAllAnimations", &Animator::getAllAnimations
-        //"getCurrentAnimationName", &Animator::getCurrentAnimationName
+        "getAllAnimations", &Animator::getAllAnimations,
+        "getCurrentAnimationName", &Animator::getCurrentAnimationName
     );
 
     lua.new_usertype<Terrain>("Terrain",

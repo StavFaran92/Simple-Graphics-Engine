@@ -231,10 +231,9 @@ void RenderConsoleWindow()
         std::lock_guard<std::mutex> lock(g_consoleMutex);
         for (const auto& line : g_consoleLog)
         {
-
             ImGui::TextColored(LogLevelToColor(line.level), line.msg.c_str());
         }
-        if (g_scrollConsole)
+        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY() || g_scrollConsole)
         {
             ImGui::SetScrollHereY(1.0f);
             g_scrollConsole = false;

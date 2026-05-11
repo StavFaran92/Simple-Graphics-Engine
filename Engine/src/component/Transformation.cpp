@@ -209,8 +209,10 @@ void Transformation::setWorldPosition(glm::vec3 pos)
 }
 void Transformation::setLocalRotation(float angle, glm::vec3 axis)
 {
-	throw std::runtime_error("Not yet implemented");
-	//m_change = true;
+	
+	localRotation = glm::rotate(glm::quat(1,0,0,0), angle, axis);
+	//throw std::runtime_error("Not yet implemented");
+	m_isDirty = true;
 }
 void Transformation::setLocalRotation(glm::quat quat)
 {
