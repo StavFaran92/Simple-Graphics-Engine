@@ -2,13 +2,18 @@
 
 #include "core/Core.h"
 #include "core/EventSystem.h"
+#include "systems/SubSystem.h"
 
-class EngineAPI GameEventSystem
+class Entity;
+
+class EngineAPI GameEventSystem : public SubSystem
 {
 public:
-	void subscribe(SDL_EventType eventType, Subscriber* s);
-	void unsubscribe(SDL_EventType eventType, Subscriber* s);
+	GameEventSystem();
+	void subscribe(SDL_EventType eventType, Entity e);
+	void unsubscribe(SDL_EventType eventType, Entity e);
+	void dispatch(SDL_Event event);
 
 private:
-	std::unordered_map<Subscriber*, EventHandler> m_handlerTable;
+	std::unordered_map<SDL_EventType, std::vector<Entity>> m_handlerTable;
 };

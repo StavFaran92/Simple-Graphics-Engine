@@ -110,19 +110,24 @@ void ScriptSystem::callUpdate(float dt)
     }
 }
 
-void ScriptSystem::callOnEvent(SDL_Event e)
+void ScriptSystem::callOnEvent(Entity entity, SDL_Event event)
 {
-    for (auto& script : impl_->scripts)
+    for (auto& state : impl_->scripts)
     {
-        sol::protected_function fn = script.script["onEvent"];
-        if (fn.valid())
+        // TODO Should be optimized, no reason to iterate all the scripts for a single entity
+        if (state.entity == entity)
         {
-            sol::protected_function_result result = fn(script.script, Event());
-            if (!result.valid()) {
-                sol::error err = result;
-                logError("Lua Error: {}", err.what());
+            sol::protected_function fn = state.script["onEvent"];
+            if (fn.valid())
+            {
+                sol::protected_function_result result = fn(state.script, Event());
+                if (!result.valid()) {
+                    sol::error err = result;
+                    logError("Lua Error: {}", err.what());
+                }
             }
         }
+
     }
 }
 

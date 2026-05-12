@@ -7,6 +7,7 @@
 #include "runtime/Scene.h"
 #include "ui/Input.h"
 #include "core/EventSystem.h"
+#include "core/GameEventSystem.h"
 #include "geometry/ModelImporter.h"
 #include "core/Logger.h"
 #include "core/TraceLogger.h"
@@ -204,6 +205,7 @@ bool Engine::init(const InitParams& initParams)
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
     auto uniqueNameManager = new UniqueNameManager();
+    auto gameEventSystem = new GameEventSystem();
 
     // Create or Load project asset registry
     std::shared_ptr<ProjectAssetRegistry> par;

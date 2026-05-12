@@ -82,7 +82,7 @@ struct EngineAPI SceneLoadDescriptor : public ResourceLoadDescriptor
 };
 
 // Resource
-class EngineAPI Scene : public Resource, public Subscriber
+class EngineAPI Scene : public Resource
 {
 public:
 	enum class RenderPhase
@@ -153,8 +153,6 @@ public:
 
     void onWindowResize(int w, int h);
 	void init(Context* context, ResourceID rid);
-
-	bool onEvent(SDL_Event e) override;
 
 	void makeDirty();
 	bool isSerializationDirty() const;

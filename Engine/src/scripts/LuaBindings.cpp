@@ -28,6 +28,7 @@
 #include "physics/Physics.h"
 #include "core/System.h"
 #include "core/Event.h"
+#include "core/GameEventSystem.h"
 
 #include "core/Window.h"
 #include "ui/Mouse.h"
@@ -513,11 +514,54 @@ void bindAll(sol::state& lua)
         "getName", & Event::getName
     );
 
+    lua.new_enum("EventType",
+        "KeyDown", SDL_EventType::SDL_MOUSEBUTTONDOWN);
+
+    //lua["EventSystem"] = lua.create_table_with(
+    //    "subscribe", [](SDL_EventType type, Entity e) {
+    //        Engine::get()->getSubSystem<GameEventSystem>()->subscribe(type, e);
+    //    },
+    //    "unsubscribe", [](SDL_EventType type, Entity e) {
+    //        Engine::get()->getSubSystem<GameEventSystem>()->unsubscribe(type, e);
+    //    }
+    //);
 
 
+    lua.new_usertype<GameEventSystem>("EventSystem",
+        // Constructor
+        sol::no_constructor,
+
+        "get", []() {
+            auto eventsystem = Engine::get()->getSubSystem<GameEventSystem>();
+            return std::ref(*eventsystem);
+        },
+
+        //"subscribe", [](SDL_EventType type,  sol::function fn) {
+
+
+        //    EventHandler handler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
+
+        //    Engine::get()->getEventSystem()->subscribe(handler, type, [fn](SDL_Event e) {
+        //        fn(e);
+
+        //        return false;
+        //    });
+
+
+
+
+        //    //GameEventSystem::subscribe(type, )
+        //}
+
+        "subscribe", &GameEventSystem::subscribe
+    );
     
 
     lua.set_function("getActiveScene", []() { return  std::ref(*Engine::get()->getContext()->getActiveScene().get()); });
     lua.set_function("assets", []() { return std::ref(*Engine::get()->getSubSystem<Assets>()); });
+    lua.set_function("testCallback", [](sol::function fn) {
+        fn(42);
+        });
+
 
 }

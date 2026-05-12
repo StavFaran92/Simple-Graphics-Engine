@@ -7,6 +7,7 @@
 // todo remove 
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
+#include "core/GameEventSystem.h"
 
 bool GameLayer::handleEvent(SDL_Event e)
 {
@@ -29,7 +30,7 @@ bool GameLayer::handleEvent(SDL_Event e)
         }
     }
 
-    Engine::get()->getContext()->getActiveScene()->onEvent(e);
+    Engine::get()->getSubSystem<GameEventSystem>()->dispatch(e);
 
     return false;
 }

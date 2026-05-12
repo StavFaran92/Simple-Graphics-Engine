@@ -17,7 +17,7 @@ public:
 
     void callCreate();
     void callUpdate(float dt);
-    void callOnEvent(SDL_Event e);
+    void callOnEvent(Entity entity, SDL_Event event);
     void callDestroy();
 
 private:
