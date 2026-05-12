@@ -33,6 +33,7 @@
 #include "render/RenderCommand.h"
 #include "core/EventLayerStack.h"
 #include "core/EngineConfig.h"
+#include "core/EventParser.h"
 #include "render/DeferredRenderer.h"
 #include "memory/FrameAccessTable.h"
 
@@ -567,7 +568,9 @@ void Engine::handleEvents(bool& quit)
             SDL_free(e.drop.file);
         }
 
-        m_eventSystem->dispatch(e);
+        auto engineEvent = EventParser::parseSDLEvent(e);
+
+        m_eventSystem->dispatch(*engineEvent);
     }
 }
 

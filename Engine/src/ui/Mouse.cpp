@@ -38,7 +38,7 @@ void Mouse::onMousePressed(EventHandler handler, MouseButton code, MouseCallback
 {
 	auto eventSystem = Engine::get()->getEventSystem();
 
-	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONDOWN, [=](SDL_Event e)
+	eventSystem->subscribe(handler, EventType::MouseButtonPressed, [=](const Event& e)
 	{
 		MouseEvent mEvent;
 		mEvent.type = Mouse::MouseEventType::ButtonPressed;
@@ -54,7 +54,7 @@ void Mouse::onMouseReleased(EventHandler handler, MouseButton code, MouseCallbac
 {
 	auto eventSystem = Engine::get()->getEventSystem();
 
-	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEBUTTONUP, [=](SDL_Event e)
+	eventSystem->subscribe(handler, EventType::MouseButtonReleased, [=](const Event& e)
 	{
 		MouseEvent mEvent;
 		mEvent.type = Mouse::MouseEventType::ButtonReleased;
@@ -70,7 +70,7 @@ void Mouse::onMouseMotion(EventHandler handler, MouseButton code, MouseCallback 
 {
 	auto eventSystem = Engine::get()->getEventSystem();
 
-	eventSystem->subscribe(handler, SDL_EventType::SDL_MOUSEMOTION, [=](SDL_Event e)
+	eventSystem->subscribe(handler, EventType::MouseMoved, [=](const Event& e)
 	{
 		MouseEvent mEvent;
 		mEvent.type = Mouse::MouseEventType::Motion;

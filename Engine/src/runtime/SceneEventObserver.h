@@ -5,7 +5,7 @@
 class SceneEventObserver : public Subscriber
 {
 public:
-	bool onEvent(SDL_Event e) override;
+	bool onEvent(const Event& e) override;
 
 	
 };

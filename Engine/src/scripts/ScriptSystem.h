@@ -4,6 +4,7 @@
 
 #include "component/ScriptComponent.h"
 #include "systems/SubSystem.h"
+#include "core/Event.h"
 
 class ScriptSystem : public SubSystem
 {
@@ -17,7 +18,7 @@ public:
 
     void callCreate();
     void callUpdate(float dt);
-    void callOnEvent(Entity entity, SDL_Event event);
+    void callOnEvent(Entity entity, const Event& event);
     void callDestroy();
 
 private:

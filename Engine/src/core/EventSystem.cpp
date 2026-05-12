@@ -2,7 +2,7 @@
 
 #include "core/Logger.h"
 
-void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Subscriber* s)
+void EventSystem::subscribe(EventHandler handler, EventType eventType, Subscriber* s)
 {
 	auto& layer = getLayer(handler);
 
@@ -12,10 +12,10 @@ void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Subsc
 		return;
 	}
 
-	layer->subscribe(handler, eventType, [=](SDL_Event e) { return s->onEvent(e); });
+	layer->subscribe(handler, eventType, [=](const Event& e) { return s->onEvent(e); });
 }
 
-void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Callback c)
+void EventSystem::subscribe(EventHandler handler, EventType eventType, Callback c)
 {
 	auto& layer = getLayer(handler);
 
@@ -28,7 +28,7 @@ void EventSystem::subscribe(EventHandler handler, SDL_EventType eventType, Callb
 	layer->subscribe(handler, eventType, c);
 }
 
-void EventSystem::unsubscribe(EventHandler handler, SDL_EventType eventType)
+void EventSystem::unsubscribe(EventHandler handler, EventType eventType)
 {
 	auto& layer = getLayer(handler);
 
@@ -87,12 +87,12 @@ EventHandler EventSystem::bindToLayer(const std::string& layerName)
 //	iter->second.isValid = false;
 //}
 
-void EventSystem::pushEvent(SDL_Event e)
+void EventSystem::pushEvent(const Event& e)
 {
-	SDL_PushEvent(&e);
+	//SDL_PushEvent(&e);
 }
 
-void EventSystem::dispatch(SDL_Event e)
+void EventSystem::dispatch(const Event& e)
 {
 	auto iter = m_layers.rbegin();
 	while(iter != m_layers.rend())

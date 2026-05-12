@@ -29,7 +29,7 @@ void Keyboard::onKeyPressed(EventHandler handler, KeyCode code, KeyCallback call
 		return;
 	}
 
-	Engine::get()->getEventSystem()->subscribe(handler, SDL_EventType::SDL_KEYDOWN, [=](SDL_Event e)
+	Engine::get()->getEventSystem()->subscribe(handler, EventType::KeyPressed, [=](const Event& e)
 	{
 		if (e.key.keysym.scancode == code)
 		{
@@ -50,7 +50,7 @@ void Keyboard::onKeyReleased(EventHandler handler, KeyCode code, KeyCallback cal
 		logError("Invalid key specified : " + code);
 		return;
 	}
-	Engine::get()->getEventSystem()->subscribe(handler, SDL_EventType::SDL_KEYUP, [=](SDL_Event e)
+	Engine::get()->getEventSystem()->subscribe(handler, EventType::KeyReleased, [=](const Event& e)
 	{
 		if (e.key.keysym.scancode == code)
 		{

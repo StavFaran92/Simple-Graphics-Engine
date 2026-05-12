@@ -12,16 +12,18 @@
 
 #include "core/EventLayer.h"
 
+#include "core/Event.h"
+
 class EngineAPI EventSystem
 {
 public:
-	void subscribe(EventHandler handler, SDL_EventType eventType, Subscriber* s);
-	void subscribe(EventHandler handler, SDL_EventType eventType, Callback c);
-	void unsubscribe(EventHandler handler, SDL_EventType eventType);
+	void subscribe(EventHandler handler, EventType eventType, Subscriber* s);
+	void subscribe(EventHandler handler, EventType eventType, Callback c);
+	void unsubscribe(EventHandler handler, EventType eventType);
 	
 	EventHandler bindToLayer(const std::string& layerName);
-	void pushEvent(SDL_Event e);
-	void dispatch(SDL_Event e);
+	void pushEvent(const Event& e);
+	void dispatch(const Event& e);
 	void pushLayer(std::shared_ptr<EventLayer> layer);
 	void popLayer();
 

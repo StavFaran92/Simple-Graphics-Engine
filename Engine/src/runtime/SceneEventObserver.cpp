@@ -1,6 +1,6 @@
 #include "SceneEventObserver.h"
 
-bool SceneEventObserver::onEvent(SDL_Event e)
+bool SceneEventObserver::onEvent(const Event& e)
 {
     return false;
 }

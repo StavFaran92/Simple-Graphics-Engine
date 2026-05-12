@@ -6,16 +6,17 @@
 #include <cstdint>
 
 #include "core/Subscriber.h"
+#include "core/Event.h"
 
 using EventHandler = uint64_t;
 
-using Callback = std::function<bool(SDL_Event e)>;
+using Callback = std::function<bool(const Event& e)>;
 
 struct EventCallback
 {
 	EventCallback(EventHandler handler, Callback func) : handler(handler), func(func) {};
 
-	std::function<bool(SDL_Event e)> func;
+	std::function<bool(const Event& e)> func;
 	EventHandler handler;
 };
 
@@ -27,14 +28,14 @@ public:
 	{
 	};
 
-	virtual bool handleEvent(SDL_Event e)
+	virtual bool handleEvent(const Event& e)
 	{
 		if (!m_isEnabled)
 			return false;
 
 		bool isHandled = false;
 
-		auto iter = m_listeners.find((SDL_EventType)e.type);
+		auto iter = m_listeners.find(e.type());
 		if (iter != m_listeners.end())
 		{
 			for (auto& ec : iter->second)
@@ -46,12 +47,12 @@ public:
 		return isHandled;
 	}
 
-	virtual void subscribe(EventHandler handler, SDL_EventType eventType, const Callback& ec)
+	virtual void subscribe(EventHandler handler, EventType eventType, const Callback& ec)
 	{
 		m_listeners[eventType].push_back(EventCallback{ handler, ec});
 	}
 
-	virtual void unsubscribe(EventHandler handler, SDL_EventType eventType)
+	virtual void unsubscribe(EventHandler handler, EventType eventType)
 	{
 		auto iter = m_listeners.find(eventType);
 		if (iter != m_listeners.end())
@@ -83,5 +84,5 @@ public:
 protected:
 	bool m_isEnabled = true;
 
-	std::unordered_map<SDL_EventType, std::vector<EventCallback>> m_listeners;
+	std::unordered_map<EventType, std::vector<EventCallback>> m_listeners;
 };

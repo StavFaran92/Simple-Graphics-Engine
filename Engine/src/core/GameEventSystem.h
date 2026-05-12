@@ -10,10 +10,10 @@ class EngineAPI GameEventSystem : public SubSystem
 {
 public:
 	GameEventSystem();
-	void subscribe(SDL_EventType eventType, Entity e);
-	void unsubscribe(SDL_EventType eventType, Entity e);
-	void dispatch(SDL_Event event);
+	void subscribe(EventType eventType, Entity e);
+	void unsubscribe(EventType eventType, Entity e);
+	void dispatch(const Event& event);
 
 private:
-	std::unordered_map<SDL_EventType, std::vector<Entity>> m_handlerTable;
+	std::unordered_map<EventType, std::vector<Entity>> m_handlerTable;
 };

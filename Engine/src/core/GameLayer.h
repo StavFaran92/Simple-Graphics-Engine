@@ -12,5 +12,5 @@ public:
 	{
 	}
 
-	bool handleEvent(SDL_Event event) override;
+	bool handleEvent(const Event& event) override;
 };

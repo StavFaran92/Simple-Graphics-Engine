@@ -9,12 +9,12 @@
 #include "runtime/Scene.h"
 #include "core/GameEventSystem.h"
 
-bool GameLayer::handleEvent(SDL_Event e)
+bool GameLayer::handleEvent(const Event& e)
 {
     if (!m_isEnabled) 
         return false;
 
-    auto iter = m_listeners.find((SDL_EventType)e.type);
+    auto iter = m_listeners.find(e.type());
     if (iter != m_listeners.end())
     {
         for (auto& ec : iter->second)

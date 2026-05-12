@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SDL2/SDL.h"
+#include "core/Event.h"
 
 class Subscriber
 {
 public:
-	virtual bool onEvent(SDL_Event e) { return false; };
+	virtual bool onEvent(const Event& e) { return false; };
 };

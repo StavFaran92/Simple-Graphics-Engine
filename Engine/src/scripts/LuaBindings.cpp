@@ -536,23 +536,6 @@ void bindAll(sol::state& lua)
             return std::ref(*eventsystem);
         },
 
-        //"subscribe", [](SDL_EventType type,  sol::function fn) {
-
-
-        //    EventHandler handler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
-
-        //    Engine::get()->getEventSystem()->subscribe(handler, type, [fn](SDL_Event e) {
-        //        fn(e);
-
-        //        return false;
-        //    });
-
-
-
-
-        //    //GameEventSystem::subscribe(type, )
-        //}
-
         "subscribe", &GameEventSystem::subscribe
     );
     
