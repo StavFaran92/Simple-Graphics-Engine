@@ -58,7 +58,12 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
     try {
         const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
         std::string filepath = (projectDir / scriptComponent.getScript().resource()->filepath).string();
-        impl_->lua.script_file(filepath);
+        auto result = impl_->lua.safe_script_file(filepath, sol::script_pass_on_error);
+        if (!result.valid()) {
+            sol::error err = result;
+            logError(err.what());
+            return;
+        }
         sol::table script = impl_->lua["Script"];
         if (script.valid())
         {
@@ -81,7 +86,7 @@ void ScriptSystem::callCreate()
 {
     for (auto& script : impl_->scripts)
     {
-        sol::function fn = script.script["create"];
+        sol::protected_function fn = script.script["create"];
         if (fn.valid())
         {
             sol::protected_function_result result = fn(script.script, script.entity);
