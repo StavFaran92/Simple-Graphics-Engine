@@ -41,7 +41,7 @@ void EditorCamera::onUpdate(float deltaTime)
 	m_cameraController->onUpdate(deltaTime);
 }
 
-bool EditorCamera::onEvent(SDL_Event e)
+bool EditorCamera::onEvent(const Event& e)
 {
 	if (m_isLocked)
 		return false;

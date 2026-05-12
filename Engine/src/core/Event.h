@@ -1,22 +1,25 @@
 #pragma once
 
+#include <string>
+
 #include "core/Core.h"
 
 
 enum class EventType {
     BaseEvent,
-    KeyPressed, 
+    KeyPressed,
     KeyReleased,
-    MouseMoved, 
+    MouseMoved,
     MouseButtonPressed,
     MouseButtonReleased,
-    WindowResized, 
+    MouseWheel,
+    WindowResized,
     WindowClosed,
+    QuitApp
 };
 
-class EngineAPI Event
+struct EngineAPI Event
 {
-public:
 	std::string getName() const;
     virtual EventType type() const { return EventType::BaseEvent;  };
     bool handled = false;

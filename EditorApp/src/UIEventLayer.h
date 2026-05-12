@@ -9,5 +9,5 @@ public:
 	{
 	}
 
-	bool handleEvent(SDL_Event e) override;
+	bool handleEvent(const Event& e) override;
 };

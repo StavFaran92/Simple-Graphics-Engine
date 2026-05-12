@@ -1,9 +1,10 @@
 #pragma once
 
-#include "SDL.h"
 #include <functional>
 #include <string>
 #include <cstdint>
+#include <vector>
+#include <unordered_map>
 
 #include "core/Subscriber.h"
 #include "core/Event.h"

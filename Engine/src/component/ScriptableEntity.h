@@ -4,7 +4,6 @@
 
 #include "runtime/Entity.h"
 
-#include "SDL.h"
 #include "core/Subscriber.h"
 
 struct NativeScriptComponent;

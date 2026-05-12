@@ -6,6 +6,7 @@
 #include "component/Transformation.h"
 #include <algorithm>
 #include "glm/glm.hpp"
+#include "core/MouseEvents.h"
 
 //void CameraControllerOrbit::calculateOrientation()
 //{
@@ -27,64 +28,53 @@ void CameraControllerOrbit::onCreate(Entity& e)
 	m_cameraTransform = &e.getComponent<Transformation>();
 }
 
-bool CameraControllerOrbit::onEvent(SDL_Event e)
+bool CameraControllerOrbit::onEvent(const Event& e)
 {
-	if (e.type == SDL_MOUSEMOTION)
+	if (e.type() == EventType::MouseMoved)
 	{
-		int xChange = e.motion.xrel;
-		int yChange = e.motion.yrel;
+		const auto& me = static_cast<const MouseMovedEvent&>(e);
 		if (m_state == ControllerState::ROTATE)
 		{
-			m_angleX += xChange * m_turnSpeed;
-			m_angleY += yChange * m_turnSpeed;
+			m_angleX += me.xrel * m_turnSpeed;
+			m_angleY += me.yrel * m_turnSpeed;
 
 			m_angleY = std::clamp(m_angleY, -89.f, 89.f);
 		}
 		else if (m_state == ControllerState::TRANSFORM)
 		{
-			int xChange = e.motion.xrel;
-			int yChange = e.motion.yrel;
-
-			xChange *= m_movementSpeed;
-			yChange *= m_movementSpeed;
-
-			float xVelocity = .1f * xChange;// *deltaTime // todo fix
-			float yVelocity = .1f * yChange;// *deltaTime
-
+			float xVelocity = .1f * (me.xrel * m_movementSpeed);
+			float yVelocity = .1f * (me.yrel * m_movementSpeed);
 
 			m_cameraComponent->center += m_right * xVelocity;
 			m_cameraComponent->center -= m_cameraComponent->up * yVelocity;
 		}
 	}
-	else if (e.type == SDL_MOUSEBUTTONDOWN)
+	else if (e.type() == EventType::MouseButtonPressed)
 	{
+		const auto& me = static_cast<const MouseButtonPressedEvent&>(e);
 
-		if (e.button.button == SDL_BUTTON_RIGHT)
+		if (me.button == MOUSE_BUTTON_RIGHT)
 		{
 			if (m_state == ControllerState::IDLE)
-			{
 				m_state = ControllerState::ROTATE;
-			}
 		}
-
-		else if (e.button.button == SDL_BUTTON_MIDDLE)
+		else if (me.button == MOUSE_BUTTON_MIDDLE)
 		{
 			if (m_state == ControllerState::IDLE)
-			{
 				m_state = ControllerState::TRANSFORM;
-			}
 		}
 	}
-	else if (e.type == SDL_MOUSEBUTTONUP)
+	else if (e.type() == EventType::MouseButtonReleased)
 	{
-		if (e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_MIDDLE)
-		{
+		const auto& me = static_cast<const MouseButtonReleasedEvent&>(e);
+
+		if (me.button == MOUSE_BUTTON_RIGHT || me.button == MOUSE_BUTTON_MIDDLE)
 			m_state = ControllerState::IDLE;
-		}
 	}
-	else if (e.type == SDL_MOUSEWHEEL)
+	else if (e.type() == EventType::MouseWheel)
 	{
-		m_distance = std::clamp(m_distance - e.wheel.y, 1.f, 50.f);
+		const auto& me = static_cast<const MouseWheelEvent&>(e);
+		m_distance = std::clamp(m_distance - static_cast<float>(me.y), 1.f, 50.f);
 	}
 
 	return false;

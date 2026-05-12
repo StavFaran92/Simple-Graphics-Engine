@@ -23,9 +23,9 @@ public:
 
 		auto eventSystem = Engine::get()->getEventSystem();
 		eventHandler = eventSystem->bindToLayer("GameLayer");
-		eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
-		eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
-		eventSystem->subscribe(eventHandler, SDL_KEYDOWN, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEMOTION, this);
+		//eventSystem->subscribe(eventHandler, SDL_MOUSEBUTTONDOWN, this);
+		//eventSystem->subscribe(eventHandler, SDL_KEYDOWN, this);
 
 		Engine::get()->getWindow()->lockMouse();
 	}

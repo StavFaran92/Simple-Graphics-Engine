@@ -28,7 +28,7 @@ bool shouldSceneViewGetKeyboard()
     return true;
 }
 
-bool UIEventLayer::handleEvent(SDL_Event e)
+bool UIEventLayer::handleEvent(const Event& e)
 {
     if (!m_isEnabled)
         return false;
@@ -36,7 +36,7 @@ bool UIEventLayer::handleEvent(SDL_Event e)
     //if (e.type == SDL_MOUSEBUTTONDOWN)
     //    std::cout << "\n";
 
-    ImGui_ImplSDL2_ProcessEvent(&e);
+   
 
     bool isHandled = false;
 

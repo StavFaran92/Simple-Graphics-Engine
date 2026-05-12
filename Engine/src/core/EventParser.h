@@ -1,13 +1,11 @@
 #pragma once
 
+#include <memory>
 #include "SDL2/SDL_events.h"
-
-class Event;
-
-
+#include "core/Event.h"
 
 class EventParser
 {
 public:
-	static Event* parseSDLEvent(SDL_Event e);
+	static std::unique_ptr<Event> parseSDLEvent(SDL_Event e);
 };

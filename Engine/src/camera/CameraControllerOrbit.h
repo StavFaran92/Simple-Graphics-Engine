@@ -12,7 +12,7 @@ class CameraControllerOrbit : public ICameraController
 {
 public:
 	void onCreate(Entity& e) override;
-	bool onEvent(SDL_Event e) override;
+	bool onEvent(const Event& e) override;
 
 private:
 	enum class ControllerState

@@ -34,50 +34,33 @@ void Mouse::getMousePosition(int& x, int& y)
 	y = state.y;
 }
 
-void Mouse::onMousePressed(EventHandler handler, MouseButton code, MouseCallback callback) const
+void Mouse::onMousePressed(EventHandler handler, MouseButton button, MouseButtonPressedCallback callback) const
 {
-	auto eventSystem = Engine::get()->getEventSystem();
-
-	eventSystem->subscribe(handler, EventType::MouseButtonPressed, [=](const Event& e)
+	Engine::get()->getEventSystem()->subscribe(handler, EventType::MouseButtonPressed, [=](const Event& e)
 	{
-		MouseEvent mEvent;
-		mEvent.type = Mouse::MouseEventType::ButtonPressed;
-		mEvent.button = static_cast<MouseButton>(e.button.button);
-		mEvent.clicks = e.button.clicks;
-		mEvent.x = e.button.x;
-		mEvent.y = e.button.y;
-		return callback(mEvent);
+		auto& mEvent = static_cast<const MouseButtonPressedEvent&>(e);
+		if (mEvent.button == button)
+			return callback(mEvent);
+		return false;
 	});
 }
 
-void Mouse::onMouseReleased(EventHandler handler, MouseButton code, MouseCallback callback) const
+void Mouse::onMouseReleased(EventHandler handler, MouseButton button, MouseButtonReleasedCallback callback) const
 {
-	auto eventSystem = Engine::get()->getEventSystem();
-
-	eventSystem->subscribe(handler, EventType::MouseButtonReleased, [=](const Event& e)
+	Engine::get()->getEventSystem()->subscribe(handler, EventType::MouseButtonReleased, [=](const Event& e)
 	{
-		MouseEvent mEvent;
-		mEvent.type = Mouse::MouseEventType::ButtonReleased;
-		mEvent.button = static_cast<MouseButton>(e.button.button);
-		mEvent.clicks = e.button.clicks;
-		mEvent.x = e.button.x;
-		mEvent.y = e.button.y;
-		return callback(mEvent);
+		auto& mEvent = static_cast<const MouseButtonReleasedEvent&>(e);
+		if (mEvent.button == button)
+			return callback(mEvent);
+		return false;
 	});
 }
 
-void Mouse::onMouseMotion(EventHandler handler, MouseButton code, MouseCallback callback) const
+void Mouse::onMouseMotion(EventHandler handler, MouseMovedCallback callback) const
 {
-	auto eventSystem = Engine::get()->getEventSystem();
-
-	eventSystem->subscribe(handler, EventType::MouseMoved, [=](const Event& e)
+	Engine::get()->getEventSystem()->subscribe(handler, EventType::MouseMoved, [=](const Event& e)
 	{
-		MouseEvent mEvent;
-		mEvent.type = Mouse::MouseEventType::Motion;
-		mEvent.x = e.motion.x;
-		mEvent.y = e.motion.y;
-		mEvent.xrel = e.motion.xrel;
-		mEvent.yrel = e.motion.yrel;
+		auto& mEvent = static_cast<const MouseMovedEvent&>(e);
 		return callback(mEvent);
 	});
 }
@@ -113,17 +96,17 @@ GameMouse::GameMouse()
 	Engine::get()->registerSubSystem<GameMouse>(this);
 }
 
-void GameMouse::onMousePressed(MouseButton code, MouseCallback callback) const
+void GameMouse::onMousePressed(MouseButton button, MouseButtonPressedCallback callback) const
 {
-	return Mouse::onMousePressed(gameHandler, code, callback);
+	return Mouse::onMousePressed(gameHandler, button, callback);
 }
 
-void GameMouse::onMouseReleased(MouseButton code, MouseCallback callback) const
+void GameMouse::onMouseReleased(MouseButton button, MouseButtonReleasedCallback callback) const
 {
-	return Mouse::onMouseReleased(gameHandler, code, callback);
+	return Mouse::onMouseReleased(gameHandler, button, callback);
 }
 
-void GameMouse::onMouseMotion(MouseButton code, MouseCallback callback) const
+void GameMouse::onMouseMotion(MouseMovedCallback callback) const
 {
-	return Mouse::onMouseMotion(gameHandler, code, callback);
+	return Mouse::onMouseMotion(gameHandler, callback);
 }

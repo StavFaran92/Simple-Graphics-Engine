@@ -20,7 +20,7 @@ public:
 
 	void onCreate() override;
 	void onUpdate(float deltaTime) override;
-	bool onEvent(SDL_Event e) override;
+	bool onEvent(const Event& e) override;
 
 	void lock();
 	void unlock();

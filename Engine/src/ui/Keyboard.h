@@ -7,30 +7,18 @@
 #include "core/EventLayer.h"
 #include "ui/KeyCodes.h"
 #include "systems/SubSystem.h"
+#include "core/KeyboardEvents.h"
 
 class EngineAPI Keyboard
 {
 public:
-
-	
-	enum KeyState : int
-	{
-		Invalid,
-		Pressed,
-		Released
-	};
-	struct KeyEvent
-	{
-		KeyState state = KeyState::Invalid;
-		bool repeat = false;
-		KeyCode keysym = SCANCODE_UNKNOWN;
-	};
-	using KeyCallback = std::function<bool(KeyEvent s)>;
+	using KeyPressedCallback = std::function<bool(KeyPressedEvent s)>;
+	using KeyReleasedCallback = std::function<bool(KeyReleasedEvent s)>;
 
 	Keyboard();
 	int getKeyState(KeyCode code) const;
-	void onKeyPressed(EventHandler handler, KeyCode code, KeyCallback callback) const;
-	void onKeyReleased(EventHandler handler, KeyCode code, KeyCallback callback) const;
+	void onKeyPressed(EventHandler handler, KeyCode code, std::function<bool(KeyPressedEvent s)> callback) const;
+	void onKeyReleased(EventHandler handler, KeyCode code, std::function<bool(KeyReleasedEvent s)>  callback) const;
 
 private:
 	const uint8_t* m_keyboardState = nullptr;
@@ -41,8 +29,8 @@ class EngineAPI GameKeyboard : public Keyboard, public SubSystem
 {
 public:
 	GameKeyboard();
-	void onKeyPressed(KeyCode code, KeyCallback callback) const;
-	void onKeyReleased(KeyCode code, KeyCallback callback) const;
+	void onKeyPressed(KeyCode code, KeyPressedCallback callback) const;
+	void onKeyReleased(KeyCode code, KeyReleasedCallback callback) const;
 
 private:
 	EventHandler gameHandler;

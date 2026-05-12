@@ -21,7 +21,7 @@ int Keyboard::getKeyState(KeyCode code) const
 	return m_keyboardState[code];
 }
 
-void Keyboard::onKeyPressed(EventHandler handler, KeyCode code, KeyCallback callback) const
+void Keyboard::onKeyPressed(EventHandler handler, KeyCode code, KeyPressedCallback callback) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -31,19 +31,17 @@ void Keyboard::onKeyPressed(EventHandler handler, KeyCode code, KeyCallback call
 
 	Engine::get()->getEventSystem()->subscribe(handler, EventType::KeyPressed, [=](const Event& e)
 	{
-		if (e.key.keysym.scancode == code)
+		auto keyPressedEvent = static_cast<const KeyPressedEvent&>(e);
+		if (code == keyPressedEvent.keysym)
 		{
-			KeyEvent kEvent;
-			kEvent.keysym = static_cast<KeyCode>(code);
-			kEvent.repeat = e.key.repeat != 0;
-			kEvent.state = KeyState::Pressed;
-			return callback(kEvent);
+			return callback(keyPressedEvent);
 		}
+
 		return false;
 	});
 }
 
-void Keyboard::onKeyReleased(EventHandler handler, KeyCode code, KeyCallback callback) const
+void Keyboard::onKeyReleased(EventHandler handler, KeyCode code, KeyReleasedCallback callback) const
 {
 	if (code < 0 || code > m_length)
 	{
@@ -52,14 +50,12 @@ void Keyboard::onKeyReleased(EventHandler handler, KeyCode code, KeyCallback cal
 	}
 	Engine::get()->getEventSystem()->subscribe(handler, EventType::KeyReleased, [=](const Event& e)
 	{
-		if (e.key.keysym.scancode == code)
+		auto keyReleasedEvent = static_cast<const KeyReleasedEvent&>(e);
+		if (code == keyReleasedEvent.keysym)
 		{
-			KeyEvent kEvent;
-			kEvent.keysym = static_cast<KeyCode>(code);
-			kEvent.repeat = e.key.repeat != 0;
-			kEvent.state = KeyState::Released;
-			return callback(kEvent);
+			return callback(keyReleasedEvent);
 		}
+
 		return false;
 	});
 
@@ -72,12 +68,12 @@ GameKeyboard::GameKeyboard() : Keyboard()
 	Engine::get()->registerSubSystem<GameKeyboard>(this);
 }
 
-void GameKeyboard::onKeyPressed(KeyCode code, KeyCallback callback) const
+void GameKeyboard::onKeyPressed(KeyCode code, KeyPressedCallback callback) const
 {
 	return Keyboard::onKeyPressed(gameHandler, code, callback);
 }
 
-void GameKeyboard::onKeyReleased(KeyCode code, KeyCallback callback) const
+void GameKeyboard::onKeyReleased(KeyCode code, KeyReleasedCallback callback) const
 {
 	return Keyboard::onKeyReleased(gameHandler, code, callback);
 }

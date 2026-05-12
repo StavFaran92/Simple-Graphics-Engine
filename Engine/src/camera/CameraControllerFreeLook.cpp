@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "glm/glm.hpp"
 #include "core/Window.h"
+#include "core/MouseEvents.h"
 
 void CameraControllerFreeLook::onCreate(Entity& e)
 {
@@ -56,18 +57,19 @@ void CameraControllerFreeLook::onUpdate(float deltaTime)
 	m_cameraTransform->translate(dir);
 }
 
-bool CameraControllerFreeLook::onEvent(SDL_Event e)
+bool CameraControllerFreeLook::onEvent(const Event& e)
 {
 	// We only allow for state enter and TRS modify to be event based,
 	// state leave should ALWAYS be handled in onUpdate.
-	if (e.type == SDL_MOUSEMOTION)
+	if (e.type() == EventType::MouseMoved)
 	{
 		auto system = Engine::get()->getSubSystem<System>();
+		const auto& me = static_cast<const MouseMovedEvent&>(e);
 
 		if (m_state == ControllerState::ROTATE)
 		{
-			float xChange = e.motion.xrel;
-			float yChange = e.motion.yrel;
+			float xChange = static_cast<float>(me.xrel);
+			float yChange = static_cast<float>(me.yrel);
 
 			xChange *= m_turnSpeed * system->getDeltaTime();
 			yChange *= m_turnSpeed * system->getDeltaTime();
@@ -76,19 +78,14 @@ bool CameraControllerFreeLook::onEvent(SDL_Event e)
 			m_pitch -= yChange;
 
 			if (m_pitch > 89.0f)
-			{
 				m_pitch = 89.0f;
-			}
 
 			if (m_pitch < -89.0f)
-			{
 				m_pitch = -89.0f;
-			}
 
 			glm::quat pitchQuat = glm::angleAxis(glm::radians(m_pitch), glm::vec3(1, 0, 0));
 			glm::quat yawQuat = glm::angleAxis(glm::radians(m_yaw), glm::vec3(0, 1, 0));
 
-			// Combine the quaternions
 			glm::quat combinedQuat = yawQuat * pitchQuat;
 
 			m_cameraTransform->setWorldRotation(combinedQuat);
@@ -96,10 +93,8 @@ bool CameraControllerFreeLook::onEvent(SDL_Event e)
 
 		if (m_state == ControllerState::TRANSFORM)
 		{
-			auto system = Engine::get()->getSubSystem<System>();
-
-			float xChange = e.motion.xrel;
-			float yChange = e.motion.yrel;
+			float xChange = static_cast<float>(me.xrel);
+			float yChange = static_cast<float>(me.yrel);
 
 			xChange *= m_movementSpeed * system->getDeltaTime();
 			yChange *= m_movementSpeed * system->getDeltaTime();
@@ -107,14 +102,15 @@ bool CameraControllerFreeLook::onEvent(SDL_Event e)
 			float xVelocity = .1f * xChange;
 			float yVelocity = .1f * yChange;
 
-
 			m_cameraTransform->translate(m_cameraComponent->right * xVelocity);
 			m_cameraTransform->translate(-m_cameraComponent->up * yVelocity);
 		}
 	}
-	else if (e.type == SDL_MOUSEBUTTONDOWN)
+	else if (e.type() == EventType::MouseButtonPressed)
 	{
-		if (e.button.button == SDL_BUTTON_RIGHT)
+		const auto& me = static_cast<const MouseButtonPressedEvent&>(e);
+
+		if (me.button == MOUSE_BUTTON_RIGHT)
 		{
 			if (m_state == ControllerState::IDLE)
 			{
@@ -122,8 +118,7 @@ bool CameraControllerFreeLook::onEvent(SDL_Event e)
 				Engine::get()->getWindow()->lockMouse();
 			}
 		}
-
-		else if (e.button.button == SDL_BUTTON_MIDDLE)
+		else if (me.button == MOUSE_BUTTON_MIDDLE)
 		{
 			if (m_state == ControllerState::IDLE)
 			{
@@ -132,10 +127,10 @@ bool CameraControllerFreeLook::onEvent(SDL_Event e)
 			}
 		}
 	}
-
-	else if (e.type == SDL_MOUSEWHEEL)
+	else if (e.type() == EventType::MouseWheel)
 	{
-		m_cameraTransform->translate(m_cameraComponent->front * (float)e.wheel.y);
+		const auto& me = static_cast<const MouseWheelEvent&>(e);
+		m_cameraTransform->translate(m_cameraComponent->front * static_cast<float>(me.y));
 	}
 
 	return false;

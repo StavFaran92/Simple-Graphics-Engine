@@ -5,21 +5,14 @@
 #include <functional>
 
 #include "core/EventLayer.h"
+#include "core/MouseEvents.h"
 #include "systems/SubSystem.h"
-
-enum MouseButton : int
-{
-	INVALID = 0,
-	MOUSE_BUTTON_LEFT = 1,
-	MOUSE_BUTTON_MIDDLE = 2,
-	MOUSE_BUTTON_RIGHT = 3,
-};
 
 class EngineAPI Mouse
 {
 public:
 	Mouse();
-	
+
 	struct MouseState
 	{
 		int x = 0;
@@ -29,37 +22,16 @@ public:
 		bool mmb = false;
 	};
 
-	enum MouseEventType
-	{
-		Invalid,
-		Motion, 
-		ButtonPressed,
-		ButtonReleased
-	};
-	struct MouseEvent
-	{
-		MouseEventType type = MouseEventType::Invalid;
-		int32_t x = 0;
-		int32_t y = 0;
-
-		// Only relevant to Motion
-		int32_t xrel = 0;
-		int32_t yrel = 0;
-
-		// Only relevant to button
-		uint8_t clicks;       /**< 1 for single-click, 2 for double-click, etc. */
-		MouseButton button = MouseButton::INVALID;
-	};
-
-	using MouseCallback = std::function<bool(MouseEvent s)>;
+	using MouseButtonPressedCallback  = std::function<bool(MouseButtonPressedEvent)>;
+	using MouseButtonReleasedCallback = std::function<bool(MouseButtonReleasedEvent)>;
+	using MouseMovedCallback          = std::function<bool(MouseMovedEvent)>;
 
 	const MouseState& getMouseState();
 	void getMousePosition(int& x, int& y);
 	bool getButtonPressed(MouseButton button);
-	void onMousePressed(EventHandler handler, MouseButton code, MouseCallback callback) const;
-	void onMouseReleased(EventHandler handler, MouseButton code, MouseCallback callback) const;
-	void onMouseMotion(EventHandler handler, MouseButton code, MouseCallback callback) const;
-
+	void onMousePressed(EventHandler handler, MouseButton button, MouseButtonPressedCallback callback) const;
+	void onMouseReleased(EventHandler handler, MouseButton button, MouseButtonReleasedCallback callback) const;
+	void onMouseMotion(EventHandler handler, MouseMovedCallback callback) const;
 
 private:
 	MouseState m_state;
@@ -69,9 +41,9 @@ class EngineAPI GameMouse : public Mouse, public SubSystem
 {
 public:
 	GameMouse();
-	void onMousePressed(MouseButton code, MouseCallback callback) const;
-	void onMouseReleased(MouseButton code, MouseCallback callback) const;
-	void onMouseMotion(MouseButton code, MouseCallback callback) const;
+	void onMousePressed(MouseButton button, MouseButtonPressedCallback callback) const;
+	void onMouseReleased(MouseButton button, MouseButtonReleasedCallback callback) const;
+	void onMouseMotion(MouseMovedCallback callback) const;
 
 private:
 	EventHandler gameHandler;

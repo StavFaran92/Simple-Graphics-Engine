@@ -37,7 +37,7 @@ public:
 	{
 		m_cameraController->onUpdate(deltaTime);
 	}
-	bool onEvent(SDL_Event e)
+	bool onEvent(const Event& e)
 	{
 		return m_cameraController->onEvent(e);
 	}

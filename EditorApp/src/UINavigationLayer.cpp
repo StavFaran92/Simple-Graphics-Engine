@@ -4,7 +4,7 @@
 
 extern Entity g_editorCamera;
 
-bool UINavigationLayer::handleEvent(SDL_Event e)
+bool UINavigationLayer::handleEvent(const Event& e)
 {
 	if (!m_isEnabled)
 		return false;

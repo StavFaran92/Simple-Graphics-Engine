@@ -6,11 +6,12 @@
 extern Entity g_editorCamera;
 
 
-bool UIEntitySelectionLayer::handleEvent(SDL_Event e)
+bool UIEntitySelectionLayer::handleEvent(const Event& e)
 {
 	if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
 	{
-		if (e.type == SDL_MOUSEBUTTONDOWN && static_cast<MouseButton>(e.button.button) == MouseButton::MOUSE_BUTTON_LEFT)
+		if (e.type() == EventType::MouseButtonPressed &&
+			static_cast<const MouseButtonPressedEvent&>(e).button == MOUSE_BUTTON_LEFT)
 		{
 
 			if (EditorState::Instance().isMouseInSceneView)

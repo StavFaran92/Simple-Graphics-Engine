@@ -294,7 +294,7 @@ void DisplayDebugInfoWindow()
 
 	if (ImGui::Button("Trigger mock event"))
 	{
-		SDL_Event e;
+		Event e;
 		Engine::get()->getEventSystem()->dispatch(e);
 	}
 
@@ -620,9 +620,9 @@ public:
 		nsc.script->onCreate();
 		g_editorCamera = editorCamera;
 
-		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](Keyboard::KeyEvent e) { stopSimulation(); return false; });
+		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](KeyPressedEvent e) { stopSimulation(); return false; });
 		
-		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiHandler, KeyCode::SCANCODE_X, [](Keyboard::KeyEvent e) {
+		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiHandler, KeyCode::SCANCODE_X, [](KeyReleasedEvent e) {
 			debugTerrainFlag = true;
 			return false;
 			});

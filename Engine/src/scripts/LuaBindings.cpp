@@ -327,21 +327,25 @@ void bindUI(sol::state& lua)
         "MOUSE_BUTTON_MIDDLE", MouseButton::MOUSE_BUTTON_MIDDLE
     );
 
-    lua.new_enum("MouseEventType",
-        "Invalid", Mouse::MouseEventType::Invalid,
-        "Motion", Mouse::MouseEventType::Motion,
-        "ButtonPressed", Mouse::MouseEventType::ButtonPressed,
-        "ButtonReleased", Mouse::MouseEventType::ButtonReleased
+    lua.new_usertype<MouseButtonPressedEvent>("MouseButtonPressedEvent",
+        "x",      &MouseButtonPressedEvent::x,
+        "y",      &MouseButtonPressedEvent::y,
+        "clicks", &MouseButtonPressedEvent::clicks,
+        "button", &MouseButtonPressedEvent::button
     );
 
-    lua.new_usertype<Mouse::MouseEvent>("MouseEvent",
-        "type", &Mouse::MouseEvent::type,
-        "x", &Mouse::MouseEvent::x,
-        "y", &Mouse::MouseEvent::y,
-        "xrel", &Mouse::MouseEvent::xrel,
-        "yrel", &Mouse::MouseEvent::yrel,
-        "clicks", &Mouse::MouseEvent::clicks,
-        "button", &Mouse::MouseEvent::button
+    lua.new_usertype<MouseButtonReleasedEvent>("MouseButtonReleasedEvent",
+        "x",      &MouseButtonReleasedEvent::x,
+        "y",      &MouseButtonReleasedEvent::y,
+        "clicks", &MouseButtonReleasedEvent::clicks,
+        "button", &MouseButtonReleasedEvent::button
+    );
+
+    lua.new_usertype<MouseMovedEvent>("MouseMovedEvent",
+        "x",    &MouseMovedEvent::x,
+        "y",    &MouseMovedEvent::y,
+        "xrel", &MouseMovedEvent::xrel,
+        "yrel", &MouseMovedEvent::yrel
     );
 
     lua.new_usertype<GameMouse>("Mouse",
@@ -349,27 +353,33 @@ void bindUI(sol::state& lua)
         "get", []() { return std::ref(*Engine::get()->getSubSystem<GameMouse>()); },
 
         // Methods
-        "getButtonPressed", & GameMouse::getButtonPressed,
-        "onMousePressed", &GameMouse::onMousePressed,
-        "onMouseReleased", &GameMouse::onMouseReleased,
-        "onMouseMotion", &GameMouse::onMouseMotion,
-        "lock", []() {Engine::get()->getWindow()->lockMouse(); },
-        "unlock", []() {Engine::get()->getWindow()->unlockMouse(); }
+        "getButtonPressed", &GameMouse::getButtonPressed,
+        "onMousePressed",   &GameMouse::onMousePressed,
+        "onMouseReleased",  &GameMouse::onMouseReleased,
+        "onMouseMotion",    &GameMouse::onMouseMotion,
+        "lock",   []() { Engine::get()->getWindow()->lockMouse(); },
+        "unlock", []() { Engine::get()->getWindow()->unlockMouse(); }
     );
 
     // Keyboard
     loadKeyCodes(lua);
 
     lua.new_enum("KeyState",
-        "Invalid", Keyboard::KeyState::Invalid,
-        "Pressed", Keyboard::KeyState::Pressed,
-        "Released", Keyboard::KeyState::Released
+        "Invalid", KeyState::Invalid,
+        "Pressed", KeyState::Pressed,
+        "Released", KeyState::Released
     );
 
-    lua.new_usertype<Keyboard::KeyEvent>("KeyEvent",
-        "state", &Keyboard::KeyEvent::state,
-        "repeat", &Keyboard::KeyEvent::repeat,
-        "code", &Keyboard::KeyEvent::keysym
+    lua.new_usertype<KeyPressedEvent>("KeyPressedEvent",
+        "state",  &KeyPressedEvent::state,
+        "repeat", &KeyPressedEvent::repeat,
+        "code",   &KeyPressedEvent::keysym
+    );
+
+    lua.new_usertype<KeyReleasedEvent>("KeyReleasedEvent",
+        "state",  &KeyReleasedEvent::state,
+        "repeat", &KeyReleasedEvent::repeat,
+        "code",   &KeyReleasedEvent::keysym
     );
 
     lua.new_usertype<GameKeyboard>("Keyboard",
@@ -509,13 +519,18 @@ void bindAll(sol::state& lua)
 
     lua.new_usertype<Event>("Event",
         sol::no_constructor,
-
-        // Methods
-        "getName", & Event::getName
+        "handled", &Event::handled
     );
 
     lua.new_enum("EventType",
-        "KeyDown", SDL_EventType::SDL_MOUSEBUTTONDOWN);
+        "KeyPressed",           EventType::KeyPressed,
+        "KeyReleased",          EventType::KeyReleased,
+        "MouseButtonPressed",   EventType::MouseButtonPressed,
+        "MouseButtonReleased",  EventType::MouseButtonReleased,
+        "MouseMoved",           EventType::MouseMoved,
+        "WindowResized",        EventType::WindowResized,
+        "WindowClosed",         EventType::WindowClosed
+    );
 
     //lua["EventSystem"] = lua.create_table_with(
     //    "subscribe", [](SDL_EventType type, Entity e) {

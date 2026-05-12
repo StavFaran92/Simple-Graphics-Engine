@@ -6,6 +6,7 @@
 
 #include "EditorState.h"
 #include "EntityState.h"
+#include "core/MouseEvents.h"
 
 extern Entity g_editorCamera;
 
@@ -148,9 +149,10 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 	}
 }
 
-bool TransformTool::onEvent(SDL_Event e)
+bool TransformTool::onEvent(const Event& e)
 {
-	if ((e.type == SDL_MOUSEBUTTONDOWN && static_cast<MouseButton>(e.button.button) == MOUSE_BUTTON_LEFT) && 
+	if (e.type() == EventType::MouseButtonPressed &&
+		static_cast<const MouseButtonPressedEvent&>(e).button == MOUSE_BUTTON_LEFT &&
 		(ImGuizmo::IsUsing() || ImGuizmo::IsOver() || m_toolbarActive))
 	{
 		// Consume input so selection / camera doesn't fire

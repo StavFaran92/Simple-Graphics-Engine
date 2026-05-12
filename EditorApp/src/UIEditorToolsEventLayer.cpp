@@ -2,7 +2,7 @@
 
 #include "EditorState.h"
 
-bool UIEditorToolsEventLayer::handleEvent(SDL_Event e)
+bool UIEditorToolsEventLayer::handleEvent(const Event& e)
 {
     if (!m_isEnabled)
         return false;

@@ -37,7 +37,7 @@ void FoliagePaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 	}
 }
 
-bool FoliagePaintTool::onEvent(SDL_Event e)
+bool FoliagePaintTool::onEvent(const Event& e)
 {
 	if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 	{

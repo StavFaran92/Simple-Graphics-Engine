@@ -61,6 +61,9 @@
 
 #include <filesystem>
 
+#include "core/CoreEvents.h"
+#include "imgui_impl_sdl.h"
+
 // Singleton
 Engine* Engine::instance = nullptr;
 
@@ -396,8 +399,7 @@ void Engine::stop()
 {
     logTrace(__FUNCTION__);
 
-    SDL_Event e;
-    e.type = SDL_QUIT;
+    QuitAppEvent e;
     m_eventSystem->pushEvent(e);
 }
 
@@ -568,9 +570,12 @@ void Engine::handleEvents(bool& quit)
             SDL_free(e.drop.file);
         }
 
-        auto engineEvent = EventParser::parseSDLEvent(e);
+        // TODO is this not needed???
+        //ImGui_ImplSDL2_ProcessEvent(&e);
 
-        m_eventSystem->dispatch(*engineEvent);
+        auto engineEvent = EventParser::parseSDLEvent(e);
+        if (engineEvent)
+            m_eventSystem->dispatch(*engineEvent);
     }
 }
 
