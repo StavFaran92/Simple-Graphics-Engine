@@ -28,6 +28,9 @@
 #include "physics/Physics.h"
 #include "core/System.h"
 #include "core/Event.h"
+#include "core/KeyboardEvents.h"
+#include "core/MouseEvents.h"
+#include "core/WindowEvents.h"
 #include "core/GameEventSystem.h"
 
 #include "core/Window.h"
@@ -334,19 +337,6 @@ void bindUI(sol::state& lua)
         "button", &MouseButtonPressedEvent::button
     );
 
-    lua.new_usertype<MouseButtonReleasedEvent>("MouseButtonReleasedEvent",
-        "x",      &MouseButtonReleasedEvent::x,
-        "y",      &MouseButtonReleasedEvent::y,
-        "clicks", &MouseButtonReleasedEvent::clicks,
-        "button", &MouseButtonReleasedEvent::button
-    );
-
-    lua.new_usertype<MouseMovedEvent>("MouseMovedEvent",
-        "x",    &MouseMovedEvent::x,
-        "y",    &MouseMovedEvent::y,
-        "xrel", &MouseMovedEvent::xrel,
-        "yrel", &MouseMovedEvent::yrel
-    );
 
     lua.new_usertype<GameMouse>("Mouse",
         sol::no_constructor,
@@ -370,17 +360,6 @@ void bindUI(sol::state& lua)
         "Released", KeyState::Released
     );
 
-    lua.new_usertype<KeyPressedEvent>("KeyPressedEvent",
-        "state",  &KeyPressedEvent::state,
-        "repeat", &KeyPressedEvent::repeat,
-        "code",   &KeyPressedEvent::keysym
-    );
-
-    lua.new_usertype<KeyReleasedEvent>("KeyReleasedEvent",
-        "state",  &KeyReleasedEvent::state,
-        "repeat", &KeyReleasedEvent::repeat,
-        "code",   &KeyReleasedEvent::keysym
-    );
 
     lua.new_usertype<GameKeyboard>("Keyboard",
         sol::no_constructor,
@@ -461,6 +440,20 @@ void bindAll(sol::state& lua)
         "z", &glm::vec3::z
     );
 
+    lua.new_usertype<glm::quat>("quat",
+        sol::constructors<glm::quat(), glm::quat(float, float, float, float)>(),
+        "x", &glm::quat::x,
+        "y", &glm::quat::y,
+        "z", &glm::quat::z,
+        "w", &glm::quat::w,
+        sol::meta_function::multiplication,
+            sol::resolve<glm::quat(const glm::quat&, const glm::quat&)>(glm::operator*)
+    );
+
+    lua.set_function("angleAxis", [](float angle, glm::vec3 axis) {
+        return glm::angleAxis(angle, axis);
+    });
+
     lua.new_usertype<Entity>("Entity",
         sol::no_constructor,
 
@@ -519,7 +512,58 @@ void bindAll(sol::state& lua)
 
     lua.new_usertype<Event>("Event",
         sol::no_constructor,
-        "handled", &Event::handled
+        "handled", &Event::handled,
+        "type",    &Event::type
+    );
+
+    lua.new_usertype<KeyPressedEvent>("KeyPressedEvent",
+        sol::no_constructor,
+        "type",   &KeyPressedEvent::type,
+        "keysym", &KeyPressedEvent::keysym,
+        "repeat", &KeyPressedEvent::repeat,
+        "state",  &KeyPressedEvent::state
+    );
+
+    lua.new_usertype<KeyReleasedEvent>("KeyReleasedEvent",
+        sol::no_constructor,
+        "type",   &KeyReleasedEvent::type,
+        "keysym", &KeyReleasedEvent::keysym,
+        "repeat", &KeyReleasedEvent::repeat,
+        "state",  &KeyReleasedEvent::state
+    );
+
+    lua.new_usertype<MouseMovedEvent>("MouseMovedEvent",
+        sol::no_constructor,
+        "type", &MouseMovedEvent::type,
+        "x",    &MouseMovedEvent::x,
+        "y",    &MouseMovedEvent::y,
+        "xrel", &MouseMovedEvent::xrel,
+        "yrel", &MouseMovedEvent::yrel
+    );
+
+    lua.new_usertype<MouseButtonPressedEvent>("MouseButtonPressedEvent",
+        sol::no_constructor,
+        "type",   &MouseButtonPressedEvent::type,
+        "button", &MouseButtonPressedEvent::button,
+        "x",      &MouseButtonPressedEvent::x,
+        "y",      &MouseButtonPressedEvent::y,
+        "clicks", &MouseButtonPressedEvent::clicks
+    );
+
+    lua.new_usertype<MouseButtonReleasedEvent>("MouseButtonReleasedEvent",
+        sol::no_constructor,
+        "type",   &MouseButtonReleasedEvent::type,
+        "button", &MouseButtonReleasedEvent::button,
+        "x",      &MouseButtonReleasedEvent::x,
+        "y",      &MouseButtonReleasedEvent::y,
+        "clicks", &MouseButtonReleasedEvent::clicks
+    );
+
+    lua.new_usertype<WindowResizedEvent>("WindowResizedEvent",
+        sol::no_constructor,
+        "type",   &WindowResizedEvent::type,
+        "width",  &WindowResizedEvent::width,
+        "height", &WindowResizedEvent::height
     );
 
     lua.new_enum("EventType",
@@ -552,6 +596,18 @@ void bindAll(sol::state& lua)
         },
 
         "subscribe", &GameEventSystem::subscribe
+    );
+
+    lua.new_usertype<System>("System",
+        // Constructor
+        sol::no_constructor,
+
+        "get", []() {
+            auto eventsystem = Engine::get()->getSubSystem<System>();
+            return std::ref(*eventsystem);
+        },
+
+        "getDeltaTime", & System::getDeltaTime
     );
     
 

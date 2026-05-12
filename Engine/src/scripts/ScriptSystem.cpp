@@ -114,7 +114,8 @@ void ScriptSystem::callUpdate(float dt)
         }
     }
 }
-
+#include "core/MouseEvents.h"
+#include "core/KeyboardEvents.h"
 void ScriptSystem::callOnEvent(Entity entity, const Event& event)
 {
     for (auto& state : impl_->scripts)
@@ -125,7 +126,28 @@ void ScriptSystem::callOnEvent(Entity entity, const Event& event)
             sol::protected_function fn = state.script["onEvent"];
             if (fn.valid())
             {
-                sol::protected_function_result result = fn(state.script, event);
+                sol::protected_function_result result;
+
+                //todo fix
+                switch (event.type())
+                {
+                case EventType::MouseMoved:
+                    result = fn(state.script, static_cast<const MouseMovedEvent*>(&event)); break;
+                case EventType::KeyPressed:
+                    result = fn(state.script, static_cast<const KeyPressedEvent*>(&event)); break;
+                case EventType::KeyReleased:
+                    result = fn(state.script, static_cast<const KeyReleasedEvent*>(&event)); break;
+                case EventType::MouseButtonPressed:
+                    result = fn(state.script, static_cast<const MouseButtonPressedEvent*>(&event)); break;
+                case EventType::MouseButtonReleased:
+                    result = fn(state.script, static_cast<const MouseButtonReleasedEvent*>(&event)); break;
+                default:
+                    result = fn(state.script, &event); break;
+                }
+
+
+
+                //sol::protected_function_result result = fn(state.script, &event);
                 if (!result.valid()) {
                     sol::error err = result;
                     logError("Lua Error: {}", err.what());

@@ -18,9 +18,13 @@ function Script:create(entity)
     self.animator = self.model.Animator
     self.velocity = -10.0
     self.gravity = -10.0
+    self.yaw = 0;
+    self.pitch = 0;
+    self.turnSpeed = 10.0;
 
     local eventSystem = EventSystem.get()
     eventSystem:subscribe(EventType.KeyPressed, entity)
+    eventSystem:subscribe(EventType.MouseMoved, entity)
 
 end
 
@@ -76,7 +80,30 @@ function Script:update(entity, dt)
 end
 
 function Script:onEvent(e)
-    print("test")
+    if e:type() == EventType.MouseMoved then
+        
+        local system = System.get()
+        local xChange = e.xrel
+        local yChange = e.yrel
+        xChange = xChange * self.turnSpeed * system:getDeltaTime()
+        yChange = yChange * self.turnSpeed * system:getDeltaTime()
+        self.yaw = self.yaw - xChange
+        self.pitch = self.pitch - yChange
+
+        if self.pitch > 70.0 then
+            self.pitch = 70.0
+        end
+        if self.pitch < 0.0 then
+            self.pitch = 0.0
+        end
+
+        local pitchQuat = angleAxis(math.rad(self.pitch), vec3.new(-1, 0, 0))
+        local yawQuat = angleAxis(math.rad(self.yaw), vec3.new(0, 1, 0))
+        local combinedQuat = yawQuat * pitchQuat
+
+        local transform = self.controller.Transform
+        transform:setWorldRotation(combinedQuat)
+    end
 end
 
 function Script:destroy(entity)
