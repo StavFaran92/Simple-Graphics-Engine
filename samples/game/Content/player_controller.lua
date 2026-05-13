@@ -24,6 +24,7 @@ function Script:create(entity)
     self.turnSpeed = 10.0;
     self.jumpForce = 200;
     self.isGrounded = false
+    self.isJumping = false
 
     local eventSystem = EventSystem.get()
     eventSystem:subscribe(EventType.KeyPressed, entity)
@@ -59,10 +60,11 @@ function Script:update(entity, dt)
     end
 
     local hitResult = HitResult.new()
-    self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), 0.01, hitResult, LayerMask.LAYER_0);  
+    self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), 0.5, hitResult, LayerMask.LAYER_0);  
     
     if self.isGrounded and self.velocityV < 0 then
         self.velocityV = 0
+        self.isJumping = false
     end
 
     if not self.isGrounded then
@@ -74,7 +76,7 @@ function Script:update(entity, dt)
     self.pc:move(disp)
 
     -- if on the ground
-    if self.isGrounded then
+    if not self.isJumping then
         local hDir = self.movementH + self.movementV
         if math.abs(hDir.x) > 0.0 or math.abs(hDir.y) > 0.0 then
             local angle = -math.atan(hDir.z, hDir.x)
@@ -136,6 +138,7 @@ function Script:onEvent(e)
         if e.keysym == KeyCode.SCANCODE_SPACE then
             if self.isGrounded then
 				self.velocityV = self.jumpForce;
+                self.isJumping = true
             end
         end
     end
