@@ -1,5 +1,4 @@
-// Auto-generated Lua bindings using Sol3
-#include <sol/sol.hpp>
+#include "LuaBindings.h"
 
 #include "animation/Animator.h"
 #include "animation/Animation.h"

@@ -1,9 +1,10 @@
 Script = {}
 
 --Player
-----PlayerController
-------Main Camera
-------Model
+----controller
+------camera pivot
+--------Main Camera
+------model
 
 function Script:create(entity)
     self.movementSpeed = 5.0
@@ -18,10 +19,13 @@ function Script:create(entity)
     self.modelTransform = self.model.Transform
     self.animator = self.model.Animator
     self.velocity = -10.0
+    self.velocityV = -10.0
     self.gravity = -10.0
     self.yaw = 0;
     self.pitch = 0;
     self.turnSpeed = 10.0;
+    self.jumpForce = 400;
+    self.isGrounded = false
 
     local eventSystem = EventSystem.get()
     eventSystem:subscribe(EventType.KeyPressed, entity)
@@ -56,11 +60,19 @@ function Script:update(entity, dt)
         self.movementV = vec3.new(0)
     end
 
-    -- Combine horizontal, vertical, and vertical-velocity displacement
-    local disp = self.movementH + self.movementV + vec3.new(0, self.velocity / 1000.0, 0)
-    self.velocity = self.velocity + self.gravity
+    local hitResult = HitResult.new()
+    self.isGrounded = raycast(self.transform:getWorldPosition() + vec3.new(0, -1.1, 0), vec3.new(0, -1, 0), 1.0, hitResult, LayerMask.LAYER_0);   
     
+    if self.isGrounded and self.velocityV < 0 then
+        self.velocityV = 0
+    end
+
+    if not self.isGrounded then
+        self.velocityV = self.velocityV + self.gravity
+    end
+
     -- Move player
+    local disp = self.movementH + self.movementV + vec3.new(0, self.velocityV / 1000.0, 0)
     self.pc:move(disp)
 
     local hDir = self.movementH + self.movementV
@@ -79,7 +91,10 @@ function Script:update(entity, dt)
         end
     end
 
+
+
     
+
 end
 
 function Script:onEvent(e)
@@ -106,6 +121,16 @@ function Script:onEvent(e)
 
         local transform = self.cameraPivot.Transform
         transform:setWorldRotation(combinedQuat)
+    end
+
+
+    if e:type() == EventType.KeyPressed then
+        if e.keysym == KeyCode.SCANCODE_SPACE then
+            if self.isGrounded then
+                print("jump")
+				self.velocityV = self.jumpForce;
+            end
+        end
     end
 end
 
