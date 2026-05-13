@@ -13,7 +13,7 @@ function Script:create(entity)
     self.transform = entity.Transform
     self.controller = entity:getChildByName("controller")
     self.pc = self.controller.PlayerController
-    self.model = self.controller:getChildByName("model")
+    self.model = entity:getChildByName("model")
     self.modelTransform = self.model.Transform
     self.animator = self.model.Animator
     self.velocity = -10.0
@@ -26,6 +26,8 @@ function Script:create(entity)
     eventSystem:subscribe(EventType.KeyPressed, entity)
     eventSystem:subscribe(EventType.MouseMoved, entity)
 
+    local window = Window.get();
+    window:lockMouse()
 end
 
 function Script:update(entity, dt)
@@ -107,4 +109,6 @@ function Script:onEvent(e)
 end
 
 function Script:destroy(entity)
+    local window = Window.get();
+    window:unlockMouse()
 end

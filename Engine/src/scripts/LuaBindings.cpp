@@ -505,9 +505,16 @@ void bindAll(sol::state& lua)
     lua.new_usertype<Window>("Window",
         sol::no_constructor,
 
+        "get", []() {
+            auto window = Engine::get()->getWindow();
+            return std::ref(*window);
+        },
+
         // Methods
         "width", &Window::getWidth,
-        "height", &Window::getHeight
+        "height", &Window::getHeight,
+        "lockMouse", &Window::lockMouse,
+        "unlockMouse", &Window::unlockMouse
     );
 
     lua.new_usertype<Event>("Event",
