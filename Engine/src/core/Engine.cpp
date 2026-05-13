@@ -512,6 +512,11 @@ void Engine::addGUILayer(const std::shared_ptr<GUILayer>& GUILayer)
     m_GUILayers.push_back(GUILayer);
 }
 
+void Engine::setImGuiContext(void* context)
+{
+    ImGui::SetCurrentContext((ImGuiContext*)context);
+}
+
 void Engine::loadProject(const std::string& dirPath)
 {
     m_projectDirectory = dirPath;
@@ -570,8 +575,9 @@ void Engine::handleEvents(bool& quit)
             SDL_free(e.drop.file);
         }
 
-        // TODO is this not needed???
-        //ImGui_ImplSDL2_ProcessEvent(&e);
+        ImGui_ImplSDL2_ProcessEvent(&e);
+
+        //getSubSystem<RawEventDispatcher>()->dispatch(e);
 
         auto engineEvent = EventParser::parseSDLEvent(e);
         if (engineEvent)

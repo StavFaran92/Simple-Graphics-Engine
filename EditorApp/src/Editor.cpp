@@ -588,7 +588,6 @@ public:
 		gui->init();
 		gui->addGUI(new GUI_Helper);
 		Engine::get()->addGUILayer(gui);
-		ImGui::SetCurrentContext((ImGuiContext * )gui->getCurrentContext());
 
         setStyleAndColors();
 

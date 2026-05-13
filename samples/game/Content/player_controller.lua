@@ -12,8 +12,9 @@ function Script:create(entity)
     self.camComponent = getActiveScene():getEntityByName("Main Camera").Camera
     self.transform = entity.Transform
     self.controller = entity:getChildByName("controller")
+    self.cameraPivot = self.controller:getChildByName("cameraPivot")
+    self.model = self.controller:getChildByName("model")
     self.pc = self.controller.PlayerController
-    self.model = entity:getChildByName("model")
     self.modelTransform = self.model.Transform
     self.animator = self.model.Animator
     self.velocity = -10.0
@@ -103,7 +104,7 @@ function Script:onEvent(e)
         local yawQuat = angleAxis(math.rad(self.yaw), vec3.new(0, 1, 0))
         local combinedQuat = yawQuat * pitchQuat
 
-        local transform = self.controller.Transform
+        local transform = self.cameraPivot.Transform
         transform:setWorldRotation(combinedQuat)
     end
 end

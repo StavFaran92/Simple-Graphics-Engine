@@ -103,6 +103,7 @@ public:
     DeferredRenderer& getDeferredRenderer() const;
     Renderer& getForwardRenderer() const;
     void addGUILayer(const std::shared_ptr<GUILayer>& GUILayer);
+    void setImGuiContext(void* context);
     
     void loadProject(const std::string& dirPath);
     void saveProject();

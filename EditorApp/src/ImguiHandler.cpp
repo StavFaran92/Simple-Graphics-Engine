@@ -41,6 +41,10 @@ bool ImguiHandler::init()
 		return false;
 	}
 
+	ImGui::SetCurrentContext((ImGuiContext*)m_imguiContext);
+
+	Engine::get()->setImGuiContext(m_imguiContext);
+
 	logInfo("Imgui has initialized successfully.");
 
     return true;
