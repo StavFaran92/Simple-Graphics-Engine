@@ -900,6 +900,39 @@ void Scene::draw(float deltaTime)
 					RenderCommand::draw(vao);
 				}
 
+				if (physics.colliderType == ColliderType::CAPSULE)
+				{
+					auto collisionCapsule = std::dynamic_pointer_cast<CollisionCapsule>(physics.collider);
+					float radius = collisionCapsule->radius;
+					float halfHeight = collisionCapsule->halfHeight;
+					glm::mat4 topSphereModel = model;
+					glm::mat4 bottomSphereModel = model;
+					glm::mat4 cylinderModel = model;
+					cylinderModel = glm::scale(cylinderModel, glm::vec3(radius * 2, halfHeight * 2, radius * 2));
+					m_debugVisualizeShader->setModelMatrix(cylinderModel);
+
+					auto& cylinderMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CYLINDER);
+					auto  cylinderVao  = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
+					auto& sphereMesh   = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
+					auto  sphereVao    = sphereMesh.resource()->getPrimaryMesh()->getVAO();
+
+					// Top cap sphere
+					topSphereModel = glm::translate(topSphereModel, glm::vec3(0.0f, halfHeight, 0.0f));
+					topSphereModel = glm::scale(topSphereModel, glm::vec3(radius * 2));
+					m_debugVisualizeShader->setModelMatrix(topSphereModel);
+					RenderCommand::draw(sphereVao);
+
+					// Bottom cap sphere
+					bottomSphereModel = glm::translate(bottomSphereModel, glm::vec3(0.0f, -halfHeight, 0.0f));
+					bottomSphereModel = glm::scale(bottomSphereModel, glm::vec3(radius * 2));
+					m_debugVisualizeShader->setModelMatrix(bottomSphereModel);
+					RenderCommand::draw(sphereVao);
+
+					// Cylinder body
+					m_debugVisualizeShader->setModelMatrix(cylinderModel);
+					RenderCommand::draw(cylinderVao);
+				}
+
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				glDisable(GL_POLYGON_OFFSET_LINE);
 

@@ -7,7 +7,7 @@ function Script:create(entity)
     self.physics = entity.Physics
     self.model = entity:getChildByName("model")
     self.modelTransform = entity:getChildByName("model").Transform
-    self.speed = 10.0
+    self.speed = 20.0
     self.animator = self.model.Animator
 end
 

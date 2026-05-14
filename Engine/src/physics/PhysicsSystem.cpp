@@ -524,6 +524,10 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
         auto physxTransform = physx::PxTransform(pxTranslation, pxRotation);
 
+        // PhysX capsules are X-axis aligned; compose a 90° Z rotation to make them Y-axis (upright)
+        if (pc.collider->getType() == ColliderType::CAPSULE)
+            physxTransform.q = physxTransform.q * physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0.0f, 0.0f, 1.0f));
+
         //auto physxTransform = PhysXUtils::toPhysXTransform(transform);
         shape->setLocalPose(physxTransform);
         body->attachShape(*shape);
