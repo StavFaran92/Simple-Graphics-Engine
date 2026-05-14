@@ -490,7 +490,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     if (shape)
     {
 
-        auto translation = transform.getWorldPosition();
+        auto translation = transform.getWorldPosition() + pc.offset;
         auto orientation = transform.getWorldRotation();
 
         physx::PxVec3 pxTranslation(translation.x, translation.y, translation.z);

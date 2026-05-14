@@ -308,6 +308,8 @@ void Scene::init(Context* context, ResourceID rid)
 	m_highlightEdgeDetectionShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlightEdgeDetectionShader.glsl", loadDesc);
 	m_highlightMergeShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/HighlightMergeShader.glsl", loadDesc);
 
+	m_debugVisualizeShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/UnlitShader.glsl");
+
 	m_wireframeGrid = std::make_shared<WireframeGrid>();
 
 	// Scene is loaded and ready to be used. should come last.
@@ -841,6 +843,60 @@ void Scene::draw(float deltaTime)
 			}
 		}
 
+		// Render physics collider
+		for (auto&& [entity, transform, physics] : getRegistry().get().view<Transformation, PhysicsComponent>().each())
+		{
+			if ((entity_id)entity == selectedObject)
+			{
+				glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Physics Debug");
+
+				m_debugVisualizeShader->use();
+
+				m_debugVisualizeShader->setViewMatrix(graphics->view);
+				m_debugVisualizeShader->setProjectionMatrix(graphics->projection);
+				m_debugVisualizeShader->setUniformValue("color", glm::vec3(0, 1, 0));
+
+				glDisable(GL_DEPTH_TEST);
+
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				glEnable(GL_POLYGON_OFFSET_LINE);
+				glPolygonOffset(-1.0, -1.0);
+				glLineWidth(1); // Size in pixels
+
+				glm::mat4 model = transform.getWorldTransformation();
+				model = model * glm::translate(glm::mat4(1.0f), physics.offset);
+
+				if (physics.colliderType == ColliderType::BOX)
+				{
+					auto collisionBox = std::dynamic_pointer_cast<CollisionBox>(physics.collider);
+					auto extents = collisionBox->extents;
+					model = glm::scale(model, glm::vec3(extents.x*2, extents.y*2, extents.z*2));
+					m_debugVisualizeShader->setModelMatrix(model);
+					auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX);
+					auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
+					RenderCommand::draw(vao);
+				}
+
+				if (physics.colliderType == ColliderType::SPHERE)
+				{
+					auto collisionSphere = std::dynamic_pointer_cast<CollisionSphere>(physics.collider);
+					auto radius = collisionSphere->radius;
+					model = glm::scale(model, glm::vec3(radius * 2));
+					m_debugVisualizeShader->setModelMatrix(model);
+					auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
+					auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
+					RenderCommand::draw(vao);
+				}
+
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				glDisable(GL_POLYGON_OFFSET_LINE);
+
+				glEnable(GL_DEPTH_TEST);
+
+				glPopDebugGroup();
+			}
+		}
+
 		// Render WireframeGrid
 		if (Engine::get()->getConfig().renderConfig.renderWireframeGrid)
 		{
@@ -862,7 +918,7 @@ void Scene::draw(float deltaTime)
 
 		if (m_isSimulationActive)
 		{
-			Engine::get()->getPhysicsSystem()->visualizePhysicsShapeDebug(this);
+			//Engine::get()->getPhysicsSystem()->visualizePhysicsShapeDebug(this);
 		}
 
 		if (Engine::get()->getConfig().renderConfig.renderNonOpaquePass)

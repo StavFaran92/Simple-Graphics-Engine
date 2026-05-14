@@ -16,7 +16,7 @@
 	}													\
 	catch (const cereal::Exception&) {					\
 		member = value;									\
-	}
+	};
 
 namespace glm
 {

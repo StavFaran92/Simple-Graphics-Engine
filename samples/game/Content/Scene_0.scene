@@ -70,15 +70,30 @@
                                     "mass": 0.0,
                                     "collider": {
                                         "polymorphic_id": 2147483652,
-                                        "polymorphic_name": "CollisionSphere",
+                                        "polymorphic_name": "CollisionBox",
                                         "ptr_wrapper": {
                                             "id": 2147483652,
                                             "data": {
-                                                "radius": 0.5
+                                                "extents": {
+                                                    "v.x": 0.4000000059604645,
+                                                    "v.y": 0.800000011920929,
+                                                    "v.z": 0.5
+                                                }
                                             }
                                         }
                                     },
-                                    "colliderType": 2
+                                    "colliderType": 1,
+                                    "isLockedLinearX": false,
+                                    "isLockedLinearY": false,
+                                    "isLockedLinearZ": false,
+                                    "isLockedAngularX": false,
+                                    "isLockedAngularY": false,
+                                    "isLockedAngularZ": false,
+                                    "offset": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.8999999761581421,
+                                        "v.z": 0.0
+                                    }
                                 }
                             }
                         },
@@ -606,7 +621,8 @@
                                     "type": 1,
                                     "mass": 0.0,
                                     "collider": {
-                                        "polymorphic_id": 4,
+                                        "polymorphic_id": 2147483658,
+                                        "polymorphic_name": "CollisionSphere",
                                         "ptr_wrapper": {
                                             "id": 2147483674,
                                             "data": {
@@ -614,7 +630,18 @@
                                             }
                                         }
                                     },
-                                    "colliderType": 2
+                                    "colliderType": 2,
+                                    "isLockedLinearX": false,
+                                    "isLockedLinearY": false,
+                                    "isLockedLinearZ": false,
+                                    "isLockedAngularX": false,
+                                    "isLockedAngularY": false,
+                                    "isLockedAngularZ": false,
+                                    "offset": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    }
                                 }
                             }
                         }
@@ -670,7 +697,7 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483658,
+                            "polymorphic_id": 2147483659,
                             "polymorphic_name": "SkyboxComponent",
                             "ptr_wrapper": {
                                 "id": 2147483677,
@@ -739,7 +766,7 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483659,
+                            "polymorphic_id": 2147483660,
                             "polymorphic_name": "Terrain",
                             "ptr_wrapper": {
                                 "id": 2147483679,
@@ -820,7 +847,7 @@
                                     "type": 0,
                                     "mass": 0.0,
                                     "collider": {
-                                        "polymorphic_id": 2147483660,
+                                        "polymorphic_id": 2147483661,
                                         "polymorphic_name": "CollisionTerrain",
                                         "ptr_wrapper": {
                                             "id": 2147483682,
@@ -829,7 +856,18 @@
                                             }
                                         }
                                     },
-                                    "colliderType": 3
+                                    "colliderType": 3,
+                                    "isLockedLinearX": false,
+                                    "isLockedLinearY": false,
+                                    "isLockedLinearZ": false,
+                                    "isLockedAngularX": false,
+                                    "isLockedAngularY": false,
+                                    "isLockedAngularZ": false,
+                                    "offset": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    }
                                 }
                             }
                         }
@@ -839,7 +877,7 @@
                     "entity": 1,
                     "components": [
                         {
-                            "polymorphic_id": 2147483661,
+                            "polymorphic_id": 2147483662,
                             "polymorphic_name": "CameraComponent",
                             "ptr_wrapper": {
                                 "id": 2147483683,
@@ -989,7 +1027,7 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483662,
+                            "polymorphic_id": 2147483663,
                             "polymorphic_name": "DirectionalLight",
                             "ptr_wrapper": {
                                 "id": 2147483689,

@@ -126,12 +126,12 @@ void InspectorWindow::display()
 			switch (type) {
 			case ColliderType::BOX:
 				if (auto* box = dynamic_cast<CollisionBox*>(rBody.collider.get())) {
-					ImGui::InputFloat3("Extents", &box->extents.x);
+					ImGui::DragFloat3("Extents", &box->extents.x, .1f);
 				}
 				break;
 			case ColliderType::SPHERE:
 				if (auto* sphere = dynamic_cast<CollisionSphere*>(rBody.collider.get())) {
-					ImGui::InputFloat("Radius", &sphere->radius);
+					ImGui::DragFloat("Radius", &sphere->radius, .1f);
 				}
 				break;
 			case ColliderType::TERRAIN:
@@ -148,6 +148,8 @@ void InspectorWindow::display()
 				ImGui::Text("Capsule collider UI not implemented yet.");
 				break;
 			}
+
+			ImGui::DragFloat3("Offset", &rBody.offset.x, .1f);
 		});
 
 		displayComponent<PlayerController>("Player Controller", [](PlayerController& controller) {

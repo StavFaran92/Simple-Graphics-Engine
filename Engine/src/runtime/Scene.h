@@ -235,6 +235,8 @@ private:
 	ShaderResourceRef m_highlightEdgeDetectionShader;
 	ShaderResourceRef m_highlightMergeShader;
 
+	ShaderResourceRef m_debugVisualizeShader;
+
 	std::shared_ptr<WireframeGrid> m_wireframeGrid;
 
 	ShaderResourceRef m_sampleComputeShader;

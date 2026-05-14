@@ -22,6 +22,13 @@ struct EngineAPI PhysicsComponent : public Component
 		SERIALIZED_MEMBER(mass);
 		SERIALIZED_MEMBER(collider);
 		SERIALIZED_MEMBER(colliderType);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearX, false);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearY, false);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearZ, false);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularX, false);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularY, false);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularZ, false);
+		SERIALIZED_MEMBER_OPTIONAL(offset, glm::vec3{});
 	}
 
 	bool isLockedLinearX = false;
@@ -39,6 +46,7 @@ struct EngineAPI PhysicsComponent : public Component
 
 	std::shared_ptr<Collider> collider;
 	ColliderType colliderType = ColliderType::NONE;
+	glm::vec3 offset{};
 };
 
 REGISTER_COMPONENT(PhysicsComponent)
