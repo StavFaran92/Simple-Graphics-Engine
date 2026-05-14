@@ -71,11 +71,12 @@ SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescripto
 
 	std::string filepath = desc.sourcePath;
 	std::ifstream is(filepath);
-	cereal::JSONInputArchive iarchive(is);
-	SceneData sceneData;
+
 
 	try
 	{
+		cereal::JSONInputArchive iarchive(is);
+		SceneData sceneData;
 		iarchive(sceneData);
 		Archiver::deserializeScene(sceneData.m_serializedScene, scene);
 	}
@@ -873,6 +874,17 @@ void Scene::draw(float deltaTime)
 					model = glm::scale(model, glm::vec3(extents.x*2, extents.y*2, extents.z*2));
 					m_debugVisualizeShader->setModelMatrix(model);
 					auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX);
+					auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
+					RenderCommand::draw(vao);
+				}
+
+				if (physics.colliderType == ColliderType::SPHERE)
+				{
+					auto collisionSphere = std::dynamic_pointer_cast<CollisionSphere>(physics.collider);
+					auto radius = collisionSphere->radius;
+					model = glm::scale(model, glm::vec3(radius * 2));
+					m_debugVisualizeShader->setModelMatrix(model);
+					auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
 					auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
 					RenderCommand::draw(vao);
 				}

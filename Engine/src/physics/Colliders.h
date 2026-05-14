@@ -71,6 +71,26 @@ struct CollisionSphere : public Collider
 	float radius = .5f;
 };
 
+struct CollisionCapsule : public Collider
+{
+	CollisionCapsule() = default;
+
+	template <class Archive>
+	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER(radius);
+		SERIALIZED_MEMBER(halfHeight);
+	}
+
+	virtual ColliderType getType() const override
+	{
+		return ColliderType::CAPSULE;
+	}
+
+	float radius = .5f;
+	float halfHeight = .5f;
+
+};
+
 struct CollisionMesh : public Collider
 {
 	CollisionMesh() = default;
@@ -112,3 +132,5 @@ CEREAL_REGISTER_TYPE(CollisionSphere);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CollisionSphere)
 CEREAL_REGISTER_TYPE(CollisionBox);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CollisionBox)
+CEREAL_REGISTER_TYPE(CollisionCapsule);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CollisionCapsule)

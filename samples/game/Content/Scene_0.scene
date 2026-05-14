@@ -13,7 +13,7 @@
                                 "data": {
                                     "localTranslation": {
                                         "v.x": 0.0,
-                                        "v.y": 0.23590898513793946,
+                                        "v.y": 0.5366149544715881,
                                         "v.z": -3.221266269683838
                                     },
                                     "localRotation": {
@@ -70,25 +70,22 @@
                                     "mass": 0.0,
                                     "collider": {
                                         "polymorphic_id": 2147483652,
-                                        "polymorphic_name": "CollisionBox",
+                                        "polymorphic_name": "CollisionCapsule",
                                         "ptr_wrapper": {
                                             "id": 2147483652,
                                             "data": {
-                                                "extents": {
-                                                    "v.x": 0.4000000059604645,
-                                                    "v.y": 0.800000011920929,
-                                                    "v.z": 0.5
-                                                }
+                                                "radius": 1.100000023841858,
+                                                "halfHeight": 0.5
                                             }
                                         }
                                     },
-                                    "colliderType": 1,
+                                    "colliderType": 5,
                                     "isLockedLinearX": false,
                                     "isLockedLinearY": false,
                                     "isLockedLinearZ": false,
-                                    "isLockedAngularX": false,
-                                    "isLockedAngularY": false,
-                                    "isLockedAngularZ": false,
+                                    "isLockedAngularX": true,
+                                    "isLockedAngularY": true,
+                                    "isLockedAngularZ": true,
                                     "offset": {
                                         "v.x": 0.0,
                                         "v.y": 0.8999999761581421,

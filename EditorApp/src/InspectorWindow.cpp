@@ -110,7 +110,7 @@ void InspectorWindow::display()
 				case ColliderType::SPHERE: rBody.collider = std::make_shared<CollisionSphere>(); break;
 				case ColliderType::TERRAIN: rBody.collider = std::make_shared<CollisionTerrain>(); break;
 				case ColliderType::MESH: rBody.collider = std::make_shared<CollisionMesh>(); break;
-				case ColliderType::CAPSULE: /* when implemented */ break;
+				case ColliderType::CAPSULE: rBody.collider = std::make_shared<CollisionCapsule>(); break;
 				}
 			}
 
@@ -134,6 +134,12 @@ void InspectorWindow::display()
 					ImGui::DragFloat("Radius", &sphere->radius, .1f);
 				}
 				break;
+			case ColliderType::CAPSULE:
+				if (auto* capsule = dynamic_cast<CollisionCapsule*>(rBody.collider.get())) {
+					ImGui::DragFloat("Radius", &capsule->radius, .1f);
+					ImGui::DragFloat("Height", &capsule->halfHeight, .1f);
+				}
+				break;
 			case ColliderType::TERRAIN:
 				ImGui::TextDisabled("Terrain collider has no editable parameters.");
 				break;
@@ -142,10 +148,6 @@ void InspectorWindow::display()
 					ImGui::Checkbox("Convex", &mesh->isConvex);
 					// Optional: display mesh ResourceWrapper name, etc.
 				}
-				break;
-			case ColliderType::CAPSULE:
-				// Handle capsule here if you define its struct
-				ImGui::Text("Capsule collider UI not implemented yet.");
 				break;
 			}
 

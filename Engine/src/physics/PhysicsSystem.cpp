@@ -154,6 +154,11 @@ physx::PxShape* PhysicsSystem::createSphereShape(float radius)
     return m_physics->createShape(physx::PxSphereGeometry(radius), *m_defaultMaterial);
 }
 
+physx::PxShape* PhysicsSystem::createCapsuleShape(float radius, float halfHeight)
+{
+    return m_physics->createShape(physx::PxCapsuleGeometry(radius, halfHeight), *m_defaultMaterial);
+}
+
 physx::PxShape* PhysicsSystem::createConvexMeshShape(const std::vector<glm::vec3>& vertices)
 {
     physx::PxConvexMeshDesc convexDesc;
@@ -396,6 +401,25 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
             return;
         }
         shape = createSphereShape(collider->radius * std::max(std::max(scale.x, scale.y), scale.z));
+
+        assert(shape);
+
+        Physics::LayerMask mask = collider->layerMask;
+
+        physx::PxFilterData filterData;
+        filterData.word0 = mask;
+
+        shape->setQueryFilterData(filterData);
+    }
+    else if (pc.collider->getType() == ColliderType::CAPSULE)
+    {
+        auto& collider = std::dynamic_pointer_cast<CollisionCapsule>(pc.collider);
+        if (collider->radius <= 0 || collider->halfHeight <= 0)
+        {
+            logWarning("Invalid collider params: {}, {}" , collider->radius, collider->halfHeight);
+            return;
+        }
+        shape = createCapsuleShape(collider->radius, collider->halfHeight);
 
         assert(shape);
 

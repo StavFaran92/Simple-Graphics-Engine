@@ -36,6 +36,7 @@ private:
 	void createShape(physx::PxRigidActor* body, Entity e, bool recursive);
 	physx::PxShape* createBoxShape(float x, float y, float z);
 	physx::PxShape* createSphereShape(float radius);
+	physx::PxShape* createCapsuleShape(float radius, float halfHeight);
 	physx::PxShape* createConvexMeshShape(const std::vector<glm::vec3>& vertices);
 	physx::PxMaterial* getDefaultMaterial() const;
 
