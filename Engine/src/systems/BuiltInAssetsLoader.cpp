@@ -11,20 +11,24 @@
 #include "texture/Texture.h"
 #include "geometry/Quad.h"
 #include "geometry/Box.h"
+#include "geometry/Cylinder.h"
 #include "geometry/Sphere.h"
 #include "geometry/Grid.h"
 
 #include "geometry/ModelImporter.h"
 #include "memory/BuiltInAssets.h"
 
+static Assets* assets() { return Engine::get()->getSubSystem<Assets>(); }
+
 void BuiltInAssetsLoader::loadTextures()
 {
+	if (!assets()->hasAsset(SGE_TEXTURE_WHITE))
 	{
 		static unsigned char whiteColor[3] = { 255, 255, 255 };
 
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
-		desc.name = "SGE_TEXTURE_WHITE";
+		desc.name = SGE_TEXTURE_WHITE;
 		desc.isEngineOwned = true;
 		desc.visibility = AssetVisibility::Public;
 		TextureCreateDescriptor createDesc;
@@ -38,16 +42,17 @@ void BuiltInAssetsLoader::loadTextures()
 		createDesc.textureData.type = TextureType::UNSIGNED_BYTE;
 		createDesc.textureData.filter = TextureFilter::Linear;
 		createDesc.textureData.wrap = TextureWrap::Repeat;
-		createDesc.textureData.textureName = "SGE_TEXTURE_WHITE";
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
+		createDesc.textureData.textureName = SGE_TEXTURE_WHITE;
+		assets()->createAsset(desc, createDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_TEXTURE_BLACK))
 	{
 		static unsigned char blackColor[3] = { 0, 0, 0 };
 
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
-		desc.name = "SGE_TEXTURE_BLACK";
+		desc.name = SGE_TEXTURE_BLACK;
 		desc.isEngineOwned = true;
 		desc.visibility = AssetVisibility::Public;
 		TextureCreateDescriptor createDesc;
@@ -61,56 +66,60 @@ void BuiltInAssetsLoader::loadTextures()
 		createDesc.textureData.type = TextureType::UNSIGNED_BYTE;
 		createDesc.textureData.filter = TextureFilter::Linear;
 		createDesc.textureData.wrap = TextureWrap::Repeat;
-		createDesc.textureData.textureName = "SGE_TEXTURE_BLACK";
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
+		createDesc.textureData.textureName = SGE_TEXTURE_BLACK;
+		assets()->createAsset(desc, createDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_TEXTURE_GRASS))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.isEngineOwned = true;
 		desc.visibility = AssetVisibility::Public;
-		desc.name = "SGE_TEXTURE_GRASS";
+		desc.name = SGE_TEXTURE_GRASS;
 		TextureLoadDescriptor loadDesc;
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/Ground037_1K-JPG_Color.jpg";
-		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
+		assets()->importAsset(desc, loadDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_TEXTURE_CHECKERBOARD))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.isEngineOwned = true;
-		desc.name = "SGE_TEXTURE_CHECKERBOARD";
+		desc.name = SGE_TEXTURE_CHECKERBOARD;
 		TextureLoadDescriptor loadDesc;
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/Checkerboard_pattern.png";
-		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
+		assets()->importAsset(desc, loadDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_TEXTURE_TERRAIN_CHECKERBOARD))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.isEngineOwned = true;
 		desc.visibility = AssetVisibility::Public;
-		desc.name = "SGE_TEXTURE_TERRAIN_CHECKERBOARD";
+		desc.name = SGE_TEXTURE_TERRAIN_CHECKERBOARD;
 		TextureLoadDescriptor loadDesc;
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/checkerboard.jpg";
-		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
+		assets()->importAsset(desc, loadDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_TEXTURE_TILE_NOISE))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::TEXTURE;
 		desc.isEngineOwned = true;
-		desc.name = "SGE_TEXTURE_TILE_NOISE";
+		desc.name = SGE_TEXTURE_TILE_NOISE;
 		TextureLoadDescriptor loadDesc;
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Textures/texTileNoise.png";
-		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
+		assets()->importAsset(desc, loadDesc);
 	}
 }
 
 void BuiltInAssetsLoader::loadMaterials()
 {
-	// TODO: procedural material creation needs MaterialCreateDescriptor + IResourceFactory impl
+	if (!assets()->hasAsset(SGE_MATERIAL_DEFAULT))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MATERIAL;
@@ -119,9 +128,10 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.visibility = AssetVisibility::Public;
 		MaterialCreateDescriptor createDesc;
 		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Opaque);
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
+		assets()->createAsset(desc, createDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_MATERIAL_TERRAIN_DEFAULT))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MATERIAL;
@@ -130,10 +140,10 @@ void BuiltInAssetsLoader::loadMaterials()
 		desc.visibility = AssetVisibility::Public;
 		MaterialCreateDescriptor createDesc;
 		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Terrain);
-		auto materialAsset = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc).as<MaterialAsset>();
+		auto materialAsset = assets()->createAsset(desc, createDesc).as<MaterialAsset>();
 
 		auto sampler = std::make_shared<TextureSamplerAsset>();
-		sampler->texture = BuiltInAssets::getByName<TextureAsset>("SGE_TEXTURE_TERRAIN_CHECKERBOARD");
+		sampler->texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_TERRAIN_CHECKERBOARD);
 		sampler->state.isActive = true;
 		materialAsset->setProperty("samplerAlbedo", sampler);
 	}
@@ -141,62 +151,74 @@ void BuiltInAssetsLoader::loadMaterials()
 
 void BuiltInAssetsLoader::loadMeshes()
 {
-	//TODO
-	// the use of ::createMesh can and should be optimized, instead of building the mesh
-	// binding VBOs all on the GPU, it should return the raw data directly on the CPU.
-
+	if (!assets()->hasAsset(SGE_MESH_BOX))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MODEL;
-		desc.name = "SGE_MESH_BOX";
+		desc.name = SGE_MESH_BOX;
 		desc.isEngineOwned = true;
 		desc.visibility = AssetVisibility::Public;
 		ModelCreateDescriptor meshDesc;
 		meshDesc.data.m_meshes = std::vector<MeshData>{ Box::createMesh()->getMeshData() };
-
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
+		assets()->createAsset(desc, meshDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_MESH_QUAD))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MODEL;
-		desc.name = "SGE_MESH_QUAD";
+		desc.name = SGE_MESH_QUAD;
 		desc.isEngineOwned = true;
 		desc.visibility = AssetVisibility::Public;
 		ModelCreateDescriptor meshDesc;
 		meshDesc.data.m_meshes = std::vector<MeshData>{ Quad::createMesh()->getMeshData() };
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
+		assets()->createAsset(desc, meshDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_MESH_SPHERE))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MODEL;
-		desc.name = "SGE_MESH_SPHERE";
+		desc.name = SGE_MESH_SPHERE;
 		desc.isEngineOwned = true;
 		desc.visibility = AssetVisibility::Public;
 		ModelCreateDescriptor meshDesc;
 		meshDesc.data.m_meshes = std::vector<MeshData>{ Sphere::createMesh(1, 36, 36)->getMeshData() };
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
+		assets()->createAsset(desc, meshDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_MESH_CYLINDER))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MODEL;
-		desc.name = "SGE_MESH_GRID";
+		desc.name = SGE_MESH_CYLINDER;
+		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
+		ModelCreateDescriptor meshDesc;
+		meshDesc.data.m_meshes = std::vector<MeshData>{ Cylinder::createMesh(1, 1, 36)->getMeshData() };
+		assets()->createAsset(desc, meshDesc);
+	}
+
+	if (!assets()->hasAsset(SGE_MESH_GRID))
+	{
+		AssetBuildDescriptor desc;
+		desc.aType = AssetType::MODEL;
+		desc.name = SGE_MESH_GRID;
 		desc.isEngineOwned = true;
 		ModelCreateDescriptor meshDesc;
 		meshDesc.data.m_meshes = std::vector<MeshData>{ Grid::createMesh(10, 10)->getMeshData() };
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, meshDesc);
+		assets()->createAsset(desc, meshDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_MESH_CAMERA))
 	{
 		AssetBuildDescriptor desc;
 		desc.aType = AssetType::MODEL;
-		desc.name = "SGE_MESH_CAMERA";
+		desc.name = SGE_MESH_CAMERA;
 		desc.isEngineOwned = true;
 		ModelLoadDescriptor loadDesc;
 		loadDesc.sourcePath = SGE_ROOT_DIR "Resources/Engine/Meshes/camera_v2.dae";
-		Engine::get()->getSubSystem<Assets>()->importAsset(desc, loadDesc);
+		assets()->importAsset(desc, loadDesc);
 	}
 }
 

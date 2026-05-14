@@ -16,6 +16,7 @@ public:
 	static Entity createBoxEntity(SGE_Regsitry* registry);
 	static Entity createQuad(SGE_Regsitry* registry);
 	static Entity createSphere(SGE_Regsitry* registry);
+	static Entity createCylinder(SGE_Regsitry* registry);
 
 private:
 	static Entity createEntity(SGE_Regsitry* registry, const std::string& name);

@@ -348,9 +348,17 @@ void GenerateTangentsForMesh(MeshData& mesh) {
 	context.m_pInterface = &iface;
 	context.m_pUserData = &userData;
 
-	if (!genTangSpaceDefault(&context)) {
-		std::cerr << "MikkTSpace tangent generation failed." << std::endl;
+	try
+	{
+		if (!genTangSpaceDefault(&context)) {
+			logWarning("MikkTSpace tangent generation failed.");
+		}
 	}
+	catch (std::exception e)
+	{
+		logWarning("MikkTSpace tangent generation failed.");
+	}
+
 
 	logDebug("Tagnents generation finished.");
 }

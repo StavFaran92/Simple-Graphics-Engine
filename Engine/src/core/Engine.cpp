@@ -216,16 +216,15 @@ bool Engine::init(const InitParams& initParams)
     if (initParams.loadExistingProject)
     {
         par = ProjectAssetRegistry::parse(m_projectDirectory);
-        m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
-        m_context = std::make_shared<Context>(par);
     }
     else
     {   
         par = ProjectAssetRegistry::create(initParams.projectDir);
-        m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
-        m_context = std::make_shared<Context>(par);
-        BuiltInAssetsLoader::loadAssets();
     }
+
+    m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
+    m_context = std::make_shared<Context>(par);
+    BuiltInAssetsLoader::loadAssets();
 
     
 

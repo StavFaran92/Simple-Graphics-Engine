@@ -244,7 +244,7 @@ void bindSystems(sol::state& lua)
         "getAllAssets", &Assets::getAllAssets,
         "getAssetFromPath", &Assets::getAssetFromPath,
         "getAsset", &Assets::getAsset,
-        "hasAsset", &Assets::hasAsset,
+        //"hasAsset", &Assets::hasAsset,
         "updateAsset", &Assets::updateAsset
     );
 

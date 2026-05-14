@@ -56,3 +56,12 @@ Entity ShapeFactory::createSphere(SGE_Regsitry* registry)
 	entity.addComponent<MeshRendererComponent>(mesh);
 	return entity;
 }
+
+Entity ShapeFactory::createCylinder(SGE_Regsitry* registry)
+{
+	static int createdCylinderCount = 0;
+	auto entity = createEntity(registry, "Cylinder_" + std::to_string(createdCylinderCount++));
+	ModelAssetRef mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CYLINDER);
+	entity.addComponent<MeshRendererComponent>(mesh);
+	return entity;
+}

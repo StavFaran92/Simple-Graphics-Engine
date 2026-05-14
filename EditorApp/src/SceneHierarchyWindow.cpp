@@ -259,6 +259,12 @@ void SceneHierarchyWindow::display()
 				updateScene();
 				state.selectEntity(sceneObjects[0].e);
 			}
+			if (ImGui::MenuItem("Cylinder"))
+			{
+				ShapeFactory::createCylinder(&Engine::get()->getContext()->getActiveScene()->getRegistry());
+				updateScene();
+				state.selectEntity(sceneObjects[0].e);
+			}
 
 			ImGui::EndMenu(); // End the submenu
 		}

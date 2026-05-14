@@ -35,7 +35,7 @@
             "visibility": 1
         }
     ],
-    "counter": 62,
+    "counter": 63,
     "lua script": [
         {
             "aType": 7,
@@ -1216,6 +1216,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1241,17 +1252,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -1538,6 +1538,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1563,17 +1574,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -1860,6 +1860,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1885,17 +1896,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -2476,17 +2476,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2512,6 +2501,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -2693,6 +2693,19 @@
             "sourcePath": "",
             "uuid": 54,
             "visibility": 1
+        },
+        {
+            "aType": 2,
+            "asset": {
+                "materials": []
+            },
+            "assetDirectory": "",
+            "ext": ".model",
+            "isEngineOwned": true,
+            "name": "SGE_MESH_CYLINDER",
+            "sourcePath": "",
+            "uuid": 62,
+            "visibility": 0
         }
     ],
     "namesToUUIDRefs": {
@@ -2727,6 +2740,7 @@
         "SGE_MATERIAL_TERRAIN_DEFAULT": 8,
         "SGE_MESH_BOX": 9,
         "SGE_MESH_CAMERA": 13,
+        "SGE_MESH_CYLINDER": 62,
         "SGE_MESH_GRID": 12,
         "SGE_MESH_QUAD": 10,
         "SGE_MESH_SPHERE": 11,
@@ -2789,6 +2803,7 @@
         "engine/sge_mesh_box.model": 9,
         "engine/sge_mesh_camera/defaultmaterial.mat": 14,
         "engine/sge_mesh_camera/sge_mesh_camera.model": 13,
+        "engine/sge_mesh_cylinder.model": 62,
         "engine/sge_mesh_grid.model": 12,
         "engine/sge_mesh_quad.model": 10,
         "engine/sge_mesh_sphere.model": 11,

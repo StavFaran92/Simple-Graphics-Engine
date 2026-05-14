@@ -53,6 +53,8 @@ public:
 
 	bool hasAsset(UUID uuid) const;
 
+	bool hasAsset(const std::string& name) const;
+
 	void makeDirty(UUID uuid);
 
 	void sync(UUID uuid);

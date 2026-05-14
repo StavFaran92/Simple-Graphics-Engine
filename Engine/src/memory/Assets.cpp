@@ -208,6 +208,11 @@ bool Assets::hasAsset(UUID uuid) const
 	return false;
 }
 
+bool Assets::hasAsset(const std::string& name) const
+{
+	return !getAssetFromName(name).isEmpty();
+}
+
 void Assets::updateRegistry(const AssetRecord& aInfo)
 {
 	if (!aInfo.name.empty())

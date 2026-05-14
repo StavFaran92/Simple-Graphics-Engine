@@ -7,15 +7,19 @@
 #include "core/Engine.h"
 #include "core/Logger.h"
 
-const std::string SGE_TEXTURE_WHITE = "SGE_TEXTURE_WHITE";
-const std::string SGE_TEXTURE_BLACK = "SGE_TEXTURE_BLACK";
-const std::string SGE_TEXTURE_CHECKERBOARD = "SGE_TEXTURE_CHECKERBOARD";
+const std::string SGE_TEXTURE_WHITE                = "SGE_TEXTURE_WHITE";
+const std::string SGE_TEXTURE_BLACK                = "SGE_TEXTURE_BLACK";
+const std::string SGE_TEXTURE_CHECKERBOARD         = "SGE_TEXTURE_CHECKERBOARD";
+const std::string SGE_TEXTURE_GRASS                = "SGE_TEXTURE_GRASS";
+const std::string SGE_TEXTURE_TERRAIN_CHECKERBOARD = "SGE_TEXTURE_TERRAIN_CHECKERBOARD";
+const std::string SGE_TEXTURE_TILE_NOISE           = "SGE_TEXTURE_TILE_NOISE";
 
 const std::string SGE_MESH_GRID = "SGE_MESH_GRID";
 const std::string SGE_MESH_BOX = "SGE_MESH_BOX";
 const std::string SGE_MESH_QUAD = "SGE_MESH_QUAD";
 const std::string SGE_MESH_SPHERE = "SGE_MESH_SPHERE";
 const std::string SGE_MESH_CAMERA = "SGE_MESH_CAMERA";
+const std::string SGE_MESH_CYLINDER = "SGE_MESH_CYLINDER";
 
 const std::string SGE_MATERIAL_DEFAULT = "SGE_MATERIAL_DEFAULT";
 const std::string SGE_MATERIAL_TERRAIN_DEFAULT = "SGE_MATERIAL_TERRAIN_DEFAULT";
