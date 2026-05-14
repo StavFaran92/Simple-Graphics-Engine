@@ -60,7 +60,7 @@ function Script:update(entity, dt)
     end
 
     local hitResult = HitResult.new()
-    self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), 0.5, hitResult, LayerMask.LAYER_0);  
+    self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), 0.01, hitResult, LayerMask.LAYER_0);  
     
     if self.isGrounded and self.velocityV < 0 then
         self.velocityV = 0

@@ -1,0 +1,95 @@
+{
+    "value0": {
+        "m_serializedPrefab": [
+            {
+                "entity": 5,
+                "components": [
+                    {
+                        "polymorphic_id": 2147483649,
+                        "polymorphic_name": "Transformation",
+                        "ptr_wrapper": {
+                            "id": 2147483649,
+                            "data": {
+                                "localTranslation": {
+                                    "v.x": 0.0,
+                                    "v.y": 0.0,
+                                    "v.z": 0.0
+                                },
+                                "localRotation": {
+                                    "q.x": 0.0,
+                                    "q.y": 0.0,
+                                    "q.z": 0.0,
+                                    "q.w": 1.0
+                                },
+                                "localScale": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "m_parent": {
+                                    "m_entity": 4294967295
+                                },
+                                "entity": {
+                                    "m_entity": 5
+                                },
+                                "root": {
+                                    "m_entity": 5
+                                },
+                                "m_children": []
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483650,
+                        "polymorphic_name": "MeshRendererComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483650,
+                            "data": {
+                                "mesh": {
+                                    "uuid": {
+                                        "m_value": 54
+                                    }
+                                },
+                                "count": 1,
+                                "m_material": [
+                                    {
+                                        "key": 0,
+                                        "value": {
+                                            "uuid": {
+                                                "m_value": 55
+                                            }
+                                        }
+                                    }
+                                ],
+                                "renderTechnique": 1
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483651,
+                        "polymorphic_name": "ObjectComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483651,
+                            "data": {
+                                "name": "Mutant",
+                                "e": {
+                                    "m_entity": 5
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483652,
+                        "polymorphic_name": "RenderableComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483652,
+                            "data": {
+                                "renderTechnique": 1
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

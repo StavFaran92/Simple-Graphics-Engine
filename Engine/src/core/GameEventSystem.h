@@ -14,6 +14,8 @@ public:
 	void unsubscribe(EventType eventType, Entity e);
 	void dispatch(const Event& event);
 
+	void clean();
+
 private:
 	std::unordered_map<EventType, std::vector<Entity>> m_handlerTable;
 };

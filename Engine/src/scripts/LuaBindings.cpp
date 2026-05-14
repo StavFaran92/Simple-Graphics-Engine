@@ -97,6 +97,197 @@ sol::object getComponentHelper(Entity & e, sol::stack_object key, sol::this_stat
     return sol::make_object(lua, sol::nil);
 }
 
+void bindCoreTypes(sol::state& lua)
+{
+    lua.new_usertype<glm::vec2>("vec2",
+        "x", &glm::vec2::x,
+        "y", &glm::vec2::y
+    );
+
+    lua.new_usertype<glm::vec3>("vec3",
+        sol::constructors<
+        glm::vec3(),                    // default: vec3()
+        glm::vec3(float),  // parameterized: vec3(x, y, z)
+        glm::vec3(float, float, float)  // parameterized: vec3(x, y, z)
+        >(),
+        // Arithmetic operators
+        sol::meta_function::addition, sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator+),
+        sol::meta_function::subtraction, sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator-),
+        sol::meta_function::multiplication, sol::overload(
+            sol::resolve<glm::vec3(const glm::vec3&, float)>(glm::operator*),
+            sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator*)
+        ),
+        sol::meta_function::division, sol::resolve<glm::vec3(const glm::vec3&, float)>(glm::operator/),
+        sol::meta_function::unary_minus, [](const glm::vec3& v) { return -v; },
+        sol::meta_function::to_string, [](const glm::vec3& v) {
+            return "vec3(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")";
+        },
+        "x", &glm::vec3::x,
+        "y", &glm::vec3::y,
+        "z", &glm::vec3::z
+    );
+
+    lua.new_usertype<glm::quat>("quat",
+        sol::constructors<glm::quat(), glm::quat(float, float, float, float)>(),
+        "x", &glm::quat::x,
+        "y", &glm::quat::y,
+        "z", &glm::quat::z,
+        "w", &glm::quat::w,
+        sol::meta_function::multiplication,
+        sol::resolve<glm::quat(const glm::quat&, const glm::quat&)>(glm::operator*)
+    );
+
+    lua.new_usertype<Entity>("Entity",
+        sol::no_constructor,
+
+        sol::meta_function::index,
+        &getComponentHelper,
+
+        "setRoot", &Entity::setRoot,
+        "setParent", &Entity::setParent,
+        "removeParent", &Entity::removeParent,
+        "getParent", &Entity::getParent,
+        "getChildren", &Entity::getChildren,
+        "getChildByName", &Entity::getChildByName,
+        "getRoot", &Entity::getRoot,
+
+        "valid", &Entity::valid,
+        "equals", [](Entity& self, Entity& other) { return self == other; },
+        "notEquals", [](Entity& self, Entity& other) { return self != other; },
+
+        "handler", &Entity::handler,
+        "handlerID", &Entity::handlerID,
+
+        // Remove function
+        "remove", &Entity::remove
+    );
+}
+
+void bindEvents(sol::state& lua)
+{
+    lua.new_usertype<Event>("Event",
+        sol::no_constructor,
+        "handled", &Event::handled,
+        "type", &Event::type
+    );
+
+    lua.new_usertype<KeyPressedEvent>("KeyPressedEvent",
+        sol::no_constructor,
+        "type", &KeyPressedEvent::type,
+        "keysym", &KeyPressedEvent::keysym,
+        "repeat", &KeyPressedEvent::repeat,
+        "state", &KeyPressedEvent::state
+    );
+
+    lua.new_usertype<KeyReleasedEvent>("KeyReleasedEvent",
+        sol::no_constructor,
+        "type", &KeyReleasedEvent::type,
+        "keysym", &KeyReleasedEvent::keysym,
+        "repeat", &KeyReleasedEvent::repeat,
+        "state", &KeyReleasedEvent::state
+    );
+
+    lua.new_usertype<MouseMovedEvent>("MouseMovedEvent",
+        sol::no_constructor,
+        "type", &MouseMovedEvent::type,
+        "x", &MouseMovedEvent::x,
+        "y", &MouseMovedEvent::y,
+        "xrel", &MouseMovedEvent::xrel,
+        "yrel", &MouseMovedEvent::yrel
+    );
+
+    lua.new_usertype<MouseButtonPressedEvent>("MouseButtonPressedEvent",
+        sol::no_constructor,
+        "type", &MouseButtonPressedEvent::type,
+        "button", &MouseButtonPressedEvent::button,
+        "x", &MouseButtonPressedEvent::x,
+        "y", &MouseButtonPressedEvent::y,
+        "clicks", &MouseButtonPressedEvent::clicks
+    );
+
+    lua.new_usertype<MouseButtonReleasedEvent>("MouseButtonReleasedEvent",
+        sol::no_constructor,
+        "type", &MouseButtonReleasedEvent::type,
+        "button", &MouseButtonReleasedEvent::button,
+        "x", &MouseButtonReleasedEvent::x,
+        "y", &MouseButtonReleasedEvent::y,
+        "clicks", &MouseButtonReleasedEvent::clicks
+    );
+
+    lua.new_usertype<WindowResizedEvent>("WindowResizedEvent",
+        sol::no_constructor,
+        "type", &WindowResizedEvent::type,
+        "width", &WindowResizedEvent::width,
+        "height", &WindowResizedEvent::height
+    );
+
+    lua.new_enum("EventType",
+        "KeyPressed", EventType::KeyPressed,
+        "KeyReleased", EventType::KeyReleased,
+        "MouseButtonPressed", EventType::MouseButtonPressed,
+        "MouseButtonReleased", EventType::MouseButtonReleased,
+        "MouseMoved", EventType::MouseMoved,
+        "WindowResized", EventType::WindowResized,
+        "WindowClosed", EventType::WindowClosed
+    );
+}
+
+void bindSystems(sol::state& lua)
+{
+    lua.new_usertype<Assets>("Assets",
+        // Constructor
+        sol::no_constructor,
+
+        // Methods
+        "getAlias", &Assets::getAlias,
+        "getAllAssetsOfType", &Assets::getAllAssetsOfType,
+        "getAllAssets", &Assets::getAllAssets,
+        "getAssetFromPath", &Assets::getAssetFromPath,
+        "getAsset", &Assets::getAsset,
+        "hasAsset", &Assets::hasAsset,
+        "updateAsset", &Assets::updateAsset
+    );
+
+    lua.new_usertype<Window>("Window",
+        sol::no_constructor,
+
+        "get", []() {
+            auto window = Engine::get()->getWindow();
+            return std::ref(*window);
+        },
+
+        // Methods
+        "width", &Window::getWidth,
+        "height", &Window::getHeight,
+        "lockMouse", &Window::lockMouse,
+        "unlockMouse", &Window::unlockMouse
+    );
+
+    lua.new_usertype<GameEventSystem>("EventSystem",
+        // Constructor
+        sol::no_constructor,
+
+        "get", []() {
+            auto eventsystem = Engine::get()->getSubSystem<GameEventSystem>();
+            return std::ref(*eventsystem);
+        },
+
+        "subscribe", &GameEventSystem::subscribe
+    );
+
+    lua.new_usertype<System>("System",
+        // Constructor
+        sol::no_constructor,
+
+        "get", []() {
+            auto eventsystem = Engine::get()->getSubSystem<System>();
+            return std::ref(*eventsystem);
+        },
+
+        "getDeltaTime", &System::getDeltaTime
+    );
+}
+
 void bindComponents(sol::state& lua)
 {
     lua.new_usertype<Animator>("Animator",
@@ -215,6 +406,11 @@ void bindComponents(sol::state& lua)
         "center", &CameraComponent::center,
         "up", &CameraComponent::up
     );
+
+    lua.new_usertype<PhysicsComponent>("PhysicsComponent",
+        "addForce", &PhysicsComponent::addForce,
+        "setForce", &PhysicsComponent::setForce
+    );
 }
 
 void bindAssets(sol::state& lua)
@@ -222,6 +418,15 @@ void bindAssets(sol::state& lua)
     lua.new_usertype<Animation>("Animation",
         "getDuration", &Animation::getDuration,
         "getTicksPerSecond", &Animation::getTicksPerSecond
+    );
+
+    lua.new_usertype<Scene>("Scene",
+        "createEntity", sol::overload(
+            [](Scene& self) { return self.createEntity(); },
+            [](Scene& self, const std::string& name) { return self.createEntity(name); }
+        ),
+        "removeEntity", &Scene::removeEntity,
+        "getEntityByName", &Scene::getEntityByName
     );
 
 
@@ -371,7 +576,28 @@ void bindUI(sol::state& lua)
         "onKeyPressed", &GameKeyboard::onKeyPressed,
         "onKeyReleased", &GameKeyboard::onKeyReleased
     );
+}
 
+void bindFreeFunctions(sol::state& lua)
+{
+    lua.set_function("getActiveScene", []() { return  std::ref(*Engine::get()->getContext()->getActiveScene().get()); });
+    lua.set_function("assets", []() { return std::ref(*Engine::get()->getSubSystem<Assets>()); });
+    lua.set_function("testCallback", [](sol::function fn) {
+        fn(42);
+        });
+}
+
+void bindMath(sol::state& lua)
+{
+    lua.set_function("normalize", [](glm::vec3 v) { return glm::normalize(v); });
+
+    lua.set_function("angleAxis", [](float angle, glm::vec3 axis) {
+        return glm::angleAxis(angle, axis);
+        });
+}
+
+void bindPhysics(sol::state& lua)
+{
     lua.new_usertype<Physics::HitResult>("HitResult",
         // Members
         "position", &Physics::HitResult::position,
@@ -407,221 +633,13 @@ void bindUI(sol::state& lua)
 
 void bindAll(sol::state& lua) 
 {
+    bindCoreTypes(lua);
+    bindMath(lua);
     bindAssets(lua);
     bindComponents(lua);
+    bindEvents(lua);
     bindUI(lua);
-
-    lua.new_usertype<glm::vec2>("vec2",
-        "x", &glm::vec2::x,
-        "y", &glm::vec2::y
-    );
-
-    lua.new_usertype<glm::vec3>("vec3",
-        sol::constructors<
-        glm::vec3(),                    // default: vec3()
-        glm::vec3(float),  // parameterized: vec3(x, y, z)
-        glm::vec3(float, float, float)  // parameterized: vec3(x, y, z)
-        >(),
-        // Arithmetic operators
-        sol::meta_function::addition, sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator+),
-        sol::meta_function::subtraction, sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator-),
-        sol::meta_function::multiplication, sol::overload(
-            sol::resolve<glm::vec3(const glm::vec3&, float)>(glm::operator*),
-            sol::resolve<glm::vec3(const glm::vec3&, const glm::vec3&)>(glm::operator*)
-        ),
-        sol::meta_function::division, sol::resolve<glm::vec3(const glm::vec3&, float)>(glm::operator/),
-        sol::meta_function::unary_minus, [](const glm::vec3& v) { return -v; },
-        sol::meta_function::to_string, [](const glm::vec3& v) {
-            return "vec3(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")";
-        },
-        "x", &glm::vec3::x,
-        "y", &glm::vec3::y,
-        "z", &glm::vec3::z
-    );
-
-    lua.new_usertype<glm::quat>("quat",
-        sol::constructors<glm::quat(), glm::quat(float, float, float, float)>(),
-        "x", &glm::quat::x,
-        "y", &glm::quat::y,
-        "z", &glm::quat::z,
-        "w", &glm::quat::w,
-        sol::meta_function::multiplication,
-            sol::resolve<glm::quat(const glm::quat&, const glm::quat&)>(glm::operator*)
-    );
-
-    lua.set_function("angleAxis", [](float angle, glm::vec3 axis) {
-        return glm::angleAxis(angle, axis);
-    });
-
-    lua.new_usertype<Entity>("Entity",
-        sol::no_constructor,
-
-        sol::meta_function::index,
-        &getComponentHelper,
-
-        "setRoot", &Entity::setRoot,
-        "setParent", &Entity::setParent,
-        "removeParent", &Entity::removeParent,
-        "getParent", &Entity::getParent,
-        "getChildren", &Entity::getChildren,
-        "getChildByName", &Entity::getChildByName,
-        "getRoot", &Entity::getRoot,
-
-        "valid", &Entity::valid,
-        "equals", [](Entity& self, Entity& other) { return self == other; },
-        "notEquals", [](Entity& self, Entity& other) { return self != other; },
-
-        "handler", &Entity::handler,
-        "handlerID", &Entity::handlerID,
-
-        // Remove function
-        "remove", &Entity::remove
-    );
-
-    lua.new_usertype<Scene>("Scene",
-        "createEntity", sol::overload(
-            [](Scene& self) { return self.createEntity(); },
-            [](Scene& self, const std::string& name) { return self.createEntity(name); }
-        ),
-        "removeEntity", &Scene::removeEntity,
-        "getEntityByName", &Scene::getEntityByName
-    );
-
-    lua.new_usertype<Assets>("Assets",
-        // Constructor
-        sol::no_constructor,
-
-        // Methods
-        "getAlias", &Assets::getAlias,
-        "getAllAssetsOfType", &Assets::getAllAssetsOfType,
-        "getAllAssets", &Assets::getAllAssets,
-        "getAssetFromPath", &Assets::getAssetFromPath,
-        "getAsset", &Assets::getAsset,
-        "hasAsset", &Assets::hasAsset,
-        "updateAsset", &Assets::updateAsset
-    );
-
-    lua.new_usertype<Window>("Window",
-        sol::no_constructor,
-
-        "get", []() {
-            auto window = Engine::get()->getWindow();
-            return std::ref(*window);
-        },
-
-        // Methods
-        "width", &Window::getWidth,
-        "height", &Window::getHeight,
-        "lockMouse", &Window::lockMouse,
-        "unlockMouse", &Window::unlockMouse
-    );
-
-    lua.new_usertype<Event>("Event",
-        sol::no_constructor,
-        "handled", &Event::handled,
-        "type",    &Event::type
-    );
-
-    lua.new_usertype<KeyPressedEvent>("KeyPressedEvent",
-        sol::no_constructor,
-        "type",   &KeyPressedEvent::type,
-        "keysym", &KeyPressedEvent::keysym,
-        "repeat", &KeyPressedEvent::repeat,
-        "state",  &KeyPressedEvent::state
-    );
-
-    lua.new_usertype<KeyReleasedEvent>("KeyReleasedEvent",
-        sol::no_constructor,
-        "type",   &KeyReleasedEvent::type,
-        "keysym", &KeyReleasedEvent::keysym,
-        "repeat", &KeyReleasedEvent::repeat,
-        "state",  &KeyReleasedEvent::state
-    );
-
-    lua.new_usertype<MouseMovedEvent>("MouseMovedEvent",
-        sol::no_constructor,
-        "type", &MouseMovedEvent::type,
-        "x",    &MouseMovedEvent::x,
-        "y",    &MouseMovedEvent::y,
-        "xrel", &MouseMovedEvent::xrel,
-        "yrel", &MouseMovedEvent::yrel
-    );
-
-    lua.new_usertype<MouseButtonPressedEvent>("MouseButtonPressedEvent",
-        sol::no_constructor,
-        "type",   &MouseButtonPressedEvent::type,
-        "button", &MouseButtonPressedEvent::button,
-        "x",      &MouseButtonPressedEvent::x,
-        "y",      &MouseButtonPressedEvent::y,
-        "clicks", &MouseButtonPressedEvent::clicks
-    );
-
-    lua.new_usertype<MouseButtonReleasedEvent>("MouseButtonReleasedEvent",
-        sol::no_constructor,
-        "type",   &MouseButtonReleasedEvent::type,
-        "button", &MouseButtonReleasedEvent::button,
-        "x",      &MouseButtonReleasedEvent::x,
-        "y",      &MouseButtonReleasedEvent::y,
-        "clicks", &MouseButtonReleasedEvent::clicks
-    );
-
-    lua.new_usertype<WindowResizedEvent>("WindowResizedEvent",
-        sol::no_constructor,
-        "type",   &WindowResizedEvent::type,
-        "width",  &WindowResizedEvent::width,
-        "height", &WindowResizedEvent::height
-    );
-
-    lua.new_enum("EventType",
-        "KeyPressed",           EventType::KeyPressed,
-        "KeyReleased",          EventType::KeyReleased,
-        "MouseButtonPressed",   EventType::MouseButtonPressed,
-        "MouseButtonReleased",  EventType::MouseButtonReleased,
-        "MouseMoved",           EventType::MouseMoved,
-        "WindowResized",        EventType::WindowResized,
-        "WindowClosed",         EventType::WindowClosed
-    );
-
-    //lua["EventSystem"] = lua.create_table_with(
-    //    "subscribe", [](SDL_EventType type, Entity e) {
-    //        Engine::get()->getSubSystem<GameEventSystem>()->subscribe(type, e);
-    //    },
-    //    "unsubscribe", [](SDL_EventType type, Entity e) {
-    //        Engine::get()->getSubSystem<GameEventSystem>()->unsubscribe(type, e);
-    //    }
-    //);
-
-
-    lua.new_usertype<GameEventSystem>("EventSystem",
-        // Constructor
-        sol::no_constructor,
-
-        "get", []() {
-            auto eventsystem = Engine::get()->getSubSystem<GameEventSystem>();
-            return std::ref(*eventsystem);
-        },
-
-        "subscribe", &GameEventSystem::subscribe
-    );
-
-    lua.new_usertype<System>("System",
-        // Constructor
-        sol::no_constructor,
-
-        "get", []() {
-            auto eventsystem = Engine::get()->getSubSystem<System>();
-            return std::ref(*eventsystem);
-        },
-
-        "getDeltaTime", & System::getDeltaTime
-    );
-    
-
-    lua.set_function("getActiveScene", []() { return  std::ref(*Engine::get()->getContext()->getActiveScene().get()); });
-    lua.set_function("assets", []() { return std::ref(*Engine::get()->getSubSystem<Assets>()); });
-    lua.set_function("testCallback", [](sol::function fn) {
-        fn(42);
-        });
-
-
+    bindPhysics(lua);
+    bindSystems(lua);
+    bindFreeFunctions(lua);
 }

@@ -62,6 +62,7 @@
 #include "core/Factory.h"
 #include "memory/BuiltInAssets.h"
 #include "core/Trace.h"
+#include "core/GameEventSystem.h"
 
 SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
@@ -1308,6 +1309,8 @@ void Scene::stopSimulation()
 	{
 		logError("Script Error occured: {}", e.what());
 	}
+
+	Engine::get()->getSubSystem<GameEventSystem>()->clean();
 
 	getRegistry().getRegistry().clear();
 

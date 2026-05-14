@@ -4,7 +4,7 @@
         {
             "aType": 3,
             "asset": {},
-            "assetDirectory": ".\\",
+            "assetDirectory": "Erika Archer (2)",
             "ext": ".anim",
             "isEngineOwned": false,
             "name": "Jump (2)",
@@ -15,7 +15,7 @@
         {
             "aType": 3,
             "asset": {},
-            "assetDirectory": ".\\",
+            "assetDirectory": "Erika Archer (2)",
             "ext": ".anim",
             "isEngineOwned": false,
             "name": "Fast Run (2)",
@@ -26,7 +26,7 @@
         {
             "aType": 3,
             "asset": {},
-            "assetDirectory": ".\\",
+            "assetDirectory": "Erika Archer (2)",
             "ext": ".anim",
             "isEngineOwned": false,
             "name": "Idle (1)",
@@ -35,19 +35,32 @@
             "visibility": 1
         }
     ],
-    "counter": 54,
+    "counter": 62,
     "lua script": [
         {
             "aType": 7,
             "asset": {
                 "filepath": ""
             },
-            "assetDirectory": ".\\",
+            "assetDirectory": "Erika Archer (2)",
             "ext": ".lua",
             "isEngineOwned": false,
             "name": "player_controller",
             "sourcePath": "",
             "uuid": 32,
+            "visibility": 1
+        },
+        {
+            "aType": 7,
+            "asset": {
+                "filepath": ""
+            },
+            "assetDirectory": "Mutant",
+            "ext": ".lua",
+            "isEngineOwned": false,
+            "name": "enemyController",
+            "sourcePath": "",
+            "uuid": 61,
             "visibility": 1
         }
     ],
@@ -2226,6 +2239,328 @@
             "sourcePath": "",
             "uuid": 43,
             "visibility": 1
+        },
+        {
+            "aType": 6,
+            "asset": {
+                "data": {
+                    "m_customShader": {
+                        "uuid": {
+                            "m_value": 0
+                        }
+                    },
+                    "m_layout": {
+                        "m_propertySchemas": [
+                            {
+                                "key": "color",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "v.x": 1.0,
+                                            "v.y": 1.0,
+                                            "v.z": 1.0
+                                        },
+                                        "index": 2
+                                    },
+                                    "defaultValueRaw": "1.0, 1.0, 1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "color",
+                                    "type": 4
+                                }
+                            },
+                            {
+                                "key": "metallicFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 0.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "0.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "metallicFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "roughnessFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 1.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "roughnessFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "samplerAO",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483649
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAO",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerAlbedo",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483650
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAlbedo",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerMetallic",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483651
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerMetallic",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerNormal",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483652
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerNormal",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerRoughness",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483653
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerRoughness",
+                                    "type": 8
+                                }
+                            }
+                        ]
+                    },
+                    "m_properties": [
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
+                            "key": "samplerNormal",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 57
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483654
+                                    }
+                                },
+                                "index": 8
+                            }
+                        },
+                        {
+                            "key": "roughnessFactor",
+                            "value": {
+                                "data": 0.7519305348396301,
+                                "index": 0
+                            }
+                        },
+                        {
+                            "key": "samplerAlbedo",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 56
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483655
+                                    }
+                                },
+                                "index": 8
+                            }
+                        }
+                    ],
+                    "m_renderMode": 0,
+                    "name": "mutant_M"
+                }
+            },
+            "assetDirectory": ".\\Mutant",
+            "ext": ".mat",
+            "isEngineOwned": false,
+            "name": "mutant_M",
+            "sourcePath": "",
+            "uuid": 55,
+            "visibility": 1
         }
     ],
     "models": [
@@ -2338,6 +2673,26 @@
             "sourcePath": "",
             "uuid": 33,
             "visibility": 1
+        },
+        {
+            "aType": 2,
+            "asset": {
+                "materials": [
+                    [
+                        0,
+                        {
+                            "uuid": 55
+                        }
+                    ]
+                ]
+            },
+            "assetDirectory": ".\\Mutant",
+            "ext": ".model",
+            "isEngineOwned": false,
+            "name": "Mutant",
+            "sourcePath": "",
+            "uuid": 54,
+            "visibility": 1
         }
     ],
     "namesToUUIDRefs": {
@@ -2363,6 +2718,10 @@
         "Ground054_2K-PNG_Roughness": 20,
         "Idle (1)": 53,
         "Jump (2)": 51,
+        "Mutant": 54,
+        "Mutant_PREFAB": 60,
+        "Mutant_diffuse": 56,
+        "Mutant_normal": 57,
         "New Material": 17,
         "SGE_MATERIAL_DEFAULT": 7,
         "SGE_MATERIAL_TERRAIN_DEFAULT": 8,
@@ -2382,9 +2741,11 @@
         "SGE_TEXTURE_WHITE": 1,
         "Scene_0": 15,
         "V941sW7o": 28,
+        "enemyController": 61,
         "eyelash_MAT": 43,
         "fISsTyQE": 27,
         "iHy45YLv": 29,
+        "mutant_M": 55,
         "player_controller": 32,
         "sunflowers_puresky_4k": 26
     },
@@ -2397,12 +2758,19 @@
         "content/erika archer (2)/erika_archer_clothes_normal.texture": 36,
         "content/erika archer (2)/eyelash_mat.mat": 43,
         "content/erika archer (2)/eyespec_mat.mat": 40,
+        "content/erika archer (2)/fast run (2).anim": 52,
         "content/erika archer (2)/femalefita_body_diffuse.texture": 38,
         "content/erika archer (2)/femalefita_eyelash_diffuse.texture": 44,
         "content/erika archer (2)/femalefita_stdnm.texture": 39,
-        "content/fast run (2).anim": 52,
-        "content/idle (1).anim": 53,
-        "content/jump (2).anim": 51,
+        "content/erika archer (2)/idle (1).anim": 53,
+        "content/erika archer (2)/jump (2).anim": 51,
+        "content/erika archer (2)/player_controller.lua": 32,
+        "content/mutant/enemycontroller.lua": 61,
+        "content/mutant/mutant.model": 54,
+        "content/mutant/mutant_diffuse.texture": 56,
+        "content/mutant/mutant_m.mat": 55,
+        "content/mutant/mutant_normal.texture": 57,
+        "content/mutant/mutant_prefab.prefab": 60,
         "content/new folder/ground037_2k-png_ambientocclusion.texture": 24,
         "content/new folder/ground037_2k-png_color.texture": 21,
         "content/new folder/ground037_2k-png_normalgl.texture": 22,
@@ -2412,7 +2780,6 @@
         "content/new folder/ground054_2k-png_normalgl.texture": 19,
         "content/new folder/ground054_2k-png_roughness.texture": 20,
         "content/new folder/new material.mat": 17,
-        "content/player_controller.lua": 32,
         "content/scene_0.scene": 15,
         "content/sunflowers_puresky_4k.texture": 26,
         "engine/fisstyqe.texture": 27,
@@ -2446,6 +2813,17 @@
             "name": "Erika Archer (2)_PREFAB",
             "sourcePath": "",
             "uuid": 50,
+            "visibility": 1
+        },
+        {
+            "aType": 5,
+            "asset": {},
+            "assetDirectory": "Mutant",
+            "ext": ".prefab",
+            "isEngineOwned": false,
+            "name": "Mutant_PREFAB",
+            "sourcePath": "",
+            "uuid": 60,
             "visibility": 1
         }
     ],
@@ -2825,6 +3203,50 @@
             "name": "FemaleFitA_eyelash_diffuse",
             "sourcePath": "",
             "uuid": 49,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Mutant",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "Mutant_diffuse",
+            "sourcePath": "",
+            "uuid": 56,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Mutant",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "Mutant_normal",
+            "sourcePath": "",
+            "uuid": 57,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Mutant",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "Mutant_diffuse",
+            "sourcePath": "",
+            "uuid": 58,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Mutant",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "Mutant_normal",
+            "sourcePath": "",
+            "uuid": 59,
             "visibility": 1
         }
     ]

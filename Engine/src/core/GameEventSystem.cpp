@@ -38,6 +38,11 @@ void GameEventSystem::dispatch(const Event& event)
 	
 }
 
+void GameEventSystem::clean()
+{
+	m_handlerTable.clear();
+}
+
 //void GameEventSystem::unsubscribe(SDL_EventType eventType, Subscriber* s)
 //{
 //	auto iter = m_handlerTable.find(s);

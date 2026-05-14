@@ -359,6 +359,8 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 {
     physx::PxShape* shape = nullptr;
     auto& transform = e.getComponent<Transformation>();
+    if (!e.HasComponent<PhysicsComponent>())
+        return;
     auto& pc = e.getComponent<PhysicsComponent>();
     auto scale = transform.getWorldScale();
 
