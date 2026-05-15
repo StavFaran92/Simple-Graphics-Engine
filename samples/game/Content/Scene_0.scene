@@ -445,6 +445,15 @@
                                                     "m_value": 51
                                                 }
                                             }
+                                        },
+                                        {
+                                            "name": "Attack",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
+                                                "uuid": {
+                                                    "m_value": 89
+                                                }
+                                            }
                                         }
                                     ]
                                 }

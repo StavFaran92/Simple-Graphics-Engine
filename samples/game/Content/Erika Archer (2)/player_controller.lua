@@ -1,5 +1,12 @@
 Script = {}
 
+local PlayerState = {
+    Idle   = "Idle",
+    Run    = "Run",
+    Jump   = "Jump",
+    Attack = "Attack",
+}
+
 --Player
 ----camera pivot
 ------Main Camera
@@ -25,10 +32,13 @@ function Script:create(entity)
     self.jumpForce = 200;
     self.isGrounded = false
     self.isJumping = false
+    self.isAttacking = false
+    self.state = PlayerState.Idle
 
     local eventSystem = EventSystem.get()
     eventSystem:subscribe(EventType.KeyPressed, entity)
     eventSystem:subscribe(EventType.MouseMoved, entity)
+    eventSystem:subscribe(EventType.MouseButtonPressed, entity)
 
     local window = Window.get();
     window:lockMouse()
@@ -75,28 +85,29 @@ function Script:update(entity, dt)
     local disp = self.movementH + self.movementV + vec3.new(0, self.velocityV / 1000.0, 0)
     self.pc:move(disp)
 
-    -- if on the ground
-    if not self.isJumping then
-        local hDir = self.movementH + self.movementV
-        if math.abs(hDir.x) > 0.0 or math.abs(hDir.y) > 0.0 then
-            local angle = -math.atan(hDir.z, hDir.x)
-            self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
+    -- Update state
+    local hDir = self.movementH + self.movementV
+    local isMoving = math.abs(hDir.x) > 0.0 or math.abs(hDir.z) > 0.0
 
-            local animState = "Run"
-            if self.animator:getCurrentAnimationName() ~= animState then
-                self.animator:playAnimation(animState)
-            end
-        else
-            local animState = "Idle"
-            if self.animator:getCurrentAnimationName() ~= animState then
-                self.animator:playAnimation(animState)
-            end
-        end
+    if self.isJumping then
+        self.state = PlayerState.Jump
+    elseif isMoving then
+        self.state = PlayerState.Run
+    elseif self.isAttacking then
+        self.state = PlayerState.Attack
     else
-        local animState = "Jump"
-        if self.animator:getCurrentAnimationName() ~= animState then
-            self.animator:playAnimation(animState)
-        end
+        self.state = PlayerState.Idle
+    end
+
+    -- Rotate model toward movement direction
+    if isMoving and not self.isJumping then
+        local angle = -math.atan(hDir.z, hDir.x)
+        self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
+    end
+
+    -- Play animation for current state
+    if self.animator:getCurrentAnimationName() ~= self.state then
+        self.animator:playAnimation(self.state)
     end
 
 
@@ -133,6 +144,12 @@ function Script:onEvent(e)
 
 
     
+
+    if e:type() == EventType.MouseButtonPressed then
+        if e.button == MouseButton.Left then
+            self.isAttacking = true
+        end
+    end
 
     if e:type() == EventType.KeyPressed then
         if e.keysym == KeyCode.SCANCODE_SPACE then

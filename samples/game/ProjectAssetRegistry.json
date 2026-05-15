@@ -88,9 +88,20 @@
             "sourcePath": "",
             "uuid": 81,
             "visibility": 1
+        },
+        {
+            "aType": 3,
+            "asset": {},
+            "assetDirectory": "warrior\\Warrior\\",
+            "ext": ".anim",
+            "isEngineOwned": false,
+            "name": "Sword And Shield Slash",
+            "sourcePath": "",
+            "uuid": 89,
+            "visibility": 1
         }
     ],
-    "counter": 89,
+    "counter": 90,
     "lua script": [
         {
             "aType": 7,
@@ -4150,6 +4161,7 @@
         "SGE_TEXTURE_TILE_NOISE": 6,
         "SGE_TEXTURE_WHITE": 1,
         "Scene_0": 15,
+        "Sword And Shield Slash": 89,
         "Thriller Idle": 78,
         "V941sW7o": 28,
         "Warrior": 82,
@@ -4211,6 +4223,7 @@
         "content/warrior/warrior/maria_diffuse.texture": 84,
         "content/warrior/warrior/maria_normal.texture": 85,
         "content/warrior/warrior/mariamat.mat": 83,
+        "content/warrior/warrior/sword and shield slash.anim": 89,
         "content/warrior/warrior/warrior.model": 82,
         "content/warrior/warrior_prefab.prefab": 88,
         "content/zombie/thriller idle.anim": 78,

@@ -529,17 +529,11 @@ void bindUI(sol::state& lua)
 {
     // Mouse
     lua.new_enum("MouseButton",
-        "MOUSE_BUTTON_LEFT", MouseButton::MOUSE_BUTTON_LEFT,
-        "MOUSE_BUTTON_RIGHT", MouseButton::MOUSE_BUTTON_RIGHT,
-        "MOUSE_BUTTON_MIDDLE", MouseButton::MOUSE_BUTTON_MIDDLE
+        "Left", MouseButton::MOUSE_BUTTON_LEFT,
+        "Middle", MouseButton::MOUSE_BUTTON_MIDDLE,
+        "Right", MouseButton::MOUSE_BUTTON_RIGHT
     );
 
-    lua.new_usertype<MouseButtonPressedEvent>("MouseButtonPressedEvent",
-        "x",      &MouseButtonPressedEvent::x,
-        "y",      &MouseButtonPressedEvent::y,
-        "clicks", &MouseButtonPressedEvent::clicks,
-        "button", &MouseButtonPressedEvent::button
-    );
 
 
     lua.new_usertype<GameMouse>("Mouse",
