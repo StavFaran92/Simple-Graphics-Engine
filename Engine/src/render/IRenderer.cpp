@@ -52,7 +52,7 @@ bool IRenderer::prepareEntityForRender(const Entity& entityHandler)
 
 	// Apply animation logic
 	auto animator = entityHandler.tryGetComponent<Animator>();
-	if (!animator || animator->m_currentAnimation.isEmpty())
+	if (!animator || !animator->hasActiveAnimation())
 	{
 		graphics->shader->setUniformValue("isAnimated", false);
 	}

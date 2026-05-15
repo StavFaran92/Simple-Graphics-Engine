@@ -27,8 +27,9 @@ struct EntityState
 			auto& animator = e.getComponent<Animator>();
 			auto animations = animator.getAllAnimations();
 			animationRenameBuffers.clear();
-			for (const auto& [name, anim] : animations) {
-				animationRenameBuffers.push_back(name);
+			for (const AnimationEntry& anim : animations) 
+			{
+				animationRenameBuffers.push_back(anim.name);
 			}
 		}
 

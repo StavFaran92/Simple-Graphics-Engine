@@ -5,30 +5,28 @@
 #include "geometry/Model.h"
 #include "runtime/Scene.h"
 
-Animator::Animator(AnimationAssetRef animation)
-	: m_currentAnimation(animation)
-{
-
-}
-
 void Animator::update(float dt)
 {
+	auto currentAnimation = getCurrentAnimation();
+	if (!currentAnimation || currentAnimation->animation.isEmpty() || currentAnimation->animation.resource().isEmpty())
+		return;
 	
-	if (!m_currentAnimation.resource().isEmpty())
-	{
-		// Increment Animation time
-		m_currentTime += m_currentAnimation.resource().get()->getTicksPerSecond() * m_playbackSpeed * dt;
-		m_currentTime = fmod(m_currentTime, m_currentAnimation.resource().get()->getDuration());
-	}
+	auto animResource = currentAnimation->animation.resource();
+
+	// Increment Animation time
+	m_currentTime += animResource->getTicksPerSecond() * currentAnimation->playbackSpeed * dt;
+	m_currentTime = fmod(m_currentTime, animResource->getDuration());
 }
 
 void Animator::getFinalBoneMatrices(const Model* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
 {
-	if (m_currentAnimation.resource().isEmpty())
+	auto currentAnimation = getCurrentAnimation();
+	if (!currentAnimation || currentAnimation->animation.isEmpty() || currentAnimation->animation.resource().isEmpty())
 		return;
 
+	auto animResource = currentAnimation->animation.resource();
 	std::unordered_map<std::string, glm::mat4> m_intermediateBoneMatrices;
-	m_currentAnimation.resource().get()->calculateFinalBoneMatrices(m_currentTime, m_intermediateBoneMatrices);
+	animResource->calculateFinalBoneMatrices(m_currentTime, m_intermediateBoneMatrices);
 	
 	meshSpaceToBoneSpaceBindPoseMat = meshCollection->getBoneOffsets();
 
@@ -44,60 +42,103 @@ void Animator::getFinalBoneMatrices(const Model* meshCollection, std::vector<glm
 	}
 }
 
-void Animator::playAnimation(AnimationAssetRef animation)
+void Animator::addAnimation(AnimationEntry animation)
 {
-	// TODO remove maybe, there is a bug here due to name not being set
-	m_currentAnimation = animation;
-	m_currentTime = 0.f;
-}
-
-void Animator::setPlaybackSpeed(float playbackSpeed)
-{
-	m_playbackSpeed = playbackSpeed;
-}
-
-void Animator::addAnimation(const std::string& name, AnimationAssetRef animation)
-{
-	m_animations[name] = animation;
+	m_animations.push_back(animation);
 }
 
 void Animator::removeAnimation(const std::string& name)
 {
-	auto iter = m_animations.find(name);
+	auto iter = std::find_if(m_animations.begin(), m_animations.end(),
+		[&name](const AnimationEntry& e) { return e.name == name; });
+
 	if (iter != m_animations.end())
 	{
+		int removedIdx = static_cast<int>(std::distance(m_animations.begin(), iter));
 		m_animations.erase(iter);
+
+		if (m_currentAnimIndex > removedIdx)
+			--m_currentAnimIndex;
+		else if (m_currentAnimIndex == removedIdx)
+			m_currentAnimIndex = 0;
 	}
 }
 
 void Animator::playAnimation(const std::string& name)
 {
-	AnimationAssetRef& anim = getAnimation(name);
-	if (!anim.resource().isEmpty())
-	{
-		playAnimation(anim);
-		m_currentAnimationName = name;
-	}
-}
+	auto iter = std::find_if(m_animations.begin(), m_animations.end(),
+		[&name](const AnimationEntry& e) { return e.name == name; });
 
-AnimationAssetRef Animator::getAnimation(const std::string& name)
-{
-	auto iter = m_animations.find(name);
 	if (iter == m_animations.end())
-	{
-		logWarning("Could not find animation: {}", name);
-		return AnimationAssetRef::empty;
-	}
+		return;
 
-	return iter->second;
+	m_currentAnimIndex = static_cast<int>(std::distance(m_animations.begin(), iter));
+	m_currentTime = 0.f;
 }
 
-const std::map<std::string, AnimationAssetRef>& Animator::getAllAnimations() const
+AnimationEntry* Animator::getAnimation(const std::string& name)
+{
+	auto iter = std::find_if(m_animations.begin(), m_animations.end(),
+		[&name](const AnimationEntry& e) { return e.name == name; });
+
+	if (iter == m_animations.end())
+		return nullptr;
+
+	int animID = static_cast<int>(std::distance(m_animations.begin(), iter));
+	return getAnimation(animID);
+}
+
+AnimationEntry* Animator::getAnimation(int index)
+{
+	if (index >= m_animations.size() || index < 0)
+	{
+		logWarning("Invalid animID: {}", index);
+		return nullptr;
+	}
+	return &m_animations[index];
+}
+
+const std::vector<AnimationEntry>& Animator::getAllAnimations() const
 {
 	return m_animations;
 }
 
+int Animator::getCurrentAnimationID() const
+{
+	return m_currentAnimIndex;
+}
+
+AnimationEntry* Animator::getCurrentAnimation()
+{
+	int animID = getCurrentAnimationID();
+	if (animID >= m_animations.size() || animID < 0)
+	{
+		logWarning("Invalid animID: {}", animID);
+		return nullptr;
+	}
+	return &m_animations[animID];
+}
+
+const AnimationEntry* Animator::getCurrentAnimation() const
+{
+	int animID = getCurrentAnimationID();
+	if (animID >= m_animations.size() || animID < 0)
+	{
+		return nullptr;
+	}
+	return &m_animations[animID];
+}
+
 std::string Animator::getCurrentAnimationName() const
 {
-	return m_currentAnimationName;
+	auto anim = getCurrentAnimation();
+	if (!anim)
+		return "";
+	return anim->name;
+}
+
+bool Animator::hasActiveAnimation() const
+{
+	auto currentAnim = getCurrentAnimation();
+	return currentAnim && !currentAnim->animation.isEmpty() ;
 }

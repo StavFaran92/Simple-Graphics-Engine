@@ -77,54 +77,6 @@ public:
 
 	void handleMoveInput(float deltaTime)
 	{
-		float velocity = m_movementSpeed * deltaTime;
-
-		auto& camComponent = m_camera.getComponent<CameraComponent>();
-
-		if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_W))
-		{
-			m_movementH = glm::vec3(camComponent.front.x, 0, camComponent.front.z) * velocity;
-		}
-		else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_S))
-		{
-			m_movementH = -glm::vec3(camComponent.front.x, 0, camComponent.front.z) * velocity;
-		}
-		else
-		{
-			m_movementH = glm::vec3(0);
-		}
-
-		if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_A))
-		{
-			m_movementV = -glm::vec3(camComponent.right.x, 0, camComponent.right.z) * velocity;
-		}
-		else if (Engine::get()->getInput()->getKeyboard()->getKeyState(KeyCode::SCANCODE_D))
-		{
-			m_movementV = glm::vec3(camComponent.right.x, 0, camComponent.right.z) * velocity;
-		}
-		else
-		{
-			m_movementV = glm::vec3(0);
-		}
-
-		if (glm::length(m_movementH + m_movementV) > 0.1f)
-		{
-			m_animationState = "Run";
-			if (m_animator->m_currentAnimationName != m_animationState)
-			{
-				m_animator->playAnimation(m_animationState);
-			}
-		}
-		else
-		{
-			m_animationState = "Idle";
-			if (m_animator->m_currentAnimationName != m_animationState)
-			{
-				m_animator->playAnimation(m_animationState);
-			}
-		}
-
-
 	}
 
 	void shoot()

@@ -11,50 +11,32 @@
                             "ptr_wrapper": {
                                 "id": 2147483649,
                                 "data": {
-                                    "value0": {
-                                        "uuid": {
-                                            "m_value": 78
-                                        }
-                                    },
-                                    "value1": 1.0,
-                                    "value2": [
+                                    "m_currentAnimIndex": 0,
+                                    "m_animations": [
                                         {
-                                            "key": "Attack",
-                                            "value": {
-                                                "uuid": {
-                                                    "m_value": 81
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "key": "Die",
-                                            "value": {
-                                                "uuid": {
-                                                    "m_value": 80
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "key": "Hit",
-                                            "value": {
-                                                "uuid": {
-                                                    "m_value": 80
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "key": "Idle",
-                                            "value": {
+                                            "name": "Idle",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
                                                 "uuid": {
                                                     "m_value": 78
                                                 }
                                             }
                                         },
                                         {
-                                            "key": "Walk",
-                                            "value": {
+                                            "name": "Walk",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
                                                 "uuid": {
                                                     "m_value": 77
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "name": "Attack",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
+                                                "uuid": {
+                                                    "m_value": 81
                                                 }
                                             }
                                         }
@@ -372,9 +354,9 @@
                                             }
                                         },
                                         {
-                                            "key": 6,
+                                            "key": 5,
                                             "value": {
-                                                "m_entity": 6
+                                                "m_entity": 5
                                             }
                                         }
                                     ]
@@ -420,41 +402,39 @@
                     ]
                 },
                 {
-                    "entity": 6,
+                    "entity": 5,
                     "components": [
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
                                 "id": 2147483665,
                                 "data": {
-                                    "value0": {
-                                        "uuid": {
-                                            "m_value": 0
-                                        }
-                                    },
-                                    "value1": 1.0,
-                                    "value2": [
+                                    "m_currentAnimIndex": 0,
+                                    "m_animations": [
                                         {
-                                            "key": "Idle",
-                                            "value": {
+                                            "name": "Idle",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
                                                 "uuid": {
                                                     "m_value": 53
                                                 }
                                             }
                                         },
                                         {
-                                            "key": "Jump",
-                                            "value": {
+                                            "name": "Run",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
                                                 "uuid": {
-                                                    "m_value": 51
+                                                    "m_value": 52
                                                 }
                                             }
                                         },
                                         {
-                                            "key": "Run",
-                                            "value": {
+                                            "name": "Jump",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
                                                 "uuid": {
-                                                    "m_value": 52
+                                                    "m_value": 51
                                                 }
                                             }
                                         }
@@ -469,7 +449,7 @@
                                 "data": {
                                     "localTranslation": {
                                         "v.x": 0.0,
-                                        "v.y": -0.896003007888794,
+                                        "v.y": -0.994951605796814,
                                         "v.z": 0.0
                                     },
                                     "localRotation": {
@@ -487,10 +467,10 @@
                                         "m_entity": 7
                                     },
                                     "entity": {
-                                        "m_entity": 6
+                                        "m_entity": 5
                                     },
                                     "root": {
-                                        "m_entity": 6
+                                        "m_entity": 5
                                     },
                                     "m_children": []
                                 }
@@ -503,40 +483,16 @@
                                 "data": {
                                     "mesh": {
                                         "uuid": {
-                                            "m_value": 33
+                                            "m_value": 82
                                         }
                                     },
-                                    "count": 4,
+                                    "count": 1,
                                     "m_material": [
                                         {
                                             "key": 0,
                                             "value": {
                                                 "uuid": {
-                                                    "m_value": 40
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "key": 1,
-                                            "value": {
-                                                "uuid": {
-                                                    "m_value": 34
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "key": 2,
-                                            "value": {
-                                                "uuid": {
-                                                    "m_value": 43
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "key": 3,
-                                            "value": {
-                                                "uuid": {
-                                                    "m_value": 37
+                                                    "m_value": 83
                                                 }
                                             }
                                         }
@@ -552,7 +508,7 @@
                                 "data": {
                                     "name": "model",
                                     "e": {
-                                        "m_entity": 6
+                                        "m_entity": 5
                                     }
                                 }
                             }

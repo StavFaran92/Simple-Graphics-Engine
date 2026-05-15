@@ -291,14 +291,13 @@ void bindSystems(sol::state& lua)
 void bindComponents(sol::state& lua)
 {
     lua.new_usertype<Animator>("Animator",
-        "playAnimation", sol::overload(
-            [](Animator& self, const std::string& name) { self.playAnimation(name); },
-            [](Animator& self, AnimationAssetRef animation) { self.playAnimation(animation); }
-        ),
-        "setPlaybackSpeed", &Animator::setPlaybackSpeed,
+        "playAnimation", &Animator::playAnimation,
         "addAnimation", &Animator::addAnimation,
         "removeAnimation", &Animator::removeAnimation,
-        "getAnimation", &Animator::getAnimation,
+        "getAnimation", sol::overload(
+            [](Animator& self, const std::string& name) { self.getAnimation(name); },
+            [](Animator& self, int id) { self.getAnimation(id); }
+        ),
         "getAllAnimations", &Animator::getAllAnimations,
         "getCurrentAnimationName", &Animator::getCurrentAnimationName
     );

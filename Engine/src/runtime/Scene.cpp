@@ -768,7 +768,7 @@ void Scene::draw(float deltaTime)
                         m_highlightMaskShader->setUniformValue("isGpuInstanced", false);
 
                         auto animator = e.tryGetComponent<Animator>();
-                        if (!animator || animator->m_currentAnimation.isEmpty())
+                        if (!animator || !animator->hasActiveAnimation())
                         {
 							m_highlightMaskShader->setUniformValue("isAnimated", false);
                         }

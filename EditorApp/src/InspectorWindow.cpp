@@ -345,88 +345,71 @@ void InspectorWindow::display()
 
 		displayComponent<Animator>("Animator", [](Animator& animator) {
 
-			ImGui::DragFloat("playback speed", &animator.m_playbackSpeed);
-
-			static int activeAnimationIndex = 0;
-			static std::string animName;
-			static std::string selectedAnimUID;
-			//static bool showAnimationSelector = false;
-			//static std::vector<std::string> renameBuffer{};
-
 			EntityState& eState = state.getCurrentEntityState();
-			
-			ImGui::LabelText("", "Animations");
 
-			auto animations = animator.getAllAnimations();
+			ImGui::Text("Animations");
 
-			auto iter = animations.cbegin();
+			const auto& animations = animator.getAllAnimations();
 
-			// Display animation list
-			int index = 0;
-			while (iter != animations.cend())
+			// Sync rename buffers size
+			while (eState.animationRenameBuffers.size() < animations.size())
+				eState.animationRenameBuffers.push_back(animations[eState.animationRenameBuffers.size()].name);
+
+			for (int index = 0; index < (int)animations.size(); ++index)
 			{
-				auto& name = iter->first;
-				auto& animation = iter->second;
+				const AnimationEntry& entry = animations[index];
 
 				ImGui::PushID(index);
 
-				if (ImGui::CollapsingHeader(name.c_str()))
-				{
+				bool isActive = (index == animator.getCurrentAnimationID());
+				if (isActive)
+					ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.2f, 0.5f, 0.2f, 1.0f));
 
+				if (ImGui::CollapsingHeader(entry.name.c_str()))
+				{
 					ImGui::Indent();
 
-					std::string oldName = name;
-
+					// Rename
 					float width = ImGui::GetContentRegionAvail().x;
 					ImGui::SetNextItemWidth(width);
-
 					ImGui::InputText("##Name", &eState.animationRenameBuffers[index]);
-
-					if (ImGui::IsItemDeactivatedAfterEdit()) 
+					if (ImGui::IsItemDeactivatedAfterEdit())
 					{
-						auto newAnimationName = std::string(eState.animationRenameBuffers[index]);
-						// This runs when the user is done editing,
-						// either by pressing Enter or unfocusing the input field
-						if (newAnimationName != oldName) {
-							auto anim = animator.getAnimation(oldName);
-							animator.removeAnimation(oldName);
-							animator.addAnimation(newAnimationName, anim);
-							break;
-						}
+						const std::string newName = eState.animationRenameBuffers[index];
+						if (newName != entry.name)
+							animator.getAnimation(entry.name)->name = newName;
 					}
 
-					std::string animationName = "None";
-					if (!animation.isEmpty())
-					{
-						animationName = animation.getUID();
-					}
-
-					addAssetSelectWidget(animationName, AssetType::ANIMATION, [&animator, name](UUID uuid) {
-						animator.addAnimation(name, AnimationAssetRef(uuid));
+					// Asset picker
+					AnimationEntry* entryPtr = animator.getAnimation(entry.name);
+					std::string animUID = entry.animation.isEmpty() ? EMPTY_UUID : entry.animation.getUID();
+					addAssetSelectWidget(animUID, AssetType::ANIMATION, [entryPtr](UUID uuid) {
+						entryPtr->animation = AnimationAssetRef(uuid);
 					});
 
+					// Playback speed
+					ImGui::DragFloat("Playback Speed", &entryPtr->playbackSpeed, 0.01f, 0.0f, 10.0f);
 
-					bool isSelected = (index == activeAnimationIndex);
-					if (ImGui::Checkbox("Make Active Animation", &isSelected))
-					{
-						activeAnimationIndex = index;
-						animator.playAnimation(name);
-					}
+					// Set active
+					if (!isActive && ImGui::Button("Play"))
+						animator.playAnimation(entry.name);
 
 					ImGui::Unindent();
 				}
 
-				ImGui::PopID();
+				if (isActive)
+					ImGui::PopStyleColor();
 
-				iter++;
-				index++;
+				ImGui::PopID();
 			}
 
-			if (ImGui::Button("+")) {
-				int animationsCount = animations.size();
-				std::string newAnimationName = "New Animation_" + std::to_string(animationsCount);
-				animator.addAnimation(newAnimationName, AnimationAssetRef::empty);
-				eState.animationRenameBuffers.push_back(newAnimationName);
+			if (ImGui::Button("+ Add Animation"))
+			{
+				AnimationEntry newEntry;
+				newEntry.name = "Animation_" + std::to_string(animations.size());
+				newEntry.playbackSpeed = 1.0f;
+				animator.addAnimation(newEntry);
+				eState.animationRenameBuffers.push_back(newEntry.name);
 			}
 		});
 
