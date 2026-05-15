@@ -155,8 +155,9 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<PlayerController>("Player Controller", [](PlayerController& controller) {
-			ImGui::TextDisabled("Controller has no editable parameters.");
-			//ImGui::Combo("##LayerMask", (int*)&collisionMesh.layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+				ImGui::DragFloat("Radius", &controller.radius, .1f);
+				ImGui::DragFloat("Height", &controller.height, .1f);
+				ImGui::DragFloat3("Offset", &controller.offset.x, .1f);
 			});
 
 		displayComponent<MeshRendererComponent>("Mesh Renderer", [](MeshRendererComponent& meshComponent) {

@@ -323,7 +323,7 @@
                                 "data": {
                                     "localTranslation": {
                                         "v.x": 0.0,
-                                        "v.y": 0.994951605796814,
+                                        "v.y": 1.6950000524520875,
                                         "v.z": 0.0
                                     },
                                     "localRotation": {
@@ -396,7 +396,15 @@
                             "polymorphic_name": "PlayerController",
                             "ptr_wrapper": {
                                 "id": 2147483664,
-                                "data": {}
+                                "data": {
+                                    "height": 1.0,
+                                    "radius": 0.20000000298023225,
+                                    "offset": {
+                                        "v.x": 0.0,
+                                        "v.y": -0.20000000298023225,
+                                        "v.z": 0.0
+                                    }
+                                }
                             }
                         }
                     ]

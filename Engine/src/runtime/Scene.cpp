@@ -53,6 +53,7 @@
 #include "component/NativeScriptComponent.h"
 #include "component/ImageComponent.h"
 #include "component/PostProcessComponent.h"
+#include "component/PlayerControllerComponent.h"
 #include "component/VolumeComponent.h"
 #include "component/VolumetricCloudsComponent.h"
 #include "scripts/ScriptSystem.h"
@@ -932,6 +933,68 @@ void Scene::draw(float deltaTime)
 					m_debugVisualizeShader->setModelMatrix(cylinderModel);
 					RenderCommand::draw(cylinderVao);
 				}
+
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				glDisable(GL_POLYGON_OFFSET_LINE);
+
+				glEnable(GL_DEPTH_TEST);
+
+				glPopDebugGroup();
+			}
+		}
+
+		// Render physics collider
+		for (auto&& [entity, transform, controller] : getRegistry().get().view<Transformation, PlayerController>().each())
+		{
+			if ((entity_id)entity == selectedObject)
+			{
+				glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Physics Debug");
+
+				m_debugVisualizeShader->use();
+
+				m_debugVisualizeShader->setViewMatrix(graphics->view);
+				m_debugVisualizeShader->setProjectionMatrix(graphics->projection);
+				m_debugVisualizeShader->setUniformValue("color", glm::vec3(0, 1, 0));
+
+				glDisable(GL_DEPTH_TEST);
+
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				glEnable(GL_POLYGON_OFFSET_LINE);
+				glPolygonOffset(-1.0, -1.0);
+				glLineWidth(1); // Size in pixels
+
+				glm::mat4 model = transform.getWorldTransformation();
+				model = model * glm::translate(glm::mat4(1.0f), controller.offset);
+
+				float radius = controller.radius;
+				float height = controller.height;
+				glm::mat4 topSphereModel = model;
+				glm::mat4 bottomSphereModel = model;
+				glm::mat4 cylinderModel = model;
+				cylinderModel = glm::scale(cylinderModel, glm::vec3(radius * 2, height, radius * 2));
+				m_debugVisualizeShader->setModelMatrix(cylinderModel);
+
+				auto& cylinderMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CYLINDER);
+				auto  cylinderVao = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
+				auto& sphereMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
+				auto  sphereVao = sphereMesh.resource()->getPrimaryMesh()->getVAO();
+
+				// Top cap sphere
+				topSphereModel = glm::translate(topSphereModel, glm::vec3(0.0f, height * .5f, 0.0f));
+				topSphereModel = glm::scale(topSphereModel, glm::vec3(radius * 2));
+				m_debugVisualizeShader->setModelMatrix(topSphereModel);
+				RenderCommand::draw(sphereVao);
+
+				// Bottom cap sphere
+				bottomSphereModel = glm::translate(bottomSphereModel, glm::vec3(0.0f, -height * .5f, 0.0f));
+				bottomSphereModel = glm::scale(bottomSphereModel, glm::vec3(radius * 2));
+				m_debugVisualizeShader->setModelMatrix(bottomSphereModel);
+				RenderCommand::draw(sphereVao);
+
+				// Cylinder body
+				m_debugVisualizeShader->setModelMatrix(cylinderModel);
+				RenderCommand::draw(cylinderVao);
+
 
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				glDisable(GL_POLYGON_OFFSET_LINE);

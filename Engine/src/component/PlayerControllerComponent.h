@@ -11,6 +11,9 @@ struct EngineAPI PlayerController : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER_OPTIONAL(height, 1.f);
+		SERIALIZED_MEMBER_OPTIONAL(radius, .5f);
+		SERIALIZED_MEMBER_OPTIONAL(offset, glm::vec3{});
 	}
 
 	void move(glm::vec3 disp)
@@ -24,6 +27,9 @@ struct EngineAPI PlayerController : public Component
 	}
 
 	glm::vec3 m_disp{};
+	float height = 1.f;
+	float radius = .5f;
+	glm::vec3 offset{};
 	int controllerIndex = 0;
 
 };

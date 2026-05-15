@@ -218,12 +218,13 @@ void PhysicsSystem::createCCTController(Scene* scene, entt::entity entity)
 
     Entity e(entity, &scene->getRegistry());
     auto pos = e.getComponent<Transformation>().getWorldPosition();
+    auto pc = e.getComponent<PlayerController>();
 
     PxCapsuleControllerDesc desc;
 
-    desc.height = 1.f;
-    desc.radius = .3f;
-    desc.position = physx::PxExtendedVec3(pos.x, pos.y, pos.z);
+    desc.height = pc.height;
+    desc.radius = pc.radius;
+    desc.position = physx::PxExtendedVec3(pos.x + pc.offset.x, pos.y + pc.offset.y, pos.z + pc.offset.z);
     desc.material = m_defaultMaterial;
 
     //mType = desc.mType;
@@ -662,7 +663,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
 
             physx::PxTransform pxTransform = actor->getGlobalPose();
 
-            glm::vec3 translation(pxTransform.p.x, pxTransform.p.y, pxTransform.p.z);
+            glm::vec3 translation(pxTransform.p.x - pc.offset.x, pxTransform.p.y - pc.offset.y, pxTransform.p.z - pc.offset.z);
 
             transform.setWorldPosition(translation);
         }
