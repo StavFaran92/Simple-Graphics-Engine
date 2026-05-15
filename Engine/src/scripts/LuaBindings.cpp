@@ -409,7 +409,8 @@ void bindComponents(sol::state& lua)
 
     lua.new_usertype<PhysicsComponent>("PhysicsComponent",
         "addForce", &PhysicsComponent::addForce,
-        "setForce", &PhysicsComponent::setForce
+        "setForce", &PhysicsComponent::setForce,
+        "move", &PhysicsComponent::move
     );
 }
 
@@ -593,6 +594,10 @@ void bindMath(sol::state& lua)
 
     lua.set_function("angleAxis", [](float angle, glm::vec3 axis) {
         return glm::angleAxis(angle, axis);
+        });
+
+    lua.set_function("length", [](glm::vec3 vec) {
+        return glm::length(vec);
         });
 }
 
