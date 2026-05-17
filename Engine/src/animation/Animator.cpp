@@ -2,6 +2,7 @@
 #include "animation/Animator.h"
 
 #include "animation/Animation.h"
+#include "animation/AnimationGraph.h"
 #include "geometry/Model.h"
 #include "runtime/Scene.h"
 
@@ -135,6 +136,15 @@ std::string Animator::getCurrentAnimationName() const
 	if (!anim)
 		return "";
 	return anim->name;
+}
+
+void Animator::createAnimationGraph()
+{
+	if (!m_animationGraph)
+	{
+		m_animationGraph = std::make_shared<AnimationGraph>();
+		m_animationGraph->setAnimatorOwner(this);
+	}
 }
 
 bool Animator::hasActiveAnimation() const

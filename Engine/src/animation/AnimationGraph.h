@@ -85,6 +85,23 @@ public:
 
     const StateNode* getCurrentState() const;
 
+    // Editor read access
+    const std::vector<StateNode>&  getStates()      const { return m_states; }
+    const std::vector<Transition>& getTransitions()  const { return m_transitions; }
+    const std::vector<Parameter>&  getParameters()   const { return m_parameters; }
+
+    // Editor write access
+    StateNode*  getState(size_t index)      { return index < m_states.size()      ? &m_states[index]      : nullptr; }
+    Transition* getTransition(size_t index) { return index < m_transitions.size() ? &m_transitions[index] : nullptr; }
+    Parameter*  getParameter(size_t index)  { return index < m_parameters.size()  ? &m_parameters[index]  : nullptr; }
+
+    void removeParameter(size_t index)
+    {
+        if (index >= m_parameters.size()) return;
+        m_paramValues.erase(m_parameters[index].name);
+        m_parameters.erase(m_parameters.begin() + index);
+    }
+
 private:
     bool evaluateCondition(const Condition& cond) const;
     bool evaluateTransitions(const std::vector<Transition*>& transitions);

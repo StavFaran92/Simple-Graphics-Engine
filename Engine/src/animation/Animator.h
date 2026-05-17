@@ -8,6 +8,8 @@
 #include "component/ComponentSerializer.h"
 #include "animation/Animation.h"
 
+class AnimationGraph;
+
 struct AnimationEntry
 {
 	std::string name;
@@ -45,6 +47,11 @@ public:
 	std::string getCurrentAnimationName() const;
 	bool hasActiveAnimation() const;
 
+	// Animation graph
+	void              createAnimationGraph();
+	AnimationGraph*   getAnimationGraph()  const { return m_animationGraph.get(); }
+	bool              hasAnimationGraph()  const { return m_animationGraph != nullptr; }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(m_currentAnimIndex);
@@ -57,6 +64,7 @@ public:
 private:
 	int m_currentAnimIndex = 0;
 	std::vector<AnimationEntry> m_animations;
+	std::shared_ptr<AnimationGraph> m_animationGraph;
 
 };
 

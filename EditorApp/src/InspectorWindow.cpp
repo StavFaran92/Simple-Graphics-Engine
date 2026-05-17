@@ -9,6 +9,7 @@
 #include "TerrainPaintTool.h"
 #include "Widgets.h"
 #include "TerrainPaintTool.h"
+#include "AnimationGraphWindow.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -348,6 +349,14 @@ void InspectorWindow::display()
 
 			EntityState& eState = state.getCurrentEntityState();
 
+			if (ImGui::Button("Edit Graph"))
+			{
+				if (!animator.hasAnimationGraph())
+					animator.createAnimationGraph();
+				AnimationGraphWindow::open(animator.getAnimationGraph(), &animator);
+			}
+
+			ImGui::Separator();
 			ImGui::Text("Animations");
 
 			const auto& animations = animator.getAllAnimations();
@@ -412,6 +421,7 @@ void InspectorWindow::display()
 				animator.addAnimation(newEntry);
 				eState.animationRenameBuffers.push_back(newEntry.name);
 			}
+
 		});
 
 		displayComponent<Terrain>("Terrain", [](Terrain& terrain) {

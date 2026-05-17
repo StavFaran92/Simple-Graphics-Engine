@@ -1,0 +1,16 @@
+#pragma once
+
+#include "nlohmann/json.hpp"
+
+class AnimationGraph;
+class Animator;
+
+class AnimationGraphWindow
+{
+public:
+    static void open(AnimationGraph* graph, Animator* animator);
+    static void display();
+
+    static nlohmann::json saveToJson();
+    static void           loadFromJson(const nlohmann::json& j);
+};
