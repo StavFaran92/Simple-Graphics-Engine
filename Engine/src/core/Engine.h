@@ -66,6 +66,7 @@ struct InitParams
     bool startSimulationOnStartup = false;
     bool fullScreen = false;
     bool shipping = false;
+    bool tempDir = false;
 };
 
 class EngineAPI Engine

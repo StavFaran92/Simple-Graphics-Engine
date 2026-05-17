@@ -87,10 +87,6 @@ EventHandler EventSystem::bindToLayer(const std::string& layerName)
 //	iter->second.isValid = false;
 //}
 
-void EventSystem::pushEvent(const Event& e)
-{
-	//SDL_PushEvent(&e);
-}
 
 void EventSystem::dispatch(const Event& e)
 {
@@ -151,4 +147,14 @@ std::shared_ptr<EventLayer> EventSystem::getLayer(EventHandler handler)
 	}
 
 	return nullptr;
+}
+
+std::unique_ptr<Event> EventSystem::pollEvent()
+{
+	if (m_customEvents.empty())
+		return nullptr;
+
+	auto e = std::move(m_customEvents.front());
+	m_customEvents.pop();
+	return e;
 }

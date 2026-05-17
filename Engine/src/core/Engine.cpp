@@ -92,44 +92,52 @@ bool Engine::init(const InitParams& initParams)
 
     m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR "/EngineConfig.json");
 
-    m_projectDirectory = initParams.projectDir + "/";
-
-    if (!std::filesystem::exists(m_projectDirectory) || !std::filesystem::is_directory(m_projectDirectory)) 
+    if (initParams.tempDir)
     {
-        logError("Path does not exist or is not a directory");
-        return false;
+        m_projectDirectory = std::filesystem::temp_directory_path().string() + "/";
+        std::filesystem::create_directories(m_projectDirectory + "Engine");
+        std::filesystem::create_directories(m_projectDirectory + "Content");
     }
-
-    // If create new project, check if dir is empty
-    if (!initParams.loadExistingProject)
+    else
     {
-        if (!initParams.overwriteExisting)
+        m_projectDirectory = initParams.projectDir + "/";
+
+        if (!std::filesystem::exists(m_projectDirectory) || !std::filesystem::is_directory(m_projectDirectory))
         {
-            // Iterate over the directory and check if there are any entries
-            if (std::filesystem::directory_iterator(m_projectDirectory) != std::filesystem::directory_iterator{})
-            {
-                logError("Directory is not empty, SGE requires an empty directory to start a new project.");
-                return false;
-            }
+            logError("Path does not exist or is not a directory");
+            return false;
         }
-        else
+
+        // If create new project, check if dir is empty
+        if (!initParams.loadExistingProject)
         {
-            // Overwrite existing files by deleting all files in the directory
-            try {
-                for (const auto& entry : std::filesystem::directory_iterator(m_projectDirectory)) {
-                    std::filesystem::remove_all(entry); // Remove file or directory
+            if (!initParams.overwriteExisting)
+            {
+                // Iterate over the directory and check if there are any entries
+                if (std::filesystem::directory_iterator(m_projectDirectory) != std::filesystem::directory_iterator{})
+                {
+                    logError("Directory is not empty, SGE requires an empty directory to start a new project.");
+                    return false;
                 }
             }
-            catch (const std::filesystem::filesystem_error& e) {
-                logError("Failed to clear the directory: " + std::string(e.what()));
-                return false;
+            else
+            {
+                // Overwrite existing files by deleting all files in the directory
+                try {
+                    for (const auto& entry : std::filesystem::directory_iterator(m_projectDirectory)) {
+                        std::filesystem::remove_all(entry); // Remove file or directory
+                    }
+                }
+                catch (const std::filesystem::filesystem_error& e) {
+                    logError("Failed to clear the directory: " + std::string(e.what()));
+                    return false;
+                }
             }
+
+            std::filesystem::create_directories(Engine::get()->getProjectDirectory());
+            std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/Engine");
+            std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/Content");
         }
-
-        std::filesystem::create_directories(Engine::get()->getProjectDirectory());
-        std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/Engine");
-        std::filesystem::create_directories(Engine::get()->getProjectDirectory() + "/Content");
-
     }
 
     auto filesystem = new FileSystem();
@@ -219,7 +227,7 @@ bool Engine::init(const InitParams& initParams)
     }
     else
     {   
-        par = ProjectAssetRegistry::create(initParams.projectDir);
+        par = ProjectAssetRegistry::create(m_projectDirectory);
     }
 
     m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
@@ -574,13 +582,29 @@ void Engine::handleEvents(bool& quit)
             SDL_free(e.drop.file);
         }
 
-        ImGui_ImplSDL2_ProcessEvent(&e);
+        if (ImGui::GetCurrentContext())
+        {
+            ImGui_ImplSDL2_ProcessEvent(&e);
+        }
 
         //getSubSystem<RawEventDispatcher>()->dispatch(e);
 
         auto engineEvent = EventParser::parseSDLEvent(e);
+
         if (engineEvent)
             m_eventSystem->dispatch(*engineEvent);
+    }
+
+    // Handle custom events
+    std::unique_ptr<Event> customEvent;
+    while ((customEvent = m_eventSystem->pollEvent()) != nullptr)
+    {
+        if (customEvent->type() == EventType::QuitApp)
+        {
+            quit = true;
+        }
+
+        m_eventSystem->dispatch(*customEvent);
     }
 }
 

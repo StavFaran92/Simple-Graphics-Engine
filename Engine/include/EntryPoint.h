@@ -44,6 +44,11 @@ InitParams parseArgs(int argc, char* argv[])
         {
             params.fullScreen = true;
         }
+
+        else if (strcmp(argv[i], "-td") == 0)
+        {
+            params.tempDir = true;
+        }
     }
 
     return params;
