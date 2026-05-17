@@ -102,6 +102,25 @@ public:
         m_parameters.erase(m_parameters.begin() + index);
     }
 
+    void removeTransition(size_t index)
+    {
+        if (index < m_transitions.size())
+            m_transitions.erase(m_transitions.begin() + index);
+    }
+
+    void removeState(size_t index)
+    {
+        if (index >= m_states.size()) return;
+        const std::string id = m_states[index].id;
+        m_transitions.erase(
+            std::remove_if(m_transitions.begin(), m_transitions.end(),
+                [&id](const Transition& t){ return t.from == id || t.to == id; }),
+            m_transitions.end());
+        m_states.erase(m_states.begin() + index);
+        if (m_currentStateId == id) m_currentStateId = m_entryStateId;
+        if (m_entryStateId   == id) m_entryStateId   = "";
+    }
+
 private:
     bool evaluateCondition(const Condition& cond) const;
     bool evaluateTransitions(const std::vector<Transition*>& transitions);
