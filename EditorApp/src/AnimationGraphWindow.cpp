@@ -484,7 +484,48 @@ void AnimationGraphWindow::display()
         ed::PopStyleColor(4); // NodeBg, NodeBorder, PinRect, PinRectBorder
         ed::PopStyleVar(7);   // NodePadding, NodeRounding, SourceDir, TargetDir, LinkStrength, PinBorderWidth, PinRadius
 
-        // Links are drawn manually after ed::End() using stored screen centers
+        // Draw transition lines inside ed::Begin/End so they live in the canvas
+        // draw list — zoom, pan and clipping are handled automatically.
+        {
+            ImDrawList* dl = ImGui::GetWindowDrawList();
+
+            auto getCenterOf = [&](const std::string& id) -> ImVec2
+            {
+                for (size_t k = 0; k < states.size(); ++k)
+                    if (states[k].id == id)
+                    {
+                        auto it = s_nodeScreenCenter.find(nodeIdOf(k).Get());
+                        if (it != s_nodeScreenCenter.end()) return it->second;
+                    }
+                if (id == AnimationGraph::ANY_STATE_ID)
+                {
+                    auto it = s_nodeScreenCenter.find(ANY_NODE_ID);
+                    if (it != s_nodeScreenCenter.end()) return it->second;
+                }
+                return ImVec2(-1, -1);
+            };
+
+            for (const auto& t : transitions)
+            {
+                ImVec2 src = getCenterOf(t.from);
+                ImVec2 dst = getCenterOf(t.to);
+                //if (src.x < 0 || dst.x < 0) continue;
+
+                float dx = dst.x - src.x, dy = dst.y - src.y;
+                float len = sqrtf(dx*dx + dy*dy);
+                if (len < 1.f) continue;
+                float nx = dx / len, ny = dy / len;
+
+                dl->AddLine(src, dst, IM_COL32(180, 180, 180, 200), 1.5f);
+
+                // Arrowhead at 55% of the way (near midpoint, pointing toward dst)
+                const float aSize = 9.f;
+                ImVec2 tip(src.x + nx * len * 0.55f, src.y + ny * len * 0.55f);
+                ImVec2 b1(tip.x - nx*aSize - ny*aSize*0.5f, tip.y - ny*aSize + nx*aSize*0.5f);
+                ImVec2 b2(tip.x - nx*aSize + ny*aSize*0.5f, tip.y - ny*aSize - nx*aSize*0.5f);
+                dl->AddTriangleFilled(tip, b1, b2, IM_COL32(200, 200, 200, 230));
+            }
+        }
 
         // No drag-to-connect — transitions created via right-click menu only
 
@@ -630,52 +671,6 @@ void AnimationGraphWindow::display()
     ed::End();
     ed::SetCurrentEditor(nullptr);
 
-    // Draw transition lines + arrowheads manually (foreground = on top of editor canvas)
-    if (s_graph)
-    {
-        ImDrawList* dl = ImGui::GetForegroundDrawList();
-        const auto& states      = s_graph->getStates();
-        const auto& transitions = s_graph->getTransitions();
-
-        auto getCenterOf = [&](const std::string& id) -> ImVec2
-        {
-            for (size_t i = 0; i < states.size(); ++i)
-                if (states[i].id == id)
-                {
-                    auto it = s_nodeScreenCenter.find(nodeIdOf(i).Get());
-                    if (it != s_nodeScreenCenter.end()) return it->second;
-                }
-            // any-state: use its stored center too
-            if (id == AnimationGraph::ANY_STATE_ID)
-            {
-                auto it = s_nodeScreenCenter.find(ANY_NODE_ID);
-                if (it != s_nodeScreenCenter.end()) return it->second;
-            }
-            return ImVec2(-1, -1);
-        };
-
-        for (const auto& t : transitions)
-        {
-            ImVec2 src = getCenterOf(t.from);
-            ImVec2 dst = getCenterOf(t.to);
-            //if (src.x < 0 || dst.x < 0) continue;
-
-            float dx = dst.x - src.x, dy = dst.y - src.y;
-            float len = sqrtf(dx*dx + dy*dy);
-            if (len < 1.f) continue;
-            float nx = dx / len, ny = dy / len;
-
-            // Line
-            dl->AddLine(src, dst, IM_COL32(180, 180, 180, 200), 1.5f);
-
-            // Arrowhead at midpoint
-            const float aSize = 9.f;
-            ImVec2 tip(src.x + nx * len * 0.55f, src.y + ny * len * 0.55f);
-            ImVec2 b1(tip.x - nx*aSize - ny*aSize*0.5f, tip.y - ny*aSize + nx*aSize*0.5f);
-            ImVec2 b2(tip.x - nx*aSize + ny*aSize*0.5f, tip.y - ny*aSize - nx*aSize*0.5f);
-            dl->AddTriangleFilled(tip, b1, b2, IM_COL32(200, 200, 200, 230));
-        }
-    }
 
     // Preview line: source node center → mouse while transition pending
     if (s_pendingFrom != SIZE_MAX && s_graph)
