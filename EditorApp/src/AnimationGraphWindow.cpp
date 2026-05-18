@@ -377,68 +377,9 @@ void AnimationGraphWindow::display()
         ed::PushStyleVar(ed::StyleVar_NodeRounding,    rounding);
         ed::PushStyleVar(ed::StyleVar_SourceDirection, ImVec2(0.f,  1.f));
         ed::PushStyleVar(ed::StyleVar_TargetDirection, ImVec2(0.f, -1.f));
-        ed::PushStyleVar(ed::StyleVar_LinkStrength,    0.f);
+        ed::PushStyleVar(ed::StyleVar_LinkStrength,    1.f);
         ed::PushStyleVar(ed::StyleVar_PinBorderWidth,  1.f);
         ed::PushStyleVar(ed::StyleVar_PinRadius,       5.f);
-
-        //auto drawBars = [&](ed::NodeId nid,
-        //                    ImVec2 topTL, ImVec2 topBR,
-        //                    ImVec2 cTL,   ImVec2 cBR,
-        //                    ImVec2 botTL, ImVec2 botBR)
-        //{
-        //    auto* dl = ed::GetNodeBackgroundDrawList(nid);
-        //    // Top input bar — dark gray, rounded bottom corners
-        //    ImVec2 topTL1(topTL.x, topTL.y + 1);
-        //    dl->AddRectFilled(topTL1, topBR, pinBgCol, rounding, ImDrawFlags_RoundCornersBottom);
-        //    dl->AddRect      (topTL1, topBR, pinBgCol, rounding, ImDrawFlags_RoundCornersBottom);
-        //    // Content area — dark blue
-        //    dl->AddRectFilled(cTL, cBR, IM_COL32(24, 64, 128, 200));
-        //    dl->AddRect      (cTL, cBR, IM_COL32(48, 128, 255, 100));
-        //    // Bottom output bar — dark gray, rounded top corners
-        //    ImVec2 botBR1(botBR.x, botBR.y - 1);
-        //    dl->AddRectFilled(botTL, botBR1, pinBgCol, rounding, ImDrawFlags_RoundCornersTop);
-        //    dl->AddRect      (botTL, botBR1, pinBgCol, rounding, ImDrawFlags_RoundCornersTop);
-        //};
-
-        // -- Any-state node (content + bottom output bar only) --
-        {
-            float w = std::max(minW, s_nodeW.count(ANY_NODE_ID) ? s_nodeW[ANY_NODE_ID] : minW);
-            ed::PushStyleColor(ed::StyleColor_NodeBg,    ImVec4(0.35f, 0.12f, 0.12f, 0.9f));
-            ed::PushStyleColor(ed::StyleColor_NodeBorder, ImVec4(0.5f,  0.1f,  0.1f,  1.f));
-            ed::BeginNode(ed::NodeId(ANY_NODE_ID));
-
-                ImVec2 cTL = ImGui::GetCursorScreenPos();
-                ImGui::BeginGroup();
-                    ImGui::Dummy(ImVec2(w, 0));
-                    ImGui::TextUnformatted("Any State");
-                ImGui::EndGroup();
-                ImVec2 cBR = ImGui::GetItemRectMax();
-                s_nodeW[ANY_NODE_ID] = cBR.x - cTL.x;
-                s_nodeScreenCenter[ANY_NODE_ID] = ImVec2((cTL.x + cBR.x) * 0.5f, (cTL.y + cBR.y) * 0.5f);
-
-                ImVec2 botTL = ImGui::GetCursorScreenPos();
-                ed::BeginPin(ed::PinId(ANY_OUT_PIN), ed::PinKind::Output);
-#if IMGUI_VERSION_NUM > 18101
-                    ed::PushStyleVar(ed::StyleVar_PinCorners, (float)ImDrawFlags_RoundCornersTop);
-#else
-                    ed::PushStyleVar(ed::StyleVar_PinCorners, 3.f);
-#endif
-                    ImGui::Dummy(ImVec2(w, barH));
-                    ImVec2 botBR = ImGui::GetItemRectMax();
-                    ed::PinPivotRect(botTL, botBR);
-                    ed::PinRect(botTL, botBR);
-                    ed::PopStyleVar();
-                ed::EndPin();
-
-            ed::EndNode();
-            ed::PopStyleColor(2);
-
-            auto* dl = ed::GetNodeBackgroundDrawList(ed::NodeId(ANY_NODE_ID));
-            ImVec2 anyBotBR1(botBR.x, botBR.y - 1);
-            dl->AddRectFilled(cTL,   cBR,   IM_COL32(80, 24, 24, 200));
-            dl->AddRectFilled(botTL, anyBotBR1, IM_COL32(180, 60, 60, 200), rounding, ImDrawFlags_RoundCornersTop);
-            dl->AddRect      (botTL, anyBotBR1, IM_COL32(180, 60, 60, 200), rounding, ImDrawFlags_RoundCornersTop);
-        }
 
         // -- State nodes --
         for (size_t i = 0; i < states.size(); ++i)
