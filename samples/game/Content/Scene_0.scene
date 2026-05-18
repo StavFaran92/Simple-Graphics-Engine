@@ -624,19 +624,9 @@
                                                 "name": "attack",
                                                 "type": 3,
                                                 "defaultValue": 0.0
-                                            },
-                                            {
-                                                "name": "NewParam",
-                                                "type": 0,
-                                                "defaultValue": 0.0
                                             }
                                         ],
-                                        "m_paramValues": [
-                                            {
-                                                "key": "NewParam",
-                                                "value": 0.0
-                                            }
-                                        ],
+                                        "m_paramValues": [],
                                         "m_entryStateId": "Idle"
                                     }
                                 }

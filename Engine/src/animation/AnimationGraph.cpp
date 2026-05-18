@@ -59,6 +59,12 @@ void AnimationGraph::init()
 void AnimationGraph::addState(StateNode state)
 {
     m_states.push_back(std::move(state));
+
+    // only node avaiable -> make it entry node
+    if (m_states.size() == 1)
+    {
+        setEntryState(state.id);
+    }
 }
 
 void AnimationGraph::addTransition(Transition transition)
@@ -330,4 +336,22 @@ nlohmann::json AnimationGraph::saveToJson() const
 
     j["entryState"] = m_entryStateId;
     return j;
+}
+
+void AnimationGraph::removeState(size_t index)
+{
+    if (index >= m_states.size()) 
+        return;
+
+    const std::string id = m_states[index].id;
+    m_transitions.erase(
+        std::remove_if(m_transitions.begin(), m_transitions.end(),
+            [&id](const Transition& t) { return t.from == id || t.to == id; }),
+        m_transitions.end());
+    m_states.erase(m_states.begin() + index);
+
+    if (m_currentStateId == id) 
+        m_currentStateId = m_entryStateId;
+    if (m_entryStateId == id) 
+        m_entryStateId = "";
 }

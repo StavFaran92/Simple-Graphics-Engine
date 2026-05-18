@@ -101,6 +101,7 @@ public:
     void addTransition(Transition transition);
     void addParameter(Parameter param);
     void setEntryState(const std::string& stateId);
+    void removeState(size_t index);
 
     // Runtime update — call from Animator::update
     void update(float dt);
@@ -144,18 +145,7 @@ public:
             m_transitions.erase(m_transitions.begin() + index);
     }
 
-    void removeState(size_t index)
-    {
-        if (index >= m_states.size()) return;
-        const std::string id = m_states[index].id;
-        m_transitions.erase(
-            std::remove_if(m_transitions.begin(), m_transitions.end(),
-                [&id](const Transition& t){ return t.from == id || t.to == id; }),
-            m_transitions.end());
-        m_states.erase(m_states.begin() + index);
-        if (m_currentStateId == id) m_currentStateId = m_entryStateId;
-        if (m_entryStateId   == id) m_entryStateId   = "";
-    }
+    
 
     template <class Archive>
     void serialize(Archive& archive) {
