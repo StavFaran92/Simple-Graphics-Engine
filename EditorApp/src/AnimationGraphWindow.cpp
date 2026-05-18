@@ -145,31 +145,50 @@ static void displayParameters(AnimationGraph* graph)
         Parameter* p = graph->getParameter(i);
         ImGui::PushID(i);
 
-        ImGui::SetNextItemWidth(80);
-        ImGui::InputText("##name", &p->name);
-        ImGui::SameLine();
+        bool open = ImGui::CollapsingHeader(p->name.c_str());
 
-        int typeIdx = (int)p->type;
-        ImGui::SetNextItemWidth(55);
-        if (ImGui::Combo("##type", &typeIdx, typeLabels, 4))
-            p->type = (ParameterType)typeIdx;
-        ImGui::SameLine();
-
-        ImGui::SetNextItemWidth(50);
-        if (p->type == ParameterType::Bool)
+        if (open)
         {
-            bool b = p->defaultValue != 0.f;
-            if (ImGui::Checkbox("##val", &b)) p->defaultValue = b ? 1.f : 0.f;
-        }
-        else if (p->type == ParameterType::Trigger)
-        {
-            if (ImGui::SmallButton("Fire")) graph->trigger(p->name);
-        }
-        else
-            ImGui::DragFloat("##val", &p->defaultValue, 0.01f);
-        ImGui::SameLine();
+            ImGui::Indent();
 
-        if (ImGui::SmallButton("X")) { graph->removeParameter(i--); ImGui::PopID(); continue; }
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputText("Name", &p->name);
+
+            int typeIdx = (int)p->type;
+            ImGui::SetNextItemWidth(-1);
+            if (ImGui::Combo("Type", &typeIdx, typeLabels, 4))
+                p->type = (ParameterType)typeIdx;
+
+            if (p->type == ParameterType::Bool)
+            {
+                bool b = p->defaultValue != 0.f;
+                if (ImGui::Checkbox("Default", &b)) p->defaultValue = b ? 1.f : 0.f;
+            }
+            else if (p->type == ParameterType::Trigger)
+            {
+                if (ImGui::SmallButton("Fire")) graph->trigger(p->name);
+            }
+            else
+            {
+                ImGui::SetNextItemWidth(-1);
+                ImGui::DragFloat("Default", &p->defaultValue, 0.01f);
+            }
+
+            ImGui::Spacing();
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6f, 0.1f, 0.1f, 1.f));
+            if (ImGui::Button("Delete", ImVec2(-1, 0)))
+            {
+                ImGui::PopStyleColor();
+                graph->removeParameter(i--);
+                ImGui::Unindent();
+                ImGui::PopID();
+                continue;
+            }
+            ImGui::PopStyleColor();
+
+            ImGui::Unindent();
+        }
+
         ImGui::PopID();
     }
 
@@ -243,7 +262,9 @@ static void displayViewer(AnimationGraph* graph, size_t selStateIdx, size_t selT
         if (highlight)
             ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.3f, 0.5f, 0.8f, 1.f));
 
-        if (ImGui::CollapsingHeader(label.c_str()))
+        bool open = ImGui::CollapsingHeader(label.c_str());
+
+        if (open)
         {
             ImGui::Indent();
             ImGui::DragFloat("Blend", &t->blendDuration, 0.01f, 0.f, 5.f);
@@ -263,6 +284,19 @@ static void displayViewer(AnimationGraph* graph, size_t selStateIdx, size_t selT
             }
             if (ImGui::Button("+ Condition"))
                 t->conditions.push_back({});
+
+            ImGui::Spacing();
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6f, 0.1f, 0.1f, 1.f));
+            if (ImGui::Button("Delete Transition", ImVec2(-1, 0)))
+            {
+                if (highlight) ImGui::PopStyleColor(2);
+                else           ImGui::PopStyleColor(1);
+                graph->removeTransition(i--);
+                ImGui::PopID();
+                ImGui::Unindent();
+                continue;
+            }
+            ImGui::PopStyleColor();
 
             ImGui::Unindent();
         }
