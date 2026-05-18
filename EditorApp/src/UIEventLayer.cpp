@@ -1,60 +1,53 @@
 #include "UIEventLayer.h"
 
 #include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
+#include "imgui_internal.h"
 
 #include "EditorState.h"
-
-bool shouldSceneViewGetKeyboard()
-{
-    const ImGuiIO& io = ImGui::GetIO();
-    const auto& state = EditorState::Instance();
-
-    bool uiFocused =
-        //ImGui::IsAnyItemActive() ||  // UI item is being edited
-        //ImGui::IsAnyItemFocused() ||  // UI has keyboard focus
-        io.WantTextInput;              // text widgets
-
-    // If UI needs keyboard -> block scene
-    if (uiFocused)
-        return false;
-
-    // If mouse is NOT in scene view -> block scene
-    if (!state.isMouseInSceneView)
-        return false;
-
-    // Otherwise: Override ImGui's WantCaptureKeyboard
-    return true;
-}
 
 bool UIEventLayer::handleEvent(const Event& e)
 {
     if (!m_isEnabled)
         return false;
 
-    //if (e.type == SDL_MOUSEBUTTONDOWN)
-    //    std::cout << "\n";
-
-   
-
     bool isHandled = false;
 
-    //EditorState::Instance().uiCapture
-
-    if (!shouldSceneViewGetKeyboard())
+    // Is it keyboard event?
+    if (e.type() == EventType::KeyPressed || e.type() == EventType::KeyReleased)
     {
-        isHandled = true; // block event
+        const ImGuiIO& io = ImGui::GetIO();
+
+        // UI needs it
+        if (io.WantTextInput || io.WantCaptureKeyboard)
+        {
+            isHandled = true; //handled
+        }
     }
 
-    //auto iter = m_listeners.find((SDL_EventType)e.type);
-    //if (iter != m_listeners.end())
-    //{
-    //    for (auto& ec : iter->second)
-    //    {
-    //        ec.func(e);
-    //    }
-    //}
+    // is it mouse event?
+    if (e.type() == EventType::MouseButtonPressed ||
+        e.type() == EventType::MouseButtonReleased ||
+        e.type() == EventType::MouseMoved ||
+        e.type() == EventType::MouseWheel)
+    {
+        ImGuiWindow* hoveredWindow = ImGui::GetCurrentContext()->HoveredWindow;
+        ImGuiWindow* sceneViewWindow = ImGui::FindWindowByName("View");
+
+        EditorState::Instance().isMouseInSceneView = hoveredWindow != nullptr
+            && sceneViewWindow != nullptr
+            && (hoveredWindow == sceneViewWindow
+                || hoveredWindow->RootWindow == sceneViewWindow);
+
+        // mouse is not in scene view
+        if (!EditorState::Instance().isMouseInSceneView)
+        {
+            const ImGuiIO& io = ImGui::GetIO();
+            if (io.WantCaptureMouse)
+            {
+                isHandled = true; //handled
+            }
+        }
+    }
 
     return isHandled;
 }

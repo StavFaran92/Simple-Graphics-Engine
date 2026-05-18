@@ -36,23 +36,6 @@ void SceneViewWindow::display()
 
 	ImGui::Image(reinterpret_cast<ImTextureID>(activeViewID), imageSize, ImVec2(0, 1), ImVec2(1, 0));
 
-	// Calculate the top left position of the rendered image within the window
-	ImVec2 viewportOffset = ImGui::GetWindowContentRegionMin();
-	ImVec2 viewportPos{ windowPos.x + viewportOffset.x, windowPos.y + viewportOffset.y };
-
-	ImVec2 mousePos = ImGui::GetMousePos();
-
-	// Check if the mouse is within the viewport bounds
-	if (mousePos.x >= EditorState::Instance().sceneViewRect.min.x && mousePos.x <= EditorState::Instance().sceneViewRect.max.x &&
-		mousePos.y >= EditorState::Instance().sceneViewRect.min.y && mousePos.y <= EditorState::Instance().sceneViewRect.max.y)
-	{
-		EditorState::Instance().isMouseInSceneView = true;
-	}
-	else
-	{
-		EditorState::Instance().isMouseInSceneView = false;
-	}
-
 	auto activeEditorTool = EditorState::Instance().getActiveEditorTool();
 	if (activeEditorTool)
 	{
