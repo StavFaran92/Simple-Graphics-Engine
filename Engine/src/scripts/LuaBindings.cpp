@@ -307,7 +307,15 @@ void bindComponents(sol::state& lua)
         "setFloat", &AnimationGraph::setFloat,
         "setBool", &AnimationGraph::setBool,
         "setInt", &AnimationGraph::setInt,
-        "trigger", &AnimationGraph::trigger
+        "trigger", &AnimationGraph::trigger,
+        "getCurrentStateID", [](AnimationGraph& self) ->std::string {
+            auto state = self.getCurrentState();
+            if (!state)
+            {
+                return "";
+            }
+            return state->animationEntry.name;
+        }
     );
 
     lua.new_usertype<Terrain>("Terrain",
