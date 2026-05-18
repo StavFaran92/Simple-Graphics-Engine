@@ -70,7 +70,7 @@ function Script:update(entity, dt)
     end
 
     local hitResult = HitResult.new()
-    self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), 0.1, hitResult, LayerMask.LAYER_0);  
+    self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), 0.01, hitResult, LayerMask.LAYER_0);  
 
     if self.isGrounded and self.velocityV < 0 then
         self.velocityV = 0
@@ -89,26 +89,25 @@ function Script:update(entity, dt)
     local hDir = self.movementH + self.movementV
     local isMoving = math.abs(hDir.x) > 0.0 or math.abs(hDir.z) > 0.0
 
-    if self.isJumping then
-        self.state = PlayerState.Jump
-    elseif isMoving then
-        self.state = PlayerState.Run
-    elseif self.isAttacking then
-        self.state = PlayerState.Attack
-    else
-        self.state = PlayerState.Idle
-    end
-
     -- Rotate model toward movement direction
     if isMoving and not self.isJumping then
         local angle = -math.atan(hDir.z, hDir.x)
         self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
     end
 
+    local speed = length(hDir)
+    self.animator:getGraph():setFloat("speed", speed)
+    self.animator:getGraph():setBool("isJumping", self.isJumping)
+
+    
+    self.animator:getGraph():setBool("isGrounded", self.isGrounded)
+    
+
+
     -- Play animation for current state
-    if self.animator:getCurrentAnimationName() ~= self.state then
-        self.animator:playAnimation(self.state)
-    end
+    -- if self.animator:getCurrentAnimationName() ~= self.state then
+    --     self.animator:playAnimation(self.state)
+    -- end
 
 
     
@@ -147,7 +146,7 @@ function Script:onEvent(e)
 
     if e:type() == EventType.MouseButtonPressed then
         if e.button == MouseButton.Left then
-            self.isAttacking = true
+            self.animator:getGraph():trigger("attack")
         end
     end
 
@@ -156,6 +155,7 @@ function Script:onEvent(e)
             if self.isGrounded then
 				self.velocityV = self.jumpForce;
                 self.isJumping = true
+                self.animator:getGraph():trigger("jump")
             end
         end
     end

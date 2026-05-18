@@ -123,7 +123,7 @@ struct TestComp : public Component
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(test);
-		SERIALIZED_MEMBER_OPTIONAL(test2, 0);
+		SERIALIZED_MEMBER_OPTIONAL(test2);
 	}
 
 	int test = 0;

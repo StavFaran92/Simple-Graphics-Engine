@@ -299,7 +299,15 @@ void bindComponents(sol::state& lua)
             [](Animator& self, int id) { self.getAnimation(id); }
         ),
         "getAllAnimations", &Animator::getAllAnimations,
-        "getCurrentAnimationName", &Animator::getCurrentAnimationName
+        "getCurrentAnimationName", &Animator::getCurrentAnimationName,
+        "getGraph", &Animator::getAnimationGraph
+    );
+
+    lua.new_usertype<AnimationGraph>("AnimationGraph",
+        "setFloat", &AnimationGraph::setFloat,
+        "setBool", &AnimationGraph::setBool,
+        "setInt", &AnimationGraph::setInt,
+        "trigger", &AnimationGraph::trigger
     );
 
     lua.new_usertype<Terrain>("Terrain",

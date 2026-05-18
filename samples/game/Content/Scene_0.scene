@@ -40,7 +40,14 @@
                                                 }
                                             }
                                         }
-                                    ]
+                                    ],
+                                    "m_animationGraph": {
+                                        "m_states": [],
+                                        "m_transitions": [],
+                                        "m_parameters": [],
+                                        "m_paramValues": [],
+                                        "m_entryStateId": ""
+                                    }
                                 }
                             }
                         },
@@ -455,7 +462,183 @@
                                                 }
                                             }
                                         }
-                                    ]
+                                    ],
+                                    "m_animationGraph": {
+                                        "m_states": [
+                                            {
+                                                "id": "Idle",
+                                                "animationEntry": {
+                                                    "name": "Idle",
+                                                    "playbackSpeed": 1.0,
+                                                    "animation": {
+                                                        "uuid": {
+                                                            "m_value": 53
+                                                        }
+                                                    }
+                                                },
+                                                "loop": true
+                                            },
+                                            {
+                                                "id": "Run",
+                                                "animationEntry": {
+                                                    "name": "Run",
+                                                    "playbackSpeed": 1.0,
+                                                    "animation": {
+                                                        "uuid": {
+                                                            "m_value": 52
+                                                        }
+                                                    }
+                                                },
+                                                "loop": true
+                                            },
+                                            {
+                                                "id": "Jump",
+                                                "animationEntry": {
+                                                    "name": "Jump",
+                                                    "playbackSpeed": 1.0,
+                                                    "animation": {
+                                                        "uuid": {
+                                                            "m_value": 51
+                                                        }
+                                                    }
+                                                },
+                                                "loop": true
+                                            },
+                                            {
+                                                "id": "Attack",
+                                                "animationEntry": {
+                                                    "name": "Attack",
+                                                    "playbackSpeed": 1.0,
+                                                    "animation": {
+                                                        "uuid": {
+                                                            "m_value": 89
+                                                        }
+                                                    }
+                                                },
+                                                "loop": true
+                                            }
+                                        ],
+                                        "m_transitions": [
+                                            {
+                                                "from": "Idle",
+                                                "to": "Run",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 1,
+                                                        "parameter": "speed",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Run",
+                                                "to": "Idle",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 0,
+                                                        "parameter": "speed",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Idle",
+                                                "to": "Jump",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 0,
+                                                        "parameter": "isJumping",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Jump",
+                                                "to": "Idle",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 0,
+                                                        "parameter": "isJumping",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Run",
+                                                "to": "Jump",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 0,
+                                                        "parameter": "isJumping",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Idle",
+                                                "to": "Attack",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 4,
+                                                        "parameter": "attack",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Attack",
+                                                "to": "Idle",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 3,
+                                                        "parameter": "",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "m_parameters": [
+                                            {
+                                                "name": "speed",
+                                                "type": 0,
+                                                "defaultValue": 0.0
+                                            },
+                                            {
+                                                "name": "isJumping",
+                                                "type": 1,
+                                                "defaultValue": 0.0
+                                            },
+                                            {
+                                                "name": "isGrounded",
+                                                "type": 1,
+                                                "defaultValue": 0.0
+                                            },
+                                            {
+                                                "name": "attack",
+                                                "type": 3,
+                                                "defaultValue": 0.0
+                                            },
+                                            {
+                                                "name": "NewParam",
+                                                "type": 0,
+                                                "defaultValue": 0.0
+                                            }
+                                        ],
+                                        "m_paramValues": [
+                                            {
+                                                "key": "NewParam",
+                                                "value": 0.0
+                                            }
+                                        ],
+                                        "m_entryStateId": "Idle"
+                                    }
                                 }
                             }
                         },

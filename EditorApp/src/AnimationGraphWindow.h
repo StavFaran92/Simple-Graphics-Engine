@@ -8,7 +8,7 @@ class Animator;
 class AnimationGraphWindow
 {
 public:
-    static void open(AnimationGraph* graph, Animator* animator);
+    static void open(Animator* animator);
     static void display();
 
     static nlohmann::json saveToJson();

@@ -351,9 +351,7 @@ void InspectorWindow::display()
 
 			if (ImGui::Button("Edit Graph"))
 			{
-				if (!animator.hasAnimationGraph())
-					animator.createAnimationGraph();
-				AnimationGraphWindow::open(animator.getAnimationGraph(), &animator);
+				AnimationGraphWindow::open(&animator);
 			}
 
 			ImGui::Separator();

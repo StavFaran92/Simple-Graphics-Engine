@@ -31,20 +31,45 @@ static size_t inPinToState(uint64_t p) { return p - 2002; }
 
 // ---- Condition editor -----------------------------------------------
 
-static const char* condTypeLabels[] = {
-    "On Value Equal", "On Value Greater Than", "On Value Less Than", "On Animation End"
-};
+static const Parameter* findParam(const std::vector<Parameter>& params, const std::string& name)
+{
+    for (const auto& p : params)
+        if (p.name == name) return &p;
+    return nullptr;
+}
+
+static bool isGlobalCondType(ConditionType t)
+{
+    return t == ConditionType::OnAnimationEnd;
+}
 
 static void displayConditionEditor(Condition& cond, const std::vector<Parameter>& params, int id)
 {
     ImGui::PushID(id);
 
-    int typeIdx = (int)cond.type;
+    // --- Row 1: Global vs Parameter ---
+    static const char* categoryLabels[] = { "Global", "Parameter" };
+    int catIdx = isGlobalCondType(cond.type) ? 0 : 1;
     ImGui::SetNextItemWidth(-1);
-    if (ImGui::Combo("##type", &typeIdx, condTypeLabels, 4))
-        cond.type = (ConditionType)typeIdx;
+    if (ImGui::Combo("##cat", &catIdx, categoryLabels, 2))
+    {
+        if (catIdx == 0) { cond.type = ConditionType::OnAnimationEnd; cond.parameter = ""; }
+        else             { cond.type = ConditionType::OnValueEqual;   cond.parameter = ""; }
+    }
 
-    if (cond.type != ConditionType::OnAnimationEnd)
+    // --- Row 2a: Global condition type ---
+    if (catIdx == 0)
+    {
+        static const char* globalLabels[] = { "On Animation End" };
+        int gIdx = 0; // only one global type for now
+        ImGui::SetNextItemWidth(-1);
+        ImGui::Combo("##globaltype", &gIdx, globalLabels, 1);
+        cond.type = ConditionType::OnAnimationEnd;
+        ImGui::PopID();
+        return;
+    }
+
+    // --- Row 2b: Parameter selector ---
     {
         const char* preview = cond.parameter.empty() ? "(none)" : cond.parameter.c_str();
         ImGui::SetNextItemWidth(-1);
@@ -54,11 +79,47 @@ static void displayConditionEditor(Condition& cond, const std::vector<Parameter>
             {
                 bool sel = (p.name == cond.parameter);
                 if (ImGui::Selectable(p.name.c_str(), sel))
+                {
                     cond.parameter = p.name;
+                    if      (p.type == ParameterType::Trigger) cond.type = ConditionType::OnTrigger;
+                    else if (p.type == ParameterType::Bool)    cond.type = ConditionType::OnValueEqual;
+                    else                                       cond.type = ConditionType::OnValueEqual;
+                }
                 if (sel) ImGui::SetItemDefaultFocus();
             }
             ImGui::EndCombo();
         }
+    }
+
+    // --- Row 3: Operator/value — driven by selected param type ---
+    const Parameter* selParam = findParam(params, cond.parameter);
+    if (!selParam) { ImGui::PopID(); return; }
+
+    if (selParam->type == ParameterType::Trigger)
+    {
+        // Trigger fires on selection alone — no operator or value needed
+        cond.type = ConditionType::OnTrigger;
+    }
+    else if (selParam->type == ParameterType::Bool)
+    {
+        static const char* boolLabels[] = { "Is True", "Is False" };
+        int boolIdx = (cond.value >= 0.5f) ? 0 : 1;
+        ImGui::SetNextItemWidth(-1);
+        if (ImGui::Combo("##boolval", &boolIdx, boolLabels, 2))
+            cond.value = (boolIdx == 0) ? 1.f : 0.f;
+        cond.type = ConditionType::OnValueEqual;
+    }
+    else // Float / Int
+    {
+        static const char* cmpLabels[] = { "==", ">", "<" };
+        int cmpIdx = cond.type == ConditionType::OnValueGreaterThan ? 1
+                   : cond.type == ConditionType::OnValueLessThan    ? 2 : 0;
+        ImGui::SetNextItemWidth(40);
+        if (ImGui::Combo("##cmp", &cmpIdx, cmpLabels, 3))
+            cond.type = cmpIdx == 1 ? ConditionType::OnValueGreaterThan
+                      : cmpIdx == 2 ? ConditionType::OnValueLessThan
+                                    : ConditionType::OnValueEqual;
+        ImGui::SameLine();
         ImGui::SetNextItemWidth(-1);
         ImGui::DragFloat("##val", &cond.value, 0.01f);
     }
@@ -76,7 +137,7 @@ static void displayParameters(AnimationGraph* graph)
     ImGui::TextUnformatted("Parameters");
     ImGui::Separator();
 
-    static const char* typeLabels[] = { "Float", "Bool", "Int" };
+    static const char* typeLabels[] = { "Float", "Bool", "Int", "Trigger" };
     const auto& params = graph->getParameters();
 
     for (int i = 0; i < (int)params.size(); ++i)
@@ -89,8 +150,8 @@ static void displayParameters(AnimationGraph* graph)
         ImGui::SameLine();
 
         int typeIdx = (int)p->type;
-        ImGui::SetNextItemWidth(50);
-        if (ImGui::Combo("##type", &typeIdx, typeLabels, 3))
+        ImGui::SetNextItemWidth(55);
+        if (ImGui::Combo("##type", &typeIdx, typeLabels, 4))
             p->type = (ParameterType)typeIdx;
         ImGui::SameLine();
 
@@ -99,6 +160,10 @@ static void displayParameters(AnimationGraph* graph)
         {
             bool b = p->defaultValue != 0.f;
             if (ImGui::Checkbox("##val", &b)) p->defaultValue = b ? 1.f : 0.f;
+        }
+        else if (p->type == ParameterType::Trigger)
+        {
+            if (ImGui::SmallButton("Fire")) graph->trigger(p->name);
         }
         else
             ImGui::DragFloat("##val", &p->defaultValue, 0.01f);
@@ -229,10 +294,10 @@ static std::unordered_map<uint64_t, ImVec2>  s_nodeScreenCenter; // node center,
 
 // ---- Public API -----------------------------------------------------
 
-void AnimationGraphWindow::open(AnimationGraph* graph, Animator* animator)
+void AnimationGraphWindow::open(Animator* animator)
 {
-    s_graph       = graph;
     s_animator    = animator;
+    s_graph       = &animator->getAnimationGraph();
     s_open        = true;
     s_firstFrame  = true;
     s_selState    = SIZE_MAX;
@@ -358,6 +423,7 @@ void AnimationGraphWindow::display()
         const auto& states      = s_graph->getStates();
         const auto& transitions = s_graph->getTransitions();
         const auto* curState    = s_graph->getCurrentState();
+        const std::string entryState    = s_graph->getEntryState();
 
         // ---- Tree/Sequence style: top input bar, content, bottom output bar ----
         const float rounding = 5.f;
@@ -388,6 +454,9 @@ void AnimationGraphWindow::display()
             bool active  = curState && curState->id == s.id;
             bool pending = s_pendingFrom == i;
             uint64_t nid = nodeIdOf(i).Get();
+            bool isEntryState = entryState == s.id;
+
+            if (isEntryState) ed::PushStyleColor(ed::StyleColor_NodeBg, ImVec4(0.24f, 0.71f, 1.00f, 0.59f));
 
             // Border tint indicates state: green=active, yellow=pending, default dark
             ImVec4 borderCol = active  ? ImVec4(0.2f, 0.8f, 0.3f, 1.f) :
@@ -418,6 +487,8 @@ void AnimationGraphWindow::display()
 
             ed::EndNode();
             ed::PopStyleColor(1);
+            if (isEntryState)  ed::PopStyleColor();
+
 
             //drawBars(nodeIdOf(i), topTL, topBR, cTL, cBR, botTL, botBR);
         }
@@ -465,6 +536,20 @@ void AnimationGraphWindow::display()
                 ImVec2 b1(tip.x - nx*aSize - ny*aSize*0.5f, tip.y - ny*aSize + nx*aSize*0.5f);
                 ImVec2 b2(tip.x - nx*aSize + ny*aSize*0.5f, tip.y - ny*aSize - nx*aSize*0.5f);
                 dl->AddTriangleFilled(tip, b1, b2, IM_COL32(200, 200, 200, 230));
+            }
+
+            // Preview line: source node center → mouse while transition pending
+            if (s_pendingFrom != SIZE_MAX && s_graph)
+            {
+                uint64_t srcNid = nodeIdOf(s_pendingFrom).Get();
+                auto it = s_nodeScreenCenter.find(srcNid);
+                if (it != s_nodeScreenCenter.end())
+                {
+                    ImVec2 src = it->second;
+                    ImVec2 dst = ImGui::GetMousePos();
+                    dl->AddLine(src, dst, IM_COL32(255, 220, 60, 200), 2.f);
+                    dl->AddCircleFilled(dst, 5.f, IM_COL32(255, 220, 60, 220));
+                }
             }
         }
 
@@ -529,6 +614,9 @@ void AnimationGraphWindow::display()
                         if (ImGui::MenuItem("Add Transition"))
                             s_pendingFrom = si;
 
+                        if (ImGui::MenuItem("Make Entry State"))
+                            s_graph->setEntryState(s_graph->getState(si)->id);
+
                         ImGui::Separator();
                         if (ImGui::MenuItem("Delete"))
                             s_graph->removeState(si);
@@ -537,25 +625,25 @@ void AnimationGraphWindow::display()
                 ImGui::EndPopup();
             }
 
-            // Link context
-            if (ImGui::BeginPopup("##linkCtx"))
-            {
-                size_t ti = s_ctxLink - 3000;
-                if (ti < s_graph->getTransitions().size())
-                    if (ImGui::MenuItem("Delete Transition"))
-                        s_graph->removeTransition(ti);
-                ImGui::EndPopup();
-            }
+            //// Link context
+            //if (ImGui::BeginPopup("##linkCtx"))
+            //{
+            //    size_t ti = s_ctxLink - 3000;
+            //    if (ti < s_graph->getTransitions().size())
+            //        if (ImGui::MenuItem("Delete Transition"))
+            //            s_graph->removeTransition(ti);
+            //    ImGui::EndPopup();
+            //}
 
-            // Background context
-            if (ImGui::BeginPopup("##bgCtx"))
-            {
-                if (s_pendingFrom != SIZE_MAX && ImGui::MenuItem("Cancel Transition"))
-                    s_pendingFrom = SIZE_MAX;
-                else
-                    ImGui::TextDisabled("(empty)");
-                ImGui::EndPopup();
-            }
+            //// Background context
+            //if (ImGui::BeginPopup("##bgCtx"))
+            //{
+            //    if (s_pendingFrom != SIZE_MAX && ImGui::MenuItem("Cancel Transition"))
+            //        s_pendingFrom = SIZE_MAX;
+            //    else
+            //        ImGui::TextDisabled("(empty)");
+            //    ImGui::EndPopup();
+            //}
 
             ed::Resume();
         }
@@ -611,22 +699,6 @@ void AnimationGraphWindow::display()
 
     ed::End();
     ed::SetCurrentEditor(nullptr);
-
-
-    // Preview line: source node center → mouse while transition pending
-    if (s_pendingFrom != SIZE_MAX && s_graph)
-    {
-        uint64_t srcNid = nodeIdOf(s_pendingFrom).Get();
-        auto it = s_nodeScreenCenter.find(srcNid);
-        if (it != s_nodeScreenCenter.end())
-        {
-            ImVec2 src = it->second;
-            ImVec2 dst = ImGui::GetMousePos();
-            ImDrawList* dl = ImGui::GetForegroundDrawList();
-            dl->AddLine(src, dst, IM_COL32(255, 220, 60, 200), 2.f);
-            dl->AddCircleFilled(dst, 5.f, IM_COL32(255, 220, 60, 220));
-        }
-    }
 
     ImGui::EndChild(); // ##graph
 

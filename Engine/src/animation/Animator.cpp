@@ -6,8 +6,20 @@
 #include "geometry/Model.h"
 #include "runtime/Scene.h"
 
+void Animator::resolve(SceneResourceRef& scene)
+{
+	m_animationGraph.setAnimatorOwner(this);
+}
+
+void Animator::onStart()
+{
+	m_animationGraph.init();
+}
+
 void Animator::update(float dt)
 {
+	m_animationGraph.update(dt);
+
 	auto currentAnimation = getCurrentAnimation();
 	if (!currentAnimation || currentAnimation->animation.isEmpty() || currentAnimation->animation.resource().isEmpty())
 		return;
@@ -16,7 +28,12 @@ void Animator::update(float dt)
 
 	// Increment Animation time
 	m_currentTime += animResource->getTicksPerSecond() * currentAnimation->playbackSpeed * dt;
-	m_currentTime = fmod(m_currentTime, animResource->getDuration());
+	if (m_currentTime >= animResource->getDuration())
+	{
+		m_currentTime = fmod(m_currentTime, animResource->getDuration());
+		m_animationGraph.onAnimationEnd();
+	}
+	
 }
 
 void Animator::getFinalBoneMatrices(const Model* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
@@ -138,17 +155,13 @@ std::string Animator::getCurrentAnimationName() const
 	return anim->name;
 }
 
-void Animator::createAnimationGraph()
-{
-	if (!m_animationGraph)
-	{
-		m_animationGraph = std::make_shared<AnimationGraph>();
-		m_animationGraph->setAnimatorOwner(this);
-	}
-}
-
 bool Animator::hasActiveAnimation() const
 {
 	auto currentAnim = getCurrentAnimation();
 	return currentAnim && !currentAnim->animation.isEmpty() ;
+}
+
+AnimationGraph& Animator::getAnimationGraph()
+{
+	return m_animationGraph;
 }

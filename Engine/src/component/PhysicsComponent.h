@@ -22,13 +22,13 @@ struct EngineAPI PhysicsComponent : public Component
 		SERIALIZED_MEMBER(mass);
 		SERIALIZED_MEMBER(collider);
 		SERIALIZED_MEMBER(colliderType);
-		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearX, false);
-		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearY, false);
-		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearZ, false);
-		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularX, false);
-		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularY, false);
-		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularZ, false);
-		SERIALIZED_MEMBER_OPTIONAL(offset, glm::vec3{});
+		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearX);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearY);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearZ);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularX);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularY);
+		SERIALIZED_MEMBER_OPTIONAL(isLockedAngularZ);
+		SERIALIZED_MEMBER_OPTIONAL(offset);
 	}
 
 	bool isLockedLinearX = false;

@@ -7,23 +7,8 @@
 #include "component/Component.h"
 #include "component/ComponentSerializer.h"
 #include "animation/Animation.h"
-
-class AnimationGraph;
-
-struct AnimationEntry
-{
-	std::string name;
-	float playbackSpeed = 1.f;
-	AnimationAssetRef animation;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(name);
-		SERIALIZED_MEMBER(playbackSpeed);
-		SERIALIZED_MEMBER(animation);
-	}
-
-};
+#include "animation/AnimationEntry.h"
+#include "animation/AnimationGraph.h"
 
 class EngineAPI Animator : public Component
 {
@@ -32,6 +17,9 @@ public:
 
 	std::string getName() override { return "Animator"; }
 
+	void resolve(SceneResourceRef& scene) override;
+
+	void onStart();
 	void update(float dt);
 	void getFinalBoneMatrices(const Model* meshCollection, std::vector<glm::mat4>& outFinalBoneMatrices) const;
 
@@ -48,14 +36,13 @@ public:
 	bool hasActiveAnimation() const;
 
 	// Animation graph
-	void              createAnimationGraph();
-	AnimationGraph*   getAnimationGraph()  const { return m_animationGraph.get(); }
-	bool              hasAnimationGraph()  const { return m_animationGraph != nullptr; }
+	AnimationGraph& getAnimationGraph();
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(m_currentAnimIndex);
-		SERIALIZED_MEMBER(m_animations);
+		SERIALIZED_MEMBER_OPTIONAL(m_currentAnimIndex);
+		SERIALIZED_MEMBER_OPTIONAL(m_animations);
+		SERIALIZED_MEMBER_OPTIONAL(m_animationGraph);
 	}
 
 	float m_currentTime = 0.f;
@@ -64,7 +51,7 @@ public:
 private:
 	int m_currentAnimIndex = 0;
 	std::vector<AnimationEntry> m_animations;
-	std::shared_ptr<AnimationGraph> m_animationGraph;
+	AnimationGraph m_animationGraph;
 
 };
 

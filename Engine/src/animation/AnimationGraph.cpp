@@ -6,8 +6,9 @@
 
 static ParameterType paramTypeFromString(const std::string& s)
 {
-    if (s == "bool")  return ParameterType::Bool;
-    if (s == "int")   return ParameterType::Int;
+    if (s == "bool")    return ParameterType::Bool;
+    if (s == "int")     return ParameterType::Int;
+    if (s == "trigger") return ParameterType::Trigger;
     return ParameterType::Float;
 }
 
@@ -15,9 +16,10 @@ static std::string paramTypeToString(ParameterType t)
 {
     switch (t)
     {
-        case ParameterType::Bool:  return "bool";
-        case ParameterType::Int:   return "int";
-        default:                   return "float";
+        case ParameterType::Bool:    return "bool";
+        case ParameterType::Int:     return "int";
+        case ParameterType::Trigger: return "trigger";
+        default:                     return "float";
     }
 }
 
@@ -26,6 +28,7 @@ static ConditionType condTypeFromString(const std::string& s)
     if (s == "onValueEqual")       return ConditionType::OnValueEqual;
     if (s == "onValueGreaterThan") return ConditionType::OnValueGreaterThan;
     if (s == "onValueLessThan")    return ConditionType::OnValueLessThan;
+    if (s == "onTrigger")          return ConditionType::OnTrigger;
     return ConditionType::OnAnimationEnd;
 }
 
@@ -36,6 +39,7 @@ static std::string condTypeToString(ConditionType t)
         case ConditionType::OnValueEqual:       return "onValueEqual";
         case ConditionType::OnValueGreaterThan: return "onValueGreaterThan";
         case ConditionType::OnValueLessThan:    return "onValueLessThan";
+        case ConditionType::OnTrigger:          return "onTrigger";
         default:                                return "onAnimationEnd";
     }
 }
@@ -45,6 +49,11 @@ static std::string condTypeToString(ConditionType t)
 void AnimationGraph::setAnimatorOwner(Animator* owner)
 {
     m_owner = owner;
+}
+
+void AnimationGraph::init()
+{
+    transitionTo(m_entryStateId, 0.0f);
 }
 
 void AnimationGraph::addState(StateNode state)
@@ -65,6 +74,11 @@ void AnimationGraph::addParameter(Parameter param)
 
 void AnimationGraph::setEntryState(const std::string& stateId)
 {
+    if (!findState(stateId))
+    {
+        logWarning("Invalid state ID: {}", stateId);
+        return;
+    }
     m_entryStateId = stateId;
     if (m_currentStateId.empty())
     {
@@ -92,6 +106,7 @@ void AnimationGraph::update(float dt)
 
     evaluateTransitions(candidates);
     m_animationEndedThisFrame = false;
+    m_pendingTriggers.clear();
 }
 
 void AnimationGraph::onAnimationEnd()
@@ -114,6 +129,11 @@ void AnimationGraph::setInt(const std::string& name, int value)
     m_paramValues[name] = static_cast<float>(value);
 }
 
+void AnimationGraph::trigger(const std::string& name)
+{
+    m_pendingTriggers.insert(name);
+}
+
 const StateNode* AnimationGraph::getCurrentState() const
 {
     return findState(m_currentStateId);
@@ -125,6 +145,9 @@ bool AnimationGraph::evaluateCondition(const Condition& cond) const
 {
     if (cond.type == ConditionType::OnAnimationEnd)
         return m_animationEndedThisFrame;
+
+    if (cond.type == ConditionType::OnTrigger)
+        return m_pendingTriggers.count(cond.parameter) > 0;
 
     auto it = m_paramValues.find(cond.parameter);
     if (it == m_paramValues.end())

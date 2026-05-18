@@ -10,12 +10,12 @@
 
 #define SERIALIZED_MEMBER(member) archive(CEREAL_NVP(member));
 
-#define SERIALIZED_MEMBER_OPTIONAL(member, value)		\
+#define SERIALIZED_MEMBER_OPTIONAL(member)		\
 	try {												\
 		archive(CEREAL_NVP(member));					\
 	}													\
 	catch (const cereal::Exception&) {					\
-		member = value;									\
+		member = {};									\
 	};
 
 namespace glm

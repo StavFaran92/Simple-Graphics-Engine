@@ -41,7 +41,7 @@ struct SerializedScene
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(serializedEntities);
-		SERIALIZED_MEMBER_OPTIONAL(gameCamera, entt::null);
+		SERIALIZED_MEMBER_OPTIONAL(gameCamera);
 	}
 
 };

@@ -1436,6 +1436,11 @@ void Scene::startSimulation()
 		logError("Script Error occured: {}", e.what());
 	}
 
+	for (auto&& [entity, animator, mesh] : m_registry->get().view<Animator, MeshRendererComponent>().each())
+	{
+		animator.onStart();
+	}
+
 	gameEventLayer->setEnabled(true);
 
 	m_isSimulationActive = true;

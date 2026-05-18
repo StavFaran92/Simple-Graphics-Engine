@@ -3,22 +3,26 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include "core/Core.h"
-#include "animation/Animator.h"
 #include "nlohmann/json.hpp"
+#include "serialize/CerealHelpers.h"
+#include "animation/AnimationEntry.h"
+
 
 class Animator;
 
 // ---- Enums ----
 
-enum class ParameterType { Float, Bool, Int };
+enum class ParameterType { Float, Bool, Int, Trigger };
 
 enum class ConditionType
 {
     OnValueEqual,
     OnValueGreaterThan,
     OnValueLessThan,
-    OnAnimationEnd
+    OnAnimationEnd,
+    OnTrigger
 };
 
 // ---- Data structs ----
@@ -28,6 +32,13 @@ struct Parameter
     std::string name;
     ParameterType type = ParameterType::Float;
     float defaultValue = 0.f;
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+        SERIALIZED_MEMBER_OPTIONAL(name);
+        SERIALIZED_MEMBER_OPTIONAL(type);
+        SERIALIZED_MEMBER_OPTIONAL(defaultValue);
+    }
 };
 
 struct Condition
@@ -35,6 +46,13 @@ struct Condition
     ConditionType type = ConditionType::OnAnimationEnd;
     std::string parameter;
     float value = 0.f;
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+        SERIALIZED_MEMBER_OPTIONAL(type);
+        SERIALIZED_MEMBER_OPTIONAL(parameter);
+        SERIALIZED_MEMBER_OPTIONAL(value);
+    }
 };
 
 struct StateNode
@@ -42,6 +60,13 @@ struct StateNode
     std::string id;
     AnimationEntry animationEntry;
     bool loop = true;
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+        SERIALIZED_MEMBER_OPTIONAL(id);
+        SERIALIZED_MEMBER_OPTIONAL(animationEntry);
+        SERIALIZED_MEMBER_OPTIONAL(loop);
+    }
 };
 
 struct Transition
@@ -50,6 +75,14 @@ struct Transition
     std::string to;
     float blendDuration = 0.2f;
     std::vector<Condition> conditions;  // AND logic, evaluated in order
+
+    template <class Archive>
+    void serialize(Archive& archive) {
+        SERIALIZED_MEMBER_OPTIONAL(from);
+        SERIALIZED_MEMBER_OPTIONAL(to);
+        SERIALIZED_MEMBER_OPTIONAL(blendDuration);
+        SERIALIZED_MEMBER_OPTIONAL(conditions);
+    }
 };
 
 // ---- AnimationGraph ----
@@ -61,6 +94,7 @@ public:
 
     AnimationGraph() = default;
     void setAnimatorOwner(Animator* animator);
+    void init();
 
     // Build API (code-side authoring)
     void addState(StateNode state);
@@ -78,6 +112,7 @@ public:
     void setFloat(const std::string& name, float value);
     void setBool(const std::string& name, bool value);
     void setInt(const std::string& name, int value);
+    void trigger(const std::string& name);
 
     // JSON serialization
     void loadFromJson(const nlohmann::json& j);
@@ -89,6 +124,7 @@ public:
     const std::vector<StateNode>&  getStates()      const { return m_states; }
     const std::vector<Transition>& getTransitions()  const { return m_transitions; }
     const std::vector<Parameter>&  getParameters()   const { return m_parameters; }
+    std::string getEntryState()   const { return m_entryStateId; }
 
     // Editor write access
     StateNode*  getState(size_t index)      { return index < m_states.size()      ? &m_states[index]      : nullptr; }
@@ -121,6 +157,15 @@ public:
         if (m_entryStateId   == id) m_entryStateId   = "";
     }
 
+    template <class Archive>
+    void serialize(Archive& archive) {
+        SERIALIZED_MEMBER_OPTIONAL(m_states);
+        SERIALIZED_MEMBER_OPTIONAL(m_transitions);
+        SERIALIZED_MEMBER_OPTIONAL(m_parameters);
+        SERIALIZED_MEMBER_OPTIONAL(m_paramValues);
+        SERIALIZED_MEMBER_OPTIONAL(m_entryStateId);
+    }
+
 private:
     bool evaluateCondition(const Condition& cond) const;
     bool evaluateTransitions(const std::vector<Transition*>& transitions);
@@ -134,6 +179,7 @@ private:
     std::vector<Transition> m_transitions;
     std::vector<Parameter> m_parameters;
     std::unordered_map<std::string, float> m_paramValues;
+    std::unordered_set<std::string> m_pendingTriggers;
 
     std::string m_currentStateId;
     std::string m_entryStateId;
