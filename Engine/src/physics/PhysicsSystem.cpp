@@ -132,11 +132,11 @@ physx::PxScene* PhysicsSystem::createScene()
     sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
     m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_dispatcher;
-    //sceneDesc.filterShader = MyFilterShader;
-    sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+    sceneDesc.filterShader = MyFilterShader;
+    //sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
     // register callback
-    //static MyContactCallback g_callback;
-    //sceneDesc.simulationEventCallback = &g_callback;
+    static MyContactCallback g_callback;
+    sceneDesc.simulationEventCallback = &g_callback;
 
     physx::PxScene* scene = m_physics->createScene(sceneDesc);
 
@@ -280,15 +280,10 @@ void PhysicsSystem::createCCTController(Scene* scene, entt::entity entity)
 
     desc.height = pc.height;
     desc.radius = pc.radius;
-    //desc.position = physx::PxExtendedVec3(pos.x + pc.offset.x, pos.y + pc.offset.y, pos.z + pc.offset.z);
-    desc.position = physx::PxExtendedVec3(pos.x, pos.y, pos.z);
-    desc.material = m_defaultMaterial;
 
-    //mType = desc.mType;
-    //mInitialPosition = desc.mPosition;
-    //mStandingSize = height;
-    //mCrouchingSize = crouchHeight;
-    //mControllerRadius = radius;
+    // We offset manually for CCT controllers
+    desc.position = physx::PxExtendedVec3(pos.x + pc.offset.x, pos.y + pc.offset.y, pos.z + pc.offset.z);
+    desc.material = m_defaultMaterial;
 
     PxController* ctrl = static_cast<PxCapsuleController*>(controllerManager->createController(desc));
     PX_ASSERT(ctrl);
@@ -373,6 +368,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                 physx::PxTransform actorPose = actor->getGlobalPose();
                 physx::PxTransform worldPose = actorPose * localPose;
                 
+                // if actor is kinematic we want to ignore rotation when drawing the shape
                 PxRigidDynamic* dynamic = actor->is<PxRigidDynamic>();
                 if (dynamic)
                 {
@@ -622,17 +618,16 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     if (shape)
     {
 
-        //physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
-        physx::PxVec3 pxTranslation(PxIdentity);
+        physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
         physx::PxQuat pxRotation(PxIdentity);
 
         auto physxTransform = physx::PxTransform(pxTranslation, pxRotation);
 
-        // PhysX capsules are X-axis aligned; compose a 90° Z rotation to make them Y-axis (upright)
+        // PhysX capsules are X-axis aligned; compose a 90 deg Z rotation to make them Y-axis (upright)
+        // This only applies to non CCT, CCT rotation is done internally by PhysX
         if (pc.collider->getType() == ColliderType::CAPSULE)
             physxTransform.q = physxTransform.q * physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0.0f, 0.0f, 1.0f));
 
-        //auto physxTransform = PhysXUtils::toPhysXTransform(transform);
         shape->setLocalPose(physxTransform);
         body->attachShape(*shape);
         shape->release();
@@ -757,15 +752,20 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().colliderType == ColliderType::TERRAIN)
                 continue;
 
-            //if (e.HasComponent<PlayerController>())
-            //    continue;
-
             auto& transform = e.getComponent<Transformation>();
 
             physx::PxTransform pxTransform = actor->getGlobalPose();
 
             if (e.HasComponent<PlayerController>())
+            {
+                auto& pc = e.getComponent<PlayerController>();
+
+                // since CCT capsule is rotated 90 deg internally we want to ignore rotation
                 pxTransform.q = physx::PxQuat(PxIdentity);
+
+                // we apply reverse offset since CCT does not have an actual shape
+                pxTransform.p -= physx::PxVec3(pc.offset.x, pc.offset.y, pc.offset.z);
+            }
 
             PhysXUtils::fromPhysXTransform(e, pxTransform, transform);
         }
