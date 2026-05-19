@@ -60,12 +60,14 @@ struct StateNode
     std::string id;
     AnimationEntry animationEntry;
     bool loop = true;
+    glm::vec2 pos;
 
     template <class Archive>
     void serialize(Archive& archive) {
         SERIALIZED_MEMBER_OPTIONAL(id);
         SERIALIZED_MEMBER_OPTIONAL(animationEntry);
         SERIALIZED_MEMBER_OPTIONAL(loop);
+        SERIALIZED_MEMBER_OPTIONAL(pos);
     }
 };
 
@@ -131,6 +133,9 @@ public:
     StateNode*  getState(size_t index)      { return index < m_states.size()      ? &m_states[index]      : nullptr; }
     Transition* getTransition(size_t index) { return index < m_transitions.size() ? &m_transitions[index] : nullptr; }
     Parameter*  getParameter(size_t index)  { return index < m_parameters.size()  ? &m_parameters[index]  : nullptr; }
+
+    glm::vec2 getNodeCenter(size_t index);
+    void setNodeCenter(size_t index, glm::vec2 pos);
 
     void removeParameter(size_t index)
     {

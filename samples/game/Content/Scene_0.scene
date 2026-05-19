@@ -476,7 +476,11 @@
                                                         }
                                                     }
                                                 },
-                                                "loop": true
+                                                "loop": true,
+                                                "pos": {
+                                                    "v.x": 300.0,
+                                                    "v.y": 68.0
+                                                }
                                             },
                                             {
                                                 "id": "Run",
@@ -489,7 +493,11 @@
                                                         }
                                                     }
                                                 },
-                                                "loop": true
+                                                "loop": true,
+                                                "pos": {
+                                                    "v.x": 444.0,
+                                                    "v.y": 180.0
+                                                }
                                             },
                                             {
                                                 "id": "Jump",
@@ -502,7 +510,11 @@
                                                         }
                                                     }
                                                 },
-                                                "loop": true
+                                                "loop": true,
+                                                "pos": {
+                                                    "v.x": 108.0,
+                                                    "v.y": 180.0
+                                                }
                                             },
                                             {
                                                 "id": "Attack",
@@ -515,7 +527,11 @@
                                                         }
                                                     }
                                                 },
-                                                "loop": true
+                                                "loop": true,
+                                                "pos": {
+                                                    "v.x": 300.0,
+                                                    "v.y": 260.0
+                                                }
                                             }
                                         ],
                                         "m_transitions": [

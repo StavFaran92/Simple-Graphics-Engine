@@ -322,10 +322,6 @@ static size_t             s_pendingFrom = SIZE_MAX;
 static uint64_t           s_ctxNode     = 0;
 static uint64_t           s_ctxLink     = 0;
 
-// Per-node bar width measured last frame (screen pixels) for sizing the top/bottom pin bars.
-static std::unordered_map<uint64_t, float>   s_nodeW;
-static std::unordered_map<uint64_t, ImVec2>  s_nodeScreenCenter; // node center, screen space
-
 // ---- Public API -----------------------------------------------------
 
 void AnimationGraphWindow::open(Animator* animator)
@@ -344,40 +340,6 @@ void AnimationGraphWindow::open(Animator* animator)
         cfg.SettingsFile = nullptr; // positions managed via JSON
         s_edCtx = ed::CreateEditor(&cfg);
     }
-}
-
-nlohmann::json AnimationGraphWindow::saveToJson()
-{
-    nlohmann::json j;
-    if (!s_graph) return j;
-
-    j["graph"] = s_graph->saveToJson();
-
-    if (s_edCtx)
-    {
-        ed::SetCurrentEditor(s_edCtx);
-        auto& layout = j["layout"];
-
-        const auto& states = s_graph->getStates();
-        for (size_t i = 0; i < states.size(); ++i)
-        {
-            ImVec2 pos = ed::GetNodePosition(nodeIdOf(i));
-            layout[states[i].id] = { {"x", pos.x}, {"y", pos.y} };
-        }
-        ImVec2 anyPos = ed::GetNodePosition(ed::NodeId(ANY_NODE_ID));
-        layout[AnimationGraph::ANY_STATE_ID] = { {"x", anyPos.x}, {"y", anyPos.y} };
-
-        ed::SetCurrentEditor(nullptr);
-    }
-    return j;
-}
-
-void AnimationGraphWindow::loadFromJson(const nlohmann::json& j)
-{
-    if (!s_graph) return;
-    if (j.contains("graph"))
-        s_graph->loadFromJson(j["graph"]);
-    s_firstFrame = true; // positions applied on first frame via SetNodePosition
 }
 
 // ---- display() ------------------------------------------------------
@@ -459,6 +421,16 @@ void AnimationGraphWindow::display()
         const auto* curState    = s_graph->getCurrentState();
         const std::string entryState    = s_graph->getEntryState();
 
+        if (s_firstFrame)
+        {
+            const auto& states = s_graph->getStates();
+            for (size_t i = 0; i < states.size(); ++i)
+            {
+                auto pos = s_graph->getNodeCenter(i);
+                ed::SetNodePosition(nodeIdOf(i), ImVec2(pos.x, pos.y));
+            }
+        }
+
         // ---- Tree/Sequence style: top input bar, content, bottom output bar ----
         const float rounding = 5.f;
         const float barH     = 14.f;
@@ -515,9 +487,9 @@ void AnimationGraphWindow::display()
                 ImVec2 cBR = ImGui::GetItemRectMax();
 
                 // Store center in screen space for manual link drawing
-                s_nodeScreenCenter[nid] = ImVec2(
+                s_graph->setNodeCenter(i, glm::vec2(
                     (cTL.x + cBR.x) * 0.5f,
-                    (cTL.y + cBR.y) * 0.5f);
+                    (cTL.y + cBR.y) * 0.5f));
 
             ed::EndNode();
             ed::PopStyleColor(1);
@@ -540,14 +512,9 @@ void AnimationGraphWindow::display()
                 for (size_t k = 0; k < states.size(); ++k)
                     if (states[k].id == id)
                     {
-                        auto it = s_nodeScreenCenter.find(nodeIdOf(k).Get());
-                        if (it != s_nodeScreenCenter.end()) return it->second;
+                        auto pos = s_graph->getNodeCenter(k);
+                        return ImVec2(pos.x, pos.y);
                     }
-                if (id == AnimationGraph::ANY_STATE_ID)
-                {
-                    auto it = s_nodeScreenCenter.find(ANY_NODE_ID);
-                    if (it != s_nodeScreenCenter.end()) return it->second;
-                }
                 return ImVec2(-1, -1);
             };
 
@@ -587,18 +554,13 @@ void AnimationGraphWindow::display()
             if (s_pendingFrom != SIZE_MAX && s_graph)
             {
                 uint64_t srcNid = nodeIdOf(s_pendingFrom).Get();
-                auto it = s_nodeScreenCenter.find(srcNid);
-                if (it != s_nodeScreenCenter.end())
-                {
-                    ImVec2 src = it->second;
-                    ImVec2 dst = ImGui::GetMousePos();
-                    dl->AddLine(src, dst, IM_COL32(255, 220, 60, 200), 2.f);
-                    dl->AddCircleFilled(dst, 5.f, IM_COL32(255, 220, 60, 220));
-                }
+                auto pos = s_graph->getNodeCenter(srcNid);
+                ImVec2 src(pos.x, pos.y);
+                ImVec2 dst = ImGui::GetMousePos();
+                dl->AddLine(src, dst, IM_COL32(255, 220, 60, 200), 2.f);
+                dl->AddCircleFilled(dst, 5.f, IM_COL32(255, 220, 60, 220));
             }
         }
-
-        // No drag-to-connect — transitions created via right-click menu only
 
         // -- Deletion (Delete key) --
         if (ed::BeginDelete())

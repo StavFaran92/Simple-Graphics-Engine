@@ -58,7 +58,7 @@ void AnimationGraph::init()
 
 void AnimationGraph::addState(StateNode state)
 {
-    m_states.push_back(std::move(state));
+    m_states.push_back(state);
 
     // only node avaiable -> make it entry node
     if (m_states.size() == 1)
@@ -143,6 +143,20 @@ void AnimationGraph::trigger(const std::string& name)
 const StateNode* AnimationGraph::getCurrentState() const
 {
     return findState(m_currentStateId);
+}
+
+glm::vec2 AnimationGraph::getNodeCenter(size_t index)
+{
+    auto state = getState(index);
+    if (!state) return {};
+    return state->pos;
+}
+
+void AnimationGraph::setNodeCenter(size_t index, glm::vec2 pos)
+{
+    auto state = getState(index);
+    if (!state) return;
+    state->pos = pos;
 }
 
 // ---- Private ----

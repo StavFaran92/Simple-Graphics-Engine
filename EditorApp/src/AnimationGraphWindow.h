@@ -10,7 +10,4 @@ class AnimationGraphWindow
 public:
     static void open(Animator* animator);
     static void display();
-
-    static nlohmann::json saveToJson();
-    static void           loadFromJson(const nlohmann::json& j);
 };
