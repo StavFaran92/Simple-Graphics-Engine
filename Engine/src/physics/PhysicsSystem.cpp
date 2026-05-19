@@ -15,6 +15,7 @@
 #include "component/PlayerControllerComponent.h"
 #include "memory/BuiltInAssets.h"
 #include "component/Terrain.h"
+#include "component/ObjectComponent.h"
 
 
 using namespace physx;
@@ -29,6 +30,35 @@ glm::mat4 PxTransformToMat4(const physx::PxTransform & transform)
 
     return mat;
 }
+
+class MyContactCallback : public PxSimulationEventCallback
+{
+public:
+    void onContact(const PxContactPairHeader& pairHeader,
+        const PxContactPair* pairs, PxU32 nbPairs) override
+    {
+        for (PxU32 i = 0; i < nbPairs; i++)
+        {
+            const PxContactPair& cp = pairs[i];
+
+            if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+            {
+                PxActor* a = pairHeader.actors[0];
+                PxActor* b = pairHeader.actors[1];
+
+                logDebug("contact!");
+                // your logic here
+            }
+        }
+    }
+
+    // must implement all pure virtuals even if unused
+    void onTrigger(PxTriggerPair* pairs, PxU32 count) override {}
+    void onWake(PxActor** actors, PxU32 count) override {}
+    void onSleep(PxActor** actors, PxU32 count) override {}
+    void onAdvance(const PxRigidBody* const*, const PxTransform*, PxU32) override {}
+    void onConstraintBreak(PxConstraintInfo*, PxU32) override {}
+};
 
 bool PhysicsSystem::init()
 {
@@ -75,13 +105,39 @@ bool PhysicsSystem::init()
     return true;
 }
 
+PxFilterFlags MyFilterShader(
+    PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+    PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+    PxPairFlags& pairFlags,
+    const void* constantBlock, PxU32 constantBlockSize)
+{
+    // let triggers through
+    if (PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
+    {
+        pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
+        return PxFilterFlag::eDEFAULT;
+    }
+
+    // normal collision + contact notifications
+    pairFlags = PxPairFlag::eCONTACT_DEFAULT
+        | PxPairFlag::eNOTIFY_TOUCH_FOUND
+        | PxPairFlag::eNOTIFY_TOUCH_LOST;
+
+    return PxFilterFlag::eDEFAULT;
+}
+
 physx::PxScene* PhysicsSystem::createScene()
 {
     physx::PxSceneDesc sceneDesc(m_physics->getTolerancesScale());
     sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
     m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = m_dispatcher;
+    //sceneDesc.filterShader = MyFilterShader;
     sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+    // register callback
+    //static MyContactCallback g_callback;
+    //sceneDesc.simulationEventCallback = &g_callback;
+
     physx::PxScene* scene = m_physics->createScene(sceneDesc);
 
     auto controllerManager = PxCreateControllerManager(*scene);
@@ -224,7 +280,8 @@ void PhysicsSystem::createCCTController(Scene* scene, entt::entity entity)
 
     desc.height = pc.height;
     desc.radius = pc.radius;
-    desc.position = physx::PxExtendedVec3(pos.x + pc.offset.x, pos.y + pc.offset.y, pos.z + pc.offset.z);
+    //desc.position = physx::PxExtendedVec3(pos.x + pc.offset.x, pos.y + pc.offset.y, pos.z + pc.offset.z);
+    desc.position = physx::PxExtendedVec3(pos.x, pos.y, pos.z);
     desc.material = m_defaultMaterial;
 
     //mType = desc.mType;
@@ -300,6 +357,11 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
 
         for (physx::PxRigidActor* actor : actors)
         {
+            //entity_id id = *(entity_id*)actor->userData;
+            //Entity e{ entt::entity(id), &scene->getRegistry() };
+            //auto& obj = e.getComponent<ObjectComponent>();
+            //logDebug("Physics debug render obj: {}", obj.name);
+
             physx::PxU32 nbShapes = actor->getNbShapes();
             std::vector<physx::PxShape*> shapes(nbShapes);
             actor->getShapes(shapes.data(), nbShapes);
@@ -310,6 +372,17 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                 physx::PxTransform localPose = shape->getLocalPose();
                 physx::PxTransform actorPose = actor->getGlobalPose();
                 physx::PxTransform worldPose = actorPose * localPose;
+                
+                PxRigidDynamic* dynamic = actor->is<PxRigidDynamic>();
+                if (dynamic)
+                {
+                    auto& flags = dynamic->getRigidBodyFlags();
+
+                    if (flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
+                    {
+                        worldPose.q = physx::PxQuat(PxIdentity);
+                    }
+                }
                 auto& model = PxTransformToMat4(worldPose);
                 
 
@@ -331,6 +404,38 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
                     auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
+                }
+
+                if (geometry.any().getType() == PxGeometryType::eCAPSULE)
+                {
+                    float radius = geometry.capsule().radius;
+                    float halfHeight = geometry.capsule().halfHeight;
+
+                    glm::mat4 topSphereModel = model;
+                    glm::mat4 bottomSphereModel = model;
+                    glm::mat4 cylinderModel = model;
+
+                    auto& cylinderMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CYLINDER);
+                    auto  cylinderVao = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
+                    auto& sphereMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
+                    auto  sphereVao = sphereMesh.resource()->getPrimaryMesh()->getVAO();
+
+                    // Top cap sphere
+                    topSphereModel = glm::translate(topSphereModel, glm::vec3(0.0f, halfHeight, 0.0f));
+                    topSphereModel = glm::scale(topSphereModel, glm::vec3(radius * 2.f));
+                    m_debugVisualizeShader->setModelMatrix(topSphereModel);
+                    RenderCommand::draw(sphereVao);
+
+                    // Bottom cap sphere
+                    bottomSphereModel = glm::translate(bottomSphereModel, glm::vec3(0.0f, -halfHeight, 0.0f));
+                    bottomSphereModel = glm::scale(bottomSphereModel, glm::vec3(radius * 2.f));
+                    m_debugVisualizeShader->setModelMatrix(bottomSphereModel);
+                    RenderCommand::draw(sphereVao);
+
+                    // Cylinder body
+                    cylinderModel = glm::scale(cylinderModel, glm::vec3(radius * 2.f, halfHeight * 2.f, radius * 2.f));
+                    m_debugVisualizeShader->setModelMatrix(cylinderModel);
+                    RenderCommand::draw(cylinderVao);
                 }
             }
         }
@@ -494,34 +599,32 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
         float terrainRowScale = (float)terrain.getHeight() / (PxReal)heightFieldDesc.nbRows;
         float terrainHeightScale = terrain.getScale() / 255.f;
 
-        PxTransform pose(PxVec3(-terrain.getHeight() / 2.f,
-            0.0f,
-            -terrain.getWidth() / 2.0f), PxQuat(PxIdentity));
-
-        body->setGlobalPose(pose);
-
         PxShape* shape = PxRigidActorExt::createExclusiveShape(*body,
             PxHeightFieldGeometry(heightField, PxMeshGeometryFlags(),
                 terrainHeightScale, terrainRowScale, terrainColScale),
             *getDefaultMaterial());
+
+
 
         if (!shape)
         {
             logError("createShape failed!");
             return;
         }
+
+        PxTransform pose(PxVec3(-terrain.getHeight() / 2.f,
+            0.0f,
+            -terrain.getWidth() / 2.0f), PxQuat(PxIdentity));
+
+        shape->setLocalPose(pose);
     }
 
     if (shape)
     {
 
-        auto translation = transform.getWorldPosition() + pc.offset;
-        auto orientation = transform.getWorldRotation();
-
-        physx::PxVec3 pxTranslation(translation.x, translation.y, translation.z);
-        pxTranslation -= body->getGlobalPose().p;
-        physx::PxQuat pxRotation(orientation.x, orientation.y, orientation.z, orientation.w);
-        pxRotation *= body->getGlobalPose().q.getConjugate();
+        //physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
+        physx::PxVec3 pxTranslation(PxIdentity);
+        physx::PxQuat pxRotation(PxIdentity);
 
         auto physxTransform = physx::PxTransform(pxTranslation, pxRotation);
 
@@ -562,6 +665,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
         {
             auto dynamicBody = static_cast<physx::PxRigidDynamic*>(actor);
             auto& flags = dynamicBody->getRigidBodyFlags();
+
             if (flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
             {
                 entity_id id = *(entity_id*)actor->userData;
@@ -581,31 +685,6 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                         rb.isChanged = false;
                     }
                 }
-
-                //if (e.HasComponent<PlayerController>())
-                //{
-                //    static const PxControllerFilters filters(NULL, NULL, NULL);
-
-                //    auto& pc = e.getComponent<PlayerController>();
-
-                //    auto iter = m_CCTControllers.find(physicsScene);
-                //    if (iter != m_CCTControllers.end())
-                //    {
-                //        auto controllerManager = iter->second;
-                //        auto CCTController = controllerManager->getController(pc.controllerIndex);
-                //        CCTController->move(physx::PxVec3(pc.disp.x, pc.disp.y, pc.disp.z), 0.0f, deltaTime, filters);
-                //    }
-
-                //    //physx::PxTransform targetPose = actor->getGlobalPose();
-                //    //targetPose.p += physx::PxVec3(rb.m_targetPisition.x, rb.m_targetPisition.y, rb.m_targetPisition.z);
-                //    //targetPose.q = physx::PxQuat(physx::PxIdentity);
-
-                //    //if (rb.isChanged)
-                //    //{
-                //    //    dynamicBody->setKinematicTarget(targetPose);
-                //    //    rb.isChanged = false;
-                //    //}
-                //}
             }
             else // Dynamic
             {
@@ -658,14 +737,6 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                 filters
             );
             pc.reset();
-
-            auto& transform = e.getComponent<Transformation>();
-
-            physx::PxTransform pxTransform = actor->getGlobalPose();
-
-            glm::vec3 translation(pxTransform.p.x - pc.offset.x, pxTransform.p.y - pc.offset.y, pxTransform.p.z - pc.offset.z);
-
-            transform.setWorldPosition(translation);
         }
     }
 
@@ -686,12 +757,16 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().colliderType == ColliderType::TERRAIN)
                 continue;
 
-            if (e.HasComponent<PlayerController>())
-                continue;
+            //if (e.HasComponent<PlayerController>())
+            //    continue;
 
             auto& transform = e.getComponent<Transformation>();
 
             physx::PxTransform pxTransform = actor->getGlobalPose();
+
+            if (e.HasComponent<PlayerController>())
+                pxTransform.q = physx::PxQuat(PxIdentity);
+
             PhysXUtils::fromPhysXTransform(e, pxTransform, transform);
         }
     }

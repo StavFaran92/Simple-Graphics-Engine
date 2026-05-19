@@ -43,7 +43,7 @@ public:
 		glm::vec3 translation(pxTransform.p.x, pxTransform.p.y, pxTransform.p.z);
 		glm::quat rotation(pxTransform.q.w, pxTransform.q.x, pxTransform.q.y, pxTransform.q.z);
 
-		transform.setWorldPosition(translation);
-		transform.setWorldRotation(rotation);
+		transform.setLocalPosition(translation);
+		transform.setLocalRotation(rotation);
 	}
 };

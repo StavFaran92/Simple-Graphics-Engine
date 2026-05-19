@@ -890,17 +890,6 @@ void Scene::draw(float deltaTime)
 					RenderCommand::draw(vao);
 				}
 
-				if (physics.colliderType == ColliderType::SPHERE)
-				{
-					auto collisionSphere = std::dynamic_pointer_cast<CollisionSphere>(physics.collider);
-					auto radius = collisionSphere->radius;
-					model = glm::scale(model, glm::vec3(radius * 2));
-					m_debugVisualizeShader->setModelMatrix(model);
-					auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
-					auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
-					RenderCommand::draw(vao);
-				}
-
 				if (physics.colliderType == ColliderType::CAPSULE)
 				{
 					auto collisionCapsule = std::dynamic_pointer_cast<CollisionCapsule>(physics.collider);
@@ -1026,7 +1015,7 @@ void Scene::draw(float deltaTime)
 
 		if (m_isSimulationActive)
 		{
-			//Engine::get()->getPhysicsSystem()->visualizePhysicsShapeDebug(this);
+			Engine::get()->getPhysicsSystem()->visualizePhysicsShapeDebug(this);
 		}
 
 		if (Engine::get()->getConfig().renderConfig.renderNonOpaquePass)
