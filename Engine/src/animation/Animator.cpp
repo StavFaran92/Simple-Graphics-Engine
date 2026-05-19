@@ -165,3 +165,14 @@ AnimationGraph& Animator::getAnimationGraph()
 {
 	return m_animationGraph;
 }
+
+std::vector<AssetRef<Asset>> Animator::gatherDependenciesInternal() const
+{
+	std::vector<AssetRef<Asset>> dependencies;
+	for (auto& aEntry : m_animations)
+	{
+		if(!aEntry.animation.isEmpty())
+			dependencies.push_back(aEntry.animation);
+	}
+	return dependencies;
+}

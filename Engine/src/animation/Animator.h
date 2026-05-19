@@ -53,6 +53,9 @@ private:
 	std::vector<AnimationEntry> m_animations;
 	AnimationGraph m_animationGraph;
 
+protected:
+	std::vector<AssetRef<Asset>> gatherDependenciesInternal() const override;
+
 };
 
 REGISTER_COMPONENT(Animator)

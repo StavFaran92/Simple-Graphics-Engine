@@ -19,6 +19,7 @@ public:
     void callCreate();
     void callUpdate(float dt);
     void callOnEvent(Entity entity, const Event& event);
+    void callOnCollide(Entity entity, Entity other);
     void callDestroy();
 
 private:

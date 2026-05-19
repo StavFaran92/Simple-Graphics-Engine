@@ -9,6 +9,8 @@
 #include "runtime/Entity.h"
 #include "core/Engine.h"
 #include "core/Event.h"
+#include "core/MouseEvents.h"
+#include "core/KeyboardEvents.h"
 
 struct LuaState
 {
@@ -114,8 +116,7 @@ void ScriptSystem::callUpdate(float dt)
         }
     }
 }
-#include "core/MouseEvents.h"
-#include "core/KeyboardEvents.h"
+
 void ScriptSystem::callOnEvent(Entity entity, const Event& event)
 {
     for (auto& state : impl_->scripts)
@@ -148,6 +149,28 @@ void ScriptSystem::callOnEvent(Entity entity, const Event& event)
 
 
                 //sol::protected_function_result result = fn(state.script, &event);
+                if (!result.valid()) {
+                    sol::error err = result;
+                    logError("Lua Error: {}", err.what());
+                }
+            }
+        }
+
+    }
+}
+
+void ScriptSystem::callOnCollide(Entity entity, Entity other)
+{
+    for (auto& state : impl_->scripts)
+    {
+        // TODO Should be optimized, no reason to iterate all the scripts for a single entity
+        if (state.entity == entity)
+        {
+            sol::protected_function fn = state.script["onCollide"];
+            if (fn.valid())
+            {
+                sol::protected_function_result result = fn(state.script, entity, other);
+
                 if (!result.valid()) {
                     sol::error err = result;
                     logError("Lua Error: {}", err.what());
