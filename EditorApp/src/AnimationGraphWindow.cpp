@@ -258,7 +258,7 @@ static void displayViewer(AnimationGraph* graph, size_t selStateIdx, size_t selT
         bool highlight = (selTransIdx == i);
         ImGui::PushID((int)i);
 
-        std::string label = "-> " + t->to;
+        std::string label = t->to;
         if (highlight)
             ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.3f, 0.5f, 0.8f, 1.f));
 
@@ -555,20 +555,31 @@ void AnimationGraphWindow::display()
             {
                 ImVec2 src = getCenterOf(t.from);
                 ImVec2 dst = getCenterOf(t.to);
-                //if (src.x < 0 || dst.x < 0) continue;
 
                 float dx = dst.x - src.x, dy = dst.y - src.y;
-                float len = sqrtf(dx*dx + dy*dy);
+                float len = sqrtf(dx * dx + dy * dy);
                 if (len < 1.f) continue;
                 float nx = dx / len, ny = dy / len;
 
-                dl->AddLine(src, dst, IM_COL32(180, 180, 180, 200), 1.5f);
+                // perpendicular offset
+                ImVec2 nDir(-ny, nx);
+                int perpOffset = 4;
+                src.x += nDir.x * perpOffset;
+                src.y += nDir.y * perpOffset;
+                dst.x += nDir.x * perpOffset;
+                dst.y += nDir.y * perpOffset;
 
-                // Arrowhead at 55% of the way (near midpoint, pointing toward dst)
+                // recompute direction from offset src/dst
+                dx = dst.x - src.x; dy = dst.y - src.y;
+                len = sqrtf(dx * dx + dy * dy);
+                nx = dx / len; ny = dy / len;
+
+                dl->AddLine(src, dst, IM_COL32(180, 180, 180, 200), 2.f);
+
                 const float aSize = 9.f;
                 ImVec2 tip(src.x + nx * len * 0.55f, src.y + ny * len * 0.55f);
-                ImVec2 b1(tip.x - nx*aSize - ny*aSize*0.5f, tip.y - ny*aSize + nx*aSize*0.5f);
-                ImVec2 b2(tip.x - nx*aSize + ny*aSize*0.5f, tip.y - ny*aSize - nx*aSize*0.5f);
+                ImVec2 b1(tip.x - nx * aSize - ny * aSize * 0.5f, tip.y - ny * aSize + nx * aSize * 0.5f);
+                ImVec2 b2(tip.x - nx * aSize + ny * aSize * 0.5f, tip.y - ny * aSize - nx * aSize * 0.5f);
                 dl->AddTriangleFilled(tip, b1, b2, IM_COL32(200, 200, 200, 230));
             }
 
@@ -592,16 +603,6 @@ void AnimationGraphWindow::display()
         // -- Deletion (Delete key) --
         if (ed::BeginDelete())
         {
-            ed::LinkId delLink;
-            while (ed::QueryDeletedLink(&delLink))
-            {
-                if (ed::AcceptDeletedItem())
-                {
-                    size_t ti = (size_t)delLink.Get() - 3000;
-                    if (ti < s_graph->getTransitions().size())
-                        s_graph->removeTransition(ti);
-                }
-            }
             ed::NodeId delNode;
             while (ed::QueryDeletedNode(&delNode))
             {
@@ -629,11 +630,6 @@ void AnimationGraphWindow::display()
                 s_ctxNode = ctxNodeId.Get();
                 ImGui::OpenPopup("##nodeCtx");
             }
-            else if (ed::ShowLinkContextMenu(&ctxLinkId))
-            {
-                s_ctxLink = ctxLinkId.Get();
-                ImGui::OpenPopup("##linkCtx");
-            }
             else if (ed::ShowBackgroundContextMenu())
                 ImGui::OpenPopup("##bgCtx");
 
@@ -659,30 +655,10 @@ void AnimationGraphWindow::display()
                 ImGui::EndPopup();
             }
 
-            //// Link context
-            //if (ImGui::BeginPopup("##linkCtx"))
-            //{
-            //    size_t ti = s_ctxLink - 3000;
-            //    if (ti < s_graph->getTransitions().size())
-            //        if (ImGui::MenuItem("Delete Transition"))
-            //            s_graph->removeTransition(ti);
-            //    ImGui::EndPopup();
-            //}
-
-            //// Background context
-            //if (ImGui::BeginPopup("##bgCtx"))
-            //{
-            //    if (s_pendingFrom != SIZE_MAX && ImGui::MenuItem("Cancel Transition"))
-            //        s_pendingFrom = SIZE_MAX;
-            //    else
-            //        ImGui::TextDisabled("(empty)");
-            //    ImGui::EndPopup();
-            //}
-
             ed::Resume();
         }
 
-        // -- Selection → complete pending transition or update viewer --
+        // -- Selection -> complete pending transition or update viewer
         {
             ed::NodeId selNodes[1];
             int selCount = ed::GetSelectedNodes(selNodes, 1);
@@ -713,14 +689,6 @@ void AnimationGraphWindow::display()
             else
             {
                 s_selState = SIZE_MAX;
-            }
-
-            ed::LinkId selLinks[1];
-            s_selTrans = SIZE_MAX;
-            if (ed::GetSelectedLinks(selLinks, 1) > 0)
-            {
-                uint64_t lid = selLinks[0].Get();
-                if (lid >= 3000) s_selTrans = lid - 3000;
             }
         }
     }
