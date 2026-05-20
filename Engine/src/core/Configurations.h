@@ -85,6 +85,13 @@ enum class RigidbodyType : int
 	Kinematic
 };
 
+enum class CollisionType : int
+{
+	Collider = 0,
+	Trigger,
+	QueryOnly
+};
+
 struct Color
 {
 	unsigned char r;

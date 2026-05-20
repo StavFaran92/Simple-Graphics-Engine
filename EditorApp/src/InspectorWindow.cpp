@@ -69,7 +69,12 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<PhysicsComponent>("Physics", [](PhysicsComponent& rBody) {
-			ImGui::Combo("##Type", (int*)&rBody.type, rigidyBodyTypesStrList, IM_ARRAYSIZE(rigidyBodyTypesStrList));
+			ImGui::LabelText("", "Actor Type");
+			ImGui::Combo("##ActorType", (int*)&rBody.rigidBodyType, rigidyBodyTypesStrList, IM_ARRAYSIZE(rigidyBodyTypesStrList));
+
+			ImGui::LabelText("", "Collision Type");
+			ImGui::Combo("##CollisionType", (int*)&rBody.collisionType, physicsCollisionTypesStrList, IM_ARRAYSIZE(physicsCollisionTypesStrList));
+
 			ImGui::InputFloat("Mass", &rBody.mass);
 
 			ImGui::LabelText("", "Linear Lock");
@@ -104,47 +109,49 @@ void InspectorWindow::display()
 				"None", "Box", "Sphere", "Terrain", "Mesh", "Capsule"
 			};
 
-			if (ImGui::Combo("Collider Type", (int*)&rBody.colliderType, colliderTypeNames, IM_ARRAYSIZE(colliderTypeNames))) {
-				switch (rBody.colliderType) {
-				case ColliderType::NONE: rBody.collider = 0; break;
-				case ColliderType::BOX: rBody.collider = std::make_shared<CollisionBox>(); break;
-				case ColliderType::SPHERE: rBody.collider = std::make_shared<CollisionSphere>(); break;
-				case ColliderType::TERRAIN: rBody.collider = std::make_shared<CollisionTerrain>(); break;
-				case ColliderType::MESH: rBody.collider = std::make_shared<CollisionMesh>(); break;
-				case ColliderType::CAPSULE: rBody.collider = std::make_shared<CollisionCapsule>(); break;
+			ImGui::LabelText("", "Shape");
+			if (ImGui::Combo("##Shape", (int*)&rBody.shapeType, colliderTypeNames, IM_ARRAYSIZE(colliderTypeNames))) {
+				switch (rBody.shapeType) {
+				case CollisionShape::NONE: rBody.collider = 0; break;
+				case CollisionShape::BOX: rBody.collider = std::make_shared<CollisionBox>(); break;
+				case CollisionShape::SPHERE: rBody.collider = std::make_shared<CollisionSphere>(); break;
+				case CollisionShape::TERRAIN: rBody.collider = std::make_shared<CollisionTerrain>(); break;
+				case CollisionShape::MESH: rBody.collider = std::make_shared<CollisionMesh>(); break;
+				case CollisionShape::CAPSULE: rBody.collider = std::make_shared<CollisionCapsule>(); break;
 				}
 			}
 
-			ColliderType type = rBody.colliderType;
+			CollisionShape type = rBody.shapeType;
 
-			if (type == ColliderType::NONE)
+			if (type == CollisionShape::NONE)
 			{
 				return;
 			}
 
+			ImGui::LabelText("", "Layer");
 			ImGui::Combo("##LayerMask", (int*)&rBody.collider->layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
 
 			switch (type) {
-			case ColliderType::BOX:
+			case CollisionShape::BOX:
 				if (auto* box = dynamic_cast<CollisionBox*>(rBody.collider.get())) {
 					ImGui::DragFloat3("Extents", &box->extents.x, .1f);
 				}
 				break;
-			case ColliderType::SPHERE:
+			case CollisionShape::SPHERE:
 				if (auto* sphere = dynamic_cast<CollisionSphere*>(rBody.collider.get())) {
 					ImGui::DragFloat("Radius", &sphere->radius, .1f);
 				}
 				break;
-			case ColliderType::CAPSULE:
+			case CollisionShape::CAPSULE:
 				if (auto* capsule = dynamic_cast<CollisionCapsule*>(rBody.collider.get())) {
 					ImGui::DragFloat("Radius", &capsule->radius, .1f);
 					ImGui::DragFloat("Height", &capsule->halfHeight, .1f);
 				}
 				break;
-			case ColliderType::TERRAIN:
+			case CollisionShape::TERRAIN:
 				ImGui::TextDisabled("Terrain collider has no editable parameters.");
 				break;
-			case ColliderType::MESH:
+			case CollisionShape::MESH:
 				if (auto* mesh = dynamic_cast<CollisionMesh*>(rBody.collider.get())) {
 					ImGui::Checkbox("Convex", &mesh->isConvex);
 					// Optional: display mesh ResourceWrapper name, etc.

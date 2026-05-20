@@ -59,7 +59,7 @@
                                 "data": {
                                     "localTranslation": {
                                         "v.x": 0.0,
-                                        "v.y": 0.0,
+                                        "v.y": -0.12796354293823243,
                                         "v.z": 0.0
                                     },
                                     "localRotation": {
@@ -215,7 +215,8 @@
                             "ptr_wrapper": {
                                 "id": 2147483656,
                                 "data": {
-                                    "type": 2,
+                                    "rigidBodyType": 2,
+                                    "collisionType": 0,
                                     "mass": 0.0,
                                     "collider": {
                                         "polymorphic_id": 2147483655,
@@ -223,12 +224,12 @@
                                         "ptr_wrapper": {
                                             "id": 2147483657,
                                             "data": {
-                                                "radius": 0.15000000596046449,
+                                                "radius": 0.20000000298023225,
                                                 "halfHeight": 0.699999988079071
                                             }
                                         }
                                     },
-                                    "colliderType": 5,
+                                    "shapeType": 5,
                                     "isLockedLinearX": false,
                                     "isLockedLinearY": false,
                                     "isLockedLinearZ": false,
@@ -458,7 +459,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483666,
                                 "data": {
-                                    "name": "temp",
+                                    "name": "attack_collider",
                                     "e": {
                                         "m_entity": 1048582
                                     }
@@ -470,7 +471,8 @@
                             "ptr_wrapper": {
                                 "id": 2147483667,
                                 "data": {
-                                    "type": 2,
+                                    "rigidBodyType": 2,
+                                    "collisionType": 1,
                                     "mass": 0.0,
                                     "collider": {
                                         "polymorphic_id": 2147483658,
@@ -486,7 +488,7 @@
                                             }
                                         }
                                     },
-                                    "colliderType": 1,
+                                    "shapeType": 1,
                                     "isLockedLinearX": false,
                                     "isLockedLinearY": false,
                                     "isLockedLinearZ": false,
@@ -496,7 +498,7 @@
                                     "offset": {
                                         "v.x": 0.10000000149011612,
                                         "v.y": 0.0,
-                                        "v.z": 1.2000000476837159
+                                        "v.z": 1.5
                                     }
                                 }
                             }
@@ -903,7 +905,8 @@
                             "ptr_wrapper": {
                                 "id": 2147483677,
                                 "data": {
-                                    "type": 1,
+                                    "rigidBodyType": 0,
+                                    "collisionType": 0,
                                     "mass": 0.0,
                                     "collider": {
                                         "polymorphic_id": 2147483659,
@@ -915,7 +918,7 @@
                                             }
                                         }
                                     },
-                                    "colliderType": 2,
+                                    "shapeType": 0,
                                     "isLockedLinearX": false,
                                     "isLockedLinearY": false,
                                     "isLockedLinearZ": false,
@@ -1129,7 +1132,8 @@
                             "ptr_wrapper": {
                                 "id": 2147483685,
                                 "data": {
-                                    "type": 0,
+                                    "rigidBodyType": 0,
+                                    "collisionType": 0,
                                     "mass": 0.0,
                                     "collider": {
                                         "polymorphic_id": 2147483662,
@@ -1141,7 +1145,7 @@
                                             }
                                         }
                                     },
-                                    "colliderType": 3,
+                                    "shapeType": 3,
                                     "isLockedLinearX": false,
                                     "isLockedLinearY": false,
                                     "isLockedLinearZ": false,

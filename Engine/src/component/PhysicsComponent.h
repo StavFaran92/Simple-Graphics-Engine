@@ -18,10 +18,11 @@ struct EngineAPI PhysicsComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(type);
-		SERIALIZED_MEMBER(mass);
-		SERIALIZED_MEMBER(collider);
-		SERIALIZED_MEMBER(colliderType);
+		SERIALIZED_MEMBER_OPTIONAL(rigidBodyType);
+		SERIALIZED_MEMBER_OPTIONAL(collisionType);
+		SERIALIZED_MEMBER_OPTIONAL(mass);
+		SERIALIZED_MEMBER_OPTIONAL(collider);
+		SERIALIZED_MEMBER_OPTIONAL(shapeType);
 		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearX);
 		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearY);
 		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearZ);
@@ -37,15 +38,16 @@ struct EngineAPI PhysicsComponent : public Component
 	bool isLockedAngularX = false;
 	bool isLockedAngularY = false;
 	bool isLockedAngularZ = false;
-	RigidbodyType type = RigidbodyType::Static;
+	RigidbodyType rigidBodyType = RigidbodyType::Static;
+	CollisionType collisionType = CollisionType::Collider;
+	CollisionShape shapeType = CollisionShape::NONE;
+	std::shared_ptr<Collider> collider;
 	float mass = 0;
 	bool isChanged = false;
 	glm::vec3 m_targetPisition{ 0 };
 	glm::vec3 m_force{ 0 };
 	void* simulatedBody = nullptr;
 
-	std::shared_ptr<Collider> collider;
-	ColliderType colliderType = ColliderType::NONE;
 	glm::vec3 offset{};
 
 	glm::vec3 m_parentCachedPos{ 0 };

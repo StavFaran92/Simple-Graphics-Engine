@@ -868,7 +868,7 @@ void Scene::draw(float deltaTime)
 				glm::mat4 model = transform.getWorldTransformation();
 				model = model * glm::translate(glm::mat4(1.0f), physics.offset);
 
-				if (physics.colliderType == ColliderType::BOX)
+				if (physics.shapeType == CollisionShape::BOX)
 				{
 					auto collisionBox = std::dynamic_pointer_cast<CollisionBox>(physics.collider);
 					auto extents = collisionBox->extents;
@@ -879,7 +879,7 @@ void Scene::draw(float deltaTime)
 					RenderCommand::draw(vao);
 				}
 
-				if (physics.colliderType == ColliderType::SPHERE)
+				if (physics.shapeType == CollisionShape::SPHERE)
 				{
 					auto collisionSphere = std::dynamic_pointer_cast<CollisionSphere>(physics.collider);
 					auto radius = collisionSphere->radius;
@@ -890,7 +890,7 @@ void Scene::draw(float deltaTime)
 					RenderCommand::draw(vao);
 				}
 
-				if (physics.colliderType == ColliderType::CAPSULE)
+				if (physics.shapeType == CollisionShape::CAPSULE)
 				{
 					auto collisionCapsule = std::dynamic_pointer_cast<CollisionCapsule>(physics.collider);
 					float radius = collisionCapsule->radius;

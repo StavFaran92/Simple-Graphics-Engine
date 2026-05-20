@@ -45,15 +45,37 @@ public:
             {
                 PxActor* a = pairHeader.actors[0];
                 PxActor* b = pairHeader.actors[1];
-
-                logDebug("contact!");
-                // your logic here
+                logDebug("contact found!");
             }
+
+            if (cp.events & PxPairFlag::eNOTIFY_TOUCH_LOST)
+            {
+                PxActor* a = pairHeader.actors[0];
+                PxActor* b = pairHeader.actors[1];
+                logDebug("contact lost!");
+            }            
         }
     }
 
     // must implement all pure virtuals even if unused
-    void onTrigger(PxTriggerPair* pairs, PxU32 count) override {}
+    void onTrigger(PxTriggerPair* pairs, PxU32 count) override
+    {
+        for (PxU32 i = 0; i < count; i++)
+        {
+            const PxTriggerPair& pair = pairs[i];
+
+            // skip deleted shapes
+            if (pair.flags & (PxTriggerPairFlag::eREMOVED_SHAPE_TRIGGER |
+                PxTriggerPairFlag::eREMOVED_SHAPE_OTHER))
+                continue;
+
+            if (pair.status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+                logDebug("trigger entered!");
+
+            if (pair.status & PxPairFlag::eNOTIFY_TOUCH_LOST)
+                logDebug("trigger exited!");
+        }
+    }
     void onWake(PxActor** actors, PxU32 count) override {}
     void onSleep(PxActor** actors, PxU32 count) override {}
     void onAdvance(const PxRigidBody* const*, const PxTransform*, PxU32) override {}
@@ -171,7 +193,7 @@ physx::PxRigidActor* PhysicsSystem::createRigidBody(Transformation& transform, P
     physx::PxTransform pxTransform = PhysXUtils::toPhysXTransform(transform);
     physx::PxRigidActor* body = nullptr;
 
-    if (rb.type == RigidbodyType::Dynamic || rb.type == RigidbodyType::Kinematic)
+    if (rb.rigidBodyType == RigidbodyType::Dynamic || rb.rigidBodyType == RigidbodyType::Kinematic)
     {
         body = m_physics->createRigidDynamic(pxTransform);
         auto dynamicBody = static_cast<physx::PxRigidDynamic*>(body);
@@ -184,12 +206,12 @@ physx::PxRigidActor* PhysicsSystem::createRigidBody(Transformation& transform, P
         dynamicBody->setAngularDamping(0.5f);
         physx::PxRigidBodyExt::updateMassAndInertia(*dynamicBody, rb.mass);
 
-        if (rb.type == RigidbodyType::Kinematic)
+        if (rb.rigidBodyType == RigidbodyType::Kinematic)
         {
             dynamicBody->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
         }
     }
-    else if (rb.type == RigidbodyType::Static)
+    else if (rb.rigidBodyType == RigidbodyType::Static)
     {
         body = m_physics->createRigidStatic(pxTransform);
     }
@@ -474,12 +496,12 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     auto& pc = e.getComponent<PhysicsComponent>();
     auto scale = transform.getWorldScale();
 
-    if (pc.colliderType == ColliderType::NONE)
+    if (pc.shapeType == CollisionShape::NONE)
     {
         return;
     }
 
-    if (pc.collider->getType() == ColliderType::BOX)
+    if (pc.collider->getType() == CollisionShape::BOX)
     {
         auto& collider = std::dynamic_pointer_cast<CollisionBox>(pc.collider);
         shape = createBoxShape(collider->extents.x * scale.x, collider->extents.y * scale.y, collider->extents.z * scale.z);
@@ -497,7 +519,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
         shape->setQueryFilterData(filterData);
     }
-    else if (pc.collider->getType() == ColliderType::SPHERE)
+    else if (pc.collider->getType() == CollisionShape::SPHERE)
     {
         auto& collider = std::dynamic_pointer_cast<CollisionSphere>(pc.collider);
         if (collider->radius <= 0)
@@ -516,7 +538,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
         shape->setQueryFilterData(filterData);
     }
-    else if (pc.collider->getType() == ColliderType::CAPSULE)
+    else if (pc.collider->getType() == CollisionShape::CAPSULE)
     {
         auto& collider = std::dynamic_pointer_cast<CollisionCapsule>(pc.collider);
         if (collider->radius <= 0 || collider->halfHeight <= 0)
@@ -535,7 +557,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
         shape->setQueryFilterData(filterData);
     }
-    else if (pc.collider->getType() == ColliderType::MESH)
+    else if (pc.collider->getType() == CollisionShape::MESH)
     {
         auto& collider = std::dynamic_pointer_cast<CollisionMesh>(pc.collider);
         const std::vector<glm::vec3>& apos = collider->mesh.get()->getPositions();
@@ -548,7 +570,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
         shape->setQueryFilterData(filterData);
     }
-    else if (pc.collider->getType() == ColliderType::TERRAIN)
+    else if (pc.collider->getType() == CollisionShape::TERRAIN)
     {
         auto& collider = std::static_pointer_cast<CollisionTerrain>(pc.collider);
         auto& terrain = e.getComponent<Terrain>();
@@ -620,6 +642,15 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
     if (shape)
     {
+        if (pc.collisionType == CollisionType::Trigger)
+        {
+            shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+            shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+        }
+        else if (pc.collisionType == CollisionType::QueryOnly)
+        {
+            shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+        }
 
         physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
         physx::PxQuat pxRotation(PxIdentity);
@@ -628,7 +659,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
         // PhysX capsules are X-axis aligned; compose a 90 deg Z rotation to make them Y-axis (upright)
         // This only applies to non CCT, CCT rotation is done internally by PhysX
-        if (pc.collider->getType() == ColliderType::CAPSULE)
+        if (pc.collider->getType() == CollisionShape::CAPSULE)
             physxTransform.q = physxTransform.q * physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0.0f, 0.0f, 1.0f));
 
         shape->setLocalPose(physxTransform);
@@ -762,7 +793,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             entity_id id = *(entity_id*)actor->userData;
             Entity e{ entt::entity(id),  &scene->getRegistry() };
 
-            if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().colliderType == ColliderType::TERRAIN)
+            if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().shapeType == CollisionShape::TERRAIN)
                 continue;
 
             auto& transform = e.getComponent<Transformation>();

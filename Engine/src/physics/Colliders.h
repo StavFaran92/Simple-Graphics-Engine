@@ -11,7 +11,7 @@
 
 class Mesh;
 
-enum class ColliderType : int
+enum class CollisionShape : int
 {
 	NONE,
 	BOX,
@@ -32,7 +32,7 @@ struct Collider
 		SERIALIZED_MEMBER(layerMask);
 	}
 
-	virtual ColliderType getType() const = 0;
+	virtual CollisionShape getType() const = 0;
 
 	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
 };
@@ -46,9 +46,9 @@ struct CollisionBox : public Collider
 		SERIALIZED_MEMBER(extents);
 	}
 
-	virtual ColliderType getType() const override
+	virtual CollisionShape getType() const override
 	{
-		return ColliderType::BOX;
+		return CollisionShape::BOX;
 	}
 
 	glm::vec3 extents{.5f};
@@ -63,9 +63,9 @@ struct CollisionSphere : public Collider
 		SERIALIZED_MEMBER(radius);
 	}
 
-	virtual ColliderType getType() const override
+	virtual CollisionShape getType() const override
 	{
-		return ColliderType::SPHERE;
+		return CollisionShape::SPHERE;
 	}
 
 	float radius = .5f;
@@ -81,9 +81,9 @@ struct CollisionCapsule : public Collider
 		SERIALIZED_MEMBER(halfHeight);
 	}
 
-	virtual ColliderType getType() const override
+	virtual CollisionShape getType() const override
 	{
-		return ColliderType::CAPSULE;
+		return CollisionShape::CAPSULE;
 	}
 
 	float radius = .5f;
@@ -100,9 +100,9 @@ struct CollisionMesh : public Collider
 		SERIALIZED_MEMBER(isConvex);
 	}
 
-	virtual ColliderType getType() const override
+	virtual CollisionShape getType() const override
 	{
-		return ColliderType::MESH;
+		return CollisionShape::MESH;
 	}
 
 	bool isConvex = false;
@@ -118,9 +118,9 @@ struct CollisionTerrain : Collider
 		SERIALIZED_MEMBER(layerMask);
 	}
 
-	virtual ColliderType getType() const override
+	virtual CollisionShape getType() const override
 	{
-		return ColliderType::TERRAIN;
+		return CollisionShape::TERRAIN;
 	}
 };
 

@@ -22,6 +22,12 @@ static const char* rigidyBodyTypesStrList[]{
 	"Kinematic"
 };
 
+static const char* physicsCollisionTypesStrList[]{
+	"Collider",
+	"Trigger",
+	"QueryOnly"
+};
+
 static const char* renderTechniqueStrList[]{
 	"Forward",
 	"Defererred"
