@@ -365,12 +365,6 @@
                                             "value": {
                                                 "m_entity": 5
                                             }
-                                        },
-                                        {
-                                            "key": 1048582,
-                                            "value": {
-                                                "m_entity": 1048582
-                                            }
                                         }
                                     ]
                                 }
@@ -432,7 +426,7 @@
                                 "data": {
                                     "localTranslation": {
                                         "v.x": 0.0,
-                                        "v.y": 0.0,
+                                        "v.y": 99.49516296386719,
                                         "v.z": 0.0
                                     },
                                     "localRotation": {
@@ -442,12 +436,12 @@
                                         "q.w": 1.0
                                     },
                                     "localScale": {
-                                        "v.x": 1.0,
-                                        "v.y": 1.0,
-                                        "v.z": 1.0
+                                        "v.x": 100.0,
+                                        "v.y": 100.0,
+                                        "v.z": 100.0
                                     },
                                     "m_parent": {
-                                        "m_entity": 7
+                                        "m_entity": 5
                                     },
                                     "entity": {
                                         "m_entity": 1048582
@@ -771,7 +765,14 @@
                                     "root": {
                                         "m_entity": 5
                                     },
-                                    "m_children": []
+                                    "m_children": [
+                                        {
+                                            "key": 1048582,
+                                            "value": {
+                                                "m_entity": 1048582
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         },

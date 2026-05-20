@@ -370,23 +370,10 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                 physx::PxTransform actorPose = actor->getGlobalPose();
                 physx::PxTransform worldPose = actorPose * localPose;
                 
-                // if actor is kinematic we want to ignore rotation when drawing the shape
-                PxRigidDynamic* dynamic = actor->is<PxRigidDynamic>();
-                if (dynamic)
-                {
-                    auto& flags = dynamic->getRigidBodyFlags();
-
-                    if (flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
-                    {
-                        worldPose.q = physx::PxQuat(PxIdentity);
-                    }
-                }
-                auto& model = PxTransformToMat4(worldPose);
-                
-
                 if (geometry.any().getType() == PxGeometryType::eBOX)
                 {
                     PxVec3 extents = geometry.box().halfExtents * 2.;
+                    auto& model = PxTransformToMat4(worldPose);
                     model = glm::scale(model, glm::vec3(extents.x, extents.y, extents.z));
                     m_debugVisualizeShader->setModelMatrix(model);
                     auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX);
@@ -397,6 +384,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                 if (geometry.any().getType() == PxGeometryType::eSPHERE)
                 {
                     float radius2 = geometry.sphere().radius * 2.;
+                    auto& model = PxTransformToMat4(worldPose);
                     model = glm::scale(model, glm::vec3(radius2));
                     m_debugVisualizeShader->setModelMatrix(model);
                     auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
@@ -406,6 +394,19 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
 
                 if (geometry.any().getType() == PxGeometryType::eCAPSULE)
                 {
+                    // if actor is kinematic we want to ignore rotation when drawing the capsule shape
+                    PxRigidDynamic* dynamic = actor->is<PxRigidDynamic>();
+                    if (dynamic)
+                    {
+                        auto& flags = dynamic->getRigidBodyFlags();
+
+                        if (flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
+                        {
+                            worldPose.q = physx::PxQuat(PxIdentity);
+                        }
+                    }
+                    auto& model = PxTransformToMat4(worldPose);
+
                     float radius = geometry.capsule().radius;
                     float halfHeight = geometry.capsule().halfHeight;
 
@@ -669,6 +670,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                 Entity e{ entt::entity(id), &scene->getRegistry()};
 
                 glm::vec3 parentDisp{ 0 };
+                glm::quat parentQuat = glm::identity<glm::quat>();
 
                 if (e.HasComponent<PhysicsComponent>())
                 {
@@ -681,11 +683,13 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                         glm::vec3 parentNewPos = parentTrasnform.getWorldPosition();
                         parentDisp = rb.m_parentCachedPos - parentNewPos;
                         rb.m_parentCachedPos = parentNewPos;
+
+                        parentQuat = parentTrasnform.getWorldRotation();
                     }
 
                     physx::PxTransform targetPose = actor->getGlobalPose();
                     targetPose.p += physx::PxVec3(rb.m_targetPisition.x - parentDisp.x, rb.m_targetPisition.y - parentDisp.y, rb.m_targetPisition.z - parentDisp.z);
-                    targetPose.q = physx::PxQuat(physx::PxIdentity);
+                    targetPose.q = physx::PxQuat(parentQuat.x, parentQuat.y, parentQuat.z, parentQuat.w);
 
                     dynamicBody->setKinematicTarget(targetPose);
                 }
