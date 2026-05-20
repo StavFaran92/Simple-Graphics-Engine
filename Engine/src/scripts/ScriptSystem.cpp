@@ -159,17 +159,52 @@ void ScriptSystem::callOnEvent(Entity entity, const Event& event)
     }
 }
 
-void ScriptSystem::callOnCollide(Entity entity, Entity other)
+void ScriptSystem::callOnCollide(CollisionType collisionType, Entity entity, Entity other)
 {
+    std::string funcName;
+    if (collisionType == CollisionType::COLLISION_ENTER)
+    {
+        funcName = "onCollisionEnter";
+    }
+    else if (collisionType == CollisionType::COLLISION_EXIT)
+    {
+        funcName = "onCollisionExit";
+    }
+    if (collisionType == CollisionType::TRIGGER_ENTER)
+    {
+        funcName = "onTriggerEnter";
+    }
+    else if (collisionType == CollisionType::TRIGGER_EXIT)
+    {
+        funcName = "onTriggerExit";
+    }
+
+    assert(!funcName.empty());
+
     for (auto& state : impl_->scripts)
     {
         // TODO Should be optimized, no reason to iterate all the scripts for a single entity
         if (state.entity == entity)
         {
-            sol::protected_function fn = state.script["onCollide"];
+            sol::protected_function fn = state.script[funcName];
             if (fn.valid())
             {
                 sol::protected_function_result result = fn(state.script, entity, other);
+
+                if (!result.valid()) {
+                    sol::error err = result;
+                    logError("Lua Error: {}", err.what());
+                }
+            }
+        }
+
+        // TODO Should be optimized, no reason to iterate all the scripts for a single entity
+        else if (state.entity == other)
+        {
+            sol::protected_function fn = state.script[funcName];
+            if (fn.valid())
+            {
+                sol::protected_function_result result = fn(state.script, other, entity);
 
                 if (!result.valid()) {
                     sol::error err = result;

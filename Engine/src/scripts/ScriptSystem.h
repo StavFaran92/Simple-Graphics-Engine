@@ -9,6 +9,14 @@
 class ScriptSystem : public SubSystem
 {
 public:
+    enum class CollisionType
+    {
+        TRIGGER_ENTER,
+        TRIGGER_EXIT,
+        COLLISION_ENTER,
+        COLLISION_EXIT
+    };
+public:
     ScriptSystem();
     ~ScriptSystem();
 
@@ -19,7 +27,7 @@ public:
     void callCreate();
     void callUpdate(float dt);
     void callOnEvent(Entity entity, const Event& event);
-    void callOnCollide(Entity entity, Entity other);
+    void callOnCollide(CollisionType, Entity entity, Entity other);
     void callDestroy();
 
 private:

@@ -78,5 +78,9 @@ function Script:update(entity, dt)
     self.physics:move(moveVector)
 end
 
+function Script:onTriggerEnter(entity, other)
+    print("Enemy hit!")
+end
+
 function Script:destroy(entity)
 end

@@ -16,6 +16,8 @@
 #include "memory/BuiltInAssets.h"
 #include "component/Terrain.h"
 #include "component/ObjectComponent.h"
+#include "scripts/ScriptSystem.h"
+#include "runtime/Context.h"
 
 
 using namespace physx;
@@ -45,15 +47,31 @@ public:
             {
                 PxActor* a = pairHeader.actors[0];
                 PxActor* b = pairHeader.actors[1];
-                logDebug("contact found!");
+                
+                entity_id id1 = *(entity_id*)a->userData;
+                Entity e1{ entt::entity(id1), &Engine::get()->getContext()->getActiveScene()->getRegistry() };
+
+                entity_id id2 = *(entity_id*)b->userData;
+                Entity e2{ entt::entity(id2), &Engine::get()->getContext()->getActiveScene()->getRegistry() };
+
+                Engine::get()->getSubSystem<ScriptSystem>()->callOnCollide(ScriptSystem::CollisionType::COLLISION_ENTER, e1, e2);
             }
 
             if (cp.events & PxPairFlag::eNOTIFY_TOUCH_LOST)
             {
                 PxActor* a = pairHeader.actors[0];
                 PxActor* b = pairHeader.actors[1];
-                logDebug("contact lost!");
-            }            
+                
+                entity_id id1 = *(entity_id*)a->userData;
+                Entity e1{ entt::entity(id1), &Engine::get()->getContext()->getActiveScene()->getRegistry() };
+
+                entity_id id2 = *(entity_id*)b->userData;
+                Entity e2{ entt::entity(id2), &Engine::get()->getContext()->getActiveScene()->getRegistry() };
+
+                Engine::get()->getSubSystem<ScriptSystem>()->callOnCollide(ScriptSystem::CollisionType::COLLISION_EXIT, e1, e2);
+            }    
+
+
         }
     }
 
@@ -70,10 +88,28 @@ public:
                 continue;
 
             if (pair.status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
-                logDebug("trigger entered!");
+            {
+                entity_id id1 = *(entity_id*)pair.triggerActor->userData;
+                Entity e1{ entt::entity(id1), &Engine::get()->getContext()->getActiveScene()->getRegistry()};
+
+                entity_id id2 = *(entity_id*)pair.otherActor->userData;
+                Entity e2{ entt::entity(id2), &Engine::get()->getContext()->getActiveScene()->getRegistry() };
+
+                Engine::get()->getSubSystem<ScriptSystem>()->callOnCollide(ScriptSystem::CollisionType::TRIGGER_ENTER, e1, e2);
+            }
 
             if (pair.status & PxPairFlag::eNOTIFY_TOUCH_LOST)
-                logDebug("trigger exited!");
+            {
+                entity_id id1 = *(entity_id*)pair.triggerActor->userData;
+                Entity e1{ entt::entity(id1), &Engine::get()->getContext()->getActiveScene()->getRegistry() };
+
+                entity_id id2 = *(entity_id*)pair.otherActor->userData;
+                Entity e2{ entt::entity(id2), &Engine::get()->getContext()->getActiveScene()->getRegistry() };
+
+                Engine::get()->getSubSystem<ScriptSystem>()->callOnCollide(ScriptSystem::CollisionType::TRIGGER_EXIT, e1, e2);
+            }
+
+
         }
     }
     void onWake(PxActor** actors, PxU32 count) override {}
