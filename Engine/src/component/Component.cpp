@@ -119,6 +119,16 @@ std::vector<AssetRef<Asset>> Component::gatherDependencies() const
 	return result;
 }
 
+void Component::activate()
+{
+	isActive = true;
+}
+
+void Component::deactivate()
+{
+	isActive = false;
+}
+
 std::vector<AssetRef<Asset>> Component::gatherDependenciesInternal() const
 {
 	return {};

@@ -36,6 +36,7 @@ struct EngineAPI MeshRendererComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(mesh);
 		SERIALIZED_MEMBER(count);
 		SERIALIZED_MEMBER(m_material);

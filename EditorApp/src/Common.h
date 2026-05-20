@@ -95,58 +95,55 @@ static void setupScene()
 	g_primaryCamera = scene->getGameCamera();
 }
 
-template<typename T> 
+template<typename T>
 static void displayComponent(const std::string& componentName, std::function<void(T&)> func)
 {
-	if (state.getSelectedEntity().HasComponent<T>())
+	if (!state.getSelectedEntity().HasComponent<T>())
+		return;
+
+	auto& component = state.getSelectedEntity().getComponent<T>();
+
+	ImGui::PushID(componentName.c_str());
+
+	bool open = ImGui::CollapsingHeader(componentName.c_str(),
+		ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap);
+	ImGui::SetItemAllowOverlap();
+
+	ImVec2 afterHeaderCursor = ImGui::GetCursorPos();
+	ImVec2 windowSize = ImGui::GetWindowSize();
+	float headerY = afterHeaderCursor.y - ImGui::GetFrameHeight() - ImGui::GetStyle().ItemSpacing.y;
+	float rightX = windowSize.x - 8.0f;
+
+	if (!std::is_same<T, Transformation>::value)
 	{
-		ImVec2 startPos = ImGui::GetCursorScreenPos();
-		ImVec2 startPosCursor = ImGui::GetCursorPos(); // Capture the initial cursor position
-
-		displayColoredLabelWidget(componentName.c_str());
-		auto& component = state.getSelectedEntity().getComponent<T>();
-
-		ImVec2 cursorPos = ImGui::GetCursorPos();
-		ImVec2 windowSize = ImGui::GetWindowSize();
-
-		if (!std::is_same<T, Transformation>::value)
+		rightX -= 18.0f;
+		ImGui::SetCursorPos(ImVec2(rightX, headerY + 2.0f));
+		if (ImGui::SmallButton("X"))
 		{
-			ImGui::SetCursorPos(ImVec2(windowSize.x - 24.0f, cursorPos.y - ImGui::GetTextLineHeightWithSpacing() - 8.0f));
-			ImGui::PushID(componentName.c_str());
-			ImVec2 size(10, 10); // size of the hitbox
-
-			auto pos = ImGui::GetCursorPos();
-			if (ImGui::InvisibleButton("##X", size))
-			{
-				state.getSelectedEntity().RemoveComponent<T>();
-				ImGui::EndGroup();
-				updateScene();
-				return;
-			}
-			ImGui::SetCursorPos(pos);
-			ImGui::Text("X"); // draw your own label or icon
-			
+			ImGui::SetCursorPos(afterHeaderCursor);
 			ImGui::PopID();
+			state.getSelectedEntity().RemoveComponent<T>();
+			updateScene();
+			return;
 		}
 
-		ImGui::Dummy(ImVec2(0, 5));
+		rightX -= 26.0f;
+		ImGui::SetCursorPos(ImVec2(rightX, headerY));
+		ImGui::Checkbox("##isActive", &component.isActive);
 
-		ImGui::Indent(5); // Indent by 10 pixels
-		func(component);
-		ImGui::Unindent(5); // Remove the indent
-
-		ImVec2 endPosCursor = ImGui::GetCursorPos(); // Capture the cursor position before adding the separator
-		ImVec2 endPos = ImVec2(startPos.x + ImGui::GetContentRegionAvail().x, startPos.y + (endPosCursor.y - startPosCursor.y));
-
-		ImGui::Dummy(ImVec2(0, 4));
-
-		ImGui::Separator();
-
-		ImGui::Dummy(ImVec2(0, 4));
-
-		// Adjust the rectangle to the correct end position
-		//ImGui::GetWindowDrawList()->AddRect(startPos, endPos, ImGui::GetColorU32(ImGuiCol_Header), 0.f, 0, 2.f);
+		ImGui::SetCursorPos(afterHeaderCursor);
 	}
+
+	if (open)
+	{
+		ImGui::Dummy(ImVec2(0, 4));
+		ImGui::Indent(5);
+		func(component);
+		ImGui::Unindent(5);
+		ImGui::Dummy(ImVec2(0, 4));
+	}
+
+	ImGui::PopID();
 }
 
 void focusOnEntity(Entity e, Entity cameraEntity);

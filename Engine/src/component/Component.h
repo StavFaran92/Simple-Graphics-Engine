@@ -34,18 +34,24 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER_OPTIONAL2(isActive, true);
 	}
 
 	//void registerSceneDependency(SceneResourceRef& scene) const;
 	//void removeSceneDependency(SceneResourceRef& scene) const;
 
 	std::vector<AssetRef<Asset>> gatherDependencies() const;
+	void activate();
+	void deactivate();
 
 
 	virtual std::string getName() = 0;
 	virtual void onInit(SceneResourceRef& scene) {};
 	virtual void resolve(SceneResourceRef& scene) {};
 	virtual void postLoad(SceneResourceRef& scene) {};
+
+public:
+	bool isActive = true;
 
 protected:
 	virtual std::vector<AssetRef<Asset>> gatherDependenciesInternal() const;
@@ -122,6 +128,7 @@ struct TestComp : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(test);
 		SERIALIZED_MEMBER_OPTIONAL(test2);
 	}

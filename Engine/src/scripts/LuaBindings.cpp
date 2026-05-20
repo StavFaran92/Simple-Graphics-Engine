@@ -425,7 +425,11 @@ void bindComponents(sol::state& lua)
     lua.new_usertype<PhysicsComponent>("PhysicsComponent",
         "addForce", &PhysicsComponent::addForce,
         "setForce", &PhysicsComponent::setForce,
-        "move", &PhysicsComponent::move
+        "move", &PhysicsComponent::move,
+        "turnToKinematic", [](PhysicsComponent& self) { self.setRigidBodyType(RigidbodyType::Kinematic); },
+        "turnToDynamic", [](PhysicsComponent& self) { self.setRigidBodyType(RigidbodyType::Dynamic); },
+        "activate", &PhysicsComponent::activate,
+        "deactivate", &PhysicsComponent::deactivate
     );
 }
 

@@ -11,6 +11,7 @@ struct EngineAPI CameraComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(center);
 		SERIALIZED_MEMBER(up);
 		SERIALIZED_MEMBER(fovyRadians);

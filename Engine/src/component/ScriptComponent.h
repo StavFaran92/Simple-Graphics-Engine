@@ -22,6 +22,7 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(script);
 		SERIALIZED_MEMBER(entity);
 	}

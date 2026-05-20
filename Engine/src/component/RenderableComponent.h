@@ -11,6 +11,7 @@ struct EngineAPI RenderableComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(renderTechnique);
 	}
 

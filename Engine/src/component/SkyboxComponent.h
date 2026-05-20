@@ -16,6 +16,7 @@ struct EngineAPI SkyboxComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(originalImage);
 		SERIALIZED_MEMBER(m_irradianceMap);
 		SERIALIZED_MEMBER(m_prefilterEnvMap);

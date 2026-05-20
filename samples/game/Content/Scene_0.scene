@@ -57,6 +57,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483650,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": -0.12796354293823243,
@@ -92,6 +93,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483651,
                                 "data": {
+                                    "isActive": true,
                                     "mesh": {
                                         "uuid": {
                                             "m_value": 63
@@ -134,6 +136,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483652,
                                 "data": {
+                                    "isActive": true,
                                     "name": "model",
                                     "e": {
                                         "m_entity": 10
@@ -147,6 +150,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483653,
                                 "data": {
+                                    "isActive": true,
                                     "renderTechnique": 1
                                 }
                             }
@@ -161,6 +165,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483654,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": 2.922130823135376,
@@ -202,6 +207,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483655,
                                 "data": {
+                                    "isActive": true,
                                     "name": "zombie",
                                     "e": {
                                         "m_entity": 9
@@ -215,6 +221,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483656,
                                 "data": {
+                                    "isActive": true,
                                     "rigidBodyType": 2,
                                     "collisionType": 0,
                                     "mass": 0.0,
@@ -250,6 +257,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483658,
                                 "data": {
+                                    "isActive": true,
                                     "script": {
                                         "uuid": {
                                             "m_value": 61
@@ -271,6 +279,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483659,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": -0.9082913398742676,
@@ -312,6 +321,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483660,
                                 "data": {
+                                    "isActive": true,
                                     "name": "cameraPivot",
                                     "e": {
                                         "m_entity": 8
@@ -329,6 +339,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483661,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": 1.6950000524520875,
@@ -376,6 +387,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483662,
                                 "data": {
+                                    "isActive": true,
                                     "name": "player",
                                     "e": {
                                         "m_entity": 7
@@ -388,6 +400,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483663,
                                 "data": {
+                                    "isActive": true,
                                     "script": {
                                         "uuid": {
                                             "m_value": 32
@@ -405,6 +418,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483664,
                                 "data": {
+                                    "isActive": true,
                                     "height": 1.0,
                                     "radius": 0.20000000298023225,
                                     "offset": {
@@ -425,6 +439,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483665,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": 99.49516296386719,
@@ -459,6 +474,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483666,
                                 "data": {
+                                    "isActive": true,
                                     "name": "attack_collider",
                                     "e": {
                                         "m_entity": 1048582
@@ -471,6 +487,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483667,
                                 "data": {
+                                    "isActive": false,
                                     "rigidBodyType": 2,
                                     "collisionType": 1,
                                     "mass": 0.0,
@@ -742,6 +759,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483670,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": -0.994951605796814,
@@ -783,6 +801,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483671,
                                 "data": {
+                                    "isActive": true,
                                     "mesh": {
                                         "uuid": {
                                             "m_value": 82
@@ -808,6 +827,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483672,
                                 "data": {
+                                    "isActive": true,
                                     "name": "model",
                                     "e": {
                                         "m_entity": 5
@@ -820,6 +840,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483673,
                                 "data": {
+                                    "isActive": true,
                                     "renderTechnique": 1
                                 }
                             }
@@ -834,6 +855,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483674,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": -9.99788761138916,
                                         "v.y": 11.924503326416016,
@@ -868,6 +890,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483675,
                                 "data": {
+                                    "isActive": true,
                                     "mesh": {
                                         "uuid": {
                                             "m_value": 11
@@ -893,6 +916,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483676,
                                 "data": {
+                                    "isActive": true,
                                     "name": "Sphere_0",
                                     "e": {
                                         "m_entity": 4
@@ -905,6 +929,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483677,
                                 "data": {
+                                    "isActive": true,
                                     "rigidBodyType": 0,
                                     "collisionType": 0,
                                     "mass": 0.0,
@@ -943,6 +968,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483679,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": 0.0,
@@ -977,6 +1003,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483680,
                                 "data": {
+                                    "isActive": true,
                                     "name": "Skybox",
                                     "e": {
                                         "m_entity": 3
@@ -990,6 +1017,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483681,
                                 "data": {
+                                    "isActive": true,
                                     "originalImage": {
                                         "uuid": {
                                             "m_value": 26
@@ -1024,6 +1052,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483682,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": 0.0,
@@ -1059,6 +1088,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483683,
                                 "data": {
+                                    "isActive": true,
                                     "m_mesh": {
                                         "uuid": {
                                             "m_value": 12
@@ -1120,6 +1150,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483684,
                                 "data": {
+                                    "isActive": true,
                                     "name": "Terrain",
                                     "e": {
                                         "m_entity": 2
@@ -1132,6 +1163,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483685,
                                 "data": {
+                                    "isActive": true,
                                     "rigidBodyType": 0,
                                     "collisionType": 0,
                                     "mass": 0.0,
@@ -1171,6 +1203,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483687,
                                 "data": {
+                                    "isActive": true,
                                     "center": {
                                         "v.x": 0.07713491469621659,
                                         "v.y": 2.972238302230835,
@@ -1198,6 +1231,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483688,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.07713434845209122,
                                         "v.y": 3.28147029876709,
@@ -1232,6 +1266,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483689,
                                 "data": {
+                                    "isActive": true,
                                     "mesh": {
                                         "uuid": {
                                             "m_value": 13
@@ -1257,6 +1292,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483690,
                                 "data": {
+                                    "isActive": true,
                                     "name": "Main Camera",
                                     "e": {
                                         "m_entity": 1
@@ -1274,6 +1310,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483691,
                                 "data": {
+                                    "isActive": true,
                                     "localTranslation": {
                                         "v.x": 0.0,
                                         "v.y": 0.0,
@@ -1308,6 +1345,7 @@
                             "ptr_wrapper": {
                                 "id": 2147483692,
                                 "data": {
+                                    "isActive": true,
                                     "name": "Directional light",
                                     "e": {
                                         "m_entity": 0

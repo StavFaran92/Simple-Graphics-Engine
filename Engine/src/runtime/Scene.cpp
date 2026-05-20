@@ -856,7 +856,11 @@ void Scene::draw(float deltaTime)
 
 				m_debugVisualizeShader->setViewMatrix(graphics->view);
 				m_debugVisualizeShader->setProjectionMatrix(graphics->projection);
-				m_debugVisualizeShader->setUniformValue("color", glm::vec3(0, 1, 0));
+
+				if(physics.isActive)
+					m_debugVisualizeShader->setUniformValue("color", glm::vec3(0, 1, 0));
+				else 
+					m_debugVisualizeShader->setUniformValue("color", glm::vec3(.8, .8, .8));
 
 				glDisable(GL_DEPTH_TEST);
 

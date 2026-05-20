@@ -14,6 +14,7 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(mesh);
 		SERIALIZED_MEMBER(material);
 	}

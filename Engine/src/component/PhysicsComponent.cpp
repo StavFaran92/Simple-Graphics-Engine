@@ -17,3 +17,8 @@ void PhysicsComponent::move(glm::vec3 position)
 	m_targetPisition = position;
 	isChanged = true;
 }
+
+void PhysicsComponent::setRigidBodyType(RigidbodyType type)
+{
+	rigidBodyType = type;
+}

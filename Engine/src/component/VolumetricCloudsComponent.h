@@ -17,6 +17,7 @@ struct EngineAPI VolumetricCloudsComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		//SERIALIZED_MEMBER(entity);
 		//SERIALIZED_MEMBER(waterBodyNormal);
 		//SERIALIZED_MEMBER(wave1Speed);

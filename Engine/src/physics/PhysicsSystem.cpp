@@ -729,13 +729,31 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
         for (physx::PxRigidActor* actor : actors)
         {
             auto dynamicBody = static_cast<physx::PxRigidDynamic*>(actor);
-            auto& flags = dynamicBody->getRigidBodyFlags();
 
+            entity_id id = *(entity_id*)actor->userData;
+            Entity e{ entt::entity(id), &scene->getRegistry() };
+
+            // Do not update inactive actors
+            if (e.HasComponent<PhysicsComponent>())
+            {
+                auto& rb = e.getComponent<PhysicsComponent>();
+                if (!rb.isActive)
+                {
+                    actor->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+                    continue;
+                }
+
+                dynamicBody->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, rb.rigidBodyType == RigidbodyType::Kinematic);
+            }
+
+            actor->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+
+            
+            
+
+            auto& flags = dynamicBody->getRigidBodyFlags();
             if (flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
             {
-                entity_id id = *(entity_id*)actor->userData;
-                Entity e{ entt::entity(id), &scene->getRegistry()};
-
                 glm::vec3 parentDisp{ 0 };
                 glm::quat parentQuat = glm::identity<glm::quat>();
 
@@ -763,8 +781,6 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             }
             else // Dynamic
             {
-                entity_id id = *(entity_id*)actor->userData;
-                Entity e{ entt::entity(id),  &scene->getRegistry() };
                 auto& rb = e.getComponent<PhysicsComponent>();
 
                 if (rb.isChanged)
@@ -818,11 +834,11 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
 
 
     // Retrieve Graphics transform from Physics transform
-    physx::PxU32 nbActors = physicsScene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC);
+    physx::PxU32 nbActors = physicsScene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC);
     if (nbActors)
     {
         std::vector<physx::PxRigidActor*> actors(nbActors);
-        physicsScene->getActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC | physx::PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<physx::PxActor**>(&actors[0]), nbActors);
+        physicsScene->getActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC, reinterpret_cast<physx::PxActor**>(&actors[0]), nbActors);
 
         for (physx::PxRigidActor* actor : actors)
         {

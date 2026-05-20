@@ -14,6 +14,7 @@ struct EngineAPI ObjectComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(name);
 		SERIALIZED_MEMBER(e);
 	}

@@ -20,6 +20,7 @@ function Script:create(entity)
     self.transform = entity.Transform
     self.cameraPivot = entity:getChildByName("cameraPivot")
     self.model = entity:getChildByName("model")
+    self.attack_collider = self.model:getChildByName("attack_collider").Physics
     self.pc = entity.PlayerController
     self.modelTransform = self.model.Transform
     self.animator = self.model.Animator
@@ -147,6 +148,7 @@ function Script:onEvent(e)
     if e:type() == EventType.MouseButtonPressed then
         if e.button == MouseButton.Left then
             self.animator:getGraph():trigger("attack")
+            self.attack_collider:activate()
         end
     end
 

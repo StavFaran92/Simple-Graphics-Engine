@@ -120,6 +120,7 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(localTranslation); 
 		SERIALIZED_MEMBER(localRotation);
 		SERIALIZED_MEMBER(localScale); 

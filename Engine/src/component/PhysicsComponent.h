@@ -15,9 +15,11 @@ struct EngineAPI PhysicsComponent : public Component
 	void setForce(glm::vec3 force);
 
 	void move(glm::vec3 position);
+	void setRigidBodyType(RigidbodyType type);
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER_OPTIONAL(rigidBodyType);
 		SERIALIZED_MEMBER_OPTIONAL(collisionType);
 		SERIALIZED_MEMBER_OPTIONAL(mass);

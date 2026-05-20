@@ -10,12 +10,24 @@
 
 #define SERIALIZED_MEMBER(member) archive(CEREAL_NVP(member));
 
+// Call this first in every derived Component::serialize to persist the base fields (e.g. isActive).
+// Cereal does not chain base class serialize automatically, even with polymorphism registered.
+#define SERIALIZE_COMPONENT_BASE Component::serialize(archive);
+
 #define SERIALIZED_MEMBER_OPTIONAL(member)		\
 	try {												\
 		archive(CEREAL_NVP(member));					\
 	}													\
 	catch (const cereal::Exception&) {					\
 		member = {};									\
+	};
+
+#define SERIALIZED_MEMBER_OPTIONAL2(member, value)		\
+	try {												\
+		archive(CEREAL_NVP(member));					\
+	}													\
+	catch (const cereal::Exception&) {					\
+		member = value;									\
 	};
 
 namespace glm

@@ -36,6 +36,7 @@ struct EngineAPI NativeScriptComponent : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(entity);
 		SERIALIZED_MEMBER(script);
 	}

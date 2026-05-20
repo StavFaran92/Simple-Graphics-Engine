@@ -11,6 +11,7 @@ struct EngineAPI PlayerController : public Component
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER_OPTIONAL(height);
 		SERIALIZED_MEMBER_OPTIONAL(radius);
 		SERIALIZED_MEMBER_OPTIONAL(offset);

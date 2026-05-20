@@ -98,6 +98,7 @@ public:
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(m_mesh);
 		SERIALIZED_MEMBER(m_heightmap);
 		SERIALIZED_MEMBER(m_width);

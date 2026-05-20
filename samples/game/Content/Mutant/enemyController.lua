@@ -80,6 +80,13 @@ end
 
 function Script:onTriggerEnter(entity, other)
     print("Enemy hit!")
+
+    local transform       = entity.Transform
+    local playerTransform = other.Transform
+    local toPlayer = playerTransform:getWorldPosition() - transform:getWorldPosition()
+
+    self.physics:turnToDynamic()
+    self.physics:setForce(-toPlayer * 1000)
 end
 
 function Script:destroy(entity)
