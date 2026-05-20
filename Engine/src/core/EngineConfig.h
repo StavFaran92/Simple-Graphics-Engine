@@ -19,6 +19,7 @@ struct EngineConfig
 		bool renderPostProcess = true;
 		bool renderWaterBodyPass = true;
 		bool renderDebugDataPass = true;
+		bool renderPhysicsDebugPass = false;
 	};
 
 	EngineConfig(const std::string& path);

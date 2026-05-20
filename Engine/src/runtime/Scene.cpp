@@ -1017,7 +1017,7 @@ void Scene::draw(float deltaTime)
 			glPopDebugGroup();
 		}
 
-		if (m_isSimulationActive)
+		if (Engine::get()->getConfig().renderConfig.renderPhysicsDebugPass)
 		{
 			Engine::get()->getPhysicsSystem()->visualizePhysicsShapeDebug(this);
 		}

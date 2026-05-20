@@ -50,5 +50,7 @@ void EngineConfig::loadConfig()
             renderConfig.renderDebugDataPass = render["RenderDebugDataPass"].get<bool>();
         if (render.contains("RenderPostProcess"))
             renderConfig.renderPostProcess = render["RenderPostProcess"].get<bool>();
+        if (render.contains("renderPhysicsDebugPass"))
+            renderConfig.renderPhysicsDebugPass = render["renderPhysicsDebugPass"].get<bool>();
     }
 }

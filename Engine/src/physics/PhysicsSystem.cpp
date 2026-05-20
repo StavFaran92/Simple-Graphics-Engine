@@ -748,9 +748,6 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
 
             actor->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
 
-            
-            
-
             auto& flags = dynamicBody->getRigidBodyFlags();
             if (flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
             {

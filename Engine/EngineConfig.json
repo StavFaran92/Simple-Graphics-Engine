@@ -11,6 +11,7 @@
     "RenderWaterBodyPass": true,
     "RenderNonOpaquePass": true,
     "RenderDebugDataPass": false,
-	"RenderPostProcess": false 
+	"RenderPostProcess": false,
+	"renderPhysicsDebugPass": false 
   }
 }

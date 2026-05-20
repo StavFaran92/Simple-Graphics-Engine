@@ -83,7 +83,12 @@ function Script:update(entity, dt)
     end
 
     -- Move player
-    local disp = self.movementH + self.movementV + vec3.new(0, self.velocityV / 1000.0, 0)
+    local disp = vec3.new(0, self.velocityV / 1000.0, 0)
+
+    if self.animator:getGraph():getCurrentStateID() == "Run" or 
+    self.animator:getGraph():getCurrentStateID() == "Jump" then
+        disp = disp + self.movementH + self.movementV
+    end
     self.pc:move(disp)
 
     -- Update state
@@ -99,20 +104,7 @@ function Script:update(entity, dt)
     local speed = length(hDir)
     self.animator:getGraph():setFloat("speed", speed)
     self.animator:getGraph():setBool("isJumping", self.isJumping)
-
-    
     self.animator:getGraph():setBool("isGrounded", self.isGrounded)
-    
-
-
-    -- Play animation for current state
-    -- if self.animator:getCurrentAnimationName() ~= self.state then
-    --     self.animator:playAnimation(self.state)
-    -- end
-
-
-    
-
 end
 
 function Script:onEvent(e)
