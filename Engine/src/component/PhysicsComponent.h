@@ -47,6 +47,8 @@ struct EngineAPI PhysicsComponent : public Component
 	std::shared_ptr<Collider> collider;
 	ColliderType colliderType = ColliderType::NONE;
 	glm::vec3 offset{};
+
+	glm::vec3 m_parentCachedPos{ 0 };
 };
 
 REGISTER_COMPONENT(PhysicsComponent)

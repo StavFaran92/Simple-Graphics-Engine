@@ -252,6 +252,13 @@ void PhysicsSystem::createActor(Scene* scene, entt::entity entity)
     auto body = createRigidBody(transform, rb);
     createShape(body, e, true);
 
+    auto parent = transform.getParent();
+    if (parent.valid())
+    {
+        auto& parentTrasnform = parent.getComponent<Transformation>();
+        rb.m_parentCachedPos = parentTrasnform.getWorldPosition();
+    }
+
     scene->getPhysicsScene()->addActor(*body);
     entity_id* id = new entity_id(e.handlerID());
     body->userData = (void*)id;
@@ -352,11 +359,6 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
 
         for (physx::PxRigidActor* actor : actors)
         {
-            //entity_id id = *(entity_id*)actor->userData;
-            //Entity e{ entt::entity(id), &scene->getRegistry() };
-            //auto& obj = e.getComponent<ObjectComponent>();
-            //logDebug("Physics debug render obj: {}", obj.name);
-
             physx::PxU32 nbShapes = actor->getNbShapes();
             std::vector<physx::PxShape*> shapes(nbShapes);
             actor->getShapes(shapes.data(), nbShapes);
@@ -666,19 +668,26 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                 entity_id id = *(entity_id*)actor->userData;
                 Entity e{ entt::entity(id), &scene->getRegistry()};
 
+                glm::vec3 parentDisp{ 0 };
+
                 if (e.HasComponent<PhysicsComponent>())
                 {
                     auto& rb = e.getComponent<PhysicsComponent>();
+                    auto& transform = e.getComponent<Transformation>();
+                    auto parent = transform.getParent();
+                    if (parent.valid())
+                    {
+                        auto& parentTrasnform = parent.getComponent<Transformation>();
+                        glm::vec3 parentNewPos = parentTrasnform.getWorldPosition();
+                        parentDisp = rb.m_parentCachedPos - parentNewPos;
+                        rb.m_parentCachedPos = parentNewPos;
+                    }
 
                     physx::PxTransform targetPose = actor->getGlobalPose();
-                    targetPose.p += physx::PxVec3(rb.m_targetPisition.x, rb.m_targetPisition.y, rb.m_targetPisition.z);
+                    targetPose.p += physx::PxVec3(rb.m_targetPisition.x - parentDisp.x, rb.m_targetPisition.y - parentDisp.y, rb.m_targetPisition.z - parentDisp.z);
                     targetPose.q = physx::PxQuat(physx::PxIdentity);
 
-                    if (rb.isChanged)
-                    {
-                        dynamicBody->setKinematicTarget(targetPose);
-                        rb.isChanged = false;
-                    }
+                    dynamicBody->setKinematicTarget(targetPose);
                 }
             }
             else // Dynamic
