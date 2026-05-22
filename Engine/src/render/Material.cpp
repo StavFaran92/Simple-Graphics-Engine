@@ -30,7 +30,7 @@
 #include "debug/RenderDocDebugHelper.h"
 #include "texture/TextureTransformer.h"
 
-void useSamplerInShader(const std::string& name, const TextureSampler& sampler, ShaderResourceRef& shader, int slot)
+void Material::useSamplerInShader(const std::string& name, const TextureSampler& sampler, ShaderResourceRef& shader, int slot)
 {
 	// if texture is empty use dummy texture
 	TextureResourceRef texture = sampler.texture;
@@ -54,6 +54,16 @@ void useSamplerInShader(const std::string& name, const TextureSampler& sampler, 
 	//shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->state.channelCount > 1 ? sampler->state.channelMaskG : 0) : 0);
 	//shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->state.channelCount > 2 ? sampler->state.channelMaskB : 0) : 0);
 	//shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->state.channelCount > 3 ? sampler->state.channelMaskA : 0) : 0);
+}
+
+const std::unordered_map<std::string, TextureSampler>& Material::getAllSamplers() const
+{
+	return m_samplers;
+}
+
+const std::unordered_map<std::string, Value>& Material::getAllUniforms() const
+{
+	return m_uniforms;
 }
 
 void Material::use()

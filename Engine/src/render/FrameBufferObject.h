@@ -1,7 +1,9 @@
 #pragma once
 #include <cstdint>
 
-class FrameBufferObject
+#include "core/Core.h"
+
+class EngineAPI FrameBufferObject
 {
 public:
 	enum class AttachmentType

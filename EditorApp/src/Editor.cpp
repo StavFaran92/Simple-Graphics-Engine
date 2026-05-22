@@ -26,6 +26,7 @@
 #include "InspectorWindow.h"
 #include "AssetInspectorWindow.h"
 #include "AnimationGraphWindow.h"
+#include "AnimationViewerWindow.h"
 #include "SceneHierarchyWindow.h"
 #include "SceneViewWindow.h"
 #include "menus/CreateMenu.h"
@@ -492,6 +493,7 @@ class GUI_Helper : public GuiMenu {
 		InspectorWindow::display();
 		AssetInspectorWindow::display();
 		AnimationGraphWindow::display();
+        AnimationViewerWindow::display();
         AssetViewWindow::display();
         RenderConsoleWindow();
 		DisplayDebugInfoWindow();

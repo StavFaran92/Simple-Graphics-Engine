@@ -65,6 +65,10 @@ public:
 	void setUniformValue(const std::string& name, const Value& v);
 	Value getUniformValue(const std::string& name);
 
+	void useSamplerInShader(const std::string& name, const TextureSampler& sampler, ShaderResourceRef& shader, int slot);
+	const std::unordered_map<std::string, TextureSampler>& getAllSamplers() const;
+	const std::unordered_map<std::string, Value >& getAllUniforms() const;
+
 private:
 	friend class MaterialAsset;
 

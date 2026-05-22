@@ -1,7 +1,9 @@
 #pragma once
 #include <cstdint>
 
-class RenderBufferObject
+#include "core/Core.h"
+
+class EngineAPI RenderBufferObject
 {
 public:
 	RenderBufferObject() = default;

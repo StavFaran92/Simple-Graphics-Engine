@@ -10,6 +10,7 @@
 #include "Widgets.h"
 #include "TerrainPaintTool.h"
 #include "AnimationGraphWindow.h"
+#include "AnimationViewerWindow.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -408,6 +409,10 @@ void InspectorWindow::display()
 					// Set active
 					if (!isActive && ImGui::Button("Play"))
 						animator.playAnimation(entry.name);
+
+					ImGui::SameLine();
+					if (ImGui::Button("View"))
+						AnimationViewerWindow::open(state.getSelectedEntity(), entry.animation);
 
 					ImGui::Unindent();
 				}
