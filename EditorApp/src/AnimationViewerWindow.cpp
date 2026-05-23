@@ -75,10 +75,20 @@ struct AnimSequence : public ImSequencer::SequenceInterface
     int lastClickedMarkerFrame = -1;
     int pendingRightClickFrame = -1;
     bool wantsOpenPopup = false;
+    bool wantsOpenTriggerPopup = false;
 
     void addMarker(int itemIndex, int frame)
     {
         s_selectedAnimation->triggers.push_back({ frame });
+    }
+
+    void removeTrigger(int frame)
+    {
+        auto& triggers = s_selectedAnimation->triggers;
+        triggers.erase(
+            std::remove_if(triggers.begin(), triggers.end(),
+                [frame](const AnimationTrigger& t) { return t.frameID == frame; }),
+            triggers.end());
     }
 
     void CustomDrawCompact(int index, ImDrawList* draw_list, const ImRect& rc, const ImRect& clipping_rect) override
@@ -90,13 +100,6 @@ struct AnimSequence : public ImSequencer::SequenceInterface
         float fw = rc.GetWidth() / float(fMax - fMin + 1);
         ImGuiIO& io = ImGui::GetIO();
 
-        if (ImRect(clipping_rect.Min, clipping_rect.Max).Contains(io.MousePos) && io.MouseClicked[1])
-        {
-            int f = fMin + (int)((io.MousePos.x - rc.Min.x) / fw);
-            pendingRightClickFrame = std::max(fMin, std::min(fMax, f));
-            wantsOpenPopup = true;
-        }
-
         draw_list->PushClipRect(clipping_rect.Min, clipping_rect.Max, true);
         for (auto& m : s_selectedAnimation->triggers)
         {
@@ -105,9 +108,26 @@ struct AnimSequence : public ImSequencer::SequenceInterface
             ImVec2 p2(x + fw - 1.f, rc.Max.y - 2.f);
             bool hovered = ImRect(p1, p2).Contains(io.MousePos);
             draw_list->AddRectFilled(p1, p2, hovered ? 0xFFFFCC00 : 0xFFFF8800, 2);
-            if (hovered && io.MouseClicked[0])
+            if (hovered && io.MouseClicked[1])
+            {
                 lastClickedMarkerFrame = m.frameID;
+                wantsOpenTriggerPopup = true;
+            }
         }
+
+        if (!wantsOpenTriggerPopup)
+        {
+            if (ImRect(clipping_rect.Min, clipping_rect.Max).Contains(io.MousePos) && io.MouseClicked[1])
+            {
+                int f = fMin + (int)((io.MousePos.x - rc.Min.x) / fw);
+                pendingRightClickFrame = std::max(fMin, std::min(fMax, f));
+                wantsOpenPopup = true;
+            }
+        }
+
+
+
+        
         draw_list->PopClipRect();
     }
 };
@@ -264,10 +284,10 @@ static void displayTimeline()
     if (s_currentFrame >= s_seq.GetItem(s_selEntry).end)
         s_currentFrame = s_seq.GetItem(s_selEntry).end;
 
-if (s_seq.lastClickedMarkerFrame != -1)
+    if (s_seq.wantsOpenTriggerPopup)
     {
-        ImGui::SetTooltip("Clicked marker at frame %d", s_seq.lastClickedMarkerFrame); // placeholder
-        s_seq.lastClickedMarkerFrame = -1;
+        ImGui::OpenPopup("##trigger_ctx");
+        s_seq.wantsOpenTriggerPopup = false;
     }
 
     if (s_seq.wantsOpenPopup)
@@ -276,11 +296,21 @@ if (s_seq.lastClickedMarkerFrame != -1)
         s_seq.wantsOpenPopup = false;
     }
 
+    if (ImGui::BeginPopup("##trigger_ctx"))
+    {
+        std::string caption = "Remove Trigger from Frame " + std::to_string(s_seq.lastClickedMarkerFrame);
+        if (ImGui::MenuItem(caption.c_str()))
+        {
+            s_seq.removeTrigger(s_seq.lastClickedMarkerFrame);
+            s_seq.lastClickedMarkerFrame = -1;
+        }
+        ImGui::EndPopup();
+    }
+
     if (ImGui::BeginPopup("##timeline_ctx"))
     {
-        ImGui::Text("Frame %d", s_seq.pendingRightClickFrame);
-        ImGui::Separator();
-        if (ImGui::MenuItem("Add Trigger"))
+        std::string caption = "Add Trigger in Frame " + std::to_string(s_seq.pendingRightClickFrame);
+        if (ImGui::MenuItem(caption.c_str()))
             s_seq.addMarker(s_selEntry, s_seq.pendingRightClickFrame);
         ImGui::EndPopup();
     }
