@@ -1,6 +1,7 @@
 #include "AnimationViewerWindow.h"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "imgui_stdlib.h"
 #include "ImSequencer.h"
 
@@ -17,8 +18,11 @@ static int                  s_selEntry = -1;
 struct AnimSequence : public ImSequencer::SequenceInterface
 {
     Animator* animator = nullptr;
+    int frameMin = 0;
+    int frameMax = 100;
 
-    struct Item { int start; int end; };
+    struct Marker { int frame; };
+    struct Item { int start; int end; std::vector<Marker> markers; };
     std::vector<Item> items;
 
     void rebuild()
@@ -36,11 +40,17 @@ struct AnimSequence : public ImSequencer::SequenceInterface
             }
             items.push_back({ 0, len });
         }
+        frameMax = 1;
+        for (auto& it : items) 
+            frameMax = std::max(frameMax, it.end);
     }
 
-    int  GetFrameMin() const override { return GetItem(s_selEntry).start; }
-    int  GetFrameMax() const override { return GetItem(s_selEntry).end; }
+    int  GetFrameMin() const override { return frameMin; }
+    int  GetFrameMax() const override { return frameMax; }
     int  GetItemCount() const override { return (int)items.size(); }
+    void  DoubleClick(int index) override { 
+        s_selEntry = index;
+    }
 
     const char* GetItemLabel(int index) const override
     {
@@ -62,8 +72,49 @@ struct AnimSequence : public ImSequencer::SequenceInterface
     Item GetItem(int index) const
     {
         if (index < 0 || index >= (int)items.size()) return {};
-
         return items.at(index);
+    }
+
+    int lastClickedMarkerFrame = -1;
+    int pendingRightClickFrame = -1;
+    bool wantsOpenPopup = false;
+
+    void addMarker(int itemIndex, int frame)
+    {
+        if (itemIndex < 0 || itemIndex >= (int)items.size()) return;
+        items[itemIndex].markers.push_back({ frame });
+    }
+
+    void CustomDrawCompact(int index, ImDrawList* draw_list, const ImRect& rc, const ImRect& clipping_rect) override
+    {
+        if (index < 0 || index >= (int)items.size()) return;
+
+        int fMin = GetFrameMin();
+        int fMax = GetFrameMax();
+        if (fMax <= fMin) return;
+
+        float fw = rc.GetWidth() / float(fMax - fMin + 1);
+        ImGuiIO& io = ImGui::GetIO();
+
+        if (ImRect(clipping_rect.Min, clipping_rect.Max).Contains(io.MousePos) && io.MouseClicked[1])
+        {
+            int f = fMin + (int)((io.MousePos.x - rc.Min.x) / fw);
+            pendingRightClickFrame = std::max(fMin, std::min(fMax, f));
+            wantsOpenPopup = true;
+        }
+
+        draw_list->PushClipRect(clipping_rect.Min, clipping_rect.Max, true);
+        for (auto& m : items[index].markers)
+        {
+            float x = rc.Min.x + (m.frame - fMin) * fw;
+            ImVec2 p1(x + 1.f, rc.Min.y + 2.f);
+            ImVec2 p2(x + fw - 1.f, rc.Max.y - 2.f);
+            bool hovered = ImRect(p1, p2).Contains(io.MousePos);
+            draw_list->AddRectFilled(p1, p2, hovered ? 0xFFFFCC00 : 0xFFFF8800, 2);
+            if (hovered && io.MouseClicked[0])
+                lastClickedMarkerFrame = m.frame;
+        }
+        draw_list->PopClipRect();
     }
 };
 
@@ -72,7 +123,6 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 static bool                 s_open         = false;
 static Entity               s_entity       = Entity::EmptyEntity;
 static Animator*            s_animator     = nullptr;
-static AnimationAssetRef    s_animation;
 static MeshRendererComponent*        s_meshRenderer = nullptr;
 
 static bool                 s_playing      = false;
@@ -84,19 +134,20 @@ static AnimSequence         s_seq;
 
 // ---- Helpers ------------------------------------------------------------
 
-static float currentTimeTicks()
-{
-    if (s_animation.isEmpty() || s_animation.resource().isEmpty()) return 0.f;
-    float tps = s_animation.resource()->getTicksPerSecond();
-    return (s_currentFrame / 30.f) * tps;
-}
-
 static const AnimationEntry* selectedEntry()
 {
     if (!s_animator || s_selEntry < 0) return nullptr;
     const auto& anims = s_animator->getAllAnimations();
     if (s_selEntry >= (int)anims.size()) return nullptr;
     return &anims[s_selEntry];
+}
+
+static float currentTimeTicks()
+{
+    auto& animation = selectedEntry()->animation;
+    if (animation.isEmpty() || animation.resource().isEmpty()) return 0.f;
+    float tps = animation.resource()->getTicksPerSecond();
+    return (s_currentFrame / 30.f) * tps;
 }
 
 // ---- Sub-panels ---------------------------------------------------------
@@ -116,7 +167,6 @@ static void displayLeftPanel(float w, float h)
         if (ImGui::Selectable(anims[i].name.c_str(), selected))
         {
             s_selEntry     = i;
-            s_animation    = anims[i].animation;
             s_currentFrame = 0;
             s_elapsedTime = 0;
             s_playing      = false;
@@ -176,7 +226,7 @@ static void displayViewport(float w, float h)
         static AnimationViewRenderer s_renderer;
 
         s_renderer.resize(iw, ih);
-        s_renderer.render(s_animation, currentTimeTicks(), s_meshRenderer);
+        s_renderer.render(selectedEntry()->animation, currentTimeTicks(), s_meshRenderer);
 
         uint32_t texID = s_renderer.getColorTextureID();
         if (texID)
@@ -190,7 +240,8 @@ static void displayViewport(float w, float h)
 
 static void displayTimeline()
 {
-    if (ImGui::Button(s_playing ? "  ||  " : "  >  ")) s_playing = !s_playing;
+    if (ImGui::Button(s_playing ? "  ||  " : "  >  ")) 
+        s_playing = !s_playing;
     ImGui::SameLine();
     if (ImGui::Button(" |< ")) 
     { 
@@ -202,16 +253,49 @@ static void displayTimeline()
     ImGui::Text("Frame %d / %d", s_currentFrame, s_seq.GetItem(s_selEntry).end);
 
     int frameBefore = s_currentFrame;
+    int beforeSelected = s_selEntry;
     ImSequencer::Sequencer(
         &s_seq,
         &s_currentFrame,
-        &s_expanded,
+        NULL,
         &s_selEntry,
         &s_firstFrame,
-        ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
+        ImSequencer::SEQUENCER_CHANGE_FRAME
     );
     if (s_currentFrame != frameBefore)
         s_elapsedTime = (float)s_currentFrame;
+
+    if (s_currentFrame >= s_seq.GetItem(s_selEntry).end)
+        s_currentFrame = s_seq.GetItem(s_selEntry).end;
+
+    if (beforeSelected != s_selEntry)
+    {
+        s_currentFrame = 0;
+        s_elapsedTime = 0;
+    }
+
+    if (s_seq.lastClickedMarkerFrame != -1)
+    {
+        ImGui::SetTooltip("Clicked marker at frame %d", s_seq.lastClickedMarkerFrame); // placeholder
+        s_seq.lastClickedMarkerFrame = -1;
+    }
+
+    if (s_seq.wantsOpenPopup)
+    {
+        ImGui::OpenPopup("##timeline_ctx");
+        s_seq.wantsOpenPopup = false;
+    }
+
+    if (ImGui::BeginPopup("##timeline_ctx"))
+    {
+        ImGui::Text("Frame %d", s_seq.pendingRightClickFrame);
+        ImGui::Separator();
+        if (ImGui::MenuItem("Add Trigger"))
+            s_seq.addMarker(s_selEntry, s_seq.pendingRightClickFrame);
+        ImGui::EndPopup();
+    }
+    else
+        s_seq.pendingRightClickFrame = -1;
 }
 
 // ---- Public API ---------------------------------------------------------
@@ -219,7 +303,6 @@ static void displayTimeline()
 void AnimationViewerWindow::open(Entity entity, AnimationAssetRef animation)
 {
     s_entity       = entity;
-    s_animation    = animation;
     s_open         = true;
     s_currentFrame = 0;
     s_playing      = false;
