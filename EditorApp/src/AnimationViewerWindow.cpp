@@ -11,7 +11,8 @@
 #include "component/MeshRendererComponent.h"
 #include "runtime/Entity.h"
 
-static int                  s_selEntry = -1;
+static int                  s_selEntry = 0;
+static AnimationEntry* s_selectedAnimation = nullptr;
 
 // ---- ImSequencer adapter ------------------------------------------------
 
@@ -21,58 +22,54 @@ struct AnimSequence : public ImSequencer::SequenceInterface
     int frameMin = 0;
     int frameMax = 100;
 
-    struct Marker { int frame; };
-    struct Item { int start; int end; std::vector<Marker> markers; };
-    std::vector<Item> items;
+    struct Item { 
+        int start; 
+        int end; 
+    };
+    Item currentItem;
 
     void rebuild()
     {
-        items.clear();
-        if (!animator) return;
-        for (const auto& e : animator->getAllAnimations())
+        if (!animator) 
+            return;
+        int len = 0;
+        if (s_selectedAnimation && !s_selectedAnimation->animation.isEmpty() && !s_selectedAnimation->animation.resource().isEmpty())
         {
-            int len = 0;
-            if (!e.animation.isEmpty() && !e.animation.resource().isEmpty())
-            {
-                float dur = e.animation.resource()->getDuration();
-                float tps = e.animation.resource()->getTicksPerSecond();
-                len = tps > 0.f ? (int)(dur / tps * 30.f) : 0;
-            }
-            items.push_back({ 0, len });
+            float dur = s_selectedAnimation->animation.resource()->getDuration();
+            float tps = s_selectedAnimation->animation.resource()->getTicksPerSecond();
+            len = tps > 0.f ? (int)(dur / tps * 30.f) : 0;
         }
-        frameMax = 1;
-        for (auto& it : items) 
-            frameMax = std::max(frameMax, it.end);
+        currentItem = { 0, len };
+        frameMax = currentItem.end;
     }
 
-    int  GetFrameMin() const override { return frameMin; }
-    int  GetFrameMax() const override { return frameMax; }
-    int  GetItemCount() const override { return (int)items.size(); }
-    void  DoubleClick(int index) override { 
-        s_selEntry = index;
+    int  GetFrameMin() const override { return 0; }
+    int  GetFrameMax() const override {
+        return frameMax;
+    }
+    int  GetItemCount() const override {
+        return 1;
     }
 
-    const char* GetItemLabel(int index) const override
+    const char* GetItemLabel(int /*index*/) const override
     {
-        if (!animator) return "";
+        if (!animator || s_selEntry < 0) return "";
         const auto& anims = animator->getAllAnimations();
-        if (index < 0 || index >= (int)anims.size()) return "";
-        return anims[index].name.c_str();
+        if (s_selEntry >= (int)anims.size()) return "";
+        return anims[s_selEntry].name.c_str();
     }
 
-    void Get(int index, int** start, int** end, int* type, unsigned int* color) override
+    void Get(int /*index*/, int** start, int** end, int* type, unsigned int* color) override
     {
-        if (index < 0 || index >= (int)items.size()) return;
-        if (start) *start = &items[index].start;
-        if (end)   *end   = &items[index].end;
+        if (start) *start = &currentItem.start;
+        if (end)   *end = &currentItem.end;
         if (type)  *type  = 0;
         if (color) *color = 0xFF4488AA;
     }
 
     Item GetItem(int index) const
     {
-        if (index < 0 || index >= (int)items.size()) return {};
-        return items.at(index);
+        return currentItem;
     }
 
     int lastClickedMarkerFrame = -1;
@@ -81,14 +78,11 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 
     void addMarker(int itemIndex, int frame)
     {
-        if (itemIndex < 0 || itemIndex >= (int)items.size()) return;
-        items[itemIndex].markers.push_back({ frame });
+        s_selectedAnimation->triggers.push_back({ frame });
     }
 
     void CustomDrawCompact(int index, ImDrawList* draw_list, const ImRect& rc, const ImRect& clipping_rect) override
     {
-        if (index < 0 || index >= (int)items.size()) return;
-
         int fMin = GetFrameMin();
         int fMax = GetFrameMax();
         if (fMax <= fMin) return;
@@ -104,15 +98,15 @@ struct AnimSequence : public ImSequencer::SequenceInterface
         }
 
         draw_list->PushClipRect(clipping_rect.Min, clipping_rect.Max, true);
-        for (auto& m : items[index].markers)
+        for (auto& m : s_selectedAnimation->triggers)
         {
-            float x = rc.Min.x + (m.frame - fMin) * fw;
+            float x = rc.Min.x + (m.frameID - fMin) * fw;
             ImVec2 p1(x + 1.f, rc.Min.y + 2.f);
             ImVec2 p2(x + fw - 1.f, rc.Max.y - 2.f);
             bool hovered = ImRect(p1, p2).Contains(io.MousePos);
             draw_list->AddRectFilled(p1, p2, hovered ? 0xFFFFCC00 : 0xFFFF8800, 2);
             if (hovered && io.MouseClicked[0])
-                lastClickedMarkerFrame = m.frame;
+                lastClickedMarkerFrame = m.frameID;
         }
         draw_list->PopClipRect();
     }
@@ -123,6 +117,7 @@ struct AnimSequence : public ImSequencer::SequenceInterface
 static bool                 s_open         = false;
 static Entity               s_entity       = Entity::EmptyEntity;
 static Animator*            s_animator     = nullptr;
+
 static MeshRendererComponent*        s_meshRenderer = nullptr;
 
 static bool                 s_playing      = false;
@@ -167,6 +162,7 @@ static void displayLeftPanel(float w, float h)
         if (ImGui::Selectable(anims[i].name.c_str(), selected))
         {
             s_selEntry     = i;
+            s_selectedAnimation = s_animator->getAnimation(s_selEntry);
             s_currentFrame = 0;
             s_elapsedTime = 0;
             s_playing      = false;
@@ -253,12 +249,12 @@ static void displayTimeline()
     ImGui::Text("Frame %d / %d", s_currentFrame, s_seq.GetItem(s_selEntry).end);
 
     int frameBefore = s_currentFrame;
-    int beforeSelected = s_selEntry;
+    int seqSel = (s_selEntry >= 0) ? 0 : -1;
     ImSequencer::Sequencer(
         &s_seq,
         &s_currentFrame,
         NULL,
-        &s_selEntry,
+        &seqSel,
         &s_firstFrame,
         ImSequencer::SEQUENCER_CHANGE_FRAME
     );
@@ -268,13 +264,7 @@ static void displayTimeline()
     if (s_currentFrame >= s_seq.GetItem(s_selEntry).end)
         s_currentFrame = s_seq.GetItem(s_selEntry).end;
 
-    if (beforeSelected != s_selEntry)
-    {
-        s_currentFrame = 0;
-        s_elapsedTime = 0;
-    }
-
-    if (s_seq.lastClickedMarkerFrame != -1)
+if (s_seq.lastClickedMarkerFrame != -1)
     {
         ImGui::SetTooltip("Clicked marker at frame %d", s_seq.lastClickedMarkerFrame); // placeholder
         s_seq.lastClickedMarkerFrame = -1;
@@ -370,7 +360,7 @@ void AnimationViewerWindow::display()
     const float rightW   = 200.f;
     const float sp       = ImGui::GetStyle().ItemSpacing.x;
     const float totalH   = ImGui::GetContentRegionAvail().y;
-    const float seqH     = s_expanded ? 130.f : 40.f;
+    const float seqH     = 75.f;
     const float contentH = totalH - seqH - sp * 2.f;
     const float viewW    = ImGui::GetContentRegionAvail().x - leftW - rightW - sp * 2.f;
 
