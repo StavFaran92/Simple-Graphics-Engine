@@ -98,10 +98,10 @@ void AnimationViewRenderer::render(AnimationAssetRef animation, float currentTim
         glm::vec3 extents = (aabbMax - aabbMin) * 0.5f;
         float     radius  = glm::length(extents);
         float     fovY    = glm::radians(45.f);
-        float     dist    = radius / tanf(fovY * 0.5f) * 1.2f; // 20% margin
+        float     dist    = radius / tanf(fovY * 0.5f);
 
         // Eye slightly elevated, looking at AABB center
-        glm::vec3 dir  = glm::normalize(glm::vec3(0.f, 0.3f, 1.f));
+        glm::vec3 dir  = glm::normalize(glm::vec3(1.f, 0.3f, 1.f));
         glm::vec3 eye  = center + dir * dist;
         m_view         = glm::lookAt(eye, center, glm::vec3(0.f, 1.f, 0.f));
         m_projection   = glm::perspective(fovY, (float)m_width / (float)m_height,

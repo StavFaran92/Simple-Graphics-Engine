@@ -10,13 +10,13 @@
 #include "component/MeshRendererComponent.h"
 #include "runtime/Entity.h"
 
+static int                  s_selEntry = -1;
+
 // ---- ImSequencer adapter ------------------------------------------------
 
 struct AnimSequence : public ImSequencer::SequenceInterface
 {
     Animator* animator = nullptr;
-    int frameMin = 0;
-    int frameMax = 100;
 
     struct Item { int start; int end; };
     std::vector<Item> items;
@@ -27,22 +27,19 @@ struct AnimSequence : public ImSequencer::SequenceInterface
         if (!animator) return;
         for (const auto& e : animator->getAllAnimations())
         {
-            int len = frameMax;
+            int len = 0;
             if (!e.animation.isEmpty() && !e.animation.resource().isEmpty())
             {
                 float dur = e.animation.resource()->getDuration();
                 float tps = e.animation.resource()->getTicksPerSecond();
-                len = tps > 0.f ? (int)(dur / tps * 30.f) : frameMax;
+                len = tps > 0.f ? (int)(dur / tps * 30.f) : 0;
             }
             items.push_back({ 0, len });
         }
-        frameMax = 0;
-        for (auto& it : items) frameMax = std::max(frameMax, it.end);
-        if (frameMax == 0) frameMax = 100;
     }
 
-    int  GetFrameMin() const override { return frameMin; }
-    int  GetFrameMax() const override { return frameMax; }
+    int  GetFrameMin() const override { return GetItem(s_selEntry).start; }
+    int  GetFrameMax() const override { return GetItem(s_selEntry).end; }
     int  GetItemCount() const override { return (int)items.size(); }
 
     const char* GetItemLabel(int index) const override
@@ -61,6 +58,13 @@ struct AnimSequence : public ImSequencer::SequenceInterface
         if (type)  *type  = 0;
         if (color) *color = 0xFF4488AA;
     }
+
+    Item GetItem(int index) const
+    {
+        if (index < 0 || index >= (int)items.size()) return {};
+
+        return items.at(index);
+    }
 };
 
 // ---- Static state -------------------------------------------------------
@@ -70,9 +74,10 @@ static Entity               s_entity       = Entity::EmptyEntity;
 static Animator*            s_animator     = nullptr;
 static AnimationAssetRef    s_animation;
 static MeshRendererComponent*        s_meshRenderer = nullptr;
-static int                  s_selEntry     = -1;
+
 static bool                 s_playing      = false;
 static int                  s_currentFrame = 0;
+static float s_elapsedTime = 0;
 static bool                 s_expanded     = true;
 static int                  s_firstFrame   = 0;
 static AnimSequence         s_seq;
@@ -113,6 +118,7 @@ static void displayLeftPanel(float w, float h)
             s_selEntry     = i;
             s_animation    = anims[i].animation;
             s_currentFrame = 0;
+            s_elapsedTime = 0;
             s_playing      = false;
             s_seq.rebuild();
         }
@@ -186,10 +192,16 @@ static void displayTimeline()
 {
     if (ImGui::Button(s_playing ? "  ||  " : "  >  ")) s_playing = !s_playing;
     ImGui::SameLine();
-    if (ImGui::Button(" |< ")) { s_currentFrame = 0; s_playing = false; }
+    if (ImGui::Button(" |< ")) 
+    { 
+        s_currentFrame = 0; 
+        s_elapsedTime = 0;
+        s_playing = false; 
+    }
     ImGui::SameLine();
-    ImGui::Text("Frame %d / %d", s_currentFrame, s_seq.frameMax);
+    ImGui::Text("Frame %d / %d", s_currentFrame, s_seq.GetItem(s_selEntry).end);
 
+    int frameBefore = s_currentFrame;
     ImSequencer::Sequencer(
         &s_seq,
         &s_currentFrame,
@@ -198,6 +210,8 @@ static void displayTimeline()
         &s_firstFrame,
         ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_CHANGE_FRAME
     );
+    if (s_currentFrame != frameBefore)
+        s_elapsedTime = (float)s_currentFrame;
 }
 
 // ---- Public API ---------------------------------------------------------
@@ -250,13 +264,23 @@ void AnimationViewerWindow::display()
     }
 
     // Advance playhead
-    if (s_playing && s_seq.frameMax > 0)
+    if (s_playing)
     {
         float fps = 30.f;
         const AnimationEntry* e = selectedEntry();
-        if (e) fps *= e->playbackSpeed;
-        s_currentFrame += (int)(ImGui::GetIO().DeltaTime * fps);
-        if (s_currentFrame > s_seq.frameMax) s_currentFrame = 0;
+        float duration = 0;
+        if (e)
+        {
+            duration = e->animation.resource()->getDuration();
+            fps *= e->playbackSpeed;
+        }
+        s_elapsedTime += ImGui::GetIO().DeltaTime * fps;
+        s_currentFrame = (int)s_elapsedTime;
+        if (s_currentFrame > duration)
+        {
+            s_elapsedTime = 0;
+            s_currentFrame = 0;
+        }
     }
 
     const float leftW    = 180.f;
