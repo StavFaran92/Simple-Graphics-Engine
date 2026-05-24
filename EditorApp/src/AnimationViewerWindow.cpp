@@ -77,9 +77,10 @@ struct AnimSequence : public ImSequencer::SequenceInterface
     bool wantsOpenPopup = false;
     bool wantsOpenTriggerPopup = false;
 
-    void addMarker(int itemIndex, int frame)
+    void addTrigger(int itemIndex, int frame)
     {
-        s_selectedAnimation->triggers.push_back({ frame });
+        std::string suggestedName = "Trigger_" + std::to_string(s_selectedAnimation->triggers.size());
+        s_selectedAnimation->triggers.push_back({ frame, suggestedName });
     }
 
     void removeTrigger(int frame)
@@ -226,6 +227,43 @@ static void displayRightPanel(float w, float h)
     if (ImGui::DragFloat("Speed", &speed, 0.01f, 0.f, 10.f))
         s_animator->getAnimation(e->name)->playbackSpeed = speed;
 
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::LabelText("", "Triggers");
+
+    if (s_selectedAnimation)
+    {
+        auto& triggers = s_selectedAnimation->triggers;
+        int toRemove = -1;
+
+        for (int i = 0; i < (int)triggers.size(); ++i)
+        {
+            ImGui::PushID(i);
+
+            float available = ImGui::GetContentRegionAvail().x;
+            float removeW   = 20.f;
+            float frameW    = 40.f;
+            float nameW     = available - frameW - removeW - ImGui::GetStyle().ItemSpacing.x * 2.f;
+
+            ImGui::SetNextItemWidth(nameW);
+            ImGui::InputText("##tname", &triggers[i].name);
+
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(frameW);
+            ImGui::InputInt("##tframe", &triggers[i].frameID, 0, 0);
+            triggers[i].frameID = std::max(0, std::min(triggers[i].frameID, s_seq.GetFrameMax()));
+
+            ImGui::SameLine();
+            if (ImGui::SmallButton("x"))
+                toRemove = i;
+
+            ImGui::PopID();
+        }
+
+        if (toRemove >= 0)
+            triggers.erase(triggers.begin() + toRemove);
+    }
+
     ImGui::EndChild();
 }
 
@@ -311,7 +349,7 @@ static void displayTimeline()
     {
         std::string caption = "Add Trigger in Frame " + std::to_string(s_seq.pendingRightClickFrame);
         if (ImGui::MenuItem(caption.c_str()))
-            s_seq.addMarker(s_selEntry, s_seq.pendingRightClickFrame);
+            s_seq.addTrigger(s_selEntry, s_seq.pendingRightClickFrame);
         ImGui::EndPopup();
     }
     else
@@ -347,6 +385,8 @@ void AnimationViewerWindow::open(Entity entity, AnimationAssetRef animation)
         }
     }
 
+    s_selectedAnimation = s_animator->getAnimation(s_selEntry);
+
     // Get model from MeshRendererComponent if present
     s_meshRenderer = entity.tryGetComponent<MeshRendererComponent>();
 
@@ -360,7 +400,7 @@ void AnimationViewerWindow::display()
 
     ImGui::SetNextWindowSize({ 1100, 700 }, ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Animation Viewer", &s_open))
+    if (!ImGui::Begin("Animation Viewer", &s_open, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
     {
         ImGui::End();
         return;
