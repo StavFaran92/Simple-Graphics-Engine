@@ -52,41 +52,23 @@ function Script:update(entity, dt)
 
     local moveVector = vec3.new(0, self.velocityV / 1000.0, 0)
 
-    if self.state == State.ATTACK then
-        local animState = "Attack"
-        if self.animator:getCurrentAnimationName() ~= animState then
-            self.animator:playAnimation(animState)
-        end
-    elseif self.state == State.SEEK_PLAYER then
+    if self.state == State.SEEK_PLAYER then
         local dir = toPlayer / distToPlayer
         moveVector = moveVector + vec3.new(dir.x, 0, dir.z) * self.speed
 
         local angle = -math.atan(dir.z, dir.x)
         self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
-
-        local animState = "Walk"
-        if self.animator:getCurrentAnimationName() ~= animState then
-            self.animator:playAnimation(animState)
-        end
-    else
-        local animState = "Idle"
-        if self.animator:getCurrentAnimationName() ~= animState then
-            self.animator:playAnimation(animState)
-        end
     end
+
+    local speed = length(moveVector)
+    self.animator:getGraph():setFloat("speed", speed)
+    self.animator:getGraph():setBool("attack", self.state == State.ATTACK)
 
     self.physics:move(moveVector)
 end
 
 function Script:onTriggerEnter(entity, other)
-    print("Enemy hit!")
-
-    local transform       = entity.Transform
-    local playerTransform = other.Transform
-    local toPlayer = playerTransform:getWorldPosition() - transform:getWorldPosition()
-
-    self.physics:turnToDynamic()
-    self.physics:setForce(-toPlayer * 1000)
+    self.animator:getGraph():trigger("hit")
 end
 
 function Script:destroy(entity)

@@ -28,6 +28,7 @@ public:
     void callUpdate(float dt);
     void callOnEvent(Entity entity, const Event& event);
     void callOnCollide(CollisionType, Entity entity, Entity other);
+    void callOnAnimTrigger(const std::string& name, int frameID);
     void callDestroy();
 
 private:

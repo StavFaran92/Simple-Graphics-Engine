@@ -5,6 +5,8 @@
 #include "animation/AnimationGraph.h"
 #include "geometry/Model.h"
 #include "runtime/Scene.h"
+#include "core/Engine.h"
+#include "scripts/ScriptSystem.h"
 
 void Animator::resolve(SceneResourceRef& scene)
 {
@@ -23,6 +25,8 @@ void Animator::update(float dt)
 	auto currentAnimation = getCurrentAnimation();
 	if (!currentAnimation || currentAnimation->animation.isEmpty() || currentAnimation->animation.resource().isEmpty())
 		return;
+
+	
 	
 	auto animResource = currentAnimation->animation.resource();
 
@@ -32,6 +36,26 @@ void Animator::update(float dt)
 	{
 		m_currentTime = fmod(m_currentTime, animResource->getDuration());
 		m_animationGraph.onAnimationEnd();
+	}
+
+	const auto& triggers = currentAnimation->triggers;
+	int currentFrameID = (int)m_currentTime;
+	bool isAnyTriggerCalled = false;
+	for (const auto& trigger : triggers)
+	{
+		// We use the last called trigger to not invoke the same trigger twice in consective updates
+		if (lastCalledTrigger != trigger.frameID && trigger.frameID == currentFrameID)
+		{
+			isAnyTriggerCalled = true;
+			lastCalledTrigger = trigger.frameID;
+			Engine::get()->getSubSystem<ScriptSystem>()->callOnAnimTrigger(trigger.name, trigger.frameID);
+		}
+	}
+
+	// If no trigger is called this iteration we are safe to clear the cache
+	if (!isAnyTriggerCalled)
+	{
+		lastCalledTrigger = -1;
 	}
 	
 }

@@ -140,7 +140,6 @@ function Script:onEvent(e)
     if e:type() == EventType.MouseButtonPressed then
         if e.button == MouseButton.Left then
             self.animator:getGraph():trigger("attack")
-            self.attack_collider:activate()
         end
     end
 
@@ -152,6 +151,15 @@ function Script:onEvent(e)
                 self.animator:getGraph():trigger("jump")
             end
         end
+    end
+end
+
+function Script:onAnimationTrigger(name, frame)
+    if name == "start_attack" then
+        self.attack_collider:activate()
+    end
+    if name == "finish_attack" then
+        self.attack_collider:deactivate()
     end
 end
 

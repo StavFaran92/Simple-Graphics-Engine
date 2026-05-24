@@ -52,6 +52,7 @@ private:
 	int m_currentAnimIndex = 0;
 	std::vector<AnimationEntry> m_animations;
 	AnimationGraph m_animationGraph;
+	int lastCalledTrigger = -1;
 
 protected:
 	std::vector<AssetRef<Asset>> gatherDependenciesInternal() const override;

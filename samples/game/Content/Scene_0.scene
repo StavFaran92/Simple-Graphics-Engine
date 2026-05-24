@@ -20,7 +20,8 @@
                                                 "uuid": {
                                                     "m_value": 78
                                                 }
-                                            }
+                                            },
+                                            "triggers": []
                                         },
                                         {
                                             "name": "Walk",
@@ -29,7 +30,8 @@
                                                 "uuid": {
                                                     "m_value": 77
                                                 }
-                                            }
+                                            },
+                                            "triggers": []
                                         },
                                         {
                                             "name": "Attack",
@@ -38,15 +40,217 @@
                                                 "uuid": {
                                                     "m_value": 81
                                                 }
-                                            }
+                                            },
+                                            "triggers": []
+                                        },
+                                        {
+                                            "name": "Hit",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
+                                                "uuid": {
+                                                    "m_value": 79
+                                                }
+                                            },
+                                            "triggers": []
                                         }
                                     ],
                                     "m_animationGraph": {
-                                        "m_states": [],
-                                        "m_transitions": [],
-                                        "m_parameters": [],
-                                        "m_paramValues": [],
-                                        "m_entryStateId": ""
+                                        "m_states": [
+                                            {
+                                                "id": "Idle",
+                                                "animationEntry": {
+                                                    "name": "Idle",
+                                                    "playbackSpeed": 1.0,
+                                                    "animation": {
+                                                        "uuid": {
+                                                            "m_value": 78
+                                                        }
+                                                    },
+                                                    "triggers": []
+                                                },
+                                                "loop": true,
+                                                "pos": {
+                                                    "v.x": 664.0,
+                                                    "v.y": 392.0
+                                                }
+                                            },
+                                            {
+                                                "id": "Walk",
+                                                "animationEntry": {
+                                                    "name": "Walk",
+                                                    "playbackSpeed": 1.0,
+                                                    "animation": {
+                                                        "uuid": {
+                                                            "m_value": 77
+                                                        }
+                                                    },
+                                                    "triggers": []
+                                                },
+                                                "loop": true,
+                                                "pos": {
+                                                    "v.x": 472.0,
+                                                    "v.y": 520.0
+                                                }
+                                            },
+                                            {
+                                                "id": "Attack",
+                                                "animationEntry": {
+                                                    "name": "Attack",
+                                                    "playbackSpeed": 1.0,
+                                                    "animation": {
+                                                        "uuid": {
+                                                            "m_value": 81
+                                                        }
+                                                    },
+                                                    "triggers": []
+                                                },
+                                                "loop": true,
+                                                "pos": {
+                                                    "v.x": 872.0,
+                                                    "v.y": 520.0
+                                                }
+                                            },
+                                            {
+                                                "id": "Hit",
+                                                "animationEntry": {
+                                                    "name": "Hit",
+                                                    "playbackSpeed": 1.0,
+                                                    "animation": {
+                                                        "uuid": {
+                                                            "m_value": 79
+                                                        }
+                                                    },
+                                                    "triggers": []
+                                                },
+                                                "loop": true,
+                                                "pos": {
+                                                    "v.x": 664.0,
+                                                    "v.y": 696.0
+                                                }
+                                            }
+                                        ],
+                                        "m_transitions": [
+                                            {
+                                                "from": "Idle",
+                                                "to": "Walk",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 1,
+                                                        "parameter": "speed",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Walk",
+                                                "to": "Idle",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 0,
+                                                        "parameter": "speed",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Walk",
+                                                "to": "Attack",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 0,
+                                                        "parameter": "attack",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Attack",
+                                                "to": "Idle",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 3,
+                                                        "parameter": "",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Walk",
+                                                "to": "Hit",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 4,
+                                                        "parameter": "hit",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Attack",
+                                                "to": "Hit",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 4,
+                                                        "parameter": "hit",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Hit",
+                                                "to": "Idle",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 3,
+                                                        "parameter": "",
+                                                        "value": 0.0
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "from": "Idle",
+                                                "to": "Attack",
+                                                "blendDuration": 0.20000000298023225,
+                                                "conditions": [
+                                                    {
+                                                        "type": 0,
+                                                        "parameter": "attack",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "m_parameters": [
+                                            {
+                                                "name": "speed",
+                                                "type": 0,
+                                                "defaultValue": 0.0
+                                            },
+                                            {
+                                                "name": "attack",
+                                                "type": 1,
+                                                "defaultValue": 0.0
+                                            },
+                                            {
+                                                "name": "hit",
+                                                "type": 3,
+                                                "defaultValue": 0.0
+                                            }
+                                        ],
+                                        "m_paramValues": [
+                                            {
+                                                "key": "NewParam",
+                                                "value": 0.0
+                                            }
+                                        ],
+                                        "m_entryStateId": "Idle"
                                     }
                                 }
                             }
@@ -161,9 +365,27 @@
                     "entity": 9,
                     "components": [
                         {
-                            "polymorphic_id": 2,
+                            "polymorphic_id": 2147483654,
+                            "polymorphic_name": "ScriptComponent",
                             "ptr_wrapper": {
                                 "id": 2147483654,
+                                "data": {
+                                    "isActive": true,
+                                    "script": {
+                                        "uuid": {
+                                            "m_value": 61
+                                        }
+                                    },
+                                    "entity": {
+                                        "m_entity": 9
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483655,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -205,7 +427,7 @@
                         {
                             "polymorphic_id": 4,
                             "ptr_wrapper": {
-                                "id": 2147483655,
+                                "id": 2147483656,
                                 "data": {
                                     "isActive": true,
                                     "name": "zombie",
@@ -216,20 +438,20 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483654,
+                            "polymorphic_id": 2147483655,
                             "polymorphic_name": "PhysicsComponent",
                             "ptr_wrapper": {
-                                "id": 2147483656,
+                                "id": 2147483657,
                                 "data": {
                                     "isActive": true,
                                     "rigidBodyType": 2,
                                     "collisionType": 0,
                                     "mass": 0.0,
                                     "collider": {
-                                        "polymorphic_id": 2147483655,
+                                        "polymorphic_id": 2147483656,
                                         "polymorphic_name": "CollisionCapsule",
                                         "ptr_wrapper": {
-                                            "id": 2147483657,
+                                            "id": 2147483658,
                                             "data": {
                                                 "radius": 0.20000000298023225,
                                                 "halfHeight": 0.699999988079071
@@ -247,24 +469,6 @@
                                         "v.x": 0.0,
                                         "v.y": 0.8999999761581421,
                                         "v.z": 0.0
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "polymorphic_id": 2147483656,
-                            "polymorphic_name": "ScriptComponent",
-                            "ptr_wrapper": {
-                                "id": 2147483658,
-                                "data": {
-                                    "isActive": true,
-                                    "script": {
-                                        "uuid": {
-                                            "m_value": 61
-                                        }
-                                    },
-                                    "entity": {
-                                        "m_entity": 9
                                     }
                                 }
                             }
@@ -335,9 +539,26 @@
                     "entity": 7,
                     "components": [
                         {
-                            "polymorphic_id": 2,
+                            "polymorphic_id": 6,
                             "ptr_wrapper": {
                                 "id": 2147483661,
+                                "data": {
+                                    "isActive": true,
+                                    "script": {
+                                        "uuid": {
+                                            "m_value": 32
+                                        }
+                                    },
+                                    "entity": {
+                                        "m_entity": 7
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483662,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -385,28 +606,11 @@
                         {
                             "polymorphic_id": 4,
                             "ptr_wrapper": {
-                                "id": 2147483662,
+                                "id": 2147483663,
                                 "data": {
                                     "isActive": true,
                                     "name": "player",
                                     "e": {
-                                        "m_entity": 7
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "polymorphic_id": 8,
-                            "ptr_wrapper": {
-                                "id": 2147483663,
-                                "data": {
-                                    "isActive": true,
-                                    "script": {
-                                        "uuid": {
-                                            "m_value": 32
-                                        }
-                                    },
-                                    "entity": {
                                         "m_entity": 7
                                     }
                                 }
@@ -483,7 +687,7 @@
                             }
                         },
                         {
-                            "polymorphic_id": 6,
+                            "polymorphic_id": 7,
                             "ptr_wrapper": {
                                 "id": 2147483667,
                                 "data": {
@@ -539,7 +743,8 @@
                                                 "uuid": {
                                                     "m_value": 53
                                                 }
-                                            }
+                                            },
+                                            "triggers": []
                                         },
                                         {
                                             "name": "Run",
@@ -548,7 +753,8 @@
                                                 "uuid": {
                                                     "m_value": 52
                                                 }
-                                            }
+                                            },
+                                            "triggers": []
                                         },
                                         {
                                             "name": "Jump",
@@ -557,7 +763,8 @@
                                                 "uuid": {
                                                     "m_value": 51
                                                 }
-                                            }
+                                            },
+                                            "triggers": []
                                         },
                                         {
                                             "name": "Attack",
@@ -566,7 +773,17 @@
                                                 "uuid": {
                                                     "m_value": 89
                                                 }
-                                            }
+                                            },
+                                            "triggers": [
+                                                {
+                                                    "name": "finish_attack",
+                                                    "frameID": 22
+                                                },
+                                                {
+                                                    "name": "start_attack",
+                                                    "frameID": 18
+                                                }
+                                            ]
                                         }
                                     ],
                                     "m_animationGraph": {
@@ -580,7 +797,8 @@
                                                         "uuid": {
                                                             "m_value": 53
                                                         }
-                                                    }
+                                                    },
+                                                    "triggers": []
                                                 },
                                                 "loop": true,
                                                 "pos": {
@@ -597,7 +815,8 @@
                                                         "uuid": {
                                                             "m_value": 52
                                                         }
-                                                    }
+                                                    },
+                                                    "triggers": []
                                                 },
                                                 "loop": true,
                                                 "pos": {
@@ -614,7 +833,8 @@
                                                         "uuid": {
                                                             "m_value": 51
                                                         }
-                                                    }
+                                                    },
+                                                    "triggers": []
                                                 },
                                                 "loop": true,
                                                 "pos": {
@@ -631,7 +851,8 @@
                                                         "uuid": {
                                                             "m_value": 89
                                                         }
-                                                    }
+                                                    },
+                                                    "triggers": []
                                                 },
                                                 "loop": true,
                                                 "pos": {
@@ -937,7 +1158,7 @@
                             }
                         },
                         {
-                            "polymorphic_id": 6,
+                            "polymorphic_id": 7,
                             "ptr_wrapper": {
                                 "id": 2147483677,
                                 "data": {
@@ -1171,7 +1392,7 @@
                             }
                         },
                         {
-                            "polymorphic_id": 6,
+                            "polymorphic_id": 7,
                             "ptr_wrapper": {
                                 "id": 2147483685,
                                 "data": {
