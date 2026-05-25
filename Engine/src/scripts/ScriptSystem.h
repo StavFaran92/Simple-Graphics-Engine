@@ -1,12 +1,13 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "component/ScriptComponent.h"
 #include "systems/SubSystem.h"
 #include "core/Event.h"
 
-class ScriptSystem : public SubSystem
+class EngineAPI ScriptSystem : public SubSystem
 {
 public:
     enum class CollisionType
@@ -30,6 +31,9 @@ public:
     void callOnCollide(CollisionType, Entity entity, Entity other);
     void callOnAnimTrigger(Entity entity, const std::string& name, int frameID);
     void callDestroy();
+
+    // Returns discovered Ref() fields for the given script entity. nullptr if not found.
+    const std::unordered_map<std::string, std::string>* getScriptRefs(Entity entity) const;
 
 private:
     class Impl;                 

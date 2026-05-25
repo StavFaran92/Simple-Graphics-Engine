@@ -16,6 +16,7 @@ struct LuaState
 {
     Entity entity;
     sol::table script;
+    std::unordered_map<std::string, std::string> refs; // fieldName -> refType ("Entity")
 };
 
 void LogDebug(const std::string& msg) {
@@ -69,7 +70,21 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
         sol::table script = impl_->lua["Script"];
         if (script.valid())
         {
-            impl_->scripts.push_back({ scriptComponent.entity, script });
+            LuaState state{ scriptComponent.entity, script };
+
+            for (auto& [key, value] : script) {
+                if (!key.is<std::string>() || !value.is<sol::table>()) continue;
+                sol::table t = value.as<sol::table>();
+                auto isRef = t.get<sol::optional<bool>>("__isRef");
+                if (isRef && *isRef) {
+                    std::string fieldName = key.as<std::string>();
+                    std::string refType = t.get_or<std::string>("refType", "Entity");
+                    state.refs[fieldName] = refType;
+                    script[fieldName] = sol::nil;
+                }
+            }
+
+            impl_->scripts.push_back(std::move(state));
         }
         else
         {
@@ -233,6 +248,16 @@ void ScriptSystem::callOnAnimTrigger(Entity entity, const std::string& name, int
             }
         }
     }
+}
+
+const std::unordered_map<std::string, std::string>* ScriptSystem::getScriptRefs(Entity entity) const
+{
+    for (auto& state : impl_->scripts)
+    {
+        if (state.entity == entity)
+            return &state.refs;
+    }
+    return nullptr;
 }
 
 void ScriptSystem::callDestroy()

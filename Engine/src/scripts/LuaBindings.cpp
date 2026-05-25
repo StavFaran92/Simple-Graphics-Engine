@@ -599,6 +599,16 @@ void bindFreeFunctions(sol::state& lua)
     lua.set_function("testCallback", [](sol::function fn) {
         fn(42);
         });
+
+    lua["Entity"] = "Entity";
+
+    lua.set_function("Ref", [](sol::object refType, sol::this_state ts) {
+        sol::state_view sv(ts);
+        sol::table marker = sv.create_table();
+        marker["__isRef"] = true;
+        marker["refType"] = refType;
+        return marker;
+    });
 }
 
 void bindMath(sol::state& lua)

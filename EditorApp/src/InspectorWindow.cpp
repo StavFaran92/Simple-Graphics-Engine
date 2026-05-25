@@ -11,6 +11,7 @@
 #include "TerrainPaintTool.h"
 #include "AnimationGraphWindow.h"
 #include "AnimationViewerWindow.h"
+#include "scripts/ScriptSystem.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -685,6 +686,16 @@ void InspectorWindow::display()
 			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uuid) {
 				script.script = LuaScriptAssetRef(uuid);
 			});
+
+			auto* refs = Engine::get()->getSubSystem<ScriptSystem>()->getScriptRefs(state.getSelectedEntity());
+			if (refs)
+			{
+				for (const auto& [fieldName, refType] : *refs)
+				{
+					logDebug("{} : {}", fieldName, refType);
+				}
+			}
+
 		});
 
 		displayComponent<PostProcessComponent>("Post Process Component", [](PostProcessComponent& postProcessComponent) {

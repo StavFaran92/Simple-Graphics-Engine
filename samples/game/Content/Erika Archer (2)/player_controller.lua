@@ -7,6 +7,9 @@ local PlayerState = {
     Attack = "Attack",
 }
 
+Script.target = Ref(Entity)
+Script.spawnPoint = Ref(Entity)
+
 --Player
 ----camera pivot
 ------Main Camera
