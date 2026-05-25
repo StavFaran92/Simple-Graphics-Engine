@@ -16,6 +16,7 @@ function Script:create(entity)
     self.physics = entity.Physics
     self.model = entity:getChildByName("model")
     self.modelTransform = entity:getChildByName("model").Transform
+    self.attack_collider = self.model:getChildByName("attack_collider").Physics
     self.speed = 0.02
     self.animator = self.model.Animator
     self.isGrounded = false
@@ -65,6 +66,15 @@ function Script:update(entity, dt)
     self.animator:getGraph():setBool("attack", self.state == State.ATTACK)
 
     self.physics:move(moveVector)
+end
+
+function Script:onAnimationTrigger(name, frame)
+    if name == "attack_start" then
+        self.attack_collider:activate()
+    end
+    if name == "attack_end" then
+        self.attack_collider:deactivate()
+    end
 end
 
 function Script:onTriggerEnter(entity, other)

@@ -19,6 +19,7 @@
 #include "render/Material.h"
 #include "component/ScriptableEntity.h"
 #include "physics/PhysicsSystem.h"
+#include "animation/AnimationSystem.h"
 #include "systems/ShadowSystem.h"
 #include "lights/LightSystem.h"
 #include "systems/TimeManager.h"
@@ -414,10 +415,7 @@ void Scene::update(float deltaTime)
 		// Physics
 		Engine::get()->getPhysicsSystem()->update(this, deltaTime);
 
-		for (auto&& [entity, animator, mesh] : m_registry->get().view<Animator, MeshRendererComponent>().each())
-		{
-			animator.update(deltaTime);
-		}
+		Engine::get()->getSubSystem<AnimationSystem>()->update(this, deltaTime);
 	}
 
 	//if (m_isDirty)

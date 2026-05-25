@@ -20,7 +20,7 @@ public:
 	void resolve(SceneResourceRef& scene) override;
 
 	void onStart();
-	void update(float dt);
+	void update(Entity e, float dt);
 	void getFinalBoneMatrices(const Model* meshCollection, std::vector<glm::mat4>& outFinalBoneMatrices) const;
 
 	void addAnimation(AnimationEntry animation);

@@ -155,10 +155,10 @@ function Script:onEvent(e)
 end
 
 function Script:onAnimationTrigger(name, frame)
-    if name == "start_attack" then
+    if name == "attack_start" then
         self.attack_collider:activate()
     end
-    if name == "finish_attack" then
+    if name == "attack_end" then
         self.attack_collider:deactivate()
     end
 end

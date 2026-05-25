@@ -216,17 +216,20 @@ void ScriptSystem::callOnCollide(CollisionType collisionType, Entity entity, Ent
     }
 }
 
-void ScriptSystem::callOnAnimTrigger(const std::string& name, int frameID)
+void ScriptSystem::callOnAnimTrigger(Entity entity, const std::string& name, int frameID)
 {
     for (auto& script : impl_->scripts)
     {
-        sol::protected_function fn = script.script["onAnimationTrigger"];
-        if (fn.valid())
+        if (script.entity == entity)
         {
-            sol::protected_function_result result = fn(script.script, name, frameID);
-            if (!result.valid()) {
-                sol::error err = result;
-                logError("Lua Error: {}", err.what());
+            sol::protected_function fn = script.script["onAnimationTrigger"];
+            if (fn.valid())
+            {
+                sol::protected_function_result result = fn(script.script, name, frameID);
+                if (!result.valid()) {
+                    sol::error err = result;
+                    logError("Lua Error: {}", err.what());
+                }
             }
         }
     }

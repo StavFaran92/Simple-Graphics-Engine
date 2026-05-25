@@ -18,7 +18,7 @@ void Animator::onStart()
 	m_animationGraph.init();
 }
 
-void Animator::update(float dt)
+void Animator::update(Entity e, float dt)
 {
 	m_animationGraph.update(dt);
 
@@ -26,8 +26,6 @@ void Animator::update(float dt)
 	if (!currentAnimation || currentAnimation->animation.isEmpty() || currentAnimation->animation.resource().isEmpty())
 		return;
 
-	
-	
 	auto animResource = currentAnimation->animation.resource();
 
 	// Increment Animation time
@@ -48,7 +46,7 @@ void Animator::update(float dt)
 		{
 			isAnyTriggerCalled = true;
 			lastCalledTrigger = trigger.frameID;
-			Engine::get()->getSubSystem<ScriptSystem>()->callOnAnimTrigger(trigger.name, trigger.frameID);
+			Engine::get()->getSubSystem<ScriptSystem>()->callOnAnimTrigger(e, trigger.name, trigger.frameID);
 		}
 	}
 

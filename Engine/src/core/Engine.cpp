@@ -47,6 +47,7 @@
 
 #include "component/RenderableComponent.h"
 #include "scripts/ScriptSystem.h"
+#include "animation/AnimationSystem.h"
 #include "core/GameLayer.h"
 #include "systems/UniqueNameManager.h"
 #include "memory/BuiltInResources.h"
@@ -287,6 +288,8 @@ bool Engine::init(const InitParams& initParams)
 
     auto scriptSystem = new ScriptSystem();
     scriptSystem->init();
+
+    new AnimationSystem();
 
     if (initParams.startSimulationOnStartup)
     {
