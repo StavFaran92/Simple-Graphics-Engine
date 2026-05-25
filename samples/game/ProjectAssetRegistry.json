@@ -101,7 +101,7 @@
             "visibility": 1
         }
     ],
-    "counter": 90,
+    "counter": 91,
     "lua script": [
         {
             "aType": 7,
@@ -127,6 +127,19 @@
             "name": "enemyController",
             "sourcePath": "",
             "uuid": 61,
+            "visibility": 1
+        },
+        {
+            "aType": 7,
+            "asset": {
+                "filepath": ""
+            },
+            "assetDirectory": "warrior\\",
+            "ext": ".lua",
+            "isEngineOwned": false,
+            "name": "AnimationRelay",
+            "sourcePath": "",
+            "uuid": 90,
             "visibility": 1
         }
     ],
@@ -3830,6 +3843,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3855,17 +3879,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -4116,6 +4129,7 @@
     ],
     "namesToUUIDRefs": {
         "Akai_MAT": 34,
+        "AnimationRelay": 90,
         "Body_MAT": 37,
         "DefaultMaterial": 14,
         "Erika Archer (2)": 33,
@@ -4220,6 +4234,7 @@
         "content/new folder/new material.mat": 17,
         "content/scene_0.scene": 15,
         "content/sunflowers_puresky_4k.texture": 26,
+        "content/warrior/animationrelay.lua": 90,
         "content/warrior/warrior/maria_diffuse.texture": 84,
         "content/warrior/warrior/maria_normal.texture": 85,
         "content/warrior/warrior/mariamat.mat": 83,

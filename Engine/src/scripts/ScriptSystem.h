@@ -7,6 +7,8 @@
 #include "systems/SubSystem.h"
 #include "core/Event.h"
 
+using ScriptArg = std::variant<bool, int, float, std::string>;
+
 class EngineAPI ScriptSystem : public SubSystem
 {
 public:
@@ -36,6 +38,9 @@ public:
     void callDestroyOnAll();
 
     void resolveRefs(Entity entity);
+
+    
+    void invokeFunction(Entity entity, const std::string& funcName, const std::vector<ScriptArg>& args);
     //void setRef(Entity entity, const std::string& fieldName, Entity ref);
     //Entity getRef(Entity entity, const std::string& fieldName) const;
 

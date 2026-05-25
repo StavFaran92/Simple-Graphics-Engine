@@ -279,3 +279,49 @@ void ScriptSystem::resolveRefs(Entity entity)
         it->second.script[fieldName] = scriptComponent.getRef(fieldName);
     }
 }
+
+static sol::object toSol(sol::state& lua, const ScriptArg& arg)
+{
+    return std::visit([&](auto&& val) -> sol::object {
+        return sol::make_object(lua, val);
+        }, arg);
+}
+
+void ScriptSystem::invokeFunction(Entity entity, const std::string& funcName, const std::vector<ScriptArg>& args)
+{
+    // If not valid script ignore
+    auto it = impl_->scripts.find(entity);
+    if (it == impl_->scripts.end())
+        return;
+
+    auto target = it->second.script;
+
+    sol::protected_function fn = it->second.script[funcName];
+    if (fn.valid())
+    {
+        // build sol call args
+        sol::protected_function_result result;
+        switch (args.size())
+        {
+        case 0: result = fn(target); break;
+        case 1: result = fn(target, toSol(impl_->lua, args[0])); break;
+        case 2: result = fn(target, toSol(impl_->lua, args[0]), toSol(impl_->lua, args[1])); break;
+        case 3: result = fn(target, toSol(impl_->lua, args[0]), toSol(impl_->lua, args[1]), toSol(impl_->lua, args[2])); break;
+        default:
+        {
+            // pack into table for larger arg counts
+            sol::table argsTable = impl_->lua.create_table();
+            for (size_t i = 0; i < args.size(); i++)
+                argsTable[i + 1] = toSol(impl_->lua, args[i]);
+            result = fn(target, argsTable);
+            break;
+        }
+        }
+
+        if (!result.valid()) 
+        {
+            sol::error err = result;
+            logError("Lua Error: {}", err.what());
+        }
+    }
+}

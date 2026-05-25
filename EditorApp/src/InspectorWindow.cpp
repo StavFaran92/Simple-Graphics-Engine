@@ -680,21 +680,31 @@ void InspectorWindow::display()
 			std::string scriptName = "None";
 			if (!script.getScript().isEmpty())
 			{
-				scriptName = script.getScript().getUID();
+				scriptName = script.getScript().info().name;
 			}
 
 			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uuid) {
 				script.script = LuaScriptAssetRef(uuid);
 			});
 
-			auto refSlots = script.getAllRefSlots();
-			for (const auto& fieldName : refSlots)
+			if (ImGui::Button("Reload"))
 			{
-				Entity current = script.getRef(fieldName);
-				addEntitySelectWidget(fieldName, current, [fieldName, &script](Entity e) {
-					script.setRef(fieldName, e);
-					});
+				script.loadScript();
 			}
+
+			if (ImGui::CollapsingHeader("References"))
+			{
+				auto refSlots = script.getAllRefSlots();
+				for (const auto& fieldName : refSlots)
+				{
+					Entity current = script.getRef(fieldName);
+					addEntitySelectWidget(fieldName, current, [fieldName, &script](Entity e) {
+						script.setRef(fieldName, e);
+						});
+				}
+			}
+
+
 
 		});
 

@@ -7,23 +7,18 @@ local PlayerState = {
     Attack = "Attack",
 }
 
-Script.target = Ref(Entity)
-Script.spawnPoint = Ref(Entity)
-
---Player
-----camera pivot
-------Main Camera
-----model
+Script.attack_collider = Ref(Entity)
+Script.cameraPivot = Ref(Entity)
+Script.mainCamera = Ref(Entity)
+Script.model = Ref(Entity)
 
 function Script:create(entity)
     self.movementSpeed = 5.0
     self.movementH = vec3.new(0)
     self.movementV = vec3.new(0)
-    self.camComponent = getActiveScene():getEntityByName("Main Camera").Camera
+    self.camComponent = self.mainCamera.Camera
     self.transform = entity.Transform
-    self.cameraPivot = entity:getChildByName("cameraPivot")
-    self.model = entity:getChildByName("model")
-    self.attack_collider = self.model:getChildByName("attack_collider").Physics
+    self.attack_collider = self.attack_collider.Physics
     self.pc = entity.PlayerController
     self.modelTransform = self.model.Transform
     self.animator = self.model.Animator
@@ -38,8 +33,6 @@ function Script:create(entity)
     self.isJumping = false
     self.isAttacking = false
     self.state = PlayerState.Idle
-
-    print(self.target:handlerID())
 
     local eventSystem = EventSystem.get()
     eventSystem:subscribe(EventType.KeyPressed, entity)

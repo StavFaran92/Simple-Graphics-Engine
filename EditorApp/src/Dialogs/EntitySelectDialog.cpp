@@ -21,13 +21,16 @@ void EntitySelectDialog::drawContent()
 
 	for (int i = 0; i < static_cast<int>(sceneObjects.size()); ++i)
 	{
+		ImGui::PushID(i);
 		auto& sceneObject = sceneObjects[i];
 		auto& obj = sceneObject.e.getComponent<ObjectComponent>();
 		bool isSelected = (m_selectedEntity == sceneObject.e);
-		if (ImGui::Selectable(obj.name.c_str(), &isSelected))
+		std::string name = obj.name + " (" + std::to_string(sceneObject.e.handlerID()) + ")";
+		if (ImGui::Selectable(name.c_str(), &isSelected))
 		{
 			m_selectedEntity = sceneObject.e;
 		}
+		ImGui::PopID();
 	}
 }
 

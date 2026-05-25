@@ -22,6 +22,8 @@
 #include "component/PhysicsComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
+#include "component/ScriptComponent.h"
+#include "scripts/ScriptSystem.h"
 
 #include "component/ImageComponent.h"
 #include "physics/Physics.h"
@@ -385,16 +387,6 @@ void bindComponents(sol::state& lua)
         "getChildren", &Transformation::getChildren
     );
 
-    lua.new_usertype<Mesh>("Mesh",
-        "getNumOfVertices", &Mesh::getNumOfVertices,
-        "getPositions", &Mesh::getPositions,
-        "getNormals", &Mesh::getNormals,
-        "getAABB", &Mesh::getAABB,
-        "getMaterialIndex", &Mesh::getMaterialIndex,
-        "setRestTransform", &Mesh::setRestTransform,
-        "getRestTransform", &Mesh::getRestTransform
-    );
-
     lua.new_usertype<DirectionalLight>("DirectionalLight",
         "SetAmbientIntensity", &DirectionalLight::SetAmbientIntensity,
         "SetDiffuseIntensity", &DirectionalLight::SetDiffuseIntensity,
@@ -609,6 +601,25 @@ void bindFreeFunctions(sol::state& lua)
         marker["refType"] = refType;
         return marker;
     });
+
+    lua.set_function("invoke", [](Entity target, const std::string& funcName, sol::variadic_args args) {
+        if (target.valid() && target.HasComponent<ScriptComponent>())
+        {
+            std::vector<ScriptArg> converted;
+            for (auto arg : args)
+            {
+                if (arg.is<int>())         converted.emplace_back(arg.as<int>());
+                else if (arg.is<float>())  converted.emplace_back(arg.as<float>());
+                else if (arg.is<bool>())   converted.emplace_back(arg.as<bool>());
+                else if (arg.is<std::string>()) converted.emplace_back(arg.as<std::string>());
+            }
+
+            Engine::get()->getSubSystem<ScriptSystem>()->invokeFunction(target, funcName, converted);
+
+        }
+
+        
+        });
 }
 
 void bindMath(sol::state& lua)
