@@ -14,20 +14,15 @@
 
 struct LuaState
 {
-    Entity entity;
     sol::table script;
-    std::unordered_map<std::string, std::string> refs; // fieldName -> refType ("Entity")
+    std::unordered_map<std::string, std::string> refs;
 };
-
-void LogDebug(const std::string& msg) {
-    logDebug(msg);
-}
 
 class ScriptSystem::Impl
 {
 public:
     sol::state lua;
-    std::vector<LuaState> scripts;
+    std::unordered_map<Entity, LuaState> scripts;
 
     void init()
     {
@@ -53,7 +48,7 @@ void ScriptSystem::init()
     impl_->init();
 }
 
-void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
+void ScriptSystem::reloadScript(Entity e, ScriptComponent& scriptComponent)
 {
     if (!scriptComponent.isValid())
         return;
@@ -70,10 +65,11 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
         sol::table script = impl_->lua["Script"];
         if (script.valid())
         {
-            LuaState state{ scriptComponent.entity, script };
+            LuaState state{ script };
 
             for (auto& [key, value] : script) {
-                if (!key.is<std::string>() || !value.is<sol::table>()) continue;
+                if (!key.is<std::string>() || !value.is<sol::table>()) 
+                    continue;
                 sol::table t = value.as<sol::table>();
                 auto isRef = t.get<sol::optional<bool>>("__isRef");
                 if (isRef && *isRef) {
@@ -84,7 +80,7 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
                 }
             }
 
-            impl_->scripts.push_back(std::move(state));
+            impl_->scripts[scriptComponent.entity] = std::move(state);
         }
         else
         {
@@ -99,78 +95,83 @@ void ScriptSystem::loadScript(ScriptComponent& scriptComponent)
     }
 }
 
-void ScriptSystem::callCreate()
+void ScriptSystem::callCreate(Entity entity)
 {
-    for (auto& script : impl_->scripts)
+    auto it = impl_->scripts.find(entity);
+    if (it == impl_->scripts.end())
+        return;
+
+    sol::protected_function fn = it->second.script["create"];
+    if (fn.valid())
     {
-        sol::protected_function fn = script.script["create"];
-        if (fn.valid())
-        {
-            sol::protected_function_result result = fn(script.script, script.entity);
-            if (!result.valid()) {
-                sol::error err = result;
-                logError("Lua Error: {}", err.what());
-            }
+        sol::protected_function_result result = fn(it->second.script, entity);
+        if (!result.valid()) {
+            sol::error err = result;
+            logError("Lua Error: {}", err.what());
         }
-            
     }
 }
 
-void ScriptSystem::callUpdate(float dt)
+void ScriptSystem::callCreateOnAll()
 {
-    for (auto& script : impl_->scripts)
+    for (auto& [e, state] : impl_->scripts)
+        callCreate(e);
+}
+
+void ScriptSystem::callUpdate(Entity entity, float dt)
+{
+    auto it = impl_->scripts.find(entity);
+    if (it == impl_->scripts.end())
+        return;
+
+    sol::protected_function fn = it->second.script["update"];
+    if (fn.valid())
     {
-        sol::protected_function fn = script.script["update"];
-        if (fn.valid())
-        {
-            sol::protected_function_result result = fn(script.script, script.entity, dt);
-            if (!result.valid()) {
-                sol::error err = result;
-                logError("Lua Error: {}", err.what());
-            }
+        sol::protected_function_result result = fn(it->second.script, entity, dt);
+        if (!result.valid()) {
+            sol::error err = result;
+            logError("Lua Error: {}", err.what());
         }
     }
+}
+
+void ScriptSystem::callUpdateOnAll(float dt)
+{
+    for (auto& [e, state] : impl_->scripts)
+        callUpdate(e, dt);
 }
 
 void ScriptSystem::callOnEvent(Entity entity, const Event& event)
 {
-    for (auto& state : impl_->scripts)
+    auto it = impl_->scripts.find(entity);
+    if (it == impl_->scripts.end())
+        return;
+
+    LuaState& state = it->second;
+    sol::protected_function fn = state.script["onEvent"];
+    if (fn.valid())
     {
-        // TODO Should be optimized, no reason to iterate all the scripts for a single entity
-        if (state.entity == entity)
+        sol::protected_function_result result;
+        switch (event.type())
         {
-            sol::protected_function fn = state.script["onEvent"];
-            if (fn.valid())
-            {
-                sol::protected_function_result result;
-
-                //todo fix
-                switch (event.type())
-                {
-                case EventType::MouseMoved:
-                    result = fn(state.script, static_cast<const MouseMovedEvent*>(&event)); break;
-                case EventType::KeyPressed:
-                    result = fn(state.script, static_cast<const KeyPressedEvent*>(&event)); break;
-                case EventType::KeyReleased:
-                    result = fn(state.script, static_cast<const KeyReleasedEvent*>(&event)); break;
-                case EventType::MouseButtonPressed:
-                    result = fn(state.script, static_cast<const MouseButtonPressedEvent*>(&event)); break;
-                case EventType::MouseButtonReleased:
-                    result = fn(state.script, static_cast<const MouseButtonReleasedEvent*>(&event)); break;
-                default:
-                    result = fn(state.script, &event); break;
-                }
-
-
-
-                //sol::protected_function_result result = fn(state.script, &event);
-                if (!result.valid()) {
-                    sol::error err = result;
-                    logError("Lua Error: {}", err.what());
-                }
-            }
+        case EventType::MouseMoved:
+            result = fn(state.script, static_cast<const MouseMovedEvent*>(&event)); break;
+        case EventType::KeyPressed:
+            result = fn(state.script, static_cast<const KeyPressedEvent*>(&event)); break;
+        case EventType::KeyReleased:
+            result = fn(state.script, static_cast<const KeyReleasedEvent*>(&event)); break;
+        case EventType::MouseButtonPressed:
+            result = fn(state.script, static_cast<const MouseButtonPressedEvent*>(&event)); break;
+        case EventType::MouseButtonReleased:
+            result = fn(state.script, static_cast<const MouseButtonReleasedEvent*>(&event)); break;
+        default:
+            result = fn(state.script, &event); break;
         }
 
+        if (!result.valid()) {
+            sol::error err = result;
+            logError("Lua Error: {}", err.what());
+        }
     }
 }
 
@@ -196,79 +197,85 @@ void ScriptSystem::callOnCollide(CollisionType collisionType, Entity entity, Ent
 
     assert(!funcName.empty());
 
-    for (auto& state : impl_->scripts)
-    {
-        // TODO Should be optimized, no reason to iterate all the scripts for a single entity
-        if (state.entity == entity)
+    auto callFn = [&](Entity self, Entity opponent) {
+        auto it = impl_->scripts.find(self);
+        if (it == impl_->scripts.end())
+            return;
+        sol::protected_function fn = it->second.script[funcName];
+        if (fn.valid())
         {
-            sol::protected_function fn = state.script[funcName];
-            if (fn.valid())
-            {
-                sol::protected_function_result result = fn(state.script, entity, other);
-
-                if (!result.valid()) {
-                    sol::error err = result;
-                    logError("Lua Error: {}", err.what());
-                }
+            sol::protected_function_result result = fn(it->second.script, self, opponent);
+            if (!result.valid()) {
+                sol::error err = result;
+                logError("Lua Error: {}", err.what());
             }
         }
+    };
 
-        // TODO Should be optimized, no reason to iterate all the scripts for a single entity
-        else if (state.entity == other)
-        {
-            sol::protected_function fn = state.script[funcName];
-            if (fn.valid())
-            {
-                sol::protected_function_result result = fn(state.script, other, entity);
-
-                if (!result.valid()) {
-                    sol::error err = result;
-                    logError("Lua Error: {}", err.what());
-                }
-            }
-        }
-
-    }
+    callFn(entity, other);
+    callFn(other, entity);
 }
 
 void ScriptSystem::callOnAnimTrigger(Entity entity, const std::string& name, int frameID)
 {
-    for (auto& script : impl_->scripts)
+    auto it = impl_->scripts.find(entity);
+    if (it == impl_->scripts.end())
+        return;
+
+    sol::protected_function fn = it->second.script["onAnimationTrigger"];
+    if (fn.valid())
     {
-        if (script.entity == entity)
-        {
-            sol::protected_function fn = script.script["onAnimationTrigger"];
-            if (fn.valid())
-            {
-                sol::protected_function_result result = fn(script.script, name, frameID);
-                if (!result.valid()) {
-                    sol::error err = result;
-                    logError("Lua Error: {}", err.what());
-                }
-            }
+        sol::protected_function_result result = fn(it->second.script, name, frameID);
+        if (!result.valid()) {
+            sol::error err = result;
+            logError("Lua Error: {}", err.what());
         }
     }
 }
 
 const std::unordered_map<std::string, std::string>* ScriptSystem::getScriptRefs(Entity entity) const
 {
-    for (auto& state : impl_->scripts)
-    {
-        if (state.entity == entity)
-            return &state.refs;
-    }
+    auto it = impl_->scripts.find(entity);
+    if (it != impl_->scripts.end())
+        return &it->second.refs;
     return nullptr;
 }
 
-void ScriptSystem::callDestroy()
+void ScriptSystem::callDestroy(Entity entity)
 {
-    for (auto& script : impl_->scripts)
+    auto it = impl_->scripts.find(entity);
+    if (it == impl_->scripts.end())
+        return;
+
+    sol::function fn = it->second.script["destroy"];
+    if (fn.valid())
+        fn(it->second.script, entity);
+
+    impl_->scripts.erase(it);
+}
+
+void ScriptSystem::callDestroyOnAll()
+{
+    std::vector<Entity> entities;
+    entities.reserve(impl_->scripts.size());
+    for (auto& [e, state] : impl_->scripts)
+        entities.push_back(e);
+
+    for (Entity e : entities)
+        callDestroy(e);
+}
+
+void ScriptSystem::resolveRefs(Entity entity)
+{
+    // If not valid script ignore
+    auto it = impl_->scripts.find(entity);
+    if (it == impl_->scripts.end())
+        return;
+
+    auto& scriptComponent = entity.getComponent<ScriptComponent>();
+    auto refSlots = scriptComponent.getAllRefSlots();
+    for (const auto& fieldName : refSlots)
     {
-        sol::function fn = script.script["destroy"];
-        if (fn.valid())
-            fn(script.script, script.entity);
+        it->second.script[fieldName] = scriptComponent.getRef(fieldName);
     }
-
-    impl_->scripts.clear();
-
 }

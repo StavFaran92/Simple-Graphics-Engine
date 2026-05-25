@@ -126,6 +126,23 @@ void displayColoredLabelWidget(const char* label)
 	ImGui::Dummy(ImVec2(0.0f, 2.0f)); // Add a vertical gap
 }
 
+void addEntitySelectWidget(const std::string& label, Entity current, const std::function<void(Entity)>& onAcceptCB)
+{
+	std::string buttonLabel = current.valid() ? current.getComponent<ObjectComponent>().name : "None";
+
+	ImGui::Text(label.c_str());
+	ImGui::SameLine();
+
+	ImGui::PushID(label.c_str());
+	float width = ImGui::GetContentRegionAvail().x;
+	if (ImGui::Button(buttonLabel.c_str(), ImVec2(width, 0)))
+	{
+		EditorState::Instance().entitySelectCB = onAcceptCB;
+		DialogManager::Instance().entitySelectDialog.activate();
+	}
+	ImGui::PopID();
+}
+
 bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& onAccpetCB)
 {
 	float width = ImGui::GetContentRegionAvail().x;

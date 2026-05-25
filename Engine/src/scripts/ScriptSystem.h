@@ -23,14 +23,21 @@ public:
 
     void init();
 
-    void loadScript(ScriptComponent& scriptComponent);
+    void reloadScript(Entity e, ScriptComponent& scriptComponent);
 
-    void callCreate();
-    void callUpdate(float dt);
+    void callCreate(Entity entity);
+    void callCreateOnAll();
+    void callUpdate(Entity entity, float dt);
+    void callUpdateOnAll(float dt);
     void callOnEvent(Entity entity, const Event& event);
     void callOnCollide(CollisionType, Entity entity, Entity other);
     void callOnAnimTrigger(Entity entity, const std::string& name, int frameID);
-    void callDestroy();
+    void callDestroy(Entity entity);
+    void callDestroyOnAll();
+
+    void resolveRefs(Entity entity);
+    //void setRef(Entity entity, const std::string& fieldName, Entity ref);
+    //Entity getRef(Entity entity, const std::string& fieldName) const;
 
     // Returns discovered Ref() fields for the given script entity. nullptr if not found.
     const std::unordered_map<std::string, std::string>* getScriptRefs(Entity entity) const;

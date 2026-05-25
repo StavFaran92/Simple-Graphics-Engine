@@ -18,6 +18,7 @@ void displayTextureWidget();
 void displayColoredLabelWidget(const char* label);
 
 bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& onAccpetCB);
+void addEntitySelectWidget(const std::string& label, Entity current, const std::function<void(Entity)>& onAcceptCB);
 
 class MaterialDataWidget
 {

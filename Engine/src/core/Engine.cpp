@@ -260,6 +260,9 @@ bool Engine::init(const InitParams& initParams)
     }
     auto volumetricCloudsSystem = new VolumetricCloudsSystem();
 
+    auto scriptSystem = new ScriptSystem();
+    scriptSystem->init();
+
     if (initParams.loadExistingProject)
     {
         loadProject(m_projectDirectory);
@@ -286,8 +289,8 @@ bool Engine::init(const InitParams& initParams)
         return false;
     }
 
-    auto scriptSystem = new ScriptSystem();
-    scriptSystem->init();
+    
+   
 
     new AnimationSystem();
 

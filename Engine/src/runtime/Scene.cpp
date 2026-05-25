@@ -405,7 +405,7 @@ void Scene::update(float deltaTime)
 		auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
 		try
 		{
-			scriptSystem->callUpdate(deltaTime);
+			scriptSystem->callUpdateOnAll(deltaTime);
 		}
 		catch (const std::exception& e)
 		{
@@ -1415,12 +1415,14 @@ void Scene::startSimulation()
 	auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
 	for (auto&& [entity, script] : m_registry->get().view<ScriptComponent>().each())
 	{
-		scriptSystem->loadScript(script);
+		Entity e(entity, &getRegistry());
+		scriptSystem->reloadScript(e, script);
+		scriptSystem->resolveRefs(e);
 	}
 
 	try
 	{
-		scriptSystem->callCreate();
+		scriptSystem->callCreateOnAll();
 	}
 	catch (const std::exception& e)
 	{
@@ -1463,7 +1465,7 @@ void Scene::stopSimulation()
 	auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
 	try
 	{
-		scriptSystem->callDestroy();
+		scriptSystem->callDestroyOnAll();
 	}
 	catch (const std::exception& e)
 	{

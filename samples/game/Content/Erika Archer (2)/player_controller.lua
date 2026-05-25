@@ -39,6 +39,8 @@ function Script:create(entity)
     self.isAttacking = false
     self.state = PlayerState.Idle
 
+    print(self.target:handlerID())
+
     local eventSystem = EventSystem.get()
     eventSystem:subscribe(EventType.KeyPressed, entity)
     eventSystem:subscribe(EventType.MouseMoved, entity)

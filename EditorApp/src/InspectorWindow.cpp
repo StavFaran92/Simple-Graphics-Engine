@@ -687,13 +687,13 @@ void InspectorWindow::display()
 				script.script = LuaScriptAssetRef(uuid);
 			});
 
-			auto* refs = Engine::get()->getSubSystem<ScriptSystem>()->getScriptRefs(state.getSelectedEntity());
-			if (refs)
+			auto refSlots = script.getAllRefSlots();
+			for (const auto& fieldName : refSlots)
 			{
-				for (const auto& [fieldName, refType] : *refs)
-				{
-					logDebug("{} : {}", fieldName, refType);
-				}
+				Entity current = script.getRef(fieldName);
+				addEntitySelectWidget(fieldName, current, [fieldName, &script](Entity e) {
+					script.setRef(fieldName, e);
+					});
 			}
 
 		});

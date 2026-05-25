@@ -486,7 +486,8 @@
                                     },
                                     "entity": {
                                         "m_entity": 9
-                                    }
+                                    },
+                                    "refs": []
                                 }
                             }
                         },
@@ -658,7 +659,21 @@
                                     },
                                     "entity": {
                                         "m_entity": 7
-                                    }
+                                    },
+                                    "refs": [
+                                        {
+                                            "key": "target",
+                                            "value": {
+                                                "m_entity": 5
+                                            }
+                                        },
+                                        {
+                                            "key": "spawnPoint",
+                                            "value": {
+                                                "m_entity": 4294967295
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         },

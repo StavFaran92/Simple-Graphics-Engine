@@ -241,12 +241,12 @@ public:
         return m_registry != nullptr && m_entity != entt::null && m_registry->getRegistry().valid(m_entity);
     }
 
-    bool operator==(const Entity& other)
+    bool operator==(const Entity& other) const
     {
         return m_registry == other.m_registry && m_entity == other.m_entity;
     }
 
-    bool operator!=(const Entity& other)
+    bool operator!=(const Entity& other) const
     {
         return m_registry != other.m_registry || m_entity != other.m_entity;
     }
@@ -279,5 +279,14 @@ private:
 
     // TODO remove
     std::set<std::string> m_components;
+};
+
+template<>
+struct std::hash<Entity>
+{
+    size_t operator()(const Entity& e) const noexcept
+    {
+        return std::hash<entity_id>{}(e.handlerID());
+    }
 };
 
