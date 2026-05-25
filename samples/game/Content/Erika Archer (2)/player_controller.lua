@@ -83,21 +83,26 @@ function Script:update(entity, dt)
     -- Move player
     local disp = vec3.new(0, self.velocityV / 1000.0, 0)
 
-    if self.animator:getGraph():getCurrentStateID() == "Run" or 
-    self.animator:getGraph():getCurrentStateID() == "Jump" then
-        disp = disp + self.movementH + self.movementV
-    end
-    self.pc:move(disp)
-
-    -- Update state
+        -- Update state
     local hDir = self.movementH + self.movementV
     local isMoving = math.abs(hDir.x) > 0.0 or math.abs(hDir.z) > 0.0
 
-    -- Rotate model toward movement direction
-    if isMoving and not self.isJumping then
+    if self.animator:getGraph():getCurrentStateID() == "Run" or 
+    self.animator:getGraph():getCurrentStateID() == "Jump" then
+        disp = disp + self.movementH + self.movementV
+
         local angle = -math.atan(hDir.z, hDir.x)
         self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
     end
+    self.pc:move(disp)
+
+
+
+    -- Rotate model toward movement direction
+    -- if isMoving and not self.isJumping then
+    --     local angle = -math.atan(hDir.z, hDir.x)
+    --     self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
+    -- end
 
     local speed = length(hDir)
     self.animator:getGraph():setFloat("speed", speed)

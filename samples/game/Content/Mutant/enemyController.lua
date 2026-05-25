@@ -3,7 +3,7 @@
 Script = {}
 
 local SEEK_RANGE   = 10.0
-local ATTACK_RANGE = 1.5
+local ATTACK_RANGE = 1
 
 local State = {
     IDLE        = "idle",
