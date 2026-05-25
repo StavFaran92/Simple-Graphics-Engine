@@ -161,6 +161,10 @@ function Script:onAnimationTrigger(name, frame)
     end
 end
 
+function Script:onTriggerEnter(entity, other)
+    self.animator:getGraph():trigger("hurt")
+end
+
 function Script:destroy(entity)
     local window = Window.get();
     window:unlockMouse()

@@ -99,9 +99,20 @@
             "sourcePath": "",
             "uuid": 89,
             "visibility": 1
+        },
+        {
+            "aType": 3,
+            "asset": {},
+            "assetDirectory": "warrior\\Warrior",
+            "ext": ".anim",
+            "isEngineOwned": false,
+            "name": "GetHurt",
+            "sourcePath": "",
+            "uuid": 91,
+            "visibility": 1
         }
     ],
-    "counter": 91,
+    "counter": 92,
     "lua script": [
         {
             "aType": 7,
@@ -4141,6 +4152,7 @@
         "FemaleFitA_Body_diffuse": 38,
         "FemaleFitA_StdNM": 39,
         "FemaleFitA_eyelash_diffuse": 44,
+        "GetHurt": 91,
         "Ground037_2K-PNG_AmbientOcclusion": 24,
         "Ground037_2K-PNG_Color": 21,
         "Ground037_2K-PNG_NormalGL": 22,
@@ -4235,6 +4247,7 @@
         "content/scene_0.scene": 15,
         "content/sunflowers_puresky_4k.texture": 26,
         "content/warrior/animationrelay.lua": 90,
+        "content/warrior/warrior/gethurt.anim": 91,
         "content/warrior/warrior/maria_diffuse.texture": 84,
         "content/warrior/warrior/maria_normal.texture": 85,
         "content/warrior/warrior/mariamat.mat": 83,
