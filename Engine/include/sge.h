@@ -35,6 +35,7 @@
 #include "runtime/Entity.h"
 #include "geometry/ShapeFactory.h"
 #include "component/Component.h"
+#include "component/TagComponent.h"
 #include "core/Random.h"
 #include "systems/TimeManager.h"
 #include "render/Graphics.h"

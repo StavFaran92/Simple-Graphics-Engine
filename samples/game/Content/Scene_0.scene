@@ -13,14 +13,14 @@
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
-                                        "v.x": -0.0037520835176110269,
-                                        "v.y": 97.98040771484375,
-                                        "v.z": -3.2887328416109088e-8
+                                        "v.x": -0.0037384033203125,
+                                        "v.y": 97.98043823242188,
+                                        "v.z": -0.000011444091796875
                                     },
                                     "localRotation": {
-                                        "q.x": -2.4735758146626763e-12,
+                                        "q.x": -2.4735760315031108e-12,
                                         "q.y": -3.576271723204627e-9,
-                                        "q.z": -1.0986673376622847e-11,
+                                        "q.z": -1.0986672509261109e-11,
                                         "q.w": 1.0
                                     },
                                     "localScale": {
@@ -93,6 +93,17 @@
                                     }
                                 }
                             }
+                        },
+                        {
+                            "polymorphic_id": 2147483653,
+                            "polymorphic_name": "TagComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483653,
+                                "data": {
+                                    "isActive": true,
+                                    "tag": "enemy_attack_collider"
+                                }
+                            }
                         }
                     ]
                 },
@@ -100,10 +111,10 @@
                     "entity": 10,
                     "components": [
                         {
-                            "polymorphic_id": 2147483653,
+                            "polymorphic_id": 2147483654,
                             "polymorphic_name": "Animator",
                             "ptr_wrapper": {
-                                "id": 2147483653,
+                                "id": 2147483654,
                                 "data": {
                                     "m_currentAnimIndex": 0,
                                     "m_animations": [
@@ -359,10 +370,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483654,
+                            "polymorphic_id": 2147483655,
                             "polymorphic_name": "MeshRendererComponent",
                             "ptr_wrapper": {
-                                "id": 2147483654,
+                                "id": 2147483655,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -402,10 +413,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483655,
+                            "polymorphic_id": 2147483656,
                             "polymorphic_name": "ScriptComponent",
                             "ptr_wrapper": {
-                                "id": 2147483655,
+                                "id": 2147483656,
                                 "data": {
                                     "isActive": true,
                                     "script": {
@@ -430,11 +441,11 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483656,
+                                "id": 2147483657,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
-                                        "v.x": -0.000005628910002997145,
+                                        "v.x": -0.000005420293746283278,
                                         "v.y": 0.0,
                                         "v.z": 0.00004673004150390625
                                     },
@@ -472,7 +483,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483657,
+                                "id": 2147483658,
                                 "data": {
                                     "isActive": true,
                                     "name": "model",
@@ -483,10 +494,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483656,
+                            "polymorphic_id": 2147483657,
                             "polymorphic_name": "RenderableComponent",
                             "ptr_wrapper": {
-                                "id": 2147483658,
+                                "id": 2147483659,
                                 "data": {
                                     "isActive": true,
                                     "renderTechnique": 1
@@ -499,9 +510,9 @@
                     "entity": 9,
                     "components": [
                         {
-                            "polymorphic_id": 7,
+                            "polymorphic_id": 8,
                             "ptr_wrapper": {
-                                "id": 2147483659,
+                                "id": 2147483660,
                                 "data": {
                                     "isActive": true,
                                     "script": {
@@ -519,7 +530,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483660,
+                                "id": 2147483661,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -561,7 +572,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483661,
+                                "id": 2147483662,
                                 "data": {
                                     "isActive": true,
                                     "name": "zombie",
@@ -574,17 +585,17 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483662,
+                                "id": 2147483663,
                                 "data": {
                                     "isActive": true,
                                     "rigidBodyType": 2,
                                     "collisionType": 0,
                                     "mass": 0.0,
                                     "collider": {
-                                        "polymorphic_id": 2147483657,
+                                        "polymorphic_id": 2147483658,
                                         "polymorphic_name": "CollisionCapsule",
                                         "ptr_wrapper": {
-                                            "id": 2147483663,
+                                            "id": 2147483664,
                                             "data": {
                                                 "radius": 0.20000000298023225,
                                                 "halfHeight": 0.4000000059604645
@@ -614,7 +625,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483664,
+                                "id": 2147483665,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -656,7 +667,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483665,
+                                "id": 2147483666,
                                 "data": {
                                     "isActive": true,
                                     "name": "cameraPivot",
@@ -672,9 +683,9 @@
                     "entity": 7,
                     "components": [
                         {
-                            "polymorphic_id": 7,
+                            "polymorphic_id": 8,
                             "ptr_wrapper": {
-                                "id": 2147483666,
+                                "id": 2147483667,
                                 "data": {
                                     "isActive": true,
                                     "script": {
@@ -687,12 +698,6 @@
                                     },
                                     "refs": [
                                         {
-                                            "key": "mainCamera",
-                                            "value": {
-                                                "m_entity": 1
-                                            }
-                                        },
-                                        {
                                             "key": "attack_collider",
                                             "value": {
                                                 "m_entity": 1048582
@@ -702,6 +707,12 @@
                                             "key": "cameraPivot",
                                             "value": {
                                                 "m_entity": 8
+                                            }
+                                        },
+                                        {
+                                            "key": "mainCamera",
+                                            "value": {
+                                                "m_entity": 1
                                             }
                                         },
                                         {
@@ -717,7 +728,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483667,
+                                "id": 2147483668,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -765,7 +776,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483668,
+                                "id": 2147483669,
                                 "data": {
                                     "isActive": true,
                                     "name": "player",
@@ -776,10 +787,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483658,
+                            "polymorphic_id": 2147483659,
                             "polymorphic_name": "PlayerController",
                             "ptr_wrapper": {
-                                "id": 2147483669,
+                                "id": 2147483670,
                                 "data": {
                                     "isActive": true,
                                     "height": 1.0,
@@ -800,7 +811,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483670,
+                                "id": 2147483671,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -835,7 +846,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483671,
+                                "id": 2147483672,
                                 "data": {
                                     "isActive": true,
                                     "name": "attack_collider",
@@ -848,7 +859,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483672,
+                                "id": 2147483673,
                                 "data": {
                                     "isActive": false,
                                     "rigidBodyType": 2,
@@ -857,7 +868,7 @@
                                     "collider": {
                                         "polymorphic_id": 4,
                                         "ptr_wrapper": {
-                                            "id": 2147483673,
+                                            "id": 2147483674,
                                             "data": {
                                                 "extents": {
                                                     "v.x": 0.5,
@@ -881,6 +892,16 @@
                                     }
                                 }
                             }
+                        },
+                        {
+                            "polymorphic_id": 5,
+                            "ptr_wrapper": {
+                                "id": 2147483675,
+                                "data": {
+                                    "isActive": true,
+                                    "tag": "player_attack_collider"
+                                }
+                            }
                         }
                     ]
                 },
@@ -888,9 +909,9 @@
                     "entity": 5,
                     "components": [
                         {
-                            "polymorphic_id": 5,
+                            "polymorphic_id": 6,
                             "ptr_wrapper": {
-                                "id": 2147483674,
+                                "id": 2147483676,
                                 "data": {
                                     "m_currentAnimIndex": 0,
                                     "m_animations": [
@@ -970,8 +991,8 @@
                                                 },
                                                 "loop": true,
                                                 "pos": {
-                                                    "v.x": 600.0,
-                                                    "v.y": 168.0
+                                                    "v.x": 660.0,
+                                                    "v.y": 188.0
                                                 }
                                             },
                                             {
@@ -988,8 +1009,8 @@
                                                 },
                                                 "loop": true,
                                                 "pos": {
-                                                    "v.x": 744.0,
-                                                    "v.y": 280.0
+                                                    "v.x": 804.0,
+                                                    "v.y": 300.0
                                                 }
                                             },
                                             {
@@ -1006,8 +1027,8 @@
                                                 },
                                                 "loop": true,
                                                 "pos": {
-                                                    "v.x": 408.0,
-                                                    "v.y": 280.0
+                                                    "v.x": 468.0,
+                                                    "v.y": 300.0
                                                 }
                                             },
                                             {
@@ -1024,8 +1045,8 @@
                                                 },
                                                 "loop": true,
                                                 "pos": {
-                                                    "v.x": 600.0,
-                                                    "v.y": 360.0
+                                                    "v.x": 660.0,
+                                                    "v.y": 380.0
                                                 }
                                             },
                                             {
@@ -1042,8 +1063,8 @@
                                                 },
                                                 "loop": true,
                                                 "pos": {
-                                                    "v.x": 772.0,
-                                                    "v.y": 460.0
+                                                    "v.x": 832.0,
+                                                    "v.y": 480.0
                                                 }
                                             }
                                         ],
@@ -1232,9 +1253,9 @@
                             }
                         },
                         {
-                            "polymorphic_id": 6,
+                            "polymorphic_id": 7,
                             "ptr_wrapper": {
-                                "id": 2147483675,
+                                "id": 2147483677,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -1258,9 +1279,9 @@
                             }
                         },
                         {
-                            "polymorphic_id": 7,
+                            "polymorphic_id": 8,
                             "ptr_wrapper": {
-                                "id": 2147483676,
+                                "id": 2147483678,
                                 "data": {
                                     "isActive": true,
                                     "script": {
@@ -1285,7 +1306,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483677,
+                                "id": 2147483679,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -1327,7 +1348,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483678,
+                                "id": 2147483680,
                                 "data": {
                                     "isActive": true,
                                     "name": "model",
@@ -1338,9 +1359,9 @@
                             }
                         },
                         {
-                            "polymorphic_id": 8,
+                            "polymorphic_id": 9,
                             "ptr_wrapper": {
-                                "id": 2147483679,
+                                "id": 2147483681,
                                 "data": {
                                     "isActive": true,
                                     "renderTechnique": 1
@@ -1353,9 +1374,9 @@
                     "entity": 4,
                     "components": [
                         {
-                            "polymorphic_id": 6,
+                            "polymorphic_id": 7,
                             "ptr_wrapper": {
-                                "id": 2147483680,
+                                "id": 2147483682,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -1381,7 +1402,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483681,
+                                "id": 2147483683,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -1416,7 +1437,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483682,
+                                "id": 2147483684,
                                 "data": {
                                     "isActive": true,
                                     "name": "Sphere_0",
@@ -1429,17 +1450,17 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483683,
+                                "id": 2147483685,
                                 "data": {
                                     "isActive": true,
                                     "rigidBodyType": 0,
                                     "collisionType": 0,
                                     "mass": 0.0,
                                     "collider": {
-                                        "polymorphic_id": 2147483659,
+                                        "polymorphic_id": 2147483660,
                                         "polymorphic_name": "CollisionSphere",
                                         "ptr_wrapper": {
-                                            "id": 2147483684,
+                                            "id": 2147483686,
                                             "data": {
                                                 "radius": 0.5
                                             }
@@ -1468,7 +1489,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483685,
+                                "id": 2147483687,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -1503,7 +1524,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483686,
+                                "id": 2147483688,
                                 "data": {
                                     "isActive": true,
                                     "name": "Skybox",
@@ -1514,10 +1535,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483660,
+                            "polymorphic_id": 2147483661,
                             "polymorphic_name": "SkyboxComponent",
                             "ptr_wrapper": {
-                                "id": 2147483687,
+                                "id": 2147483689,
                                 "data": {
                                     "isActive": true,
                                     "originalImage": {
@@ -1552,7 +1573,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483688,
+                                "id": 2147483690,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -1585,10 +1606,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483661,
+                            "polymorphic_id": 2147483662,
                             "polymorphic_name": "Terrain",
                             "ptr_wrapper": {
-                                "id": 2147483689,
+                                "id": 2147483691,
                                 "data": {
                                     "isActive": true,
                                     "m_mesh": {
@@ -1650,7 +1671,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483690,
+                                "id": 2147483692,
                                 "data": {
                                     "isActive": true,
                                     "name": "Terrain",
@@ -1663,17 +1684,17 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483691,
+                                "id": 2147483693,
                                 "data": {
                                     "isActive": true,
                                     "rigidBodyType": 0,
                                     "collisionType": 0,
                                     "mass": 0.0,
                                     "collider": {
-                                        "polymorphic_id": 2147483662,
+                                        "polymorphic_id": 2147483663,
                                         "polymorphic_name": "CollisionTerrain",
                                         "ptr_wrapper": {
-                                            "id": 2147483692,
+                                            "id": 2147483694,
                                             "data": {
                                                 "layerMask": 0
                                             }
@@ -1700,9 +1721,9 @@
                     "entity": 1,
                     "components": [
                         {
-                            "polymorphic_id": 6,
+                            "polymorphic_id": 7,
                             "ptr_wrapper": {
-                                "id": 2147483693,
+                                "id": 2147483695,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -1726,10 +1747,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483663,
+                            "polymorphic_id": 2147483664,
                             "polymorphic_name": "CameraComponent",
                             "ptr_wrapper": {
-                                "id": 2147483694,
+                                "id": 2147483696,
                                 "data": {
                                     "isActive": true,
                                     "center": {
@@ -1757,7 +1778,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483695,
+                                "id": 2147483697,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -1792,7 +1813,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483696,
+                                "id": 2147483698,
                                 "data": {
                                     "isActive": true,
                                     "name": "Main Camera",
@@ -1810,7 +1831,7 @@
                         {
                             "polymorphic_id": 1,
                             "ptr_wrapper": {
-                                "id": 2147483697,
+                                "id": 2147483699,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -1845,7 +1866,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483698,
+                                "id": 2147483700,
                                 "data": {
                                     "isActive": true,
                                     "name": "Directional light",
@@ -1856,10 +1877,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483664,
+                            "polymorphic_id": 2147483665,
                             "polymorphic_name": "DirectionalLight",
                             "ptr_wrapper": {
-                                "id": 2147483699,
+                                "id": 2147483701,
                                 "data": {
                                     "color": {
                                         "v.x": 1.0,

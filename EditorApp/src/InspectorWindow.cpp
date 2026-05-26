@@ -12,6 +12,7 @@
 #include "AnimationGraphWindow.h"
 #include "AnimationViewerWindow.h"
 #include "scripts/ScriptSystem.h"
+#include "component/TagComponent.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -69,6 +70,10 @@ void InspectorWindow::display()
 			bool isChanged = false;
 			displayTransformation(transform, isChanged);
 		});
+
+		displayComponent<TagComponent>("Tag", [](TagComponent& tag) {
+			ImGui::InputText("##tag", &tag.tag);
+			});
 
 		displayComponent<PhysicsComponent>("Physics", [](PhysicsComponent& rBody) {
 			ImGui::LabelText("", "Actor Type");
@@ -794,6 +799,11 @@ void InspectorWindow::display()
 			if (ImGui::MenuItem("Transformation"))
 			{
 				state.getSelectedEntity().addComponent<Transformation>(state.getSelectedEntity());
+			}
+
+			if (ImGui::MenuItem("Tag"))
+			{
+				state.getSelectedEntity().addComponent<TagComponent>();
 			}
 
 			if (ImGui::MenuItem("Physics"))

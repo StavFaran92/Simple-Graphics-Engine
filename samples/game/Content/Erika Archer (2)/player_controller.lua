@@ -86,13 +86,16 @@ function Script:update(entity, dt)
         -- Update state
     local hDir = self.movementH + self.movementV
     local isMoving = math.abs(hDir.x) > 0.0 or math.abs(hDir.z) > 0.0
+    local speed = length(hDir)
 
     if self.animator:getGraph():getCurrentStateID() == "Run" or 
     self.animator:getGraph():getCurrentStateID() == "Jump" then
-        disp = disp + self.movementH + self.movementV
-
-        local angle = -math.atan(hDir.z, hDir.x)
-        self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
+        if speed > 0 then
+            disp = disp + self.movementH + self.movementV
+            
+            local angle = -math.atan(hDir.z, hDir.x)
+            self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
+        end
     end
     self.pc:move(disp)
 
@@ -104,7 +107,7 @@ function Script:update(entity, dt)
     --     self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
     -- end
 
-    local speed = length(hDir)
+    
     self.animator:getGraph():setFloat("speed", speed)
     self.animator:getGraph():setBool("isJumping", self.isJumping)
     self.animator:getGraph():setBool("isGrounded", self.isGrounded)
@@ -167,7 +170,9 @@ function Script:onAnimationTrigger(name, frame)
 end
 
 function Script:onTriggerEnter(entity, other)
-    self.animator:getGraph():trigger("hurt")
+    if other.Tag:getTag() == "enemy_attack_collider" then
+        self.animator:getGraph():trigger("hurt")
+    end
 end
 
 function Script:destroy(entity)

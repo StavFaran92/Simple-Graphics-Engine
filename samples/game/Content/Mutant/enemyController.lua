@@ -78,7 +78,9 @@ function Script:onAnimationTrigger(name, frame)
 end
 
 function Script:onTriggerEnter(entity, other)
-    self.animator:getGraph():trigger("hit")
+    if other.Tag:getTag() == "player_attack_collider" then
+        self.animator:getGraph():trigger("hit")
+    end    
 end
 
 function Script:destroy(entity)

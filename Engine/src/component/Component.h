@@ -82,11 +82,6 @@ std::shared_ptr<Component> getComponentIfExists(const Entity& e)
 	CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, TYPE); \
 	COMPONENT_SERDES(TYPE)
 
-struct EngineAPI TagComponent : public Component
-{
-	std::string getName() override { return "TagComponent"; }
-	std::string tag;
-};
 
 struct EngineAPI InstanceBatch : public Component
 {

@@ -23,6 +23,7 @@
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 #include "component/ScriptComponent.h"
+#include "component/TagComponent.h"
 #include "scripts/ScriptSystem.h"
 
 #include "component/ImageComponent.h"
@@ -82,7 +83,13 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
 
     { "Image", [](Entity& e, sol::this_state lua) -> sol::object {
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<ImageComponent>()));
+    } },
+        
+    { "Tag", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<TagComponent>()));
     } }
+
+
 };
 
 sol::object getComponentHelper(Entity & e, sol::stack_object key, sol::this_state lua)
@@ -422,6 +429,11 @@ void bindComponents(sol::state& lua)
         "turnToDynamic", [](PhysicsComponent& self) { self.setRigidBodyType(RigidbodyType::Dynamic); },
         "activate", &PhysicsComponent::activate,
         "deactivate", &PhysicsComponent::deactivate
+    );
+
+    lua.new_usertype<TagComponent>("TagComponent",
+        "tag", &TagComponent::tag,
+        "getTag", &TagComponent::getTag
     );
 }
 
