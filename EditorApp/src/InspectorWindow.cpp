@@ -19,37 +19,84 @@ Terrain* g_activeTerrain = 0;
 
 extern Entity g_editorCamera;
 
+static bool dragFloat3Colored(const char* id, float v[3], float speed)
+{
+	static const ImVec4 axisColors[3] = {
+		{0.82f, 0.17f, 0.17f, 1.f},
+		{0.17f, 0.72f, 0.17f, 1.f},
+		{0.22f, 0.40f, 0.90f, 1.f},
+	};
+
+	bool changed = false;
+	float colorStripW = 4.0f;
+	float stripPad = 3.0f;
+	float betweenSpacing = 4.0f;
+
+	float colWidth = ImGui::GetColumnWidth();
+	float overhead = (colorStripW + stripPad) * 3.0f + betweenSpacing * 2.0f;
+	float fittedWidth = (colWidth - overhead) / 3.0f;
+	float preferredWidth = ImGui::CalcTextSize("-000.00").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+	float dragWidth = std::min(preferredWidth, fittedWidth);
+
+	for (int i = 0; i < 3; i++)
+	{
+		ImGui::PushID(i);
+		if (i > 0) ImGui::SameLine(0.f, betweenSpacing);
+
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		float frameH = ImGui::GetFrameHeight();
+		ImGui::GetWindowDrawList()->AddRectFilled(
+			pos,
+			{pos.x + colorStripW, pos.y + frameH},
+			ImGui::ColorConvertFloat4ToU32(axisColors[i]),
+			1.0f
+		);
+		ImGui::SetCursorScreenPos({pos.x + colorStripW + stripPad, pos.y});
+
+		ImGui::SetNextItemWidth(dragWidth);
+		char dragId[64];
+		snprintf(dragId, sizeof(dragId), "##%s%d", id, i);
+		if (ImGui::DragFloat(dragId, &v[i], speed)) changed = true;
+
+		ImGui::PopID();
+	}
+	return changed;
+}
+
 static void displayTransformation(Transformation& transform, bool& isChanged)
 {
 	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
 	auto& localTransform = transform.getLocalTransformation();
 	ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localTransform), matrixTranslation, matrixRotation, matrixScale);
 
-	BEGIN_IMGUI_TABLE("Transform");
+	if (!ImGui::BeginTable("Transform", 2, ImGuiTableFlags_None))
+		return;
 
-	addTableRow("Position", [&](std::string id) {
-		if (ImGui::DragFloat3(id.c_str(), matrixTranslation, .1f)) {
-			transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
-			isChanged = true;
-		}
-	});
+	ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch, 0.35f);
+	ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.65f);
 
-	addTableRow("Rotation", [&](std::string id) {
-		if (ImGui::DragFloat3(id.c_str(), matrixRotation), .001f, 0.f, 180.f) {
-			transform.setLocalRotation(glm::radians(glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2])));
-			isChanged = true;
-		}
-	});
+	auto row = [](const char* label, float v[3], float speed) -> bool {
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::TextUnformatted(label);
+		ImGui::TableSetColumnIndex(1);
+		return dragFloat3Colored(label, v, speed);
+	};
 
-	addTableRow("Scale", [&](std::string id) {
-		if (ImGui::DragFloat3(id.c_str(), matrixScale, .1f)) {
-			transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
-			isChanged = true;
-		}
-	});
+	if (row("Position", matrixTranslation, .1f)) {
+		transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
+		isChanged = true;
+	}
+	if (row("Rotation", matrixRotation, .1f)) {
+		transform.setLocalRotation(glm::radians(glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2])));
+		isChanged = true;
+	}
+	if (row("Scale", matrixScale, .1f)) {
+		transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
+		isChanged = true;
+	}
 
-	END_IMGUI_TABLE();
-
+	ImGui::EndTable();
 }
 
 void InspectorWindow::display()
