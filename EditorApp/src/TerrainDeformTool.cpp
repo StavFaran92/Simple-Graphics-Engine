@@ -44,7 +44,7 @@ void TerrainDeformTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 	}
 }
 
-bool TerrainDeformTool::onEvent(SDL_Event e)
+bool TerrainDeformTool::onEvent(const Event& e)
 {
 	if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 	{

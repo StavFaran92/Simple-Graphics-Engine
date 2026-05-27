@@ -7,8 +7,6 @@
 #include <functional>
 #include <string>
 
-#include "SDL2/SDL_events.h"
-
 #include "core/Core.h"
 
 #include "core/EventLayer.h"

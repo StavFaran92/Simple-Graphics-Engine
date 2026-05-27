@@ -17,7 +17,7 @@ public:
 
     void update(ImVec2 viewportPos, ImVec2 viewportSize) override;
 
-    bool onEvent(SDL_Event e);
+    bool onEvent(const Event& e) override;
 
     const char* name() const override
     {

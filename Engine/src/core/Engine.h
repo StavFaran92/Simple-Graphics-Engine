@@ -21,7 +21,6 @@ class ImguiHandler;
 class ObjectSelection;
 class PostProcessProjector;
 class Application;
-union SDL_Event;
 class Input;
 class EventSystem;
 class ModelImporter;

@@ -52,7 +52,7 @@ void TerrainPaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
     }
 }
 
-bool TerrainPaintTool::onEvent(SDL_Event e)
+bool TerrainPaintTool::onEvent(const Event& e)
 {
     if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
     {

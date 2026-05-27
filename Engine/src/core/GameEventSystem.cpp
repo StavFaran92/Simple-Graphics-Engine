@@ -2,9 +2,6 @@
 
 #include "core/Engine.h"
 #include "runtime/Entity.h"
-#include "runtime/Context.h"
-#include "runtime/Scene.h"
-#include "component/ScriptComponent.h"
 #include "scripts/ScriptSystem.h"
 
 GameEventSystem::GameEventSystem()
@@ -42,16 +39,3 @@ void GameEventSystem::clean()
 {
 	m_handlerTable.clear();
 }
-
-//void GameEventSystem::unsubscribe(SDL_EventType eventType, Subscriber* s)
-//{
-//	auto iter = m_handlerTable.find(s);
-//	if (iter == m_handlerTable.end())
-//	{
-//		return;
-//	}
-//	
-//	EventHandler handler = iter->second;
-//
-//	Engine::get()->getEventSystem()->unsubscribe(handler, eventType);
-//}
