@@ -54,6 +54,11 @@ void AnimationGraph::setAnimatorOwner(Animator* owner)
 void AnimationGraph::init()
 {
     transitionTo(m_entryStateId, 0.0f);
+
+    // init param values to default
+    for (const auto& param : m_parameters) {
+        m_paramValues[param.name] = param.defaultValue;
+    }
 }
 
 void AnimationGraph::addState(StateNode state)

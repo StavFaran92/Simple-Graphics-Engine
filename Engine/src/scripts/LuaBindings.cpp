@@ -41,6 +41,41 @@
 
 #include "ui/KeyCodes_Lua.gen.h"
 
+#include "core/StateMachine.h"
+
+class LuaState : public State {
+    sol::table luaTable;
+
+public:
+    LuaState(const std::string& name, sol::table table)
+        : State(name), luaTable(table) {
+    }
+
+    void onEnter() override {
+        auto fn = luaTable["onEnter"];
+        if (fn.valid()) 
+            fn(luaTable);
+    }
+
+    void onUpdate(float dt) override {
+        auto fn = luaTable["onUpdate"];
+        if (fn.valid()) 
+            fn(luaTable, dt);
+    }
+
+    void onExit() override {
+        auto fn = luaTable["onExit"];
+        if (fn.valid()) 
+            fn(luaTable);
+    }
+
+    static void addLuaState(StateMachine& sm, const std::string& name, sol::table table) {
+        sm.addState(std::make_shared<LuaState>(name, table));
+    }
+};
+
+
+
 using ComponentGetter = std::function<sol::object(Entity&, sol::this_state)>;
 
 std::unordered_map<std::string, ComponentGetter> componentGetters{
@@ -295,6 +330,15 @@ void bindSystems(sol::state& lua)
 
         "getDeltaTime", &System::getDeltaTime
     );
+
+    lua.new_usertype<StateMachine>("StateMachine",
+        sol::constructors<StateMachine()>(),
+        "addState", [](StateMachine& self, const std::string& name, sol::table table) { LuaState::addLuaState(self, name, table); },
+        "transitionTo", &StateMachine::transitionTo,
+        "update", &StateMachine::update,
+        "currentState", &StateMachine::currentState
+    );
+
 }
 
 void bindComponents(sol::state& lua)

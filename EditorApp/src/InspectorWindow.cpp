@@ -35,7 +35,7 @@ static bool dragFloat3Colored(const char* id, float v[3], float speed)
 	float colWidth = ImGui::GetColumnWidth();
 	float overhead = (colorStripW + stripPad) * 3.0f + betweenSpacing * 2.0f;
 	float fittedWidth = (colWidth - overhead) / 3.0f;
-	float preferredWidth = ImGui::CalcTextSize("-000.00").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+	float preferredWidth = ImGui::CalcTextSize("-000.000").x + ImGui::GetStyle().FramePadding.x * 2.0f;
 	float dragWidth = std::min(preferredWidth, fittedWidth);
 
 	for (int i = 0; i < 3; i++)
@@ -72,8 +72,8 @@ static void displayTransformation(Transformation& transform, bool& isChanged)
 	if (!ImGui::BeginTable("Transform", 2, ImGuiTableFlags_None))
 		return;
 
-	ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch, 0.35f);
-	ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.65f);
+	ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch, 0.3f);
+	ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.7f);
 
 	auto row = [](const char* label, float v[3], float speed) -> bool {
 		ImGui::TableNextRow();

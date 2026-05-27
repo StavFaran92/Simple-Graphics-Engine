@@ -157,7 +157,6 @@ public:
         SERIALIZED_MEMBER_OPTIONAL(m_states);
         SERIALIZED_MEMBER_OPTIONAL(m_transitions);
         SERIALIZED_MEMBER_OPTIONAL(m_parameters);
-        SERIALIZED_MEMBER_OPTIONAL(m_paramValues);
         SERIALIZED_MEMBER_OPTIONAL(m_entryStateId);
     }
 
