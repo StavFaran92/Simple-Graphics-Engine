@@ -53,12 +53,37 @@ SceneAssetRef Context::getActiveSceneAsset() const
 
 void Context::startSimulation()
 {
-	m_sceneManager->startSimulation();
+	auto activeScene = getActiveScene();
+	if (activeScene.isEmpty())
+		return;
+
+	if (activeScene->isSimulationPaused())
+	{
+		activeScene->resumeSimulation();
+	}
+	else
+	{
+		m_sceneManager->startSimulation();
+	}
 }
 
 void Context::stopSimulation()
 {
 	m_sceneManager->stopSimulation();
+}
+
+void Context::pauseSimulation()
+{
+	auto activeScene = getActiveScene();
+	if (activeScene.isEmpty())
+		return;
+
+	activeScene->pauseSimulation();
+}
+
+void Context::advanceSimulation()
+{
+	logError("Not yet implemented..");
 }
 
 ProjectAssetRegistry* Context::getProjectAssetRegistry() const

@@ -27,6 +27,7 @@ public:
 	void update();
 	void lockMouse();
 	void unlockMouse();
+	bool isMouseLocked() const;
 
 	SDL_Window* GetWindow() { return m_mainWindow; }
 	SDL_GLContext GetContext() { return m_glContext; }

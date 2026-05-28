@@ -51,9 +51,17 @@ public:
 
 	SceneAssetRef getActiveSceneAsset() const;
 
+	// Start / Resume the simulation
 	void startSimulation();
 
+	// Stop the simulation entirely
 	void stopSimulation();
+
+	// Pause the simulation (update will not be called)
+	void pauseSimulation();
+
+	// Advance the simulation by  frame and then pause
+	void advanceSimulation();
 
 	ProjectAssetRegistry* getProjectAssetRegistry() const;
 

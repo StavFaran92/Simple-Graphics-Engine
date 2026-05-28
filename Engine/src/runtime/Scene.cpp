@@ -369,7 +369,7 @@ void Scene::update(float deltaTime)
 
 	getGameCamera().getComponent<Transformation>().update();
 
-	if (m_isSimulationActive)
+	if (isSimulationActive())
 	{
 
 		// Advance all coroutines
@@ -1379,7 +1379,7 @@ void SceneAsset::deserialize(const nlohmann::json& j)
 
 void Scene::startSimulation()
 {
-	if (m_isSimulationActive)
+	if (isSimulationActive())
 	{
 		logWarning("Simulation already active.");
 		return;
@@ -1436,12 +1436,12 @@ void Scene::startSimulation()
 
 	gameEventLayer->setEnabled(true);
 
-	m_isSimulationActive = true;
+	m_simulationState = SimState::ACTIVE;
 }
 
 void Scene::stopSimulation()
 {
-	if (!m_isSimulationActive)
+	if (m_simulationState == SimState::STOPPED)
 	{
 		return;
 	}
@@ -1478,7 +1478,20 @@ void Scene::stopSimulation()
 
 	gameEventLayer->setEnabled(false);
 
-	m_isSimulationActive = false;
+	m_simulationState = SimState::STOPPED;
+}
+
+void Scene::pauseSimulation()
+{
+	m_simulationState = SimState::PAUSED;
+}
+
+void Scene::resumeSimulation()
+{
+	if (!isSimulationPaused())
+		return;
+
+	m_simulationState = SimState::ACTIVE;
 }
 
 physx::PxScene* Scene::getPhysicsScene() const
@@ -1580,5 +1593,10 @@ void Scene::preloadSceneResources()
 
 bool Scene::isSimulationActive() const
 {
-	return m_isSimulationActive;
+	return m_simulationState == SimState::ACTIVE;
+}
+
+bool Scene::isSimulationPaused() const
+{
+	return m_simulationState == SimState::PAUSED;
 }

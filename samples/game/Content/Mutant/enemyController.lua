@@ -75,9 +75,19 @@ function Script:create(entity)
         onEnter  = function(state)
             s.moveDir = nil
             s.animator:getGraph():trigger("hit")
+
+            local dir = s.toPlayer / s.distToPlayer
+            dir = -vec3.new(dir.x, 0, dir.z)
+
+            s.physics:turnToDynamic()
+            s.physics:setForce(dir * 500)
         end,
         onUpdate = function(state, dt) end,
-        onExit   = function(state) end,
+        onExit   = function(state) 
+            s.physics:setForce(vec3.new(0))
+            s.physics:turnToKinematic()
+            s.physics:move(vec3.new(0))
+        end,
     }
 
     self.sm = StateMachine.new()

@@ -166,11 +166,18 @@ void Window::update()
 void Window::lockMouse()
 {
 	SDL_SetRelativeMouseMode(SDL_TRUE);
+	m_isMouseLocked = true;
 }
 
 void Window::unlockMouse()
 {
 	SDL_SetRelativeMouseMode(SDL_FALSE);
+	m_isMouseLocked = false;
+}
+
+bool Window::isMouseLocked() const
+{
+	return m_isMouseLocked;
 }
 
 void* Window::GetNativeWindow()

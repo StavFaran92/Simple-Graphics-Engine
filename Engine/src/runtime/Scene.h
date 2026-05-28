@@ -128,6 +128,7 @@ public:
 	//int getRenderTarget() const;
 
 	bool isSimulationActive() const;
+	bool isSimulationPaused() const;
 
 	Entity getEntityByName(const std::string& name) const;
 
@@ -169,6 +170,8 @@ private:
 	
 	void startSimulation();
 	void stopSimulation();
+	void pauseSimulation();
+	void resumeSimulation();
 	
 	void clear();
 	void close();
@@ -198,7 +201,15 @@ private:
 
 	physx::PxScene* m_PhysicsScene = nullptr;
 
-	bool m_isSimulationActive = false;
+	enum class SimState
+	{
+		STOPPED = 0,
+		ACTIVE,
+		PAUSED
+
+	};
+
+	SimState m_simulationState = SimState::STOPPED;
 
 	ShaderResourceRef m_tempOutlineShader = nullptr;
 

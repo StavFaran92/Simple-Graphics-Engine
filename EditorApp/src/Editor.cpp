@@ -38,6 +38,7 @@
 extern bool g_testRay;
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
+std::shared_ptr<EventLayer> uiShortcutsLayer = std::make_shared<EventLayer>("uiShortcutsLayer");
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 std::shared_ptr<EventLayer> uiEditorToolsLayer = std::make_shared<UIEditorToolsEventLayer>();
 std::shared_ptr<EventLayer> uiNavigationLayer = std::make_shared<UINavigationLayer>();
@@ -103,56 +104,111 @@ uint32_t g_previewWindowID = 0;
 
 static void stopSimulation()
 {
-	EditorState::Instance().startButtonPressed = false; // Toggle the state
+	EditorState::Instance().startButtonPressed = false;
+	EditorState::Instance().simPaused = false;
 	Engine::get()->getContext()->stopSimulation();
 
-	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_editorCamera);
 	Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(false);
 	Engine::get()->getContext()->getActiveScene()->setRenderViewEnabled("Editor View", true);
 	uiLayer->setEnabled(true);
+	EditorState::Instance().isMouseLocked = false;
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->unlock(); //TODO this should be in camera event
 }
 
 static void startsimulation()
 {
-	EditorState::Instance().startButtonPressed = true; // Toggle the state
+	EditorState::Instance().startButtonPressed = true;
+	EditorState::Instance().simPaused = false;
+
+	if (EditorState::Instance().isMouseLocked)
+	{
+		Engine::get()->getWindow()->lockMouse();
+	}
+
 	Engine::get()->getContext()->startSimulation();
 
-	//Engine::get()->getContext()->getActiveScene()->setPrimaryCamera(g_primaryCamera);
 	uiLayer->setEnabled(false);
 	Engine::get()->getContext()->getActiveScene()->setGameRenderViewEnabled(true);
 	Engine::get()->getContext()->getActiveScene()->setRenderViewEnabled("Editor View", false);
 	state.selectEntity(Entity::EmptyEntity);
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock(); //TODO this should be in camera event
+}
 
+static void pauseSimulation()
+{
+	EditorState::Instance().simPaused = true;
+	Engine::get()->getContext()->pauseSimulation();
+
+	EditorState::Instance().isMouseLocked = Engine::get()->getWindow()->isMouseLocked();
+	if (EditorState::Instance().isMouseLocked)
+	{
+		Engine::get()->getWindow()->unlockMouse();
+	}
+}
+
+static void advanceSimulation()
+{
+	Engine::get()->getContext()->advanceSimulation();
 }
 
 void RenderSimulationControlView()
 {
 	ImGui::Begin("Simulation Controls", nullptr, windowFlags | ImGuiWindowFlags_NoResize);
 
-	float windowWidth = ImGui::GetContentRegionAvail().x;
-	ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
+	bool isRunning = EditorState::Instance().startButtonPressed;
+	bool isPaused  = EditorState::Instance().simPaused;
 
-	// Draw the button based on the current state
-	if (EditorState::Instance().startButtonPressed)
+	float windowWidth = ImGui::GetContentRegionAvail().x;
+	static const float btnW = 70.0f;
+	static const float gap  = 8.0f;
+	ImGui::SetCursorPosX((windowWidth - btnW * 3.0f - gap * 2.0f) * 0.5f);
+
+	// START — always calls context startSimulation
+	ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.15f, 0.55f, 0.15f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.70f, 0.20f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.10f, 0.45f, 0.10f, 1.0f));
+	if (ImGui::Button("START", ImVec2(btnW, 0)))
+		startsimulation();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine(0, gap);
+
+	// STOP — always calls context stopSimulation
+	ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.70f, 0.15f, 0.15f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.85f, 0.20f, 0.20f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.60f, 0.10f, 0.10f, 1.0f));
+	if (ImGui::Button("STOP", ImVec2(btnW, 0)))
+		stopSimulation();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine(0, gap);
+
+	// PAUSE / ADVANCE toggle — greyed out when simulation is stopped
+	float alpha = isRunning ? 1.0f : 0.35f;
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * alpha);
+
+	if (isPaused)
 	{
-		if (ImGui::Button("STOP", ImVec2(70, 0)))
-		{
-			// Handle stop button click
-			stopSimulation();
-		}
+		ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.20f, 0.45f, 0.65f, alpha));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.58f, 0.80f, alpha));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.15f, 0.36f, 0.55f, alpha));
+		if (ImGui::Button("ADVANCE", ImVec2(btnW, 0)) && isRunning)
+			advanceSimulation();
+		ImGui::PopStyleColor(3);
 	}
 	else
 	{
-		if (ImGui::Button("START", ImVec2(70, 0)))
-		{
-			// Handle start button click
-			startsimulation();
-		}
+		ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.55f, 0.45f, 0.10f, alpha));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.70f, 0.58f, 0.15f, alpha));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.45f, 0.35f, 0.08f, alpha));
+		if (ImGui::Button("PAUSE", ImVec2(btnW, 0)) && isRunning)
+			pauseSimulation();
+		ImGui::PopStyleColor(3);
 	}
 
-	ImGui::End(); // End the window
+	ImGui::PopStyleVar();
+
+	ImGui::End();
 }                                           
 
 void LightCreatorWindow()
@@ -611,7 +667,9 @@ public:
         Engine::get()->getEventSystem()->pushLayer(uiEntitySelectionLayer);
         Engine::get()->getEventSystem()->pushLayer(uiEditorToolsLayer);
         Engine::get()->getEventSystem()->pushLayer(uiLayer);
+        Engine::get()->getEventSystem()->pushLayer(uiShortcutsLayer);
 
+		uiShortucutsHandler = Engine::get()->getEventSystem()->bindToLayer(uiShortcutsLayer->name);
 		uiHandler = Engine::get()->getEventSystem()->bindToLayer(uiLayer->name);
 		gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
 
@@ -624,8 +682,32 @@ public:
 		g_editorCamera = editorCamera;
 
 		Engine::get()->getInput()->getKeyboard()->onKeyPressed(gameHandler, KeyCode::SCANCODE_ESCAPE, [](KeyPressedEvent e) { stopSimulation(); return false; });
+
+		auto* kb = Engine::get()->getInput()->getKeyboard();
+
+		// F9 — Start
+		kb->onKeyPressed(uiShortucutsHandler, KeyCode::SCANCODE_F9, [](KeyPressedEvent e) {
+			startsimulation();
+			return true;
+		});
+
+		// F10 — Stop
+		kb->onKeyPressed(uiShortucutsHandler, KeyCode::SCANCODE_F10, [](KeyPressedEvent e) {
+			stopSimulation();
+			return true;
+		});
+
+		// F11 — Pause / Advance
+		kb->onKeyPressed(uiShortucutsHandler, KeyCode::SCANCODE_F11, [](KeyPressedEvent e) {
+			if (!EditorState::Instance().startButtonPressed) return false;
+			if (EditorState::Instance().simPaused)
+				advanceSimulation();
+			else
+				pauseSimulation();
+			return true;
+		});
 		
-		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiHandler, KeyCode::SCANCODE_X, [](KeyReleasedEvent e) {
+		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiShortucutsHandler, KeyCode::SCANCODE_X, [](KeyReleasedEvent e) {
 			debugTerrainFlag = true;
 			return false;
 			});
@@ -653,6 +735,7 @@ public:
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
 	
 	EventHandler uiHandler;
+	EventHandler uiShortucutsHandler;
 	EventHandler gameHandler;
 };
 

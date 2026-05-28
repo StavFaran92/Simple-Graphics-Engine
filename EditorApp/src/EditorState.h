@@ -32,6 +32,7 @@ public:
     bool showShaderCreateWindow = false;
     bool showMaterialEditWindow = false;
     bool startButtonPressed = false;
+    bool simPaused = false;
     bool isMouseInSceneView = false;
     bool showTextureDisplayWindow = false;
     bool showLuaScriptCreateWindow = false;
@@ -42,6 +43,7 @@ public:
     bool showAnimationImportWindow = false;
     bool showLuaScriptImportWindow = false;
     bool showMaterialCreateWindow = false;
+    bool isMouseLocked = false;
 
     bool showAssetSelectorWindow = false;
     AssetType assetSelectType;
