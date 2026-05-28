@@ -8,6 +8,28 @@
 
 using namespace physx;
 
+namespace
+{
+    struct LayerMaskFilter : public PxQueryFilterCallback
+    {
+        PxU32 mask;
+        LayerMaskFilter(PxU32 m) : mask(m) {}
+
+        PxQueryHitType::Enum preFilter(const PxFilterData&, const PxShape* shape, const PxRigidActor*, PxHitFlags&) override
+        {
+            PxFilterData shapeData = shape->getQueryFilterData();
+            if (mask == 0 || (shapeData.word0 & mask))
+                return PxQueryHitType::eBLOCK;
+            return PxQueryHitType::eNONE;
+        }
+
+        PxQueryHitType::Enum postFilter(const PxFilterData&, const PxQueryHit&) override
+        {
+            return PxQueryHitType::eBLOCK;
+        }
+    };
+}
+
 bool Physics::raycast(glm::vec3 origin, glm::vec3 dir, float distance, HitResult& hitResult, LayerMask mask)
 {
     PxScene* scene = Engine::get()->getContext()->getActiveScene()->getPhysicsScene();
@@ -15,11 +37,12 @@ bool Physics::raycast(glm::vec3 origin, glm::vec3 dir, float distance, HitResult
 
     const PxHitFlags outputFlags = PxHitFlag::ePOSITION | PxHitFlag::eNORMAL;
 
-    // [in] Raycast against GROUP2 and GROUP3
-    PxQueryFilterData filterData = PxQueryFilterData();
-    filterData.data.word0 = mask;
+    PxQueryFilterData filterData;
+    filterData.flags = PxQueryFlag::eSTATIC | PxQueryFlag::eDYNAMIC | PxQueryFlag::ePREFILTER;
 
-    if (scene->raycast(PxVec3(origin.x, origin.y, origin.z), PxVec3(dir.x, dir.y, dir.z), distance, hit, outputFlags, filterData))
+    LayerMaskFilter filterCallback(static_cast<PxU32>(mask));
+
+    if (scene->raycast(PxVec3(origin.x, origin.y, origin.z), PxVec3(dir.x, dir.y, dir.z), distance, hit, outputFlags, filterData, &filterCallback))
     {
         entity_id id = *(entity_id*)hit.block.actor->userData;
         hitResult.e = { entt::entity(id), &Engine::get()->getContext()->getActiveScene()->getRegistry() };

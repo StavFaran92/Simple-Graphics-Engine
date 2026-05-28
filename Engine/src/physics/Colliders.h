@@ -43,6 +43,7 @@ struct CollisionBox : public Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER_OPTIONAL(layerMask);
 		SERIALIZED_MEMBER(extents);
 	}
 
@@ -60,6 +61,7 @@ struct CollisionSphere : public Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER_OPTIONAL(layerMask);
 		SERIALIZED_MEMBER(radius);
 	}
 
@@ -77,6 +79,7 @@ struct CollisionCapsule : public Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER_OPTIONAL(layerMask);
 		SERIALIZED_MEMBER(radius);
 		SERIALIZED_MEMBER(halfHeight);
 	}
@@ -97,6 +100,7 @@ struct CollisionMesh : public Collider
 
 	template <class Archive>
 	void serialize(Archive& archive) {
+		SERIALIZED_MEMBER_OPTIONAL(layerMask);
 		SERIALIZED_MEMBER(isConvex);
 	}
 
