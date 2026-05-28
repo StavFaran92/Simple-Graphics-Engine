@@ -17,6 +17,7 @@ function Script:create(entity)
     self.moveDir        = nil
     self.toPlayer       = vec3.new(0, 0, 0)
     self.distToPlayer   = 0
+    self.transform      = entity.Transform
 
     local s = self  -- capture for state closures
 
@@ -50,6 +51,25 @@ function Script:create(entity)
                 local dir = s.toPlayer / s.distToPlayer
                 s.moveDir = vec3.new(dir.x, 0, dir.z)
                 facePlayer()
+
+                local hitResult = HitResult.new()
+                self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), .5, hitResult, LayerMask.LAYER_0)
+
+                if self.isGrounded and self.velocityV < 0 then
+                    self.velocityV = 0
+                end
+                if not self.isGrounded then
+                    self.velocityV = self.velocityV + self.gravity
+                end
+
+                local moveVector = vec3.new(0, s.velocityV / 1000.0, 0)
+                if s.moveDir then
+                    moveVector = moveVector + s.moveDir * s.speed
+                end
+
+                print(s.velocityV)
+                
+                s.physics:move(moveVector)
             end
         end,
         onExit   = function(state)
@@ -81,12 +101,16 @@ function Script:create(entity)
 
             s.physics:turnToDynamic()
             s.physics:setForce(dir * 500)
+
+            print(s.velocityV)
         end,
         onUpdate = function(state, dt) end,
         onExit   = function(state) 
             s.physics:setForce(vec3.new(0))
             s.physics:turnToKinematic()
-            s.physics:move(vec3.new(0))
+            local dest = vec3.new(0, 1, 0)
+            s.physics:move(dest)
+            s.velocityV = 0
         end,
     }
 
@@ -104,25 +128,25 @@ function Script:update(entity, dt)
     self.distToPlayer = length(self.toPlayer)
 
     -- gravity
-    local hitResult = HitResult.new()
-    self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), .5, hitResult, LayerMask.LAYER_0)
+    -- local hitResult = HitResult.new()
+    -- self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), .5, hitResult, LayerMask.LAYER_0)
 
-    if self.isGrounded and self.velocityV < 0 then
-        self.velocityV = 0
-    end
-    if not self.isGrounded then
-        self.velocityV = self.velocityV + self.gravity
-    end
+    -- if self.isGrounded and self.velocityV < 0 then
+    --     self.velocityV = 0
+    -- end
+    -- if not self.isGrounded then
+    --     self.velocityV = self.velocityV + self.gravity
+    -- end
 
-    self.sm:update(dt)
-
-    local moveVector = vec3.new(0, self.velocityV / 1000.0, 0)
+    local moveVector = vec3.new(0)
     if self.moveDir then
         moveVector = moveVector + self.moveDir * self.speed
     end
-
+    
+    --self.physics:move(moveVector)
+    
+    self.sm:update(dt)
     self.animator:getGraph():setFloat("speed", length(moveVector))
-    self.physics:move(moveVector)
 end
 
 function Script:onAnimationTrigger(name, frame)
