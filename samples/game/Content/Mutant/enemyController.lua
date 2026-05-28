@@ -41,6 +41,8 @@ function Script:create(entity)
     }
 
     local FollowState = {
+        lastY = 0,
+        expectedPos = 0,
         onEnter  = function(state) end,
         onUpdate = function(state, dt)
             if canAttack() then
@@ -52,24 +54,52 @@ function Script:create(entity)
                 s.moveDir = vec3.new(dir.x, 0, dir.z)
                 facePlayer()
 
+                local maxFall = math.abs(s.velocityV * dt)
+                local rayLength = math.max(0.2, maxFall + 0.05) -- small buffer on top
+
+                print("### new iteration ###")
+                print("pos.y", s.modelTransform:getWorldPosition().y)
+                local diff = state.expectedPos - s.modelTransform:getWorldPosition().y
+                print("diff.y", diff)
+                state.lastY = s.modelTransform:getWorldPosition().y
+
                 local hitResult = HitResult.new()
-                self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), .5, hitResult, LayerMask.LAYER_0)
+                s.isGrounded = raycast(
+                    s.modelTransform:getWorldPosition(), 
+                    vec3.new(0, -1, 0), 
+                    rayLength, 
+                    hitResult, 
+                    LayerMask.LAYER_0
+                )
 
-                if self.isGrounded and self.velocityV < 0 then
-                    self.velocityV = 0
-                end
-                if not self.isGrounded then
-                    self.velocityV = self.velocityV + self.gravity
+                print("velocity" , s.velocityV)
+                print("grounded" , s.isGrounded)
+
+                local moveVector = vec3.new(0)
+                if s.isGrounded and s.velocityV < 0 then
+                    s.velocityV = 0
+                    --moveVector = vec3.new(0, -hitResult.distance, 0)
+                    print("hit result dist " , hitResult.distance)
+                else
+                    if not s.isGrounded then
+                        s.velocityV = s.velocityV + s.gravity * dt
+                    end
+                    moveVector = vec3.new(0, s.velocityV * dt, 0)
+
+                    
                 end
 
-                local moveVector = vec3.new(0, s.velocityV / 1000.0, 0)
+                
+
                 if s.moveDir then
                     moveVector = moveVector + s.moveDir * s.speed
                 end
 
-                print(s.velocityV)
-                
+                print("move vector: " , moveVector.y)
+                state.expectedPos = s.modelTransform:getWorldPosition().y + moveVector.y
+                print("next pos should be", s.modelTransform:getWorldPosition().y + moveVector.y)
                 s.physics:move(moveVector)
+                
             end
         end,
         onExit   = function(state)
@@ -101,16 +131,12 @@ function Script:create(entity)
 
             s.physics:turnToDynamic()
             s.physics:setForce(dir * 500)
-
-            print(s.velocityV)
         end,
         onUpdate = function(state, dt) end,
         onExit   = function(state) 
             s.physics:setForce(vec3.new(0))
             s.physics:turnToKinematic()
-            local dest = vec3.new(0, 1, 0)
-            s.physics:move(dest)
-            s.velocityV = 0
+            --s.velocityV = 0
         end,
     }
 

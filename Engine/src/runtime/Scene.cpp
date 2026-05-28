@@ -401,6 +401,9 @@ void Scene::update(float deltaTime)
 			}
 		}
 
+		// Physics
+		Engine::get()->getPhysicsSystem()->update(this, deltaTime);
+
 		// Run all scripts updates
 		auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
 		try
@@ -412,8 +415,7 @@ void Scene::update(float deltaTime)
 			logError("Script Error occured: {}", e.what());
 		}
 
-		// Physics
-		Engine::get()->getPhysicsSystem()->update(this, deltaTime);
+		
 
 		Engine::get()->getSubSystem<AnimationSystem>()->update(this, deltaTime);
 	}
