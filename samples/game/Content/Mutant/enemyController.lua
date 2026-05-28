@@ -12,7 +12,7 @@ function Script:create(entity)
     self.speed          = 0.02
     self.animator       = self.model.Animator
     self.isGrounded     = false
-    self.velocityV      = -10.0
+    self.velocityV      = 0.0
     self.gravity        = -10.0
     self.moveDir        = nil
     self.toPlayer       = vec3.new(0, 0, 0)

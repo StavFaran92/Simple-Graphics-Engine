@@ -716,7 +716,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
 {
     auto physicsScene = scene->getPhysicsScene();
 
-    physicsScene->simulate(1 / 120.f);
+    physicsScene->simulate(deltaTime);
     physicsScene->fetchResults(true);
 
     // Update kinematics
@@ -774,6 +774,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                     targetPose.q = physx::PxQuat(parentQuat.x, parentQuat.y, parentQuat.z, parentQuat.w);
 
                     dynamicBody->setKinematicTarget(targetPose);
+                    rb.m_targetPisition = glm::vec3{0.0};
                 }
             }
             else // Dynamic
