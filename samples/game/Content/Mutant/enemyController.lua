@@ -57,12 +57,6 @@ function Script:create(entity)
                 local maxFall = math.abs(s.velocityV * dt)
                 local rayLength = math.max(0.2, maxFall + 0.05) -- small buffer on top
 
-                print("### new iteration ###")
-                print("pos.y", s.modelTransform:getWorldPosition().y)
-                local diff = state.expectedPos - s.modelTransform:getWorldPosition().y
-                print("diff.y", diff)
-                state.lastY = s.modelTransform:getWorldPosition().y
-
                 local hitResult = HitResult.new()
                 s.isGrounded = raycast(
                     s.modelTransform:getWorldPosition(), 
@@ -72,32 +66,21 @@ function Script:create(entity)
                     LayerMask.LAYER_0
                 )
 
-                print("velocity" , s.velocityV)
-                print("grounded" , s.isGrounded)
-
                 local moveVector = vec3.new(0)
                 if s.isGrounded and s.velocityV < 0 then
                     s.velocityV = 0
-                    --moveVector = vec3.new(0, -hitResult.distance, 0)
-                    print("hit result dist " , hitResult.distance)
+                    moveVector = vec3.new(0, -hitResult.distance, 0)
                 else
                     if not s.isGrounded then
                         s.velocityV = s.velocityV + s.gravity * dt
                     end
                     moveVector = vec3.new(0, s.velocityV * dt, 0)
-
-                    
                 end
-
-                
 
                 if s.moveDir then
                     moveVector = moveVector + s.moveDir * s.speed
                 end
 
-                print("move vector: " , moveVector.y)
-                state.expectedPos = s.modelTransform:getWorldPosition().y + moveVector.y
-                print("next pos should be", s.modelTransform:getWorldPosition().y + moveVector.y)
                 s.physics:move(moveVector)
                 
             end

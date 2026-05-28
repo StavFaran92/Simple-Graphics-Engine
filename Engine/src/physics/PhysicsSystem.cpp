@@ -716,9 +716,6 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
 {
     auto physicsScene = scene->getPhysicsScene();
 
-    physicsScene->simulate(deltaTime);
-    physicsScene->fetchResults(true);
-
     // Update kinematics
     physx::PxU32 nbDynamicActors = physicsScene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC);
     if (nbDynamicActors)
@@ -732,6 +729,9 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
 
             entity_id id = *(entity_id*)actor->userData;
             Entity e{ entt::entity(id), &scene->getRegistry() };
+
+            //auto& obj = e.getComponent<ObjectComponent>();
+            //logDebug("Physics debug:: objName: {}", obj.name);
 
             // Do not update inactive actors
             if (e.HasComponent<PhysicsComponent>())
@@ -828,6 +828,9 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             pc.reset();
         }
     }
+
+    physicsScene->simulate(deltaTime);
+    physicsScene->fetchResults(true);
 
 
 

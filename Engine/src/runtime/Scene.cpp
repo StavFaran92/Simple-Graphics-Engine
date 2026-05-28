@@ -362,11 +362,6 @@ void Scene::update(float deltaTime)
 {
 	preloadSceneResources();
 
-	for (auto&& [entity, transform] : m_registry->get().view<Transformation>().each())
-	{
-		transform.update();
-	}
-
 	getGameCamera().getComponent<Transformation>().update();
 
 	if (isSimulationActive())
@@ -397,12 +392,17 @@ void Scene::update(float deltaTime)
 			}
 			catch (const std::exception& e)
 			{
-				logError("Native Script Error occured: {}" , e.what());
+				logError("Native Script Error occured: {}", e.what());
 			}
 		}
 
 		// Physics
 		Engine::get()->getPhysicsSystem()->update(this, deltaTime);
+
+		for (auto&& [entity, transform] : m_registry->get().view<Transformation>().each())
+		{
+			transform.update();
+		}
 
 		// Run all scripts updates
 		auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
@@ -418,6 +418,13 @@ void Scene::update(float deltaTime)
 		
 
 		Engine::get()->getSubSystem<AnimationSystem>()->update(this, deltaTime);
+	}
+	else
+	{
+		for (auto&& [entity, transform] : m_registry->get().view<Transformation>().each())
+		{
+			transform.update();
+		}
 	}
 
 	//if (m_isDirty)
