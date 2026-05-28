@@ -164,49 +164,67 @@ void RenderSimulationControlView()
 	ImGui::SetCursorPosX((windowWidth - btnW * 3.0f - gap * 2.0f) * 0.5f);
 
 	// START — always calls context startSimulation
-	ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.15f, 0.55f, 0.15f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.70f, 0.20f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.10f, 0.45f, 0.10f, 1.0f));
-	if (ImGui::Button("START", ImVec2(btnW, 0)))
-		startsimulation();
-	ImGui::PopStyleColor(3);
+	{
+		float alpha = Engine::get()->getContext()->getActiveScene()->isSimulationActive() ? 0.35f : 1.0f;
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * alpha);
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.55f, 0.15f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.70f, 0.20f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.10f, 0.45f, 0.10f, 1.0f));
+		std::string caption = Engine::get()->getContext()->getActiveScene()->isSimulationPaused() ? "RESUME" : "START";
+		if (ImGui::Button(caption.c_str(), ImVec2(btnW, 0)))
+			startsimulation();
+		ImGui::PopStyleColor(3);
+
+		ImGui::PopStyleVar();
+	}
 
 	ImGui::SameLine(0, gap);
 
 	// STOP — always calls context stopSimulation
-	ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.70f, 0.15f, 0.15f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.85f, 0.20f, 0.20f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.60f, 0.10f, 0.10f, 1.0f));
-	if (ImGui::Button("STOP", ImVec2(btnW, 0)))
-		stopSimulation();
-	ImGui::PopStyleColor(3);
+	{
+		float alpha = Engine::get()->getContext()->getActiveScene()->isSimulationActive() ? 1.0f : 0.35f;
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * alpha);
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.70f, 0.15f, 0.15f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.85f, 0.20f, 0.20f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.60f, 0.10f, 0.10f, 1.0f));
+		if (ImGui::Button("STOP", ImVec2(btnW, 0)))
+			stopSimulation();
+		ImGui::PopStyleColor(3);
+
+		ImGui::PopStyleVar();
+	}
 
 	ImGui::SameLine(0, gap);
 
 	// PAUSE / ADVANCE toggle — greyed out when simulation is stopped
-	float alpha = isRunning ? 1.0f : 0.35f;
-	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * alpha);
-
-	if (isPaused)
 	{
-		ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.20f, 0.45f, 0.65f, alpha));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.58f, 0.80f, alpha));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.15f, 0.36f, 0.55f, alpha));
-		if (ImGui::Button("ADVANCE", ImVec2(btnW, 0)) && isRunning)
-			advanceSimulation();
-		ImGui::PopStyleColor(3);
-	}
-	else
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.55f, 0.45f, 0.10f, alpha));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.70f, 0.58f, 0.15f, alpha));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.45f, 0.35f, 0.08f, alpha));
-		if (ImGui::Button("PAUSE", ImVec2(btnW, 0)) && isRunning)
-			pauseSimulation();
-		ImGui::PopStyleColor(3);
+		float alpha = isRunning ? 1.0f : 0.35f;
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * alpha);
+
+		if (isPaused)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.45f, 0.65f, alpha));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.58f, 0.80f, alpha));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.36f, 0.55f, alpha));
+			if (ImGui::Button("ADVANCE", ImVec2(btnW, 0)) && isRunning)
+				advanceSimulation();
+			ImGui::PopStyleColor(3);
+		}
+		else
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.55f, 0.45f, 0.10f, alpha));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.70f, 0.58f, 0.15f, alpha));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.45f, 0.35f, 0.08f, alpha));
+			if (ImGui::Button("PAUSE", ImVec2(btnW, 0)) && isRunning)
+				pauseSimulation();
+			ImGui::PopStyleColor(3);
+		}
+
+		ImGui::PopStyleVar();
 	}
 
-	ImGui::PopStyleVar();
 
 	ImGui::End();
 }                                           
