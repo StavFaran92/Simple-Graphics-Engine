@@ -41,8 +41,6 @@ function Script:create(entity)
     }
 
     local FollowState = {
-        lastY = 0,
-        expectedPos = 0,
         onEnter  = function(state) end,
         onUpdate = function(state, dt)
             if canAttack() then
@@ -63,7 +61,7 @@ function Script:create(entity)
                     vec3.new(0, -1, 0), 
                     rayLength, 
                     hitResult, 
-                    LayerMask.LAYER_0
+                    LayerMask.LAYER_1
                 )
 
                 local moveVector = vec3.new(0)
@@ -113,7 +111,7 @@ function Script:create(entity)
             dir = -vec3.new(dir.x, 0, dir.z)
 
             s.physics:turnToDynamic()
-            s.physics:setForce(dir * 500)
+            s.physics:setForce(dir * 150)
         end,
         onUpdate = function(state, dt) end,
         onExit   = function(state) 

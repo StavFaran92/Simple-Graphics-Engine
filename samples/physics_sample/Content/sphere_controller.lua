@@ -21,7 +21,7 @@ function Script:update(entity, dt)
         vec3.new(0, -1, 0), 
         rayLength, 
         hitResult, 
-        LayerMask.LAYER_0
+        LayerMask.LAYER_1
     )
 
     local moveVector = vec3.new(0)

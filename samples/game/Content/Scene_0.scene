@@ -71,6 +71,7 @@
                                         "ptr_wrapper": {
                                             "id": 2147483652,
                                             "data": {
+                                                "layerMask": 0,
                                                 "extents": {
                                                     "v.x": 0.5,
                                                     "v.y": 0.30000001192092898,
@@ -596,8 +597,9 @@
                                         "ptr_wrapper": {
                                             "id": 2147483664,
                                             "data": {
+                                                "layerMask": 0,
                                                 "radius": 0.20000000298023225,
-                                                "halfHeight": 0.4000000059604645
+                                                "halfHeight": 0.5
                                             }
                                         }
                                     },
@@ -610,7 +612,7 @@
                                     "isLockedAngularZ": true,
                                     "offset": {
                                         "v.x": 0.0,
-                                        "v.y": 0.8999999761581421,
+                                        "v.y": 0.699999988079071,
                                         "v.z": 0.0
                                     }
                                 }
@@ -697,15 +699,9 @@
                                     },
                                     "refs": [
                                         {
-                                            "key": "model",
+                                            "key": "cameraPivot",
                                             "value": {
-                                                "m_entity": 5
-                                            }
-                                        },
-                                        {
-                                            "key": "mainCamera",
-                                            "value": {
-                                                "m_entity": 1
+                                                "m_entity": 8
                                             }
                                         },
                                         {
@@ -715,9 +711,15 @@
                                             }
                                         },
                                         {
-                                            "key": "cameraPivot",
+                                            "key": "model",
                                             "value": {
-                                                "m_entity": 8
+                                                "m_entity": 5
+                                            }
+                                        },
+                                        {
+                                            "key": "mainCamera",
+                                            "value": {
+                                                "m_entity": 1
                                             }
                                         }
                                     ]
@@ -869,6 +871,7 @@
                                         "ptr_wrapper": {
                                             "id": 2147483674,
                                             "data": {
+                                                "layerMask": 0,
                                                 "extents": {
                                                     "v.x": 0.5,
                                                     "v.y": 0.5,
@@ -1455,6 +1458,7 @@
                                         "ptr_wrapper": {
                                             "id": 2147483686,
                                             "data": {
+                                                "layerMask": 0,
                                                 "radius": 0.5
                                             }
                                         }
@@ -1689,7 +1693,7 @@
                                         "ptr_wrapper": {
                                             "id": 2147483694,
                                             "data": {
-                                                "layerMask": 0
+                                                "layerMask": 1
                                             }
                                         }
                                     },

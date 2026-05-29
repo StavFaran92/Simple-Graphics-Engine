@@ -541,19 +541,6 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     {
         auto& collider = std::dynamic_pointer_cast<CollisionBox>(pc.collider);
         shape = createBoxShape(collider->extents.x * scale.x, collider->extents.y * scale.y, collider->extents.z * scale.z);
-
-        if (!shape)
-        {
-            logError("Failed to create physics shape");
-            return;
-        }
-
-        Physics::LayerMask mask = collider->layerMask;
-
-        physx::PxFilterData filterData;
-        filterData.word0 = mask;
-
-        shape->setQueryFilterData(filterData);
     }
     else if (pc.collider->getType() == CollisionShape::SPHERE)
     {
@@ -564,15 +551,6 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
             return;
         }
         shape = createSphereShape(collider->radius * std::max(std::max(scale.x, scale.y), scale.z));
-
-        assert(shape);
-
-        Physics::LayerMask mask = collider->layerMask;
-
-        physx::PxFilterData filterData;
-        filterData.word0 = mask;
-
-        shape->setQueryFilterData(filterData);
     }
     else if (pc.collider->getType() == CollisionShape::CAPSULE)
     {
@@ -583,28 +561,12 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
             return;
         }
         shape = createCapsuleShape(collider->radius, collider->halfHeight);
-
-        assert(shape);
-
-        Physics::LayerMask mask = collider->layerMask;
-
-        physx::PxFilterData filterData;
-        filterData.word0 = mask;
-
-        shape->setQueryFilterData(filterData);
     }
     else if (pc.collider->getType() == CollisionShape::MESH)
     {
         auto& collider = std::dynamic_pointer_cast<CollisionMesh>(pc.collider);
         const std::vector<glm::vec3>& apos = collider->mesh.get()->getPositions();
         shape = createConvexMeshShape(apos);
-
-        Physics::LayerMask mask = collider->layerMask;
-
-        physx::PxFilterData filterData;
-        filterData.word0 = mask;
-
-        shape->setQueryFilterData(filterData);
     }
     else if (pc.collider->getType() == CollisionShape::TERRAIN)
     {
@@ -646,28 +608,15 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
             logError("createHeightField failed!");
             return;
         }
-        // create shape for heightfield		
-        //PxTransform pose(PxVec3(-(heightFieldDesc.nbRows * terrain.getHeight()) / 2.0f,
-        //    0.0f,
-        //    -((PxReal)heightFieldDesc.nbColumns * terrain.getWidth()) / 2.0f),
-        //    PxQuat(PxIdentity));
 
         float terrainColScale = (float)terrain.getWidth() / (PxReal)heightFieldDesc.nbColumns;
         float terrainRowScale = (float)terrain.getHeight() / (PxReal)heightFieldDesc.nbRows;
         float terrainHeightScale = terrain.getScale() / 255.f;
 
-        PxShape* shape = PxRigidActorExt::createExclusiveShape(*body,
+        shape = PxRigidActorExt::createExclusiveShape(*body,
             PxHeightFieldGeometry(heightField, PxMeshGeometryFlags(),
                 terrainHeightScale, terrainRowScale, terrainColScale),
             *getDefaultMaterial());
-
-
-
-        if (!shape)
-        {
-            logError("createShape failed!");
-            return;
-        }
 
         PxTransform pose(PxVec3(-terrain.getHeight() / 2.f,
             0.0f,
@@ -676,32 +625,49 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
         shape->setLocalPose(pose);
     }
 
-    if (shape)
+    if (!shape)
     {
-        if (pc.collisionType == CollisionType::Trigger)
-        {
-            shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-            shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
-        }
-        else if (pc.collisionType == CollisionType::QueryOnly)
-        {
-            shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-        }
+        logError("createShape failed!");
+        return;
+    }
 
-        physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
-        physx::PxQuat pxRotation(PxIdentity);
+    // Apply query filter data
+    Physics::LayerMask mask = pc.collider->layerMask;
 
-        auto physxTransform = physx::PxTransform(pxTranslation, pxRotation);
+    physx::PxFilterData filterData;
+    filterData.word0 = mask;
 
-        // PhysX capsules are X-axis aligned; compose a 90 deg Z rotation to make them Y-axis (upright)
-        // This only applies to non CCT, CCT rotation is done internally by PhysX
-        if (pc.collider->getType() == CollisionShape::CAPSULE)
-            physxTransform.q = physxTransform.q * physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0.0f, 0.0f, 1.0f));
+    shape->setQueryFilterData(filterData);
 
+    // Set up flags based on collider type
+    if (pc.collisionType == CollisionType::Trigger)
+    {
+        shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+        shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+    }
+    else if (pc.collisionType == CollisionType::QueryOnly)
+    {
+        shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+    }
+
+    // Apply local transformation
+    physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
+    physx::PxQuat pxRotation(PxIdentity);
+
+    auto physxTransform = physx::PxTransform(pxTranslation, pxRotation);
+
+    // PhysX capsules are X-axis aligned; compose a 90 deg Z rotation to make them Y-axis (upright)
+    // This only applies to non CCT, CCT rotation is done internally by PhysX
+    if (pc.collider->getType() == CollisionShape::CAPSULE)
+        physxTransform.q = physxTransform.q * physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0.0f, 0.0f, 1.0f));
+
+
+    if (pc.collider->getType() != CollisionShape::TERRAIN)
+    {
         shape->setLocalPose(physxTransform);
         body->attachShape(*shape);
-        shape->release();
     }
+    //shape->release();
 
     if (recursive)
     {

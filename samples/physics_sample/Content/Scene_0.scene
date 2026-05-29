@@ -231,7 +231,7 @@
                                         "ptr_wrapper": {
                                             "id": 2147483659,
                                             "data": {
-                                                "layerMask": 0,
+                                                "layerMask": 1,
                                                 "extents": {
                                                     "v.x": 0.5,
                                                     "v.y": 0.5,
