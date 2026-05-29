@@ -651,23 +651,21 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     }
 
     // Apply local transformation
-    physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
-    physx::PxQuat pxRotation(PxIdentity);
-
-    auto physxTransform = physx::PxTransform(pxTranslation, pxRotation);
-
-    // PhysX capsules are X-axis aligned; compose a 90 deg Z rotation to make them Y-axis (upright)
-    // This only applies to non CCT, CCT rotation is done internally by PhysX
-    if (pc.collider->getType() == CollisionShape::CAPSULE)
-        physxTransform.q = physxTransform.q * physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0.0f, 0.0f, 1.0f));
-
-
     if (pc.collider->getType() != CollisionShape::TERRAIN)
     {
+        physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
+        physx::PxQuat pxRotation(PxIdentity);
+
+        auto physxTransform = physx::PxTransform(pxTranslation, pxRotation);
+
+        // PhysX capsules are X-axis aligned; compose a 90 deg Z rotation to make them Y-axis (upright)
+        // This only applies to non CCT, CCT rotation is done internally by PhysX
+        if (pc.collider->getType() == CollisionShape::CAPSULE)
+            physxTransform.q = physxTransform.q * physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0.0f, 0.0f, 1.0f));
+
         shape->setLocalPose(physxTransform);
         body->attachShape(*shape);
     }
-    //shape->release();
 
     if (recursive)
     {
