@@ -3,3 +3,5 @@
 #include <sol/sol.hpp>
 
 void bindAll(sol::state& lua);
+void bindStatic(sol::state& lua);
+void bindDynamic(sol::state& lua);

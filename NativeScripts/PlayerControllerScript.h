@@ -85,7 +85,7 @@ public:
 		auto& transform = m_camera.getComponent<Transformation>();
 
 		Physics::HitResult hitResult;
-		if (Physics::raycast(transform.getWorldPosition(), camComponent.front, 100.f, hitResult, Physics::LayerMask::LAYER_1))
+		if (Physics::raycast(transform.getWorldPosition(), camComponent.front, 100.f, hitResult, Physics::LayerMaskEnum::LAYER_1))
 		{
 			hitResult.e.getComponent<PhysicsComponent>().setForce(-hitResult.normal * m_bulletForce);
 		}

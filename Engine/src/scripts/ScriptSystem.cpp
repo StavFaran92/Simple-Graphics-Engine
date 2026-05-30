@@ -33,6 +33,11 @@ public:
 
         bindAll(lua);
     }
+
+    void bindDynamics()
+    {
+        bindDynamic(lua);
+    }
 };
 
 ScriptSystem::ScriptSystem()
@@ -46,6 +51,11 @@ ScriptSystem::~ScriptSystem() = default;
 void ScriptSystem::init()
 {
     impl_->init();
+}
+
+void ScriptSystem::bindDynamics()
+{
+    impl_->bindDynamics();
 }
 
 void ScriptSystem::reloadScript(Entity e, ScriptComponent& scriptComponent)

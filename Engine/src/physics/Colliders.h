@@ -34,7 +34,7 @@ struct Collider
 
 	virtual CollisionShape getType() const = 0;
 
-	Physics::LayerMask layerMask = Physics::LayerMask::LAYER_0;
+	Physics::LayerMask layerMask = 0;
 };
 
 struct CollisionBox : public Collider

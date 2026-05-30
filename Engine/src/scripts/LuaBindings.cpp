@@ -691,6 +691,7 @@ void bindMath(sol::state& lua)
         });
 }
 
+#include "core/ProjectSettings.h"
 void bindPhysics(sol::state& lua)
 {
     lua.new_usertype<Physics::HitResult>("HitResult",
@@ -701,32 +702,21 @@ void bindPhysics(sol::state& lua)
         "entity", &Physics::HitResult::e
     );
 
-    lua.new_enum("LayerMask",
-        "LAYER_0", Physics::LayerMask::LAYER_0,
-        "LAYER_1", Physics::LayerMask::LAYER_1,
-        "LAYER_2", Physics::LayerMask::LAYER_2,
-        "LAYER_3", Physics::LayerMask::LAYER_3,
-        "LAYER_4", Physics::LayerMask::LAYER_4,
-        "LAYER_5", Physics::LayerMask::LAYER_5,
-        "LAYER_6", Physics::LayerMask::LAYER_6,
-        "LAYER_7", Physics::LayerMask::LAYER_7,
-        "LAYER_8", Physics::LayerMask::LAYER_8,
-        "LAYER_9", Physics::LayerMask::LAYER_9,
-        "LAYER_10", Physics::LayerMask::LAYER_10,
-        "LAYER_11", Physics::LayerMask::LAYER_11,
-        "LAYER_12", Physics::LayerMask::LAYER_12,
-        "LAYER_13", Physics::LayerMask::LAYER_13,
-        "LAYER_14", Physics::LayerMask::LAYER_14,
-        "LAYER_15", Physics::LayerMask::LAYER_15,
-        "LAYER_16", Physics::LayerMask::LAYER_16,
-        "LAYER_17", Physics::LayerMask::LAYER_17
-    );
+    
 
+
+    
 
     lua.set_function("raycast", Physics::raycast);
 }
 
 void bindAll(sol::state& lua) 
+{
+    bindStatic(lua);
+    bindDynamic(lua);
+}
+
+void bindStatic(sol::state& lua)
 {
     bindCoreTypes(lua);
     bindMath(lua);
@@ -737,4 +727,18 @@ void bindAll(sol::state& lua)
     bindPhysics(lua);
     bindSystems(lua);
     bindFreeFunctions(lua);
+}
+
+void bindDynamic(sol::state& lua)
+{
+    sol::table t = lua.create_table();
+
+    for (int i = 0; i < 32; i++)
+    {
+        const std::string& name = ProjectSettings::get().getLayerName(i);
+        t[name] = (1 << i);  // "Ground" = 1, "Enemy" = 2, etc.
+    }
+
+    lua["LayerMask"] = t;
+
 }

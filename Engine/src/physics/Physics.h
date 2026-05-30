@@ -17,7 +17,9 @@ public:
         Entity e = Entity::EmptyEntity;
     };
 
-    enum LayerMask
+    using LayerMask = uint32_t;
+
+    enum LayerMaskEnum
     {
         LAYER_0 = 0,
         LAYER_1 = (1 << 0),
@@ -39,5 +41,5 @@ public:
         LAYER_17 = (1 << 16),
     };
 public:
-	static bool raycast(glm::vec3 origin, glm::vec3 dir, float distance, HitResult& hitResult, LayerMask mask = LayerMask::LAYER_0);
+	static bool raycast(glm::vec3 origin, glm::vec3 dir, float distance, HitResult& hitResult, LayerMask mask = 0);
 };

@@ -24,6 +24,7 @@ public:
     ~ScriptSystem();
 
     void init();
+    void bindDynamics();
 
     void reloadScript(Entity e, ScriptComponent& scriptComponent);
 

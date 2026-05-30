@@ -1422,6 +1422,7 @@ void Scene::startSimulation()
 
 	// Run all scripts create
 	auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
+	scriptSystem->bindDynamics();
 	for (auto&& [entity, script] : m_registry->get().view<ScriptComponent>().each())
 	{
 		Entity e(entity, &getRegistry());

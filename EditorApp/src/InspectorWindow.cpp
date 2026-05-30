@@ -13,6 +13,7 @@
 #include "AnimationViewerWindow.h"
 #include "scripts/ScriptSystem.h"
 #include "component/TagComponent.h"
+#include "core/ProjectSettings.h"
 
 bool g_testRay = false;
 Terrain* g_activeTerrain = 0;
@@ -183,7 +184,24 @@ void InspectorWindow::display()
 			}
 
 			ImGui::LabelText("", "Layer");
-			ImGui::Combo("##LayerMask", (int*)&rBody.collider->layerMask, layerMaskList, IM_ARRAYSIZE(layerMaskList));
+			
+			if (ImGui::CollapsingHeader("Layer Mask")) {
+				ImGui::BeginChild("##LayerMaskScroll", ImVec2(0, 150), true);
+				for (int i = 0; i < ProjectSettings::get().m_layerNames.size(); i++) {
+					bool checked = rBody.collider->layerMask & (1 << i);
+					ImGui::Text("%s", ProjectSettings::get().m_layerNames[i].c_str());
+					ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ScrollbarSize);
+					ImGui::PushID(i);
+					if (ImGui::Checkbox("##layer", &checked)) {
+						if (checked)
+							rBody.collider->layerMask |= (1 << i);
+						else
+							rBody.collider->layerMask &= ~(1 << i);
+					}
+					ImGui::PopID();
+				}
+				ImGui::EndChild();
+			}
 
 			switch (type) {
 			case CollisionShape::BOX:
