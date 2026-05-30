@@ -54,6 +54,7 @@
 #include "fileSystem/FileSystem.h"
 #include "memory/MemoryPool.h"
 #include "runtime/StartupSceneTemplate.h"
+#include "core/ProjectSettings.h"
 
 #include "core/Application.h"
 #include "SDL2/SDL.h"
@@ -269,6 +270,7 @@ bool Engine::init(const InitParams& initParams)
     }
     else
     {
+        ProjectSettings::get().create(m_projectDirectory);
         auto startupScene = StartupSceneTemplate::createStartupScene("Scene_0");
         m_context->setActiveScene(startupScene.resource()->getID());
         saveProject();

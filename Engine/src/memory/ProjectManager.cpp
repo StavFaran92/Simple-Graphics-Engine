@@ -6,6 +6,7 @@
 //#include "TextureSerializer.h"
 #include <nlohmann/json.hpp>
 #include "runtime/Scene.h"
+#include "core/ProjectSettings.h"
 
 using json = nlohmann::json;
 
@@ -13,6 +14,7 @@ namespace fs = std::filesystem;
 
 void ProjectManager::loadProject(const std::string& filePath, std::shared_ptr<Context>& context)
 {
+    ProjectSettings::get().load(Engine::get()->getProjectDirectory());
     Engine::get()->getSubSystem<Assets>()->loadAssetsDatabase();
     Archiver::load();
 
@@ -27,6 +29,7 @@ void ProjectManager::saveProject()
     Engine::get()->getSubSystem<Assets>()->saveDirtyAssets();
 
     // Save Assets
+    ProjectSettings::get().save();
     Engine::get()->getContext()->save();
     Archiver::save();
     
