@@ -174,7 +174,14 @@ function Script:onAnimationTrigger(name, frame)
 end
 
 function Script:onTriggerEnter(entity, other)
+    local function faceEnemy()
+        local dirToEnemy = other.Transform:getWorldPosition() - entity.Transform:getWorldPosition()
+        dirToEnemy = normalize(dirToEnemy)
+        self.modelTransform:setLocalRotation(-math.atan(dirToEnemy.z, dirToEnemy.x) + math.pi / 2, vec3.new(0, 1, 0))
+    end
+
     if other.Tag:getTag() == "enemy_attack_collider" then
+        faceEnemy()
         self.animator:getGraph():trigger("hurt")
     end
 end
