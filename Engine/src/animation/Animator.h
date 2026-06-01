@@ -21,7 +21,7 @@ public:
 
 	void onStart();
 	void update(Entity e, float dt);
-	void getFinalBoneMatrices(const Model* meshCollection, std::vector<glm::mat4>& outFinalBoneMatrices) const;
+	void getFinalBoneMatrices(const ModelResourceRef meshCollection, std::vector<glm::mat4>& outFinalBoneMatrices) const;
 
 	void addAnimation(AnimationEntry animation);
 	void removeAnimation(const std::string& name);

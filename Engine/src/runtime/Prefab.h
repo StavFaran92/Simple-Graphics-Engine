@@ -34,17 +34,11 @@ public:
 
 	Entity Instansiate(glm::vec3 position = glm::vec3{ 0.0f });
 
-	template <class Archive>
-	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(m_serializedPrefab);
-	}
-
 	static PrefabData serializeEntityToPrefabData(const Entity& e); // todo make private
 private:
 	static void serializeEntityToPrefabDataHelper(const Entity& e, PrefabData& prefabData);
 private:
 	PrefabData m_data;
-	//std::vector<SerializedEntity> m_serializedPrefab;
 };
 
 // Asset

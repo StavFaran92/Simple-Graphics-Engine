@@ -61,7 +61,7 @@ bool IRenderer::prepareEntityForRender(const Entity& entityHandler)
 		auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
 
 		std::vector<glm::mat4> finalBoneMatrices;
-		animator->getFinalBoneMatrices(meshRenderer.mesh.resource().get(), finalBoneMatrices);
+		animator->getFinalBoneMatrices(meshRenderer.mesh.resource(), finalBoneMatrices);
 		for (int i = 0; i < finalBoneMatrices.size(); ++i)
 		{
 			graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);

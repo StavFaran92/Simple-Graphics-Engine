@@ -52,6 +52,7 @@ void displayEntityHelper(Entity& e)
 				aInfo.aType = AssetType::PREFAB;
 				aInfo.name = assetName;
 				PrefabCreateDescriptor createDesc;
+				createDesc.data = Prefab::serializeEntityToPrefabData(e);
 				// TODO: makeResourceCreateDescriptor<PrefabCreateDescriptor>() with entity
 				Engine::get()->getSubSystem<Assets>()->createAsset(aInfo, createDesc);
 

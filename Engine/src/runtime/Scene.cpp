@@ -783,7 +783,7 @@ void Scene::draw(float deltaTime)
                         else
                         {
                             std::vector<glm::mat4> finalBoneMatrices;
-                            animator->getFinalBoneMatrices(mesh.get(), finalBoneMatrices);
+                            animator->getFinalBoneMatrices(mesh, finalBoneMatrices);
                             for (int i = 0; i < finalBoneMatrices.size(); ++i)
                             {
                                 m_highlightMaskShader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);

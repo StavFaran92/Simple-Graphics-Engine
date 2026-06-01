@@ -522,30 +522,21 @@ void bindAssets(sol::state& lua)
         "load", &Shader::load
     );
 
-    // todo fix
-    //lua.new_usertype<PrefabResourceRef>("Prefab",
-    //    sol::factories(
-    //        [](int value) {
-    //            // your custom UUID creation from int
-    //            return PrefabResourceRef(UUID(value));
-    //        }
-    //    ),
-    //    // Instance methods
-    //    "save", [](PrefabResourceRef& self) {
-    //        self->save(self, {});
-    //    },
-    //    "instansiate", [](PrefabResourceRef& self, glm::vec3 position) {
-    //        self->Instansiate(position);
-    //    },
-
-    //    // Static methods wrapped as lambdas inside new_usertype
-    //    "create", [](const Entity& e) {
-    //        return Prefab::create(e); // returns PrefabResourceRef
-    //    },
-    //    "import", [](const std::string& path) {
-    //        return PrefabAsset::import(path, {}); // returns PrefabResourceRef
-    //    }
-    //);
+    lua.new_usertype<PrefabAssetRef>("Prefab",
+        sol::factories(
+            [](int value) {
+                // your custom UUID creation from int
+                return PrefabAssetRef(UUID(value));
+            },
+            [](const std::string& assetName) {
+                // your custom UUID creation from int
+                return Engine::get()->getSubSystem<Assets>()->getAssetFromName(assetName).as<PrefabAsset>();
+            }
+        ),
+        "instansiate", [](PrefabAssetRef& self, glm::vec3 position) {
+            self.resource()->Instansiate(position);
+        }
+    );
 
     //lua.new_usertype<LuaScript>("LuaScript",
     //    "import", &LuaScriptAsset::import,

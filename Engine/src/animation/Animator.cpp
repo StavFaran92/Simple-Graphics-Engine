@@ -58,7 +58,7 @@ void Animator::update(Entity e, float dt)
 	
 }
 
-void Animator::getFinalBoneMatrices(const Model* meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
+void Animator::getFinalBoneMatrices(const ModelResourceRef meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
 {
 	auto currentAnimation = getCurrentAnimation();
 	if (!currentAnimation || currentAnimation->animation.isEmpty() || currentAnimation->animation.resource().isEmpty())
