@@ -21,7 +21,6 @@ public:
 
     enum LayerMaskEnum
     {
-        LAYER_0 = 0,
         LAYER_1 = (1 << 0),
         LAYER_2 = (1 << 1),
         LAYER_3 = (1 << 2),

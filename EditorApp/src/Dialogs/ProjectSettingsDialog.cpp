@@ -41,7 +41,7 @@ void ProjectSettingsDialog::drawContent()
 				buf[sizeof(buf) - 1] = '\0';
 
 				ImGui::PushID(i);
-				ImGui::Text("%2d", i);
+				ImGui::Text("Layer %2d", i + 1);
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(-1);
 				if (ImGui::InputText("##layer", buf, sizeof(buf)))
