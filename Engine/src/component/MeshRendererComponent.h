@@ -41,6 +41,7 @@ struct EngineAPI MeshRendererComponent : public Component
 		SERIALIZED_MEMBER(count);
 		SERIALIZED_MEMBER(m_material);
 		SERIALIZED_MEMBER(renderTechnique);
+		SERIALIZED_MEMBER_OPTIONAL(isInstanced);
 
 	}
 
@@ -58,6 +59,8 @@ struct EngineAPI MeshRendererComponent : public Component
 	};
 
 	RenderTechnique renderTechnique = RenderTechnique::Deferred;
+
+	bool isInstanced = false;
 
 protected:
 	std::vector<AssetRef<Asset>> gatherDependenciesInternal() const override;

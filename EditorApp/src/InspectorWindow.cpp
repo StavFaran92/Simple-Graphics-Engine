@@ -271,8 +271,9 @@ void InspectorWindow::display()
 				int index = 0;
 				for (auto& [id, mat] : meshComponent.m_material)
 				{
+					ImGui::Text("Slot %d:", index);
+					ImGui::SameLine();
 					ImGui::PushID(&mat);
-
 					std::string matName = "None";
 					if (!mat.isEmpty())
 					{
@@ -292,6 +293,9 @@ void InspectorWindow::display()
 				}
 			}
 
+			ImGui::Text("Is instanced");
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x);
+			ImGui::Checkbox("##isInstanced", &meshComponent.isInstanced);
 
 			
 			
