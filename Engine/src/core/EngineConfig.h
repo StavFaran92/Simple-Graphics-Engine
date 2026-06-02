@@ -10,6 +10,7 @@ struct EngineConfig
 		bool renderForwardPass = true;
 		bool renderDeferredPass = true;
 		bool renderCustomShadersPass = true;
+		bool renderIndirectRendererPass = true;
 		bool renderSkyboxPass = true;
 		bool renderTerrainPass = true;
 		bool renderVolumetricsPass = true;

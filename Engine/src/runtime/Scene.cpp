@@ -25,6 +25,7 @@
 #include "systems/TimeManager.h"
 #include "render/UniformBufferObject.h"
 #include "render/DeferredRenderer.h"
+#include "render/IndirectRenderer.h"
 #include "render/Renderer.h"
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
@@ -545,6 +546,13 @@ void Scene::draw(float deltaTime)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Custom shader render pass");
 			Engine::get()->getForwardRenderer().renderSceneUsingCustomShader(this);
+			glPopDebugGroup();
+		}
+
+		if (Engine::get()->getConfig().renderConfig.renderIndirectRendererPass)
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Indirect render pass");
+			Engine::get()->getIndirectRenderer().renderScene(this);
 			glPopDebugGroup();
 		}
 

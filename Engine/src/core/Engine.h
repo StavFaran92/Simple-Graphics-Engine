@@ -50,6 +50,7 @@ class BuiltInMaterials;
 class Resource;
 class SubSystem;
 class DeferredRenderer;
+class IndirectRenderer;
 class Renderer;
 struct EngineConfig;
 template<typename T>class ResourceRef;
@@ -102,6 +103,7 @@ public:
     MemoryPool<Resource>& getMemoryPool() const;
     DeferredRenderer& getDeferredRenderer() const;
     Renderer& getForwardRenderer() const;
+    IndirectRenderer& getIndirectRenderer() const;
     void addGUILayer(const std::shared_ptr<GUILayer>& GUILayer);
     void setImGuiContext(void* context);
     
@@ -190,6 +192,7 @@ protected:
     std::shared_ptr<MemoryPool<Resource>> m_memoryPool;
     std::shared_ptr<DeferredRenderer> m_deferredRenderer;
     std::shared_ptr<Renderer> m_forwardRenderer;
+    std::shared_ptr<IndirectRenderer> m_indirectRenderer;
 
     InitParams m_initParams;
 

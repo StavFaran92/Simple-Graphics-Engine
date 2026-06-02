@@ -282,6 +282,9 @@ bool Engine::init(const InitParams& initParams)
 
     m_forwardRenderer = std::make_shared<Renderer>();
     m_forwardRenderer->init();
+
+    m_indirectRenderer = std::make_shared<IndirectRenderer>();
+    m_indirectRenderer->init();
     
 
     auto objectPicker = new ObjectPicker();
@@ -520,6 +523,11 @@ DeferredRenderer& Engine::getDeferredRenderer() const
 Renderer& Engine::getForwardRenderer() const
 {
     return *m_forwardRenderer.get();
+}
+
+IndirectRenderer& Engine::getIndirectRenderer() const
+{
+    return *m_indirectRenderer.get();
 }
 
 void Engine::addGUILayer(const std::shared_ptr<GUILayer>& GUILayer)
