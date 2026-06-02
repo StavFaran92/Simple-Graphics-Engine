@@ -79,6 +79,10 @@ void ScriptComponent::resolve(SceneResourceRef& scene)
 void ScriptComponent::postLoad(SceneResourceRef& scene)
 {
 	loadScript();
+
+	// We call on destroy so the script is not preserved in the script system
+	// (the main reason we want to load the script on post load is to reflect its structure anyway..)
+	Engine::get()->getSubSystem<ScriptSystem>()->callDestroy(entity);
 }
 
 std::vector<std::string> ScriptComponent::getAllRefSlots() const
