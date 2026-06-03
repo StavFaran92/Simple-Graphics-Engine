@@ -11,6 +11,7 @@ public:
     uint32_t addMaterial(const RenderData::MaterialData& mat) { return push(m_materials, mat); }
 
     void upload();
+    void clear();
 
     void bind(int slot);
 

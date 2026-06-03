@@ -252,7 +252,7 @@ void InspectorWindow::display()
 			END_IMGUI_TABLE();
 
 			// Array of string names for the enum
-			const char* renderTechniqueNames[] = { "Forward", "Deferred" };
+			const char* renderTechniqueNames[] = { "Forward", "Deferred", "Indirect"};
 
 			ImGui::Combo("Render Technique", (int*)&meshComponent.renderTechnique, renderTechniqueNames, IM_ARRAYSIZE(renderTechniqueNames));
 

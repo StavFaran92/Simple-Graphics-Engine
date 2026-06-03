@@ -13,6 +13,12 @@ void SceneBuffer::upload()
     //    m_drawCommands.data());
 }
 
+void SceneBuffer::clear()
+{
+    m_objects.clear();
+    m_materials.clear();
+}
+
 void SceneBuffer::bind(int slot)
 {
 	m_ssbo.setSlot(slot);

@@ -125,8 +125,13 @@ void IndirectRenderer::renderScene(Scene* scene)
 		glLineWidth(1); // Size in pixels
 	}
 
-	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
+	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_INDIRECT_PBR_GEOM);
 	graphics->shader->use();
+
+	graphics->shader->setViewMatrix(graphics->view);
+	graphics->shader->setProjectionMatrix(graphics->projection);
+	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
 
 	// Render all objects
 	for (auto&& [entity, meshRenderer, transform, obj] :
@@ -158,10 +163,7 @@ void IndirectRenderer::renderScene(Scene* scene)
 		//	graphics->shader->setUniformValue("isAnimated", true);
 		//}
 
-		graphics->shader->setViewMatrix(graphics->view);
-		graphics->shader->setProjectionMatrix(graphics->projection);
-		graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-		graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+
 
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
@@ -183,7 +185,7 @@ void IndirectRenderer::renderScene(Scene* scene)
 			}
 
 			//DebugHelper::getInstance().drawAABB(aabb);
-			RenderData::ObjectData objData;
+			RenderData::ObjectData objData{};
 			objData.model = modelTransform;
 			objData.materialIndex = mesh->getMaterialIndex();
 			m_sceneBuffer.addObject(objData);
@@ -217,6 +219,9 @@ void IndirectRenderer::renderScene(Scene* scene)
 		m_drawCommands.size(),  // how many draw commands
 		0                       // stride (0 = tightly packed)
 	);
+
+	m_drawCommands.clear();
+	m_sceneBuffer.clear();
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Light pass");
 
