@@ -1,4 +1,4 @@
-#include "IndirectRenderer.h"
+#include "render/IndirectRenderer.h"
 
 #include "memory/ResourceRef.h"
 #include "gl/glew.h"
@@ -27,17 +27,125 @@
 #include "memory/BuiltInAssets.h"
 #include "memory/BuiltInResources.h"
 
-void IndirectRenderer::init()
+static float lerp(float a, float b, float t)
 {
+	return a + t * (b - a);
+}
+
+bool IndirectRenderer::setupGBuffer(int width, int height)
+{
+	m_gBuffer.bind();
+
+	// Generate Texture for Position data
+	m_positionTexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
+	m_gBuffer.attachTexture(m_positionTexture.get()->getID(), GL_COLOR_ATTACHMENT0);
+
+	// Generate Texture for Normal data
+	m_normalTexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
+	m_gBuffer.attachTexture(m_normalTexture.get()->getID(), GL_COLOR_ATTACHMENT1);
+
+	// Generate Texture for Albedo
+	m_albedoTexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA, TextureFormat::RGBA, TextureType::UNSIGNED_BYTE);
+	m_gBuffer.attachTexture(m_albedoTexture.get()->getID(), GL_COLOR_ATTACHMENT2);
+
+	// Generate Texture for MRA
+	m_MRATexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA, TextureFormat::RGBA, TextureType::UNSIGNED_BYTE);
+	m_gBuffer.attachTexture(m_MRATexture.get()->getID(), GL_COLOR_ATTACHMENT3);
+
+	// Generate Texture for Position ViewSpace data
+	m_positionTextureVS = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
+	m_gBuffer.attachTexture(m_positionTextureVS.get()->getID(), GL_COLOR_ATTACHMENT4);
+
+	// Generate Texture for Normal ViewSpace data
+	m_normalTextureVS = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
+	m_gBuffer.attachTexture(m_normalTextureVS.get()->getID(), GL_COLOR_ATTACHMENT5);
+
+	// Generate Texture for Tangent data
+	m_TangentTexture = Texture::createTexture(width, height, 3, TextureInternalFormat::RGBA16F, TextureFormat::RGBA, TextureType::FLOAT);
+	m_gBuffer.attachTexture(m_TangentTexture.get()->getID(), GL_COLOR_ATTACHMENT6);
+
+	unsigned int attachments[7] = {
+		GL_COLOR_ATTACHMENT0,
+		GL_COLOR_ATTACHMENT1,
+		GL_COLOR_ATTACHMENT2,
+		GL_COLOR_ATTACHMENT3,
+		GL_COLOR_ATTACHMENT4,
+		GL_COLOR_ATTACHMENT5,
+		GL_COLOR_ATTACHMENT6
+	};
+	glDrawBuffers(7, attachments);
+
+	// Create RBO and attach to FBO
+	m_renderBuffer = RenderBufferObject(width, height);
+	m_gBuffer.attachRenderBuffer(m_renderBuffer.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
+
+	if (!m_gBuffer.isComplete())
+	{
+		logError("FBO is not complete!");
+		return false;
+	}
+
+	m_gBuffer.unbind();
+
+	return true;
+}
+
+bool IndirectRenderer::init()
+{
+
+	auto width = Engine::get()->getWindow()->getWidth();
+	auto height = Engine::get()->getWindow()->getHeight();
+
+	setupGBuffer(width, height);
+
+	// Generate screen quad
+	m_quad = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD).as<ModelAsset>().resource();
+
+	return true;
+}
+
+void IndirectRenderer::render()
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	graphics->shader->setModelMatrix(graphics->model);
+	graphics->shader->setViewMatrix(graphics->view);
+	graphics->shader->setProjectionMatrix(graphics->projection);
+	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+
+	graphics->material->use();
+
+	// Draw
+	auto instanceBatch = graphics->entity.tryGetComponent<InstanceBatch>();
+	if (!instanceBatch)
+	{
+		graphics->shader->setUniformValue("isGpuInstanced", false);
+		RenderCommand::draw(graphics->mesh->getVAO());
+	}
+	else
+	{
+		graphics->shader->setUniformValue("isGpuInstanced", true);
+		RenderCommand::drawInstanced(graphics->mesh->getVAO(), instanceBatch->getCount());
+	}
 }
 
 void IndirectRenderer::renderScene(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
+	glBindFramebuffer(GL_FRAMEBUFFER, getGBuffer().getID());
 	RenderCommand::clear();
 
 	glEnable(GL_DEPTH_TEST);
+
+	if (graphics->renderMode == RenderMode::WIREFRAME)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glEnable(GL_POLYGON_OFFSET_LINE);
+		glPolygonOffset(-1.0, -1.0);
+		glLineWidth(1); // Size in pixels
+	}
 
 	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
 	graphics->shader->use();
@@ -58,13 +166,55 @@ void IndirectRenderer::renderScene(Scene* scene)
 		std::string captionGPU = "About to render Entity: '" + name + "'";
 		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
 
-		prepareEntityForRender(entityHandler);
+		auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+		// Apply animation logic
+		auto animator = entityHandler.tryGetComponent<Animator>();
+		if (!animator || !animator->hasActiveAnimation())
+		{
+			graphics->shader->setUniformValue("isAnimated", false);
+		}
+		else
+		{
+			auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
+			std::vector<glm::mat4> finalBoneMatrices;
+			animator->getFinalBoneMatrices(meshRenderer.mesh.resource(), finalBoneMatrices);
+			for (int i = 0; i < finalBoneMatrices.size(); ++i)
+			{
+				graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
+			}
+
+			graphics->shader->setUniformValue("isAnimated", true);
+		}
 
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
-			if (!prepareMeshForRender(mesh.get(), entityHandler))
+			auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+			auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
+			graphics->mesh = mesh.get();
+			auto& transform = entityHandler.getComponent<Transformation>();
+			glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
+			graphics->model = modelTransform;
+
+			AABB& aabb = mesh->getAABB();
+			aabb.transform(modelTransform);
+
+			if (!aabb.isOnFrustum(*graphics->frustum))
 			{
 				continue;
+			}
+
+			//DebugHelper::getInstance().drawAABB(aabb);
+
+			auto matIndex = mesh->getMaterialIndex();
+			graphics->material = meshRenderer.at(matIndex);
+
+			if (graphics->material.isEmpty())
+			{
+				graphics->material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
 			}
 
 			// Only render Opaque objects
@@ -102,67 +252,6 @@ void IndirectRenderer::renderScene(Scene* scene)
 
 	//glDisable(GL_DEPTH_TEST);
 
-	if (graphics->useSSAO)
-	{
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "SSAO pass");
-
-		glDisable(GL_DEPTH_TEST);
-
-		m_ssaoFBO.bind();
-		m_ssaoPassShader->use();
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		// SSAO
-		m_ssaoPassShader->setTextureInShader(m_positionTextureVS, "gPositionVS", 0);
-		m_ssaoPassShader->setTextureInShader(m_normalTextureVS, "gNormalVS", 1);
-		m_ssaoPassShader->setTextureInShader(m_ssaoNoiseTexture, "gSSAONoise", 2);
-
-		// TODO remove
-		auto width = Engine::get()->getWindow()->getWidth();
-		auto height = Engine::get()->getWindow()->getHeight();
-
-		// We set the viewport to half the screen size to improve the SSAO performance
-		RenderCommand::setViewport(0, 0, width / 2.f, height / 2.f);
-
-		m_ssaoPassShader->setUniformValue("screenWidth", (int)(width / 2.f));
-		m_ssaoPassShader->setUniformValue("screenHeight", (int)(height / 2.f));
-
-		for (unsigned int i = 0; i < 64; ++i)
-		{
-			m_ssaoPassShader->setUniformValue("ssaoKernel[" + std::to_string(i) + "]", m_ssaoKernel[i]);
-		}
-
-		m_ssaoPassShader->setUniformValue("view", graphics->view);
-		m_ssaoPassShader->setUniformValue("projection", graphics->projection);
-
-		{
-			// render to quad
-			auto vao = m_quad->getPrimaryMesh()->getVAO();
-			RenderCommand::draw(vao);
-		}
-
-		//glClear(GL_COLOR_BUFFER_BIT);
-
-		m_ssaoBlurFBO.bind();
-		m_ssaoBlurPassShader->use();
-
-		m_ssaoBlurPassShader->setTextureInShader(m_ssaoColorBuffer, "gSSAOColorBuffer", 0);
-
-
-		{
-			// render to quad
-			auto vao = m_quad->getPrimaryMesh()->getVAO();
-			RenderCommand::draw(vao);
-		}
-
-		glEnable(GL_DEPTH_TEST);
-
-		// We set the viewport back to original size
-		RenderCommand::setViewport(0, 0, width, height);
-
-		glPopDebugGroup();
-	}
-
 	// bind textures
 	// Todo solve slots issue
 	ShaderResourceRef lightPassShaderResource = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_LIGHT);
@@ -192,4 +281,23 @@ void IndirectRenderer::renderScene(Scene* scene)
 	}
 
 	glPopDebugGroup();
+
+	//graphics->renderView->unbind();
 }
+
+const FrameBufferObject& IndirectRenderer::getGBuffer() const
+{
+	return m_gBuffer;
+}
+
+void IndirectRenderer::resize(int w, int h)
+{
+	setupGBuffer(w, h);
+}
+
+//void DeferredRenderer::reloadShaders()
+//{
+//	m_gBufferShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBR_GeomPassShader.glsl"); // TODO fix, now when its a built in asset it will cause issues
+//	m_lightPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBR_LightPassShader.glsl");
+//	m_ssaoPassShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SSAOPassShader.glsl");
+//}

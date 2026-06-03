@@ -35,6 +35,7 @@
 #include "core/EngineConfig.h"
 #include "core/EventParser.h"
 #include "render/DeferredRenderer.h"
+#include "render/IndirectRenderer.h"
 #include "memory/FrameAccessTable.h"
 
 #include "systems/FoliageSystem.h"
