@@ -25,10 +25,10 @@ struct RenderData
 
     // per draw call
     struct DrawCommand {
-        uint32_t indexCount = 0;
-        uint32_t instanceCount = 0;
-        uint32_t firstIndex = 0;
-        uint32_t baseVertex = 0;
-        uint32_t baseInstance = 0;
+        uint32_t vertexCount;
+        uint32_t instanceCount;
+        uint32_t firstIndex;
+        uint32_t baseVertex;
+        uint32_t baseInstance;
     };
 };

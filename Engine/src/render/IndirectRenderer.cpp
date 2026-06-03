@@ -184,22 +184,41 @@ void IndirectRenderer::renderScene(Scene* scene)
 				continue;
 			}
 
+			graphics->shader->setModelMatrix(graphics->model);
+
 			//DebugHelper::getInstance().drawAABB(aabb);
 			RenderData::ObjectData objData{};
 			objData.model = modelTransform;
 			objData.materialIndex = mesh->getMaterialIndex();
 			m_sceneBuffer.addObject(objData);
 
-			RenderData::DrawCommand drawCommand;
-			drawCommand.indexCount = mesh->getMeshData().m_indices.size();
+			RenderData::DrawCommand drawCommand{};
+			drawCommand.vertexCount = 6;
 			drawCommand.instanceCount = 1;
-			drawCommand.baseVertex = 0;
 			drawCommand.firstIndex = 0;
+			drawCommand.baseVertex = 0;
 			drawCommand.baseInstance = 0;
 			addDrawCommand(drawCommand);
 		}
 
 	};
+
+	auto mat = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
+
+	int slot = 6;
+
+	// Set samplers
+	for (const auto& [name, sampler] : mat->getAllSamplers())
+	{
+		mat->useSamplerInShader(name, sampler, graphics->shader, slot);
+		slot++;
+	}
+
+	// Set uniforms
+	for (const auto& [name, value] : mat->getAllUniforms())
+	{
+		graphics->shader->setUniformValue(name, value);
+	}
 
 	m_sceneBuffer.upload();
 
@@ -208,7 +227,7 @@ void IndirectRenderer::renderScene(Scene* scene)
 		m_drawCommands.size() * sizeof(RenderData::DrawCommand),
 		m_drawCommands.data());
 
-	auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh()->getVAO();
+	auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
 	vao->Bind();
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
