@@ -55,7 +55,8 @@ struct EngineAPI MeshRendererComponent : public Component
 	enum class RenderTechnique : int
 	{
 		Forward,
-		Deferred
+		Deferred,
+		Indirect
 	};
 
 	RenderTechnique renderTechnique = RenderTechnique::Deferred;

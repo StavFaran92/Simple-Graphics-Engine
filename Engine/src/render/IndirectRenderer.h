@@ -4,6 +4,7 @@
 
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
+#include "render/SceneRenderBuffer.h"
 #include "memory/AssetRef.h"
 #include "runtime/Entity.h"
 #include "core/Window.h"
@@ -22,10 +23,16 @@ public:
 	void renderSceneUsingCustomShader(Scene* scene);
 	void setUniforms(Shader* shader);
 
+	void beginFrame();
+	void endFrame();
+
 	void resize(int w, int h);
 	//void reloadShaders();
 
 	const FrameBufferObject& getGBuffer() const;
+
+	void addDrawCommand(const RenderData::DrawCommand& drawCommand) { m_drawCommands.push_back(drawCommand); }
+
 
 private:
 	bool setupGBuffer(int width, int height);
@@ -47,16 +54,8 @@ private:
 	ModelResourceRef m_quad;
 	ShaderResourceRef m_screenShader;
 
-	// SSAO
-	FrameBufferObject m_ssaoFBO;
-	RenderBufferObject m_ssaoRenderBuffer;
-	TextureResourceRef m_ssaoNoiseTexture = nullptr;
-	TextureResourceRef m_ssaoColorBuffer = nullptr;
-	ShaderResourceRef m_ssaoPassShader;
-	std::vector<glm::vec3> m_ssaoKernel;
+	SceneBuffer m_sceneBuffer;
 
-	FrameBufferObject m_ssaoBlurFBO;
-	RenderBufferObject m_ssaoBlurRenderBuffer;
-	TextureResourceRef m_ssaoBlurColorBuffer = nullptr;
-	ShaderResourceRef m_ssaoBlurPassShader;
+	std::vector<RenderData::DrawCommand>  m_drawCommands;
+	uint32_t m_indirectBuffer;
 };

@@ -12,6 +12,7 @@
 #include "render/Material.h"
 #include "core/Random.h"
 #include "render/RenderCommand.h"
+#include "render/VertexArrayOBject.h"
 #include "runtime/Context.h"
 #include "animation/Animator.h"
 #include "geometry/Model.h"
@@ -92,6 +93,9 @@ bool IndirectRenderer::setupGBuffer(int width, int height)
 
 bool IndirectRenderer::init()
 {
+	glGenBuffers(1, &m_indirectBuffer);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, 1000 * sizeof(RenderData::DrawCommand), nullptr, GL_DYNAMIC_DRAW);
 
 	auto width = Engine::get()->getWindow()->getWidth();
 	auto height = Engine::get()->getWindow()->getHeight();
@@ -102,32 +106,6 @@ bool IndirectRenderer::init()
 	m_quad = Engine::get()->getSubSystem<Assets>()->getAssetFromName(SGE_MESH_QUAD).as<ModelAsset>().resource();
 
 	return true;
-}
-
-void IndirectRenderer::render()
-{
-	auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-	graphics->shader->setModelMatrix(graphics->model);
-	graphics->shader->setViewMatrix(graphics->view);
-	graphics->shader->setProjectionMatrix(graphics->projection);
-	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
-
-	graphics->material->use();
-
-	// Draw
-	auto instanceBatch = graphics->entity.tryGetComponent<InstanceBatch>();
-	if (!instanceBatch)
-	{
-		graphics->shader->setUniformValue("isGpuInstanced", false);
-		RenderCommand::draw(graphics->mesh->getVAO());
-	}
-	else
-	{
-		graphics->shader->setUniformValue("isGpuInstanced", true);
-		RenderCommand::drawInstanced(graphics->mesh->getVAO(), instanceBatch->getCount());
-	}
 }
 
 void IndirectRenderer::renderScene(Scene* scene)
@@ -150,43 +128,40 @@ void IndirectRenderer::renderScene(Scene* scene)
 	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
 	graphics->shader->use();
 
-	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
-
 	// Render all objects
 	for (auto&& [entity, meshRenderer, transform, obj] :
 		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
 	{
-		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Deferred)
+		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Indirect)
 			continue;
 
 		Entity entityHandler{ entity, &scene->getRegistry() };
 		graphics->entity = entityHandler;
 
-		std::string name = entityHandler.getComponent<ObjectComponent>().name;
-		std::string captionGPU = "About to render Entity: '" + name + "'";
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
-
-		auto graphics = Engine::get()->getSubSystem<Graphics>();
-
 		// Apply animation logic
-		auto animator = entityHandler.tryGetComponent<Animator>();
-		if (!animator || !animator->hasActiveAnimation())
-		{
-			graphics->shader->setUniformValue("isAnimated", false);
-		}
-		else
-		{
-			auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+		//auto animator = entityHandler.tryGetComponent<Animator>();
+		//if (!animator || !animator->hasActiveAnimation())
+		//{
+		//	graphics->shader->setUniformValue("isAnimated", false);
+		//}
+		//else
+		//{
+		//	auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
 
-			std::vector<glm::mat4> finalBoneMatrices;
-			animator->getFinalBoneMatrices(meshRenderer.mesh.resource(), finalBoneMatrices);
-			for (int i = 0; i < finalBoneMatrices.size(); ++i)
-			{
-				graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
-			}
+		//	std::vector<glm::mat4> finalBoneMatrices;
+		//	animator->getFinalBoneMatrices(meshRenderer.mesh.resource(), finalBoneMatrices);
+		//	for (int i = 0; i < finalBoneMatrices.size(); ++i)
+		//	{
+		//		graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
+		//	}
 
-			graphics->shader->setUniformValue("isAnimated", true);
-		}
+		//	graphics->shader->setUniformValue("isAnimated", true);
+		//}
+
+		graphics->shader->setViewMatrix(graphics->view);
+		graphics->shader->setProjectionMatrix(graphics->projection);
+		graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+		graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
 
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
@@ -208,35 +183,40 @@ void IndirectRenderer::renderScene(Scene* scene)
 			}
 
 			//DebugHelper::getInstance().drawAABB(aabb);
+			RenderData::ObjectData objData;
+			objData.model = modelTransform;
+			objData.materialIndex = mesh->getMaterialIndex();
+			m_sceneBuffer.addObject(objData);
 
-			auto matIndex = mesh->getMaterialIndex();
-			graphics->material = meshRenderer.at(matIndex);
-
-			if (graphics->material.isEmpty())
-			{
-				graphics->material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
-			}
-
-			// Only render Opaque objects
-			if (graphics->material->getRenderMode() != MaterialRenderMode::Opaque)
-			{
-				continue;
-			}
-
-			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
-			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
-
-			// draw model
-			render();
-
-			glPopDebugGroup();
+			RenderData::DrawCommand drawCommand;
+			drawCommand.indexCount = mesh->getMeshData().m_indices.size();
+			drawCommand.instanceCount = 1;
+			drawCommand.baseVertex = 0;
+			drawCommand.firstIndex = 0;
+			drawCommand.baseInstance = 0;
+			addDrawCommand(drawCommand);
 		}
-
-		glPopDebugGroup();
 
 	};
 
-	glPopDebugGroup();
+	m_sceneBuffer.upload();
+
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+		m_drawCommands.size() * sizeof(RenderData::DrawCommand),
+		m_drawCommands.data());
+
+	auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh()->getVAO();
+
+	vao->Bind();
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+	glMultiDrawElementsIndirect(
+		GL_TRIANGLES,           // primitive type
+		GL_UNSIGNED_INT,        // index type
+		0,                      // offset into indirect buffer (0 = start)
+		m_drawCommands.size(),  // how many draw commands
+		0                       // stride (0 = tightly packed)
+	);
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Light pass");
 
@@ -264,7 +244,6 @@ void IndirectRenderer::renderScene(Scene* scene)
 	lightPassShaderResource->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 5);
 	lightPassShaderResource->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
 	lightPassShaderResource->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
-	lightPassShaderResource->setTextureInShader(m_ssaoBlurColorBuffer, "gSSAOColorBuffer", 8);
 	lightPassShaderResource->setTextureInShader(m_TangentTexture, "gTangnet", 9);
 	lightPassShaderResource->bindUniformBlockToBindPoint("Time", 0);
 	lightPassShaderResource->bindUniformBlockToBindPoint("Lights", 1);
@@ -288,6 +267,21 @@ void IndirectRenderer::renderScene(Scene* scene)
 const FrameBufferObject& IndirectRenderer::getGBuffer() const
 {
 	return m_gBuffer;
+}
+
+void IndirectRenderer::beginFrame()
+{
+}
+
+void IndirectRenderer::endFrame()
+{
+
+	//m_sceneBuffer.upload();
+
+	//glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+	//glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+	//	m_drawCommands.size() * sizeof(DrawCommand),
+	//	m_drawCommands.data());
 }
 
 void IndirectRenderer::resize(int w, int h)

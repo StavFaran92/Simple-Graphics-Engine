@@ -25,6 +25,5 @@ private:
 
     std::vector<RenderData::ObjectData>   m_objects;
     std::vector<RenderData::MaterialData> m_materials;
-    std::vector<RenderData::DrawCommand>  m_drawCommands;
     SSBO m_ssbo;
 };
