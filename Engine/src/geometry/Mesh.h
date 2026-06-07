@@ -5,6 +5,7 @@
 #include "core/Core.h"
 #include "memory/Asset.h"
 #include "render/VertexLayout.h"
+#include "render/Vertex.h"
 #include "geometry/AABB.h"
 
 // Forward declerations
@@ -14,20 +15,78 @@ class VertexBufferObject;
 class ElementBufferObject;
 class VertexArrayObject;
 
+enum class MeshType
+{
+	StaticMesh = 0,
+	SkinnedMesh = 1
+};
+
 struct MeshData
 {
+	MeshData(MeshType meshType) : type(meshType) {
+
+		//todo move to const configs
+		if (meshType == MeshType::StaticMesh)
+		{
+			m_layout.attribs.push_back(LayoutAttribute::Positions);
+			m_layout.attribs.push_back(LayoutAttribute::Normals);
+			m_layout.attribs.push_back(LayoutAttribute::Texcoords);
+			m_layout.attribs.push_back(LayoutAttribute::Tangents);
+		}
+		else if (meshType == MeshType::SkinnedMesh)
+		{
+			m_layout.attribs.push_back(LayoutAttribute::Positions);
+			m_layout.attribs.push_back(LayoutAttribute::Normals);
+			m_layout.attribs.push_back(LayoutAttribute::Texcoords);
+			m_layout.attribs.push_back(LayoutAttribute::Tangents);
+			m_layout.attribs.push_back(LayoutAttribute::BoneIDs);
+			m_layout.attribs.push_back(LayoutAttribute::BoneWeights);
+		}
+	};
 	std::string name;
-	std::vector<glm::vec3> m_positions;
-	std::vector<glm::vec3> m_normals;
-	std::vector<glm::vec4> m_tangents;
-	std::vector<glm::vec2> m_texCoords;
-	std::vector<glm::vec3> m_colors;
-	std::vector<unsigned int> m_indices;
-	std::vector<glm::ivec3> bonesIDs;
-	std::vector<glm::vec3> bonesWeights;
+	std::vector<unsigned int> indices;
 	int materialIndex{};
-	VertexLayout m_layout;
 	glm::mat4 restTransform{ 1.0f };
+
+	std::vector<StaticVertex> staticVertices;
+	std::vector<SkinnedVertex> skinnedVertices;
+
+	MeshType getType() const
+	{
+		return type;
+	}
+
+	size_t getStride() const
+	{
+		size_t stride = 0;
+		for (auto entry : m_layout.attribs)
+		{
+			auto& attribData = getAttributeData(entry);
+			stride += attribData.length * attribData.size;
+		}
+
+		return stride;
+	}
+
+private:
+	MeshType type{};
+	VertexLayout m_layout;
+
+public:
+	size_t getVertexCount() const
+	{
+		if (type == MeshType::StaticMesh) return staticVertices.size();
+		if (type == MeshType::SkinnedMesh) return skinnedVertices.size();
+		return 0;
+	}
+	size_t getIndexCount() const
+	{
+		return indices.size();
+	}
+	bool isSkinned() const
+	{
+		return type == MeshType::SkinnedMesh;
+	}
 };
 
 /**

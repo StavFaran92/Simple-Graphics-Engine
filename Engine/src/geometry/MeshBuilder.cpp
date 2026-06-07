@@ -6,137 +6,28 @@
 #include "geometry/MeshSerializer.h"
 #include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
+#include "utils/MikkTSpaceImpl.h"
 
-MeshBuilder& MeshBuilder::addPosition(const glm::vec3& position)
+void MeshBuilder::addVertices(const std::vector<StaticVertex>& vertices)
 {
-	m_data.m_positions.push_back(position);
-
-	return *this;
+	m_data.staticVertices.insert(m_data.staticVertices.end(), vertices.begin(), vertices.end());
 }
 
-MeshBuilder& MeshBuilder::addPositions(const std::vector<glm::vec3>& positions)
+void MeshBuilder::addVertices(const std::vector<SkinnedVertex>& vertices)
 {
-	m_data.m_positions.insert(m_data.m_positions.end(), positions.begin(), positions.end());
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addPositions(const float* positions, size_t size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		addPosition({ positions[i * 3 + 0], positions[i * 3 + 1], positions[i * 3 + 2] });
-	}
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addNormal(const glm::vec3& normal)
-{
-	m_data.m_normals.push_back(normal);
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addNormals(const std::vector<glm::vec3>& normals)
-{
-	m_data.m_normals.insert(m_data.m_normals.end(), normals.begin(), normals.end());
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addNormals(const float* normals, size_t size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		addNormal({ normals[i * 3 + 0], normals[i * 3 + 1], normals[i * 3 + 2] });
-	}
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addTexcoord(const glm::vec2& texCoord)
-{
-	m_data.m_texCoords.push_back(texCoord);
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addTexcoords(const std::vector<glm::vec2>& texCoords)
-{
-	m_data.m_texCoords.insert(m_data.m_texCoords.end(), texCoords.begin(), texCoords.end());
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addTexcoords(const float* texCoords, size_t size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		addTexcoord({ texCoords[i * 2 + 0], texCoords[i * 2 + 1] });
-	}
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addColor(const glm::vec3& color)
-{
-	m_data.m_colors.push_back(color);
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addColors(const std::vector<glm::vec3>& colors)
-{
-	m_data.m_colors.insert(m_data.m_colors.end(), colors.begin(), colors.end());
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addColors(const float* colors, size_t size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		addColor({ colors[i * 3 + 0], colors[i * 3 + 1], colors[i * 3 + 2] });
-	}
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addTangent(const glm::vec4& tangent)
-{
-	m_data.m_tangents.push_back(tangent);
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addTangents(const std::vector<glm::vec4>& tangents)
-{
-	m_data.m_tangents.insert(m_data.m_tangents.end(), tangents.begin(), tangents.end());
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addTangents(const float* tangents, size_t size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		addTangent({ tangents[i * 4 + 0], tangents[i * 4 + 1], tangents[i * 4 + 2], tangents[i * 4 + 3] });
-	}
-
-	return *this;
+	m_data.skinnedVertices.insert(m_data.skinnedVertices.end(), vertices.begin(), vertices.end());
 }
 
 MeshBuilder& MeshBuilder::addIndex(unsigned int index)
 {
-	m_data.m_indices.push_back(index);
+	m_data.indices.push_back(index);
 
 	return *this;
 }
 
 MeshBuilder& MeshBuilder::addIndices(const unsigned int* indices, size_t size)
 {
-	int offset = m_data.m_indices.size() > 0 ? m_data.m_indices[m_data.m_indices.size() - 1] + 1 : 0;
+	int offset = m_data.indices.size() > 0 ? m_data.indices[m_data.indices.size() - 1] + 1 : 0;
 	for (int i = 0; i < size; i++)
 	{
 		addIndex(indices[i] + offset);
@@ -145,51 +36,9 @@ MeshBuilder& MeshBuilder::addIndices(const unsigned int* indices, size_t size)
 	return *this;
 }
 
-MeshBuilder& MeshBuilder::addBoneIDs(const glm::ivec3& boneIDs)
-{
-	m_data.bonesIDs.push_back(boneIDs);
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addBoneIDs(const std::vector<glm::ivec3>& bonesIDs)
-{
-	m_data.bonesIDs.insert(m_data.bonesIDs.end(), bonesIDs.begin(), bonesIDs.end());
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addBoneWeights(const glm::vec3& boneWeight)
-{
-	m_data.bonesWeights.push_back(boneWeight);
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::addBoneWeights(const std::vector<glm::vec3>& boneWeights)
-{
-	m_data.bonesWeights.insert(m_data.bonesWeights.end(), boneWeights.begin(), boneWeights.end());
-
-	return *this;
-}
-
 MeshBuilder& MeshBuilder::addIndices(const std::vector<unsigned int>& indices)
 {
 	addIndices(&indices.data()[0], indices.size());
-
-	return *this;
-}
-
-MeshBuilder& MeshBuilder::merge(const MeshBuilder& other)
-{
-
-	addPositions(other.m_data.m_positions);
-	addNormals(other.m_data.m_normals);
-	addTexcoords(other.m_data.m_texCoords);
-	addColors(other.m_data.m_colors);
-	addIndices(other.m_data.m_indices);
-
-	m_data.m_layout = other.m_data.m_layout;
 
 	return *this;
 }
@@ -274,22 +123,6 @@ MeshBuilder& MeshBuilder::addRawVertices(const float* vertices, VertexLayout lay
 			addTexcoords(texcoords);
 		}
 
-		// Parse colors
-		else if (LayoutAttribute::Colors == entry)
-		{
-			colors.reserve(layout.numOfVertices * getAttributeCompCount(entry));
-			for (int i = 0; i < layout.numOfVertices; i++)
-			{
-				glm::vec3 color;
-				for (int j = 0; j < getAttributeCompCount(entry); j++)
-				{
-					color[j] = vertices[stride * i + j + offset];
-				}
-				colors.emplace_back(color);
-			}
-			addColors(colors);
-		}
-
 		// Parse Tangents
 		else if (LayoutAttribute::Tangents == entry)
 		{
@@ -318,8 +151,6 @@ MeshBuilder& MeshBuilder::setMaterialIndex(int index)
 
 	return *this;
 }
-
-#include "utils/MikkTSpaceImpl.h"
 
 void GenerateTangentsForMesh(MeshData& mesh) {
 	if (mesh.m_positions.empty() ||
@@ -369,40 +200,157 @@ void MeshBuilder::build(Mesh& mesh)
 {
 	GenerateTangentsForMesh(m_data);
 
-	if (m_data.m_positions.size() > 0)
+	// validate mesh data
+	if (m_data.getVertexCount() == 0)
 	{
-		enableAttribute(LayoutAttribute::Positions);
-	}
-	if (m_data.m_normals.size() > 0)
-	{
-		enableAttribute(LayoutAttribute::Normals);
-	}
-	if (m_data.m_texCoords.size() > 0)
-	{
-		enableAttribute(LayoutAttribute::Texcoords);
-	}
-	if (m_data.m_colors.size() > 0)
-	{
-		enableAttribute(LayoutAttribute::Colors);
-	}
-	if (m_data.m_tangents.size() > 0)
-	{
-		enableAttribute(LayoutAttribute::Tangents);
-	}
-	if (m_data.bonesIDs.size() > 0)
-	{
-		enableAttribute(LayoutAttribute::BoneIDs);
-	}
-	if (m_data.bonesWeights.size() > 0)
-	{
-		enableAttribute(LayoutAttribute::BoneWeights);
+		logError("Cannot build mesh without vertices");
+		return;
 	}
 
-	std::sort(m_data.m_layout.attribs.begin(), m_data.m_layout.attribs.end(),
-		[](LayoutAttribute l1, LayoutAttribute l2)
+	// calculate stride
+	size_t stride = m_data.getStride();
+	size_t numOfVertices = m_data.getVertexCount();
+
+	// Create verticies array
+	// array size = size of each attribute * size of elements in attribute * vertices count
+	int offset = 0;
+	unsigned int bufferSize = stride * numOfVertices;
+	unsigned char* vertices = new unsigned char[bufferSize];
+
+	if (m_data.getType() == MeshType::StaticMesh)
 	{
-		return getAttributeLocationInShader(l1) < getAttributeLocationInShader(l2);
-	});
+		for (auto entry : m_data.staticVertices)
+		{
+			entry.position
+		}
+
+	}
+
+	for (auto entry : m_layout.attribs)
+	{
+		auto& attribData = getAttributeData(entry);
+
+		// Parse positions
+		if (LayoutAttribute::Positions == entry)
+		{
+			for (int i = 0; i < m_layout.numOfVertices; i++)
+			{
+				auto pos = mData.m_positions.at(i);
+				auto vOffset = stride * i + offset;
+				memcpy(vertices + vOffset + attribData.size * 0, &pos.x, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 1, &pos.y, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 2, &pos.z, attribData.size);
+			}
+		}
+
+		// Parse normals
+		else if (LayoutAttribute::Normals == entry)
+		{
+			for (int i = 0; i < m_layout.numOfVertices; i++)
+			{
+				auto normal = mData.m_normals.at(i);
+				auto vOffset = stride * i + offset;
+				memcpy(vertices + vOffset + attribData.size * 0, &normal.x, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 1, &normal.y, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 2, &normal.z, attribData.size);
+			}
+		}
+
+		// Parse texcoords
+		else if (LayoutAttribute::Texcoords == entry)
+		{
+			for (int i = 0; i < m_layout.numOfVertices; i++)
+			{
+				auto texCoord = mData.m_texCoords.at(i);
+				auto vOffset = stride * i + offset;
+				memcpy(vertices + vOffset + attribData.size * 0, &texCoord.x, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 1, &texCoord.y, attribData.size);
+			}
+		}
+
+		// Parse tangents
+		else if (LayoutAttribute::Tangents == entry)
+		{
+			for (int i = 0; i < m_layout.numOfVertices; i++)
+			{
+				auto tangent = mData.m_tangents.at(i);
+				auto vOffset = stride * i + offset;
+				memcpy(vertices + vOffset + attribData.size * 0, &tangent.x, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 1, &tangent.y, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 2, &tangent.y, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 3, &tangent.y, attribData.size);
+			}
+		}
+
+		// Parse tangents
+		else if (LayoutAttribute::BoneIDs == entry)
+		{
+			for (int i = 0; i < m_layout.numOfVertices; i++)
+			{
+				auto boneIDs = mData.bonesIDs.at(i);
+				auto vOffset = stride * i + offset;
+				memcpy(vertices + vOffset + attribData.size * 0, &boneIDs.x, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 1, &boneIDs.y, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 2, &boneIDs.z, attribData.size);
+			}
+		}
+
+		// Parse tangents
+		else if (LayoutAttribute::BoneWeights == entry)
+		{
+			for (int i = 0; i < m_layout.numOfVertices; i++)
+			{
+				auto boneWeights = mData.bonesWeights.at(i);
+				auto vOffset = stride * i + offset;
+				memcpy(vertices + vOffset + attribData.size * 0, &boneWeights.x, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 1, &boneWeights.y, attribData.size);
+				memcpy(vertices + vOffset + attribData.size * 2, &boneWeights.z, attribData.size);
+			}
+		}
+
+
+		offset += attribData.length * attribData.size;
+	}
+
+	// Create buffers
+	m_vao = std::make_shared<VertexArrayObject>();
+
+	if (mData.m_indices.size() > 0)
+	{
+		m_ibo = std::make_shared<ElementBufferObject>((unsigned int*)&(mData.m_indices[0]), mData.m_indices.size());
+	}
+
+
+	auto vbo = VertexBufferObject::createRaw(&(vertices[0]), m_layout.numOfVertices, bufferSize, m_layout);
+
+	delete[] vertices;
+
+	m_meshData = mData;
+	m_vao->attachBuffer(vbo, m_ibo.get());
+	m_vao->setVertexCount(mData.m_positions.size());
+	m_vao->build();
+
+
+	glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
+	glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
+
+	// TODO this can be optimized using assimp premade aabb structure
+	for (auto&& pos : mData.m_positions)
+	{
+		minAABB.x = std::min(minAABB.x, pos.x);
+		minAABB.y = std::min(minAABB.y, pos.y);
+		minAABB.z = std::min(minAABB.z, pos.z);
+
+		maxAABB.x = std::max(maxAABB.x, pos.x);
+		maxAABB.y = std::max(maxAABB.y, pos.y);
+		maxAABB.z = std::max(maxAABB.z, pos.z);
+	}
+
+	m_aabb = AABB::createFromMinMax(minAABB, maxAABB);
+	materialIndex = mData.materialIndex;
+	//m_normals = std::move(mData.m_normals);
+
+	return true;
 
 	
 
@@ -435,15 +383,15 @@ MeshBuilder::MeshBuilder(const MeshData& meshData)
 {
 }
 
-void MeshBuilder::enableAttribute(LayoutAttribute attribute)
-{
-	if (std::find(m_data.m_layout.attribs.begin(), m_data.m_layout.attribs.end(), attribute) == m_data.m_layout.attribs.end())
-		m_data.m_layout.attribs.emplace_back(attribute);
-}
-
-void MeshBuilder::disableAttribute(LayoutAttribute attribute)
-{
-	auto iter = std::find(m_data.m_layout.attribs.begin(), m_data.m_layout.attribs.end(), attribute);
-	if (iter != m_data.m_layout.attribs.end())
-		m_data.m_layout.attribs.erase(iter);
-}
+//void MeshBuilder::enableAttribute(LayoutAttribute attribute)
+//{
+//	if (std::find(m_data.m_layout.attribs.begin(), m_data.m_layout.attribs.end(), attribute) == m_data.m_layout.attribs.end())
+//		m_data.m_layout.attribs.emplace_back(attribute);
+//}
+//
+//void MeshBuilder::disableAttribute(LayoutAttribute attribute)
+//{
+//	auto iter = std::find(m_data.m_layout.attribs.begin(), m_data.m_layout.attribs.end(), attribute);
+//	if (iter != m_data.m_layout.attribs.end())
+//		m_data.m_layout.attribs.erase(iter);
+//}

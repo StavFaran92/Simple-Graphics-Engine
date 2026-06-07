@@ -118,5 +118,10 @@ std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
         .addIndices(*indices)
         .build(*mesh.get());
 
+    auto& builder = MeshBuilder::builder();
+    builder.addVertex();
+    builder.setMeshType(MeshType::StaticMesh);
+    builder.build(*mesh.get());
+
     return mesh;
 }

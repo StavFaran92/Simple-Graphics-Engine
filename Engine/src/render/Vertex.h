@@ -2,12 +2,18 @@
 
 #include "glm/glm.hpp"
 
-struct Vertex {
+struct StaticVertex {
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 texCoord;
-	glm::vec3 color;
-	glm::vec2 tangent;
-	glm::vec3 boneIDs;
-	glm::vec3 boneWeights;
+	glm::vec4 tangent;
+};
+
+struct SkinnedVertex {
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 texCoord;
+	glm::vec4 tangent;
+	std::vector<glm::ivec3> bonesIDs;
+	std::vector<glm::vec3> bonesWeights;
 };
