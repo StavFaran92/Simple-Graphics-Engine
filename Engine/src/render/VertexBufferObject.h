@@ -9,7 +9,7 @@ class VertexBufferObject
 {
 public:
 	static std::shared_ptr<VertexBufferObject> createRaw(const void* data, unsigned int length, unsigned int size, const VertexLayout& layout);
-	static std::shared_ptr<VertexBufferObject> create(const std::vector<Vertex>& v, const VertexLayout& layout);
+	static std::shared_ptr<VertexBufferObject> create(const std::vector<StaticVertex>& v, const VertexLayout& layout);
 	/**
 	* data - ptr to data
 	* size - total size of the Buffer in bytes
@@ -27,14 +27,14 @@ public:
 	const VertexLayout& getLayout() const;
 	VertexBufferObject() = default;
 private:
-	void addVertex(const Vertex& v);
-	void addVertices(const std::vector<Vertex>& v);
+	void addVertex(const StaticVertex& v);
+	void addVertices(const std::vector<StaticVertex>& v);
 	void setLayout(const VertexLayout& layout);
 private:
 	unsigned int m_id = 0;
 	unsigned int m_length = 0;
 	unsigned int m_size = 0;
 
-	std::vector<Vertex> m_vertices;
+	std::vector<StaticVertex> m_vertices;
 	VertexLayout m_layout;
 };

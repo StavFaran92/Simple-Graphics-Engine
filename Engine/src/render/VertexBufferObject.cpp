@@ -15,7 +15,7 @@ std::shared_ptr<VertexBufferObject> VertexBufferObject::createRaw(const void* da
 	return instance;
 }
 
-std::shared_ptr<VertexBufferObject> VertexBufferObject::create(const std::vector<Vertex>& vertices, const VertexLayout& layout)
+std::shared_ptr<VertexBufferObject> VertexBufferObject::create(const std::vector<StaticVertex>& vertices, const VertexLayout& layout)
 {
 	VertexLayout instLayout = layout;
 	// create raw vertices vector
@@ -42,7 +42,7 @@ std::shared_ptr<VertexBufferObject> VertexBufferObject::create(const std::vector
 		for (auto entry : layout.attribs)
 		{
 			auto& attribData = getAttributeData(entry);
-			const Vertex& v = vertices[i];
+			const StaticVertex& v = vertices[i];
 
 			if (entry == LayoutAttribute::Positions)
 			{
@@ -61,29 +61,23 @@ std::shared_ptr<VertexBufferObject> VertexBufferObject::create(const std::vector
 				memcpy(dest + offset + attribData.size * 0, &v.texCoord.x, attribData.size);
 				memcpy(dest + offset + attribData.size * 1, &v.texCoord.y, attribData.size);
 			}
-			else if (entry == LayoutAttribute::Colors)
-			{
-				memcpy(dest + offset + attribData.size * 0, &v.color.x, attribData.size);
-				memcpy(dest + offset + attribData.size * 1, &v.color.y, attribData.size);
-				memcpy(dest + offset + attribData.size * 2, &v.color.z, attribData.size);
-			}
 			else if (entry == LayoutAttribute::Tangents)
 			{
 				memcpy(dest + offset + attribData.size * 0, &v.tangent.x, attribData.size);
 				memcpy(dest + offset + attribData.size * 1, &v.tangent.y, attribData.size);
 			}
-			else if (entry == LayoutAttribute::BoneIDs)
-			{
-				memcpy(dest + offset + attribData.size * 0, &v.boneIDs.x, attribData.size);
-				memcpy(dest + offset + attribData.size * 1, &v.boneIDs.y, attribData.size);
-				memcpy(dest + offset + attribData.size * 2, &v.boneIDs.z, attribData.size);
-			}
-			else if (entry == LayoutAttribute::BoneWeights)
-			{
-				memcpy(dest + offset + attribData.size * 0, &v.boneWeights.x, attribData.size);
-				memcpy(dest + offset + attribData.size * 1, &v.boneWeights.y, attribData.size);
-				memcpy(dest + offset + attribData.size * 2, &v.boneWeights.z, attribData.size);
-			}
+			//else if (entry == LayoutAttribute::BoneIDs)
+			//{
+			//	memcpy(dest + offset + attribData.size * 0, &v.boneIDs.x, attribData.size);
+			//	memcpy(dest + offset + attribData.size * 1, &v.boneIDs.y, attribData.size);
+			//	memcpy(dest + offset + attribData.size * 2, &v.boneIDs.z, attribData.size);
+			//}
+			//else if (entry == LayoutAttribute::BoneWeights)
+			//{
+			//	memcpy(dest + offset + attribData.size * 0, &v.boneWeights.x, attribData.size);
+			//	memcpy(dest + offset + attribData.size * 1, &v.boneWeights.y, attribData.size);
+			//	memcpy(dest + offset + attribData.size * 2, &v.boneWeights.z, attribData.size);
+			//}
 
 			offset += attribData.length * attribData.size;
 		}
@@ -134,12 +128,12 @@ void VertexBufferObject::setLayout(const VertexLayout& layout)
 	m_layout = layout;
 }
 
-void VertexBufferObject::addVertex(const Vertex& v)
+void VertexBufferObject::addVertex(const StaticVertex& v)
 {
 	m_vertices.push_back(v);
 }
 
-void VertexBufferObject::addVertices(const std::vector<Vertex>& vs)
+void VertexBufferObject::addVertices(const std::vector<StaticVertex>& vs)
 {
 	m_vertices.reserve(vs.size());
 	for (const auto& v : vs)

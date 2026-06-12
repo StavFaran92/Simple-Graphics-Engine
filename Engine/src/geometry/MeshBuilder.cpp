@@ -12,14 +12,14 @@
 #include "geometry/StaticMesh.h"
 #include "geometry/SkinnedMesh.h"
 
-void MeshBuilder::addVertices(const std::vector<StaticVertex>& vertices)
+void MeshBuilder::addVertices(const std::vector<VertexVariant>& vertices)
 {
-	m_data.staticVertices.insert(m_data.staticVertices.end(), vertices.begin(), vertices.end());
+	m_data.vertices.insert(m_data.vertices.end(), vertices.begin(), vertices.end());
 }
 
-void MeshBuilder::addVertices(const std::vector<SkinnedVertex>& vertices)
+void MeshBuilder::addVertex(VertexVariant vertex)
 {
-	m_data.skinnedVertices.insert(m_data.skinnedVertices.end(), vertices.begin(), vertices.end());
+	m_data.vertices.push_back(vertex);
 }
 
 MeshBuilder& MeshBuilder::addIndex(unsigned int index)
@@ -47,7 +47,7 @@ MeshBuilder& MeshBuilder::addIndices(const std::vector<unsigned int>& indices)
 	return *this;
 }
 
-MeshBuilder& MeshBuilder::addRawVertices(const float* vertices, VertexLayout layout)
+MeshBuilder& MeshBuilder::addRawVertices(const float* vertices, size_t count)
 {
 	if (!vertices)
 	{
@@ -55,95 +55,27 @@ MeshBuilder& MeshBuilder::addRawVertices(const float* vertices, VertexLayout lay
 		return *this;
 	}
 
-	if (layout.numOfVertices == 0)
+	if (count == 0)
 	{
 		logError("Size cannot be set to 0.");
 		return *this;
 	}
 
-	// calculate stride
-	int stride = 0;
-	for (auto entry : layout.attribs)
+	if (m_data.type == MeshType::SkinnedMesh)
 	{
-		stride += getAttributeCompCount(entry);
+		size_t vertexCount = count / (sizeof(SkinnedVertex) / sizeof(float));
+		const SkinnedVertex* begin = reinterpret_cast<const SkinnedVertex*>(vertices);
+		m_data.vertices.insert(m_data.vertices.end(), begin, begin + vertexCount);
 	}
-
-	int offset = 0;
-
-	// Parse vertices
-	std::vector<glm::vec3> positions;
-	std::vector<glm::vec3> normals;
-	std::vector<glm::vec2> texcoords;
-	std::vector<glm::vec3> colors;
-	std::vector<glm::vec4> tangents;
-
-	for (auto entry : layout.attribs)
+	else if (m_data.type == MeshType::StaticMesh)
 	{
-		// Parse positions
-		if (LayoutAttribute::Positions == entry)
-		{
-			positions.reserve(layout.numOfVertices * getAttributeCompCount(entry));
-			for (int i = 0; i < layout.numOfVertices; i++)
-			{
-				glm::vec3 pos;
-				for (int j = 0; j < getAttributeCompCount(entry); j++)
-				{
-					pos[j] = vertices[stride * i + j + offset];
-				}
-				positions.emplace_back(pos);
-			}
-			addPositions(positions);
-		}
-
-		// Parse normals
-		else if (LayoutAttribute::Normals == entry)
-		{
-			normals.reserve(layout.numOfVertices * getAttributeCompCount(entry));
-			for (int i = 0; i < layout.numOfVertices; i++)
-			{
-				glm::vec3 normal;
-				for (int j = 0; j < getAttributeCompCount(entry); j++)
-				{
-					normal[j] = vertices[stride * i + j + offset];
-				}
-				normals.emplace_back(normal);
-			}
-			addNormals(normals);
-		}
-
-		// Parse texcoords
-		else if (LayoutAttribute::Texcoords == entry)
-		{
-			texcoords.reserve(layout.numOfVertices * getAttributeCompCount(entry));
-			for (int i = 0; i < layout.numOfVertices; i++)
-			{
-				glm::vec2 vec;
-				for (int j = 0; j < getAttributeCompCount(entry); j++)
-				{
-					vec[j] = vertices[stride * i + j + offset];
-				}
-				texcoords.emplace_back(vec);
-			}
-			addTexcoords(texcoords);
-		}
-
-		// Parse Tangents
-		else if (LayoutAttribute::Tangents == entry)
-		{
-			tangents.reserve(layout.numOfVertices * getAttributeCompCount(entry));
-			for (int i = 0; i < layout.numOfVertices; i++)
-			{
-				glm::vec4 tangent;
-				for (int j = 0; j < getAttributeCompCount(entry); j++)
-				{
-					tangent[j] = vertices[stride * i + j + offset];
-				}
-				tangents.emplace_back(tangent);
-			}
-			addTangents(tangents);
-		}
-
-		offset += getAttributeCompCount(entry);
+		size_t vertexCount = count / (sizeof(StaticVertex) / sizeof(float));
+		const StaticVertex* begin = reinterpret_cast<const StaticVertex*>(vertices);
+		m_data.vertices.insert(m_data.vertices.end(), begin, begin + vertexCount);
+	}
+	else
+	{
+		logInfo("Invalid mesh type.");
 	}
 
 	return *this;
@@ -206,11 +138,11 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 	size_t stride = m_data.getStride();
 	size_t numOfVertices = m_data.getVertexCount();
 
-	if (m_data.getType() == MeshType::StaticMesh)
+	if (m_data.type == MeshType::StaticMesh)
 	{
 		mesh = std::make_shared<StaticMesh>();
 
-		auto& verts = m_data.staticVertices;
+		auto& verts = m_data.vertices;
 
 		auto gigaVAO = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::StaticGeometry);
 		unsigned int meshVertexOffset = 0;
@@ -223,7 +155,8 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 		// TODO this can be optimized using assimp premade aabb structure
 		for (auto&& v : verts)
 		{
-			auto pos = v.position;
+			auto skinnedVertex = std::get<StaticVertex>(v);
+			auto pos = skinnedVertex.position;
 			minAABB.x = std::min(minAABB.x, pos.x);
 			minAABB.y = std::min(minAABB.y, pos.y);
 			minAABB.z = std::min(minAABB.z, pos.z);
@@ -235,11 +168,11 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 
 		mesh->m_aabb = AABB::createFromMinMax(minAABB, maxAABB);
 	}
-	else if (m_data.getType() == MeshType::SkinnedMesh)
+	else if (m_data.type == MeshType::SkinnedMesh)
 	{
 		mesh = std::make_shared<SkinnedMesh>();
 
-		auto& verts = m_data.staticVertices;
+		auto& verts = m_data.vertices;
 
 		auto gigaVAO = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::SkinnedGeometry);
 		unsigned int meshVertexOffset = 0; 
@@ -252,7 +185,8 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 		// TODO this can be optimized using assimp premade aabb structure
 		for (auto&& v : verts)
 		{
-			auto pos = v.position;
+			auto skinnedVertex = std::get<SkinnedVertex>(v);
+			auto pos = skinnedVertex.position;
 			minAABB.x = std::min(minAABB.x, pos.x);
 			minAABB.y = std::min(minAABB.y, pos.y);
 			minAABB.z = std::min(minAABB.z, pos.z);
@@ -301,14 +235,25 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 	//MeshSerializer::readDataFromBinaryFile(mesh.getUID() + ".bin", newMeshData);
 }
 
-MeshBuilder& MeshBuilder::builder()
+MeshBuilder::MeshBuilder(MeshType meshType)
 {
-	return *new MeshBuilder();
-}
-
-MeshBuilder::MeshBuilder()
-{
-	
+	//todo move to const configs
+	if (meshType == MeshType::StaticMesh)
+	{
+		m_data.m_layout.attribs.push_back(LayoutAttribute::Positions);
+		m_data.m_layout.attribs.push_back(LayoutAttribute::Normals);
+		m_data.m_layout.attribs.push_back(LayoutAttribute::Texcoords);
+		m_data.m_layout.attribs.push_back(LayoutAttribute::Tangents);
+	}
+	else if (meshType == MeshType::SkinnedMesh)
+	{
+		m_data.m_layout.attribs.push_back(LayoutAttribute::Positions);
+		m_data.m_layout.attribs.push_back(LayoutAttribute::Normals);
+		m_data.m_layout.attribs.push_back(LayoutAttribute::Texcoords);
+		m_data.m_layout.attribs.push_back(LayoutAttribute::Tangents);
+		m_data.m_layout.attribs.push_back(LayoutAttribute::BoneIDs);
+		m_data.m_layout.attribs.push_back(LayoutAttribute::BoneWeights);
+	}
 }
 
 MeshBuilder::MeshBuilder(const MeshData& meshData)

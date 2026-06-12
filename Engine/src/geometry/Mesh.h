@@ -21,42 +21,19 @@ enum class MeshType
 	SkinnedMesh = 1
 };
 
+using VertexVariant = std::variant<
+	StaticVertex, 
+	SkinnedVertex
+>;
+
 struct MeshData
 {
-	MeshData() = default;
-
-	MeshData(MeshType meshType) : type(meshType) {
-
-		//todo move to const configs
-		if (meshType == MeshType::StaticMesh)
-		{
-			m_layout.attribs.push_back(LayoutAttribute::Positions);
-			m_layout.attribs.push_back(LayoutAttribute::Normals);
-			m_layout.attribs.push_back(LayoutAttribute::Texcoords);
-			m_layout.attribs.push_back(LayoutAttribute::Tangents);
-		}
-		else if (meshType == MeshType::SkinnedMesh)
-		{
-			m_layout.attribs.push_back(LayoutAttribute::Positions);
-			m_layout.attribs.push_back(LayoutAttribute::Normals);
-			m_layout.attribs.push_back(LayoutAttribute::Texcoords);
-			m_layout.attribs.push_back(LayoutAttribute::Tangents);
-			m_layout.attribs.push_back(LayoutAttribute::BoneIDs);
-			m_layout.attribs.push_back(LayoutAttribute::BoneWeights);
-		}
-	};
 	std::string name;
 	std::vector<unsigned int> indices;
 	int materialIndex{};
 	glm::mat4 restTransform{ 1.0f };
-
-	std::vector<StaticVertex> staticVertices;
-	std::vector<SkinnedVertex> skinnedVertices;
-
-	MeshType getType() const
-	{
-		return type;
-	}
+	MeshType type{};
+	std::vector<VertexVariant> vertices;
 
 	size_t getStride() const
 	{
@@ -72,15 +49,13 @@ struct MeshData
 
 private:
 	friend class MeshBuilder;
-	MeshType type{};
+	
 	VertexLayout m_layout;
 
 public:
 	size_t getVertexCount() const
 	{
-		if (type == MeshType::StaticMesh) return staticVertices.size();
-		if (type == MeshType::SkinnedMesh) return skinnedVertices.size();
-		return 0;
+		return vertices.size();
 	}
 	size_t getIndexCount() const
 	{
