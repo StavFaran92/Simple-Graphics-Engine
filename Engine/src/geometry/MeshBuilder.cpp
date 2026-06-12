@@ -157,17 +157,6 @@ MeshBuilder& MeshBuilder::setMaterialIndex(int index)
 }
 
 void GenerateTangentsForMesh(MeshData& mesh) {
-	if (mesh.m_positions.empty() ||
-		mesh.m_normals.empty() ||
-		mesh.m_texCoords.empty() ||
-		mesh.m_indices.empty()) {
-		std::cerr << "Mesh missing necessary data for tangent generation." << std::endl;
-		return;
-	}
-
-	// Ensure m_tangents is correctly sized
-	mesh.m_tangents.resize(mesh.m_positions.size(), glm::vec4(0.0f));
-
 	MikkMeshContext userData;
 	userData.mesh = &mesh;
 
