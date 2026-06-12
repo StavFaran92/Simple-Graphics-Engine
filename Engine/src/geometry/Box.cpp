@@ -78,17 +78,15 @@ std::shared_ptr<Mesh> Box::createMesh()
     //settings.isTransient = true;
     //return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR "Resources/Engine/Meshes/cube.gltf", settings).mesh;
 
-    auto mesh = std::make_shared<Mesh>();
-
     VertexLayout layout;
     layout.numOfVertices = 36;
     layout.attribs.emplace_back(LayoutAttribute::Positions);
     layout.attribs.emplace_back(LayoutAttribute::Normals);
     layout.attribs.emplace_back(LayoutAttribute::Texcoords);
 
-    MeshBuilder::builder()
+    auto mesh = MeshBuilder::builder()
         .addRawVertices((float*)vertices, layout)
-        .build(*mesh.get());
+        .build();
 
     return mesh;
 }

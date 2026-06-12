@@ -27,8 +27,8 @@ void getNormal(const SMikkTSpaceContext* context, float outNormal[3], int face, 
 
 void getTexCoord(const SMikkTSpaceContext* context, float outUV[2], int face, int vert) {
     auto* userData = (MikkMeshContext*)context->m_pUserData;
-    int idx = userData->mesh->m_indices[face * 3 + vert];
-    const glm::vec2& uv = userData->mesh->m_texCoords[idx];
+    int idx = userData->mesh->indices[face * 3 + vert];
+    const glm::vec2& uv = userData->mesh->staticVertices[idx].texCoord;
     memcpy(outUV, &uv, sizeof(float) * 2);
 }
 

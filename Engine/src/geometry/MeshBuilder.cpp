@@ -7,6 +7,10 @@
 #include "runtime/Context.h"
 #include "serialize/ProjectAssetRegistry.h"
 #include "utils/MikkTSpaceImpl.h"
+#include "render/VAOManager.h"
+#include "render/GigaVAO.h"
+#include "geometry/StaticMesh.h"
+#include "geometry/SkinnedMesh.h"
 
 void MeshBuilder::addVertices(const std::vector<StaticVertex>& vertices)
 {
@@ -196,8 +200,10 @@ void GenerateTangentsForMesh(MeshData& mesh) {
 
 
 
-void MeshBuilder::build(Mesh& mesh)
+std::shared_ptr<Mesh> MeshBuilder::build()
 {
+	std::shared_ptr<Mesh> mesh;
+
 	GenerateTangentsForMesh(m_data);
 
 	// validate mesh data
@@ -211,146 +217,89 @@ void MeshBuilder::build(Mesh& mesh)
 	size_t stride = m_data.getStride();
 	size_t numOfVertices = m_data.getVertexCount();
 
-	// Create verticies array
-	// array size = size of each attribute * size of elements in attribute * vertices count
-	int offset = 0;
-	unsigned int bufferSize = stride * numOfVertices;
-	unsigned char* vertices = new unsigned char[bufferSize];
-
 	if (m_data.getType() == MeshType::StaticMesh)
 	{
-		for (auto entry : m_data.staticVertices)
+		mesh = std::make_shared<StaticMesh>();
+
+		auto& verts = m_data.staticVertices;
+
+		auto gigaVAO = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::StaticGeometry);
+		unsigned int meshVertexOffset = 0;
+		unsigned int meshIndexOffset = 0;
+		gigaVAO.push(verts.data(), verts.size(), m_data.indices, meshVertexOffset, meshIndexOffset);
+
+		glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
+		glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
+
+		// TODO this can be optimized using assimp premade aabb structure
+		for (auto&& v : verts)
 		{
-			entry.position
+			auto pos = v.position;
+			minAABB.x = std::min(minAABB.x, pos.x);
+			minAABB.y = std::min(minAABB.y, pos.y);
+			minAABB.z = std::min(minAABB.z, pos.z);
+
+			maxAABB.x = std::max(maxAABB.x, pos.x);
+			maxAABB.y = std::max(maxAABB.y, pos.y);
+			maxAABB.z = std::max(maxAABB.z, pos.z);
 		}
 
+		mesh->m_aabb = AABB::createFromMinMax(minAABB, maxAABB);
 	}
-
-	for (auto entry : m_layout.attribs)
+	else if (m_data.getType() == MeshType::SkinnedMesh)
 	{
-		auto& attribData = getAttributeData(entry);
+		mesh = std::make_shared<SkinnedMesh>();
 
-		// Parse positions
-		if (LayoutAttribute::Positions == entry)
+		auto& verts = m_data.staticVertices;
+
+		auto gigaVAO = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::SkinnedGeometry);
+		unsigned int meshVertexOffset = 0; 
+		unsigned int meshIndexOffset = 0; 
+		gigaVAO.push(verts.data(), verts.size(), m_data.indices, meshVertexOffset, meshIndexOffset);
+
+		glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
+		glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
+
+		// TODO this can be optimized using assimp premade aabb structure
+		for (auto&& v : verts)
 		{
-			for (int i = 0; i < m_layout.numOfVertices; i++)
-			{
-				auto pos = mData.m_positions.at(i);
-				auto vOffset = stride * i + offset;
-				memcpy(vertices + vOffset + attribData.size * 0, &pos.x, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 1, &pos.y, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 2, &pos.z, attribData.size);
-			}
+			auto pos = v.position;
+			minAABB.x = std::min(minAABB.x, pos.x);
+			minAABB.y = std::min(minAABB.y, pos.y);
+			minAABB.z = std::min(minAABB.z, pos.z);
+
+			maxAABB.x = std::max(maxAABB.x, pos.x);
+			maxAABB.y = std::max(maxAABB.y, pos.y);
+			maxAABB.z = std::max(maxAABB.z, pos.z);
 		}
 
-		// Parse normals
-		else if (LayoutAttribute::Normals == entry)
-		{
-			for (int i = 0; i < m_layout.numOfVertices; i++)
-			{
-				auto normal = mData.m_normals.at(i);
-				auto vOffset = stride * i + offset;
-				memcpy(vertices + vOffset + attribData.size * 0, &normal.x, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 1, &normal.y, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 2, &normal.z, attribData.size);
-			}
-		}
-
-		// Parse texcoords
-		else if (LayoutAttribute::Texcoords == entry)
-		{
-			for (int i = 0; i < m_layout.numOfVertices; i++)
-			{
-				auto texCoord = mData.m_texCoords.at(i);
-				auto vOffset = stride * i + offset;
-				memcpy(vertices + vOffset + attribData.size * 0, &texCoord.x, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 1, &texCoord.y, attribData.size);
-			}
-		}
-
-		// Parse tangents
-		else if (LayoutAttribute::Tangents == entry)
-		{
-			for (int i = 0; i < m_layout.numOfVertices; i++)
-			{
-				auto tangent = mData.m_tangents.at(i);
-				auto vOffset = stride * i + offset;
-				memcpy(vertices + vOffset + attribData.size * 0, &tangent.x, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 1, &tangent.y, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 2, &tangent.y, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 3, &tangent.y, attribData.size);
-			}
-		}
-
-		// Parse tangents
-		else if (LayoutAttribute::BoneIDs == entry)
-		{
-			for (int i = 0; i < m_layout.numOfVertices; i++)
-			{
-				auto boneIDs = mData.bonesIDs.at(i);
-				auto vOffset = stride * i + offset;
-				memcpy(vertices + vOffset + attribData.size * 0, &boneIDs.x, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 1, &boneIDs.y, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 2, &boneIDs.z, attribData.size);
-			}
-		}
-
-		// Parse tangents
-		else if (LayoutAttribute::BoneWeights == entry)
-		{
-			for (int i = 0; i < m_layout.numOfVertices; i++)
-			{
-				auto boneWeights = mData.bonesWeights.at(i);
-				auto vOffset = stride * i + offset;
-				memcpy(vertices + vOffset + attribData.size * 0, &boneWeights.x, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 1, &boneWeights.y, attribData.size);
-				memcpy(vertices + vOffset + attribData.size * 2, &boneWeights.z, attribData.size);
-			}
-		}
-
-
-		offset += attribData.length * attribData.size;
+		mesh->m_aabb = AABB::createFromMinMax(minAABB, maxAABB);
 	}
 
-	// Create buffers
-	m_vao = std::make_shared<VertexArrayObject>();
+	
 
-	if (mData.m_indices.size() > 0)
-	{
-		m_ibo = std::make_shared<ElementBufferObject>((unsigned int*)&(mData.m_indices[0]), mData.m_indices.size());
-	}
+	//// Create buffers
+	//m_vao = std::make_shared<VertexArrayObject>();
 
-
-	auto vbo = VertexBufferObject::createRaw(&(vertices[0]), m_layout.numOfVertices, bufferSize, m_layout);
-
-	delete[] vertices;
-
-	m_meshData = mData;
-	m_vao->attachBuffer(vbo, m_ibo.get());
-	m_vao->setVertexCount(mData.m_positions.size());
-	m_vao->build();
+	//if (mData.m_indices.size() > 0)
+	//{
+	//	m_ibo = std::make_shared<ElementBufferObject>((unsigned int*)&(mData.m_indices[0]), mData.m_indices.size());
+	//}
 
 
-	glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
-	glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
+	//auto vbo = VertexBufferObject::createRaw(&(vertices[0]), m_layout.numOfVertices, bufferSize, m_layout);
 
-	// TODO this can be optimized using assimp premade aabb structure
-	for (auto&& pos : mData.m_positions)
-	{
-		minAABB.x = std::min(minAABB.x, pos.x);
-		minAABB.y = std::min(minAABB.y, pos.y);
-		minAABB.z = std::min(minAABB.z, pos.z);
+	//delete[] vertices;
 
-		maxAABB.x = std::max(maxAABB.x, pos.x);
-		maxAABB.y = std::max(maxAABB.y, pos.y);
-		maxAABB.z = std::max(maxAABB.z, pos.z);
-	}
+	//m_meshData = mData;
+	//m_vao->attachBuffer(vbo, m_ibo.get());
+	//m_vao->setVertexCount(mData.m_positions.size());
+	//m_vao->build();
 
-	m_aabb = AABB::createFromMinMax(minAABB, maxAABB);
-	materialIndex = mData.materialIndex;
+
+	mesh->materialIndex = m_data.materialIndex;
 	//m_normals = std::move(mData.m_normals);
 
-	return true;
 
 	
 
@@ -361,11 +310,6 @@ void MeshBuilder::build(Mesh& mesh)
 
 	//MeshData newMeshData;
 	//MeshSerializer::readDataFromBinaryFile(mesh.getUID() + ".bin", newMeshData);
-
-	if (!mesh.build(m_data))
-	{
-		logError("Mesh Builder failed to build mesh.");
-	}
 }
 
 MeshBuilder& MeshBuilder::builder()

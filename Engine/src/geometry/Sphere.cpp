@@ -102,8 +102,6 @@ std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
 
     
 
-    auto mesh = std::make_shared<Mesh>();
-
     VertexLayout layout;
     layout.attribs.push_back(LayoutAttribute::Positions);
     layout.attribs.push_back(LayoutAttribute::Normals);
@@ -116,12 +114,12 @@ std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
         .addNormals(*normals)
         .addTexcoords(*texcoords)
         .addIndices(*indices)
-        .build(*mesh.get());
+        .build();
 
     auto& builder = MeshBuilder::builder();
     builder.addVertex();
     builder.setMeshType(MeshType::StaticMesh);
-    builder.build(*mesh.get());
+    auto mesh = builder.build();
 
     return mesh;
 }

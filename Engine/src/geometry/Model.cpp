@@ -76,9 +76,8 @@ ModelResourceRef Model::load(const std::string& fileLocation, ModelLoadDescripto
 	ModelResourceRef model = Factory<Model>::create();
 	for (const auto& data : modelInfo.meshDataList)
 	{
-		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 		MeshBuilder builder(data);
-		builder.build(*mesh.get());
+		auto mesh = builder.build();
 		model->addMesh(mesh);
 	}
 

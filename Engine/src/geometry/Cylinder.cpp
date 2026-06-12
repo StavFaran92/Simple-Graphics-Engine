@@ -68,7 +68,6 @@ std::shared_ptr<Mesh> Cylinder::createMesh(float height, float radius, int secto
         builder.addIndex(bottomCenterIdx); builder.addIndex(botB); builder.addIndex(botA);
     }
 
-    auto mesh = std::make_shared<Mesh>();
-    builder.build(*mesh);
+    auto mesh = builder.build();
     return mesh;
 }

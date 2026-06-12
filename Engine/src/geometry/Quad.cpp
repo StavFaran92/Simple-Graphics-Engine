@@ -26,18 +26,16 @@ std::shared_ptr<Mesh> Quad::createMesh()
 	//settings.isTransient = true;
 	//return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR "Resources/Engine/Meshes/plane.gltf", settings).mesh;
 
-	auto mesh = std::make_shared<Mesh>();
-
 	VertexLayout layout;
 	layout.numOfVertices = 4;
 	layout.attribs.emplace_back(LayoutAttribute::Positions);
 	layout.attribs.emplace_back(LayoutAttribute::Normals);
 	layout.attribs.emplace_back(LayoutAttribute::Texcoords);
 
-	MeshBuilder::builder()
+	auto mesh = MeshBuilder::builder()
 		.addRawVertices((float*)vertices, layout)
 		.addIndices((unsigned int*)indices, sizeof(indices) / sizeof(unsigned int))
-		.build(*mesh.get());
+		.build();
 
 	return mesh;
 }

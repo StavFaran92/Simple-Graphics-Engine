@@ -29,6 +29,7 @@
 #include "animation/AnimationLoader.h"
 #include "memory/Assets.h"
 #include "render/Graphics.h"
+#include "render/VAOManager.h"
 #include "core/System.h"
 #include "render/RenderCommand.h"
 #include "core/EventLayerStack.h"
@@ -217,6 +218,7 @@ bool Engine::init(const InitParams& initParams)
     auto modelImporter = new ModelImporter();
     auto animationLoader = new AnimationLoader();
     auto graphics = new Graphics();
+    auto vaoManager = new VAOManager();
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
     auto uniqueNameManager = new UniqueNameManager();

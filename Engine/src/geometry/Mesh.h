@@ -23,6 +23,8 @@ enum class MeshType
 
 struct MeshData
 {
+	MeshData() = default;
+
 	MeshData(MeshType meshType) : type(meshType) {
 
 		//todo move to const configs
@@ -69,6 +71,7 @@ struct MeshData
 	}
 
 private:
+	friend class MeshBuilder;
 	MeshType type{};
 	VertexLayout m_layout;
 

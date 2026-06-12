@@ -103,18 +103,16 @@ std::shared_ptr<Mesh> Grid::createMesh(int x, int y)
 
 	
 
-	auto mesh = std::make_shared<Mesh>();
-
 	VertexLayout layout;
 	layout.attribs.push_back(LayoutAttribute::Positions);
 	layout.attribs.push_back(LayoutAttribute::Texcoords);
 	layout.numOfVertices = vertexCount;
 	layout.build();
 
-	MeshBuilder::builder()
+	auto mesh = MeshBuilder::builder()
 		.addRawVertices(vertices.data(), layout)
 		.addIndices(indices)
-		.build(*mesh.get());
+		.build();
 
 	return mesh;
 }

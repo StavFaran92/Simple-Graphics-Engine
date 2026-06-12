@@ -139,9 +139,8 @@ ResourceRef<Resource> ModelTypeManager::loadResourceFromDisk(ResourceLoadDescrip
 	ModelResourceRef model = Factory<Model>::create();
 	for (const auto& data : modelData.m_meshes)
 	{
-		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 		MeshBuilder builder(data);
-		builder.build(*mesh.get());
+		auto mesh = builder.build();
 		model->addMesh(mesh);
 	}
 	model->addBonesInfo(modelData.m_bonesOffsets, modelData.m_bonesNameToIDMap);

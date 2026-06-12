@@ -29,7 +29,7 @@ public:
 
 	MeshBuilder& setMaterialIndex(int index);
 
-	void build(Mesh& mesh);
+	std::shared_ptr<Mesh> build();
 
 	static MeshBuilder& builder();
 	
