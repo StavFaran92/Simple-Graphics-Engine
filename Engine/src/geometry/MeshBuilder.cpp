@@ -131,7 +131,7 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 	if (m_data.getVertexCount() == 0)
 	{
 		logError("Cannot build mesh without vertices");
-		return;
+		return nullptr;
 	}
 
 	// calculate stride

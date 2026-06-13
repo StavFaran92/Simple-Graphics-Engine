@@ -49,7 +49,8 @@ struct MeshData
 
 private:
 	friend class MeshBuilder;
-	
+	friend class ModelBinaryLoader;
+
 	VertexLayout m_layout;
 
 public:
@@ -91,14 +92,14 @@ public:
 	 *
 	 * \return	positions vector pointer
 	 */
-	const std::vector<glm::vec3>& getPositions() const;
+	virtual std::vector<glm::vec3> getPositions() const = 0;
 
 	/**
 	 * Gets the mesh's Normals vertices.
 	 *
 	 * \return	normals vector pointer
 	 */
-	const std::vector<glm::vec3>& getNormals() const;
+	virtual std::vector<glm::vec3> getNormals() const = 0;
 
 	const MeshData& getMeshData() const
 	{

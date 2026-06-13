@@ -12,16 +12,6 @@ Mesh::Mesh()
 {
 }
 
-const std::vector<glm::vec3>& Mesh::getPositions() const
-{
-	return m_meshData.m_positions;
-}
-
-const std::vector<glm::vec3>& Mesh::getNormals() const
-{
-	return m_meshData.m_normals;
-}
-
 size_t Mesh::getNumOfVertices() const
 {
 	return getPositions().size();

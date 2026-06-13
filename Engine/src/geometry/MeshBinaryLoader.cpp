@@ -1,6 +1,7 @@
 #include "geometry/MeshBinaryLoader.h"
 
 #include <fstream>
+#include <variant>
 
 #include "core/Logger.h"
 #include "geometry/Model.h"
@@ -20,15 +21,9 @@ namespace
 	{
 		uint32_t nameLength = 0;
 
-		uint32_t positionsCount = 0;
-		uint32_t normalsCount = 0;
-		uint32_t tangentsCount = 0;
-		uint32_t texCoordsCount = 0;
-		uint32_t colorsCount = 0;
+		uint32_t type = 0;
+		uint32_t vertexCount = 0;
 		uint32_t indicesCount = 0;
-		uint32_t boneIDsCount = 0;
-		uint32_t boneWeightsCount = 0;
-
 		uint32_t attributesCount = 0;
 
 		int32_t materialIndex = 0;
@@ -77,17 +72,12 @@ bool ModelBinaryLoader::save(const ModelData& modelData, const std::string& targ
 	for (const MeshData& mesh : modelData.m_meshes)
 	{
 		MeshBinaryMeshHeader header{};
-		header.nameLength       = static_cast<uint32_t>(mesh.name.size());
-		header.positionsCount   = static_cast<uint32_t>(mesh.m_positions.size());
-		header.normalsCount     = static_cast<uint32_t>(mesh.m_normals.size());
-		header.tangentsCount    = static_cast<uint32_t>(mesh.m_tangents.size());
-		header.texCoordsCount   = static_cast<uint32_t>(mesh.m_texCoords.size());
-		header.colorsCount      = static_cast<uint32_t>(mesh.m_colors.size());
-		header.indicesCount     = static_cast<uint32_t>(mesh.m_indices.size());
-		header.boneIDsCount     = static_cast<uint32_t>(mesh.bonesIDs.size());
-		header.boneWeightsCount = static_cast<uint32_t>(mesh.bonesWeights.size());
-		header.attributesCount  = static_cast<uint32_t>(mesh.m_layout.attribs.size());
-		header.materialIndex    = static_cast<int32_t>(mesh.materialIndex);
+		header.nameLength      = static_cast<uint32_t>(mesh.name.size());
+		header.type            = static_cast<uint32_t>(mesh.type);
+		header.vertexCount     = static_cast<uint32_t>(mesh.getVertexCount());
+		header.indicesCount    = static_cast<uint32_t>(mesh.indices.size());
+		header.attributesCount = static_cast<uint32_t>(mesh.m_layout.attribs.size());
+		header.materialIndex   = static_cast<int32_t>(mesh.materialIndex);
 
 		// Write header
 		if (!writeAll(file, &header, sizeof(header)))
@@ -106,20 +96,6 @@ bool ModelBinaryLoader::save(const ModelData& modelData, const std::string& targ
 			}
 		}
 
-		// Write vertex data
-		if (!writeAll(file, mesh.m_positions.data(), header.positionsCount * sizeof(glm::vec3))) return false;
-		if (!writeAll(file, mesh.m_normals.data(),   header.normalsCount   * sizeof(glm::vec3))) return false;
-		if (!writeAll(file, mesh.m_tangents.data(),  header.tangentsCount  * sizeof(glm::vec4))) return false;
-		if (!writeAll(file, mesh.m_texCoords.data(), header.texCoordsCount * sizeof(glm::vec2))) return false;
-		if (!writeAll(file, mesh.m_colors.data(),    header.colorsCount    * sizeof(glm::vec3))) return false;
-
-		// Bones
-		if (!writeAll(file, mesh.bonesIDs.data(),     header.boneIDsCount     * sizeof(glm::ivec3))) return false;
-		if (!writeAll(file, mesh.bonesWeights.data(), header.boneWeightsCount * sizeof(glm::vec3)))  return false;
-
-		// Indices
-		if (!writeAll(file, mesh.m_indices.data(), header.indicesCount * sizeof(unsigned int))) return false;
-
 		// Vertex layout
 		if (!writeAll(file, mesh.m_layout.attribs.data(),
 			header.attributesCount * sizeof(LayoutAttribute)))
@@ -133,6 +109,39 @@ bool ModelBinaryLoader::save(const ModelData& modelData, const std::string& targ
 
 		// Rest transform
 		if (!writeAll(file, &mesh.restTransform, sizeof(mesh.restTransform))) return false;
+
+		// Indices
+		if (!writeAll(file, mesh.indices.data(), header.indicesCount * sizeof(unsigned int))) return false;
+
+		// Vertices
+		if (mesh.type == MeshType::StaticMesh)
+		{
+			for (const VertexVariant& v : mesh.vertices)
+			{
+				const StaticVertex& vertex = std::get<StaticVertex>(v);
+				if (!writeAll(file, &vertex, sizeof(StaticVertex))) return false;
+			}
+		}
+		else if (mesh.type == MeshType::SkinnedMesh)
+		{
+			for (const VertexVariant& v : mesh.vertices)
+			{
+				const SkinnedVertex& vertex = std::get<SkinnedVertex>(v);
+
+				if (!writeAll(file, &vertex.position, sizeof(vertex.position))) return false;
+				if (!writeAll(file, &vertex.normal,   sizeof(vertex.normal)))   return false;
+				if (!writeAll(file, &vertex.texCoord, sizeof(vertex.texCoord))) return false;
+				if (!writeAll(file, &vertex.tangent,  sizeof(vertex.tangent)))  return false;
+
+				uint32_t boneIDsCount     = static_cast<uint32_t>(vertex.bonesIDs.size());
+				uint32_t boneWeightsCount = static_cast<uint32_t>(vertex.bonesWeights.size());
+				if (!writeAll(file, &boneIDsCount,     sizeof(boneIDsCount)))     return false;
+				if (!writeAll(file, &boneWeightsCount, sizeof(boneWeightsCount))) return false;
+
+				if (!writeAll(file, vertex.bonesIDs.data(),     boneIDsCount     * sizeof(glm::ivec3))) return false;
+				if (!writeAll(file, vertex.bonesWeights.data(), boneWeightsCount * sizeof(glm::vec3)))  return false;
+			}
+		}
 	}
 
 	if (!writeAll(file, modelData.m_bonesOffsets.data(),
@@ -201,34 +210,11 @@ bool ModelBinaryLoader::load(const std::string& sourceFile, ModelData& outModelD
 			}
 		}
 
-		// Resize containers
-		mesh.m_positions.resize(header.positionsCount);
-		mesh.m_normals.resize(header.normalsCount);
-		mesh.m_tangents.resize(header.tangentsCount);
-		mesh.m_texCoords.resize(header.texCoordsCount);
-		mesh.m_colors.resize(header.colorsCount);
-		mesh.m_indices.resize(header.indicesCount);
-		mesh.bonesIDs.resize(header.boneIDsCount);
-		mesh.bonesWeights.resize(header.boneWeightsCount);
-		mesh.m_layout.attribs.resize(header.attributesCount);
-
+		mesh.type = static_cast<MeshType>(header.type);
 		mesh.materialIndex = header.materialIndex;
 
-		// Read vertex data
-		if (!readAll(file, mesh.m_positions.data(), header.positionsCount * sizeof(glm::vec3))) return false;
-		if (!readAll(file, mesh.m_normals.data(),   header.normalsCount   * sizeof(glm::vec3))) return false;
-		if (!readAll(file, mesh.m_tangents.data(),  header.tangentsCount  * sizeof(glm::vec4))) return false;
-		if (!readAll(file, mesh.m_texCoords.data(), header.texCoordsCount * sizeof(glm::vec2))) return false;
-		if (!readAll(file, mesh.m_colors.data(),    header.colorsCount    * sizeof(glm::vec3))) return false;
-
-		// Bones
-		if (!readAll(file, mesh.bonesIDs.data(),     header.boneIDsCount     * sizeof(glm::ivec3))) return false;
-		if (!readAll(file, mesh.bonesWeights.data(), header.boneWeightsCount * sizeof(glm::vec3)))  return false;
-
-		// Indices
-		if (!readAll(file, mesh.m_indices.data(), header.indicesCount * sizeof(unsigned int))) return false;
-
 		// Vertex layout
+		mesh.m_layout.attribs.resize(header.attributesCount);
 		if (!readAll(file, mesh.m_layout.attribs.data(),
 			header.attributesCount * sizeof(LayoutAttribute)))
 			return false;
@@ -244,6 +230,53 @@ bool ModelBinaryLoader::load(const std::string& sourceFile, ModelData& outModelD
 
 		// Rest transform
 		if (!readAll(file, &mesh.restTransform, sizeof(mesh.restTransform))) return false;
+
+		// Indices
+		mesh.indices.resize(header.indicesCount);
+		if (!readAll(file, mesh.indices.data(), header.indicesCount * sizeof(unsigned int))) return false;
+
+		// Vertices
+		mesh.vertices.clear();
+		mesh.vertices.reserve(header.vertexCount);
+
+		if (mesh.type == MeshType::StaticMesh)
+		{
+			for (uint32_t v = 0; v < header.vertexCount; ++v)
+			{
+				StaticVertex vertex{};
+				if (!readAll(file, &vertex, sizeof(StaticVertex)))
+				{
+					outModelData = {};
+					return false;
+				}
+				mesh.vertices.emplace_back(vertex);
+			}
+		}
+		else if (mesh.type == MeshType::SkinnedMesh)
+		{
+			for (uint32_t v = 0; v < header.vertexCount; ++v)
+			{
+				SkinnedVertex vertex{};
+
+				if (!readAll(file, &vertex.position, sizeof(vertex.position))) { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.normal,   sizeof(vertex.normal)))   { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.texCoord, sizeof(vertex.texCoord))) { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.tangent,  sizeof(vertex.tangent)))  { outModelData = {}; return false; }
+
+				uint32_t boneIDsCount = 0;
+				uint32_t boneWeightsCount = 0;
+				if (!readAll(file, &boneIDsCount,     sizeof(boneIDsCount)))     { outModelData = {}; return false; }
+				if (!readAll(file, &boneWeightsCount, sizeof(boneWeightsCount))) { outModelData = {}; return false; }
+
+				vertex.bonesIDs.resize(boneIDsCount);
+				vertex.bonesWeights.resize(boneWeightsCount);
+
+				if (!readAll(file, vertex.bonesIDs.data(),     boneIDsCount     * sizeof(glm::ivec3))) { outModelData = {}; return false; }
+				if (!readAll(file, vertex.bonesWeights.data(), boneWeightsCount * sizeof(glm::vec3)))  { outModelData = {}; return false; }
+
+				mesh.vertices.emplace_back(std::move(vertex));
+			}
+		}
 	}
 
 	outModelData.m_bonesOffsets.resize(modelHeader.bonesOffsetsCount);
@@ -278,4 +311,3 @@ bool ModelBinaryLoader::load(const std::string& sourceFile, ModelData& outModelD
 
 	return true;
 }
-

@@ -396,13 +396,13 @@ MeshData ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, Mode
 			indices.push_back(face.mIndices[j]);
 	}
 
-	
-	
+
+
+	std::vector<glm::ivec3> bonesIDs;
+	std::vector<glm::vec3> bonesWeights;
+
 	if (aiMesh->HasBones())
 	{
-		std::vector<glm::ivec3> bonesIDs;
-		std::vector<glm::vec3> bonesWeights;
-
 		// Will be used by mesh as base array for bone transformations uniform
 		std::vector<glm::mat4> bonesOffsets;
 
@@ -464,17 +464,48 @@ MeshData ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, Mode
 				index++;
 			}
 		}
-
-		meshData.bonesIDs.insert(meshData.bonesIDs.end(), bonesIDs.begin(), bonesIDs.end());
-		meshData.bonesWeights.insert(meshData.bonesWeights.end(), bonesWeights.begin(), bonesWeights.end());
 	}
 
 	meshData.materialIndex = aiMesh->mMaterialIndex;
-	meshData.m_positions = positions;
-	meshData.m_normals = normals;
-	meshData.m_texCoords = texcoords;
-	meshData.m_indices = indices;
-	meshData.m_tangents = tangents;
+	meshData.indices = indices;
+	meshData.type = aiMesh->HasBones() ? MeshType::SkinnedMesh : MeshType::StaticMesh;
+
+	size_t vertexCount = positions.size();
+	meshData.vertices.reserve(vertexCount);
+
+	for (size_t i = 0; i < vertexCount; i++)
+	{
+		glm::vec3 normal   = i < normals.size()   ? normals[i]   : glm::vec3(0.0f);
+		glm::vec2 texCoord = i < texcoords.size() ? texcoords[i] : glm::vec2(0.0f);
+		glm::vec4 tangent  = i < tangents.size()  ? tangents[i]  : glm::vec4(0.0f);
+
+		if (meshData.type == MeshType::SkinnedMesh)
+		{
+			SkinnedVertex vertex{};
+			vertex.position = positions[i];
+			vertex.normal = normal;
+			vertex.texCoord = texCoord;
+			vertex.tangent = tangent;
+
+			if (i < bonesIDs.size())
+			{
+				vertex.bonesIDs.push_back(bonesIDs[i]);
+				vertex.bonesWeights.push_back(bonesWeights[i]);
+			}
+
+			meshData.vertices.emplace_back(std::move(vertex));
+		}
+		else
+		{
+			StaticVertex vertex{};
+			vertex.position = positions[i];
+			vertex.normal = normal;
+			vertex.texCoord = texCoord;
+			vertex.tangent = tangent;
+
+			meshData.vertices.emplace_back(vertex);
+		}
+	}
 
 	return meshData;
 }
