@@ -296,6 +296,7 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 
 
 	mesh->materialIndex = m_data.materialIndex;
+	mesh->m_meshData = m_data;
 	//m_normals = std::move(mData.m_normals);
 
 

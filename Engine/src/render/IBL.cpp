@@ -4,6 +4,7 @@
 #include "render/FrameBufferObject.h"
 #include "render/RenderBufferObject.h"
 #include "memory/ResourceRef.h"
+#include "memory/BuiltInAssets.h"
 #include "render/Shader.h"
 #include "geometry/ShapeFactory.h"
 
@@ -248,11 +249,7 @@ TextureResourceRef IBL::generateBRDFIntegrationLUT()
 
 	BRDFIntegrationShader->use();
 
-	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
-	quad.RemoveComponent<RenderableComponent>();
-	quad.RemoveComponent<ObjectComponent>();
-
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+	auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
