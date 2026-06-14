@@ -6,6 +6,7 @@
 #include "memory/ResourceRef.h"
 #include "memory/BuiltInAssets.h"
 #include "render/Shader.h"
+#include "render/VAOManager.h"
 #include "geometry/ShapeFactory.h"
 
 #include "GL/glew.h"
@@ -19,8 +20,6 @@
 #include "geometry/Mesh.h"
 #include "geometry/Model.h"
 #include "runtime/Context.h"
-#include "component/RenderableComponent.h"
-#include "component/ObjectComponent.h"
 
 #include "core/Engine.h"
 
@@ -80,11 +79,7 @@ TextureResourceRef IBL::generateIrradianceMap(TextureResourceRef environmentMap)
 	environmentMap.get()->setSlot(0);
 	environmentMap.get()->bind();
 
-
-	auto box = ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getRegistry());
-	box.RemoveComponent<RenderableComponent>();
-	box.RemoveComponent<ObjectComponent>();
-	auto vao = box.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getBoxVAO();;
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -164,10 +159,7 @@ TextureResourceRef IBL::generatePrefilterEnvMap(TextureResourceRef environmentMa
 	environmentMap.get()->bind();
 
 
-	auto box = ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getRegistry());
-	box.RemoveComponent<RenderableComponent>();
-	box.RemoveComponent<ObjectComponent>();
-	auto vao = box.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getBoxVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -249,7 +241,7 @@ TextureResourceRef IBL::generateBRDFIntegrationLUT()
 
 	BRDFIntegrationShader->use();
 
-	auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getQuadVAO();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

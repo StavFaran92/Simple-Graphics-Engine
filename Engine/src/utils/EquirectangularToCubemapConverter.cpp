@@ -11,6 +11,7 @@
 #include "core/Logger.h"
 
 #include "render/RenderCommand.h"
+#include "render/VAOManager.h"
 #include "component/Component.h"
 #include "geometry/Model.h"
 #include "memory/BuiltInAssets.h"
@@ -76,8 +77,7 @@ TextureResourceRef EquirectangularToCubemapConverter::fromEquirectangularToCubem
 	equirectangularTexture.get()->bind();
 	
 
-	auto box = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX);
-	auto vao = box.resource()->getPrimaryMesh()->getVAO();
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getBoxVAO();
 
 	// render to cube
 	// Attach cube map to frame buffer
@@ -146,8 +146,7 @@ TextureResourceRef EquirectangularToCubemapConverter::fromCubemapToEquirectangul
 	cubemapTexture.get()->setSlot(0);
 	cubemapTexture.get()->bind();
 
-	auto quad = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD);
-	auto vao = quad.resource()->getPrimaryMesh()->getVAO();
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getBoxVAO();
 
 	// render to quad
 	// attach cubemap face to fbo

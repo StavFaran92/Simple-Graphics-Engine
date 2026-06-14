@@ -19,7 +19,7 @@ public:
 
 	static void clear();
 
-	static void draw(const VertexArrayObject* vao);
+	static void draw(const VertexArrayObject& vao);
 
 	static void drawPatches(const VertexArrayObject* vao);
 

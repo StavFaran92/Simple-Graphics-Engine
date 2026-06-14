@@ -13,19 +13,19 @@ void RenderCommand::clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderCommand::draw(const VertexArrayObject* vao)
+void RenderCommand::draw(const VertexArrayObject& vao)
 {
-	Engine::get()->getSubSystem<System>()->addTriangleCount(vao->GetIndexCount() / 3); // todo remove
+	Engine::get()->getSubSystem<System>()->addTriangleCount(vao.GetIndexCount() / 3); // todo remove
 
-	vao->Bind();
+	vao.Bind();
 
-	if (vao->GetIndexCount() == 0)
+	if (vao.GetIndexCount() == 0)
 	{
-		glDrawArrays(GL_TRIANGLES, 0, vao->GetVerticesCount());
+		glDrawArrays(GL_TRIANGLES, 0, vao.GetVerticesCount());
 	}
 	else
 	{
-		glDrawElements(GL_TRIANGLES, vao->GetIndexCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, vao.GetIndexCount(), GL_UNSIGNED_INT, 0);
 	}
 }
 

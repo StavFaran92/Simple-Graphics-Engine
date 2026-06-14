@@ -18,6 +18,7 @@
 #include "component/RenderableComponent.h"
 #include "core/Logger.h"
 #include "memory/BuiltInAssets.h"
+#include "render/VAOManager.h"
 
 TextureResourceRef TextureTransformer::flipVertical(TextureResourceRef srcTexture)
 {
@@ -56,10 +57,7 @@ void TextureTransformer::flipVertical(TextureResourceRef srcTexture, TextureReso
 
 	fbo.attachTexture(dstTexture.get()->getID());
 
-	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
-	quad.RemoveComponent<RenderableComponent>();
-	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getQuadVAO();
 
 	RenderCommand::clear();
 
@@ -103,10 +101,7 @@ void TextureTransformer::applyGammaCorrection(TextureResourceRef srcTexture, Tex
 
 	fbo.attachTexture(dstTexture.get()->getID());
 
-	auto quad = ShapeFactory::createQuad(&Engine::get()->getContext()->getRegistry());
-	quad.RemoveComponent<RenderableComponent>();
-	quad.RemoveComponent<ObjectComponent>();
-	auto vao = quad.getComponent<MeshRendererComponent>().mesh.resource()->getPrimaryMesh()->getVAO();
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getQuadVAO();
 
 	RenderCommand::clear();
 
@@ -177,8 +172,8 @@ TextureResourceRef TextureTransformer::packTextures(
 	RenderCommand::clear();
 
 	// render to quad
-	auto quad = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource();
-	RenderCommand::draw(quad->getPrimaryMesh()->getVAO());
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getQuadVAO();
+	RenderCommand::draw(vao);
 
 	return outputTexture;
 }

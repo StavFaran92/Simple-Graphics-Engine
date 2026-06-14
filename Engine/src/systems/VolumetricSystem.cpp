@@ -9,6 +9,7 @@
 #include "render/RenderCommand.h"
 #include "memory/BuiltInAssets.h"
 #include "runtime/Scene.h"
+#include "render/VAOManager.h"
 #include "core/Window.h"
 
 VolumetricSystem::VolumetricSystem()
@@ -127,7 +128,7 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	m_renderVolumeIntoSceneShader->setTextureInShader(renderTargetTexture, "uMainTexture", 0);
 	m_renderVolumeIntoSceneShader->setTextureInShader(m_renderTargetTexture, "uVolumeColor", 1);
 
-	auto quadVAO = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+	auto quadVAO = Engine::get()->getSubSystem<VAOManager>()->getQuadVAO();;
 	RenderCommand::draw(quadVAO);
 
 	//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad
