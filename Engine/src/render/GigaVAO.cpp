@@ -7,8 +7,6 @@
 GigaVAO::GigaVAO(const VertexLayout& layout)
     : m_layout(layout)
 {
-    if (m_layout.stride == 0)
-        m_layout.build();
 
     glGenVertexArrays(1, &m_vaoID);
     glGenBuffers(1, &m_vboID);
@@ -40,7 +38,7 @@ bool GigaVAO::push(const void* vertexData, size_t vertexCount,
                    const std::vector<unsigned int>& indices,
                    unsigned int& outVertexOffset, unsigned int& outIndexOffset)
 {
-    const size_t vertexBytes = vertexCount * m_layout.stride;
+    const size_t vertexBytes = vertexCount * m_layout.getStride();
     const size_t indexBytes  = indices.size() * sizeof(unsigned int);
 
     // Grow vertex buffer if needed
@@ -63,7 +61,7 @@ bool GigaVAO::push(const void* vertexData, size_t vertexCount,
         }
     }
 
-    outVertexOffset = static_cast<unsigned int>(m_vertexUsed / m_layout.stride);
+    outVertexOffset = static_cast<unsigned int>(m_vertexUsed / m_layout.getStride());
     outIndexOffset  = static_cast<unsigned int>(m_indexUsed);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
@@ -89,7 +87,8 @@ void GigaVAO::unbind() const
 
 size_t GigaVAO::getVertexCount() const
 {
-    return m_layout.stride > 0 ? m_vertexUsed / m_layout.stride : 0;
+    size_t stride = m_layout.getStride();
+    return stride > 0 ? m_vertexUsed / stride : 0;
 }
 
 size_t GigaVAO::getIndexCount() const
@@ -166,12 +165,12 @@ void GigaVAO::setupVertexAttributes()
         if (attrib.typeName == typeid(int).name())
         {
             glVertexAttribIPointer(attrib.location, (GLint)attrib.length, GL_INT,
-                                   (GLsizei)m_layout.stride, (const void*)offset);
+                                   (GLsizei)m_layout.getStride(), (const void*)offset);
         }
         else
         {
             glVertexAttribPointer(attrib.location, (GLint)attrib.length, GL_FLOAT, GL_FALSE,
-                                  (GLsizei)m_layout.stride, (const void*)offset);
+                                  (GLsizei)m_layout.getStride(), (const void*)offset);
         }
         offset += attrib.length * attrib.size;
     }

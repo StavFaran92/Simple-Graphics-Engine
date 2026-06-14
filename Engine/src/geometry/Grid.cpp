@@ -107,7 +107,6 @@ std::shared_ptr<Mesh> Grid::createMesh(int x, int y)
 	layout.attribs.push_back(LayoutAttribute::Positions);
 	layout.attribs.push_back(LayoutAttribute::Texcoords);
 	layout.numOfVertices = vertexCount;
-	layout.build();
 
 	auto mesh = MeshBuilder(MeshType::StaticMesh)
 		.addRawVertices(vertices.data(), layout)

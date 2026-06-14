@@ -61,17 +61,11 @@ MeshBuilder& MeshBuilder::addRawVertices(
 		return *this;
 	}
 
-	if (layout.stride == 0)
-	{
-		logError("Layout was not built.");
-		return *this;
-	}
-
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(vertices);
 
 	for (size_t i = 0; i < layout.numOfVertices; ++i)
 	{
-		const uint8_t* src = data + i * layout.stride;
+		const uint8_t* src = data + i * layout.getStride();
 
 		if (m_data.type == MeshType::StaticMesh)
 		{

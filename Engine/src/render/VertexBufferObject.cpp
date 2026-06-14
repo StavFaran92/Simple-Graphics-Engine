@@ -27,9 +27,6 @@ std::shared_ptr<VertexBufferObject> VertexBufferObject::create(const std::vector
 		stride += attribData.length * attribData.size;
 	}
 
-	// Update layout info
-	instLayout.stride = stride;
-
 	std::vector<uint8_t> raw;
 	unsigned int bufferSize = stride * vertices.size();
 	raw.resize(bufferSize);
