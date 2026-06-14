@@ -84,9 +84,9 @@ std::shared_ptr<Mesh> Box::createMesh()
     layout.attribs.emplace_back(LayoutAttribute::Normals);
     layout.attribs.emplace_back(LayoutAttribute::Texcoords);
 
-    auto mesh = MeshBuilder::builder()
-        .addRawVertices((float*)vertices, layout)
-        .build();
+    auto builder = MeshBuilder(MeshType::StaticMesh);
+    builder.addRawVertices(vertices, layout);
+    auto mesh = builder.build();
 
     return mesh;
 }

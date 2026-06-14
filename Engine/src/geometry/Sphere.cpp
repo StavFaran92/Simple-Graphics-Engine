@@ -13,10 +13,10 @@ std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
     //settings.name = "SGE_SPHERE_MESH";
     //settings.isTransient = true;
     //return Engine::get()->getSubSystem<ModelImporter>()->import(SGE_ROOT_DIR "Resources/Engine/Meshes/sphere.gltf", settings).mesh;
-    // clear memory of prev arrays
-    auto positions = new std::vector<glm::vec3>();
-    auto normals = new std::vector<glm::vec3>();
-    auto texcoords = new std::vector<glm::vec2>();
+
+    std::vector<glm::vec3> positions;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> texcoords;
 
     float x, y, z, xy;                              // vertex position
     float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
@@ -41,18 +41,18 @@ std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
             // vertex position (x, y, z)
             x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
             y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
-            positions->push_back({ x, y, z });
+            positions.push_back({ x, y, z });
 
             // normalized vertex normal (nx, ny, nz)
             nx = x * lengthInv;
             ny = y * lengthInv;
             nz = z * lengthInv;
-            normals->push_back({ nx, ny, nz });
+            normals.push_back({ nx, ny, nz });
 
             // vertex tex coord (s, t) range between [0, 1]
             s = (float)j / sectors;
             t = (float)i / stacks;
-            texcoords->push_back({ s, t });
+            texcoords.push_back({ s, t });
         }
     }
 
@@ -61,8 +61,7 @@ std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
     // |  / |
     // | /  |
     // k2--k2+1
-    auto indices = new std::vector<unsigned int>();
-    std::vector<int> lineIndices;
+    std::vector<unsigned int> indices;
     int k1, k2;
     for (int i = 0; i < stacks; ++i)
     {
@@ -75,51 +74,36 @@ std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
             // k1 => k2 => k1+1
             if (i != 0)
             {
-                indices->push_back(k1);
-                indices->push_back(k2);
-                indices->push_back(k1 + 1);
+                indices.push_back(k1);
+                indices.push_back(k2);
+                indices.push_back(k1 + 1);
             }
 
             // k1+1 => k2 => k2+1
             if (i != (stacks - 1))
             {
-                indices->push_back(k1 + 1);
-                indices->push_back(k2);
-                indices->push_back(k2 + 1);
-            }
-
-            // store indices for lines
-            // vertical lines for all stacks, k1 => k2
-            lineIndices.push_back(k1);
-            lineIndices.push_back(k2);
-            if (i != 0)  // horizontal lines except 1st stack, k1 => k+1
-            {
-                lineIndices.push_back(k1);
-                lineIndices.push_back(k1 + 1);
+                indices.push_back(k1 + 1);
+                indices.push_back(k2);
+                indices.push_back(k2 + 1);
             }
         }
     }
 
-    
+    std::vector<VertexVariant> vertices;
+    vertices.reserve(positions.size());
+    for (size_t i = 0; i < positions.size(); ++i)
+    {
+        StaticVertex vertex{};
+        vertex.position = positions[i];
+        vertex.normal = normals[i];
+        vertex.texCoord = texcoords[i];
+        vertices.push_back(vertex);
+    }
 
-    VertexLayout layout;
-    layout.attribs.push_back(LayoutAttribute::Positions);
-    layout.attribs.push_back(LayoutAttribute::Normals);
-    layout.attribs.push_back(LayoutAttribute::Texcoords);
-    layout.numOfVertices = positions->size();
-    layout.build();
-
-    MeshBuilder::builder()
-        .addPositions(*positions)
-        .addNormals(*normals)
-        .addTexcoords(*texcoords)
-        .addIndices(*indices)
+    auto mesh = MeshBuilder(MeshType::StaticMesh)
+        .addVertices(vertices)
+        .addIndices(indices)
         .build();
-
-    auto& builder = MeshBuilder::builder();
-    builder.addVertex();
-    builder.setMeshType(MeshType::StaticMesh);
-    auto mesh = builder.build();
 
     return mesh;
 }

@@ -32,7 +32,7 @@ std::shared_ptr<Mesh> Quad::createMesh()
 	layout.attribs.emplace_back(LayoutAttribute::Normals);
 	layout.attribs.emplace_back(LayoutAttribute::Texcoords);
 
-	auto mesh = MeshBuilder::builder()
+	auto mesh = MeshBuilder(MeshType::StaticMesh)
 		.addRawVertices((float*)vertices, layout)
 		.addIndices((unsigned int*)indices, sizeof(indices) / sizeof(unsigned int))
 		.build();

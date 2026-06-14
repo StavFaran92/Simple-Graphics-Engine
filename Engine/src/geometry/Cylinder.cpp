@@ -9,7 +9,7 @@
 
 std::shared_ptr<Mesh> Cylinder::createMesh(float height, float radius, int sectors)
 {
-    MeshBuilder builder;
+    MeshBuilder builder(MeshType::StaticMesh);
 
     float sectorStep = 2.0f * Constants::PI / sectors;
     float halfHeight = height * 0.5f;
@@ -21,13 +21,17 @@ std::shared_ptr<Mesh> Cylinder::createMesh(float height, float radius, int secto
         float x = radius * cosf(angle);
         float z = radius * sinf(angle);
 
-        builder.addPosition({ x,  halfHeight, z });
-        builder.addNormal(glm::normalize(glm::vec3(x, 0.0f, z)));
-        builder.addTexcoord({ (float)i / sectors, 1.0f });
+        StaticVertex top{};
+        top.position = { x, halfHeight, z };
+        top.normal = glm::normalize(glm::vec3(x, 0.0f, z));
+        top.texCoord = { (float)i / sectors, 1.0f };
+        builder.addVertex(top);
 
-        builder.addPosition({ x, -halfHeight, z });
-        builder.addNormal(glm::normalize(glm::vec3(x, 0.0f, z)));
-        builder.addTexcoord({ (float)i / sectors, 0.0f });
+        StaticVertex bottom{};
+        bottom.position = { x, -halfHeight, z };
+        bottom.normal = glm::normalize(glm::vec3(x, 0.0f, z));
+        bottom.texCoord = { (float)i / sectors, 0.0f };
+        builder.addVertex(bottom);
     }
 
     // Side indices
@@ -46,13 +50,17 @@ std::shared_ptr<Mesh> Cylinder::createMesh(float height, float radius, int secto
     int topCenterIdx    = (sectors + 1) * 2;
     int bottomCenterIdx = topCenterIdx + 1;
 
-    builder.addPosition({ 0.0f,  halfHeight, 0.0f });
-    builder.addNormal({ 0.0f,  1.0f, 0.0f });
-    builder.addTexcoord({ 0.5f, 0.5f });
+    StaticVertex topCenter{};
+    topCenter.position = { 0.0f, halfHeight, 0.0f };
+    topCenter.normal = { 0.0f, 1.0f, 0.0f };
+    topCenter.texCoord = { 0.5f, 0.5f };
+    builder.addVertex(topCenter);
 
-    builder.addPosition({ 0.0f, -halfHeight, 0.0f });
-    builder.addNormal({ 0.0f, -1.0f, 0.0f });
-    builder.addTexcoord({ 0.5f, 0.5f });
+    StaticVertex bottomCenter{};
+    bottomCenter.position = { 0.0f, -halfHeight, 0.0f };
+    bottomCenter.normal = { 0.0f, -1.0f, 0.0f };
+    bottomCenter.texCoord = { 0.5f, 0.5f };
+    builder.addVertex(bottomCenter);
 
     // Cap indices — reuse the side top/bottom vertices (i*2 and i*2+1)
     for (int i = 0; i < sectors; ++i)

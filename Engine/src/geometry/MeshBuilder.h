@@ -15,14 +15,14 @@ public:
 	MeshBuilder(MeshType meshType);
 	MeshBuilder(const MeshData& meshData);
 
-	void addVertex(VertexVariant vertex);
-	void addVertices(const std::vector<VertexVariant>& vertex);
+	MeshBuilder& addVertex(VertexVariant vertex);
+	MeshBuilder& addVertices(const std::vector<VertexVariant>& vertex);
 
 	MeshBuilder& addIndex(unsigned int index);
 	MeshBuilder& addIndices(const std::vector<unsigned int>& indices);
 	MeshBuilder& addIndices(const unsigned int* indices, size_t size);
 
-	MeshBuilder& addRawVertices(const float* vertices, size_t count);
+	MeshBuilder& addRawVertices(const float* vertices, VertexLayout layout);
 
 	MeshBuilder& setMaterialIndex(int index);
 

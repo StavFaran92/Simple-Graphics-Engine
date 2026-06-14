@@ -132,14 +132,6 @@ public:
 	void setName(const std::string& name);
 	std::string getName() const;
 
-	/**
-	 * Build the mesh using the specified vertices data.
-	 * This call will initialize all the OpenGL related Buffer data
-	 *
-	 * return true if the model was built succesfully, false otherwise.
-	 */
-	bool build(MeshData& mData);
-
 	/** Destructor */
 	~Mesh();
 private:

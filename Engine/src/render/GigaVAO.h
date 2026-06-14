@@ -12,7 +12,8 @@ public:
     static constexpr size_t kMaxVertexBytes     = 512 * 1024 * 1024;  // 512 MB
     static constexpr size_t kMaxIndexBytes      = 128 * 1024 * 1024;  // 128 MB  (~32M indices)
 
-    explicit GigaVAO(const VertexLayout& layout);
+    GigaVAO() = default;
+    GigaVAO(const VertexLayout& layout);
     ~GigaVAO();
 
     // Appends mesh data into the buffer. Grows up to the hard limit.

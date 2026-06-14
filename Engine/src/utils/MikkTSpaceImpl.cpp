@@ -12,13 +12,19 @@ struct MikkVertexRef {
 MikkVertexRef getVertexRef(MeshData* mesh, int face, int vert) {
     int idx = mesh->indices[face * 3 + vert];
 
-    if (mesh->getType() == MeshType::SkinnedMesh) {
-        auto& v = mesh->skinnedVertices[idx];
-        return { v.position, v.normal, v.texCoord, v.tangent };
+    if (mesh->type == MeshType::SkinnedMesh) {
+        auto& v = mesh->vertices[idx];
+        auto& skinnedVertex = std::get<SkinnedVertex>(v);
+        return { skinnedVertex.position, skinnedVertex.normal, skinnedVertex.texCoord, skinnedVertex.tangent };
     }
-
-    auto& v = mesh->staticVertices[idx];
-    return { v.position, v.normal, v.texCoord, v.tangent };
+    else if (mesh->type == MeshType::StaticMesh)
+    {
+        auto& v = mesh->vertices[idx];
+        auto& staticVertex = std::get<StaticVertex>(v);
+        return { staticVertex.position, staticVertex.normal, staticVertex.texCoord, staticVertex.tangent };
+    }
+    
+    throw std::exception("Invalid mesh type!");
 }
 
 // --- Callbacks ---

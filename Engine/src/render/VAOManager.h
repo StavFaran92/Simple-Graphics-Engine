@@ -17,4 +17,8 @@ public:
 
 	VAOManager();
 	~VAOManager() = default;
+
+private:
+	GigaVAO m_staticGeometry;
+	GigaVAO m_skinnedGeometry;
 };

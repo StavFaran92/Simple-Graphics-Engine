@@ -12,14 +12,18 @@
 #include "geometry/StaticMesh.h"
 #include "geometry/SkinnedMesh.h"
 
-void MeshBuilder::addVertices(const std::vector<VertexVariant>& vertices)
+MeshBuilder& MeshBuilder::addVertices(const std::vector<VertexVariant>& vertices)
 {
 	m_data.vertices.insert(m_data.vertices.end(), vertices.begin(), vertices.end());
+
+	return *this;
 }
 
-void MeshBuilder::addVertex(VertexVariant vertex)
+MeshBuilder& MeshBuilder::addVertex(VertexVariant vertex)
 {
 	m_data.vertices.push_back(vertex);
+
+	return *this;
 }
 
 MeshBuilder& MeshBuilder::addIndex(unsigned int index)
@@ -47,35 +51,112 @@ MeshBuilder& MeshBuilder::addIndices(const std::vector<unsigned int>& indices)
 	return *this;
 }
 
-MeshBuilder& MeshBuilder::addRawVertices(const float* vertices, size_t count)
+MeshBuilder& MeshBuilder::addRawVertices(
+	const float* vertices,
+	VertexLayout layout)
 {
 	if (!vertices)
 	{
-		logError("Specified ptr is null");
+		logError("Specified ptr is null.");
 		return *this;
 	}
 
-	if (count == 0)
+	if (layout.stride == 0)
 	{
-		logError("Size cannot be set to 0.");
+		logError("Layout was not built.");
 		return *this;
 	}
 
-	if (m_data.type == MeshType::SkinnedMesh)
+	const uint8_t* data = reinterpret_cast<const uint8_t*>(vertices);
+
+	for (size_t i = 0; i < layout.numOfVertices; ++i)
 	{
-		size_t vertexCount = count / (sizeof(SkinnedVertex) / sizeof(float));
-		const SkinnedVertex* begin = reinterpret_cast<const SkinnedVertex*>(vertices);
-		m_data.vertices.insert(m_data.vertices.end(), begin, begin + vertexCount);
-	}
-	else if (m_data.type == MeshType::StaticMesh)
-	{
-		size_t vertexCount = count / (sizeof(StaticVertex) / sizeof(float));
-		const StaticVertex* begin = reinterpret_cast<const StaticVertex*>(vertices);
-		m_data.vertices.insert(m_data.vertices.end(), begin, begin + vertexCount);
-	}
-	else
-	{
-		logInfo("Invalid mesh type.");
+		const uint8_t* src = data + i * layout.stride;
+
+		if (m_data.type == MeshType::StaticMesh)
+		{
+			StaticVertex vertex{};
+
+			size_t offset = 0;
+
+			for (LayoutAttribute attr : layout.attribs)
+			{
+				const auto& info = getAttributeData(attr);
+				const uint8_t* ptr = src + offset;
+
+				switch (attr)
+				{
+				case LayoutAttribute::Positions:
+					memcpy(&vertex.position, ptr, sizeof(vertex.position));
+					break;
+
+				case LayoutAttribute::Normals:
+					memcpy(&vertex.normal, ptr, sizeof(vertex.normal));
+					break;
+
+				case LayoutAttribute::Texcoords:
+					memcpy(&vertex.texCoord, ptr, sizeof(vertex.texCoord));
+					break;
+
+				case LayoutAttribute::Tangents:
+					memcpy(&vertex.tangent, ptr, sizeof(vertex.tangent));
+					break;
+
+				default:
+					break;
+				}
+
+				offset += info.length * info.size;
+			}
+
+			m_data.vertices.push_back(vertex);
+		}
+		else
+		{
+			SkinnedVertex vertex{};
+
+			size_t offset = 0;
+
+			for (LayoutAttribute attr : layout.attribs)
+			{
+				const auto& info = getAttributeData(attr);
+				const uint8_t* ptr = src + offset;
+
+				switch (attr)
+				{
+				case LayoutAttribute::Positions:
+					memcpy(&vertex.position, ptr, sizeof(vertex.position));
+					break;
+
+				case LayoutAttribute::Normals:
+					memcpy(&vertex.normal, ptr, sizeof(vertex.normal));
+					break;
+
+				case LayoutAttribute::Texcoords:
+					memcpy(&vertex.texCoord, ptr, sizeof(vertex.texCoord));
+					break;
+
+				case LayoutAttribute::Tangents:
+					memcpy(&vertex.tangent, ptr, sizeof(vertex.tangent));
+					break;
+
+				case LayoutAttribute::BoneIDs:
+					memcpy(&vertex.bonesIDs, ptr, sizeof(vertex.bonesIDs));
+					break;
+
+				case LayoutAttribute::BoneWeights:
+					memcpy(&vertex.bonesWeights, ptr, sizeof(vertex.bonesWeights));
+					break;
+
+				default:
+					break;
+				}
+
+				offset += info.length * info.size;
+			}
+
+			m_data.vertices.push_back(vertex);
+		}
 	}
 
 	return *this;
@@ -233,6 +314,8 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 
 	//MeshData newMeshData;
 	//MeshSerializer::readDataFromBinaryFile(mesh.getUID() + ".bin", newMeshData);
+
+	return mesh;
 }
 
 MeshBuilder::MeshBuilder(MeshType meshType)
