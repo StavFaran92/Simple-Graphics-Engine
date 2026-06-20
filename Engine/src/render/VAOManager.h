@@ -24,4 +24,6 @@ public:
 private:
 	GigaVAO m_staticGeometry;
 	GigaVAO m_skinnedGeometry;
+	VertexArrayObject m_quadVAO;
+	VertexArrayObject m_boxVAO;
 };

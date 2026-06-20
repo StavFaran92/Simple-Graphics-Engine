@@ -10,6 +10,16 @@ GigaVAO& VAOManager::getGigaVAO(Type type)
 	throw std::exception("Invalid type specified!");
 }
 
+VertexArrayObject& VAOManager::getQuadVAO()
+{
+	return m_quadVAO;
+}
+
+VertexArrayObject& VAOManager::getBoxVAO()
+{
+	return m_boxVAO;
+}
+
 VAOManager::VAOManager()
 {
 	Engine::get()->registerSubSystem<VAOManager>(this);
