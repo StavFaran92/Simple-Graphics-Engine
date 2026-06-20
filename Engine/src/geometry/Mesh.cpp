@@ -63,9 +63,14 @@ VertexLayout Mesh::getVertexLayout()
 	return m_layout;
 }
 
-VertexArrayObject* Mesh::getVAO() const
+VertexArrayObject& Mesh::getVAO()
 {
-	return m_vao.get();
+	return m_vao;
+}
+
+const VertexArrayObject& Mesh::getVAO() const
+{
+	return m_vao;
 }
 
 AABB Mesh::getAABB() const

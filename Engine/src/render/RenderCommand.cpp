@@ -29,24 +29,24 @@ void RenderCommand::draw(const VertexArrayObject& vao)
 	}
 }
 
-void RenderCommand::drawPatches(const VertexArrayObject* vao)
+void RenderCommand::drawPatches(const VertexArrayObject& vao)
 {
-	vao->Bind();
+	vao.Bind();
 
-	glDrawElements(GL_PATCHES, vao->GetIndexCount() , GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_PATCHES, vao.GetIndexCount() , GL_UNSIGNED_INT, 0);
 }
 
-void RenderCommand::drawInstanced(const VertexArrayObject* vao, int count)
+void RenderCommand::drawInstanced(const VertexArrayObject& vao, int count)
 {
-	vao->Bind();
+	vao.Bind();
 
-	if (vao->GetIndexCount() == 0)
+	if (vao.GetIndexCount() == 0)
 	{
-		glDrawArraysInstanced(GL_TRIANGLES, 0, vao->GetVerticesCount(), count);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, vao.GetVerticesCount(), count);
 	}
 	else
 	{
-		glDrawElementsInstanced(GL_TRIANGLES, vao->GetIndexCount(), GL_UNSIGNED_INT, 0, count);
+		glDrawElementsInstanced(GL_TRIANGLES, vao.GetIndexCount(), GL_UNSIGNED_INT, 0, count);
 	}
 }
 

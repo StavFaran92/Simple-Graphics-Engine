@@ -274,8 +274,6 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 		mesh->m_aabb = AABB::createFromMinMax(minAABB, maxAABB);
 	}
 
-	
-
 	//// Create buffers
 	//m_vao = std::make_shared<VertexArrayObject>();
 

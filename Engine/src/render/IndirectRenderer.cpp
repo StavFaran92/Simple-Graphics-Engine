@@ -229,7 +229,7 @@ void IndirectRenderer::renderScene(Scene* scene)
 
 	auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
-	vao->Bind();
+	vao.Bind();
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
 	glMultiDrawElementsIndirect(
 		GL_TRIANGLES,           // primitive type

@@ -7,6 +7,7 @@
 #include "render/VertexLayout.h"
 #include "render/Vertex.h"
 #include "geometry/AABB.h"
+#include "render/VertexArrayObject.h"
 
 // Forward declerations
 class MeshBuilder;
@@ -119,7 +120,9 @@ public:
 	 */
 	VertexLayout getVertexLayout();
 
-	VertexArrayObject* getVAO() const;
+	VertexArrayObject& getVAO();
+
+	const VertexArrayObject& getVAO() const;
 
 	AABB getAABB() const;
 
@@ -149,7 +152,7 @@ private:
 	// render data
 	std::shared_ptr<ElementBufferObject> m_ibo = nullptr;
 	std::shared_ptr<VertexBufferObject>  m_vbo = nullptr;
-	std::shared_ptr<VertexArrayObject>   m_vao = nullptr;
+	VertexArrayObject m_vao;
 
 	size_t m_indexCount = 0;
 	VertexLayout m_layout;

@@ -211,17 +211,7 @@ void DeferredRenderer::render()
 	graphics->material->use();
 
 	// Draw
-	auto instanceBatch = graphics->entity.tryGetComponent<InstanceBatch>();
-	if (!instanceBatch)
-	{
-		graphics->shader->setUniformValue("isGpuInstanced", false);
-		RenderCommand::draw(graphics->mesh->getVAO());
-	}
-	else
-	{
-		graphics->shader->setUniformValue("isGpuInstanced", true);
-		RenderCommand::drawInstanced(graphics->mesh->getVAO(), instanceBatch->getCount());
-	}
+	RenderCommand::draw(graphics->mesh->getVAO());
 }
 
 void DeferredRenderer::renderScene(Scene* scene)
