@@ -435,7 +435,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     model = glm::scale(model, glm::vec3(extents.x, extents.y, extents.z));
                     m_debugVisualizeShader->setModelMatrix(model);
                     auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX);
-                    auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
+                    auto& vao = mesh.resource()->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
                 }
 
@@ -446,7 +446,7 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     model = glm::scale(model, glm::vec3(radius2));
                     m_debugVisualizeShader->setModelMatrix(model);
                     auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
-                    auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
+                    auto& vao = mesh.resource()->getPrimaryMesh()->getVAO();
                     RenderCommand::draw(vao);
                 }
 
@@ -473,9 +473,9 @@ void PhysicsSystem::visualizePhysicsShapeDebug(Scene* scene)
                     glm::mat4 cylinderModel = model;
 
                     auto& cylinderMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CYLINDER);
-                    auto  cylinderVao = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
+                    auto&  cylinderVao = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
                     auto& sphereMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
-                    auto  sphereVao = sphereMesh.resource()->getPrimaryMesh()->getVAO();
+                    auto&  sphereVao = sphereMesh.resource()->getPrimaryMesh()->getVAO();
 
                     // Top cap sphere
                     topSphereModel = glm::translate(topSphereModel, glm::vec3(0.0f, halfHeight, 0.0f));

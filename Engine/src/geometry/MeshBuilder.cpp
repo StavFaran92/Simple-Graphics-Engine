@@ -212,6 +212,7 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 	// calculate stride
 	size_t stride = m_data.getStride();
 	size_t numOfVertices = m_data.getVertexCount();
+	m_data.m_layout.numOfVertices = numOfVertices;
 
 	if (m_data.type == MeshType::StaticMesh)
 	{

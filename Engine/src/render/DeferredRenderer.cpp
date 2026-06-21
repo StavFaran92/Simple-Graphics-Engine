@@ -329,7 +329,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 		{
 			// render to quad
-			auto vao = m_quad->getPrimaryMesh()->getVAO();
+			auto& vao = m_quad->getPrimaryMesh()->getVAO();
 			RenderCommand::draw(vao);
 		}
 
@@ -343,7 +343,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 		{
 			// render to quad
-			auto vao = m_quad->getPrimaryMesh()->getVAO();
+			auto& vao = m_quad->getPrimaryMesh()->getVAO();
 			RenderCommand::draw(vao);
 		}
 
@@ -379,7 +379,7 @@ void DeferredRenderer::renderScene(Scene* scene)
 
 	{
 		// render to quad
-		auto vao = m_quad->getPrimaryMesh()->getVAO();
+		auto& vao = m_quad->getPrimaryMesh()->getVAO();
 		RenderCommand::draw(vao);
 	}
 

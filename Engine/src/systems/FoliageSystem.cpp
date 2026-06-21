@@ -199,7 +199,7 @@ void FoliageSystem::drawFoliage(Terrain& terrain)
 
 			//auto& grassBlade = Engine::get()->getBuiltInMeshes()->getMesh(BuiltInMeshes::MeshType::SPHERE);
 			auto& grassBlade = m_grassBlade;
-			auto vao = grassBlade->getPrimaryMesh()->getVAO();
+			auto& vao = grassBlade->getPrimaryMesh()->getVAO();
 
 			float density = std::min(1.0f, std::max(0.f, maxFoliageViewDistance - distance) / maxFoliageViewDistance);
 			int instanceCount = visiblePatches[i]->instanceCount * density;

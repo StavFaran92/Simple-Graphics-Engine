@@ -16,6 +16,9 @@ public:
 	VertexArrayObject();
 	~VertexArrayObject();
 
+	VertexArrayObject(const VertexArrayObject&) = delete;
+	VertexArrayObject& operator=(const VertexArrayObject&) = delete;
+
 	void attachBuffer(std::shared_ptr<VertexBufferObject> vbo, const ElementBufferObject* ebo);
 	void setVertexCount(unsigned int vCount);
 	std::shared_ptr<VertexBufferObject> getBufferByID(unsigned int id) const;

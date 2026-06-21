@@ -227,7 +227,7 @@ void IndirectRenderer::renderScene(Scene* scene)
 		m_drawCommands.size() * sizeof(RenderData::DrawCommand),
 		m_drawCommands.data());
 
-	auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+	auto& vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
 	vao.Bind();
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
@@ -279,7 +279,7 @@ void IndirectRenderer::renderScene(Scene* scene)
 
 	{
 		// render to quad
-		auto vao = m_quad->getPrimaryMesh()->getVAO();
+		auto& vao = m_quad->getPrimaryMesh()->getVAO();
 		RenderCommand::draw(vao);
 	}
 

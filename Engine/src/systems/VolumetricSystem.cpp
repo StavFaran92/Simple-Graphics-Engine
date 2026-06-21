@@ -128,7 +128,7 @@ void VolumetricSystem::drawVolumetric(const VolumeComponent& volume, const glm::
 	m_renderVolumeIntoSceneShader->setTextureInShader(renderTargetTexture, "uMainTexture", 0);
 	m_renderVolumeIntoSceneShader->setTextureInShader(m_renderTargetTexture, "uVolumeColor", 1);
 
-	auto quadVAO = Engine::get()->getSubSystem<VAOManager>()->getQuadVAO();;
+	auto& quadVAO = Engine::get()->getSubSystem<VAOManager>()->getQuadVAO();;
 	RenderCommand::draw(quadVAO);
 
 	//auto vao = m_quadUI.getComponent<MeshComponent>().mesh.get()->getPrimaryMesh()->getVAO(); //todo change, we start off with a quad

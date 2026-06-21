@@ -217,11 +217,9 @@ bool ModelBinaryLoader::load(const std::string& sourceFile, ModelData& outModelD
 			header.attributesCount * sizeof(LayoutAttribute)))
 			return false;
 
-		// numOfVertices and stride
+		// numOfVertices
 		uint64_t numOfVertices = 0;
-		uint64_t stride        = 0;
 		if (!readAll(file, &numOfVertices, sizeof(numOfVertices))) return false;
-		if (!readAll(file, &stride,        sizeof(stride)))        return false;
 
 		mesh.m_layout.numOfVertices = static_cast<std::size_t>(numOfVertices);
 

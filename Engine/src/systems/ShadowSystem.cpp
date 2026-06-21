@@ -181,7 +181,7 @@ void ShadowSystem::renderToDepthMap()
 			//}
 
 			// draw model
-			auto vao = mesh->getVAO();
+			auto& vao = mesh->getVAO();
 
 			// render to quad
 			RenderCommand::draw(vao);

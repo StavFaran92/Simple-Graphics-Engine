@@ -654,7 +654,7 @@ void Scene::draw(float deltaTime)
 				auto& terrainMesh = terrain.getMesh();
 				if (!terrainMesh.isEmpty())
 				{
-					auto vao = terrainMesh->getPrimaryMesh()->getVAO();
+					auto& vao = terrainMesh->getPrimaryMesh()->getVAO();
 					RenderCommand::drawPatches(vao);
 				}
 
@@ -688,7 +688,7 @@ void Scene::draw(float deltaTime)
 				skybox.m_cubemap.resource().get()->bind();
 				skybox.m_cubemap.resource().get()->setSlot(0);
 
-				auto vao = graphics->mesh->getVAO();
+				auto& vao = graphics->mesh->getVAO();
 				RenderCommand::draw(vao);
 			}
 			glDepthMask(GL_TRUE);
@@ -824,7 +824,7 @@ void Scene::draw(float deltaTime)
 						m_highlightEdgeDetectionShader->setUniformValue("uTexelSize", texelSize);
 						m_highlightEdgeDetectionShader->setTextureInShader(binaryMaskTexture, "uMaskTex", 1);
 
-						auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+						auto& vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -849,7 +849,7 @@ void Scene::draw(float deltaTime)
 
 						graphics->renderView->bind();
 
-						auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+						auto& vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 						RenderCommand::draw(vao);
 
 						glPopDebugGroup();
@@ -894,7 +894,7 @@ void Scene::draw(float deltaTime)
 					model = glm::scale(model, glm::vec3(extents.x*2, extents.y*2, extents.z*2));
 					m_debugVisualizeShader->setModelMatrix(model);
 					auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX);
-					auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
+					auto& vao = mesh.resource()->getPrimaryMesh()->getVAO();
 					RenderCommand::draw(vao);
 				}
 
@@ -905,7 +905,7 @@ void Scene::draw(float deltaTime)
 					model = glm::scale(model, glm::vec3(radius * 2));
 					m_debugVisualizeShader->setModelMatrix(model);
 					auto& mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
-					auto vao = mesh.resource()->getPrimaryMesh()->getVAO();
+					auto& vao = mesh.resource()->getPrimaryMesh()->getVAO();
 					RenderCommand::draw(vao);
 				}
 
@@ -921,9 +921,9 @@ void Scene::draw(float deltaTime)
 					m_debugVisualizeShader->setModelMatrix(cylinderModel);
 
 					auto& cylinderMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CYLINDER);
-					auto  cylinderVao  = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
+					auto&  cylinderVao  = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
 					auto& sphereMesh   = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
-					auto  sphereVao    = sphereMesh.resource()->getPrimaryMesh()->getVAO();
+					auto&  sphereVao    = sphereMesh.resource()->getPrimaryMesh()->getVAO();
 
 					// Top cap sphere
 					topSphereModel = glm::translate(topSphereModel, glm::vec3(0.0f, halfHeight, 0.0f));
@@ -983,9 +983,9 @@ void Scene::draw(float deltaTime)
 				m_debugVisualizeShader->setModelMatrix(cylinderModel);
 
 				auto& cylinderMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_CYLINDER);
-				auto  cylinderVao = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
+				auto&  cylinderVao = cylinderMesh.resource()->getPrimaryMesh()->getVAO();
 				auto& sphereMesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_SPHERE);
-				auto  sphereVao = sphereMesh.resource()->getPrimaryMesh()->getVAO();
+				auto&  sphereVao = sphereMesh.resource()->getPrimaryMesh()->getVAO();
 
 				// Top cap sphere
 				topSphereModel = glm::translate(topSphereModel, glm::vec3(0.0f, height * .5f, 0.0f));
@@ -1087,7 +1087,7 @@ void Scene::draw(float deltaTime)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		m_UIShader->use();
 		m_UIShader->setProjectionMatrix(m_defaultUIProjection);
-		auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+		auto& vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
 		for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
 		{
@@ -1201,7 +1201,7 @@ void Scene::draw(float deltaTime)
 				//shader->setUniformValue("cameraLookAt", primaryCamera.front);
 
 				// bind mesh
-				auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+				auto& vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
 				// in frag shader i need access to mesh extentes & main texture -> set uniforms
 

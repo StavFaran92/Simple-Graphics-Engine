@@ -1,8 +1,188 @@
 {
     "value0": {
         "m_serializedScene": {
-            "serializedEntities": [],
-            "gameCamera": 2188368820
+            "serializedEntities": [
+                {
+                    "entity": 1,
+                    "components": [
+                        {
+                            "polymorphic_id": 2147483649,
+                            "polymorphic_name": "MeshRendererComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483649,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 14
+                                        }
+                                    },
+                                    "count": 1,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 7
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 1,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483650,
+                            "polymorphic_name": "CameraComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483650,
+                                "data": {
+                                    "isActive": true,
+                                    "center": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "up": {
+                                        "v.x": 0.0,
+                                        "v.y": 1.0,
+                                        "v.z": 0.0
+                                    },
+                                    "fovyRadians": 0.7853981852531433,
+                                    "aspect": 1.8400719165802003,
+                                    "znear": 0.10000000149011612,
+                                    "zfar": 1000.0,
+                                    "type": 0,
+                                    "ortho_left": 0.0,
+                                    "ortho_right": 10.0,
+                                    "ortho_bottom": 0.0,
+                                    "ortho_top": 10.0
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483651,
+                            "polymorphic_name": "Transformation",
+                            "ptr_wrapper": {
+                                "id": 2147483651,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 10.0,
+                                        "v.y": 10.0,
+                                        "v.z": 10.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 1
+                                    },
+                                    "root": {
+                                        "m_entity": 1
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483652,
+                            "polymorphic_name": "ObjectComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483652,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Main Camera",
+                                    "e": {
+                                        "m_entity": 1
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 0,
+                    "components": [
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483653,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": -0.4794255495071411,
+                                        "q.z": 0.0,
+                                        "q.w": 0.8775825500488281
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 0
+                                    },
+                                    "root": {
+                                        "m_entity": 0
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483654,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Directional light",
+                                    "e": {
+                                        "m_entity": 0
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483653,
+                            "polymorphic_name": "DirectionalLight",
+                            "ptr_wrapper": {
+                                "id": 2147483655,
+                                "data": {
+                                    "color": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "gameCamera": 1
         }
     }
 }

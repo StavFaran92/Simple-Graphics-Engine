@@ -115,7 +115,7 @@ int ObjectPicker::pickObject(int x, int y, Entity camera)
 		for (auto& mesh : meshComponent.mesh.resource()->getMeshes())
 		{
 			m_pickingShader->setUniformValue("model", transform.getWorldTransformation() * mesh->getRestTransform());
-			auto vao = mesh->getVAO();
+			auto& vao = mesh->getVAO();
 
 			// render to quad
 			RenderCommand::draw(vao);
