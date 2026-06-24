@@ -1,6 +1,7 @@
 #include "render/VAOManager.h"
 
 #include "core/Engine.h"
+#include "render/ElementBufferObject.h"
 
 GigaVAO& VAOManager::getGigaVAO(Type type)
 {

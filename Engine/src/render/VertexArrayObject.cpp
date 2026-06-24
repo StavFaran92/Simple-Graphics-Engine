@@ -17,7 +17,7 @@ VertexArrayObject::~VertexArrayObject()
 	glDeleteVertexArrays(1, &m_id);
 }
 
-void VertexArrayObject::attachBuffer(std::shared_ptr<VertexBufferObject> vbo, const ElementBufferObject* ebo)
+void VertexArrayObject::attachBuffer(std::shared_ptr<VertexBufferObject> vbo, std::shared_ptr<ElementBufferObject> ebo)
 {
 	// bind this VAO
 	Bind();
@@ -32,6 +32,7 @@ void VertexArrayObject::attachBuffer(std::shared_ptr<VertexBufferObject> vbo, co
 	{
 		ebo->Bind();
 		m_indexCount = ebo->getLength();
+		m_attachedEBOs.push_back(ebo);
 	}
 }
 
