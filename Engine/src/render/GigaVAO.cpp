@@ -4,6 +4,53 @@
 #include "core/Logger.h"
 #include "core/Configurations.h"
 
+GigaVAO::GigaVAO(GigaVAO&& other) noexcept
+    : m_vaoID(other.m_vaoID)
+    , m_vboID(other.m_vboID)
+    , m_eboID(other.m_eboID)
+    , m_vertexCapacity(other.m_vertexCapacity)
+    , m_vertexUsed(other.m_vertexUsed)
+    , m_indexCapacity(other.m_indexCapacity)
+    , m_indexUsed(other.m_indexUsed)
+    , m_layout(std::move(other.m_layout))
+{
+    other.m_vaoID = 0;
+    other.m_vboID = 0;
+    other.m_eboID = 0;
+    other.m_vertexCapacity = 0;
+    other.m_vertexUsed = 0;
+    other.m_indexCapacity = 0;
+    other.m_indexUsed = 0;
+}
+
+GigaVAO& GigaVAO::operator=(GigaVAO&& other) noexcept
+{
+    if (this == &other) return *this;
+
+    if (m_vaoID != 0) glDeleteVertexArrays(1, &m_vaoID);
+    if (m_vboID != 0) glDeleteBuffers(1, &m_vboID);
+    if (m_eboID != 0) glDeleteBuffers(1, &m_eboID);
+
+    m_vaoID = other.m_vaoID;
+    m_vboID = other.m_vboID;
+    m_eboID = other.m_eboID;
+    m_vertexCapacity = other.m_vertexCapacity;
+    m_vertexUsed = other.m_vertexUsed;
+    m_indexCapacity = other.m_indexCapacity;
+    m_indexUsed = other.m_indexUsed;
+    m_layout = std::move(other.m_layout);
+
+    other.m_vaoID = 0;
+    other.m_vboID = 0;
+    other.m_eboID = 0;
+    other.m_vertexCapacity = 0;
+    other.m_vertexUsed = 0;
+    other.m_indexCapacity = 0;
+    other.m_indexUsed = 0;
+
+    return *this;
+}
+
 GigaVAO::GigaVAO(const VertexLayout& layout)
     : m_layout(layout)
 {
@@ -29,9 +76,9 @@ GigaVAO::GigaVAO(const VertexLayout& layout)
 
 GigaVAO::~GigaVAO()
 {
-    glDeleteBuffers(1, &m_vboID);
-    glDeleteBuffers(1, &m_eboID);
-    glDeleteVertexArrays(1, &m_vaoID);
+    if (m_vaoID != 0) glDeleteVertexArrays(1, &m_vaoID);
+    if (m_vboID != 0) glDeleteBuffers(1, &m_vboID);
+    if (m_eboID != 0) glDeleteBuffers(1, &m_eboID);
 }
 
 bool GigaVAO::push(const void* vertexData, size_t vertexCount,

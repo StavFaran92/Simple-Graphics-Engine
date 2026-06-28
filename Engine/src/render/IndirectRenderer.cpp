@@ -9,6 +9,7 @@
 #include "component/Transformation.h"
 #include "render/ScreenQuad.h"
 #include "runtime/Scene.h"
+#include "render/VAOManager.h"
 #include "render/Material.h"
 #include "core/Random.h"
 #include "render/RenderCommand.h"
@@ -227,9 +228,9 @@ void IndirectRenderer::renderScene(Scene* scene)
 		m_drawCommands.size() * sizeof(RenderData::DrawCommand),
 		m_drawCommands.data());
 
-	auto& vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::StaticGeometry);
 
-	vao.Bind();
+	vao.bind();
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
 	glMultiDrawElementsIndirect(
 		GL_TRIANGLES,           // primitive type

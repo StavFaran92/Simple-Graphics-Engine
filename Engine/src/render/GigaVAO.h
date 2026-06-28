@@ -16,6 +16,12 @@ public:
     GigaVAO(const VertexLayout& layout);
     ~GigaVAO();
 
+    GigaVAO(const GigaVAO&) = delete;
+    GigaVAO& operator=(const GigaVAO&) = delete;
+
+    GigaVAO(GigaVAO&&) noexcept;             // allow move
+    GigaVAO& operator=(GigaVAO&&) noexcept;  // allow move assign
+
     // Appends mesh data into the buffer. Grows up to the hard limit.
     // Returns false only when the hard limit has been reached.
     // outVertexOffset: base vertex index for this mesh (used in indirect draw baseVertex)

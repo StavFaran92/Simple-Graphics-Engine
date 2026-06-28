@@ -2,6 +2,7 @@
 
 #include "core/Engine.h"
 #include "render/ElementBufferObject.h"
+#include "render/VertexBufferObject.h"
 
 GigaVAO& VAOManager::getGigaVAO(Type type)
 {
@@ -40,5 +41,22 @@ VAOManager::VAOManager()
 	skinnedGeometryLayout.attribs.push_back(LayoutAttribute::BoneIDs);
 	skinnedGeometryLayout.attribs.push_back(LayoutAttribute::BoneWeights);
 	m_skinnedGeometry = GigaVAO(skinnedGeometryLayout);
-	
+
+	static const float quadVerts[] = {
+		-1.f,  1.f, 0.f,  0.f, 1.f,
+		-1.f, -1.f, 0.f,  0.f, 0.f,
+		 1.f, -1.f, 0.f,  1.f, 0.f,
+		 1.f,  1.f, 0.f,  1.f, 1.f,
+	};
+	static unsigned int quadIndices[] = { 3, 2, 1, 1, 0, 3 };
+
+	VertexLayout quadLayout;
+	quadLayout.numOfVertices = 4;
+	quadLayout.attribs.push_back(LayoutAttribute::Positions);
+	quadLayout.attribs.push_back(LayoutAttribute::Texcoords);
+
+	auto vbo = VertexBufferObject::createRaw(quadVerts, 4, sizeof(quadVerts), quadLayout);
+	auto ebo = std::make_shared<ElementBufferObject>(quadIndices, 6);
+	m_quadVAO.attachBuffer(vbo, ebo);
+	m_quadVAO.build();
 }
