@@ -214,6 +214,14 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 	size_t numOfVertices = m_data.getVertexCount();
 	m_data.m_layout.numOfVertices = numOfVertices;
 
+	if (m_data.indices.size() == 0)
+	{
+		for (int i = 0; i < numOfVertices; i++)
+		{
+			m_data.indices.push_back(i);
+		}
+	}
+
 	if (m_data.type == MeshType::StaticMesh)
 	{
 		mesh = std::make_shared<StaticMesh>();
@@ -224,6 +232,9 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 		unsigned int meshVertexOffset = 0;
 		unsigned int meshIndexOffset = 0;
 		gigaVAO.push(verts.data(), verts.size(), m_data.indices, meshVertexOffset, meshIndexOffset);
+
+		mesh->vertexOffset = meshVertexOffset;
+		mesh->indexOffset = meshIndexOffset;
 
 		glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
 		glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
