@@ -135,6 +135,10 @@ public:
 	void setName(const std::string& name);
 	std::string getName() const;
 
+	uint32_t getVertexOffset() const;
+	uint32_t getIndexOffset() const;
+	uint32_t getVertexCount() const;
+
 	/** Destructor */
 	~Mesh();
 private:
@@ -162,4 +166,7 @@ private:
 	AABB m_aabb;
 	int materialIndex{};
 	std::string m_name;
+
+	uint32_t vertexOffset = 0;
+	uint32_t indexOffset = 0;
 };

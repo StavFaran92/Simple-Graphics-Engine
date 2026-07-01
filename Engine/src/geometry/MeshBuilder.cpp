@@ -255,6 +255,9 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 		unsigned int meshIndexOffset = 0; 
 		gigaVAO.push(verts.data(), verts.size(), m_data.indices, meshVertexOffset, meshIndexOffset);
 
+		mesh->vertexOffset = meshVertexOffset;
+		mesh->indexOffset = meshIndexOffset;
+
 		glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
 		glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
 

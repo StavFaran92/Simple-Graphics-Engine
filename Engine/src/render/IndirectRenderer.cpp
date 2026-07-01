@@ -194,10 +194,10 @@ void IndirectRenderer::renderScene(Scene* scene)
 			m_sceneBuffer.addObject(objData);
 
 			RenderData::DrawCommand drawCommand{};
-			drawCommand.vertexCount = 6;
+			drawCommand.vertexCount = mesh->getVertexCount();
 			drawCommand.instanceCount = 1;
-			drawCommand.firstIndex = 0;
-			drawCommand.baseVertex = 0;
+			drawCommand.firstIndex = mesh->getIndexOffset();
+			drawCommand.baseVertex = mesh->getVertexOffset();
 			drawCommand.baseInstance = 0;
 			addDrawCommand(drawCommand);
 		}

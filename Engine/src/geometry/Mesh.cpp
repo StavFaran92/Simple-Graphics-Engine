@@ -103,6 +103,21 @@ std::string Mesh::getName() const
 	return m_name;
 }
 
+uint32_t Mesh::getVertexOffset() const
+{
+	return vertexOffset;
+}
+
+uint32_t Mesh::getIndexOffset() const
+{
+	return indexOffset;
+}
+
+uint32_t Mesh::getVertexCount() const
+{
+	return m_meshData.getVertexCount();
+}
+
 Mesh::~Mesh()
 {
 	logDebug( __FUNCTION__ );
