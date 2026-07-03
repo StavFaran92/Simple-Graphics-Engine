@@ -489,8 +489,8 @@ MeshData ModelImporter::processMesh(const aiScene* aiScene, aiMesh* aiMesh, Mode
 
 			if (i < bonesIDs.size())
 			{
-				vertex.bonesIDs.push_back(bonesIDs[i]);
-				vertex.bonesWeights.push_back(bonesWeights[i]);
+				vertex.bonesIDs = bonesIDs[i];
+				vertex.bonesWeights = bonesWeights[i];
 			}
 
 			meshData.vertices.emplace_back(std::move(vertex));

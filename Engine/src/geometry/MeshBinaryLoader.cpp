@@ -126,18 +126,12 @@ bool ModelBinaryLoader::save(const ModelData& modelData, const std::string& targ
 			{
 				const SkinnedVertex& vertex = std::get<SkinnedVertex>(v);
 
-				if (!writeAll(file, &vertex.position, sizeof(vertex.position))) return false;
-				if (!writeAll(file, &vertex.normal,   sizeof(vertex.normal)))   return false;
-				if (!writeAll(file, &vertex.texCoord, sizeof(vertex.texCoord))) return false;
-				if (!writeAll(file, &vertex.tangent,  sizeof(vertex.tangent)))  return false;
-
-				uint32_t boneIDsCount     = static_cast<uint32_t>(vertex.bonesIDs.size());
-				uint32_t boneWeightsCount = static_cast<uint32_t>(vertex.bonesWeights.size());
-				if (!writeAll(file, &boneIDsCount,     sizeof(boneIDsCount)))     return false;
-				if (!writeAll(file, &boneWeightsCount, sizeof(boneWeightsCount))) return false;
-
-				if (!writeAll(file, vertex.bonesIDs.data(),     boneIDsCount     * sizeof(glm::ivec3))) return false;
-				if (!writeAll(file, vertex.bonesWeights.data(), boneWeightsCount * sizeof(glm::vec3)))  return false;
+				if (!writeAll(file, &vertex.position,     sizeof(vertex.position)))     return false;
+				if (!writeAll(file, &vertex.normal,       sizeof(vertex.normal)))       return false;
+				if (!writeAll(file, &vertex.texCoord,     sizeof(vertex.texCoord)))     return false;
+				if (!writeAll(file, &vertex.tangent,      sizeof(vertex.tangent)))      return false;
+				if (!writeAll(file, &vertex.bonesIDs,     sizeof(vertex.bonesIDs)))     return false;
+				if (!writeAll(file, &vertex.bonesWeights, sizeof(vertex.bonesWeights))) return false;
 			}
 		}
 	}
@@ -253,21 +247,12 @@ bool ModelBinaryLoader::load(const std::string& sourceFile, ModelData& outModelD
 			{
 				SkinnedVertex vertex{};
 
-				if (!readAll(file, &vertex.position, sizeof(vertex.position))) { outModelData = {}; return false; }
-				if (!readAll(file, &vertex.normal,   sizeof(vertex.normal)))   { outModelData = {}; return false; }
-				if (!readAll(file, &vertex.texCoord, sizeof(vertex.texCoord))) { outModelData = {}; return false; }
-				if (!readAll(file, &vertex.tangent,  sizeof(vertex.tangent)))  { outModelData = {}; return false; }
-
-				uint32_t boneIDsCount = 0;
-				uint32_t boneWeightsCount = 0;
-				if (!readAll(file, &boneIDsCount,     sizeof(boneIDsCount)))     { outModelData = {}; return false; }
-				if (!readAll(file, &boneWeightsCount, sizeof(boneWeightsCount))) { outModelData = {}; return false; }
-
-				vertex.bonesIDs.resize(boneIDsCount);
-				vertex.bonesWeights.resize(boneWeightsCount);
-
-				if (!readAll(file, vertex.bonesIDs.data(),     boneIDsCount     * sizeof(glm::ivec3))) { outModelData = {}; return false; }
-				if (!readAll(file, vertex.bonesWeights.data(), boneWeightsCount * sizeof(glm::vec3)))  { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.position,     sizeof(vertex.position)))     { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.normal,       sizeof(vertex.normal)))       { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.texCoord,     sizeof(vertex.texCoord)))     { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.tangent,      sizeof(vertex.tangent)))      { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.bonesIDs,     sizeof(vertex.bonesIDs)))     { outModelData = {}; return false; }
+				if (!readAll(file, &vertex.bonesWeights, sizeof(vertex.bonesWeights))) { outModelData = {}; return false; }
 
 				mesh.vertices.emplace_back(std::move(vertex));
 			}
