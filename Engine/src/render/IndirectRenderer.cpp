@@ -280,7 +280,7 @@ void IndirectRenderer::renderScene(Scene* scene)
 
 	{
 		// render to quad
-		auto& vao = m_quad->getPrimaryMesh()->getVAO();
+		auto& vao = Engine::get()->getSubSystem<VAOManager>()->getQuadVAO();
 		RenderCommand::draw(vao);
 	}
 

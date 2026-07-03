@@ -228,10 +228,15 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 
 		auto& verts = m_data.vertices;
 
+		std::vector<StaticVertex> staticVerts;
+		staticVerts.reserve(verts.size());
+		for (auto& v : verts)
+			staticVerts.push_back(std::get<StaticVertex>(v));
+
 		auto& gigaVAO = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::StaticGeometry);
 		unsigned int meshVertexOffset = 0;
 		unsigned int meshIndexOffset = 0;
-		gigaVAO.push(verts.data(), verts.size(), m_data.indices, meshVertexOffset, meshIndexOffset);
+		gigaVAO.push(staticVerts.data(), staticVerts.size(), m_data.indices, meshVertexOffset, meshIndexOffset);
 
 		mesh->vertexOffset = meshVertexOffset;
 		mesh->indexOffset = meshIndexOffset;
@@ -261,10 +266,15 @@ std::shared_ptr<Mesh> MeshBuilder::build()
 
 		auto& verts = m_data.vertices;
 
+		std::vector<SkinnedVertex> skinnedVerts;
+		skinnedVerts.reserve(verts.size());
+		for (auto& v : verts)
+			skinnedVerts.push_back(std::get<SkinnedVertex>(v));
+
 		auto& gigaVAO = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::SkinnedGeometry);
-		unsigned int meshVertexOffset = 0; 
-		unsigned int meshIndexOffset = 0; 
-		gigaVAO.push(verts.data(), verts.size(), m_data.indices, meshVertexOffset, meshIndexOffset);
+		unsigned int meshVertexOffset = 0;
+		unsigned int meshIndexOffset = 0;
+		gigaVAO.push(skinnedVerts.data(), skinnedVerts.size(), m_data.indices, meshVertexOffset, meshIndexOffset);
 
 		mesh->vertexOffset = meshVertexOffset;
 		mesh->indexOffset = meshIndexOffset;
