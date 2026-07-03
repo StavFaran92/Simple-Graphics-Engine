@@ -8,6 +8,7 @@ public:
 	SSBO();
 	~SSBO();
 
+	void allocate(int size);
 	void setData(int size, const void* data);
 	void bind();
 	void setSlot(int index);

@@ -146,6 +146,7 @@ void IndirectRenderer::renderStaticGeometry(Scene* scene)
 
 
 	m_sceneBuffer.upload();
+	m_sceneBuffer.bind(2);
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
 	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
@@ -242,6 +243,7 @@ void IndirectRenderer::renderDynamicGeometry(Scene* scene)
 
 
 	m_sceneBuffer.upload();
+	m_sceneBuffer.bind(2);
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
 	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,

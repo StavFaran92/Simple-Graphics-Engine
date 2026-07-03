@@ -1,6 +1,6 @@
 #vert
 
-#version 330
+#version 460 core
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -14,6 +14,20 @@ layout (location = 4) in vec4 aTangent;
 #include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/animation.glsl
+
+// ----- Scene Buffer ----- //
+
+struct ObjectData {
+    mat4 model;
+    mat4 normalMatrix;
+    uint materialIndex;
+    uint meshIndex;
+    vec2 padding;
+};
+
+layout(std430, binding = 2) readonly buffer SceneBuffer {
+    ObjectData objects[];
+};
 
 // ----- Structs ----- //
 
@@ -44,7 +58,7 @@ float getTime()
 
 void main()
 {
-	mat4 finalModel = model;
+	mat4 finalModel = objects[gl_DrawID].model;
 
 	vec4 totalPosition = vec4(aPos.xyz, 1.0);
 	vec3 totalNormal = aNormal.xyz;

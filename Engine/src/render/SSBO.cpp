@@ -12,6 +12,12 @@ SSBO::~SSBO()
 	glDeleteBuffers(1, &id);
 }
 
+void SSBO::allocate(int size)
+{
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+}
+
 void SSBO::setData(int size, const void* data)
 {
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, data);

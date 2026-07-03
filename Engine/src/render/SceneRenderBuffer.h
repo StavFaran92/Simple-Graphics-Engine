@@ -7,6 +7,10 @@
 class SceneBuffer
 {
 public:
+    static constexpr int MAX_OBJECTS = 5000;
+
+    SceneBuffer() { m_ssbo.allocate(MAX_OBJECTS * sizeof(RenderData::ObjectData)); }
+
     uint32_t addObject(const RenderData::ObjectData& obj) { return push(m_objects, obj); }
     uint32_t addMaterial(const RenderData::MaterialData& mat) { return push(m_materials, mat); }
 
