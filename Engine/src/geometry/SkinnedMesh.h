@@ -14,4 +14,7 @@ public:
 
 private:
 	std::vector<SkinnedVertex> vertices;
+
+	// Inherited via Mesh
+	MeshType getMeshType() const override;
 };

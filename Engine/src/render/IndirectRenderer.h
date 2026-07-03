@@ -38,6 +38,10 @@ private:
 	bool setupGBuffer(int width, int height);
 
 private:
+	void renderStaticGeometry(Scene* scene);
+	void renderDynamicGeometry(Scene* scene);
+
+private:
 	FrameBufferObject m_gBuffer;
 
 	RenderBufferObject m_renderBuffer;

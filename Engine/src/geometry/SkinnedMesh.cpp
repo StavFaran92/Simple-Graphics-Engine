@@ -16,3 +16,8 @@ std::vector<glm::vec3> SkinnedMesh::getNormals() const
     throw std::exception("NYI");
 
 }
+
+MeshType SkinnedMesh::getMeshType() const
+{
+    return MeshType::SkinnedMesh;
+}

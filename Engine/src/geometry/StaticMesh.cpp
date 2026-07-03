@@ -13,3 +13,8 @@ std::vector<glm::vec3> StaticMesh::getNormals() const
 {
     return std::vector<glm::vec3>();
 }
+
+MeshType StaticMesh::getMeshType() const
+{
+    return MeshType::StaticMesh;
+}

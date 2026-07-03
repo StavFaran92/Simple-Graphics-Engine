@@ -102,6 +102,8 @@ public:
 	 */
 	virtual std::vector<glm::vec3> getNormals() const = 0;
 
+	virtual MeshType getMeshType() const = 0;
+
 	const MeshData& getMeshData() const
 	{
 		return m_meshData;

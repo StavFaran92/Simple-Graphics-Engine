@@ -92,6 +92,178 @@ bool IndirectRenderer::setupGBuffer(int width, int height)
 	return true;
 }
 
+void IndirectRenderer::renderStaticGeometry(Scene* scene)
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	// Render all objects
+	for (auto&& [entity, meshRenderer, transform, obj] :
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	{
+		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Indirect)
+			continue;
+
+		Entity entityHandler{ entity, &scene->getRegistry() };
+		graphics->entity = entityHandler;
+
+		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+		{
+			if (mesh->getMeshType() != MeshType::StaticMesh)
+				continue;
+
+			graphics->mesh = mesh.get();
+			auto& transform = entityHandler.getComponent<Transformation>();
+			glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
+			graphics->model = modelTransform;
+
+			AABB& aabb = mesh->getAABB();
+			aabb.transform(modelTransform);
+
+			if (!aabb.isOnFrustum(*graphics->frustum))
+			{
+				continue;
+			}
+
+			graphics->shader->setModelMatrix(graphics->model);
+
+			//DebugHelper::getInstance().drawAABB(aabb);
+			RenderData::ObjectData objData{};
+			objData.model = modelTransform;
+			objData.materialIndex = mesh->getMaterialIndex();
+			m_sceneBuffer.addObject(objData);
+
+			RenderData::DrawCommand drawCommand{};
+			drawCommand.vertexCount = mesh->getVertexCount();
+			drawCommand.instanceCount = 1;
+			drawCommand.firstIndex = mesh->getIndexOffset();
+			drawCommand.baseVertex = mesh->getVertexOffset();
+			drawCommand.baseInstance = 0;
+			addDrawCommand(drawCommand);
+		}
+
+	};
+
+
+
+	m_sceneBuffer.upload();
+
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+		m_drawCommands.size() * sizeof(RenderData::DrawCommand),
+		m_drawCommands.data());
+
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::StaticGeometry);
+
+	vao.bind();
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+	glMultiDrawElementsIndirect(
+		GL_TRIANGLES,           // primitive type
+		GL_UNSIGNED_INT,        // index type
+		0,                      // offset into indirect buffer (0 = start)
+		m_drawCommands.size(),  // how many draw commands
+		0                       // stride (0 = tightly packed)
+	);
+
+	m_drawCommands.clear();
+	m_sceneBuffer.clear();
+}
+
+void IndirectRenderer::renderDynamicGeometry(Scene* scene)
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	// Render all objects
+	for (auto&& [entity, meshRenderer, transform, obj] :
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	{
+		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Indirect)
+			continue;
+
+		Entity entityHandler{ entity, &scene->getRegistry() };
+		graphics->entity = entityHandler;
+
+		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+		{
+			if (mesh->getMeshType() != MeshType::SkinnedMesh)
+				continue;
+
+			graphics->mesh = mesh.get();
+			auto& transform = entityHandler.getComponent<Transformation>();
+			glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
+			graphics->model = modelTransform;
+
+			AABB& aabb = mesh->getAABB();
+			aabb.transform(modelTransform);
+
+			if (!aabb.isOnFrustum(*graphics->frustum))
+			{
+				continue;
+			}
+
+			// Apply animation logic
+			//auto animator = entityHandler.tryGetComponent<Animator>();
+			//if (!animator || !animator->hasActiveAnimation())
+			//{
+			//    graphics->shader->setUniformValue("isAnimated", false);
+			//}
+			//else
+			//{
+			//    auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
+			//    std::vector<glm::mat4> finalBoneMatrices;
+			//    animator->getFinalBoneMatrices(meshRenderer.mesh.resource(), finalBoneMatrices);
+			//    for (int i = 0; i < finalBoneMatrices.size(); ++i)
+			//    {
+			//        graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
+			//    }
+
+			//    graphics->shader->setUniformValue("isAnimated", true);
+			//}
+
+			graphics->shader->setModelMatrix(graphics->model);
+
+			//DebugHelper::getInstance().drawAABB(aabb);
+			RenderData::ObjectData objData{};
+			objData.model = modelTransform;
+			objData.materialIndex = mesh->getMaterialIndex();
+			m_sceneBuffer.addObject(objData);
+
+			RenderData::DrawCommand drawCommand{};
+			drawCommand.vertexCount = mesh->getVertexCount();
+			drawCommand.instanceCount = 1;
+			drawCommand.firstIndex = mesh->getIndexOffset();
+			drawCommand.baseVertex = mesh->getVertexOffset();
+			drawCommand.baseInstance = 0;
+			addDrawCommand(drawCommand);
+		}
+
+	};
+
+
+
+	m_sceneBuffer.upload();
+
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
+		m_drawCommands.size() * sizeof(RenderData::DrawCommand),
+		m_drawCommands.data());
+
+	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::SkinnedGeometry);
+
+	vao.bind();
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
+	glMultiDrawElementsIndirect(
+		GL_TRIANGLES,           // primitive type
+		GL_UNSIGNED_INT,        // index type
+		0,                      // offset into indirect buffer (0 = start)
+		m_drawCommands.size(),  // how many draw commands
+		0                       // stride (0 = tightly packed)
+	);
+
+	m_drawCommands.clear();
+	m_sceneBuffer.clear();
+}
+
 bool IndirectRenderer::init()
 {
 	glGenBuffers(1, &m_indirectBuffer);
@@ -134,76 +306,6 @@ void IndirectRenderer::renderScene(Scene* scene)
 	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
 	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
 
-	// Render all objects
-	for (auto&& [entity, meshRenderer, transform, obj] :
-		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
-	{
-		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Indirect)
-			continue;
-
-		Entity entityHandler{ entity, &scene->getRegistry() };
-		graphics->entity = entityHandler;
-
-		// Apply animation logic
-		//auto animator = entityHandler.tryGetComponent<Animator>();
-		//if (!animator || !animator->hasActiveAnimation())
-		//{
-		//	graphics->shader->setUniformValue("isAnimated", false);
-		//}
-		//else
-		//{
-		//	auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
-
-		//	std::vector<glm::mat4> finalBoneMatrices;
-		//	animator->getFinalBoneMatrices(meshRenderer.mesh.resource(), finalBoneMatrices);
-		//	for (int i = 0; i < finalBoneMatrices.size(); ++i)
-		//	{
-		//		graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
-		//	}
-
-		//	graphics->shader->setUniformValue("isAnimated", true);
-		//}
-
-
-
-		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
-		{
-			auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-			auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
-
-			graphics->mesh = mesh.get();
-			auto& transform = entityHandler.getComponent<Transformation>();
-			glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
-			graphics->model = modelTransform;
-
-			AABB& aabb = mesh->getAABB();
-			aabb.transform(modelTransform);
-
-			if (!aabb.isOnFrustum(*graphics->frustum))
-			{
-				continue;
-			}
-
-			graphics->shader->setModelMatrix(graphics->model);
-
-			//DebugHelper::getInstance().drawAABB(aabb);
-			RenderData::ObjectData objData{};
-			objData.model = modelTransform;
-			objData.materialIndex = mesh->getMaterialIndex();
-			m_sceneBuffer.addObject(objData);
-
-			RenderData::DrawCommand drawCommand{};
-			drawCommand.vertexCount = mesh->getVertexCount();
-			drawCommand.instanceCount = 1;
-			drawCommand.firstIndex = mesh->getIndexOffset();
-			drawCommand.baseVertex = mesh->getVertexOffset();
-			drawCommand.baseInstance = 0;
-			addDrawCommand(drawCommand);
-		}
-
-	};
-
 	auto mat = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
 
 	int slot = 6;
@@ -221,27 +323,8 @@ void IndirectRenderer::renderScene(Scene* scene)
 		graphics->shader->setUniformValue(name, value);
 	}
 
-	m_sceneBuffer.upload();
-
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
-	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
-		m_drawCommands.size() * sizeof(RenderData::DrawCommand),
-		m_drawCommands.data());
-
-	auto& vao = Engine::get()->getSubSystem<VAOManager>()->getGigaVAO(VAOManager::Type::StaticGeometry);
-
-	vao.bind();
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
-	glMultiDrawElementsIndirect(
-		GL_TRIANGLES,           // primitive type
-		GL_UNSIGNED_INT,        // index type
-		0,                      // offset into indirect buffer (0 = start)
-		m_drawCommands.size(),  // how many draw commands
-		0                       // stride (0 = tightly packed)
-	);
-
-	m_drawCommands.clear();
-	m_sceneBuffer.clear();
+	renderStaticGeometry(scene);
+	renderDynamicGeometry(scene);
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Light pass");
 
