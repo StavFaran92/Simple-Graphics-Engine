@@ -30,7 +30,7 @@ size_t Model::getNumOfVertices() const
 	size_t vCount = 0;
 	for (auto& mesh : m_meshes)
 	{
-		vCount += mesh->getNumOfVertices();
+		vCount += mesh->getVertexCount();
 	}
 	return vCount;
 }
