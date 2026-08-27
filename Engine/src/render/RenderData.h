@@ -16,11 +16,9 @@ struct RenderData
 
     // per material
     struct MaterialData {
-        glm::vec4 albedo;
-        float roughness = 0;
-        float metallic = 0;
-        uint32_t albedoTexture;
-        uint32_t normalTexture;
+        uint64_t albedoTexture;
+        uint64_t normalTexture;
+        glm::vec4 baseColor;
     };
 
     // per draw call

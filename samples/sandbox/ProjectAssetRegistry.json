@@ -1,7 +1,7 @@
 {
     "N/A": [],
     "animations": [],
-    "counter": 17,
+    "counter": 35,
     "lua script": [],
     "materials": [
         {
@@ -702,6 +702,1266 @@
             "sourcePath": "",
             "uuid": 15,
             "visibility": 1
+        },
+        {
+            "aType": 6,
+            "asset": {
+                "data": {
+                    "m_customShader": {
+                        "uuid": {
+                            "m_value": 0
+                        }
+                    },
+                    "m_layout": {
+                        "m_propertySchemas": [
+                            {
+                                "key": "color",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "v.x": 1.0,
+                                            "v.y": 1.0,
+                                            "v.z": 1.0
+                                        },
+                                        "index": 2
+                                    },
+                                    "defaultValueRaw": "1.0, 1.0, 1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "color",
+                                    "type": 4
+                                }
+                            },
+                            {
+                                "key": "metallicFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 0.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "0.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "metallicFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "roughnessFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 1.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "roughnessFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "samplerAO",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483649
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAO",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerAlbedo",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483650
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAlbedo",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerMetallic",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483651
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerMetallic",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerNormal",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483652
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerNormal",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerRoughness",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483653
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerRoughness",
+                                    "type": 8
+                                }
+                            }
+                        ]
+                    },
+                    "m_properties": [
+                        {
+                            "key": "samplerNormal",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 20
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483654
+                                    }
+                                },
+                                "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
+                            "key": "roughnessFactor",
+                            "value": {
+                                "data": 0.7763931751251221,
+                                "index": 0
+                            }
+                        },
+                        {
+                            "key": "samplerAlbedo",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 19
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483655
+                                    }
+                                },
+                                "index": 8
+                            }
+                        }
+                    ],
+                    "m_renderMode": 0,
+                    "name": "Akai_MAT"
+                }
+            },
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".mat",
+            "isEngineOwned": false,
+            "name": "Akai_MAT",
+            "sourcePath": "",
+            "uuid": 18,
+            "visibility": 1
+        },
+        {
+            "aType": 6,
+            "asset": {
+                "data": {
+                    "m_customShader": {
+                        "uuid": {
+                            "m_value": 0
+                        }
+                    },
+                    "m_layout": {
+                        "m_propertySchemas": [
+                            {
+                                "key": "color",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "v.x": 1.0,
+                                            "v.y": 1.0,
+                                            "v.z": 1.0
+                                        },
+                                        "index": 2
+                                    },
+                                    "defaultValueRaw": "1.0, 1.0, 1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "color",
+                                    "type": 4
+                                }
+                            },
+                            {
+                                "key": "metallicFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 0.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "0.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "metallicFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "roughnessFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 1.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "roughnessFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "samplerAO",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483649
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAO",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerAlbedo",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483650
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAlbedo",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerMetallic",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483651
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerMetallic",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerNormal",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483652
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerNormal",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerRoughness",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483653
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerRoughness",
+                                    "type": 8
+                                }
+                            }
+                        ]
+                    },
+                    "m_properties": [
+                        {
+                            "key": "samplerNormal",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 23
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483654
+                                    }
+                                },
+                                "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
+                            "key": "roughnessFactor",
+                            "value": {
+                                "data": 0.7487671971321106,
+                                "index": 0
+                            }
+                        },
+                        {
+                            "key": "samplerAlbedo",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 22
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483655
+                                    }
+                                },
+                                "index": 8
+                            }
+                        }
+                    ],
+                    "m_renderMode": 0,
+                    "name": "Body_MAT"
+                }
+            },
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".mat",
+            "isEngineOwned": false,
+            "name": "Body_MAT",
+            "sourcePath": "",
+            "uuid": 21,
+            "visibility": 1
+        },
+        {
+            "aType": 6,
+            "asset": {
+                "data": {
+                    "m_customShader": {
+                        "uuid": {
+                            "m_value": 0
+                        }
+                    },
+                    "m_layout": {
+                        "m_propertySchemas": [
+                            {
+                                "key": "color",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "v.x": 1.0,
+                                            "v.y": 1.0,
+                                            "v.z": 1.0
+                                        },
+                                        "index": 2
+                                    },
+                                    "defaultValueRaw": "1.0, 1.0, 1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "color",
+                                    "type": 4
+                                }
+                            },
+                            {
+                                "key": "metallicFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 0.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "0.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "metallicFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "roughnessFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 1.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "roughnessFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "samplerAO",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483649
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAO",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerAlbedo",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483650
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAlbedo",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerMetallic",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483651
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerMetallic",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerNormal",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483652
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerNormal",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerRoughness",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483653
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerRoughness",
+                                    "type": 8
+                                }
+                            }
+                        ]
+                    },
+                    "m_properties": [
+                        {
+                            "key": "samplerNormal",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 26
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483654
+                                    }
+                                },
+                                "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
+                            "key": "roughnessFactor",
+                            "value": {
+                                "data": 0.28293097019195557,
+                                "index": 0
+                            }
+                        },
+                        {
+                            "key": "samplerAlbedo",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 25
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483655
+                                    }
+                                },
+                                "index": 8
+                            }
+                        }
+                    ],
+                    "m_renderMode": 0,
+                    "name": "EyeSpec_MAT"
+                }
+            },
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".mat",
+            "isEngineOwned": false,
+            "name": "EyeSpec_MAT",
+            "sourcePath": "",
+            "uuid": 24,
+            "visibility": 1
+        },
+        {
+            "aType": 6,
+            "asset": {
+                "data": {
+                    "m_customShader": {
+                        "uuid": {
+                            "m_value": 0
+                        }
+                    },
+                    "m_layout": {
+                        "m_propertySchemas": [
+                            {
+                                "key": "color",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "v.x": 1.0,
+                                            "v.y": 1.0,
+                                            "v.z": 1.0
+                                        },
+                                        "index": 2
+                                    },
+                                    "defaultValueRaw": "1.0, 1.0, 1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "color",
+                                    "type": 4
+                                }
+                            },
+                            {
+                                "key": "metallicFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 0.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "0.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "metallicFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "roughnessFactor",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": 1.0,
+                                        "index": 0
+                                    },
+                                    "defaultValueRaw": "1.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "roughnessFactor",
+                                    "type": 2
+                                }
+                            },
+                            {
+                                "key": "samplerAO",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483649
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAO",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerAlbedo",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483650
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerAlbedo",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerMetallic",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483651
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerMetallic",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerNormal",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483652
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerNormal",
+                                    "type": 8
+                                }
+                            },
+                            {
+                                "key": "samplerRoughness",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "state.channelCount": 3,
+                                                    "state.channelMaskA": 4,
+                                                    "state.channelMaskB": 3,
+                                                    "state.channelMaskG": 2,
+                                                    "state.channelMaskR": 1,
+                                                    "state.isActive": false,
+                                                    "state.xOffset": 0.0,
+                                                    "state.xScale": 1.0,
+                                                    "state.yOffset": 0.0,
+                                                    "state.yScale": 1.0,
+                                                    "texture": {
+                                                        "uuid": {
+                                                            "m_value": 1
+                                                        }
+                                                    }
+                                                },
+                                                "id": 2147483653
+                                            }
+                                        },
+                                        "index": 8
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "samplerRoughness",
+                                    "type": 8
+                                }
+                            }
+                        ]
+                    },
+                    "m_properties": [
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
+                            "key": "roughnessFactor",
+                            "value": {
+                                "data": 0.5527864098548889,
+                                "index": 0
+                            }
+                        },
+                        {
+                            "key": "samplerAlbedo",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "state.channelCount": 3,
+                                            "state.channelMaskA": 4,
+                                            "state.channelMaskB": 3,
+                                            "state.channelMaskG": 2,
+                                            "state.channelMaskR": 1,
+                                            "state.isActive": true,
+                                            "state.xOffset": 0.0,
+                                            "state.xScale": 1.0,
+                                            "state.yOffset": 0.0,
+                                            "state.yScale": 1.0,
+                                            "texture": {
+                                                "uuid": {
+                                                    "m_value": 28
+                                                }
+                                            }
+                                        },
+                                        "id": 2147483654
+                                    }
+                                },
+                                "index": 8
+                            }
+                        }
+                    ],
+                    "m_renderMode": 0,
+                    "name": "eyelash_MAT"
+                }
+            },
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".mat",
+            "isEngineOwned": false,
+            "name": "eyelash_MAT",
+            "sourcePath": "",
+            "uuid": 27,
+            "visibility": 1
         }
     ],
     "models": [
@@ -789,10 +2049,58 @@
             "sourcePath": "",
             "uuid": 14,
             "visibility": 1
+        },
+        {
+            "aType": 2,
+            "asset": {
+                "materials": [
+                    [
+                        0,
+                        {
+                            "uuid": 24
+                        }
+                    ],
+                    [
+                        1,
+                        {
+                            "uuid": 18
+                        }
+                    ],
+                    [
+                        2,
+                        {
+                            "uuid": 27
+                        }
+                    ],
+                    [
+                        3,
+                        {
+                            "uuid": 21
+                        }
+                    ]
+                ]
+            },
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".model",
+            "isEngineOwned": false,
+            "name": "Erika Archer (2)",
+            "sourcePath": "",
+            "uuid": 17,
+            "visibility": 1
         }
     ],
     "namesToUUIDRefs": {
+        "Akai_MAT": 18,
+        "Body_MAT": 21,
         "DefaultMaterial": 15,
+        "Erika Archer (2)": 17,
+        "Erika Archer (2)_PREFAB": 34,
+        "Erika_Archer_Clothes_diffuse": 19,
+        "Erika_Archer_Clothes_normal": 20,
+        "EyeSpec_MAT": 24,
+        "FemaleFitA_Body_diffuse": 22,
+        "FemaleFitA_StdNM": 23,
+        "FemaleFitA_eyelash_diffuse": 28,
         "SGE_MATERIAL_DEFAULT": 7,
         "SGE_MATERIAL_TERRAIN_DEFAULT": 8,
         "SGE_MESH_BOX": 9,
@@ -807,9 +2115,21 @@
         "SGE_TEXTURE_TERRAIN_CHECKERBOARD": 5,
         "SGE_TEXTURE_TILE_NOISE": 6,
         "SGE_TEXTURE_WHITE": 1,
-        "Scene_0": 16
+        "Scene_0": 16,
+        "eyelash_MAT": 27
     },
     "pathsToUUIDRefs": {
+        "content/erika archer (2)/akai_mat.mat": 18,
+        "content/erika archer (2)/body_mat.mat": 21,
+        "content/erika archer (2)/erika archer (2).model": 17,
+        "content/erika archer (2)/erika_archer_clothes_diffuse.texture": 19,
+        "content/erika archer (2)/erika_archer_clothes_normal.texture": 20,
+        "content/erika archer (2)/eyelash_mat.mat": 27,
+        "content/erika archer (2)/eyespec_mat.mat": 24,
+        "content/erika archer (2)/femalefita_body_diffuse.texture": 22,
+        "content/erika archer (2)/femalefita_eyelash_diffuse.texture": 28,
+        "content/erika archer (2)/femalefita_stdnm.texture": 23,
+        "content/erika archer (2)_prefab.prefab": 34,
         "content/scene_0.scene": 16,
         "engine/sge_material_default.mat": 7,
         "engine/sge_material_terrain_default.mat": 8,
@@ -827,7 +2147,19 @@
         "engine/sge_texture_tile_noise.texture": 6,
         "engine/sge_texture_white.texture": 1
     },
-    "prefabs": [],
+    "prefabs": [
+        {
+            "aType": 5,
+            "asset": {},
+            "assetDirectory": ".\\",
+            "ext": ".prefab",
+            "isEngineOwned": false,
+            "name": "Erika Archer (2)_PREFAB",
+            "sourcePath": "",
+            "uuid": 34,
+            "visibility": 1
+        }
+    ],
     "scene": [
         {
             "aType": 8,
@@ -907,6 +2239,138 @@
             "name": "SGE_TEXTURE_TILE_NOISE",
             "sourcePath": "",
             "uuid": 6,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "Erika_Archer_Clothes_diffuse",
+            "sourcePath": "",
+            "uuid": 19,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "Erika_Archer_Clothes_normal",
+            "sourcePath": "",
+            "uuid": 20,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "FemaleFitA_Body_diffuse",
+            "sourcePath": "",
+            "uuid": 22,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "FemaleFitA_StdNM",
+            "sourcePath": "",
+            "uuid": 23,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "FemaleFitA_Body_diffuse",
+            "sourcePath": "",
+            "uuid": 25,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "FemaleFitA_StdNM",
+            "sourcePath": "",
+            "uuid": 26,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "FemaleFitA_eyelash_diffuse",
+            "sourcePath": "",
+            "uuid": 28,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "Erika_Archer_Clothes_diffuse",
+            "sourcePath": "",
+            "uuid": 29,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "Erika_Archer_Clothes_normal",
+            "sourcePath": "",
+            "uuid": 30,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "FemaleFitA_Body_diffuse",
+            "sourcePath": "",
+            "uuid": 31,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "FemaleFitA_StdNM",
+            "sourcePath": "",
+            "uuid": 32,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\Erika Archer (2)",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "FemaleFitA_eyelash_diffuse",
+            "sourcePath": "",
+            "uuid": 33,
             "visibility": 1
         }
     ]

@@ -3,13 +3,244 @@
         "m_serializedScene": {
             "serializedEntities": [
                 {
-                    "entity": 1,
+                    "entity": 3,
                     "components": [
                         {
                             "polymorphic_id": 2147483649,
                             "polymorphic_name": "MeshRendererComponent",
                             "ptr_wrapper": {
                                 "id": 2147483649,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 17
+                                        }
+                                    },
+                                    "count": 4,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 24
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "key": 1,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 18
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "key": 2,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 27
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "key": 3,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 21
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 2,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483650,
+                            "polymorphic_name": "Transformation",
+                            "ptr_wrapper": {
+                                "id": 2147483650,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 19.537765502929689,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 0.10000000149011612,
+                                        "v.y": 0.10000000149011612,
+                                        "v.z": 0.10000000149011612
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 3
+                                    },
+                                    "root": {
+                                        "m_entity": 2
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483651,
+                            "polymorphic_name": "ObjectComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483651,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Erika Archer (2)_copy",
+                                    "e": {
+                                        "m_entity": 3
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483652,
+                            "polymorphic_name": "RenderableComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483652,
+                                "data": {
+                                    "isActive": true,
+                                    "renderTechnique": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 2,
+                    "components": [
+                        {
+                            "polymorphic_id": 1,
+                            "ptr_wrapper": {
+                                "id": 2147483653,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 17
+                                        }
+                                    },
+                                    "count": 4,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 24
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "key": 1,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 18
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "key": 2,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 27
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "key": 3,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 21
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 2,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483654,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 0.10000000149011612,
+                                        "v.y": 0.10000000149011612,
+                                        "v.z": 0.10000000149011612
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 2
+                                    },
+                                    "root": {
+                                        "m_entity": 2
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483655,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Erika Archer (2)_copy",
+                                    "e": {
+                                        "m_entity": 2
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483656,
+                                "data": {
+                                    "isActive": true,
+                                    "renderTechnique": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 1,
+                    "components": [
+                        {
+                            "polymorphic_id": 1,
+                            "ptr_wrapper": {
+                                "id": 2147483657,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -34,16 +265,16 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483650,
+                            "polymorphic_id": 2147483653,
                             "polymorphic_name": "CameraComponent",
                             "ptr_wrapper": {
-                                "id": 2147483650,
+                                "id": 2147483658,
                                 "data": {
                                     "isActive": true,
                                     "center": {
-                                        "v.x": 0.0,
-                                        "v.y": 0.0,
-                                        "v.z": 0.0
+                                        "v.x": 10.0,
+                                        "v.y": 10.0,
+                                        "v.z": 9.0
                                     },
                                     "up": {
                                         "v.x": 0.0,
@@ -63,10 +294,9 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483651,
-                            "polymorphic_name": "Transformation",
+                            "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483651,
+                                "id": 2147483659,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -99,10 +329,9 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483652,
-                            "polymorphic_name": "ObjectComponent",
+                            "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483652,
+                                "id": 2147483660,
                                 "data": {
                                     "isActive": true,
                                     "name": "Main Camera",
@@ -118,9 +347,9 @@
                     "entity": 0,
                     "components": [
                         {
-                            "polymorphic_id": 3,
+                            "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483653,
+                                "id": 2147483661,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -153,9 +382,9 @@
                             }
                         },
                         {
-                            "polymorphic_id": 4,
+                            "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483654,
+                                "id": 2147483662,
                                 "data": {
                                     "isActive": true,
                                     "name": "Directional light",
@@ -166,10 +395,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483653,
+                            "polymorphic_id": 2147483654,
                             "polymorphic_name": "DirectionalLight",
                             "ptr_wrapper": {
-                                "id": 2147483655,
+                                "id": 2147483663,
                                 "data": {
                                     "color": {
                                         "v.x": 1.0,

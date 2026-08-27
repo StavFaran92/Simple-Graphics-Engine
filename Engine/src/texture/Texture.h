@@ -202,6 +202,10 @@ public:
 	// Returns true on success
 	bool download();
 
+	uint64_t getResidentID() const;
+
+	uint64_t makeResident();
+
 	static TextureFormat getFormatFromChannels(int channels);
 
 	static TextureInternalFormat getInternalFormatFromUsage(TextureSemantic usage);
@@ -230,6 +234,9 @@ private:
 	int m_slot = 0;
 	
 	TextureData m_data;
+
+	bool m_isResident = false;
+	uint64_t m_residentHandleID = 0;
 };
 
 template<typename T>

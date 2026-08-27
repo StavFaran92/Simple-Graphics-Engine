@@ -106,6 +106,8 @@ void IndirectRenderer::renderStaticGeometry(Scene* scene)
 		Entity entityHandler{ entity, &scene->getRegistry() };
 		graphics->entity = entityHandler;
 
+		
+
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
 			if (mesh->getMeshType() != MeshType::StaticMesh)
@@ -126,10 +128,15 @@ void IndirectRenderer::renderStaticGeometry(Scene* scene)
 
 			graphics->shader->setModelMatrix(graphics->model);
 
+			auto material = meshRenderer.getMaterialBySlot(mesh->getMaterialIndex());
+			RenderData::MaterialData matData;
+			matData.albedoTexture = material.resource()->getSampler("albedo").texture->getResidentID();
+			auto materialBufferID = m_sceneBuffer.addMaterial(matData);
+
 			//DebugHelper::getInstance().drawAABB(aabb);
 			RenderData::ObjectData objData{};
 			objData.model = modelTransform;
-			objData.materialIndex = mesh->getMaterialIndex();
+			objData.materialIndex = materialBufferID;
 			m_sceneBuffer.addObject(objData);
 
 			RenderData::DrawCommand drawCommand{};
@@ -146,7 +153,7 @@ void IndirectRenderer::renderStaticGeometry(Scene* scene)
 
 
 	m_sceneBuffer.upload();
-	m_sceneBuffer.bind(2);
+	m_sceneBuffer.bind();
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
 	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,
@@ -223,10 +230,16 @@ void IndirectRenderer::renderDynamicGeometry(Scene* scene)
 
 			graphics->shader->setModelMatrix(graphics->model);
 
+			auto material = meshRenderer.getMaterialBySlot(mesh->getMaterialIndex());
+			RenderData::MaterialData matData;
+			material.resource()->getSampler(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO).texture->makeResident(); // todo fix
+			matData.albedoTexture = material.resource()->getSampler(SHADER_PROPERTY_PBR_SAMPLER_ALBEDO).texture->getResidentID();
+			auto materialBufferID = m_sceneBuffer.addMaterial(matData);
+
 			//DebugHelper::getInstance().drawAABB(aabb);
 			RenderData::ObjectData objData{};
 			objData.model = modelTransform;
-			objData.materialIndex = mesh->getMaterialIndex();
+			objData.materialIndex = materialBufferID;
 			m_sceneBuffer.addObject(objData);
 
 			RenderData::DrawCommand drawCommand{};
@@ -243,7 +256,7 @@ void IndirectRenderer::renderDynamicGeometry(Scene* scene)
 
 
 	m_sceneBuffer.upload();
-	m_sceneBuffer.bind(2);
+	m_sceneBuffer.bind();
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_indirectBuffer);
 	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, 0,

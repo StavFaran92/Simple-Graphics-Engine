@@ -2,6 +2,9 @@
 
 #version 460 core
 
+#extension GL_ARB_bindless_texture : require
+#extension GL_ARB_shader_draw_parameters : require
+
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
@@ -25,8 +28,18 @@ struct ObjectData {
     vec2 padding;
 };
 
+struct PBRMaterial {
+    sampler2D albedoTex;   // this becomes the 64-bit handle
+    sampler2D normalTex;
+    vec4 baseColor;
+};
+
 layout(std430, binding = 2) readonly buffer SceneBuffer {
     ObjectData objects[];
+};
+
+layout(std430, binding = 3) buffer MaterialBuffer {
+    PBRMaterial materials[];
 };
 
 // ----- Structs ----- //
@@ -41,6 +54,7 @@ out VS_OUT {
 	vec3 normalVS;
 	vec4 tangent;
 	mat3 TBN;
+	flat uint materialIndex;
 } vs_out;
 
 // ----- Forward Declerations ----- //
@@ -59,6 +73,7 @@ float getTime()
 void main()
 {
 	mat4 finalModel = objects[gl_DrawID].model;
+	vs_out.materialIndex = objects[gl_DrawID].materialIndex;
 
 	vec4 totalPosition = vec4(aPos.xyz, 1.0);
 	vec3 totalNormal = aNormal.xyz;
@@ -91,7 +106,9 @@ void main()
 
 #frag
 
-#version 330 
+#version 460 core
+
+#extension GL_ARB_bindless_texture : require
 
 // ----- Definitions ----- //
 
@@ -111,6 +128,7 @@ in VS_OUT {
 	vec3 normalVS;
 	vec4 tangent;
 	mat3 TBN;
+	flat uint materialIndex;
 } fs_in;
 
 // ----- Out ----- //
@@ -123,6 +141,27 @@ layout (location = 4) out vec3 gPositionVS;
 layout (location = 5) out vec3 gNormalVS;
 layout (location = 6) out vec3 gTangent;
 
+struct ObjectData {
+    mat4 model;
+    mat4 normalMatrix;
+    uint materialIndex;
+    uint meshIndex;
+    vec2 padding;
+};
+
+struct PBRMaterial {
+    sampler2D albedoTex;   // this becomes the 64-bit handle
+    sampler2D normalTex;
+    vec4 baseColor;
+};
+
+layout(std430, binding = 2) readonly buffer SceneBuffer {
+    ObjectData objects[];
+};
+
+layout(std430, binding = 3) buffer MaterialBuffer {
+    PBRMaterial materials[];
+};
 
 // ----- Uniforms ----- //
 #pragma editable
@@ -157,6 +196,20 @@ void main()
 { 	
 	gPosition = fs_in.fragPos;
 
+	uint matIndex = fs_in.materialIndex;
+
+	PBR_Sampler bindlessAlbedo;
+	bindlessAlbedo.isActive = true;
+	bindlessAlbedo.texture = materials[matIndex].albedoTex;
+	bindlessAlbedo.channelMaskR = CHANNEL_R;
+	bindlessAlbedo.channelMaskG = CHANNEL_G;
+	bindlessAlbedo.channelMaskB = CHANNEL_B;
+	bindlessAlbedo.channelMaskA = CHANNEL_A;
+	bindlessAlbedo.xOffset = 0.0;
+	bindlessAlbedo.yOffset = 0.0;
+	bindlessAlbedo.xScale = 1.0;
+	bindlessAlbedo.yScale = 1.0;
+
 	samplePBR(
 		// Input
 		fs_in.TBN,
@@ -167,7 +220,7 @@ void main()
 		fs_in.texCoord,
 
 		samplerNormal,
-		samplerAlbedo,
+		bindlessAlbedo,
 		samplerMetallic,
 		samplerRoughness,
 		samplerAO,

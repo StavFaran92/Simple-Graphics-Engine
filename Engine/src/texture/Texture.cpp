@@ -401,6 +401,17 @@ bool Texture::download()
 	return false;
 }
 
+uint64_t Texture::getResidentID() const
+{
+	if (!m_isResident)
+	{
+		logWarning("Texture is not resident in GPU");
+		return 0;
+	}
+
+	return m_residentHandleID;
+}
+
 void Texture::ClearTexture()
 {
 	glDeleteTextures(1, &m_id);
@@ -457,6 +468,16 @@ TextureResourceRef Texture::clone() const
 	}
 
 	return clonedTexture;
+}
+
+uint64_t Texture::makeResident()
+{
+	if (m_isResident)
+		return m_residentHandleID;
+	m_isResident = true;
+	m_residentHandleID = glGetTextureHandleARB(m_id);
+	glMakeTextureHandleResidentARB(m_residentHandleID);
+	return m_residentHandleID;
 }
 
 TextureFormat Texture::getFormatFromChannels(int channels)

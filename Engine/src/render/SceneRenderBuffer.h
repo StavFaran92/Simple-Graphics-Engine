@@ -8,8 +8,12 @@ class SceneBuffer
 {
 public:
     static constexpr int MAX_OBJECTS = 5000;
+    static constexpr int MAX_MATERIALS = 5000;
 
-    SceneBuffer() { m_ssbo.allocate(MAX_OBJECTS * sizeof(RenderData::ObjectData)); }
+    SceneBuffer() { 
+        m_ssbo.allocate(MAX_OBJECTS * sizeof(RenderData::ObjectData)); 
+        m_materialssbo.allocate(MAX_MATERIALS * sizeof(RenderData::MaterialData));
+    }
 
     uint32_t addObject(const RenderData::ObjectData& obj) { return push(m_objects, obj); }
     uint32_t addMaterial(const RenderData::MaterialData& mat) { return push(m_materials, mat); }
@@ -17,7 +21,7 @@ public:
     void upload();
     void clear();
 
-    void bind(int slot);
+    void bind();
 
 private:
     template<typename T>
@@ -31,4 +35,5 @@ private:
     std::vector<RenderData::ObjectData>   m_objects;
     std::vector<RenderData::MaterialData> m_materials;
     SSBO m_ssbo;
+    SSBO m_materialssbo;
 };
