@@ -1,7 +1,6 @@
 #include "core/Engine.h"
 
 #include "runtime/Context.h"
-#include "render/ForwardRenderer.h"
 #include "core/Window.h"
 #include "camera/ICamera.h"
 #include "runtime/Scene.h"
@@ -34,7 +33,6 @@
 #include "core/EventLayerStack.h"
 #include "core/EngineConfig.h"
 #include "core/EventParser.h"
-#include "render/DeferredRenderer.h"
 #include "memory/FrameAccessTable.h"
 
 #include "systems/FoliageSystem.h"
@@ -277,13 +275,6 @@ bool Engine::init(const InitParams& initParams)
         saveProject();
     }
 
-    
-    m_deferredRenderer = std::make_shared<DeferredRenderer>();
-    m_deferredRenderer->init();
-
-    m_forwardRenderer = std::make_shared<ForwardRenderer>();
-    m_forwardRenderer->init();
-    
 
     auto objectPicker = new ObjectPicker();
     if (!objectPicker->init())
@@ -511,16 +502,6 @@ const EngineConfig& Engine::getConfig() const
 MemoryPool<Resource>& Engine::getMemoryPool() const
 {
     return *m_memoryPool.get();
-}
-
-//DeferredRenderer& Engine::getDeferredRenderer() const
-//{
-//    return *m_deferredRenderer.get();
-//}
-
-ForwardRenderer& Engine::getForwardRenderer() const
-{
-    return *m_forwardRenderer.get();
 }
 
 void Engine::addGUILayer(const std::shared_ptr<GUILayer>& GUILayer)

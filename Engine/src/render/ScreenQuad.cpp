@@ -1,7 +1,6 @@
 #include "render/ScreenQuad.h"
 
 #include "render/Vertex.h"
-#include "render/ForwardRenderer.h"
 #include "geometry/Mesh.h"
 #include "geometry/Quad.h"
 #include "geometry/ShapeFactory.h"

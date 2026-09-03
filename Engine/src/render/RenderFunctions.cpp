@@ -1,6 +1,10 @@
 #include "render/RenderFunctions.h"
 
+#include <map>
+
 #include "gl/glew.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "core/Engine.h"
 #include "render/Graphics.h"
@@ -83,6 +87,236 @@ bool RenderFunctions::prepareEntityForRender(const Entity& entityHandler)
 	return true;
 }
 
+
+void RenderFunctions::drawForwardScene(Scene* scene)
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	glEnable(GL_DEPTH_TEST);
+	graphics->renderView->bind();
+
+	for (auto&& [entity, meshRenderer, transform, obj] :
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	{
+		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Forward)
+			continue;
+
+		Entity entityHandler{ entity, &scene->getRegistry() };
+
+		prepareEntityForRender(entityHandler);
+
+		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+		{
+			if (!prepareMeshForRender(mesh.get(), entityHandler))
+			{
+				continue;
+			}
+
+			// draw model
+			graphics->shader = graphics->material->getActiveShader();
+			graphics->shader->use();
+
+			graphics->shader->setModelMatrix(graphics->model);
+			graphics->shader->setViewMatrix(graphics->view);
+			graphics->shader->setProjectionMatrix(graphics->projection);
+			graphics->material->use();
+
+			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+			graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+			graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
+			graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
+			graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
+
+			graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
+			// Draw
+			RenderCommand::draw(mesh->getVAO());
+		}
+	}
+}
+
+void RenderFunctions::drawTransparentScene(Scene* scene)
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	graphics->renderView->bind();
+
+	std::map<float, Entity> transparentEntities;
+
+	auto& camera = graphics->renderView->getCamera();
+	auto& camTransform = camera.getComponent<Transformation>();
+	auto& camForward = camTransform.getForward();
+
+	for (auto&& [entity, mesh, transform, obj] :
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	{
+		Entity entityHandler{ entity, &scene->getRegistry() };
+
+		auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
+		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+		{
+			float distance = glm::dot(transform.getWorldPosition(), camForward);
+
+			// object is behind the camera
+			if (distance < 0)
+			{
+				//continue; // TODO fix
+			}
+
+			transparentEntities[distance] = entityHandler;
+		}
+	}
+
+	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+	auto iter = transparentEntities.rbegin();
+	while (iter != transparentEntities.rend())
+	{
+		Entity& entityHandler = iter->second;
+
+		std::string name = entityHandler.getComponent<ObjectComponent>().name;
+		std::string captionGPU = "About to render: '" + name + "'";
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
+
+		prepareEntityForRender(entityHandler);
+
+		graphics->entity = entityHandler;
+		graphics->shader->use();
+		for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.resource()->getMeshes())
+		{
+			if (!prepareMeshForRender(mesh.get(), entityHandler))
+			{
+				continue;
+			}
+
+			// Only render transparent objects
+			if (graphics->material->getRenderMode() != MaterialRenderMode::Transparent)
+			{
+				continue;
+			}
+
+			// draw model
+			glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
+			graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
+
+			graphics->shader = graphics->material->getActiveShader();
+			graphics->shader->setModelMatrix(graphics->model);
+			graphics->shader->setViewMatrix(graphics->view);
+			graphics->shader->setProjectionMatrix(graphics->projection);
+			graphics->material->use();
+
+			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+			graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+			graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
+			graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
+			graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
+
+			graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
+			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
+
+			// Draw
+			RenderCommand::draw(graphics->mesh->getVAO());
+
+			glPopDebugGroup();
+		}
+
+		glPopDebugGroup();
+
+		iter++;
+	}
+}
+
+void RenderFunctions::drawDebugData(Scene* scene)
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	glEnable(GL_DEPTH_TEST);
+	graphics->renderView->bind();
+
+	for (auto&& [entity, meshRenderer, transform, obj] :
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	{
+		Entity entityHandler{ entity, &scene->getRegistry() };
+		std::string name = entityHandler.getComponent<ObjectComponent>().name;
+		logTrace("About to display debug data for {}", name);
+
+		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+		{
+			if (!prepareMeshForRender(mesh.get(), entityHandler))
+			{
+				continue;
+			}
+
+			graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEBUG_DATA);
+			graphics->shader->use();
+
+			graphics->shader->setModelMatrix(graphics->model);
+			graphics->shader->setViewMatrix(graphics->view);
+			graphics->shader->setProjectionMatrix(graphics->projection);
+			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+			graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
+			// Draw
+			RenderCommand::draw(mesh->getVAO());
+		}
+	}
+}
+
+void RenderFunctions::drawSceneUsingCustomShader(Scene* scene)
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	glEnable(GL_DEPTH_TEST);
+	graphics->renderView->bind();
+
+	for (auto&& [entity, meshRenderer, transform, obj] :
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	{
+		Entity entityHandler{ entity, &scene->getRegistry() };
+		std::string name = entityHandler.getComponent<ObjectComponent>().name;
+		logTrace("About to render '{}' using Custom Shader pass", name);
+
+		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+		{
+			if (!prepareMeshForRender(mesh.get(), entityHandler))
+			{
+				continue;
+			}
+
+			if (graphics->material->getRenderMode() != MaterialRenderMode::Custom)
+				continue;
+
+			// draw model
+
+			graphics->shader = graphics->material->getActiveShader();
+			graphics->shader->use();
+			// Ensure per-entity uniforms (including animation) are set for custom shaders
+			graphics->entity = entityHandler;
+			prepareEntityForRender(entityHandler);
+			glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
+			graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
+
+			graphics->shader = graphics->material->getActiveShader();
+			graphics->shader->setModelMatrix(graphics->model);
+			graphics->shader->setViewMatrix(graphics->view);
+			graphics->shader->setProjectionMatrix(graphics->projection);
+			graphics->material->use();
+
+			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+			graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+			graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
+			graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
+			graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
+
+			graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
+			// Draw
+			RenderCommand::draw(mesh->getVAO());
+		}
+	}
+}
 
 void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
 {

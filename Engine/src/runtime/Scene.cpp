@@ -24,8 +24,6 @@
 #include "lights/LightSystem.h"
 #include "systems/TimeManager.h"
 #include "render/UniformBufferObject.h"
-#include "render/DeferredRenderer.h"
-#include "render/ForwardRenderer.h"
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
 
@@ -525,14 +523,14 @@ void Scene::draw(float deltaTime)
 		if (Engine::get()->getConfig().renderConfig.renderForwardPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Forward Renderer pass");
-			Engine::get()->getForwardRenderer().renderScene(this);
+			RenderFunctions::drawForwardScene(this);
 			glPopDebugGroup();
 		}
 
 		if (Engine::get()->getConfig().renderConfig.renderCustomShadersPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Custom shader render pass");
-			Engine::get()->getForwardRenderer().renderSceneUsingCustomShader(this);
+			RenderFunctions::drawSceneUsingCustomShader(this);
 			glPopDebugGroup();
 		}
 
@@ -1022,7 +1020,7 @@ void Scene::draw(float deltaTime)
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Non Opaque render pass");
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			Engine::get()->getForwardRenderer().renderSceneNonOpaque(this);
+			RenderFunctions::drawTransparentScene(this);
 			glDisable(GL_BLEND);
 			glPopDebugGroup();
 		}
@@ -1030,7 +1028,7 @@ void Scene::draw(float deltaTime)
 		if (Engine::get()->getConfig().renderConfig.renderDebugDataPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Debug Data render pass");
-			Engine::get()->getForwardRenderer().renderDebugData(this);
+			RenderFunctions::drawDebugData(this);
 			glPopDebugGroup();
 		}
 

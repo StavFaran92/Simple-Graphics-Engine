@@ -3,7 +3,6 @@
 #include "core/Engine.h"
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
-#include "render/DeferredRenderer.h"
 #include "memory/BuiltInResources.h"
 
 Graphics::Graphics()
