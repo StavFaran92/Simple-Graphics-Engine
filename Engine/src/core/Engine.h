@@ -50,7 +50,7 @@ class BuiltInMaterials;
 class Resource;
 class SubSystem;
 class DeferredRenderer;
-class Renderer;
+class ForwardRenderer;
 struct EngineConfig;
 template<typename T>class ResourceRef;
 template<typename T>class Factory;
@@ -100,8 +100,8 @@ public:
     EventLayerStack* getEventLayerStack() const;
     const EngineConfig& getConfig() const;
     MemoryPool<Resource>& getMemoryPool() const;
-    DeferredRenderer& getDeferredRenderer() const;
-    Renderer& getForwardRenderer() const;
+    //DeferredRenderer& getDeferredRenderer() const;
+    ForwardRenderer& getForwardRenderer() const;
     void addGUILayer(const std::shared_ptr<GUILayer>& GUILayer);
     void setImGuiContext(void* context);
     
@@ -189,7 +189,7 @@ protected:
     std::shared_ptr<EngineConfig> m_engineConfig;
     std::shared_ptr<MemoryPool<Resource>> m_memoryPool;
     std::shared_ptr<DeferredRenderer> m_deferredRenderer;
-    std::shared_ptr<Renderer> m_forwardRenderer;
+    std::shared_ptr<ForwardRenderer> m_forwardRenderer;
 
     InitParams m_initParams;
 

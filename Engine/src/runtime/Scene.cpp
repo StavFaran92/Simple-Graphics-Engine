@@ -25,7 +25,7 @@
 #include "systems/TimeManager.h"
 #include "render/UniformBufferObject.h"
 #include "render/DeferredRenderer.h"
-#include "render/Renderer.h"
+#include "render/ForwardRenderer.h"
 #include "geometry/ShapeFactory.h"
 #include <GL/glew.h>
 
@@ -65,6 +65,8 @@
 #include "memory/BuiltInAssets.h"
 #include "core/Trace.h"
 #include "core/GameEventSystem.h"
+#include "render/RenderFunctions.h"
+#include "systems/SSAOSystem.h"
 
 SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
@@ -148,21 +150,6 @@ void cameraCalculateOrientation(Transformation& transform, CameraComponent& came
 
 	right = glm::normalize(glm::cross(front, { 0,1,0 }));
 	up = glm::normalize(glm::cross(right, front));
-}
-
-void Scene::displayWireframeMesh(Entity e)
-{
-	auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-	for (auto& mesh : e.tryGetComponent<MeshRendererComponent>()->mesh.resource()->getMeshes())
-	{
-		graphics->entity = e;
-		graphics->shader = m_tempOutlineShader;
-		graphics->mesh = mesh.get();
-		graphics->model = e.getComponent<Transformation>().getWorldTransformation();
-
-		Engine::get()->getDeferredRenderer().render();
-	}
 }
 
 void Scene::setIBLData(TextureResourceRef irradianceMap, TextureResourceRef prefilterEnvMap)
@@ -527,8 +514,9 @@ void Scene::draw(float deltaTime)
 		if (Engine::get()->getConfig().renderConfig.renderDeferredPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Deferred Renderer pass");
-			Engine::get()->getDeferredRenderer().renderScene(this);
-			unsigned int srcID = Engine::get()->getDeferredRenderer().getGBuffer().getID();
+			RenderFunctions::drawGeometryToGBuffer(this);
+			RenderFunctions::drawLightPass();
+			unsigned int srcID = graphics->gBuffer.getID();
 			unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
 			RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
 			glPopDebugGroup();
@@ -1325,7 +1313,8 @@ void Scene::onWindowResize(int w, int h)
 		m_highlightRenderView->resize(w, h);
 	}
 
-	Engine::get()->getDeferredRenderer().resize(w, h);
+	Engine::get()->getSubSystem<Graphics>()->gBuffer.setup(w, h);
+	Engine::get()->getSubSystem<SSAOSystem>()->resize(w, h);
 
     m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)w / h, 0.1f, 1000.0f);
     m_defaultUIProjection = glm::ortho(0.0f, (float)w, (float)h, 0.0f, -1.0f, 1.0f);

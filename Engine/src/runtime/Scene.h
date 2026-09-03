@@ -26,7 +26,7 @@ class Context;
 class Object3D;
 class PointLight;
 class DirectionalLight;
-class Renderer;
+class ForwardRenderer;
 class ObjectSelection;
 class PostProcessProjector;
 class Shader;
@@ -120,8 +120,6 @@ public:
 	Entity createEntity();
 	Entity createEntity(const std::string& name);
 	void removeEntity(const Entity& e);
-
-	void displayWireframeMesh(Entity e);
 
 	void setIBLData(TextureResourceRef irradianceMap, TextureResourceRef prefilterEnvMap);
 

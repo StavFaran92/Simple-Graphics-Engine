@@ -6,6 +6,7 @@
 #include "runtime/Entity.h"
 #include "systems/SubSystem.h"
 #include "memory/AssetAliases.h"
+#include "render/GBuffer.h"
 
 class Scene;
 class Context;
@@ -52,6 +53,7 @@ public:
 	TextureResourceRef prefilterEnvMap = nullptr;
 	TextureResourceRef brdfLUT = nullptr;
 	TextureResourceRef shadowMap = nullptr;
+	TextureResourceRef ssaoTexture = nullptr;
 	glm::mat4 lightSpaceMatrix;
 	Frustum* frustum = nullptr;
 	std::shared_ptr<RenderView> renderView;
@@ -59,4 +61,6 @@ public:
 	RenderMode renderMode = RenderMode::SHADED;
 
 	bool useSSAO = true;
+
+	GBuffer gBuffer;
 };

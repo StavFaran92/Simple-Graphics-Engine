@@ -1,7 +1,7 @@
 #include "core/Engine.h"
 
 #include "runtime/Context.h"
-#include "render/Renderer.h"
+#include "render/ForwardRenderer.h"
 #include "core/Window.h"
 #include "camera/ICamera.h"
 #include "runtime/Scene.h"
@@ -216,6 +216,7 @@ bool Engine::init(const InitParams& initParams)
     auto modelImporter = new ModelImporter();
     auto animationLoader = new AnimationLoader();
     auto graphics = new Graphics();
+    graphics->gBuffer.setup(m_window->getWidth(), m_window->getHeight());
     auto gameKeyboard = new GameKeyboard();
     auto gameMouse = new GameMouse();
     auto uniqueNameManager = new UniqueNameManager();
@@ -280,7 +281,7 @@ bool Engine::init(const InitParams& initParams)
     m_deferredRenderer = std::make_shared<DeferredRenderer>();
     m_deferredRenderer->init();
 
-    m_forwardRenderer = std::make_shared<Renderer>();
+    m_forwardRenderer = std::make_shared<ForwardRenderer>();
     m_forwardRenderer->init();
     
 
@@ -512,12 +513,12 @@ MemoryPool<Resource>& Engine::getMemoryPool() const
     return *m_memoryPool.get();
 }
 
-DeferredRenderer& Engine::getDeferredRenderer() const
-{
-    return *m_deferredRenderer.get();
-}
+//DeferredRenderer& Engine::getDeferredRenderer() const
+//{
+//    return *m_deferredRenderer.get();
+//}
 
-Renderer& Engine::getForwardRenderer() const
+ForwardRenderer& Engine::getForwardRenderer() const
 {
     return *m_forwardRenderer.get();
 }
