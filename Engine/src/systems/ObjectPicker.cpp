@@ -10,7 +10,6 @@
 #include "render/RenderBufferObject.h"
 #include "memory/ResourceRef.h"
 #include "ui/Input.h"
-#include "render/IRenderer.h"
 #include "camera/ICamera.h"
 #include "runtime/Entity.h"
 #include "texture/Texture.h"

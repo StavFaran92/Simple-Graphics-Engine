@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include "render/IRenderer.h"
-
 class UniformBufferObject;
 class Context;
 class Scene;

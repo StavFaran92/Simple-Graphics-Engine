@@ -3,8 +3,6 @@
 #include "core/Core.h"
 
 #include "render/FrameBufferObject.h"
-#include "render/IRenderer.h"
-#include "runtime/Entity.h"
 #include "memory/AssetAliases.h"
 
 class Shader;

@@ -5,7 +5,6 @@
 #include "gl/glew.h"
 #include "core/Logger.h"
 #include "runtime/Scene.h"
-#include "render/IRenderer.h"
 #include "component/Component.h"
 #include "core/Engine.h"
 #include "core/Window.h"

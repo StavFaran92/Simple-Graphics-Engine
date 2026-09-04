@@ -3,7 +3,6 @@
 #include "render/UniformBufferObject.h"
 #include "runtime/Scene.h"
 #include "runtime/Context.h"
-#include "render/IRenderer.h"
 #include "lights/DirectionalLight.h"
 #include "lights/PointLight.h"
 #include "component/Transformation.h"
