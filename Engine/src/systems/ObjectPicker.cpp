@@ -27,7 +27,6 @@
 
 ObjectPicker::ObjectPicker()
 {
-	Engine::get()->registerSubSystem<ObjectPicker>(this);
 }
 
 bool ObjectPicker::init()

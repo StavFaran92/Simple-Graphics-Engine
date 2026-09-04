@@ -13,7 +13,6 @@
 
 VolumetricSystem::VolumetricSystem()
 {
-	Engine::get()->registerSubSystem<VolumetricSystem>(this);
 }
 
 bool VolumetricSystem::init()

@@ -4,7 +4,6 @@
 
 TimeManager::TimeManager()
 {
-	Engine::get()->registerSubSystem<TimeManager>(this);
 	m_beginTime = std::chrono::high_resolution_clock::now();
 }
 

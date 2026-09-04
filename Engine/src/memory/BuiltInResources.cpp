@@ -5,7 +5,6 @@
 
 BuiltInResources::BuiltInResources()
 {
-    Engine::get()->registerSubSystem<BuiltInResources>(this);
 }
 
 void BuiltInResources::loadAllResources()

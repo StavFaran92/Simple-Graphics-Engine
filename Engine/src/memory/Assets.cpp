@@ -16,7 +16,6 @@
 Assets::Assets()
 {
 	m_assets = {};
-	Engine::get()->registerSubSystem<Assets>(this);
 
 	registerAllManagers();
 }

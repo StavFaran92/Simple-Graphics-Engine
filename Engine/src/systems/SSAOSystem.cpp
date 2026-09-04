@@ -25,7 +25,6 @@ namespace
 
 SSAOSystem::SSAOSystem()
 {
-	Engine::get()->registerSubSystem<SSAOSystem>(this);
 }
 
 bool SSAOSystem::init()

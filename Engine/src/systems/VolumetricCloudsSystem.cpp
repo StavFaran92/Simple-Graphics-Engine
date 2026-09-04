@@ -14,8 +14,6 @@
 
 VolumetricCloudsSystem::VolumetricCloudsSystem()
 {
-	Engine::get()->registerSubSystem<VolumetricCloudsSystem>(this);
-
 	TextureLoadDescriptor desc;
 	desc.filter = TextureFilter::Linear;
 	desc.wrap = TextureWrap::Mirror;

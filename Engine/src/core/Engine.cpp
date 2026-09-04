@@ -181,12 +181,13 @@ void Engine::createSystems()
 
     m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR "/EngineConfig.json");
 
-    new FileSystem();
+    registerSubSystem<FileSystem>(new FileSystem());
 
     m_eventSystem = std::make_shared<EventSystem>();
     m_eventLayerStack = std::make_shared<EventLayerStack>();
-    new System(); // TODO change to systemAnalytics
+    registerSubSystem<System>(new System()); // TODO change to systemAnalytics
     m_timeManager = std::make_shared<TimeManager>();
+    registerSubSystem<TimeManager>(m_timeManager.get());
     m_randomSystem = std::make_shared<RandomNumberGenerator>();
 
     std::shared_ptr<GameLayer> gameEventLayer = std::make_shared<GameLayer>();
@@ -203,17 +204,17 @@ void Engine::createSystems()
     lParams.extendShader = true;
     m_shaderLoader = std::make_shared<ShaderLoader>(shaderParser, lParams);
 
-    new FrameAccessTable(5);
-    new BuiltInResources();
-    new Assets();
+    registerSubSystem<FrameAccessTable>(new FrameAccessTable(5));
+    registerSubSystem<BuiltInResources>(new BuiltInResources());
+    registerSubSystem<Assets>(new Assets());
 
-    new ModelImporter();
-    new AnimationLoader();
-    new Graphics();
-    new GameKeyboard();
-    new GameMouse();
-    new UniqueNameManager();
-    new GameEventSystem();
+    registerSubSystem<ModelImporter>(new ModelImporter());
+    registerSubSystem<AnimationLoader>(new AnimationLoader());
+    registerSubSystem<Graphics>(new Graphics());
+    registerSubSystem<GameKeyboard>(new GameKeyboard());
+    registerSubSystem<GameMouse>(new GameMouse());
+    registerSubSystem<UniqueNameManager>(new UniqueNameManager());
+    registerSubSystem<GameEventSystem>(new GameEventSystem());
 
     // Create or load the project asset registry - CacheSystem/Context need it as a constructor
     // argument, so it has to be resolved here rather than in initSystems().
@@ -232,16 +233,16 @@ void Engine::createSystems()
 
     m_physicsSystem = std::make_shared<PhysicsSystem>();
 
-    new FoliageSystem();
-    new WaterSystem();
-    new VolumetricSystem();
-    new VolumetricCloudsSystem();
+    registerSubSystem<FoliageSystem>(new FoliageSystem());
+    registerSubSystem<WaterSystem>(new WaterSystem());
+    registerSubSystem<VolumetricSystem>(new VolumetricSystem());
+    registerSubSystem<VolumetricCloudsSystem>(new VolumetricCloudsSystem());
 
-    new ScriptSystem();
+    registerSubSystem<ScriptSystem>(new ScriptSystem());
 
-    new ObjectPicker();
-    new SSAOSystem();
-    new AnimationSystem();
+    registerSubSystem<ObjectPicker>(new ObjectPicker());
+    registerSubSystem<SSAOSystem>(new SSAOSystem());
+    registerSubSystem<AnimationSystem>(new AnimationSystem());
 }
 
 bool Engine::initSystems()

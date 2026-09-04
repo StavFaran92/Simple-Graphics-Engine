@@ -64,8 +64,6 @@ void Keyboard::onKeyReleased(EventHandler handler, KeyCode code, KeyReleasedCall
 GameKeyboard::GameKeyboard() : Keyboard()
 {
 	gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
-
-	Engine::get()->registerSubSystem<GameKeyboard>(this);
 }
 
 void GameKeyboard::onKeyPressed(KeyCode code, KeyPressedCallback callback) const

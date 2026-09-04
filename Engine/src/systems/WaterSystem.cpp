@@ -12,7 +12,6 @@
 
 WaterSystem::WaterSystem()
 {
-	Engine::get()->registerSubSystem<WaterSystem>(this);
 }
 
 Entity WaterSystem::createPool()

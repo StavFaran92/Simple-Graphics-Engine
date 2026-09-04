@@ -149,8 +149,6 @@ std::string findTexture(aiString str, const std::string& dir)
 
 ModelImporter::ModelImporter()
 {
-	Engine::get()->registerSubSystem<ModelImporter>(this);
-
 	m_importer = std::make_shared<Assimp::Importer>();
 
 	m_importer->SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);

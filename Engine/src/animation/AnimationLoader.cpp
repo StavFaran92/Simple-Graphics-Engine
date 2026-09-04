@@ -12,8 +12,6 @@
 
 AnimationLoader::AnimationLoader()
 {
-    Engine::get()->registerSubSystem<AnimationLoader>(this);
-
     m_importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
     m_importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_TEXTURES, false);
 }

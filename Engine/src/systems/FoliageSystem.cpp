@@ -19,7 +19,6 @@
 
 FoliageSystem::FoliageSystem()
 {
-	Engine::get()->registerSubSystem<FoliageSystem>(this);
 }
 
 bool FoliageSystem::init()

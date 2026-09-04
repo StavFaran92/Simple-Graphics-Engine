@@ -92,8 +92,6 @@ bool Mouse::getButtonPressed(MouseButton button)
 GameMouse::GameMouse()
 {
 	gameHandler = Engine::get()->getEventSystem()->bindToLayer("GameLayer");
-
-	Engine::get()->registerSubSystem<GameMouse>(this);
 }
 
 void GameMouse::onMousePressed(MouseButton button, MouseButtonPressedCallback callback) const

@@ -4,7 +4,6 @@
 
 System::System()
 {
-	Engine::get()->registerSubSystem<System>(this);
 }
 
 double System::getFPS() const

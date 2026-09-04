@@ -8,7 +8,6 @@ namespace fs = std::filesystem;
 
 UniqueNameManager::UniqueNameManager()
 {
-	Engine::get()->registerSubSystem<UniqueNameManager>(this);
 }
 
 std::string UniqueNameManager::suggestUniqueName(const std::string& hint, const ScopedPath& folder) const

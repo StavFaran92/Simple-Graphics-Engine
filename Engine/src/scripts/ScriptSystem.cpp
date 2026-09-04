@@ -43,7 +43,6 @@ public:
 ScriptSystem::ScriptSystem()
     : impl_(std::make_unique<Impl>())
 {
-    Engine::get()->registerSubSystem<ScriptSystem>(this);
 }
 
 ScriptSystem::~ScriptSystem() = default;

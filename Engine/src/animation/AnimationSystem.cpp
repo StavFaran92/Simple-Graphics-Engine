@@ -7,7 +7,6 @@
 
 AnimationSystem::AnimationSystem()
 {
-	Engine::get()->registerSubSystem<AnimationSystem>(this);
 }
 
 void AnimationSystem::update(Scene* scene, float dt)

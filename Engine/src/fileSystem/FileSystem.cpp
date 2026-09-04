@@ -3,7 +3,6 @@
 
 FileSystem::FileSystem()
 {
-    Engine::get()->registerSubSystem<FileSystem>(this);
 }
 
 fs::path FileSystem::toAbsolute(fs::path path)

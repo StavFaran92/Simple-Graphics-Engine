@@ -5,8 +5,6 @@
 FrameAccessTable::FrameAccessTable(int windowSize)
     : m_windowSize(windowSize)
 {
-    Engine::get()->registerSubSystem<FrameAccessTable>(this);
-
     m_frames.push_back({ m_currentFrame, {} });
 }
 

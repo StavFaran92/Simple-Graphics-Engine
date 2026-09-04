@@ -6,7 +6,6 @@
 
 GameEventSystem::GameEventSystem()
 {
-	Engine::get()->registerSubSystem<GameEventSystem>(this);
 }
 
 void GameEventSystem::subscribe(EventType eventType, Entity e)
