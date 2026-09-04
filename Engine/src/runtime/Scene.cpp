@@ -512,8 +512,13 @@ void Scene::draw(float deltaTime)
 		if (Engine::get()->getConfig().renderConfig.renderDeferredPass)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Deferred Renderer pass");
+			graphics->gBuffer.bind();
+			RenderCommand::clear();
 			RenderFunctions::drawGeometryToGBuffer(this);
-			RenderFunctions::drawLightPass();
+			Engine::get()->getSubSystem<SSAOSystem>()->draw(
+				graphics->gBuffer.getTexture(GBuffer::Attachment::PositionVS), 
+				graphics->gBuffer.getTexture(GBuffer::Attachment::NormalVS));
+			RenderFunctions::drawLightPass(graphics->gBuffer);
 			unsigned int srcID = graphics->gBuffer.getID();
 			unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
 			RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);

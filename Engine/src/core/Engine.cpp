@@ -39,6 +39,7 @@
 #include "systems/WaterSystem.h"
 #include "systems/VolumetricCloudsSystem.h"
 #include "systems/VolumetricSystem.h"
+#include "systems/SSAOSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/PostProcessComponent.h"
@@ -284,7 +285,8 @@ bool Engine::init(const InitParams& initParams)
     }
 
     
-   
+    auto ssaoSystem = new SSAOSystem();
+    ssaoSystem->init();
 
     new AnimationSystem();
 

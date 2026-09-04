@@ -8,7 +8,6 @@ layout (location = 2) in vec2 aTexCoord;
 layout (location = 4) in vec4 aTangent;
 layout (location = 5) in ivec3 aBoneIDs;
 layout (location = 6) in vec3 aBoneWeights;
-layout (location = 7) in mat4 instanceModel;
 
 // ----- Definitions ----- //
 
@@ -49,10 +48,10 @@ void main()
 {
 	mat4 finalModel = model;
 
-    if (isGpuInstanced)
-    {
-        finalModel = model * instanceModel;
-    }
+    // if (isGpuInstanced)
+    // {
+    //     finalModel = model * instanceModel;
+    // }
 
 	vec4 totalPosition;
 	vec3 totalNormal;

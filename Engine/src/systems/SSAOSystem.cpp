@@ -182,6 +182,8 @@ void SSAOSystem::draw(TextureResourceRef positionVS, TextureResourceRef normalVS
 		RenderCommand::draw(vao);
 	}
 
+	graphics->ssaoTexture = getSSAOTexture();
+
 	glEnable(GL_DEPTH_TEST);
 
 	// We set the viewport back to original size
