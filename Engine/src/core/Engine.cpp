@@ -81,18 +81,6 @@ bool Engine::init(const InitParams& initParams)
 
     m_initParams = initParams;
 
-    m_resourceManager = std::make_shared<ResourceManager>();
-    if (!SGE_EXPORT_PACKAGE)
-    {
-        m_resourceManager->setRootDir(SGE_ROOT_DIR "/");
-    }
-    else
-    {
-        m_resourceManager->setRootDir("./");
-    }
-
-    m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR "/EngineConfig.json");
-
     if (initParams.tempDir)
     {
         m_projectDirectory = std::filesystem::temp_directory_path().string() + "/";
@@ -141,7 +129,12 @@ bool Engine::init(const InitParams& initParams)
         }
     }
 
-    auto filesystem = new FileSystem();
+    m_window = std::make_shared<Window>();
+    if (!m_window->init())
+    {
+        logError("Window init failed!");
+        return false;
+    }
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_3D);
@@ -150,18 +143,51 @@ bool Engine::init(const InitParams& initParams)
     //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
     //glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
+
+    m_input = std::make_shared<Input>();
+    m_input->init();
+
+    createSystems();
+
+    if (!initSystems())
+    {
+        return false;
+    }
+
+    m_isInit = true;
+
+    logInfo("SGE Initialized Successfully!");
+
+    return true;
+}
+
+void Engine::createSystems()
+{
+    m_resourceManager = std::make_shared<ResourceManager>();
+    if (!SGE_EXPORT_PACKAGE)
+    {
+        m_resourceManager->setRootDir(SGE_ROOT_DIR "/");
+    }
+    else
+    {
+        m_resourceManager->setRootDir("./");
+    }
+
+    m_engineConfig = std::make_shared<EngineConfig>(SGE_ROOT_DIR "/EngineConfig.json");
+
+    new FileSystem();
+
     m_eventSystem = std::make_shared<EventSystem>();
     m_eventLayerStack = std::make_shared<EventLayerStack>();
-    auto system = new System(); // TODO change to systemAnalytics
+    new System(); // TODO change to systemAnalytics
     m_timeManager = std::make_shared<TimeManager>();
     m_randomSystem = std::make_shared<RandomNumberGenerator>();
-
-    Trace::setProjectRootFolder(m_projectDirectory);
 
     std::shared_ptr<GameLayer> gameEventLayer = std::make_shared<GameLayer>();
     gameEventLayer->setEnabled(false);
@@ -171,23 +197,56 @@ bool Engine::init(const InitParams& initParams)
 
     m_projectManager = std::make_shared<ProjectManager>();
 
-    m_window = std::make_shared<Window>();
-    if (!m_window->init())
-    {
-        logError("Window init failed!");
-        return false;
-    }
-
-    glPatchParameteri(GL_PATCH_VERTICES, 4);
-
-    m_input = std::make_shared<Input>();
-    m_input->init();
-
     auto shaderParser = std::make_shared<ShaderParser_tntmeijs>();
 
     ShaderLoader::LoadParams lParams;
     lParams.extendShader = true;
     m_shaderLoader = std::make_shared<ShaderLoader>(shaderParser, lParams);
+
+    new FrameAccessTable(5);
+    new BuiltInResources();
+    new Assets();
+
+    new ModelImporter();
+    new AnimationLoader();
+    new Graphics();
+    new GameKeyboard();
+    new GameMouse();
+    new UniqueNameManager();
+    new GameEventSystem();
+
+    // Create or load the project asset registry - CacheSystem/Context need it as a constructor
+    // argument, so it has to be resolved here rather than in initSystems().
+    std::shared_ptr<ProjectAssetRegistry> par;
+    if (m_initParams.loadExistingProject)
+    {
+        par = ProjectAssetRegistry::parse(m_projectDirectory);
+    }
+    else
+    {
+        par = ProjectAssetRegistry::create(m_projectDirectory);
+    }
+
+    m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
+    m_context = std::make_shared<Context>(par);
+
+    m_physicsSystem = std::make_shared<PhysicsSystem>();
+
+    new FoliageSystem();
+    new WaterSystem();
+    new VolumetricSystem();
+    new VolumetricCloudsSystem();
+
+    new ScriptSystem();
+
+    new ObjectPicker();
+    new SSAOSystem();
+    new AnimationSystem();
+}
+
+bool Engine::initSystems()
+{
+    Trace::setProjectRootFolder(m_projectDirectory);
 
     for (auto& GUILayer : m_GUILayers)
     {
@@ -196,75 +255,35 @@ bool Engine::init(const InitParams& initParams)
             logError("Imgui init failed!");
             return false;
         }
-
     }
 
-    //m_imguiHandler = std::make_shared<ImguiHandler>();
-    //if (!m_imguiHandler->init(m_window->GetWindow(), m_window->GetContext()))
-    //{
-    //    logError("Imgui init failed!");
-    //    return false;
-    //}
+    getSubSystem<BuiltInResources>()->loadAllResources();
 
-    auto frameAcessTable = new FrameAccessTable(5);
-    auto builtInResources = new BuiltInResources();
-    auto assets = new Assets();
+    getSubSystem<Graphics>()->gBuffer.setup(m_window->getWidth(), m_window->getHeight());
 
-    builtInResources->loadAllResources();
-
-    auto modelImporter = new ModelImporter();
-    auto animationLoader = new AnimationLoader();
-    auto graphics = new Graphics();
-    graphics->gBuffer.setup(m_window->getWidth(), m_window->getHeight());
-    auto gameKeyboard = new GameKeyboard();
-    auto gameMouse = new GameMouse();
-    auto uniqueNameManager = new UniqueNameManager();
-    auto gameEventSystem = new GameEventSystem();
-
-    // Create or Load project asset registry
-    std::shared_ptr<ProjectAssetRegistry> par;
-    if (initParams.loadExistingProject)
-    {
-        par = ProjectAssetRegistry::parse(m_projectDirectory);
-    }
-    else
-    {   
-        par = ProjectAssetRegistry::create(m_projectDirectory);
-    }
-
-    m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
-    m_context = std::make_shared<Context>(par);
     BuiltInAssetsLoader::loadAssets();
 
-    
-
-    m_physicsSystem = std::make_shared<PhysicsSystem>();
     if (!m_physicsSystem->init())
     {
         logError("Physics System init failed!");
         return false;
     }
 
-    auto foliageSystem = new FoliageSystem();
-    if(!foliageSystem->init())
+    if (!getSubSystem<FoliageSystem>()->init())
     {
         logError("Foliage System init failed!");
         return false;
     }
 
-    auto waterSystem = new WaterSystem();
-    auto volumetricSystem = new VolumetricSystem();
-    if (!volumetricSystem->init())
+    if (!getSubSystem<VolumetricSystem>()->init())
     {
         logError("Volumetric System init failed!");
         return false;
     }
-    auto volumetricCloudsSystem = new VolumetricCloudsSystem();
 
-    auto scriptSystem = new ScriptSystem();
-    scriptSystem->init();
+    getSubSystem<ScriptSystem>()->init();
 
-    if (initParams.loadExistingProject)
+    if (m_initParams.loadExistingProject)
     {
         loadProject(m_projectDirectory);
     }
@@ -276,28 +295,18 @@ bool Engine::init(const InitParams& initParams)
         saveProject();
     }
 
-
-    auto objectPicker = new ObjectPicker();
-    if (!objectPicker->init())
+    if (!getSubSystem<ObjectPicker>()->init())
     {
         logError("Object picker failed to init!");
         return false;
     }
 
-    
-    auto ssaoSystem = new SSAOSystem();
-    ssaoSystem->init();
+    getSubSystem<SSAOSystem>()->init();
 
-    new AnimationSystem();
-
-    if (initParams.startSimulationOnStartup)
+    if (m_initParams.startSimulationOnStartup)
     {
         m_context->startSimulation();
     }
-
-    m_isInit = true;
-
-    logInfo("SGE Initialized Successfully!");
 
     return true;
 }

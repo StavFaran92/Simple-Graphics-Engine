@@ -150,6 +150,13 @@ protected:
 #endif
 
     bool init(const InitParams& initParams);
+
+    // Phase 1: construct every engine system (cheap, dependency-free construction only).
+    void createSystems();
+
+    // Phase 2: initialize every engine system that needs it (may load resources, touch GL, fail).
+    bool initSystems();
+
     void update(float deltaTime);
     void draw(float deltaTime);
     void run(Application* app);
