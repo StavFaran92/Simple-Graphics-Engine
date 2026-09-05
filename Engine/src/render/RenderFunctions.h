@@ -11,7 +11,7 @@ class EngineAPI RenderFunctions
 {
 public:
 	static void drawGeometryToGBuffer(Scene* scene);
-	static void drawInstanceGeometrydToGBuffer(Scene* scene);
+	static void drawInstancedGeometryToGBuffer(Scene* scene);
 	static void drawLightPass(const GBuffer& gBuffer);
 	static void drawForwardScene(Scene* scene);
 	static void drawTransparentScene(Scene* scene);

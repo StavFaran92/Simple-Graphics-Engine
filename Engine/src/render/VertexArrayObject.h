@@ -28,7 +28,9 @@ public:
 	unsigned int GetIndexCount() const;
 	unsigned int GetVerticesCount() const;
 
-	
+	unsigned int getID() const {
+		return m_id;
+	};
 
 	
 

@@ -20,6 +20,7 @@
 #include "memory/BuiltInResources.h"
 #include "memory/BuiltInAssets.h"
 #include "render/RenderView.h"
+#include "render/VertexArrayObject.h"
 #include "geometry/Model.h"
 #include "geometry/Mesh.h"
 #include "animation/Animator.h"
@@ -392,19 +393,11 @@ void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
 	glPopDebugGroup();
 }
 
-void RenderFunctions::drawInstanceGeometrydToGBuffer(Scene* scene)
+void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
 	glEnable(GL_DEPTH_TEST);
-
-	if (graphics->renderMode == RenderMode::WIREFRAME)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glEnable(GL_POLYGON_OFFSET_LINE);
-		glPolygonOffset(-1.0, -1.0);
-		glLineWidth(1); // Size in pixels
-	}
 
 	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM); //todo change to instanced
 	graphics->shader->use();
@@ -416,6 +409,15 @@ void RenderFunctions::drawInstanceGeometrydToGBuffer(Scene* scene)
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer instanced pass");
 
+	struct InstancedRenderData
+	{
+		std::shared_ptr<Mesh> mesh;
+		MaterialResourceRef material;
+		std::vector<glm::mat4> models;
+	};
+
+	std::unordered_map<unsigned int, InstancedRenderData> instancedRenderData;
+
 	// Render all objects
 	for (auto&& [entity, meshRenderer, transform, obj] :
 		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
@@ -423,58 +425,47 @@ void RenderFunctions::drawInstanceGeometrydToGBuffer(Scene* scene)
 		if (!meshRenderer.isInstanced)
 			continue;
 
-		// frustum cull
-
-		// key is mesh & material
-
-		//get transform and store in transform ssbo by key
-
-		//get animations and store in anim ssbo by key
-
-		//get VAO if first entry store for key
-
-		Entity entityHandler{ entity, &scene->getRegistry() };
-		graphics->entity = entityHandler;
-
-		std::string name = entityHandler.getComponent<ObjectComponent>().name;
-		std::string captionGPU = "About to render Entity: '" + name + "'";
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
-
-		prepareEntityForRender(entityHandler);
-
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
+			Entity entityHandler{ entity, &scene->getRegistry() };
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
 			{
 				continue;
 			}
 
-			// Only render Opaque objects
 			if (graphics->material->getRenderMode() != MaterialRenderMode::Opaque)
 			{
 				continue;
 			}
 
-			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
-			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
+			auto vaoID = mesh->getVAO()->getID();
 
-			// draw model
-			auto graphics = Engine::get()->getSubSystem<Graphics>();
+			auto it = instancedRenderData.find(vaoID);
+			if (it == instancedRenderData.end())
+			{
+				InstancedRenderData data;
+				data.mesh = mesh;
+				data.material = graphics->material;
+				data.models.push_back(graphics->model);
+				instancedRenderData.emplace(vaoID, std::move(data));
+			}
+			else
+			{
+				it->second.models.push_back(graphics->model);
+			}
 
-			graphics->shader->setModelMatrix(graphics->model);
-
-
-			graphics->material->use();
-
-			// Draw
-			RenderCommand::draw(graphics->mesh->getVAO());
-
-			glPopDebugGroup();
+			//get animations and store in anim ssbo by key
 		}
 
-		glPopDebugGroup();
-
 	};
+
+	for(auto& [_, ird] : instancedRenderData)
+	{
+		graphics->instancedModelBuffer.setData(sizeof(glm::mat4) * ird.models.size(), ird.models.data());
+		RenderCommand::drawInstanced(ird.mesh->getVAO(), ird.models.size());
+
+	}
+
 
 	glPopDebugGroup();
 }

@@ -7,6 +7,7 @@
 #include "systems/SubSystem.h"
 #include "memory/AssetAliases.h"
 #include "render/GBuffer.h"
+#include "render/SSBO.h"
 
 class Scene;
 class Context;
@@ -63,4 +64,6 @@ public:
 	bool useSSAO = true;
 
 	GBuffer gBuffer;
+
+	SSBO instancedModelBuffer;
 };
