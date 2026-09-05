@@ -92,6 +92,18 @@ void RenderFunctions::drawForwardScene(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
+	auto shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+	shader->use();
+
+	graphics->shader->setViewMatrix(graphics->view);
+	graphics->shader->setProjectionMatrix(graphics->projection);
+	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+	graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
+	graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
+	graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
+	graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
 	glEnable(GL_DEPTH_TEST);
 	graphics->renderView->bind();
 
@@ -112,22 +124,8 @@ void RenderFunctions::drawForwardScene(Scene* scene)
 				continue;
 			}
 
-			// draw model
-			graphics->shader = graphics->material->getActiveShader();
-			graphics->shader->use();
-
 			graphics->shader->setModelMatrix(graphics->model);
-			graphics->shader->setViewMatrix(graphics->view);
-			graphics->shader->setProjectionMatrix(graphics->projection);
 			graphics->material->use();
-
-			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-			graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
-			graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
-			graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
-			graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
-
-			graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
 
 			// Draw
 			RenderCommand::draw(mesh->getVAO());
@@ -169,6 +167,16 @@ void RenderFunctions::drawTransparentScene(Scene* scene)
 	}
 
 	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+	graphics->shader->use();
+	graphics->shader->setViewMatrix(graphics->view);
+	graphics->shader->setProjectionMatrix(graphics->projection);
+	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+	graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
+	graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
+	graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
+	graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
 	auto iter = transparentEntities.rbegin();
 	while (iter != transparentEntities.rend())
 	{
@@ -181,7 +189,7 @@ void RenderFunctions::drawTransparentScene(Scene* scene)
 		prepareEntityForRender(entityHandler);
 
 		graphics->entity = entityHandler;
-		graphics->shader->use();
+		
 		for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.resource()->getMeshes())
 		{
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -199,19 +207,9 @@ void RenderFunctions::drawTransparentScene(Scene* scene)
 			glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
 			graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
 
-			graphics->shader = graphics->material->getActiveShader();
 			graphics->shader->setModelMatrix(graphics->model);
-			graphics->shader->setViewMatrix(graphics->view);
-			graphics->shader->setProjectionMatrix(graphics->projection);
+
 			graphics->material->use();
-
-			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-			graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
-			graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
-			graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
-			graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
-
-			graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
 
 			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
@@ -232,6 +230,14 @@ void RenderFunctions::drawDebugData(Scene* scene)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
+	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEBUG_DATA);
+	graphics->shader->use();
+
+	graphics->shader->setViewMatrix(graphics->view);
+	graphics->shader->setProjectionMatrix(graphics->projection);
+	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+	graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+
 	glEnable(GL_DEPTH_TEST);
 	graphics->renderView->bind();
 
@@ -249,14 +255,7 @@ void RenderFunctions::drawDebugData(Scene* scene)
 				continue;
 			}
 
-			graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEBUG_DATA);
-			graphics->shader->use();
-
 			graphics->shader->setModelMatrix(graphics->model);
-			graphics->shader->setViewMatrix(graphics->view);
-			graphics->shader->setProjectionMatrix(graphics->projection);
-			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-			graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
 
 			// Draw
 			RenderCommand::draw(mesh->getVAO());
@@ -335,6 +334,11 @@ void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
 	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
 	graphics->shader->use();
 
+	graphics->shader->setViewMatrix(graphics->view);
+	graphics->shader->setProjectionMatrix(graphics->projection);
+	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
 
 	// Render all objects
@@ -370,13 +374,8 @@ void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
 
 			// draw model
-			auto graphics = Engine::get()->getSubSystem<Graphics>();
 
 			graphics->shader->setModelMatrix(graphics->model);
-			graphics->shader->setViewMatrix(graphics->view);
-			graphics->shader->setProjectionMatrix(graphics->projection);
-			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-			graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
 
 			graphics->material->use();
 
@@ -410,14 +409,29 @@ void RenderFunctions::drawInstanceGeometrydToGBuffer(Scene* scene)
 	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM); //todo change to instanced
 	graphics->shader->use();
 
+	graphics->shader->setViewMatrix(graphics->view);
+	graphics->shader->setProjectionMatrix(graphics->projection);
+	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer instanced pass");
 
 	// Render all objects
 	for (auto&& [entity, meshRenderer, transform, obj] :
 		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
 	{
-		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Deferred)
+		if (!meshRenderer.isInstanced)
 			continue;
+
+		// frustum cull
+
+		// key is mesh & material
+
+		//get transform and store in transform ssbo by key
+
+		//get animations and store in anim ssbo by key
+
+		//get VAO if first entry store for key
 
 		Entity entityHandler{ entity, &scene->getRegistry() };
 		graphics->entity = entityHandler;
@@ -448,10 +462,7 @@ void RenderFunctions::drawInstanceGeometrydToGBuffer(Scene* scene)
 			auto graphics = Engine::get()->getSubSystem<Graphics>();
 
 			graphics->shader->setModelMatrix(graphics->model);
-			graphics->shader->setViewMatrix(graphics->view);
-			graphics->shader->setProjectionMatrix(graphics->projection);
-			graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-			graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+
 
 			graphics->material->use();
 
