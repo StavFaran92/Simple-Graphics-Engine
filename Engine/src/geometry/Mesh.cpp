@@ -51,16 +51,10 @@ bool Mesh::build(MeshData& mData)
 	m_layout = mData.m_layout;
 
 	// calculate stride
-	int stride = 0;
-	for (auto entry : m_layout.attribs)
-	{
-		auto& attribData = getAttributeData(entry);
-		stride += attribData.length * attribData.size;
-	}
+	int stride = m_layout.getStride();
 
 	// Update layout info
 	m_layout.numOfVertices = mData.m_positions.size();
-	m_layout.stride = stride;
 
 	// Create verticies array
 	// array size = size of each attribute * size of elements in attribute * vertices count

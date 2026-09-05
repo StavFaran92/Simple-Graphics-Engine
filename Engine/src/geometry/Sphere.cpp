@@ -109,7 +109,6 @@ std::shared_ptr<Mesh> Sphere::createMesh(float radius, int sectors, int stacks)
     layout.attribs.push_back(LayoutAttribute::Normals);
     layout.attribs.push_back(LayoutAttribute::Texcoords);
     layout.numOfVertices = positions->size();
-    layout.build();
 
     MeshBuilder::builder()
         .addPositions(*positions)

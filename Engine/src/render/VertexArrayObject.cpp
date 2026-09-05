@@ -49,11 +49,11 @@ void VertexArrayObject::fillVertexAttributes(const VertexLayout& layout)
 		glEnableVertexAttribArray(attribData.location);
 		if (attribData.typeName == typeid(float).name())
 		{
-			glVertexAttribPointer(attribData.location, attribData.length, GL_FLOAT, GL_FALSE, layout.stride, (void*)offset);
+			glVertexAttribPointer(attribData.location, attribData.length, GL_FLOAT, GL_FALSE, layout.getStride(), (void*)offset);
 		}
 		else if (attribData.typeName == typeid(int).name())
 		{
-			glVertexAttribIPointer(attribData.location, attribData.length, GL_INT, layout.stride, (void*)offset);
+			glVertexAttribIPointer(attribData.location, attribData.length, GL_INT, layout.getStride(), (void*)offset);
 		}
 
 		offset += attribData.size * attribData.length;

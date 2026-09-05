@@ -127,9 +127,7 @@ bool ModelBinaryLoader::save(const ModelData& modelData, const std::string& targ
 
 		// numOfVertices and stride
 		uint64_t numOfVertices = static_cast<uint64_t>(mesh.m_layout.numOfVertices);
-		uint64_t stride        = static_cast<uint64_t>(mesh.m_layout.stride);
 		if (!writeAll(file, &numOfVertices, sizeof(numOfVertices))) return false;
-		if (!writeAll(file, &stride,        sizeof(stride)))        return false;
 
 		// Rest transform
 		if (!writeAll(file, &mesh.restTransform, sizeof(mesh.restTransform))) return false;
@@ -240,7 +238,6 @@ bool ModelBinaryLoader::load(const std::string& sourceFile, ModelData& outModelD
 		if (!readAll(file, &stride,        sizeof(stride)))        return false;
 
 		mesh.m_layout.numOfVertices = static_cast<std::size_t>(numOfVertices);
-		mesh.m_layout.stride        = static_cast<std::size_t>(stride);
 
 		// Rest transform
 		if (!readAll(file, &mesh.restTransform, sizeof(mesh.restTransform))) return false;
