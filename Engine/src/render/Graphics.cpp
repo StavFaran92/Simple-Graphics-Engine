@@ -9,6 +9,7 @@
 
 Graphics::Graphics()
 {
+	instancedModelBuffer.allocate(5000);
 	//irradianceMap = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
 	//prefilterEnvMap = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
 	//brdfLUT = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();

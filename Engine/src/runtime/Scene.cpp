@@ -515,6 +515,7 @@ void Scene::draw(float deltaTime)
 			graphics->gBuffer.bind();
 			RenderCommand::clear();
 			RenderFunctions::drawGeometryToGBuffer(this);
+			RenderFunctions::drawInstancedGeometryToGBuffer(this);
 			Engine::get()->getSubSystem<SSAOSystem>()->draw(
 				graphics->gBuffer.getTexture(GBuffer::Attachment::PositionVS), 
 				graphics->gBuffer.getTexture(GBuffer::Attachment::NormalVS));

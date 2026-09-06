@@ -334,6 +334,7 @@ void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
 
 	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
 	graphics->shader->use();
+	graphics->shader->setUniformValue("isGpuInstanced", false);
 
 	graphics->shader->setViewMatrix(graphics->view);
 	graphics->shader->setProjectionMatrix(graphics->projection);
@@ -347,6 +348,9 @@ void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
 		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
 	{
 		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Deferred)
+			continue;
+
+		if (meshRenderer.isInstanced)
 			continue;
 
 		Entity entityHandler{ entity, &scene->getRegistry() };
@@ -401,6 +405,8 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM); //todo change to instanced
 	graphics->shader->use();
+	graphics->shader->setUniformValue("isGpuInstanced", true);
+	graphics->shader->setUniformValue("isAnimated", false);
 
 	graphics->shader->setViewMatrix(graphics->view);
 	graphics->shader->setProjectionMatrix(graphics->projection);
@@ -461,7 +467,10 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 	for(auto& [_, ird] : instancedRenderData)
 	{
+		graphics->instancedModelBuffer.setSlot(0);
+		graphics->instancedModelBuffer.bind();
 		graphics->instancedModelBuffer.setData(sizeof(glm::mat4) * ird.models.size(), ird.models.data());
+		ird.material->use();
 		RenderCommand::drawInstanced(ird.mesh->getVAO(), ird.models.size());
 
 	}

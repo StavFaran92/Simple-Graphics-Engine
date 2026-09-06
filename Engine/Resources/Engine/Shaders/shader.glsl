@@ -17,19 +17,9 @@ uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 
-uniform bool isGpuInstanced = false;
-
 void main()
 {
-	mat4 modelMatrix;
-	if(!isGpuInstanced)
-	{
-		modelMatrix =  model;
-	}
-	else
-	{
-		modelMatrix = instanceMatrix;
-	}
+	mat4 modelMatrix =  model;
 	gl_Position = projection * view * modelMatrix * vec4(pos, 1.0);
 	Color = color;
 	

@@ -20,11 +20,6 @@ void main()
 {
     mat4 aModel = model;
 
-    if (isGpuInstanced)
-    {
-        aModel = model * instanceModel;
-    }
-
     vec4 totalPosition;
     applySkinningPosition(aPos, boneIDs, boneWeights, totalPosition);
 

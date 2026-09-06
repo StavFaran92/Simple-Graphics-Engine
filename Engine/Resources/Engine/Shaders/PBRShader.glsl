@@ -42,11 +42,6 @@ void main()
 {
     mat4 finalModel = model;
 
-    if (isGpuInstanced)
-    {
-        finalModel = model * instanceModel;
-    }
-
     vec4 totalPosition;
     vec3 totalNormal;
     applySkinning(aPos, aNormal, aBoneIDs, aBoneWeights, totalPosition, totalNormal);

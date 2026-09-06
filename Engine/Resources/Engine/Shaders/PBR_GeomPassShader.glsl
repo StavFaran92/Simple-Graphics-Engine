@@ -1,6 +1,6 @@
 #vert
 
-#version 330
+#version 430
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -17,7 +17,14 @@ layout (location = 6) in vec3 aBoneWeights;
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/animation.glsl
 
+uniform bool isGpuInstanced;
+
 // ----- Structs ----- //
+
+// SSBO TransformBuffer
+layout(std430, binding = 0) readonly buffer TransformBuffer {
+    mat4 transformBuffer[];
+};
 
 // ----- Out ----- //
 
@@ -40,18 +47,14 @@ float getTime()
 	return iTime;
 }
 
-#ifdef CUSTOM_SHADER
-#custom_vert
-#endif
-
 void main()
 {
 	mat4 finalModel = model;
 
-    // if (isGpuInstanced)
-    // {
-    //     finalModel = model * instanceModel;
-    // }
+    if (isGpuInstanced)
+    {
+        finalModel = transformBuffer[gl_InstanceID];
+    }
 
 	vec4 totalPosition;
 	vec3 totalNormal;
