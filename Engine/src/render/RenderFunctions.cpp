@@ -415,14 +415,19 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer instanced pass");
 
-	struct InstancedRenderData
+	struct MeshRenderData
 	{
 		std::shared_ptr<Mesh> mesh;
 		MaterialResourceRef material;
+		std::vector<InstanceData> instances;
 		std::vector<glm::mat4> models;
 	};
 
-	std::unordered_map<unsigned int, InstancedRenderData> instancedRenderData;
+	std::unordered_map<unsigned int, MeshRenderData> meshRenderData;
+
+	graphics->instancedAnimationBuffer.setSlot(1);
+	graphics->instancedAnimationBuffer.bind();
+	graphics->instancedAnimationBuffer.resetCursor();
 
 	// Render all objects
 	for (auto&& [entity, meshRenderer, transform, obj] :
@@ -431,9 +436,28 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 		if (!meshRenderer.isInstanced)
 			continue;
 
+		Entity entityHandler{ entity, &scene->getRegistry() };
+
+		// Animation belongs to the whole model (skeleton), not to any one of its meshes - compute it once
+		// per entity and write it straight into the animation SSBO. Meshes below only record where it landed.
+		unsigned int modelIndex = 0;
+		unsigned int isAnimated = 0;
+
+		auto animator = entityHandler.tryGetComponent<Animator>();
+		if (animator && animator->hasActiveAnimation())
+		{
+			std::vector<glm::mat4> boneTransforms;
+			animator->getFinalBoneMatrices(meshRenderer.mesh.resource(), boneTransforms);
+
+			int byteOffset = graphics->instancedAnimationBuffer.pushData(sizeof(glm::mat4) * boneTransforms.size(), boneTransforms.data());
+			modelIndex = static_cast<unsigned int>(byteOffset / sizeof(glm::mat4));
+			isAnimated = 1u;
+		}
+
+		unsigned int boneCount = static_cast<unsigned int>(meshRenderer.mesh.resource()->getBoneOffsets().size());
+
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
-			Entity entityHandler{ entity, &scene->getRegistry() };
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
 			{
 				continue;
@@ -446,32 +470,41 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 			auto vaoID = mesh->getVAO()->getID();
 
-			auto it = instancedRenderData.find(vaoID);
-			if (it == instancedRenderData.end())
+			auto it = meshRenderData.find(vaoID);
+			if (it == meshRenderData.end())
 			{
-				InstancedRenderData data;
+				MeshRenderData data;
 				data.mesh = mesh;
 				data.material = graphics->material;
-				data.models.push_back(graphics->model);
-				instancedRenderData.emplace(vaoID, std::move(data));
-			}
-			else
-			{
-				it->second.models.push_back(graphics->model);
+				meshRenderData.emplace(vaoID, std::move(data));
+				it = meshRenderData.find(vaoID);
 			}
 
-			//get animations and store in anim ssbo by key
+			auto& renderData = it->second;
+
+			InstanceData instance;
+			instance.modelIndex = modelIndex;
+			instance.isAnimated = isAnimated;
+			instance.boneCount = boneCount;
+
+			renderData.models.push_back(graphics->model);
+			renderData.instances.push_back(instance);
 		}
 
 	};
 
-	for(auto& [_, ird] : instancedRenderData)
+	for(auto& [_, renderData] : meshRenderData)
 	{
 		graphics->instancedModelBuffer.setSlot(0);
 		graphics->instancedModelBuffer.bind();
-		graphics->instancedModelBuffer.setData(sizeof(glm::mat4) * ird.models.size(), ird.models.data());
-		ird.material->use();
-		RenderCommand::drawInstanced(ird.mesh->getVAO(), ird.models.size());
+		graphics->instancedModelBuffer.setData(sizeof(glm::mat4) * renderData.models.size(), renderData.models.data());
+
+		graphics->instancedInstanceDataBuffer.setSlot(2);
+		graphics->instancedInstanceDataBuffer.bind();
+		graphics->instancedInstanceDataBuffer.setData(sizeof(InstanceData) * renderData.instances.size(), renderData.instances.data());
+
+		renderData.material->use();
+		RenderCommand::drawInstanced(renderData.mesh->getVAO(), renderData.models.size());
 
 	}
 

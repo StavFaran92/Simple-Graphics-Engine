@@ -23,6 +23,19 @@ void SSBO::setData(int size, const void* data)
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, data);
 }
 
+int SSBO::pushData(int size, const void* data)
+{
+	int offset = cursor;
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, size, data);
+	cursor += size;
+	return offset;
+}
+
+void SSBO::resetCursor()
+{
+	cursor = 0;
+}
+
 void SSBO::bind()
 {
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, slot, id);

@@ -26,6 +26,15 @@ enum class RenderMode
 	WIREFRAME = 1
 };
 
+// Per-instance data uploaded to the GPU alongside the instanced model-matrix buffer.
+// Mirrors the SSBO struct read on the GPU side - keep std430 friendly (uint, not bool).
+struct InstanceData
+{
+	unsigned int modelIndex = 0; // index (in mat4 units) into the animation SSBO where this model's bones start
+	unsigned int isAnimated = 0;
+	unsigned int boneCount = 0;
+};
+
 class EngineAPI Graphics : public SubSystem
 {
 public:
@@ -66,4 +75,6 @@ public:
 	GBuffer gBuffer;
 
 	SSBO instancedModelBuffer;
+	SSBO instancedAnimationBuffer;
+	SSBO instancedInstanceDataBuffer;
 };

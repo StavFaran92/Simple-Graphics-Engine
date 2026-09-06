@@ -9,7 +9,12 @@
 
 Graphics::Graphics()
 {
-	instancedModelBuffer.allocate(5000);
+	constexpr int maxInstancedObjects = 5000; // approx upper bound on instanced object count
+	constexpr int maxBonesPerObject = 100; // matches MAX_BONES in animation.glsl
+
+	instancedModelBuffer.allocate(maxInstancedObjects);
+	instancedAnimationBuffer.allocate(maxInstancedObjects * maxBonesPerObject * sizeof(glm::mat4));
+	instancedInstanceDataBuffer.allocate(maxInstancedObjects * sizeof(InstanceData));
 	//irradianceMap = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
 	//prefilterEnvMap = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
 	//brdfLUT = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
