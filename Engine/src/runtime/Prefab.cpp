@@ -143,16 +143,16 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	{
 		auto& transform = e.getComponent<Transformation>();
 		auto& children = transform.getChildren();
-		for (int i=0; i< children.size(); i++)
+		for (auto& child : children)
 		{
-			entity_id oldID = children[i].handlerID();
+			entity_id oldID = child.second.handlerID();
 			auto it = entityIDRemapTable.find(oldID);
-			if (it == entityIDRemapTable.end()) 
+			if (it == entityIDRemapTable.end())
 			{
 				logWarning("Could not locate oldID {} and remap table", oldID);
 				continue;
 			}
-			children[i] = it->second;
+			child.second = it->second;
 		}
 
 		entity_id oldParentID = transform.m_parent.handlerID();
