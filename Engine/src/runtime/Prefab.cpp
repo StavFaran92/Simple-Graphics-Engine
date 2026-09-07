@@ -139,37 +139,41 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 		// in transform iterate children
 			// give child new id using generated table
 
+	// The deserialized parent/children still reference the stale ids from the
+	// serialized template. Local transforms were captured relative to the
+	// original parent, and since the whole hierarchy is cloned together, those
+	// local values are already correct relative to the remapped parent too -
+	// so just relink the raw entity references, no transform math needed.
+	std::vector<entity_id> oldParentIDs;
+	oldParentIDs.reserve(createdEntities.size());
 	for (Entity& e : createdEntities)
 	{
 		auto& transform = e.getComponent<Transformation>();
-		auto& children = transform.getChildren();
-		for (auto& child : children)
-		{
-			entity_id oldID = child.second.handlerID();
-			auto it = entityIDRemapTable.find(oldID);
-			if (it == entityIDRemapTable.end())
-			{
-				logWarning("Could not locate oldID {} and remap table", oldID);
-				continue;
-			}
-			child.second = it->second;
-		}
+		oldParentIDs.push_back(transform.m_parent.handlerID());
+		transform.m_children.clear();
+		transform.m_parent = Entity::EmptyEntity;
+	}
 
-		entity_id oldParentID = transform.m_parent.handlerID();
+	for (size_t i = 0; i < createdEntities.size(); ++i)
+	{
+		entity_id oldParentID = oldParentIDs[i];
 		if (oldParentID == entt::null)
 		{
-			e.getComponent<Transformation>().m_parent = Entity::EmptyEntity;
+			continue;
 		}
-		else
+
+		auto it = entityIDRemapTable.find(oldParentID);
+		if (it == entityIDRemapTable.end())
 		{
-			auto it = entityIDRemapTable.find(oldParentID);
-			if (it == entityIDRemapTable.end())
-			{
-				logWarning("Could not locate oldID {} and remap table", oldParentID);
-				continue;
-			}
-			e.getComponent<Transformation>().m_parent = it->second;
+			logWarning("Could not locate oldID {} and remap table", oldParentID);
+			continue;
 		}
+
+		Entity& newParent = it->second;
+		Entity& child = createdEntities[i];
+
+		child.getComponent<Transformation>().m_parent = newParent;
+		newParent.getComponent<Transformation>().m_children[child.handlerID()] = child;
 	}
 
 	// First entity is the root.
