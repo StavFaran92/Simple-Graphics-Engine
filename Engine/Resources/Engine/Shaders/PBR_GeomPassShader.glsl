@@ -15,30 +15,8 @@ layout (location = 6) in vec3 aBoneWeights;
 #include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/buffers.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/animation.glsl
-
-uniform bool isGpuInstanced;
-
-// ----- Structs ----- //
-
-struct InstanceData
-{
-	uint modelIndex;
-	uint isAnimated;
-	uint boneCount;
-};
-
-layout(std430, binding = 0) readonly buffer TransformBuffer {
-    mat4 transformBuffer[];
-};
-
-layout(std430, binding = 1) readonly buffer AnimationBuffer {
-    mat4 animationBuffer[];
-};
-
-layout(std430, binding = 2) readonly buffer InstanceDataBuffer {
-    InstanceData instanceDataBuffer[];
-};
 
 // ----- Out ----- //
 
@@ -73,15 +51,7 @@ void main()
 	vec4 totalPosition;
 	vec3 totalNormal;
 
-	if (isGpuInstanced)
-	{
-		InstanceData instData = instanceDataBuffer[gl_InstanceID];
-		applySkinning(aPos, aNormal, aBoneIDs, aBoneWeights, animationBuffer, int(instData.modelIndex), instData.isAnimated != 0u, totalPosition, totalNormal);
-	}
-	else
-	{
-		applySkinning(aPos, aNormal, aBoneIDs, aBoneWeights, totalPosition, totalNormal);
-	}
+	applySkinning(aPos, aNormal, aBoneIDs, aBoneWeights, totalPosition, totalNormal);
 
 	vec3 normWS = mat3(transpose(inverse(finalModel))) * totalNormal;
 
