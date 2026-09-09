@@ -112,7 +112,7 @@
             "visibility": 1
         }
     ],
-    "counter": 92,
+    "counter": 95,
     "lua script": [
         {
             "aType": 7,
@@ -151,6 +151,19 @@
             "name": "AnimationRelay",
             "sourcePath": "",
             "uuid": 90,
+            "visibility": 1
+        },
+        {
+            "aType": 7,
+            "asset": {
+                "filepath": ""
+            },
+            "assetDirectory": ".\\",
+            "ext": ".lua",
+            "isEngineOwned": false,
+            "name": "gen_enemies",
+            "sourcePath": "",
+            "uuid": 93,
             "visibility": 1
         }
     ],
@@ -2566,6 +2579,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2591,17 +2615,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -2888,17 +2901,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2924,6 +2926,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3210,17 +3223,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3246,6 +3248,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3532,17 +3545,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3568,6 +3570,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3854,17 +3867,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3890,6 +3892,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -4203,12 +4216,14 @@
         "enemyController": 61,
         "eyelash_MAT": 43,
         "fISsTyQE": 27,
+        "gen_enemies": 93,
         "iHy45YLv": 29,
         "maria_diffuse": 84,
         "maria_normal": 85,
         "mutant_M": 55,
         "player_controller": 32,
         "sunflowers_puresky_4k": 26,
+        "zombie": 94,
         "zombie_body_diffuse": 71,
         "zombie_diffuse": 68,
         "zombie_normal": 69
@@ -4229,6 +4244,7 @@
         "content/erika archer (2)/idle (1).anim": 53,
         "content/erika archer (2)/jump (2).anim": 51,
         "content/erika archer (2)/player_controller.lua": 32,
+        "content/gen_enemies.lua": 93,
         "content/mutant/enemycontroller.lua": 61,
         "content/mutant/mutant.model": 54,
         "content/mutant/mutant_diffuse.texture": 56,
@@ -4254,6 +4270,7 @@
         "content/warrior/warrior/sword and shield slash.anim": 89,
         "content/warrior/warrior/warrior.model": 82,
         "content/warrior/warrior_prefab.prefab": 88,
+        "content/zombie.prefab": 94,
         "content/zombie/thriller idle.anim": 78,
         "content/zombie/zombie attack.anim": 81,
         "content/zombie/zombie dying.anim": 80,
@@ -4331,6 +4348,28 @@
             "name": "Warrior_PREFAB",
             "sourcePath": "",
             "uuid": 88,
+            "visibility": 1
+        },
+        {
+            "aType": 5,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".prefab",
+            "isEngineOwned": false,
+            "name": "zombie",
+            "sourcePath": "",
+            "uuid": 92,
+            "visibility": 1
+        },
+        {
+            "aType": 5,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".prefab",
+            "isEngineOwned": false,
+            "name": "zombie",
+            "sourcePath": "",
+            "uuid": 94,
             "visibility": 1
         }
     ],

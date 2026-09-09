@@ -1,0 +1,625 @@
+{
+    "value0": {
+        "m_serializedPrefab": [
+            {
+                "entity": 9,
+                "components": [
+                    {
+                        "polymorphic_id": 2147483649,
+                        "polymorphic_name": "ScriptComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483649,
+                            "data": {
+                                "isActive": true,
+                                "script": {
+                                    "uuid": {
+                                        "m_value": 61
+                                    }
+                                },
+                                "entity": {
+                                    "m_entity": 9
+                                },
+                                "refs": []
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483650,
+                        "polymorphic_name": "Transformation",
+                        "ptr_wrapper": {
+                            "id": 2147483650,
+                            "data": {
+                                "isActive": true,
+                                "localTranslation": {
+                                    "v.x": 0.25217536091804507,
+                                    "v.y": 3.2000045776367189,
+                                    "v.z": 2.167363405227661
+                                },
+                                "localRotation": {
+                                    "q.x": -9.61108526098542e-7,
+                                    "q.y": 0.998323380947113,
+                                    "q.z": -9.61108526098542e-7,
+                                    "q.w": -0.05788283050060272
+                                },
+                                "localScale": {
+                                    "v.x": 0.9998880624771118,
+                                    "v.y": 0.9999959468841553,
+                                    "v.z": 0.9998887777328491
+                                },
+                                "m_parent": {
+                                    "m_entity": 4294967295
+                                },
+                                "entity": {
+                                    "m_entity": 9
+                                },
+                                "root": {
+                                    "m_entity": 9
+                                },
+                                "m_children": [
+                                    {
+                                        "key": 10,
+                                        "value": {
+                                            "m_entity": 10
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483651,
+                        "polymorphic_name": "ObjectComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483651,
+                            "data": {
+                                "isActive": true,
+                                "name": "zombie",
+                                "e": {
+                                    "m_entity": 9
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483652,
+                        "polymorphic_name": "PhysicsComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483652,
+                            "data": {
+                                "isActive": true,
+                                "rigidBodyType": 2,
+                                "collisionType": 0,
+                                "mass": 0.0,
+                                "collider": {
+                                    "polymorphic_id": 2147483653,
+                                    "polymorphic_name": "CollisionCapsule",
+                                    "ptr_wrapper": {
+                                        "id": 2147483653,
+                                        "data": {
+                                            "layerMask": 0,
+                                            "radius": 0.20000000298023225,
+                                            "halfHeight": 0.5
+                                        }
+                                    }
+                                },
+                                "shapeType": 5,
+                                "isLockedLinearX": false,
+                                "isLockedLinearY": false,
+                                "isLockedLinearZ": false,
+                                "isLockedAngularX": true,
+                                "isLockedAngularY": true,
+                                "isLockedAngularZ": true,
+                                "offset": {
+                                    "v.x": 0.0,
+                                    "v.y": 0.699999988079071,
+                                    "v.z": 0.0
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "entity": 10,
+                "components": [
+                    {
+                        "polymorphic_id": 2147483654,
+                        "polymorphic_name": "Animator",
+                        "ptr_wrapper": {
+                            "id": 2147483654,
+                            "data": {
+                                "m_currentAnimIndex": 0,
+                                "m_animations": [
+                                    {
+                                        "name": "Idle",
+                                        "playbackSpeed": 1.0,
+                                        "animation": {
+                                            "uuid": {
+                                                "m_value": 78
+                                            }
+                                        },
+                                        "triggers": []
+                                    },
+                                    {
+                                        "name": "Walk",
+                                        "playbackSpeed": 1.0,
+                                        "animation": {
+                                            "uuid": {
+                                                "m_value": 77
+                                            }
+                                        },
+                                        "triggers": []
+                                    },
+                                    {
+                                        "name": "Attack",
+                                        "playbackSpeed": 1.0,
+                                        "animation": {
+                                            "uuid": {
+                                                "m_value": 81
+                                            }
+                                        },
+                                        "triggers": [
+                                            {
+                                                "name": "attack_start",
+                                                "frameID": 30
+                                            },
+                                            {
+                                                "name": "attack_end",
+                                                "frameID": 34
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Hit",
+                                        "playbackSpeed": 1.0,
+                                        "animation": {
+                                            "uuid": {
+                                                "m_value": 79
+                                            }
+                                        },
+                                        "triggers": [
+                                            {
+                                                "name": "hurt_end",
+                                                "frameID": 60
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "m_animationGraph": {
+                                    "m_states": [
+                                        {
+                                            "id": "Idle",
+                                            "animationEntry": {
+                                                "name": "Idle",
+                                                "playbackSpeed": 1.0,
+                                                "animation": {
+                                                    "uuid": {
+                                                        "m_value": 78
+                                                    }
+                                                },
+                                                "triggers": []
+                                            },
+                                            "loop": true,
+                                            "pos": {
+                                                "v.x": 1084.0,
+                                                "v.y": 532.0
+                                            }
+                                        },
+                                        {
+                                            "id": "Walk",
+                                            "animationEntry": {
+                                                "name": "Walk",
+                                                "playbackSpeed": 1.0,
+                                                "animation": {
+                                                    "uuid": {
+                                                        "m_value": 77
+                                                    }
+                                                },
+                                                "triggers": []
+                                            },
+                                            "loop": true,
+                                            "pos": {
+                                                "v.x": 892.0,
+                                                "v.y": 660.0
+                                            }
+                                        },
+                                        {
+                                            "id": "Attack",
+                                            "animationEntry": {
+                                                "name": "Attack",
+                                                "playbackSpeed": 1.0,
+                                                "animation": {
+                                                    "uuid": {
+                                                        "m_value": 81
+                                                    }
+                                                },
+                                                "triggers": []
+                                            },
+                                            "loop": true,
+                                            "pos": {
+                                                "v.x": 1292.0,
+                                                "v.y": 660.0
+                                            }
+                                        },
+                                        {
+                                            "id": "Hit",
+                                            "animationEntry": {
+                                                "name": "Hit",
+                                                "playbackSpeed": 1.0,
+                                                "animation": {
+                                                    "uuid": {
+                                                        "m_value": 79
+                                                    }
+                                                },
+                                                "triggers": []
+                                            },
+                                            "loop": true,
+                                            "pos": {
+                                                "v.x": 1084.0,
+                                                "v.y": 836.0
+                                            }
+                                        }
+                                    ],
+                                    "m_transitions": [
+                                        {
+                                            "from": "Idle",
+                                            "to": "Walk",
+                                            "blendDuration": 0.20000000298023225,
+                                            "conditions": [
+                                                {
+                                                    "type": 1,
+                                                    "parameter": "speed",
+                                                    "value": 0.0
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "from": "Walk",
+                                            "to": "Idle",
+                                            "blendDuration": 0.20000000298023225,
+                                            "conditions": [
+                                                {
+                                                    "type": 0,
+                                                    "parameter": "speed",
+                                                    "value": 0.0
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "from": "Walk",
+                                            "to": "Attack",
+                                            "blendDuration": 0.20000000298023225,
+                                            "conditions": [
+                                                {
+                                                    "type": 0,
+                                                    "parameter": "attack",
+                                                    "value": 1.0
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "from": "Attack",
+                                            "to": "Idle",
+                                            "blendDuration": 0.20000000298023225,
+                                            "conditions": [
+                                                {
+                                                    "type": 3,
+                                                    "parameter": "",
+                                                    "value": 0.0
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "from": "Walk",
+                                            "to": "Hit",
+                                            "blendDuration": 0.20000000298023225,
+                                            "conditions": [
+                                                {
+                                                    "type": 4,
+                                                    "parameter": "hit",
+                                                    "value": 0.0
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "from": "Attack",
+                                            "to": "Hit",
+                                            "blendDuration": 0.20000000298023225,
+                                            "conditions": [
+                                                {
+                                                    "type": 4,
+                                                    "parameter": "hit",
+                                                    "value": 0.0
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "from": "Hit",
+                                            "to": "Idle",
+                                            "blendDuration": 0.20000000298023225,
+                                            "conditions": [
+                                                {
+                                                    "type": 3,
+                                                    "parameter": "",
+                                                    "value": 0.0
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "from": "Idle",
+                                            "to": "Attack",
+                                            "blendDuration": 0.20000000298023225,
+                                            "conditions": [
+                                                {
+                                                    "type": 0,
+                                                    "parameter": "attack",
+                                                    "value": 1.0
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "m_parameters": [
+                                        {
+                                            "name": "speed",
+                                            "type": 0,
+                                            "defaultValue": 0.0
+                                        },
+                                        {
+                                            "name": "attack",
+                                            "type": 1,
+                                            "defaultValue": 0.0
+                                        },
+                                        {
+                                            "name": "hit",
+                                            "type": 3,
+                                            "defaultValue": 0.0
+                                        }
+                                    ],
+                                    "m_entryStateId": "Idle"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483655,
+                        "polymorphic_name": "MeshRendererComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483655,
+                            "data": {
+                                "isActive": true,
+                                "mesh": {
+                                    "uuid": {
+                                        "m_value": 63
+                                    }
+                                },
+                                "count": 3,
+                                "m_material": [
+                                    {
+                                        "key": 0,
+                                        "value": {
+                                            "uuid": {
+                                                "m_value": 70
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "key": 1,
+                                        "value": {
+                                            "uuid": {
+                                                "m_value": 64
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "key": 2,
+                                        "value": {
+                                            "uuid": {
+                                                "m_value": 67
+                                            }
+                                        }
+                                    }
+                                ],
+                                "renderTechnique": 1,
+                                "isInstanced": true
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 1,
+                        "ptr_wrapper": {
+                            "id": 2147483656,
+                            "data": {
+                                "isActive": true,
+                                "script": {
+                                    "uuid": {
+                                        "m_value": 90
+                                    }
+                                },
+                                "entity": {
+                                    "m_entity": 10
+                                },
+                                "refs": [
+                                    {
+                                        "key": "player_script",
+                                        "value": {
+                                            "m_entity": 9
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2,
+                        "ptr_wrapper": {
+                            "id": 2147483657,
+                            "data": {
+                                "isActive": true,
+                                "localTranslation": {
+                                    "v.x": -0.000005420293746283278,
+                                    "v.y": 0.0,
+                                    "v.z": 0.00004673004150390625
+                                },
+                                "localRotation": {
+                                    "q.x": -0.000001283337724089506,
+                                    "q.y": 0.7576023936271668,
+                                    "q.z": -0.000001283337724089506,
+                                    "q.w": -0.652716338634491
+                                },
+                                "localScale": {
+                                    "v.x": 0.009999290108680725,
+                                    "v.y": 0.009999999776482582,
+                                    "v.z": 0.0099997129291296
+                                },
+                                "m_parent": {
+                                    "m_entity": 9
+                                },
+                                "entity": {
+                                    "m_entity": 10
+                                },
+                                "root": {
+                                    "m_entity": 10
+                                },
+                                "m_children": [
+                                    {
+                                        "key": 1048587,
+                                        "value": {
+                                            "m_entity": 1048587
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 3,
+                        "ptr_wrapper": {
+                            "id": 2147483658,
+                            "data": {
+                                "isActive": true,
+                                "name": "model",
+                                "e": {
+                                    "m_entity": 10
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483656,
+                        "polymorphic_name": "RenderableComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483659,
+                            "data": {
+                                "isActive": true,
+                                "renderTechnique": 1
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "entity": 1048587,
+                "components": [
+                    {
+                        "polymorphic_id": 2,
+                        "ptr_wrapper": {
+                            "id": 2147483660,
+                            "data": {
+                                "isActive": true,
+                                "localTranslation": {
+                                    "v.x": -0.0037384033203125,
+                                    "v.y": 97.98043823242188,
+                                    "v.z": -0.000011444091796875
+                                },
+                                "localRotation": {
+                                    "q.x": -2.4735758146626763e-12,
+                                    "q.y": -3.576271723204627e-9,
+                                    "q.z": -1.0986673376622847e-11,
+                                    "q.w": 1.0
+                                },
+                                "localScale": {
+                                    "v.x": 100.00019836425781,
+                                    "v.y": 100.0101089477539,
+                                    "v.z": 100.00359344482422
+                                },
+                                "m_parent": {
+                                    "m_entity": 10
+                                },
+                                "entity": {
+                                    "m_entity": 1048587
+                                },
+                                "root": {
+                                    "m_entity": 1048587
+                                },
+                                "m_children": []
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 3,
+                        "ptr_wrapper": {
+                            "id": 2147483661,
+                            "data": {
+                                "isActive": true,
+                                "name": "attack_collider",
+                                "e": {
+                                    "m_entity": 1048587
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 4,
+                        "ptr_wrapper": {
+                            "id": 2147483662,
+                            "data": {
+                                "isActive": false,
+                                "rigidBodyType": 2,
+                                "collisionType": 1,
+                                "mass": 0.0,
+                                "collider": {
+                                    "polymorphic_id": 2147483657,
+                                    "polymorphic_name": "CollisionBox",
+                                    "ptr_wrapper": {
+                                        "id": 2147483663,
+                                        "data": {
+                                            "layerMask": 0,
+                                            "extents": {
+                                                "v.x": 0.5,
+                                                "v.y": 0.30000001192092898,
+                                                "v.z": 0.699999988079071
+                                            }
+                                        }
+                                    }
+                                },
+                                "shapeType": 1,
+                                "isLockedLinearX": false,
+                                "isLockedLinearY": false,
+                                "isLockedLinearZ": false,
+                                "isLockedAngularX": false,
+                                "isLockedAngularY": false,
+                                "isLockedAngularZ": false,
+                                "offset": {
+                                    "v.x": 0.0,
+                                    "v.y": 0.0,
+                                    "v.z": 0.6000000238418579
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483658,
+                        "polymorphic_name": "TagComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483664,
+                            "data": {
+                                "isActive": true,
+                                "tag": "enemy_attack_collider"
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

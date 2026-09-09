@@ -43,16 +43,15 @@ void Animation::calculateFinalBoneMatricesHelper(const MeshNodeData& nodeData, g
 
 	std::string nodeName = nodeData.name;
 	glm::mat4 nodeTransform = nodeData.transformation;
-	glm::mat4 globalTransformation = parentTransform * nodeTransform; //convert bone transform from bone space into parent space (eventually into animated mesh space)
 
 	if (m_data.bones.find(nodeName) != m_data.bones.end())
 	{
 		auto bone = m_data.bones[nodeName];
 		bone->update(currentTime);
 		nodeTransform = bone->getLocalTransform();
-		globalTransformation = parentTransform * nodeTransform;
 	}
 
+	glm::mat4 globalTransformation = parentTransform * nodeTransform; //convert bone transform from bone space into parent space (eventually into animated mesh space)
 	finalBoneMatrices[nodeName] = globalTransformation;
 
 	for (int i = 0; i < nodeData.childrenCount; i++)
