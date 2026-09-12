@@ -304,6 +304,12 @@ bool Engine::initSystems()
 
     getSubSystem<SSAOSystem>()->init();
 
+    if (!getSubSystem<AnimationSystem>()->init())
+    {
+        logError("Animation System init failed!");
+        return false;
+    }
+
     if (m_initParams.startSimulationOnStartup)
     {
         m_context->startSimulation();
