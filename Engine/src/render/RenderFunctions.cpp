@@ -24,6 +24,7 @@
 #include "geometry/Model.h"
 #include "geometry/Mesh.h"
 #include "animation/Animator.h"
+#include "animation/AnimationSystem.h"
 
 bool RenderFunctions::prepareMeshForRender(Mesh* mesh, const Entity& entityHandler)
 {
@@ -429,6 +430,8 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 	graphics->instancedAnimationBuffer.bind();
 	graphics->instancedAnimationBuffer.resetCursor();
 
+	unsigned int totalBoneCount = 0;
+
 	// Render all objects
 	for (auto&& [entity, meshRenderer, transform, obj] :
 		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
@@ -455,6 +458,7 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 		}
 
 		unsigned int boneCount = static_cast<unsigned int>(meshRenderer.mesh.resource()->getBoneOffsets().size());
+		totalBoneCount += boneCount;
 
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
@@ -489,9 +493,26 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 			renderData.models.push_back(graphics->model);
 			renderData.instances.push_back(instance);
+
+			
 		}
 
 	};
+
+	Engine::get()->getSubSystem<AnimationSystem>()->bindBuffers();
+
+	m_CalculateBoneTransformCS->use();
+	m_CalculateBoneTransformCS->setUniformValue("totalBoneTransforms", totalBoneCount);
+	m_CalculateBoneTransformCS->setUniformValue("currentTime", dt);
+	glDispatchCompute(1, 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT); // Do i need this?
+
+
+	// Read result
+	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	//GLuint* ptr = (GLuint*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
+	//GLuint result = ptr[0];
+	//glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
 	for(auto& [_, renderData] : meshRenderData)
 	{

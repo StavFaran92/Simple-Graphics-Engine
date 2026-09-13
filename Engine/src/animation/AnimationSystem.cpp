@@ -55,21 +55,6 @@ void AnimationSystem::bindBuffers()
 
 void AnimationSystem::update(Scene* scene, float dt)
 {
-	bindBuffers();
-
-	m_CalculateBoneTransformCS->use();
-	m_CalculateBoneTransformCS->setUniformValue("totalBoneTransforms", );
-	m_CalculateBoneTransformCS->setUniformValue("currentTime", dt);
-	glDispatchCompute(1, 1, 1);
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT); // Do i need this?
-
-
-	// Read result
-	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-	//GLuint* ptr = (GLuint*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
-	//GLuint result = ptr[0];
-	//glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
 	for (auto&& [e, animator, mesh] : scene->getRegistry().getRegistry().view<Animator, MeshRendererComponent>().each())
 	{
 		Entity entity(e, &scene->getRegistry());
