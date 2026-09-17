@@ -27,14 +27,7 @@ public:
 		const auto elapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - m_start).count();
 		const float elapsedMs = static_cast<float>(elapsedUs) / 1000.0f;
 
-		// Best-effort: ProfilerSystem may not be registered yet (e.g. very early startup).
-		try
-		{
-			Engine::get()->getSubSystem<ProfilerSystem>()->recordSample(m_name, elapsedMs);
-		}
-		catch (...)
-		{
-		}
+		logDebug("{} took {:.3f} ms", m_name, elapsedMs);
 	}
 
 private:
