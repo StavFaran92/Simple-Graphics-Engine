@@ -164,6 +164,13 @@ void RenderFunctions::drawTransparentScene(Scene* scene)
 				//continue; // TODO fix
 			}
 
+			// Only render transparent objects
+			auto matIndex = mesh->getMaterialIndex();
+			if (meshRenderer.at(matIndex)->getRenderMode() != MaterialRenderMode::Transparent)
+			{
+				continue;
+			}
+
 			transparentEntities[distance] = entityHandler;
 		}
 	}
@@ -195,12 +202,6 @@ void RenderFunctions::drawTransparentScene(Scene* scene)
 		for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.resource()->getMeshes())
 		{
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
-			{
-				continue;
-			}
-
-			// Only render transparent objects
-			if (graphics->material->getRenderMode() != MaterialRenderMode::Transparent)
 			{
 				continue;
 			}
@@ -281,13 +282,16 @@ void RenderFunctions::drawSceneUsingCustomShader(Scene* scene)
 
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
+			auto matIndex = mesh->getMaterialIndex();
+			graphics->material = meshRenderer.at(matIndex);
+
+			if (graphics->material->getRenderMode() != MaterialRenderMode::Custom)
+				continue;
+
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
 			{
 				continue;
 			}
-
-			if (graphics->material->getRenderMode() != MaterialRenderMode::Custom)
-				continue;
 
 			// draw model
 

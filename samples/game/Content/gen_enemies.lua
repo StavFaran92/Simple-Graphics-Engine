@@ -5,7 +5,7 @@ Script = {}
 function Script:create(entity)
     local prefab = Prefab.new("zombie")
 
-    local gridSize = 10
+    local gridSize = 50
     local spacing = 5
 
     for i = 0, gridSize - 1 do
