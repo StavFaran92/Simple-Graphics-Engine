@@ -16,4 +16,5 @@ void BuiltInResources::loadAllResources()
     m_resources[SGE_RESOURCE_SHADER_DEBUG_DATA] = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/normalDisplayShader.glsl");
     m_resources[SGE_RESOURCE_SHADER_FOLIAGE] = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/FoliageShader.glsl");
     m_resources[SGE_RESOURCE_SHADER_TEXTURE_BRUSH_DEFORM] = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/TexturePaintShader.glsl");
+    m_resources[SGE_RESOURCE_SHADER_BONE_TRANSFORM_SINGLE_THREAD_PER_INSTANCE_COMPUTE] = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SingleThreadPerInstanceBoneTransformComputeShader.glsl");
 }

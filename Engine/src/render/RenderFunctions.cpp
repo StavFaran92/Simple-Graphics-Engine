@@ -24,7 +24,7 @@
 #include "geometry/Model.h"
 #include "geometry/Mesh.h"
 #include "animation/Animator.h"
-#include "animation/AnimationSystem.h"
+#include "animation/BoneTransformSystem.h"
 
 bool RenderFunctions::prepareMeshForRender(Mesh* mesh, const Entity& entityHandler)
 {
@@ -428,9 +428,8 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 	graphics->instancedAnimationBuffer.setSlot(1);
 	graphics->instancedAnimationBuffer.bind();
-	graphics->instancedAnimationBuffer.resetCursor();
 
-	unsigned int totalBoneCount = 0;
+	BoneTransformSystem::beginFrame();
 
 	// Render all objects
 	for (auto&& [entity, meshRenderer, transform, obj] :
@@ -441,24 +440,20 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 		Entity entityHandler{ entity, &scene->getRegistry() };
 
-		// Animation belongs to the whole model (skeleton), not to any one of its meshes - compute it once
-		// per entity and write it straight into the animation SSBO. Meshes below only record where it landed.
+		// Animation belongs to the whole model (skeleton), not to any one of its meshes - schedule it once
+		// per entity via the GPU bone-transform router. Meshes below only record where the result will land;
+		// BoneTransformSystem::endFrame() (called after this loop) actually fills the animation SSBO.
 		unsigned int modelIndex = 0;
 		unsigned int isAnimated = 0;
 
 		auto animator = entityHandler.tryGetComponent<Animator>();
 		if (animator && animator->hasActiveAnimation())
 		{
-			std::vector<glm::mat4> boneTransforms;
-			animator->getFinalBoneMatrices(meshRenderer.mesh.resource(), boneTransforms);
-
-			int byteOffset = graphics->instancedAnimationBuffer.pushData(sizeof(glm::mat4) * boneTransforms.size(), boneTransforms.data());
-			modelIndex = static_cast<unsigned int>(byteOffset / sizeof(glm::mat4));
+			modelIndex = BoneTransformSystem::addInstance(*animator, meshRenderer.mesh.resource());
 			isAnimated = 1u;
 		}
 
 		unsigned int boneCount = static_cast<unsigned int>(meshRenderer.mesh.resource()->getBoneOffsets().size());
-		totalBoneCount += boneCount;
 
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
@@ -493,26 +488,11 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 			renderData.models.push_back(graphics->model);
 			renderData.instances.push_back(instance);
-
-			
 		}
 
 	};
 
-	Engine::get()->getSubSystem<AnimationSystem>()->bindBuffers();
-
-	m_CalculateBoneTransformCS->use();
-	m_CalculateBoneTransformCS->setUniformValue("totalBoneTransforms", totalBoneCount);
-	m_CalculateBoneTransformCS->setUniformValue("currentTime", dt);
-	glDispatchCompute(1, 1, 1);
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT); // Do i need this?
-
-
-	// Read result
-	//glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-	//GLuint* ptr = (GLuint*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), GL_MAP_READ_BIT);
-	//GLuint result = ptr[0];
-	//glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	BoneTransformSystem::endFrame(graphics->instancedAnimationBuffer);
 
 	for(auto& [_, renderData] : meshRenderData)
 	{
