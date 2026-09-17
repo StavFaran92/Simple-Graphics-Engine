@@ -38,6 +38,7 @@
 #include "component/TagComponent.h"
 #include "core/Random.h"
 #include "systems/TimeManager.h"
+#include "systems/ProfilerSystem.h"
 #include "render/Graphics.h"
 
 #include "memory/ResourceManager.h"

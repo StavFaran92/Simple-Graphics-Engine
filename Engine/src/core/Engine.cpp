@@ -10,8 +10,10 @@
 #include "geometry/ModelImporter.h"
 #include "core/Logger.h"
 #include "core/TraceLogger.h"
+#include "core/ScopeTimer.h"
 #include "core/CacheSystem.h"
 #include "systems/TimeManager.h"
+#include "systems/ProfilerSystem.h"
 #include "physics/PhysicsSystem.h"
 #include "core/Random.h"
 #include "render/ShaderLoader.h"
@@ -186,6 +188,7 @@ void Engine::createSystems()
     m_eventSystem = std::make_shared<EventSystem>();
     m_eventLayerStack = std::make_shared<EventLayerStack>();
     registerSubSystem<System>(new System()); // TODO change to systemAnalytics
+    registerSubSystem<ProfilerSystem>(new ProfilerSystem());
     m_timeManager = std::make_shared<TimeManager>();
     registerSubSystem<TimeManager>(m_timeManager.get());
     m_randomSystem = std::make_shared<RandomNumberGenerator>();
@@ -349,12 +352,16 @@ Context* Engine::getContext() const
 
 void Engine::draw(float deltaTime)
 {
+    SCOPE_TIMER("Engine::draw");
+
     m_context->draw(deltaTime);
 }
 
 
 void Engine::update(float deltaTime)
 {
+    SCOPE_TIMER("Engine::update");
+
     m_context->update(deltaTime);
 }
 #include "core/SGE_Exception.h"

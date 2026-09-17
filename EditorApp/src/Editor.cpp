@@ -337,6 +337,29 @@ void DisplayDebugInfoWindow()
 
 	ImGui::Separator();
 
+	// --- CPU Scope Timers ---
+	ImGui::Text("CPU Timings:");
+	auto profilerSnapshot = Engine::get()->getSubSystem<ProfilerSystem>()->getSnapshot();
+	for (const auto& [name, history] : profilerSnapshot)
+	{
+		if (history.count == 0)
+			continue;
+
+		ImGui::Text("%s: %.3f ms", name.c_str(), history.latest);
+
+		const int valuesOffset = (history.count < ProfilerSystem::kHistorySize) ? 0 : history.offset;
+		ImGui::PlotLines(("##" + name).c_str(),
+			history.samples.data(),
+			history.count,
+			valuesOffset,
+			nullptr,
+			0.0f,
+			FLT_MAX,
+			ImVec2(0, 60));
+	}
+
+	ImGui::Separator();
+
 	// --- Texture List ---
 	const auto& debugTextures = DebugHelper::getInstance().getDebugTextures();
 
