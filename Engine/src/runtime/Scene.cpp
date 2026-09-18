@@ -345,7 +345,7 @@ bool Scene::isReady() const
 
 void Scene::update(float deltaTime)
 {
-	preloadSceneResources();
+	//preloadSceneResources();
 
 	getGameCamera().getComponent<Transformation>().update();
 

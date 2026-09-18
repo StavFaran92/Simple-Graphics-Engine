@@ -12,7 +12,7 @@ Graphics::Graphics()
 	constexpr int maxInstancedObjects = 5000; // approx upper bound on instanced object count
 	constexpr int maxBonesPerObject = 100; // matches MAX_BONES in animation.glsl
 
-	instancedModelBuffer.allocate(maxInstancedObjects);
+	instancedModelBuffer.allocate(maxInstancedObjects * sizeof(glm::mat4));
 	instancedAnimationBuffer.allocate(maxInstancedObjects * maxBonesPerObject * sizeof(glm::mat4));
 	instancedInstanceDataBuffer.allocate(maxInstancedObjects * sizeof(InstanceData));
 	//irradianceMap = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
