@@ -335,6 +335,11 @@ void DisplayDebugInfoWindow()
 	auto triangleCount = Engine::get()->getSubSystem<System>()->getTriangleCount();
 	ImGui::Text("Triangle count: %u", triangleCount);
 
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+	bool vsync = graphics->isVSyncEnabled();
+	if (ImGui::Checkbox("VSync", &vsync))
+		graphics->setVSync(vsync);
+
 	ImGui::Separator();
 
 	// --- CPU Scope Timers ---

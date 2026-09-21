@@ -18,6 +18,12 @@ layout (location = 6) in vec3 aBoneWeights;
 #include ../../../../Engine/Resources/Engine/Shaders/include/buffers.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/animation.glsl
 
+// ----- Uniforms ----- //
+
+// Mesh rest transform, constant for a whole instanced batch (one batch == one mesh),
+// so it is folded in here instead of being baked into every per-instance model matrix.
+uniform mat4 restTransform;
+
 // ----- Out ----- //
 
 out VS_OUT {
@@ -45,7 +51,7 @@ void main()
 
     if (isGpuInstanced)
     {
-        finalModel = transformBuffer[gl_InstanceID];
+        finalModel = transformBuffer[gl_InstanceID] * restTransform;
     }
 
 	vec4 totalPosition;

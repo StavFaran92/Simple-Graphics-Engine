@@ -33,17 +33,15 @@ bool RenderFunctions::prepareMeshForRender(Mesh* mesh, const Entity& entityHandl
 	auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
 
 	graphics->mesh = mesh;
-	auto& transform = entityHandler.getComponent<Transformation>();
-	glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
-	graphics->model = modelTransform;
+	graphics->model = entityHandler.getComponent<Transformation>().getWorldTransformation();
 
-	AABB& aabb = mesh->getAABB();
-	aabb.transform(modelTransform);
+	//AABB& aabb = mesh->getAABB();
+	//aabb.transform(modelTransform);
 
-	if (!aabb.isOnFrustum(*graphics->frustum))
-	{
-		return false;
-	}
+	//if (!aabb.isOnFrustum(*graphics->frustum))
+	//{
+	//	return false;
+	//}
 
 	//DebugHelper::getInstance().drawAABB(aabb);
 
@@ -424,6 +422,7 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 	{
 		std::shared_ptr<Mesh> mesh;
 		MaterialResourceRef material;
+		glm::mat4 restTransform{ 1.f };
 		std::vector<InstanceData> instances;
 		std::vector<glm::mat4> models;
 	};
@@ -459,11 +458,40 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 
 		unsigned int boneCount = static_cast<unsigned int>(meshRenderer.mesh.resource()->getBoneOffsets().size());
 
+		// The rest transform is per mesh, not per instance, so it is passed to the shader as a
+		// per-batch uniform - only the entity's world transform goes into the instance buffer.
+		const glm::mat4 worldTransform = transform.getWorldTransformation();
+
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
 			{
 				continue;
+			}
+
+			auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+			auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+
+			graphics->mesh = mesh.get();
+			graphics->model = worldTransform;
+
+			//AABB& aabb = mesh->getAABB();
+			//aabb.transform(worldTransform * mesh->getRestTransform());
+
+			//if (!aabb.isOnFrustum(*graphics->frustum))
+			//{
+			//	return false;
+			//}
+
+			//DebugHelper::getInstance().drawAABB(aabb);
+
+			auto matIndex = mesh->getMaterialIndex();
+			graphics->material = meshRenderer.at(matIndex);
+
+			if (graphics->material.isEmpty())
+			{
+				graphics->material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
 			}
 
 			if (graphics->material->getRenderMode() != MaterialRenderMode::Opaque)
@@ -479,6 +507,7 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 				MeshRenderData data;
 				data.mesh = mesh;
 				data.material = graphics->material;
+				data.restTransform = mesh->getRestTransform();
 				meshRenderData.emplace(vaoID, std::move(data));
 				it = meshRenderData.find(vaoID);
 			}
@@ -490,7 +519,7 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 			instance.isAnimated = isAnimated;
 			instance.boneCount = boneCount;
 
-			renderData.models.push_back(graphics->model);
+			renderData.models.push_back(worldTransform);
 			renderData.instances.push_back(instance);
 		}
 
@@ -509,6 +538,7 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
 		graphics->instancedInstanceDataBuffer.setData(sizeof(InstanceData) * renderData.instances.size(), renderData.instances.data());
 
 		renderData.material->use();
+		renderData.material->getActiveShader()->setUniformValue("restTransform", renderData.restTransform);
 		RenderCommand::drawInstanced(renderData.mesh->getVAO(), renderData.models.size());
 
 	}

@@ -59,10 +59,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 )
 
 if(MSVC)
-    set_source_files_properties(
-        ${SOURCE_ROOT}/scripts/LuaBindings.cpp
-        PROPERTIES COMPILE_FLAGS "/bigobj"
-    )
+    target_compile_options(${PROJECT_NAME} PUBLIC /bigobj)
 endif()
  
 add_subdirectory(extern)

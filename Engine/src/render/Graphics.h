@@ -42,6 +42,10 @@ public:
 	
 public:
 	void reloadShaders();
+
+	// Toggles vertical sync (swap interval) on the current GL context.
+	void setVSync(bool enabled);
+	bool isVSyncEnabled() const { return m_vsync; }
 public:
 	Scene* scene = nullptr;
 	Context* context = nullptr;
@@ -77,4 +81,7 @@ public:
 	SSBO instancedModelBuffer;
 	SSBO instancedAnimationBuffer;
 	SSBO instancedInstanceDataBuffer;
+
+private:
+	bool m_vsync = false;
 };
