@@ -1,7 +1,7 @@
 set(PROJECT_NAME Engine)
 
 set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build." FORCE)
-set(CMAKE_CONFIGURATION_TYPES "Release;RelWithDebInfo" CACHE STRING "" FORCE)
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "" FORCE)
 
 # Set relative source root (assuming src is inside Engine/)
 set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -56,6 +56,7 @@ target_compile_options(${PROJECT_NAME} PUBLIC
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
     $<$<CONFIG:RelWithDebInfo>:SGE_DEBUG>
+    $<$<CONFIG:Debug>:SGE_DEBUG>
 )
 
 if(MSVC)

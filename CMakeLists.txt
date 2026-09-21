@@ -5,6 +5,14 @@ project(SGE)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# The prebuilt third party libs (PhysX, assimp, spdlog, SDL2, ...) are all release CRT (/MT),
+# so every config - Debug included - has to use the same runtime to link against them.
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+
+# PhysX requires exactly one of NDEBUG/_DEBUG, and we link its checked (NDEBUG) binaries in
+# every config, so Debug takes NDEBUG too - CMake does not define either one for Debug.
+add_compile_definitions($<$<CONFIG:Debug>:NDEBUG>)
+
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
