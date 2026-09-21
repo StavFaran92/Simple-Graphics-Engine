@@ -298,7 +298,11 @@ void PhysicsSystem::removeActor(Scene* scene, entt::entity entity)
     Entity e{ entity, &scene->getRegistry()};
 
     auto& rBody = e.getComponent<PhysicsComponent>();
-    scene->getPhysicsScene()->removeActor(*(physx::PxRigidActor*)rBody.simulatedBody);
+
+    if (rBody.simulatedBody)
+    {
+        scene->getPhysicsScene()->removeActor(*(physx::PxRigidActor*)rBody.simulatedBody);
+    }
 }
 
 void PhysicsSystem::createActor(Scene* scene, entt::entity entity)
