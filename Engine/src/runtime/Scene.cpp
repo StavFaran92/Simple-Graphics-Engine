@@ -1387,6 +1387,8 @@ void Scene::startSimulation()
 		return;
 	}
 
+	m_simulationState = SimState::ACTIVE;
+
 	Engine::get()->getPhysicsSystem()->startScenePhysics(this);
 
 	// Run all User Scriptable Entities scripts
@@ -1438,8 +1440,6 @@ void Scene::startSimulation()
 	}
 
 	gameEventLayer->setEnabled(true);
-
-	m_simulationState = SimState::ACTIVE;
 }
 
 void Scene::stopSimulation()

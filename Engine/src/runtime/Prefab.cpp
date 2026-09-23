@@ -14,7 +14,10 @@
 #include "component/ObjectComponent.h"
 #include "core/Engine.h"
 #include "component/Transformation.h"
+#include "component/ScriptComponent.h"
 #include "runtime/Context.h"
+#include "runtime/Scene.h"
+#include "scripts/ScriptSystem.h"
 
 PrefabResourceRef Prefab::load(const std::string& fileLocation, PrefabLoadDescriptor desc)
 {
@@ -115,13 +118,18 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 		entityIDRemapTable[oldEntityID] = e;
 
 		std::string newName = e.getComponent<ObjectComponent>().name;
-		newName += "_copy";
+		//newName += "_copy";
 
 		// Todo - validate name is not taken
 
 		e.getComponent<ObjectComponent>().name = newName;
 		e.getComponent<ObjectComponent>().e = e;
 		e.getComponent<Transformation>().entity = e;
+
+		if (auto script = e.tryGetComponent<ScriptComponent>())
+		{
+			script->entity = e;
+		}
 
 		createdEntities.push_back(e);
 	}
@@ -179,6 +187,27 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	// First entity is the root.
 	Entity& root = createdEntities.front();
 	root.getComponent<Transformation>().setLocalPosition(position);
+
+	auto activeScene = Engine::get()->getContext()->getActiveScene();
+	if (activeScene->isSimulationActive())
+	{
+		auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
+		for (Entity& e : createdEntities)
+		{
+			auto* scriptComponent = e.tryGetComponent<ScriptComponent>();
+			if (!scriptComponent || !scriptComponent->isValid())
+				continue;
+
+			scriptSystem->reloadScript(e, *scriptComponent);
+			scriptSystem->resolveRefs(e);
+		}
+
+		for (Entity& e : createdEntities)
+		{
+			if (e.HasComponent<ScriptComponent>())
+				scriptSystem->callCreate(e);
+		}
+	}
 	
 	return root;
 }

@@ -123,7 +123,16 @@ void ScriptSystem::callCreate(Entity entity)
 
 void ScriptSystem::callCreateOnAll()
 {
+    // Snapshot entities first: calling into Lua's create() may spawn a prefab,
+    // which inserts/erases entries in impl_->scripts (see ScriptComponent::postLoad).
+    // Iterating the map directly while that happens is UB (insert can rehash and
+    // invalidate the in-flight iterator).
+    std::vector<Entity> entities;
+    entities.reserve(impl_->scripts.size());
     for (auto& [e, state] : impl_->scripts)
+        entities.push_back(e);
+
+    for (Entity e : entities)
         callCreate(e);
 }
 
@@ -146,7 +155,14 @@ void ScriptSystem::callUpdate(Entity entity, float dt)
 
 void ScriptSystem::callUpdateOnAll(float dt)
 {
+    // See callCreateOnAll: snapshot entities first since update() can spawn
+    // prefabs and mutate impl_->scripts mid-iteration.
+    std::vector<Entity> entities;
+    entities.reserve(impl_->scripts.size());
     for (auto& [e, state] : impl_->scripts)
+        entities.push_back(e);
+
+    for (Entity e : entities)
         callUpdate(e, dt);
 }
 

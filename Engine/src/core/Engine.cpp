@@ -352,7 +352,7 @@ Context* Engine::getContext() const
 
 void Engine::draw(float deltaTime)
 {
-    SCOPE_TIMER("Engine::draw");
+    //SCOPE_TIMER("Engine::draw");
 
     m_context->draw(deltaTime);
 }
@@ -360,7 +360,7 @@ void Engine::draw(float deltaTime)
 
 void Engine::update(float deltaTime)
 {
-    SCOPE_TIMER("Engine::update");
+    //SCOPE_TIMER("Engine::update");
 
     m_context->update(deltaTime);
 }
