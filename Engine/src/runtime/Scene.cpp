@@ -194,7 +194,6 @@ void Scene::init(Context* context, ResourceID rid)
 		if (scene->isReady())
 		{
 			c.init(scene);
-			c.onInit(scene);
 		}
 		else
 		{

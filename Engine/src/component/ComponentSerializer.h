@@ -80,16 +80,6 @@ public:
 			}
 		};
 
-		entry.onInit = [](Entity e, SceneResourceRef& scene) {
-			entt::entity entity = e.handler();
-			if (scene->getRegistry().get().all_of<T>(entity))
-			{
-				auto& c = scene->getRegistry().get().get<T>(entity);
-
-				c.onInit(scene);
-			}
-		};
-
 		entry.postLoad = [](Entity e, SceneResourceRef& scene) {
 			entt::entity entity = e.handler();
 			if (scene->getRegistry().get().all_of<T>(entity))

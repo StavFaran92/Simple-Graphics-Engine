@@ -29,7 +29,7 @@ struct EngineAPI SkyboxComponent : public Component
 
 	void build();
 
-	void onInit(SceneResourceRef& scene) override;
+	void init(SceneResourceRef& scene) override;
 	void postLoad(SceneResourceRef& scene) override;
 
 
