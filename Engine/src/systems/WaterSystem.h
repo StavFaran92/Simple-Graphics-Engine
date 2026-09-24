@@ -14,5 +14,5 @@ public:
 
 	static void drawWaterBody(const WaterBodyComponent& waterBody);
 
-	void prepareWaterBodyForRender(WaterBodyComponent& waterBody);
+	void prepareWaterBodyForRender(WaterBodyComponent& waterBody, Entity entity);
 };

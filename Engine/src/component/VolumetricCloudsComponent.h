@@ -9,11 +9,8 @@
 struct EngineAPI VolumetricCloudsComponent : public Component
 {
 	VolumetricCloudsComponent() = default;
-	VolumetricCloudsComponent(Entity entity);
 
 	std::string getName() override { return "VolumetricCloudsComponent"; }
-
-	MaterialAssetRef getMaterial();
 
 	template <class Archive>
 	void serialize(Archive& archive) {
@@ -31,8 +28,6 @@ struct EngineAPI VolumetricCloudsComponent : public Component
 		//SERIALIZED_MEMBER(opacity);
 
 	}
-
-	Entity entity = Entity::EmptyEntity;
 
 	glm::vec3 colorA{ 0.023497, 0.451692, 1.0 };
 	glm::vec3 colorB{ 0.0, 0.05938, 0.135417 };

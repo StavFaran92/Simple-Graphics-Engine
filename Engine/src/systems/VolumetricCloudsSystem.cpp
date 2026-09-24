@@ -24,7 +24,7 @@ VolumetricCloudsSystem::VolumetricCloudsSystem()
 Entity VolumetricCloudsSystem::createVolumetricClouds()
 {
 	auto volumetricCloudsEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Volumetric Clouds");
-	auto& volumetricCloudsComponent = volumetricCloudsEntity.addComponent<VolumetricCloudsComponent>(volumetricCloudsEntity);
+	auto& volumetricCloudsComponent = volumetricCloudsEntity.addComponent<VolumetricCloudsComponent>();
 
 	auto cloudVolumeEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Volume");
 	cloudVolumeEntity.setParent(volumetricCloudsEntity);
@@ -55,16 +55,22 @@ Entity VolumetricCloudsSystem::createVolumetricClouds()
 	return volumetricCloudsEntity;
 }
 
-void VolumetricCloudsSystem::prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds)
+void VolumetricCloudsSystem::prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds, Entity entity)
 {
-	auto& materialResource = clouds.getMaterial().resource();
+	if (!entity.valid())
+	{
+		logWarning("Invalid Entity set in volumetric clouds");
+		return;
+	}
+
+	VolumeComponent& volumeComponent = entity.getComponentInChildren<VolumeComponent>();
+
+	auto& materialResource = volumeComponent.material.resource();
 	materialResource->setUniformValue("MARCH_SIZE", clouds.marchSize);
 
-
-	VolumeComponent& volumeComponent = clouds.entity.getComponentInChildren<VolumeComponent>();
 	auto& mesh = volumeComponent.mesh.resource()->getPrimaryMesh();
 
-	auto& transform = clouds.entity.getComponent<Transformation>();
+	auto& transform = entity.getComponent<Transformation>();
 	glm::mat4 modelTransform = transform.getWorldTransformation() * mesh->getRestTransform();
 
 	AABB& aabb = mesh->getAABB();

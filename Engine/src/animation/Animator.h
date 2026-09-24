@@ -17,7 +17,7 @@ public:
 
 	std::string getName() override { return "Animator"; }
 
-	void resolve(SceneResourceRef& scene) override;
+	void init(SceneResourceRef& scene) override;
 
 	void onStart();
 	void update(Entity e, float dt);

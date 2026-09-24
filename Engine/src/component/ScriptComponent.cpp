@@ -63,7 +63,7 @@ Entity ScriptComponent::getRef(const std::string& fieldName)
 	return Entity::EmptyEntity;
 }
 
-void ScriptComponent::resolve(SceneResourceRef& scene)
+void ScriptComponent::init(SceneResourceRef& scene)
 {
 	entity.setRegistry(&scene->getRegistry());
 

@@ -169,7 +169,7 @@ std::unordered_map<entity_id, Entity> Transformation::getChildren()
 	return m_children;
 }
 
-void Transformation::resolve(SceneResourceRef& scene)
+void Transformation::init(SceneResourceRef& scene)
 {
 	entity.setRegistry(&scene->getRegistry());
 	root.setRegistry(&scene->getRegistry());

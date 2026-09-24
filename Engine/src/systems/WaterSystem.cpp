@@ -17,7 +17,7 @@ WaterSystem::WaterSystem()
 Entity WaterSystem::createPool()
 {
 	auto waterBodyEntity = Engine::get()->getContext()->getActiveScene()->createEntity("Pool");
-	auto& waterBodyComponent = waterBodyEntity.addComponent<WaterBodyComponent>(waterBodyEntity);
+	auto& waterBodyComponent = waterBodyEntity.addComponent<WaterBodyComponent>();
 
 	auto waterBodyNestedImpl = Engine::get()->getContext()->getActiveScene()->createEntity("NestedImpl");
 	auto& transform = waterBodyNestedImpl.getComponent<Transformation>();
@@ -71,9 +71,16 @@ void WaterSystem::drawWaterBody(const WaterBodyComponent& waterBody)
 {
 }
 
-void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody)
+void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody, Entity entity)
 {
-	auto& materialResource = waterBody.getMaterial().resource();
+	if (!entity.valid())
+	{
+		logWarning("Invalid Entity set in water body");
+		return;
+	}
+
+	MeshRendererComponent& meshRenderer = entity.getComponentInChildren<MeshRendererComponent>(false); // todo fix this is unsafe (getComponentInChildren itself is)
+	auto& materialResource = meshRenderer.getMaterialBySlot(0).resource(); // A water body plane only has single material
 
 	if (materialResource.isEmpty())
 	{

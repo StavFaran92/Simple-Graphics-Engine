@@ -32,7 +32,7 @@ public:
 		SERIALIZED_MEMBER_OPTIONAL(refs);
 	}
 
-	void resolve(SceneResourceRef& scene) override;
+	void init(SceneResourceRef& scene) override;
 	void postLoad(SceneResourceRef& scene) override;
 
 	LuaScriptAssetRef script;

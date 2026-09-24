@@ -47,7 +47,7 @@ public:
 
 	virtual std::string getName() = 0;
 	virtual void onInit(SceneResourceRef& scene) {};
-	virtual void resolve(SceneResourceRef& scene) {};
+	virtual void init(SceneResourceRef& scene) {};
 	virtual void postLoad(SceneResourceRef& scene) {};
 
 public:

@@ -30,7 +30,6 @@ struct EngineAPI SkyboxComponent : public Component
 	void build();
 
 	void onInit(SceneResourceRef& scene) override;
-	void resolve(SceneResourceRef& scene) override;
 	void postLoad(SceneResourceRef& scene) override;
 
 
@@ -38,8 +37,6 @@ struct EngineAPI SkyboxComponent : public Component
 	//TextureResourceRef cubemap;
 
 	//TextureAssetRef
-
-	SceneResourceRef m_scene = nullptr;
 
 	bool m_isBuilt = false;
 

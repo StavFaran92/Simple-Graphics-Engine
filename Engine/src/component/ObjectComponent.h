@@ -6,21 +6,19 @@
 struct EngineAPI ObjectComponent : public Component
 {
 	ObjectComponent() = default;
-	ObjectComponent(Entity e, const std::string& name) : name(name), e(e) {};
+	ObjectComponent(Entity e, const std::string& name) : name(name)/*, e(e) */{};
 
 	std::string getName() override { return "ObjectComponent"; }
-
-	void resolve(SceneResourceRef& scene) override;
 
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZE_COMPONENT_BASE;
 		SERIALIZED_MEMBER(name);
-		SERIALIZED_MEMBER(e);
+		//SERIALIZED_MEMBER(e);
 	}
 
 	std::string name;
-	Entity e = Entity::EmptyEntity;
+	//Entity e = Entity::EmptyEntity;
 
 };
 

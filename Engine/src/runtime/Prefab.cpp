@@ -105,7 +105,7 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 
 		for (auto& cbWrapper : ComponentSerdes::getRegistry())
 		{
-			cbWrapper.resolve(e, scene);
+			cbWrapper.init(e, scene);
 		}
 
 		for (auto& cbWrapper : ComponentSerdes::getRegistry())
@@ -113,7 +113,7 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 			cbWrapper.postLoad(e, scene);
 		}
 
-		entity_id oldEntityID = e.getComponent<ObjectComponent>().e.handlerID();
+		entity_id oldEntityID = e.handlerID();
 
 		entityIDRemapTable[oldEntityID] = e;
 
@@ -123,7 +123,7 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 		// Todo - validate name is not taken
 
 		e.getComponent<ObjectComponent>().name = newName;
-		e.getComponent<ObjectComponent>().e = e;
+		//e.getComponent<ObjectComponent>().e = e;
 		e.getComponent<Transformation>().entity = e;
 
 		if (auto script = e.tryGetComponent<ScriptComponent>())

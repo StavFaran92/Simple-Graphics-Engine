@@ -16,7 +16,7 @@ public:
 
 	//static void drawWaterBody(const WaterBodyComponent& waterBody);
 
-	void prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds);
+	void prepareVolumetricCloudsForRender(VolumetricCloudsComponent& clouds, Entity entity);
 
 private:
 	TextureResourceRef m_noiseTexture;

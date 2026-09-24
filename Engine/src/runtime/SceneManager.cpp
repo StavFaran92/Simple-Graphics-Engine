@@ -99,7 +99,7 @@ void SceneManager::stopSimulation()
 	{
 		activeScene->getRegistry().get().each([&](entt::entity e) {
 			Entity entity(e, &activeScene->getRegistry());
-			cbWrapper.resolve(entity, activeScene);
+			cbWrapper.init(entity, activeScene);
 		});
 
 	}

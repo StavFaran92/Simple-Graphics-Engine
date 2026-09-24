@@ -77,7 +77,9 @@ static void updateScene()
 	sceneObjects.clear();
 	for (auto&& [entity, obj] : Engine::get()->getContext()->getActiveScene()->getRegistry().get().view<ObjectComponent>().each())
 	{
-		sceneObjects.emplace_back(SceneObject{ obj.name, obj.e });
+		sceneObjects.emplace_back(SceneObject{ 
+			obj.name, 
+			Entity{entity, &Engine::get()->getContext()->getActiveScene()->getRegistry() } });
 	}
 }
 

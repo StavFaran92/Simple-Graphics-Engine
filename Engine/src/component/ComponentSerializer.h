@@ -30,7 +30,7 @@ struct SerializerEntry
 	std::string name;
 	SnapshotSerializeFunc serialize;
 	SnapshotDeserializeFunc deserialize;
-	std::function<void(Entity e, SceneResourceRef&)> resolve;
+	std::function<void(Entity e, SceneResourceRef&)> init;
 	std::function<void(Entity e, SceneResourceRef&)> onInit;
 	std::function<void(Entity e, SceneResourceRef&)> postLoad;
 };
@@ -70,13 +70,13 @@ public:
 				}
 			};
 
-		entry.resolve = [](Entity e, SceneResourceRef& scene) { 
+		entry.init = [](Entity e, SceneResourceRef& scene) {
 			entt::entity entity = e.handler();
 			if (scene->getRegistry().get().all_of<T>(entity))
 			{
 				auto& c = scene->getRegistry().get().get<T>(entity);
 
-				c.resolve(scene);
+				c.init(scene);
 			}
 		};
 

@@ -113,7 +113,7 @@ public:
 
 	std::unordered_map<entity_id, Entity> getChildren();
 
-	void resolve(SceneResourceRef& scene) override;
+	void init(SceneResourceRef& scene) override;
 	void postLoad(SceneResourceRef& scene) override;
 
 	std::string getName() override { return "Transformation"; }

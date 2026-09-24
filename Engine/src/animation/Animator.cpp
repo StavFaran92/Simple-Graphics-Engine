@@ -8,7 +8,7 @@
 #include "core/Engine.h"
 #include "scripts/ScriptSystem.h"
 
-void Animator::resolve(SceneResourceRef& scene)
+void Animator::init(SceneResourceRef& scene)
 {
 	m_animationGraph.setAnimatorOwner(this);
 }

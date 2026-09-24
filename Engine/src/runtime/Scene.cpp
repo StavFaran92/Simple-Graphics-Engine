@@ -92,7 +92,7 @@ SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescripto
 	{
 		scene->getRegistry().get().each([&](entt::entity e) {
 			Entity entity(e, &scene->getRegistry());
-			cbWrapper.resolve(entity, scene);
+			cbWrapper.init(entity, scene);
 		});
 		
 	}
@@ -193,7 +193,7 @@ void Scene::init(Context* context, ResourceID rid)
 
 		if (scene->isReady())
 		{
-			c.resolve(scene);
+			c.init(scene);
 			c.onInit(scene);
 		}
 		else
@@ -478,12 +478,12 @@ void Scene::draw(float deltaTime)
 
 		for (auto&& [entity, waterBody, transform] : m_registry->get().view<WaterBodyComponent, Transformation>().each())
 		{
-			Engine::get()->getSubSystem<WaterSystem>()->prepareWaterBodyForRender(waterBody);
+			Engine::get()->getSubSystem<WaterSystem>()->prepareWaterBodyForRender(waterBody, Entity(entity, &getRegistry()));
 		}
 
 		for (auto&& [entity, clouds, transform] : m_registry->get().view<VolumetricCloudsComponent, Transformation>().each())
 		{
-			Engine::get()->getSubSystem <VolumetricCloudsSystem>()->prepareVolumetricCloudsForRender(clouds);
+			Engine::get()->getSubSystem <VolumetricCloudsSystem>()->prepareVolumetricCloudsForRender(clouds, Entity(entity, &getRegistry()));
 		}
 
 		// PRE Render Phase
