@@ -113,7 +113,9 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 			cbWrapper.postLoad(e, scene);
 		}
 
-		entity_id oldEntityID = e.handlerID();
+		//The created entity might not receive the specified id since its taken, so we do this to fetch the old entity actual id
+		Entity tempEntity{ serializedEntity.entity, &Engine::get()->getContext()->getActiveScene()->getRegistry() };
+		entity_id oldEntityID = tempEntity.handlerID();
 
 		entityIDRemapTable[oldEntityID] = e;
 
