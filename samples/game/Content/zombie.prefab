@@ -68,33 +68,19 @@
                     },
                     {
                         "polymorphic_id": 2147483651,
-                        "polymorphic_name": "ObjectComponent",
-                        "ptr_wrapper": {
-                            "id": 2147483651,
-                            "data": {
-                                "isActive": true,
-                                "name": "zombie",
-                                "e": {
-                                    "m_entity": 9
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "polymorphic_id": 2147483652,
                         "polymorphic_name": "PhysicsComponent",
                         "ptr_wrapper": {
-                            "id": 2147483652,
+                            "id": 2147483651,
                             "data": {
                                 "isActive": true,
                                 "rigidBodyType": 2,
                                 "collisionType": 0,
                                 "mass": 0.0,
                                 "collider": {
-                                    "polymorphic_id": 2147483653,
+                                    "polymorphic_id": 2147483652,
                                     "polymorphic_name": "CollisionCapsule",
                                     "ptr_wrapper": {
-                                        "id": 2147483653,
+                                        "id": 2147483652,
                                         "data": {
                                             "layerMask": 0,
                                             "radius": 0.20000000298023225,
@@ -114,6 +100,17 @@
                                     "v.y": 0.699999988079071,
                                     "v.z": 0.0
                                 }
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483653,
+                        "polymorphic_name": "ObjectComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483653,
+                            "data": {
+                                "isActive": true,
+                                "name": "zombie"
                             }
                         }
                     }
@@ -492,26 +489,23 @@
                         }
                     },
                     {
-                        "polymorphic_id": 3,
+                        "polymorphic_id": 2147483656,
+                        "polymorphic_name": "RenderableComponent",
                         "ptr_wrapper": {
                             "id": 2147483658,
                             "data": {
                                 "isActive": true,
-                                "name": "model",
-                                "e": {
-                                    "m_entity": 10
-                                }
+                                "renderTechnique": 1
                             }
                         }
                     },
                     {
-                        "polymorphic_id": 2147483656,
-                        "polymorphic_name": "RenderableComponent",
+                        "polymorphic_id": 5,
                         "ptr_wrapper": {
                             "id": 2147483659,
                             "data": {
                                 "isActive": true,
-                                "renderTechnique": 1
+                                "name": "model"
                             }
                         }
                     }
@@ -560,19 +554,6 @@
                         "ptr_wrapper": {
                             "id": 2147483661,
                             "data": {
-                                "isActive": true,
-                                "name": "attack_collider",
-                                "e": {
-                                    "m_entity": 1048587
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "polymorphic_id": 4,
-                        "ptr_wrapper": {
-                            "id": 2147483662,
-                            "data": {
                                 "isActive": false,
                                 "rigidBodyType": 2,
                                 "collisionType": 1,
@@ -581,7 +562,7 @@
                                     "polymorphic_id": 2147483657,
                                     "polymorphic_name": "CollisionBox",
                                     "ptr_wrapper": {
-                                        "id": 2147483663,
+                                        "id": 2147483662,
                                         "data": {
                                             "layerMask": 0,
                                             "extents": {
@@ -611,10 +592,20 @@
                         "polymorphic_id": 2147483658,
                         "polymorphic_name": "TagComponent",
                         "ptr_wrapper": {
-                            "id": 2147483664,
+                            "id": 2147483663,
                             "data": {
                                 "isActive": true,
                                 "tag": "enemy_attack_collider"
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 5,
+                        "ptr_wrapper": {
+                            "id": 2147483664,
+                            "data": {
+                                "isActive": true,
+                                "name": "attack_collider"
                             }
                         }
                     }
