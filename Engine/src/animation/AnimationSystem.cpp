@@ -4,6 +4,7 @@
 #include "runtime/Scene.h"
 #include "animation/Animator.h"
 #include "component/MeshRendererComponent.h"
+#include "component/EngineComponents.h"
 
 namespace
 {
@@ -55,6 +56,12 @@ void AnimationSystem::bindBuffers()
 
 void AnimationSystem::update(Scene* scene, float dt)
 {
+	// Start animators of newly spawned entities
+	for (auto&& [e, animator, mesh] : scene->getRegistry().getRegistry().view<JustSpawned, Animator, MeshRendererComponent>().each())
+	{
+		animator.onStart();
+	}
+
 	for (auto&& [e, animator, mesh] : scene->getRegistry().getRegistry().view<Animator, MeshRendererComponent>().each())
 	{
 		Entity entity(e, &scene->getRegistry());

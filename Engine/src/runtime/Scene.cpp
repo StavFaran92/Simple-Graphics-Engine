@@ -364,6 +364,26 @@ void Scene::update(float deltaTime)
 			}
 		}
 
+		// Create newly spawned User Scriptable Entities scripts
+		for (auto&& [entity, nsc] : m_registry->get().view<JustSpawned, NativeScriptComponent>().each())
+		{
+			if (!nsc.script)
+			{
+				continue;
+			}
+
+			nsc.script->entity = Entity(entity, &getRegistry());
+
+			try
+			{
+				nsc.script->onCreate();
+			}
+			catch (const std::exception& e)
+			{
+				logError("Native Script Error occured: {}", e.what());
+			}
+		}
+
 		// Run all User Scriptable Entities scripts
 		for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())
 		{
@@ -1399,30 +1419,6 @@ void Scene::startSimulation()
 		m_registry->get().emplace_or_replace<JustSpawned>(e);
 	});
 
-	// Run all User Scriptable Entities scripts
-	for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())
-	{
-		if (!nsc.script)
-		{
-			logWarning("Native Script cannot be Null, did you forget to call Bind()?");
-			continue;
-		}
-
-		nsc.script->entity = Entity(entity, &getRegistry());
-
-		try
-		{
-			nsc.script->onCreate();
-		}
-		catch (const std::exception& e)
-		{
-			logError("Native Script Error occured: {}", e.what());
-		}
-		
-
-		//nsc.script->eventHandler = Engine::get()->getEventSystem()->bindToLayer(gameEventLayer->name);
-	}
-
 	// Run all scripts create
 	auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();
 	scriptSystem->bindDynamics();
@@ -1440,11 +1436,6 @@ void Scene::startSimulation()
 	catch (const std::exception& e)
 	{
 		logError("Script Error occured: {}", e.what());
-	}
-
-	for (auto&& [entity, animator, mesh] : m_registry->get().view<Animator, MeshRendererComponent>().each())
-	{
-		animator.onStart();
 	}
 
 	gameEventLayer->setEnabled(true);
