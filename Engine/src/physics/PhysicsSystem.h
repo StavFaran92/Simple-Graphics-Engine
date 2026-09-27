@@ -21,7 +21,6 @@ public:
 
 	physx::PxScene* createScene();
 
-	void startScenePhysics(Scene* scene);
 	void stopScenePhysics(Scene* scene);
 	void update(Scene* scene, float deltaTime);
 

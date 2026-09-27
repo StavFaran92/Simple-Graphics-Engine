@@ -49,6 +49,7 @@
 #include "component/RenderableComponent.h"
 #include "scripts/ScriptSystem.h"
 #include "animation/AnimationSystem.h"
+#include "systems/SpawnedTagCleanupSystem.h"
 #include "core/GameLayer.h"
 #include "systems/UniqueNameManager.h"
 #include "memory/BuiltInResources.h"
@@ -246,6 +247,7 @@ void Engine::createSystems()
     registerSubSystem<ObjectPicker>(new ObjectPicker());
     registerSubSystem<SSAOSystem>(new SSAOSystem());
     registerSubSystem<AnimationSystem>(new AnimationSystem());
+    registerSubSystem<SpawnedTagCleanupSystem>(new SpawnedTagCleanupSystem());
 }
 
 bool Engine::initSystems()

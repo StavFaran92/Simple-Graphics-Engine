@@ -15,6 +15,7 @@
 #include "core/Engine.h"
 #include "component/Transformation.h"
 #include "component/ScriptComponent.h"
+#include "component/EngineComponents.h"
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
 #include "scripts/ScriptSystem.h"
@@ -191,6 +192,13 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	root.getComponent<Transformation>().setLocalPosition(position);
 
 	auto activeScene = Engine::get()->getContext()->getActiveScene();
+
+	// Mark all created entities as newly spawned so every system initializes them
+	for (Entity& e : createdEntities)
+	{
+		activeScene->getRegistry().getRegistry().emplace_or_replace<JustSpawned>(e.handler());
+	}
+
 	if (activeScene->isSimulationActive())
 	{
 		auto scriptSystem = Engine::get()->getSubSystem<ScriptSystem>();

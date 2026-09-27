@@ -65,6 +65,8 @@
 #include "core/GameEventSystem.h"
 #include "render/RenderFunctions.h"
 #include "systems/SSAOSystem.h"
+#include "systems/SpawnedTagCleanupSystem.h"
+#include "component/EngineComponents.h"
 
 SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescriptor desc/* = {}*/)
 {
@@ -417,6 +419,9 @@ void Scene::update(float deltaTime)
 	//	preloadSceneResources();
 	//	m_isDirty = false;
 	//}
+
+	// Must be last, every system before this needs to see the JustSpawned tag this frame
+	Engine::get()->getSubSystem<SpawnedTagCleanupSystem>()->update(this);
 }
 
 void Scene::draw(float deltaTime)
@@ -1389,7 +1394,10 @@ void Scene::startSimulation()
 
 	m_simulationState = SimState::ACTIVE;
 
-	Engine::get()->getPhysicsSystem()->startScenePhysics(this);
+	// Mark all existing entities as newly spawned so every system initializes them in the next update
+	m_registry->get().each([&](entt::entity e) {
+		m_registry->get().emplace_or_replace<JustSpawned>(e);
+	});
 
 	// Run all User Scriptable Entities scripts
 	for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())

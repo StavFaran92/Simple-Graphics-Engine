@@ -13,6 +13,7 @@
 
 #include <glm/gtx/quaternion.hpp>
 #include "component/PlayerControllerComponent.h"
+#include "component/EngineComponents.h"
 #include "memory/BuiltInAssets.h"
 #include "component/Terrain.h"
 #include "component/ObjectComponent.h"
@@ -361,19 +362,6 @@ void PhysicsSystem::createCCTController(Scene* scene, entt::entity entity)
     ctrl->getActor()->userData = (void*)id;
 }
 
-void PhysicsSystem::startScenePhysics(Scene* scene)
-{
-    for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<PhysicsComponent>().each())
-    {
-        createActor(scene, entity);
-    }
-
-    for (auto&& [entity, pc] : scene->getRegistry().getRegistry().view<PlayerController>().each())
-    {
-        createCCTController(scene, entity);
-    }
-}
-
 void PhysicsSystem::stopScenePhysics(Scene* scene)
 {
     for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<PhysicsComponent>().each())
@@ -683,6 +671,17 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 void PhysicsSystem::update(Scene* scene, float deltaTime)
 {
     auto physicsScene = scene->getPhysicsScene();
+
+    // Create physics objects for newly spawned entities
+    for (auto&& [entity, rb] : scene->getRegistry().getRegistry().view<JustSpawned, PhysicsComponent>().each())
+    {
+        createActor(scene, entity);
+    }
+
+    for (auto&& [entity, pc] : scene->getRegistry().getRegistry().view<JustSpawned, PlayerController>().each())
+    {
+        createCCTController(scene, entity);
+    }
 
     // Update kinematics
     physx::PxU32 nbDynamicActors = physicsScene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC);
