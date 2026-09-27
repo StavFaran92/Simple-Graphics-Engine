@@ -5,7 +5,7 @@ Script = {}
 function Script:create(entity)
     local prefab = Prefab.new("zombie")
 
-    local gridSize = 50
+    local gridSize = 10
     local spacing = 1
 
     -- for i = 0, gridSize - 1 do
@@ -16,6 +16,8 @@ function Script:create(entity)
 
     prefab:instansiate(vec3.new(0, 0, 0))
      prefab:instansiate(vec3.new(3, 0, 0))
+    --  prefab:instansiate(vec3.new(6, 0, 0))
+    --  prefab:instansiate(vec3.new(7, 0, 0))
     -- initialization logic
 end
 

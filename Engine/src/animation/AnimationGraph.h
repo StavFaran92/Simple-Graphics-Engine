@@ -96,6 +96,7 @@ public:
 
     AnimationGraph() = default;
     void setAnimatorOwner(Animator* animator);
+    void setDebugOwnerEntity(uint32_t entityID);
     void init();
 
     // Build API (code-side authoring)
@@ -168,6 +169,9 @@ private:
 
 private:
     Animator* m_owner = nullptr;
+
+    // Debug only - owning entity handler, used to tag trace events
+    uint32_t m_debugOwnerEntityID = 0;
 
     std::vector<StateNode> m_states;
     std::vector<Transition> m_transitions;

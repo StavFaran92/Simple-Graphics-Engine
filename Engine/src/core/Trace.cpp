@@ -106,3 +106,36 @@ void Trace::updateSceneResourceVersionCache(ResourceID sceneResurceID, UUID asse
 	};
 	TraceLogger::writeJsonLine(j);
 }
+
+void Trace::animGraphInit(uint32_t entityID, const std::string& entryState)
+{
+	auto frame = Engine::get()->getSubSystem<System>()->getFrameCount();
+	auto globalTime = Engine::get()->getSubSystem<TimeManager>()->getCurrentTime(TimeManager::Duration::MicroSeconds);
+
+	nlohmann::json j = {
+		{"frame", frame},
+		{"global_time", globalTime},
+		{"system", "anim_graph"},
+		{"type", "init"},
+		{"entity", entityID},
+		{"entry_state", entryState}
+	};
+	TraceLogger::writeJsonLine(j);
+}
+
+void Trace::animGraphEnterState(uint32_t entityID, const std::string& fromState, const std::string& toState)
+{
+	auto frame = Engine::get()->getSubSystem<System>()->getFrameCount();
+	auto globalTime = Engine::get()->getSubSystem<TimeManager>()->getCurrentTime(TimeManager::Duration::MicroSeconds);
+
+	nlohmann::json j = {
+		{"frame", frame},
+		{"global_time", globalTime},
+		{"system", "anim_graph"},
+		{"type", "enter_state"},
+		{"entity", entityID},
+		{"from", fromState},
+		{"to", toState}
+	};
+	TraceLogger::writeJsonLine(j);
+}

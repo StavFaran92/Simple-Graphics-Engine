@@ -19,7 +19,7 @@ public:
 
 	void init(SceneResourceRef& scene) override;
 
-	void onStart();
+	void onStart(Entity e);
 	void update(Entity e, float dt);
 	void getFinalBoneMatrices(const ModelResourceRef meshCollection, std::vector<glm::mat4>& outFinalBoneMatrices) const;
 

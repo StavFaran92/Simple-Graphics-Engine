@@ -1,6 +1,7 @@
 #include "animation/AnimationGraph.h"
 #include "animation/Animator.h"
 #include "core/Logger.h"
+#include "core/Trace.h"
 
 // ---- String conversion helpers ----
 
@@ -51,8 +52,14 @@ void AnimationGraph::setAnimatorOwner(Animator* owner)
     m_owner = owner;
 }
 
+void AnimationGraph::setDebugOwnerEntity(uint32_t entityID)
+{
+    m_debugOwnerEntityID = entityID;
+}
+
 void AnimationGraph::init()
 {
+    Trace::animGraphInit(m_debugOwnerEntityID, m_entryStateId);
     transitionTo(m_entryStateId, 0.0f);
 
     // init param values to default
@@ -207,7 +214,9 @@ bool AnimationGraph::evaluateTransitions(const std::vector<Transition*>& transit
 
         if (allMet)
         {
+            std::string fromStateId = m_currentStateId;
             transitionTo(t->to, t->blendDuration);
+            Trace::animGraphEnterState(m_debugOwnerEntityID, fromStateId, m_currentStateId);
             return true;
         }
     }

@@ -59,7 +59,7 @@ void AnimationSystem::update(Scene* scene, float dt)
 	// Start animators of newly spawned entities
 	for (auto&& [e, animator, mesh] : scene->getRegistry().getRegistry().view<JustSpawned, Animator, MeshRendererComponent>().each())
 	{
-		animator.onStart();
+		animator.onStart(Entity(e, &scene->getRegistry()));
 	}
 
 	for (auto&& [e, animator, mesh] : scene->getRegistry().getRegistry().view<Animator, MeshRendererComponent>().each())

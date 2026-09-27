@@ -13,8 +13,9 @@ void Animator::init(SceneResourceRef& scene)
 	m_animationGraph.setAnimatorOwner(this);
 }
 
-void Animator::onStart()
+void Animator::onStart(Entity e)
 {
+	m_animationGraph.setDebugOwnerEntity(e.handlerID());
 	m_animationGraph.init();
 }
 
