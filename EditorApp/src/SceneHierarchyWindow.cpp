@@ -1,5 +1,8 @@
 #include "SceneHierarchyWindow.h"
 
+#include <algorithm>
+#include <vector>
+
 #include "EditorState.h"
 #include "memory/Assets.h"
 
@@ -145,6 +148,9 @@ void displayEntity(Entity& e)
 	static int nonLeafTreeFlags = ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
 	static int leafTreeFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
 
+	// Scope ImGui IDs by entity id - tree nodes are labeled by name, and names aren't unique (e.g. prefab clones)
+	ImGui::PushID(static_cast<int>(e.handlerID()));
+
 	ImGui::SetNextItemWidth(300.0f);
 
 
@@ -158,15 +164,20 @@ void displayEntity(Entity& e)
 
 		if (isOpen)
 		{
-			//ImGui::TreePush(obj.name.c_str());
-			auto childrens = transform.getChildren();
-			auto childIter = childrens.begin();
-			while (childIter != childrens.end())
+			// m_children is an unordered_map - sort by entity id so children keep a stable display order
+			std::vector<Entity> childrens;
+			for (auto& [_, child] : transform.getChildren())
 			{
-				displayEntity(childIter->second);
-				childIter++;
+				childrens.push_back(child);
 			}
-			//ImGui::TreePop();
+			std::sort(childrens.begin(), childrens.end(), [](const Entity& a, const Entity& b) {
+				return a.handlerID() < b.handlerID();
+			});
+
+			for (auto& child : childrens)
+			{
+				displayEntity(child);
+			}
 			ImGui::TreePop();
 		}
 	}
@@ -178,6 +189,7 @@ void displayEntity(Entity& e)
 		displayEntityHelper(e);
 	}
 
+	ImGui::PopID();
 
 }
 
@@ -201,20 +213,24 @@ void displaySceneObjects()
 
 	ImGui::BeginChild("##items", ImGui::GetContentRegionAvail(), true, ImGuiWindowFlags_NoScrollbar);
 
-	for (int i = 0; i < sceneObjects.size(); ++i)
+	// Registry iteration order changes as entities are added/removed - sort roots by entity id
+	// so the hierarchy keeps a stable display order.
+	std::vector<Entity> roots;
+	for (auto& sceneObject : sceneObjects)
 	{
-		auto& sceneObject = sceneObjects[i];
-		auto& transform = sceneObject.e.getComponent<Transformation>();
-
 		// if has parent it will be rendered in the recursive call (can be optimized if needed)
-		if (transform.getParent().valid())
+		if (sceneObject.e.getComponent<Transformation>().getParent().valid())
 			continue;
 
-		ImGui::PushID(i); // Push a unique ID to avoid ImGui ID conflicts
+		roots.push_back(sceneObject.e);
+	}
+	std::sort(roots.begin(), roots.end(), [](const Entity& a, const Entity& b) {
+		return a.handlerID() < b.handlerID();
+	});
 
-		displayEntity(sceneObject.e);
-
-		ImGui::PopID();
+	for (auto& root : roots)
+	{
+		displayEntity(root);
 	}
 
 	ImGui::EndChild(); // End background drop zone
