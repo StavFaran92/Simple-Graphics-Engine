@@ -8,22 +8,27 @@ struct NodeData {
     mat4 transform;
     int  parentID;    // -1 for root
     int  boneID;           // -1 means no related bone
+    int  _pad0, _pad1;     // explicit padding to 80 bytes - matches AnimationNodeData
 };
 
+// Explicit padding below keeps every struct a 16-byte multiple, matching AnimationSystem.h.
 struct BoneChannelInfo {
     uint posOffset,   posCount;
     uint rotOffset,   rotCount;
     uint scaleOffset, scaleCount;
+    uint _pad0, _pad1;
 };
 
 struct AnimClipInfo {
     uint boneTableOffset;   // where this clip's bones begin in bones[]
     uint boneCount;         // bones in this clip
+    uint _pad0, _pad1;
 };
 
 struct InstanceStateData {
     uint  clipID;
     float time;             // current sample time for this instance
+    float _pad0, _pad1;
 };
 
 // ---- buffers ----

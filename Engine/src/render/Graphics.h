@@ -33,7 +33,9 @@ struct InstanceData
 	unsigned int modelIndex = 0; // index (in mat4 units) into the animation SSBO where this model's bones start
 	unsigned int isAnimated = 0;
 	unsigned int boneCount = 0;
+	unsigned int _pad0 = 0;      // explicit padding to 16 bytes - drivers disagree on std430 struct rounding
 };
+static_assert(sizeof(InstanceData) == 16, "InstanceData must match the shader's std430 layout (include/buffers.glsl)");
 
 class EngineAPI Graphics : public SubSystem
 {

@@ -21,6 +21,10 @@ struct AnimationNodeData
 	int boneID = -1;            // -1 means no related bone
 	int _pad[2] = { 0, 0 };     // std430 rounds the struct up to a vec4 boundary (80 bytes)
 };
+static_assert(sizeof(AnimationNodeData) == 80, "AnimationNodeData must match NodeData in the compute shader");
+
+// Structs below are padded explicitly to a 16-byte multiple on both sides, since drivers
+// disagree on whether std430 rounds small structs up to a vec4 boundary.
 
 // AnimationBuffer::BoneTable
 struct BoneChannelInfo
@@ -28,21 +32,27 @@ struct BoneChannelInfo
 	unsigned int posOffset = 0, posCount = 0;
 	unsigned int rotOffset = 0, rotCount = 0;
 	unsigned int scaleOffset = 0, scaleCount = 0;
+	unsigned int _pad[2] = { 0, 0 };
 };
+static_assert(sizeof(BoneChannelInfo) == 32, "BoneChannelInfo must match the compute shader's std430 layout");
 
 // AnimationBuffer::Clips
 struct AnimClipInfo
 {
 	unsigned int boneTableOffset = 0;   // where this clip's bones begin in bones[]
 	unsigned int boneCount = 0;         // bones in this clip
+	unsigned int _pad[2] = { 0, 0 };
 };
+static_assert(sizeof(AnimClipInfo) == 16, "AnimClipInfo must match the compute shader's std430 layout");
 
 // AnimationBuffer::InstanceState
 struct InstanceStateData
 {
 	unsigned int clipID = 0;
 	float time = 0.f;                   // current sample time for this instance
+	float _pad[2] = { 0.f, 0.f };
 };
+static_assert(sizeof(InstanceStateData) == 16, "InstanceStateData must match the compute shader's std430 layout");
 
 // Doubles as the SSBO binding point - the values must match the layout(binding = N)
 // declarations in CalculateBoneTransformComputeShader.glsl.

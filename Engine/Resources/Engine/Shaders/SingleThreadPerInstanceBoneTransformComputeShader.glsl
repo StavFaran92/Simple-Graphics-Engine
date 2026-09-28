@@ -27,6 +27,10 @@ struct InstanceParams
 {
     uint outputBoneOffset; // mat4-unit offset into AnimationBuffer where this instance's bones start
     float currentTime;
+    // Explicit padding to match GpuInstanceParams (16 bytes) on the C++ side. std430 would otherwise
+    // pack this struct to 8 bytes, and some drivers round it to 16 - don't rely on either.
+    float _pad0;
+    float _pad1;
 };
 
 layout(std430, binding = 3) readonly buffer NodeDataBuffer    { NodeData nodes[]; };
