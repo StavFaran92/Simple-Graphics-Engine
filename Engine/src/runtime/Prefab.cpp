@@ -100,19 +100,10 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 
 	for (SerializedEntity& serializedEntity : m_data.m_serializedPrefab)
 	{
-		auto scene = Engine::get()->getContext()->getActiveScene();
-
 		auto& e = Archiver::deserializeEntity(serializedEntity, Engine::get()->getContext()->getActiveScene());
 
-		for (auto& cbWrapper : ComponentSerdes::getRegistry())
-		{
-			cbWrapper.init(e, scene);
-		}
-
-		for (auto& cbWrapper : ComponentSerdes::getRegistry())
-		{
-			cbWrapper.postLoad(e, scene);
-		}
+		// init/postLoad run later, once the hierarchy is relinked - until then the components still
+		// reference the template's entity ids, which may be dead or belong to other live entities.
 
 		//The created entity might not receive the specified id since its taken, so we do this to fetch the old entity actual id
 		Entity tempEntity{ serializedEntity.entity, &Engine::get()->getContext()->getActiveScene()->getRegistry() };
@@ -187,11 +178,28 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 		newParent.getComponent<Transformation>().m_children[child.handlerID()] = child;
 	}
 
+	auto activeScene = Engine::get()->getContext()->getActiveScene();
+
+	// Now that every entity and hierarchy link points at the new entities, run the component callbacks.
+	for (Entity& e : createdEntities)
+	{
+		for (auto& cbWrapper : ComponentSerdes::getRegistry())
+		{
+			cbWrapper.init(e, activeScene);
+		}
+	}
+
+	for (Entity& e : createdEntities)
+	{
+		for (auto& cbWrapper : ComponentSerdes::getRegistry())
+		{
+			cbWrapper.postLoad(e, activeScene);
+		}
+	}
+
 	// First entity is the root.
 	Entity& root = createdEntities.front();
 	root.getComponent<Transformation>().setLocalPosition(position);
-
-	auto activeScene = Engine::get()->getContext()->getActiveScene();
 
 	// Mark all created entities as newly spawned so every system initializes them
 	for (Entity& e : createdEntities)
