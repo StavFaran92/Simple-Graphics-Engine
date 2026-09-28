@@ -15,13 +15,11 @@ void ScriptComponent::loadScript()
 	if (!isValid())
 		return;
 
-	Engine::get()->getSubSystem<ScriptSystem>()->reloadScript(entity, *this);
-
-	auto refSlots = Engine::get()->getSubSystem<ScriptSystem>()->getScriptRefs(entity);
-	if (refSlots)
+	std::unordered_map<std::string, std::string> refSlots;
+	if (Engine::get()->getSubSystem<ScriptSystem>()->getScriptRefSlots(*this, refSlots))
 	{
 		std::unordered_map<std::string, Entity> newRefs;
-		for (const auto& refSlot : *refSlots)
+		for (const auto& refSlot : refSlots)
 		{
 			auto it = refs.find(refSlot.first);
 			newRefs[refSlot.first] = (it != refs.end()) ? it->second : Entity::EmptyEntity;
@@ -78,11 +76,9 @@ void ScriptComponent::init(SceneResourceRef& scene)
 
 void ScriptComponent::postLoad(SceneResourceRef& scene)
 {
+	// Only refreshes the ref slots to reflect the script's structure - live script instances are
+	// registered separately on simulation start / prefab instantiation.
 	loadScript();
-
-	// We call on destroy so the script is not preserved in the script system
-	// (the main reason we want to load the script on post load is to reflect its structure anyway..)
-	Engine::get()->getSubSystem<ScriptSystem>()->callDestroy(entity);
 }
 
 std::vector<std::string> ScriptComponent::getAllRefSlots() const

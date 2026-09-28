@@ -45,6 +45,10 @@ public:
     //void setRef(Entity entity, const std::string& fieldName, Entity ref);
     //Entity getRef(Entity entity, const std::string& fieldName) const;
 
+    // Parses the component's script into outRefSlots (Ref() field name -> ref type) without registering
+    // a live script instance. Returns false if the script is invalid or fails to load.
+    bool getScriptRefSlots(ScriptComponent& scriptComponent, std::unordered_map<std::string, std::string>& outRefSlots);
+
     // Returns discovered Ref() fields for the given script entity. nullptr if not found.
     const std::unordered_map<std::string, std::string>* getScriptRefs(Entity entity) const;
 

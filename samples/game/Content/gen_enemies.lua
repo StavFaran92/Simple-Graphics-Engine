@@ -16,8 +16,8 @@ function Script:create(entity)
 
     prefab:instansiate(vec3.new(0, 0, 0))
      prefab:instansiate(vec3.new(3, 0, 0))
-    --  prefab:instansiate(vec3.new(6, 0, 0))
-    --  prefab:instansiate(vec3.new(7, 0, 0))
+     prefab:instansiate(vec3.new(6, 0, 0))
+     prefab:instansiate(vec3.new(7, 0, 0))
     -- initialization logic
 end
 

@@ -57,51 +57,71 @@ void ScriptSystem::bindDynamics()
     impl_->bindDynamics();
 }
 
-void ScriptSystem::reloadScript(Entity e, ScriptComponent& scriptComponent)
+// Runs the script file and extracts its Script table and Ref() fields into outState, without
+// registering anything. Returns false if the script is invalid or fails to load.
+static bool loadScriptState(sol::state& lua, ScriptComponent& scriptComponent, LuaState& outState)
 {
     if (!scriptComponent.isValid())
-        return;
+        return false;
 
     try {
         const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
         std::string filepath = (projectDir / scriptComponent.getScript().resource()->filepath).string();
-        auto result = impl_->lua.safe_script_file(filepath, sol::script_pass_on_error);
+        auto result = lua.safe_script_file(filepath, sol::script_pass_on_error);
         if (!result.valid()) {
             sol::error err = result;
             logError(err.what());
-            return;
+            return false;
         }
-        sol::table script = impl_->lua["Script"];
-        if (script.valid())
-        {
-            LuaState state{ script };
-
-            for (auto& [key, value] : script) {
-                if (!key.is<std::string>() || !value.is<sol::table>()) 
-                    continue;
-                sol::table t = value.as<sol::table>();
-                auto isRef = t.get<sol::optional<bool>>("__isRef");
-                if (isRef && *isRef) {
-                    std::string fieldName = key.as<std::string>();
-                    std::string refType = t.get_or<std::string>("refType", "Entity");
-                    state.refs[fieldName] = refType;
-                    script[fieldName] = sol::nil;
-                }
-            }
-
-            impl_->scripts[scriptComponent.entity] = std::move(state);
-        }
-        else
+        sol::table script = lua["Script"];
+        if (!script.valid())
         {
             logWarning("Warning: No 'Script' table found in {}", filepath);
+            return false;
         }
 
-    
+        outState = LuaState{ script };
+
+        for (auto& [key, value] : script) {
+            if (!key.is<std::string>() || !value.is<sol::table>())
+                continue;
+            sol::table t = value.as<sol::table>();
+            auto isRef = t.get<sol::optional<bool>>("__isRef");
+            if (isRef && *isRef) {
+                std::string fieldName = key.as<std::string>();
+                std::string refType = t.get_or<std::string>("refType", "Entity");
+                outState.refs[fieldName] = refType;
+                script[fieldName] = sol::nil;
+            }
+        }
+
+        return true;
     }
-    catch (const sol::error& e) 
+    catch (const sol::error& e)
     {
         logError("Error loading script: {}" ,e.what());
     }
+
+    return false;
+}
+
+void ScriptSystem::reloadScript(Entity e, ScriptComponent& scriptComponent)
+{
+    LuaState state;
+    if (loadScriptState(impl_->lua, scriptComponent, state))
+    {
+        impl_->scripts[scriptComponent.entity] = std::move(state);
+    }
+}
+
+bool ScriptSystem::getScriptRefSlots(ScriptComponent& scriptComponent, std::unordered_map<std::string, std::string>& outRefSlots)
+{
+    LuaState state;
+    if (!loadScriptState(impl_->lua, scriptComponent, state))
+        return false;
+
+    outRefSlots = std::move(state.refs);
+    return true;
 }
 
 void ScriptSystem::callCreate(Entity entity)
