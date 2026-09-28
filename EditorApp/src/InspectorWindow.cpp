@@ -437,6 +437,33 @@ void InspectorWindow::display()
 				AnimationGraphWindow::open(&animator);
 			}
 
+			AnimationGraph& graph = animator.getAnimationGraph();
+			if (graph.isEmpty())
+			{
+				ImGui::SameLine();
+				ImGui::TextDisabled("No graph - driven from script");
+			}
+			else
+			{
+				ImGui::SameLine();
+				if (ImGui::Button("Clear Graph"))
+					ImGui::OpenPopup("Clear Animation Graph");
+
+				if (ImGui::BeginPopupModal("Clear Animation Graph", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("Remove all states, transitions and parameters?");
+					if (ImGui::Button("Clear"))
+					{
+						graph.clear();
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("Cancel"))
+						ImGui::CloseCurrentPopup();
+					ImGui::EndPopup();
+				}
+			}
+
 			ImGui::Separator();
 			ImGui::Text("Animations");
 

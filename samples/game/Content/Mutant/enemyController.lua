@@ -33,6 +33,7 @@ function Script:create(entity)
     local IdleState = {
         onEnter  = function(state)
             s.moveDir = nil
+            s.animator:playAnimation("Idle", true)
         end,
         onUpdate = function(state, dt)
             if nearPlayer() then s.sm:transitionTo("Follow") end
@@ -41,7 +42,9 @@ function Script:create(entity)
     }
 
     local FollowState = {
-        onEnter  = function(state) end,
+        onEnter  = function(state)
+            s.animator:playAnimation("Walk", true)
+        end,
         onUpdate = function(state, dt)
             if canAttack() then
                 s.sm:transitionTo("Attack")
@@ -91,21 +94,25 @@ function Script:create(entity)
     local AttackState = {
         onEnter  = function(state)
             s.moveDir = nil
-            s.animator:getGraph():setBool("attack", true)
+            s.animator:playAnimation("Attack", false)
         end,
         onUpdate = function(state, dt)
             facePlayer()
-            if not canAttack() then s.sm:transitionTo("Follow") end
+            -- A swing always plays to the end
+            if s.animator:isFinished() then
+                s.sm:transitionTo(canAttack() and "Attack" or "Follow")
+            end
         end,
         onExit   = function(state)
-            s.animator:getGraph():setBool("attack", false)
+            -- The swing may be cut short before attack_end fires
+            s.attack_collider:deactivate()
         end,
     }
 
     local HurtState = {
         onEnter  = function(state)
             s.moveDir = nil
-            s.animator:getGraph():trigger("hit")
+            s.animator:playAnimation("Hit", false)
 
             local dir = s.toPlayer / s.distToPlayer
             dir = -vec3.new(dir.x, 0, dir.z)
@@ -113,7 +120,9 @@ function Script:create(entity)
             s.physics:turnToDynamic()
             s.physics:setForce(dir * 150)
         end,
-        onUpdate = function(state, dt) end,
+        onUpdate = function(state, dt)
+            if s.animator:isFinished() then s.sm:transitionTo("Idle") end
+        end,
         onExit   = function(state) 
             s.physics:setForce(vec3.new(0))
             s.physics:turnToKinematic()
@@ -145,23 +154,12 @@ function Script:update(entity, dt)
     --     self.velocityV = self.velocityV + self.gravity
     -- end
 
-    local moveVector = vec3.new(0)
-    if self.moveDir then
-        moveVector = moveVector + self.moveDir * self.speed
-    end
-    
-    --self.physics:move(moveVector)
-    
     self.sm:update(dt)
-    self.animator:getGraph():setFloat("speed", length(moveVector))
 end
 
 function Script:onAnimationTrigger(name, frame)
     if name == "attack_start" then self.attack_collider:activate()   end
     if name == "attack_end"   then self.attack_collider:deactivate() end
-    if name == "hurt_end" then
-        self.sm:transitionTo("Idle")
-    end
 end
 
 function Script:onTriggerEnter(entity, other)

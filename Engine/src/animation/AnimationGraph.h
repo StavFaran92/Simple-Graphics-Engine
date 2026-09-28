@@ -106,6 +106,10 @@ public:
     void setEntryState(const std::string& stateId);
     void removeState(size_t index);
 
+    // An empty graph is inactive - the Animator is then driven directly (e.g. from script)
+    void clear();
+    bool isEmpty() const { return m_states.empty(); }
+
     // Runtime update — call from Animator::update
     void update(float dt);
 
@@ -117,6 +121,7 @@ public:
     void setBool(const std::string& name, bool value);
     void setInt(const std::string& name, int value);
     void trigger(const std::string& name);
+    void clearTriggers();
 
     // JSON serialization
     void loadFromJson(const nlohmann::json& j);
@@ -177,7 +182,10 @@ private:
     std::vector<Transition> m_transitions;
     std::vector<Parameter> m_parameters;
     std::unordered_map<std::string, float> m_paramValues;
-    std::unordered_set<std::string> m_pendingTriggers;
+    // trigger name -> seconds left. A trigger stays pending until a transition uses it or it expires,
+    // so it isn't lost when another transition wins the frame it was set on.
+    std::unordered_map<std::string, float> m_pendingTriggers;
+    static constexpr float TRIGGER_BUFFER_DURATION = 0.15f;
 
     std::string m_currentStateId;
     std::string m_entryStateId;

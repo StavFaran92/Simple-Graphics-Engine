@@ -370,6 +370,15 @@ void AnimationGraphWindow::display()
         }
     }
 
+    // The graph can change outside this window (e.g. cleared from the inspector) - drop stale selections
+    if (s_graph)
+    {
+        const size_t stateCount = s_graph->getStates().size();
+        if (s_selState    >= stateCount) s_selState    = SIZE_MAX;
+        if (s_pendingFrom >= stateCount) s_pendingFrom = SIZE_MAX;
+        if (s_selTrans    >= s_graph->getTransitions().size()) s_selTrans = SIZE_MAX;
+    }
+
     const float leftW  = 200.f;
     const float rightW = 270.f;
     const float sp     = ImGui::GetStyle().ItemSpacing.x;

@@ -59,6 +59,9 @@ void AnimationGraph::setDebugOwnerEntity(uint32_t entityID)
 
 void AnimationGraph::init()
 {
+    if (isEmpty())
+        return;
+
     Trace::animGraphInit(m_debugOwnerEntityID, m_entryStateId);
     transitionTo(m_entryStateId, 0.0f);
 
@@ -124,7 +127,12 @@ void AnimationGraph::update(float dt)
 
     evaluateTransitions(candidates);
     m_animationEndedThisFrame = false;
-    m_pendingTriggers.clear();
+
+    for (auto it = m_pendingTriggers.begin(); it != m_pendingTriggers.end(); )
+    {
+        it->second -= dt;
+        it = (it->second <= 0.f) ? m_pendingTriggers.erase(it) : std::next(it);
+    }
 }
 
 void AnimationGraph::onAnimationEnd()
@@ -149,7 +157,12 @@ void AnimationGraph::setInt(const std::string& name, int value)
 
 void AnimationGraph::trigger(const std::string& name)
 {
-    m_pendingTriggers.insert(name);
+    m_pendingTriggers[name] = TRIGGER_BUFFER_DURATION;
+}
+
+void AnimationGraph::clearTriggers()
+{
+    m_pendingTriggers.clear();
 }
 
 const StateNode* AnimationGraph::getCurrentState() const
@@ -214,6 +227,13 @@ bool AnimationGraph::evaluateTransitions(const std::vector<Transition*>& transit
 
         if (allMet)
         {
+            // Only the triggers this transition used are spent - others stay pending
+            for (const Condition& cond : t->conditions)
+            {
+                if (cond.type == ConditionType::OnTrigger)
+                    m_pendingTriggers.erase(cond.parameter);
+            }
+
             std::string fromStateId = m_currentStateId;
             transitionTo(t->to, t->blendDuration);
             Trace::animGraphEnterState(m_debugOwnerEntityID, fromStateId, m_currentStateId);
@@ -378,8 +398,21 @@ void AnimationGraph::removeState(size_t index)
         m_transitions.end());
     m_states.erase(m_states.begin() + index);
 
-    if (m_currentStateId == id) 
+    // Fix the entry first so current never falls back to the removed state
+    if (m_entryStateId == id)
+        m_entryStateId = m_states.empty() ? "" : m_states.front().id;
+    if (m_currentStateId == id)
         m_currentStateId = m_entryStateId;
-    if (m_entryStateId == id) 
-        m_entryStateId = "";
+}
+
+void AnimationGraph::clear()
+{
+    m_states.clear();
+    m_transitions.clear();
+    m_parameters.clear();
+    m_paramValues.clear();
+    m_pendingTriggers.clear();
+    m_currentStateId.clear();
+    m_entryStateId.clear();
+    m_animationEndedThisFrame = false;
 }

@@ -26,6 +26,14 @@ public:
 	void addAnimation(AnimationEntry animation);
 	void removeAnimation(const std::string& name);
 	void playAnimation(const std::string& name);
+	// loop == false: the clip holds its last pose when it ends and isFinished() turns true
+	void playAnimation(const std::string& name, bool loop);
+
+	// Playback state of the current clip - safe to poll, stays valid until the next playAnimation
+	bool isFinished() const;
+	float getCurrentFrame() const;
+	float getNormalizedTime() const;
+
 	AnimationEntry* getAnimation(const std::string& name);
 	AnimationEntry* getAnimation(int index);
 	const std::vector<AnimationEntry>& getAllAnimations() const;
@@ -52,7 +60,10 @@ private:
 	int m_currentAnimIndex = 0;
 	std::vector<AnimationEntry> m_animations;
 	AnimationGraph m_animationGraph;
-	int lastCalledTrigger = -1;
+	bool m_loop = true;
+	bool m_finished = false;
+	// Time before this update's advance - frame triggers fire when the playhead crosses them
+	float m_previousTime = 0.f;
 
 protected:
 	std::vector<AssetRef<Asset>> gatherDependenciesInternal() const override;

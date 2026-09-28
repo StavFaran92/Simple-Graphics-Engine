@@ -344,7 +344,14 @@ void bindSystems(sol::state& lua)
 void bindComponents(sol::state& lua)
 {
     lua.new_usertype<Animator>("Animator",
-        "playAnimation", &Animator::playAnimation,
+        "playAnimation", sol::overload(
+            [](Animator& self, const std::string& name) { self.playAnimation(name); },
+            [](Animator& self, const std::string& name, bool loop) { self.playAnimation(name, loop); }
+        ),
+        "isFinished", &Animator::isFinished,
+        "getCurrentFrame", &Animator::getCurrentFrame,
+        "getNormalizedTime", &Animator::getNormalizedTime,
+        "hasGraph", [](Animator& self) { return !self.getAnimationGraph().isEmpty(); },
         "addAnimation", &Animator::addAnimation,
         "removeAnimation", &Animator::removeAnimation,
         "getAnimation", sol::overload(
@@ -361,6 +368,7 @@ void bindComponents(sol::state& lua)
         "setBool", &AnimationGraph::setBool,
         "setInt", &AnimationGraph::setInt,
         "trigger", &AnimationGraph::trigger,
+        "clearTriggers", &AnimationGraph::clearTriggers,
         "getCurrentStateID", [](AnimationGraph& self) ->std::string {
             auto state = self.getCurrentState();
             if (!state)

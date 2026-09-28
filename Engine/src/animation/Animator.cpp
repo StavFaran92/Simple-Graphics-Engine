@@ -1,6 +1,8 @@
 
 #include "animation/Animator.h"
 
+#include <cmath>
+
 #include "animation/Animation.h"
 #include "animation/AnimationGraph.h"
 #include "geometry/Model.h"
@@ -29,34 +31,46 @@ void Animator::update(Entity e, float dt)
 
 	auto animResource = currentAnimation->animation.resource();
 
+	if (m_finished)
+		return;
+
 	// Increment Animation time
+	const float duration = animResource->getDuration();
+	m_previousTime = m_currentTime;
 	m_currentTime += animResource->getTicksPerSecond() * currentAnimation->playbackSpeed * dt;
-	if (m_currentTime >= animResource->getDuration())
+	bool wrapped = false;
+	if (m_currentTime >= duration)
 	{
-		m_currentTime = fmod(m_currentTime, animResource->getDuration());
+		if (m_loop)
+		{
+			m_currentTime = fmod(m_currentTime, duration);
+			wrapped = true;
+		}
+		else
+		{
+			// Hold the last pose - stay just below duration, the same range looping clips are sampled in
+			m_currentTime = std::nextafter(duration, 0.f);
+			m_finished = true;
+		}
 		m_animationGraph.onAnimationEnd();
 	}
 
-	const auto& triggers = currentAnimation->triggers;
-	int currentFrameID = (int)m_currentTime;
-	bool isAnyTriggerCalled = false;
-	for (const auto& trigger : triggers)
+	// Fire every trigger the playhead crossed this update: [previous, current),
+	// split across the end when the clip wrapped, so large dt steps can't skip one
+	for (const auto& trigger : currentAnimation->triggers)
 	{
-		// We use the last called trigger to not invoke the same trigger twice in consective updates
-		if (lastCalledTrigger != trigger.frameID && trigger.frameID == currentFrameID)
-		{
-			isAnyTriggerCalled = true;
-			lastCalledTrigger = trigger.frameID;
-			Engine::get()->getSubSystem<ScriptSystem>()->callOnAnimTrigger(e, trigger.name, trigger.frameID);
-		}
-	}
+		const float frame = (float)trigger.frameID;
+		bool crossed = false;
+		if (wrapped)
+			crossed = frame >= m_previousTime || frame < m_currentTime;
+		else if (m_finished)
+			crossed = frame >= m_previousTime;
+		else
+			crossed = frame >= m_previousTime && frame < m_currentTime;
 
-	// If no trigger is called this iteration we are safe to clear the cache
-	if (!isAnyTriggerCalled)
-	{
-		lastCalledTrigger = -1;
+		if (crossed)
+			Engine::get()->getSubSystem<ScriptSystem>()->callOnAnimTrigger(e, trigger.name, trigger.frameID);
 	}
-	
 }
 
 void Animator::getFinalBoneMatrices(const ModelResourceRef meshCollection, std::vector<glm::mat4>& meshSpaceToBoneSpaceBindPoseMat) const
@@ -107,14 +121,45 @@ void Animator::removeAnimation(const std::string& name)
 
 void Animator::playAnimation(const std::string& name)
 {
+	playAnimation(name, true);
+}
+
+void Animator::playAnimation(const std::string& name, bool loop)
+{
 	auto iter = std::find_if(m_animations.begin(), m_animations.end(),
 		[&name](const AnimationEntry& e) { return e.name == name; });
 
 	if (iter == m_animations.end())
+	{
+		logWarning("Animator: animation '{}' not found", name);
 		return;
+	}
 
 	m_currentAnimIndex = static_cast<int>(std::distance(m_animations.begin(), iter));
 	m_currentTime = 0.f;
+	m_previousTime = 0.f;
+	m_loop = loop;
+	m_finished = false;
+}
+
+bool Animator::isFinished() const
+{
+	return m_finished;
+}
+
+float Animator::getCurrentFrame() const
+{
+	return m_currentTime;
+}
+
+float Animator::getNormalizedTime() const
+{
+	auto currentAnimation = getCurrentAnimation();
+	if (!currentAnimation || currentAnimation->animation.isEmpty() || currentAnimation->animation.resource().isEmpty())
+		return 0.f;
+
+	const float duration = currentAnimation->animation.resource()->getDuration();
+	return duration > 0.f ? m_currentTime / duration : 0.f;
 }
 
 AnimationEntry* Animator::getAnimation(const std::string& name)
