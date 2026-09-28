@@ -3,15 +3,19 @@ Script = {}
 local SEEK_RANGE   = 10.0
 local ATTACK_RANGE = 1.5
 
+local PROBE_UP  = 1.0   -- ground ray starts this far above the feet
+local SNAP_DOWN = 0.3   -- ground this far below still counts (keeps it glued going downhill)
+
 function Script:create(entity)
     self.player         = getActiveScene():getEntityByName("player")
     self.physics        = entity.Physics
     self.model          = entity:getChildByName("model")
     self.modelTransform = self.model.Transform
     self.attack_collider = self.model:getChildByName("attack_collider").Physics
-    self.speed          = 0.02
+    self.speed          = 1.2 -- units per second
     self.animator       = self.model.Animator
     self.isGrounded     = false
+    self.isKnockedBack  = false -- body is dynamic while hurt, PhysX moves it
     self.velocityV      = 0.0
     self.gravity        = -10.0
     self.moveDir        = nil
@@ -54,36 +58,6 @@ function Script:create(entity)
                 local dir = s.toPlayer / s.distToPlayer
                 s.moveDir = vec3.new(dir.x, 0, dir.z)
                 facePlayer()
-
-                local maxFall = math.abs(s.velocityV * dt)
-                local rayLength = math.max(0.2, maxFall + 0.05) -- small buffer on top
-
-                local hitResult = HitResult.new()
-                s.isGrounded = raycast(
-                    s.modelTransform:getWorldPosition(), 
-                    vec3.new(0, -1, 0), 
-                    rayLength, 
-                    hitResult, 
-                    LayerMask.Ground
-                )
-
-                local moveVector = vec3.new(0)
-                if s.isGrounded and s.velocityV < 0 then
-                    s.velocityV = 0
-                    moveVector = vec3.new(0, -hitResult.distance, 0)
-                else
-                    if not s.isGrounded then
-                        s.velocityV = s.velocityV + s.gravity * dt
-                    end
-                    moveVector = vec3.new(0, s.velocityV * dt, 0)
-                end
-
-                if s.moveDir then
-                    moveVector = moveVector + s.moveDir * s.speed
-                end
-
-                s.physics:move(moveVector)
-                
             end
         end,
         onExit   = function(state)
@@ -117,6 +91,7 @@ function Script:create(entity)
             local dir = s.toPlayer / s.distToPlayer
             dir = -vec3.new(dir.x, 0, dir.z)
 
+            s.isKnockedBack = true
             s.physics:turnToDynamic()
             s.physics:setForce(dir * 150)
         end,
@@ -126,6 +101,7 @@ function Script:create(entity)
         onExit   = function(state) 
             s.physics:setForce(vec3.new(0))
             s.physics:turnToKinematic()
+            s.isKnockedBack = false
             --s.velocityV = 0
         end,
     }
@@ -143,18 +119,46 @@ function Script:update(entity, dt)
     self.toPlayer     = playerTransform:getWorldPosition() - entity.Transform:getWorldPosition()
     self.distToPlayer = length(self.toPlayer)
 
-    -- gravity
-    -- local hitResult = HitResult.new()
-    -- self.isGrounded = raycast(self.modelTransform:getWorldPosition(), vec3.new(0, -1, 0), .5, hitResult, LayerMask.LAYER_0)
-
-    -- if self.isGrounded and self.velocityV < 0 then
-    --     self.velocityV = 0
-    -- end
-    -- if not self.isGrounded then
-    --     self.velocityV = self.velocityV + self.gravity
-    -- end
-
     self.sm:update(dt)
+
+    -- The body is kinematic, so terrain never stops it - this is the only thing keeping it grounded.
+    -- Runs in every state; skipped while hurt since PhysX drives the dynamic body then.
+    if not self.isKnockedBack then
+        local horizontal = vec3.new(0)
+        if self.moveDir then
+            horizontal = self.moveDir * (self.speed * dt)
+        end
+        self:moveWithGravity(dt, horizontal)
+    end
+end
+
+-- Must be the only physics:move call per frame - move() overwrites, it does not accumulate.
+function Script:moveWithGravity(dt, horizontal)
+    local feet = self.transform:getWorldPosition()
+
+    self.velocityV = self.velocityV + self.gravity * dt
+    local fall = math.max(0, -self.velocityV * dt) -- this frame's full drop, gravity included
+
+    -- Start above the feet so the ray never begins inside the terrain
+    local hitResult = HitResult.new()
+    local grounded = raycast(
+        feet + vec3.new(0, PROBE_UP, 0),
+        vec3.new(0, -1, 0),
+        PROBE_UP + fall + SNAP_DOWN,
+        hitResult,
+        LayerMask.Ground
+    )
+
+    local dy
+    if grounded then
+        dy = hitResult.position.y - feet.y -- > 0 pushes out of a hill, < 0 snaps down
+        self.velocityV = 0
+    else
+        dy = self.velocityV * dt
+    end
+    self.isGrounded = grounded
+
+    self.physics:move(horizontal + vec3.new(0, dy, 0))
 end
 
 function Script:onAnimationTrigger(name, frame)

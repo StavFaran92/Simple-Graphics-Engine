@@ -577,8 +577,12 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
         heightFieldDesc.nbColumns = heightmapData.width;
         heightFieldDesc.nbRows = heightmapData.height;
-        heightFieldDesc.samples.data = new unsigned int[sizeof(unsigned int) * heightFieldDesc.nbColumns * heightFieldDesc.nbRows];
-        heightFieldDesc.samples.stride = sizeof(unsigned int);
+        // Must be zeroed: material index 127 (eHOLE) in garbage memory = invisible hole
+        std::vector<physx::PxHeightFieldSample> samples(
+            size_t(heightFieldDesc.nbColumns) * heightFieldDesc.nbRows, physx::PxHeightFieldSample{});
+
+        heightFieldDesc.samples.data = samples.data();
+        heightFieldDesc.samples.stride = sizeof(physx::PxHeightFieldSample);
         unsigned char* currentByte = (unsigned char*)heightFieldDesc.samples.data;
         for (int row = 0; row < heightFieldDesc.nbRows; row++)
         {
