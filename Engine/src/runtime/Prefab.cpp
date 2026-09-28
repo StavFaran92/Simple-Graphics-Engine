@@ -178,6 +178,24 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 		newParent.getComponent<Transformation>().m_children[child.handlerID()] = child;
 	}
 
+	// Script refs to entities inside the prefab still point at the template's entities - remap them
+	// to their clones. Refs to entities outside the prefab (e.g. the player) are left as is.
+	for (Entity& e : createdEntities)
+	{
+		auto* script = e.tryGetComponent<ScriptComponent>();
+		if (!script)
+			continue;
+
+		for (const auto& fieldName : script->getAllRefSlots())
+		{
+			auto it = entityIDRemapTable.find(script->getRef(fieldName).handlerID());
+			if (it != entityIDRemapTable.end())
+			{
+				script->setRef(fieldName, it->second);
+			}
+		}
+	}
+
 	auto activeScene = Engine::get()->getContext()->getActiveScene();
 
 	// Now that every entity and hierarchy link points at the new entities, run the component callbacks.
