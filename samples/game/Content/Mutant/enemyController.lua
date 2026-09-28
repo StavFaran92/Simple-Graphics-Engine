@@ -6,6 +6,9 @@ local ATTACK_RANGE = 1.5
 local PROBE_UP  = 1.0   -- ground ray starts this far above the feet
 local SNAP_DOWN = 0.3   -- ground this far below still counts (keeps it glued going downhill)
 
+local KNOCKBACK_SPEED = 20.0 -- initial knockback speed when hit, units per second
+local KNOCKBACK_DAMP  = 6.0 -- per second; total slide distance is about SPEED / DAMP
+
 function Script:create(entity)
     self.player         = getActiveScene():getEntityByName("player")
     self.physics        = entity.Physics
@@ -15,7 +18,7 @@ function Script:create(entity)
     self.speed          = 1.2 -- units per second
     self.animator       = self.model.Animator
     self.isGrounded     = false
-    self.isKnockedBack  = false -- body is dynamic while hurt, PhysX moves it
+    self.knockback      = vec3.new(0) -- horizontal velocity from being hit, decays over time
     self.velocityV      = 0.0
     self.gravity        = -10.0
     self.moveDir        = nil
@@ -91,18 +94,14 @@ function Script:create(entity)
             local dir = s.toPlayer / s.distToPlayer
             dir = -vec3.new(dir.x, 0, dir.z)
 
-            s.isKnockedBack = true
-            s.physics:turnToDynamic()
-            s.physics:setForce(dir * 150)
+            -- Stay kinematic: knockback goes through moveWithGravity so it can't tunnel the terrain
+            s.knockback = dir * KNOCKBACK_SPEED
         end,
         onUpdate = function(state, dt)
             if s.animator:isFinished() then s.sm:transitionTo("Idle") end
         end,
-        onExit   = function(state) 
-            s.physics:setForce(vec3.new(0))
-            s.physics:turnToKinematic()
-            s.isKnockedBack = false
-            --s.velocityV = 0
+        onExit   = function(state)
+            s.knockback = vec3.new(0)
         end,
     }
 
@@ -122,14 +121,14 @@ function Script:update(entity, dt)
     self.sm:update(dt)
 
     -- The body is kinematic, so terrain never stops it - this is the only thing keeping it grounded.
-    -- Runs in every state; skipped while hurt since PhysX drives the dynamic body then.
-    if not self.isKnockedBack then
-        local horizontal = vec3.new(0)
-        if self.moveDir then
-            horizontal = self.moveDir * (self.speed * dt)
-        end
-        self:moveWithGravity(dt, horizontal)
+    -- Runs in every state.
+    local horizontal = self.knockback * dt
+    if self.moveDir then
+        horizontal = horizontal + self.moveDir * (self.speed * dt)
     end
+    self.knockback = self.knockback * math.max(0, 1 - KNOCKBACK_DAMP * dt)
+
+    self:moveWithGravity(dt, horizontal)
 end
 
 -- Must be the only physics:move call per frame - move() overwrites, it does not accumulate.
