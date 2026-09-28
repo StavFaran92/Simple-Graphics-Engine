@@ -3,6 +3,7 @@
 #include "core/Core.h"
 
 #include <glm/glm.hpp>
+#include <vector>
 
 #include "runtime/Entity.h"
 
@@ -41,4 +42,8 @@ public:
     };
 public:
 	static bool raycast(glm::vec3 origin, glm::vec3 dir, float distance, HitResult& hitResult, LayerMask mask = 0);
+
+	// Entities whose shapes overlap the sphere, one entry per actor. Uses the scene's query structure,
+	// so only nearby shapes are visited.
+	static std::vector<Entity> overlapSphere(glm::vec3 center, float radius, LayerMask mask = 0);
 };

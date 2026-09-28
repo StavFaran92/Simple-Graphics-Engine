@@ -707,6 +707,10 @@ void bindPhysics(sol::state& lua)
     
 
     lua.set_function("raycast", Physics::raycast);
+
+    lua.set_function("overlapSphere", [](glm::vec3 center, float radius, Physics::LayerMask mask) {
+        return sol::as_table(Physics::overlapSphere(center, radius, mask));
+    });
 }
 
 void bindAll(sol::state& lua) 

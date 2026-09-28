@@ -9,6 +9,11 @@ local SNAP_DOWN = 0.3   -- ground this far below still counts (keeps it glued go
 local KNOCKBACK_SPEED = 20.0 -- initial knockback speed when hit, units per second
 local KNOCKBACK_DAMP  = 6.0 -- per second; total slide distance is about SPEED / DAMP
 
+local CAPSULE_RADIUS   = 0.2 -- must match the prefab's collider
+local CAPSULE_CENTER_Y = 0.7 -- collider offset above the feet
+local SEPARATION_DIST  = 1.2 -- enemies closer than this (center to center) push apart
+local SEPARATION_SPEED = 0.5 -- push speed at full overlap, units per second
+
 function Script:create(entity)
     self.player         = getActiveScene():getEntityByName("player")
     self.physics        = entity.Physics
@@ -128,7 +133,51 @@ function Script:update(entity, dt)
     end
     self.knockback = self.knockback * math.max(0, 1 - KNOCKBACK_DAMP * dt)
 
+    horizontal = horizontal + self:separation(entity) * (SEPARATION_SPEED * dt)
+
     self:moveWithGravity(dt, horizontal)
+end
+
+-- Horizontal push away from nearby enemies, length 0..1. The overlap query only visits
+-- nearby shapes, so this never loops over every enemy.
+function Script:separation(entity)
+    local pos = self.transform:getWorldPosition()
+
+    -- The query sphere touches a neighbor's capsule when their centers are within SEPARATION_DIST
+    local neighbors = overlapSphere(
+        pos + vec3.new(0, CAPSULE_CENTER_Y, 0),
+        SEPARATION_DIST - CAPSULE_RADIUS,
+        LayerMask.Enemy
+    )
+
+    local push = vec3.new(0)
+    for _, other in ipairs(neighbors) do
+        if not other:equals(entity) then
+            local offset = pos - other.Transform:getWorldPosition()
+            offset = vec3.new(offset.x, 0, offset.z)
+            local dist = length(offset)
+
+            if dist < SEPARATION_DIST then
+                local dir
+                if dist > 0.0001 then
+                    dir = offset / dist
+                else
+                    -- Exactly stacked: pick any direction so they can split
+                    local angle = math.random() * 2 * math.pi
+                    dir = vec3.new(math.cos(angle), 0, math.sin(angle))
+                end
+                push = push + dir * (1 - dist / SEPARATION_DIST)
+            end
+        end
+    end
+
+    -- Cap so a dense crowd doesn't shove harder than a single full overlap
+    local pushLen = length(push)
+    if pushLen > 1 then
+        push = push / pushLen
+    end
+
+    return push
 end
 
 -- Must be the only physics:move call per frame - move() overwrites, it does not accumulate.
