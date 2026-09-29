@@ -7,6 +7,8 @@ local PlayerState = {
     Attack = "Attack",
 }
 
+local HIT_GRACE = 1.5 -- seconds of invulnerability after being hit
+
 Script.attack_collider = Ref(Entity)
 Script.cameraPivot = Ref(Entity)
 Script.mainCamera = Ref(Entity)
@@ -32,6 +34,7 @@ function Script:create(entity)
     self.isGrounded = false
     self.isJumping = false
     self.isAttacking = false
+    self.graceTimer = 0 -- > 0 while invulnerable
     self.state = PlayerState.Idle
 
     local eventSystem = EventSystem.get()
@@ -44,6 +47,7 @@ function Script:create(entity)
 end
 
 function Script:update(entity, dt)
+    self.graceTimer = math.max(0, self.graceTimer - dt)
 
     local velocity = self.movementSpeed * dt
     local keyboard = Keyboard.get()
@@ -181,6 +185,10 @@ function Script:onTriggerEnter(entity, other)
     end
 
     if other.Tag:getTag() == "enemy_attack_collider" then
+        -- Still in grace from the last hit: ignore so the player has time to escape
+        if self.graceTimer > 0 then return end
+
+        self.graceTimer = HIT_GRACE
         faceEnemy()
         self.animator:getGraph():trigger("hurt")
     end
