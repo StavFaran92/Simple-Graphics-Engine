@@ -1,0 +1,86 @@
+{
+    "value0": {
+        "m_serializedPrefab": [
+            {
+                "entity": 3145739,
+                "components": [
+                    {
+                        "polymorphic_id": 2147483649,
+                        "polymorphic_name": "MeshRendererComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483649,
+                            "data": {
+                                "isActive": true,
+                                "mesh": {
+                                    "uuid": {
+                                        "m_value": 9
+                                    }
+                                },
+                                "count": 1,
+                                "m_material": [
+                                    {
+                                        "key": 0,
+                                        "value": {
+                                            "uuid": {
+                                                "m_value": 7
+                                            }
+                                        }
+                                    }
+                                ],
+                                "renderTechnique": 1,
+                                "isInstanced": false
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483650,
+                        "polymorphic_name": "Transformation",
+                        "ptr_wrapper": {
+                            "id": 2147483650,
+                            "data": {
+                                "isActive": true,
+                                "localTranslation": {
+                                    "v.x": -25.0,
+                                    "v.y": 4.0,
+                                    "v.z": -0.000008940696716308594
+                                },
+                                "localRotation": {
+                                    "q.x": 0.0,
+                                    "q.y": 0.7071066498756409,
+                                    "q.z": 0.0,
+                                    "q.w": 0.7071069478988648
+                                },
+                                "localScale": {
+                                    "v.x": 49.99958801269531,
+                                    "v.y": 10.0,
+                                    "v.z": 0.9999935030937195
+                                },
+                                "m_parent": {
+                                    "m_entity": 4294967295
+                                },
+                                "entity": {
+                                    "m_entity": 3145739
+                                },
+                                "root": {
+                                    "m_entity": 1048585
+                                },
+                                "m_children": []
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 2147483651,
+                        "polymorphic_name": "ObjectComponent",
+                        "ptr_wrapper": {
+                            "id": 2147483651,
+                            "data": {
+                                "isActive": true,
+                                "name": "Box_1"
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
