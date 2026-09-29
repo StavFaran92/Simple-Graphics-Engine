@@ -1,12 +1,5 @@
 Script = {}
 
-local PlayerState = {
-    Idle   = "Idle",
-    Run    = "Run",
-    Jump   = "Jump",
-    Attack = "Attack",
-}
-
 local HIT_GRACE = 1.5 -- seconds of invulnerability after being hit
 
 Script.attack_collider = Ref(Entity)
@@ -33,9 +26,93 @@ function Script:create(entity)
     self.jumpForce = 200;
     self.isGrounded = false
     self.isJumping = false
-    self.isAttacking = false
     self.graceTimer = 0 -- > 0 while invulnerable
-    self.state = PlayerState.Idle
+    self.hDir = vec3.new(0) -- this frame's horizontal input, already scaled by speed * dt
+    self.canMove = false    -- set by Run/Jump each frame
+    self.wantAttack = false -- input requests, consumed by the states
+    self.wantJump = false
+
+    local s = self  -- capture for state closures
+
+    local function isMoving() return length(s.hDir) > 0 end
+
+    -- Shared by Idle and Run: start an attack or a jump if requested
+    local function handleActions()
+        if s.wantAttack then
+            s.sm:transitionTo("Attack")
+            return true
+        end
+        if s.wantJump and s.isGrounded then
+            s.velocityV = s.jumpForce
+            s.isJumping = true
+            s.sm:transitionTo("Jump")
+            return true
+        end
+        return false
+    end
+
+    local IdleState = {
+        onEnter  = function(state) s.animator:playAnimation("Idle", true) end,
+        onUpdate = function(state, dt)
+            if handleActions() then return end
+            if isMoving() then s.sm:transitionTo("Run") end
+        end,
+        onExit   = function(state) end,
+    }
+
+    local RunState = {
+        onEnter  = function(state) s.animator:playAnimation("Run", true) end,
+        onUpdate = function(state, dt)
+            if handleActions() then return end
+            if not isMoving() then
+                s.sm:transitionTo("Idle")
+            else
+                s.canMove = true
+            end
+        end,
+        onExit   = function(state) end,
+    }
+
+    local JumpState = {
+        onEnter  = function(state) s.animator:playAnimation("Jump", false) end,
+        onUpdate = function(state, dt)
+            if not s.isJumping then
+                s.sm:transitionTo(isMoving() and "Run" or "Idle")
+            else
+                s.canMove = true
+            end
+        end,
+        onExit   = function(state) end,
+    }
+
+    local AttackState = {
+        onEnter  = function(state) s.animator:playAnimation("Attack", false) end,
+        onUpdate = function(state, dt)
+            if s.animator:isFinished() then
+                s.sm:transitionTo(isMoving() and "Run" or "Idle")
+            end
+        end,
+        onExit   = function(state)
+            -- The swing may be cut short (e.g. by a hit) before attack_end fires
+            s.attack_collider:deactivate()
+        end,
+    }
+
+    local HurtState = {
+        onEnter  = function(state) s.animator:playAnimation("GetHurt", false) end,
+        onUpdate = function(state, dt)
+            if s.animator:isFinished() then s.sm:transitionTo("Idle") end
+        end,
+        onExit   = function(state) end,
+    }
+
+    self.sm = StateMachine.new()
+    self.sm:addState("Idle",   IdleState)
+    self.sm:addState("Run",    RunState)
+    self.sm:addState("Jump",   JumpState)
+    self.sm:addState("Attack", AttackState)
+    self.sm:addState("Hurt",   HurtState)
+    self.sm:transitionTo("Idle")
 
     local eventSystem = EventSystem.get()
     eventSystem:subscribe(EventType.KeyPressed, entity)
@@ -88,37 +165,25 @@ function Script:update(entity, dt)
         self.velocityV = self.velocityV + self.gravity
     end
 
+    self.hDir = self.movementH + self.movementV
+
+    -- States decide whether we can move this frame and consume the input requests
+    self.canMove = false
+    self.sm:update(dt)
+    self.wantAttack = false
+    self.wantJump = false
+
     -- Move player
     local disp = vec3.new(0, self.velocityV / 1000.0, 0)
 
-        -- Update state
-    local hDir = self.movementH + self.movementV
-    local isMoving = math.abs(hDir.x) > 0.0 or math.abs(hDir.z) > 0.0
-    local speed = length(hDir)
+    if self.canMove and length(self.hDir) > 0 then
+        disp = disp + self.hDir
 
-    if self.animator:getGraph():getCurrentStateID() == "Run" or 
-    self.animator:getGraph():getCurrentStateID() == "Jump" then
-        if speed > 0 then
-            disp = disp + self.movementH + self.movementV
-            
-            local angle = -math.atan(hDir.z, hDir.x)
-            self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
-        end
+        -- Rotate model toward movement direction
+        local angle = -math.atan(self.hDir.z, self.hDir.x)
+        self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
     end
     self.pc:move(disp)
-
-
-
-    -- Rotate model toward movement direction
-    -- if isMoving and not self.isJumping then
-    --     local angle = -math.atan(hDir.z, hDir.x)
-    --     self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
-    -- end
-
-    
-    self.animator:getGraph():setFloat("speed", speed)
-    self.animator:getGraph():setBool("isJumping", self.isJumping)
-    self.animator:getGraph():setBool("isGrounded", self.isGrounded)
 end
 
 function Script:onEvent(e)
@@ -153,17 +218,13 @@ function Script:onEvent(e)
 
     if e:type() == EventType.MouseButtonPressed then
         if e.button == MouseButton.Left then
-            self.animator:getGraph():trigger("attack")
+            self.wantAttack = true
         end
     end
 
     if e:type() == EventType.KeyPressed then
         if e.keysym == KeyCode.SCANCODE_SPACE then
-            if self.isGrounded then
-				self.velocityV = self.jumpForce;
-                self.isJumping = true
-                self.animator:getGraph():trigger("jump")
-            end
+            self.wantJump = true
         end
     end
 end
@@ -190,7 +251,7 @@ function Script:onTriggerEnter(entity, other)
 
         self.graceTimer = HIT_GRACE
         faceEnemy()
-        self.animator:getGraph():trigger("hurt")
+        self.sm:transitionTo("Hurt")
     end
 end
 

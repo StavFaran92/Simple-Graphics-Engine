@@ -149,12 +149,6 @@
                                     },
                                     "refs": [
                                         {
-                                            "key": "mainCamera",
-                                            "value": {
-                                                "m_entity": 1
-                                            }
-                                        },
-                                        {
                                             "key": "attack_collider",
                                             "value": {
                                                 "m_entity": 1048582
@@ -170,6 +164,12 @@
                                             "key": "model",
                                             "value": {
                                                 "m_entity": 5
+                                            }
+                                        },
+                                        {
+                                            "key": "mainCamera",
+                                            "value": {
+                                                "m_entity": 1
                                             }
                                         }
                                     ]
@@ -426,272 +426,10 @@
                                         }
                                     ],
                                     "m_animationGraph": {
-                                        "m_states": [
-                                            {
-                                                "id": "Idle",
-                                                "animationEntry": {
-                                                    "name": "Idle",
-                                                    "playbackSpeed": 1.0,
-                                                    "animation": {
-                                                        "uuid": {
-                                                            "m_value": 53
-                                                        }
-                                                    },
-                                                    "triggers": []
-                                                },
-                                                "loop": true,
-                                                "pos": {
-                                                    "v.x": 720.0,
-                                                    "v.y": 208.0
-                                                }
-                                            },
-                                            {
-                                                "id": "Run",
-                                                "animationEntry": {
-                                                    "name": "Run",
-                                                    "playbackSpeed": 1.0,
-                                                    "animation": {
-                                                        "uuid": {
-                                                            "m_value": 52
-                                                        }
-                                                    },
-                                                    "triggers": []
-                                                },
-                                                "loop": true,
-                                                "pos": {
-                                                    "v.x": 864.0,
-                                                    "v.y": 320.0
-                                                }
-                                            },
-                                            {
-                                                "id": "Jump",
-                                                "animationEntry": {
-                                                    "name": "Jump",
-                                                    "playbackSpeed": 1.0,
-                                                    "animation": {
-                                                        "uuid": {
-                                                            "m_value": 51
-                                                        }
-                                                    },
-                                                    "triggers": []
-                                                },
-                                                "loop": true,
-                                                "pos": {
-                                                    "v.x": 528.0,
-                                                    "v.y": 320.0
-                                                }
-                                            },
-                                            {
-                                                "id": "Attack",
-                                                "animationEntry": {
-                                                    "name": "Attack",
-                                                    "playbackSpeed": 1.0,
-                                                    "animation": {
-                                                        "uuid": {
-                                                            "m_value": 89
-                                                        }
-                                                    },
-                                                    "triggers": []
-                                                },
-                                                "loop": true,
-                                                "pos": {
-                                                    "v.x": 720.0,
-                                                    "v.y": 400.0
-                                                }
-                                            },
-                                            {
-                                                "id": "GetHurt",
-                                                "animationEntry": {
-                                                    "name": "GetHurt",
-                                                    "playbackSpeed": 1.0,
-                                                    "animation": {
-                                                        "uuid": {
-                                                            "m_value": 91
-                                                        }
-                                                    },
-                                                    "triggers": []
-                                                },
-                                                "loop": true,
-                                                "pos": {
-                                                    "v.x": 892.0,
-                                                    "v.y": 500.0
-                                                }
-                                            }
-                                        ],
-                                        "m_transitions": [
-                                            {
-                                                "from": "Idle",
-                                                "to": "Run",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 1,
-                                                        "parameter": "speed",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Run",
-                                                "to": "Idle",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 0,
-                                                        "parameter": "speed",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Idle",
-                                                "to": "Jump",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 0,
-                                                        "parameter": "isJumping",
-                                                        "value": 1.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Jump",
-                                                "to": "Idle",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 0,
-                                                        "parameter": "isJumping",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Run",
-                                                "to": "Jump",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 0,
-                                                        "parameter": "isJumping",
-                                                        "value": 1.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Idle",
-                                                "to": "Attack",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 4,
-                                                        "parameter": "attack",
-                                                        "value": 1.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Attack",
-                                                "to": "Idle",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 3,
-                                                        "parameter": "",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Run",
-                                                "to": "Attack",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 4,
-                                                        "parameter": "attack",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Run",
-                                                "to": "GetHurt",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 4,
-                                                        "parameter": "hurt",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Attack",
-                                                "to": "GetHurt",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 4,
-                                                        "parameter": "hurt",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "Idle",
-                                                "to": "GetHurt",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 4,
-                                                        "parameter": "hurt",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "from": "GetHurt",
-                                                "to": "Idle",
-                                                "blendDuration": 0.20000000298023225,
-                                                "conditions": [
-                                                    {
-                                                        "type": 3,
-                                                        "parameter": "",
-                                                        "value": 0.0
-                                                    }
-                                                ]
-                                            }
-                                        ],
-                                        "m_parameters": [
-                                            {
-                                                "name": "speed",
-                                                "type": 0,
-                                                "defaultValue": 0.0
-                                            },
-                                            {
-                                                "name": "isJumping",
-                                                "type": 1,
-                                                "defaultValue": 0.0
-                                            },
-                                            {
-                                                "name": "isGrounded",
-                                                "type": 1,
-                                                "defaultValue": 0.0
-                                            },
-                                            {
-                                                "name": "attack",
-                                                "type": 3,
-                                                "defaultValue": 0.0
-                                            },
-                                            {
-                                                "name": "hurt",
-                                                "type": 3,
-                                                "defaultValue": 0.0
-                                            }
-                                        ],
-                                        "m_entryStateId": "Idle"
+                                        "m_states": [],
+                                        "m_transitions": [],
+                                        "m_parameters": [],
+                                        "m_entryStateId": ""
                                     }
                                 }
                             }
