@@ -2,7 +2,6 @@ Script = {}
 
 local HIT_GRACE = 1.5 -- seconds of invulnerability after being hit
 
-Script.attack_collider = Ref(Entity)
 Script.cameraPivot = Ref(Entity)
 Script.mainCamera = Ref(Entity)
 Script.model = Ref(Entity)
@@ -13,7 +12,6 @@ function Script:create(entity)
     self.movementV = vec3.new(0)
     self.camComponent = self.mainCamera.Camera
     self.transform = entity.Transform
-    self.attack_collider = self.attack_collider.Physics
     self.pc = entity.PlayerController
     self.modelTransform = self.model.Transform
     self.animator = self.model.Animator
