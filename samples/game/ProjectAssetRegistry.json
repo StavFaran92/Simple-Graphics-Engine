@@ -110,9 +110,20 @@
             "sourcePath": "",
             "uuid": 91,
             "visibility": 1
+        },
+        {
+            "aType": 3,
+            "asset": {},
+            "assetDirectory": "zombie",
+            "ext": ".anim",
+            "isEngineOwned": false,
+            "name": "Zombie Running",
+            "sourcePath": "",
+            "uuid": 99,
+            "visibility": 1
         }
     ],
-    "counter": 99,
+    "counter": 101,
     "lua script": [
         {
             "aType": 7,
@@ -2901,17 +2912,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2937,6 +2937,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3223,17 +3234,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3259,6 +3259,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3545,17 +3556,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3581,6 +3581,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3867,17 +3878,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3903,6 +3903,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -4208,6 +4219,7 @@
         "Zombie Attack": 81,
         "Zombie Dying": 80,
         "Zombie Reaction Hit": 79,
+        "Zombie Running": 99,
         "Zombie Walk": 77,
         "ZombieGirl_Material": 67,
         "ZombieGirl_body_Material": 70,
@@ -4223,7 +4235,7 @@
         "mutant_M": 55,
         "player_controller": 32,
         "sunflowers_puresky_4k": 26,
-        "zombie": 98,
+        "zombie": 100,
         "zombie_body_diffuse": 71,
         "zombie_diffuse": 68,
         "zombie_normal": 69
@@ -4270,11 +4282,12 @@
         "content/warrior/warrior/sword and shield slash.anim": 89,
         "content/warrior/warrior/warrior.model": 82,
         "content/warrior/warrior_prefab.prefab": 88,
-        "content/zombie.prefab": 98,
+        "content/zombie.prefab": 100,
         "content/zombie/thriller idle.anim": 78,
         "content/zombie/zombie attack.anim": 81,
         "content/zombie/zombie dying.anim": 80,
         "content/zombie/zombie reaction hit.anim": 79,
+        "content/zombie/zombie running.anim": 99,
         "content/zombie/zombie walk.anim": 77,
         "content/zombie/zombiegirl w kurniawan/zombie_body_diffuse.texture": 71,
         "content/zombie/zombiegirl w kurniawan/zombie_diffuse.texture": 68,
@@ -4369,7 +4382,7 @@
             "isEngineOwned": false,
             "name": "zombie",
             "sourcePath": "",
-            "uuid": 98,
+            "uuid": 100,
             "visibility": 1
         }
     ],

@@ -11,8 +11,8 @@ local KNOCKBACK_DAMP  = 6.0 -- per second; total slide distance is about SPEED /
 
 local CAPSULE_RADIUS   = 0.2 -- must match the prefab's collider
 local CAPSULE_CENTER_Y = 0.7 -- collider offset above the feet
-local SEPARATION_DIST  = 1.2 -- enemies closer than this (center to center) push apart
-local SEPARATION_SPEED = 0.5 -- push speed at full overlap, units per second
+local SEPARATION_DIST  = 1.8 -- enemies closer than this (center to center) push apart
+local SEPARATION_SPEED = 2 -- push speed at full overlap, units per second
 
 function Script:create(entity)
     self.player         = getActiveScene():getEntityByName("player")
@@ -20,7 +20,7 @@ function Script:create(entity)
     self.model          = entity:getChildByName("model")
     self.modelTransform = self.model.Transform
     self.attack_collider = self.model:getChildByName("attack_collider").Physics
-    self.speed          = 1.2 -- units per second
+    self.speed          = 3.0 -- units per second
     self.animator       = self.model.Animator
     self.isGrounded     = false
     self.knockback      = vec3.new(0) -- horizontal velocity from being hit, decays over time
@@ -55,7 +55,7 @@ function Script:create(entity)
 
     local FollowState = {
         onEnter  = function(state)
-            s.animator:playAnimation("Walk", true)
+            s.animator:playAnimation("Run", true)
         end,
         onUpdate = function(state, dt)
             if canAttack() then

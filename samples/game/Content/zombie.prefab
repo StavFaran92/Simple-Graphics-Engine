@@ -31,9 +31,9 @@
                             "data": {
                                 "isActive": true,
                                 "localTranslation": {
-                                    "v.x": 0.32487761974334719,
-                                    "v.y": 1.8550745248794556,
-                                    "v.z": 2.792245388031006
+                                    "v.x": 0.0,
+                                    "v.y": 0.0,
+                                    "v.z": 0.0
                                 },
                                 "localRotation": {
                                     "q.x": -9.61108526098542e-7,
@@ -125,7 +125,7 @@
                         "ptr_wrapper": {
                             "id": 2147483654,
                             "data": {
-                                "m_currentAnimIndex": 0,
+                                "m_currentAnimIndex": 4,
                                 "m_animations": [
                                     {
                                         "name": "Idle",
@@ -180,6 +180,16 @@
                                                 "frameID": 60
                                             }
                                         ]
+                                    },
+                                    {
+                                        "name": "Run",
+                                        "playbackSpeed": 1.0,
+                                        "animation": {
+                                            "uuid": {
+                                                "m_value": 99
+                                            }
+                                        },
+                                        "triggers": []
                                     }
                                 ],
                                 "m_animationGraph": {
@@ -267,9 +277,9 @@
                             "data": {
                                 "isActive": true,
                                 "localTranslation": {
-                                    "v.x": -0.000005557838449021801,
-                                    "v.y": 0.0,
-                                    "v.z": 0.00005221366882324219
+                                    "v.x": -0.0000055578420870006088,
+                                    "v.y": -1.7132129048746948e-14,
+                                    "v.z": 0.00005221356332185678
                                 },
                                 "localRotation": {
                                     "q.x": -0.000001283337724089506,
