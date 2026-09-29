@@ -178,8 +178,8 @@ function Script:update(entity, dt)
         disp = disp + self.hDir
 
         -- Rotate model toward movement direction
-        local angle = -math.atan(self.hDir.z, self.hDir.x)
-        self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
+        -- local angle = -math.atan(self.hDir.z, self.hDir.x)
+        -- self.modelTransform:setLocalRotation(angle + math.pi / 2, vec3.new(0, 1, 0))
     end
     self.pc:move(disp)
 end
@@ -198,11 +198,11 @@ function Script:onEvent(e)
         if self.pitch > 70.0 then
             self.pitch = 70.0
         end
-        if self.pitch < 0.0 then
-            self.pitch = 0.0
+        if self.pitch < -70.0 then
+            self.pitch = -70.0
         end
 
-        local pitchQuat = angleAxis(math.rad(self.pitch), vec3.new(-1, 0, 0))
+        local pitchQuat = angleAxis(math.rad(self.pitch), vec3.new(1, 0, 0))
         local yawQuat = angleAxis(math.rad(self.yaw), vec3.new(0, 1, 0))
         local combinedQuat = yawQuat * pitchQuat
 
@@ -248,7 +248,7 @@ function Script:onTriggerEnter(entity, other)
         if self.graceTimer > 0 then return end
 
         self.graceTimer = HIT_GRACE
-        faceEnemy()
+        --faceEnemy()
         self.sm:transitionTo("Hurt")
     end
 end
