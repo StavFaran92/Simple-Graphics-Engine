@@ -2,6 +2,10 @@ Script = {}
 
 local HIT_GRACE = 1.5 -- seconds of invulnerability after being hit
 local SHOOT_RANGE = 100.0 -- max distance a shot travels
+local FIRE_INTERVAL = 0.1 -- seconds between shots while the button is held
+local RECOIL_KICK = 1.2 -- degrees the view kicks up per shot
+local RECOIL_SIDE = 0.3 -- max random sideways kick per shot, degrees
+local RECOIL_RECOVER = 10.0 -- per second; how fast the view settles back after a kick
 
 Script.cameraPivot = Ref(Entity)
 Script.mainCamera = Ref(Entity)
@@ -26,6 +30,9 @@ function Script:create(entity)
     self.isGrounded = false
     self.isJumping = false
     self.graceTimer = 0 -- > 0 while invulnerable
+    self.fireCooldown = 0 -- <= 0 when the next shot may fire
+    self.recoilPitch = 0 -- current kick in degrees, added on top of the aim and decays back to 0
+    self.recoilYaw = 0
     self.hDir = vec3.new(0) -- this frame's horizontal input, already scaled by speed * dt
     self.canMove = false    -- set by Run/Jump each frame
     self.wantJump = false -- input request, consumed by the states
@@ -106,6 +113,24 @@ end
 function Script:update(entity, dt)
     self.graceTimer = math.max(0, self.graceTimer - dt)
 
+    -- Hold to fire. Adding the interval (rather than resetting to it) keeps the rate frame-rate
+    -- independent; clamping on release stops idle time from banking a burst of shots.
+    self.fireCooldown = self.fireCooldown - dt
+    if Mouse.get():getButtonPressed(MouseButton.Left) then
+        if self.fireCooldown <= 0 then
+            self:shoot()
+            self.fireCooldown = self.fireCooldown + FIRE_INTERVAL
+        end
+    else
+        self.fireCooldown = math.max(self.fireCooldown, 0)
+    end
+
+    -- Ease the recoil back toward the aim, then refresh the camera even if the mouse didn't move
+    local recover = math.max(0, 1 - RECOIL_RECOVER * dt)
+    self.recoilPitch = self.recoilPitch * recover
+    self.recoilYaw = self.recoilYaw * recover
+    self:applyCameraRotation()
+
     local velocity = self.movementSpeed * dt
     local keyboard = Keyboard.get()
 
@@ -183,23 +208,12 @@ function Script:onEvent(e)
             self.pitch = -70.0
         end
 
-        local pitchQuat = angleAxis(math.rad(self.pitch), vec3.new(1, 0, 0))
-        local yawQuat = angleAxis(math.rad(self.yaw), vec3.new(0, 1, 0))
-        local combinedQuat = yawQuat * pitchQuat
-
-        local transform = self.cameraPivot.Transform
-        transform:setWorldRotation(combinedQuat)
+        self:applyCameraRotation()
     end
 
 
 
     
-
-    if e:type() == EventType.MouseButtonPressed then
-        if e.button == MouseButton.Left then
-            self:shoot()
-        end
-    end
 
     if e:type() == EventType.KeyPressed then
         if e.keysym == KeyCode.SCANCODE_SPACE then
@@ -216,6 +230,20 @@ function Script:shoot()
     if raycast(origin, self.camComponent.front, SHOOT_RANGE, hitResult, LayerMask.Ground | LayerMask.Enemy) then
         invoke(hitResult.entity, "hurt")
     end
+
+    -- Kick after the trace so this shot lands where the player aimed
+    self.recoilPitch = self.recoilPitch + RECOIL_KICK
+    self.recoilYaw = self.recoilYaw + (math.random() * 2 - 1) * RECOIL_SIDE
+end
+
+-- Camera pivot rotation = aim (yaw/pitch from the mouse) + current recoil offset
+function Script:applyCameraRotation()
+    local pitch = math.max(-70.0, math.min(70.0, self.pitch + self.recoilPitch))
+    local yaw = self.yaw + self.recoilYaw
+
+    local pitchQuat = angleAxis(math.rad(pitch), vec3.new(1, 0, 0))
+    local yawQuat = angleAxis(math.rad(yaw), vec3.new(0, 1, 0))
+    self.cameraPivot.Transform:setWorldRotation(yawQuat * pitchQuat)
 end
 
 function Script:onTriggerEnter(entity, other)
