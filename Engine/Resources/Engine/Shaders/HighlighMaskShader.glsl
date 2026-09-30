@@ -1,6 +1,6 @@
 #vert
 
-#version 330 
+#version 430 core
 
 // ----- Definitions ----- //
 
@@ -8,6 +8,7 @@
 #include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/buffers.glsl
                                                                                     
 layout (location = 0) in vec3 aPos;
 layout (location = 5) in ivec3 boneIDs;

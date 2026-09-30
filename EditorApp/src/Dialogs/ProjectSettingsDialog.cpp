@@ -27,6 +27,40 @@ void ProjectSettingsDialog::drawContent()
 		ImGui::EndTabItem();
 	}
 
+	if (ImGui::BeginTabItem("Shadows"))
+	{
+		auto& shadows = Engine::get()->getSubSystem<Graphics>()->shadowSettings;
+		ImGui::Checkbox("Enabled", &shadows.enabled);
+
+		static const int resolutions[] = { 512, 1024, 2048, 4096 };
+		static const char* resolutionNames[] = { "512", "1024", "2048", "4096" };
+		int resolutionIndex = 1;
+		for (int i = 0; i < IM_ARRAYSIZE(resolutions); i++)
+		{
+			if (resolutions[i] == shadows.resolution)
+				resolutionIndex = i;
+		}
+		if (ImGui::Combo("Resolution", &resolutionIndex, resolutionNames, IM_ARRAYSIZE(resolutionNames)))
+			shadows.resolution = resolutions[resolutionIndex];
+
+		if (ImGui::CollapsingHeader("Projection", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat("Left", &shadows.left, 0.5f);
+			ImGui::DragFloat("Right", &shadows.right, 0.5f);
+			ImGui::DragFloat("Bottom", &shadows.bottom, 0.5f);
+			ImGui::DragFloat("Top", &shadows.top, 0.5f);
+			ImGui::DragFloat("Near", &shadows.nearPlane, 0.1f);
+			ImGui::DragFloat("Far", &shadows.farPlane, 1.0f);
+		}
+
+		if (ImGui::CollapsingHeader("Light View", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat3("Origin", &shadows.lightOrigin.x, 0.5f);
+		}
+
+		ImGui::EndTabItem();
+	}
+
 	if (ImGui::BeginTabItem("Physics"))
 	{
 		if (ImGui::CollapsingHeader("Layer Masks")) 

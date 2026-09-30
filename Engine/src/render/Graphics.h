@@ -26,6 +26,26 @@ enum class RenderMode
 	WIREFRAME = 1
 };
 
+// Global directional-light shadow settings, consumed by ShadowSystem and the lighting shaders.
+struct ShadowSettings
+{
+	bool enabled = true;
+
+	// Shadow map resolution (square), changing it reallocates the depth texture
+	int resolution = 2048;
+
+	// Orthographic light projection
+	float left = -10.0f;
+	float right = 10.0f;
+	float bottom = -10.0f;
+	float top = 10.0f;
+	float nearPlane = 1.0f;
+	float farPlane = 200.0f;
+
+	// Position the light view is rendered from (looks along the directional light's direction)
+	glm::vec3 lightOrigin = { 0.0f, 100.0f, 0.0f };
+};
+
 // Per-instance data uploaded to the GPU alongside the instanced model-matrix buffer.
 // Mirrors the SSBO struct read on the GPU side - keep std430 friendly (uint, not bool).
 struct InstanceData
@@ -77,6 +97,7 @@ public:
 	RenderMode renderMode = RenderMode::SHADED;
 
 	bool useSSAO = true;
+	ShadowSettings shadowSettings;
 
 	GBuffer gBuffer;
 

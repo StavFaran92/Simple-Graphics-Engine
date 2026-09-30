@@ -491,7 +491,7 @@ void Scene::draw(float deltaTime)
 
 		graphics->frustum = &frustum;
 
-		if(Engine::get()->getConfig().renderConfig.renderShadowMap)
+		if(Engine::get()->getConfig().renderConfig.renderShadowMap && graphics->shadowSettings.enabled)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Shadow Map");
 			m_shadowSystem->renderToDepthMap();
@@ -621,7 +621,7 @@ void Scene::draw(float deltaTime)
 				terrainShader->setUniformValue("width", terrain.getWidth());
 				terrainShader->setUniformValue("height", terrain.getHeight());
 				terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
-				terrainShader->setUniformValue("cameraPos", graphics->cameraPos);
+				terrainShader->setUniformValue("useShadows", graphics->shadowSettings.enabled);				terrainShader->setUniformValue("cameraPos", graphics->cameraPos);
 				terrainShader->setUniformValue("layerCount", terrain.getLayerCount());
 				terrainShader->bindUniformBlockToBindPoint("Time", 0);
 				terrainShader->bindUniformBlockToBindPoint("Lights", 1);

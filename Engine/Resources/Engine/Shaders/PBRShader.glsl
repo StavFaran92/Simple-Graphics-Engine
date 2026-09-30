@@ -1,6 +1,6 @@
 #vert
 
-#version 330
+#version 430
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -16,6 +16,7 @@ layout (location = 7) in mat4 instanceModel;
 #include ../../../../Engine/Resources/Engine/Shaders/include/structs.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/uniforms.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/functions.glsl
+#include ../../../../Engine/Resources/Engine/Shaders/include/buffers.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/animation.glsl
 
 // ----- Out ----- //

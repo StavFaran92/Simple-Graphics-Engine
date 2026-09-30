@@ -183,6 +183,7 @@ uniform samplerCube gIrradianceMap;
 uniform samplerCube gPrefilterEnvMap;
 uniform sampler2D gBRDFIntegrationLUT;
 uniform sampler2D gShadowMap;
+uniform bool useShadows;
 layout(binding = 5) uniform sampler2D noise;
 
 uniform int layerCount;
@@ -324,7 +325,7 @@ void main()
 
 
     vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
-    float shadow = calculateShadows(fragPosInLightSpace, gShadowMap);
+    float shadow = useShadows ? calculateShadows(fragPosInLightSpace, gShadowMap) : 0.0;
 
     vec3 color = calculatePBR(
                 totalAlbedo,

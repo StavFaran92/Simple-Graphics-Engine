@@ -28,7 +28,11 @@ public:
 	TextureResourceRef getShadowMap() const;
 	glm::mat4 getLightSpaceMat() const;
 private:
+	bool createDepthMap(int resolution);
+
+private:
 	bool m_isInit = false;
+	int m_resolution = 0;
 
 	ShadowAlgorithm m_shadowAlgorithm = ShadowAlgorithm::ShadowMapping;
 

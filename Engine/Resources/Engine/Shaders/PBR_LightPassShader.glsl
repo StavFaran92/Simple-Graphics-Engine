@@ -53,6 +53,7 @@ uniform sampler2D gSSAOColorBuffer;
 uniform sampler2D gTangent;
 
 uniform bool useSSAO;
+uniform bool useShadows;
 
 // ----- Forward Declerations ----- //
 
@@ -110,7 +111,7 @@ void main()
 	float ssao = texture(gSSAOColorBuffer, TexCoords).r;
 
 	vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
-	float shadow = calculateShadows(fragPosInLightSpace, gShadowMap);
+	float shadow = useShadows ? calculateShadows(fragPosInLightSpace, gShadowMap) : 0.0;
 
 	float ssaoFinal = useSSAO ? ao * ssao : 1.0;
 

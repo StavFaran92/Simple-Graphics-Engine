@@ -572,7 +572,7 @@ void RenderFunctions::drawLightPass(const GBuffer& gBuffer)
 	lightPassShaderResource->setUniformValue("cameraPos", graphics->cameraPos);
 	lightPassShaderResource->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
 	lightPassShaderResource->setUniformValue("useSSAO", graphics->useSSAO);
-
+	lightPassShaderResource->setUniformValue("useShadows", graphics->shadowSettings.enabled);
 	graphics->renderView->bind();
 
 	{

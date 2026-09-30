@@ -23,9 +23,6 @@
 #include "component/RenderableComponent.h"
 
 
-const unsigned int SHADOW_WIDTH = 1024;
-const unsigned int SHADOW_HEIGHT = 1024;
-
 ShadowSystem::ShadowSystem()
 {}
 
@@ -36,13 +33,27 @@ bool ShadowSystem::init()
 	//	renderToDepthMap(params);
 	//});
 
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+	if (!createDepthMap(graphics->shadowSettings.resolution))
+		return false;
+
+	m_simpleDepthShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SimpleDepthShader.glsl");
+
+	//m_bufferDisplay = std::make_shared<ScreenBufferDisplay>(m_scene);
+	//m_bufferDisplay->init(Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight());
+
+	return true;
+}
+
+bool ShadowSystem::createDepthMap(int resolution)
+{
 	m_fbo.bind();
 
 	// Generate 2D texture
 	TextureData textureData;
 	textureData.target = TextureTarget::TEXTURE_2D;
-	textureData.width = SHADOW_WIDTH;
-	textureData.height = SHADOW_HEIGHT;
+	textureData.width = resolution;
+	textureData.height = resolution;
 	textureData.channels = 1;
 	textureData.internalFormat = TextureInternalFormat::DEPTH_COMPONENT;
 	textureData.format = TextureFormat::DEPTH_COMPONENT;
@@ -65,17 +76,15 @@ bool ShadowSystem::init()
 	if (!m_fbo.isComplete())
 	{
 		logError("FBO is not complete!");
+		m_fbo.unbind();
 		return false;
 	}
 
 	m_fbo.unbind();
 
-	m_simpleDepthShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SimpleDepthShader.glsl");
+	m_resolution = resolution;
 
 	DebugHelper::getInstance().registerTextureForDebug("Depth map", m_depthMapTexture);
-
-	//m_bufferDisplay = std::make_shared<ScreenBufferDisplay>(m_scene);
-	//m_bufferDisplay->init(Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight());
 
 	return true;
 }
@@ -83,12 +92,16 @@ bool ShadowSystem::init()
 void ShadowSystem::renderToDepthMap()
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
+	const ShadowSettings& settings = graphics->shadowSettings;
+
+	if (settings.resolution > 0 && settings.resolution != m_resolution)
+		createDepthMap(settings.resolution);
 
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
 	// Set shadow map viewport
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glViewport(0, 0, m_resolution, m_resolution);
 
 	// Bind FBO
 	m_fbo.bind();
@@ -102,6 +115,9 @@ void ShadowSystem::renderToDepthMap()
 	if (view.size() < 1)
 	{
 		// No directional light, for now simply return
+		m_fbo.unbind();
+		glDisable(GL_DEPTH_TEST);
+		glCullFace(GL_BACK);
 		return;
 	}
 
@@ -113,8 +129,10 @@ void ShadowSystem::renderToDepthMap()
 	//todo verify exists
 
 	// Generate Orthogonal projection
-	float near_plane = 1.0f, far_plane = 200.f;
-	glm::mat4 lightProjection = glm::ortho(-30.0f, 30.0f, -30.0f, 30.0f, near_plane, far_plane);
+	glm::mat4 lightProjection = glm::ortho(
+		settings.left, settings.right,
+		settings.bottom, settings.top,
+		settings.nearPlane, settings.farPlane);
 
 	auto& trans = e.getComponent<Transformation>();
 	auto& direction = trans.getLocalRotationVec3();
@@ -124,8 +142,8 @@ void ShadowSystem::renderToDepthMap()
 
 	// Generate lookAt light matrix 
 	glm::mat4 dirLightView = glm::lookAt(
-		glm::vec3(0.0f, 100.0f, 0.0f),
-		glm::vec3(0.0f, 100.0f, 0.0f) + direction,
+		settings.lightOrigin,
+		settings.lightOrigin + direction,
 		up);
 
 	m_lightSpaceMatrix = lightProjection * dirLightView;
