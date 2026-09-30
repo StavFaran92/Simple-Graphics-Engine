@@ -417,9 +417,10 @@ TextureResourceRef Texture::load(const std::string& fileLocation, TextureLoadDes
 
 	TextureData textureData;
 
-	// extract texture build data
-	Texture::extractTextureDataFromSettings(desc, textureData);
+	// extract texture build data; settings go last so they can override what the file implies
+	textureData.flip = desc.flip; // must be known before the file is read
 	Texture::extractTextureDataFromFile(filepath, textureData);
+	Texture::extractTextureDataFromSettings(desc, textureData);
 
 	assert(textureData.data);
 
@@ -626,6 +627,14 @@ void Texture::extractTextureDataFromFile(const std::string& fileLocation, Textur
 	}
 
 	textureData.format = getFormatFromChannels(textureData.channels);
+
+	// Match the GPU storage to the source channels, otherwise the RGB default drops alpha.
+	// Float (HDR/EXR) textures keep their existing internal format.
+	if (textureData.type == TextureType::UNSIGNED_BYTE)
+	{
+		if (textureData.channels == 4) textureData.internalFormat = TextureInternalFormat::RGBA;
+		else if (textureData.channels == 1) textureData.internalFormat = TextureInternalFormat::R8;
+	}
 
 	std::string textureName = std::filesystem::path(fileLocation).filename().stem().string();
 	textureData.textureName = textureName;

@@ -20,8 +20,8 @@ struct EngineAPI ImageComponent : public Component
 		SERIALIZED_MEMBER(rotate);
 	}
 
-	glm::vec2 size;
-	glm::vec2 position;
+	glm::vec2 size{};
+	glm::vec2 position{};
 	float rotate = 0;
 
 	TextureAssetRef image;

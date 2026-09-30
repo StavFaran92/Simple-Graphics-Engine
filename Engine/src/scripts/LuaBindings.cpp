@@ -144,6 +144,7 @@ sol::object getComponentHelper(Entity & e, sol::stack_object key, sol::this_stat
 void bindCoreTypes(sol::state& lua)
 {
     lua.new_usertype<glm::vec2>("vec2",
+        sol::constructors<glm::vec2(), glm::vec2(float), glm::vec2(float, float)>(),
         "x", &glm::vec2::x,
         "y", &glm::vec2::y
     );
@@ -464,6 +465,12 @@ void bindComponents(sol::state& lua)
 
     lua.new_usertype<PlayerController>("PlayerController",
         "move", &PlayerController::move
+    );
+
+    lua.new_usertype<ImageComponent>("ImageComponent",
+        "position", &ImageComponent::position,
+        "size", &ImageComponent::size,
+        "rotate", &ImageComponent::rotate
     );
 
     lua.new_usertype<CameraComponent>("CameraComponent",

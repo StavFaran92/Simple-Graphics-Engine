@@ -1,6 +1,7 @@
 Script = {}
 
 local HIT_GRACE = 1.5 -- seconds of invulnerability after being hit
+local SHOOT_RANGE = 100.0 -- max distance a shot travels
 
 Script.cameraPivot = Ref(Entity)
 Script.mainCamera = Ref(Entity)
@@ -27,19 +28,14 @@ function Script:create(entity)
     self.graceTimer = 0 -- > 0 while invulnerable
     self.hDir = vec3.new(0) -- this frame's horizontal input, already scaled by speed * dt
     self.canMove = false    -- set by Run/Jump each frame
-    self.wantAttack = false -- input requests, consumed by the states
-    self.wantJump = false
+    self.wantJump = false -- input request, consumed by the states
 
     local s = self  -- capture for state closures
 
     local function isMoving() return length(s.hDir) > 0 end
 
-    -- Shared by Idle and Run: start an attack or a jump if requested
+    -- Shared by Idle and Run: start a jump if requested
     local function handleActions()
-        if s.wantAttack then
-            s.sm:transitionTo("Attack")
-            return true
-        end
         if s.wantJump and s.isGrounded then
             s.velocityV = s.jumpForce
             s.isJumping = true
@@ -83,19 +79,6 @@ function Script:create(entity)
         onExit   = function(state) end,
     }
 
-    local AttackState = {
-        onEnter  = function(state) s.animator:playAnimation("Attack", false) end,
-        onUpdate = function(state, dt)
-            if s.animator:isFinished() then
-                s.sm:transitionTo(isMoving() and "Run" or "Idle")
-            end
-        end,
-        onExit   = function(state)
-            -- The swing may be cut short (e.g. by a hit) before attack_end fires
-            s.attack_collider:deactivate()
-        end,
-    }
-
     local HurtState = {
         onEnter  = function(state) s.animator:playAnimation("GetHurt", false) end,
         onUpdate = function(state, dt)
@@ -108,7 +91,6 @@ function Script:create(entity)
     self.sm:addState("Idle",   IdleState)
     self.sm:addState("Run",    RunState)
     self.sm:addState("Jump",   JumpState)
-    self.sm:addState("Attack", AttackState)
     self.sm:addState("Hurt",   HurtState)
     self.sm:transitionTo("Idle")
 
@@ -168,7 +150,6 @@ function Script:update(entity, dt)
     -- States decide whether we can move this frame and consume the input requests
     self.canMove = false
     self.sm:update(dt)
-    self.wantAttack = false
     self.wantJump = false
 
     -- Move player
@@ -216,7 +197,7 @@ function Script:onEvent(e)
 
     if e:type() == EventType.MouseButtonPressed then
         if e.button == MouseButton.Left then
-            self.wantAttack = true
+            self:shoot()
         end
     end
 
@@ -227,12 +208,13 @@ function Script:onEvent(e)
     end
 end
 
-function Script:onAnimationTrigger(name, frame)
-    if name == "attack_start" then
-        self.attack_collider:activate()
-    end
-    if name == "attack_end" then
-        self.attack_collider:deactivate()
+-- Hitscan from the camera along its view direction. Ground is in the mask so walls block shots;
+-- only enemy scripts define hurt(), so invoke() is a no-op on anything else.
+function Script:shoot()
+    local origin = self.mainCamera.Transform:getWorldPosition()
+    local hitResult = HitResult.new()
+    if raycast(origin, self.camComponent.front, SHOOT_RANGE, hitResult, LayerMask.Ground | LayerMask.Enemy) then
+        invoke(hitResult.entity, "hurt")
     end
 end
 

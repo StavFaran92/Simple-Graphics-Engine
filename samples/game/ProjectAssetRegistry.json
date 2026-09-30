@@ -123,7 +123,7 @@
             "visibility": 1
         }
     ],
-    "counter": 115,
+    "counter": 120,
     "lua script": [
         {
             "aType": 7,
@@ -175,6 +175,19 @@
             "name": "gen_enemies",
             "sourcePath": "",
             "uuid": 93,
+            "visibility": 1
+        },
+        {
+            "aType": 7,
+            "asset": {
+                "filepath": ""
+            },
+            "assetDirectory": ".\\",
+            "ext": ".lua",
+            "isEngineOwned": false,
+            "name": "crosshair_script",
+            "sourcePath": "",
+            "uuid": 119,
             "visibility": 1
         }
     ],
@@ -2912,6 +2925,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2937,17 +2961,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -3234,6 +3247,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3259,17 +3283,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -3556,6 +3569,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3581,17 +3605,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -4768,6 +4781,8 @@
         "ak_Roughness": 114,
         "ak_latest": 107,
         "ak_latest_PREFAB": 109,
+        "crosshair2": 118,
+        "crosshair_script": 119,
         "enemyController": 61,
         "eyelash_MAT": 43,
         "fISsTyQE": 27,
@@ -4793,6 +4808,8 @@
         "content/ak_latest/ak_normal_opengl.texture": 113,
         "content/ak_latest/ak_roughness.texture": 114,
         "content/box_1.prefab": 102,
+        "content/crosshair2.texture": 118,
+        "content/crosshair_script.lua": 119,
         "content/erika archer (2)/akai_mat.mat": 34,
         "content/erika archer (2)/body_mat.mat": 37,
         "content/erika archer (2)/erika archer (2).model": 33,
@@ -5590,6 +5607,17 @@
             "name": "ak_Roughness",
             "sourcePath": "",
             "uuid": 114,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": ".\\",
+            "ext": ".texture",
+            "isEngineOwned": false,
+            "name": "crosshair2",
+            "sourcePath": "",
+            "uuid": 118,
             "visibility": 1
         }
     ]

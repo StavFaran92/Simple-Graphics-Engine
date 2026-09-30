@@ -214,9 +214,14 @@ function Script:onAnimationTrigger(name, frame)
     if name == "attack_end"   then self.attack_collider:deactivate() end
 end
 
+-- Called by the player's shot via invoke(), and by melee hits below
+function Script:hurt()
+    self.sm:transitionTo("Hurt")
+end
+
 function Script:onTriggerEnter(entity, other)
     if other.Tag:getTag() == "player_attack_collider" then
-        self.sm:transitionTo("Hurt")
+        self:hurt()
     end
 end
 
