@@ -22,7 +22,11 @@ public:
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZED_MEMBER(color);
+		SERIALIZED_MEMBER_OPTIONAL2(intensity, 1.0f); // optional: scenes saved before it existed
 	}
+
+	// Multiplies color before it reaches the shader, so color stays a plain [0,1] tint
+	float intensity = 1.0f;
 };
 
 REGISTER_COMPONENT(DirectionalLight)

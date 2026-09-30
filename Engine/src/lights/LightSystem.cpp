@@ -117,7 +117,7 @@ void LightSystem::setLightsInUBO()
 			DirLightUBORep dirLightUBO;
 			auto dir4 = /**params->view **/ glm::vec4(dir, 1.0f);
 			dirLightUBO.direction = { glm::vec3(dir4.x, dir4.y, dir4.z) , 1.f};
-			dirLightUBO.color = { dLight.getColor(), 1.f };
+			dirLightUBO.color = { dLight.getColor() * dLight.intensity, 1.f };
 
 			m_uboLights->setData(2 * sizeof(int) + 8 + sizeof(PointLightUBORep) * NR_POINT_LIGHTS + sizeof(DirLightUBORep) * i, sizeof(dirLightUBO.direction), glm::value_ptr(dirLightUBO.direction));
 			m_uboLights->setData(2 * sizeof(int) + 8 + sizeof(PointLightUBORep) * NR_POINT_LIGHTS + sizeof(DirLightUBORep) * i + sizeof(dirLightUBO.direction), sizeof(dirLightUBO.color), glm::value_ptr(dirLightUBO.color));

@@ -368,6 +368,7 @@ void InspectorWindow::display()
 
 		displayComponent<DirectionalLight>("Directional Light", [](DirectionalLight& dLight) {
 			ImGui::ColorEdit3("Color", glm::value_ptr(dLight.color));
+			ImGui::DragFloat("Intensity", &dLight.intensity, 0.05f, 0.0f, 100.0f);
 		});
 
 		displayComponent<PointLight>("Point Light", [](PointLight& pLight) {
