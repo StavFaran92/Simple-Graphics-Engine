@@ -134,8 +134,8 @@ void ShadowSystem::renderToDepthMap()
 	m_simpleDepthShader->setUniformValue("lightSpaceMatrix", m_lightSpaceMatrix);
 
 	// Render Scene 
-	for (auto&& [entity, mesh, transform, renderable] : 
-		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, RenderableComponent>().each())
+	for (auto&& [entity, mesh, transform] : 
+		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation>().each())
 	{
 		
 

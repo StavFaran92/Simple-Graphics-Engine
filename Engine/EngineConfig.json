@@ -1,6 +1,6 @@
 {
   "Rendering": {
-    "RenderShadowMap": false,
+    "RenderShadowMap": true,
     "RenderForwardPass": true,
     "RenderDeferredPass": true,
     "RenderCustomShadersPass": true,
