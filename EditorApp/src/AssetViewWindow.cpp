@@ -395,6 +395,10 @@ void AssetViewWindow::display()
 							UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
 							auto& asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 							asset.erase();
+
+							// Drop the selection so nothing keeps referencing the deleted asset
+							s_assetViewSelectedIndices.clear();
+							EditorState::Instance().clearAssetSelection();
 						}
 						else
 						{

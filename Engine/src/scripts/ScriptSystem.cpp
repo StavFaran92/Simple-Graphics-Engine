@@ -65,8 +65,12 @@ static bool loadScriptState(sol::state& lua, ScriptComponent& scriptComponent, L
         return false;
 
     try {
-        const std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
-        std::string filepath = (projectDir / scriptComponent.getScript().resource()->filepath).string();
+        // The resource filepath is already resolved by the loader (it includes the project dir),
+        // only fall back to joining with the project dir for a bare project-relative path.
+        std::filesystem::path scriptPath = scriptComponent.getScript().resource()->filepath;
+        if (scriptPath.is_relative() && !std::filesystem::exists(scriptPath))
+            scriptPath = std::filesystem::path(Engine::get()->getProjectDirectory()) / scriptPath;
+        std::string filepath = scriptPath.string();
         auto result = lua.safe_script_file(filepath, sol::script_pass_on_error);
         if (!result.valid()) {
             sol::error err = result;

@@ -2,7 +2,7 @@
     "value0": {
         "m_serializedPrefab": [
             {
-                "entity": 9,
+                "entity": 1048582,
                 "components": [
                     {
                         "polymorphic_id": 2147483649,
@@ -17,7 +17,7 @@
                                     }
                                 },
                                 "entity": {
-                                    "m_entity": 9
+                                    "m_entity": 1048582
                                 },
                                 "refs": []
                             }
@@ -31,9 +31,9 @@
                             "data": {
                                 "isActive": true,
                                 "localTranslation": {
-                                    "v.x": 0.0,
-                                    "v.y": 0.0,
-                                    "v.z": 0.0
+                                    "v.x": -5.80665397644043,
+                                    "v.y": -0.000010567678145889659,
+                                    "v.z": 0.6756113171577454
                                 },
                                 "localRotation": {
                                     "q.x": -9.61108526098542e-7,
@@ -50,16 +50,16 @@
                                     "m_entity": 4294967295
                                 },
                                 "entity": {
-                                    "m_entity": 9
+                                    "m_entity": 1048582
                                 },
                                 "root": {
                                     "m_entity": 9
                                 },
                                 "m_children": [
                                     {
-                                        "key": 10,
+                                        "key": 5,
                                         "value": {
-                                            "m_entity": 10
+                                            "m_entity": 5
                                         }
                                     }
                                 ]
@@ -117,7 +117,7 @@
                 ]
             },
             {
-                "entity": 10,
+                "entity": 5,
                 "components": [
                     {
                         "polymorphic_id": 2147483654,
@@ -257,13 +257,13 @@
                                     }
                                 },
                                 "entity": {
-                                    "m_entity": 10
+                                    "m_entity": 5
                                 },
                                 "refs": [
                                     {
                                         "key": "player_script",
                                         "value": {
-                                            "m_entity": 9
+                                            "m_entity": 1048582
                                         }
                                     }
                                 ]
@@ -277,9 +277,9 @@
                             "data": {
                                 "isActive": true,
                                 "localTranslation": {
-                                    "v.x": -0.0000055578420870006088,
-                                    "v.y": -1.7132129048746948e-14,
-                                    "v.z": 0.00005221356332185678
+                                    "v.x": -0.000005245208740234375,
+                                    "v.y": -6.729124368831663e-9,
+                                    "v.z": 0.00005841256643179804
                                 },
                                 "localRotation": {
                                     "q.x": -0.000001283337724089506,
@@ -293,19 +293,19 @@
                                     "v.z": 0.0099997129291296
                                 },
                                 "m_parent": {
-                                    "m_entity": 9
+                                    "m_entity": 1048582
                                 },
                                 "entity": {
-                                    "m_entity": 10
+                                    "m_entity": 5
                                 },
                                 "root": {
                                     "m_entity": 10
                                 },
                                 "m_children": [
                                     {
-                                        "key": 1048587,
+                                        "key": 16,
                                         "value": {
-                                            "m_entity": 1048587
+                                            "m_entity": 16
                                         }
                                     }
                                 ]
@@ -336,7 +336,7 @@
                 ]
             },
             {
-                "entity": 1048587,
+                "entity": 16,
                 "components": [
                     {
                         "polymorphic_id": 2,
@@ -361,10 +361,10 @@
                                     "v.z": 100.00359344482422
                                 },
                                 "m_parent": {
-                                    "m_entity": 10
+                                    "m_entity": 5
                                 },
                                 "entity": {
-                                    "m_entity": 1048587
+                                    "m_entity": 16
                                 },
                                 "root": {
                                     "m_entity": 1048587

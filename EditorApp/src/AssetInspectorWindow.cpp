@@ -142,7 +142,13 @@ void AssetInspectorWindow::display()
 		~ImGuiWindowFlags_NoScrollWithMouse);
 
 	auto& currentAssetEdit = EditorState::Instance().getSelectedAsset();
-	if (currentAssetEdit.isEmpty())
+	if (!currentAssetEdit.isEmpty() && !Engine::get()->getSubSystem<Assets>()->hasAsset(currentAssetEdit.getUID()))
+	{
+		// Selected asset was deleted
+		EditorState::Instance().clearAssetSelection();
+	}
+
+	if (EditorState::Instance().getSelectedAsset().isEmpty())
 	{
 		ImGui::TextDisabled("No asset selected");
 		ImGui::End();

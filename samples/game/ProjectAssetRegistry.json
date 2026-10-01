@@ -123,7 +123,7 @@
             "visibility": 1
         }
     ],
-    "counter": 120,
+    "counter": 124,
     "lua script": [
         {
             "aType": 7,
@@ -4793,7 +4793,7 @@
         "mutant_M": 55,
         "player_controller": 32,
         "sunflowers_puresky_4k": 26,
-        "zombie": 100,
+        "zombie": 123,
         "zombie_body_diffuse": 71,
         "zombie_diffuse": 68,
         "zombie_normal": 69
@@ -4852,7 +4852,7 @@
         "content/warrior/warrior/sword and shield slash.anim": 89,
         "content/warrior/warrior/warrior.model": 82,
         "content/warrior/warrior_prefab.prefab": 88,
-        "content/zombie.prefab": 100,
+        "content/zombie.prefab": 123,
         "content/zombie/thriller idle.anim": 78,
         "content/zombie/zombie attack.anim": 81,
         "content/zombie/zombie dying.anim": 80,
@@ -4950,17 +4950,6 @@
             "assetDirectory": "",
             "ext": ".prefab",
             "isEngineOwned": false,
-            "name": "zombie",
-            "sourcePath": "",
-            "uuid": 100,
-            "visibility": 1
-        },
-        {
-            "aType": 5,
-            "asset": {},
-            "assetDirectory": "",
-            "ext": ".prefab",
-            "isEngineOwned": false,
             "name": "Box_1",
             "sourcePath": "",
             "uuid": 101,
@@ -4986,6 +4975,28 @@
             "name": "ak_latest_PREFAB",
             "sourcePath": "",
             "uuid": 109,
+            "visibility": 1
+        },
+        {
+            "aType": 5,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".prefab",
+            "isEngineOwned": false,
+            "name": "zombie",
+            "sourcePath": "",
+            "uuid": 121,
+            "visibility": 1
+        },
+        {
+            "aType": 5,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".prefab",
+            "isEngineOwned": false,
+            "name": "zombie",
+            "sourcePath": "",
+            "uuid": 123,
             "visibility": 1
         }
     ],

@@ -194,7 +194,8 @@ const AssetRecord& Assets::getInfo(UUID uuid) const
 		return iter->second;
 	}
 	logWarning("Could not locate asset info: {}", uuid);
-	return {};
+	static const AssetRecord emptyRecord;
+	return emptyRecord;
 }
 
 bool Assets::hasAsset(UUID uuid) const
