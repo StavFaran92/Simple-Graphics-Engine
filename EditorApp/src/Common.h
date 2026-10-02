@@ -2,6 +2,7 @@
 
 #include "sge.h"
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "ImGuizmo.h"
 
 #include <unordered_map>
@@ -107,9 +108,17 @@ static void displayComponent(const std::string& componentName, std::function<voi
 
 	ImGui::PushID(componentName.c_str());
 
+	// Sharper corners for component headers (global FrameRounding is too round here)
+	const float componentRounding = 1.0f;
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, componentRounding);
 	bool open = ImGui::CollapsingHeader(componentName.c_str(),
 		ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap);
+	ImGui::PopStyleVar();
 	ImGui::SetItemAllowOverlap();
+
+	// Header rect - the content box matches its width (framed headers extend past the content region)
+	ImVec2 headerMin = ImGui::GetItemRectMin();
+	ImVec2 headerMax = ImGui::GetItemRectMax();
 
 	ImVec2 afterHeaderCursor = ImGui::GetCursorPos();
 	ImVec2 windowSize = ImGui::GetWindowSize();
@@ -138,11 +147,39 @@ static void displayComponent(const std::string& componentName, std::function<voi
 
 	if (open)
 	{
+		const ImGuiStyle& style = ImGui::GetStyle();
+
+		// Horizontal padding on both sides of the component content
+		const float contentPadding = 8.0f;
+
+		ImGuiWindow* window = ImGui::GetCurrentWindow();
+		const float prevWorkMaxX = window->WorkRect.Max.x;
+		const float prevContentMaxX = window->ContentRegionRect.Max.x;
+		window->WorkRect.Max.x -= contentPadding;
+		window->ContentRegionRect.Max.x -= contentPadding;
+
 		ImGui::Dummy(ImVec2(0, 4));
-		ImGui::Indent(5);
+		ImGui::Indent(contentPadding);
 		func(component);
-		ImGui::Unindent(5);
+		ImGui::Unindent(contentPadding);
 		ImGui::Dummy(ImVec2(0, 4));
+
+		window->WorkRect.Max.x = prevWorkMaxX;
+		window->ContentRegionRect.Max.x = prevContentMaxX;
+
+		// Wrap the component content in a rectangle, starting under the header and matching its width
+		float bottom = ImGui::GetCursorScreenPos().y - style.ItemSpacing.y;
+
+		ImGui::GetWindowDrawList()->AddRect(
+			ImVec2(headerMin.x, headerMax.y),
+			ImVec2(headerMax.x, bottom),
+			ImGui::GetColorU32(ImVec4(0.35f, 0.39f, 0.45f, 1.0f)), // muted grey-blue, visible on the dark window bg
+			componentRounding,
+			ImDrawFlags_RoundCornersBottom,
+			1.0f);
+
+		// Gap between component boxes
+		ImGui::Dummy(ImVec2(0, 2));
 	}
 
 	ImGui::PopID();
