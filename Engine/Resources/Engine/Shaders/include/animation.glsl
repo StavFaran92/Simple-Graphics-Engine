@@ -8,6 +8,7 @@ void applySkinning(
     vec3 norm,
     ivec3 boneIDs,
     vec3 boneWeights,
+    bool gpuInstanced,
     out vec4 totalPosition,
     out vec3 totalNormal)
 {
@@ -17,7 +18,7 @@ void applySkinning(
     bool animated = isAnimated;
     int boneOffset = 0;
 
-    if (isGpuInstanced)
+    if (gpuInstanced)
     {
         InstanceData instData = instanceDataBuffer[gl_InstanceID];
         animated = instData.isAnimated != 0u;
@@ -39,7 +40,7 @@ void applySkinning(
                 break;
             }
 
-            mat4 boneMatrix = isGpuInstanced ? animationBuffer[boneOffset + boneIDs[i]] : finalBonesMatrices[boneIDs[i]];
+            mat4 boneMatrix = gpuInstanced ? animationBuffer[boneOffset + boneIDs[i]] : finalBonesMatrices[boneIDs[i]];
 
             vec4 localPosition = boneMatrix * vec4(pos, 1.0f);
             totalPosition += localPosition * boneWeights[i];
@@ -49,8 +50,8 @@ void applySkinning(
     }
 }
 
-void applySkinningPosition(vec3 pos, ivec3 boneIDs, vec3 boneWeights, out vec4 totalPosition)
+void applySkinningPosition(vec3 pos, ivec3 boneIDs, vec3 boneWeights, bool gpuInstanced, out vec4 totalPosition)
 {
     vec3 unusedNormal;
-    applySkinning(pos, vec3(0.0f), boneIDs, boneWeights, totalPosition, unusedNormal);
+    applySkinning(pos, vec3(0.0f), boneIDs, boneWeights, gpuInstanced, totalPosition, unusedNormal);
 }

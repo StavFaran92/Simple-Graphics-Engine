@@ -22,7 +22,7 @@ void main()
     mat4 aModel = model;
 
     vec4 totalPosition;
-    applySkinningPosition(aPos, boneIDs, boneWeights, totalPosition);
+    applySkinningPosition(aPos, boneIDs, boneWeights, isGpuInstanced, totalPosition);
 
     gl_Position = projection * view * aModel * totalPosition;
 

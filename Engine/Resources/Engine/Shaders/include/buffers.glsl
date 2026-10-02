@@ -1,7 +1,5 @@
 // ----- Buffers ----- //
 
-uniform bool isGpuInstanced;
-
 struct InstanceData
 {
 	uint modelIndex;

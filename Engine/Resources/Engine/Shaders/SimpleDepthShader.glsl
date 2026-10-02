@@ -16,7 +16,7 @@ layout (location = 6) in vec3 boneWeights;
 void main()
 {
     vec4 totalPosition;
-    applySkinningPosition(pos, boneIDs, boneWeights, totalPosition);
+    applySkinningPosition(pos, boneIDs, boneWeights, isGpuInstanced, totalPosition);
 
     gl_Position = lightSpaceMatrix * model * totalPosition;
 }

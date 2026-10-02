@@ -57,7 +57,7 @@ void main()
 	vec4 totalPosition;
 	vec3 totalNormal;
 
-	applySkinning(aPos, aNormal, aBoneIDs, aBoneWeights, totalPosition, totalNormal);
+	applySkinning(aPos, aNormal, aBoneIDs, aBoneWeights, isGpuInstanced, totalPosition, totalNormal);
 
 	vec3 normWS = mat3(transpose(inverse(finalModel))) * totalNormal;
 
