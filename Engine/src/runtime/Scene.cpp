@@ -345,6 +345,63 @@ bool Scene::isReady() const
 	return m_isReady;
 }
 
+void Scene::generateDrawItems()
+{
+	m_drawItems.clear();
+
+	for (auto&& [entity, meshRenderer, transform] :
+		m_registry->getRegistry().view<MeshRendererComponent, Transformation>().each())
+	{
+		// Instanced meshes are not handled by draw items yet
+		if (meshRenderer.isInstanced)
+			continue;
+
+		auto model = meshRenderer.mesh.resource();
+		if (model.isEmpty())
+			continue;
+
+		Entity entityHandler{ entity, &getRegistry() };
+
+		uint32_t entityFlags = meshRenderer.renderTechnique == MeshRendererComponent::RenderTechnique::Forward
+			? DRAW_ITEM_FORWARD
+			: DRAW_ITEM_DEFERRED;
+
+		auto animator = entityHandler.tryGetComponent<Animator>();
+		if (animator && animator->hasActiveAnimation())
+		{
+			entityFlags |= DRAW_ITEM_ANIMATED;
+		}
+
+		const glm::mat4& worldTransform = transform.getWorldTransformation();
+
+		for (auto& mesh : model->getMeshes())
+		{
+			DrawItem item;
+			item.mesh = mesh.get();
+			item.transform = worldTransform;
+			item.entityId = static_cast<uint32_t>(entity);
+			item.flags = entityFlags;
+
+			auto material = meshRenderer.at(mesh->getMaterialIndex());
+			if (material.isEmpty())
+			{
+				material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
+			}
+			item.material = material.get();
+
+			if (item.material && item.material->getRenderMode() == MaterialRenderMode::Transparent)
+			{
+				item.flags |= DRAW_ITEM_TRANSPARENT;
+			}
+
+			item.worldBounds = mesh->getAABB();
+			item.worldBounds.transform(worldTransform);
+
+			m_drawItems.push_back(item);
+		}
+	}
+}
+
 void Scene::update(float deltaTime)
 {
 	//preloadSceneResources();

@@ -18,6 +18,7 @@
 #include "memory/Asset.h"
 #include "memory/AssetAliases.h"
 #include "memory/ResourceRef.h"
+#include "render/DrawItem.h"
 
 
 class Model;
@@ -155,6 +156,10 @@ public:
 	bool isSerializationDirty() const;
 
 	bool isReady() const;
+
+	// Collects what to draw this frame from all mesh renderer entities (non instanced only for now)
+	void generateDrawItems();
+	const std::vector<DrawItem>& getDrawItems() const { return m_drawItems; }
 private:
 	// -------------------- Methods -------------------- //
 	friend class Context;
@@ -255,6 +260,8 @@ private:
 		uint64_t version = 0;
 	};
 	std::unordered_map<UUID, CachedResource> m_cachedResources;;
+
+	std::vector<DrawItem> m_drawItems;
 
 	bool m_isDirty = false;
 
