@@ -160,6 +160,7 @@ public:
 	// Collects what to draw this frame from all mesh renderer entities (non instanced only for now)
 	void generateDrawItems();
 	const std::vector<DrawItem>& getDrawItems() const { return m_drawItems; }
+	const std::vector<glm::mat4>& getDrawItemBones() const { return m_drawItemBones; }
 private:
 	// -------------------- Methods -------------------- //
 	friend class Context;
@@ -262,6 +263,9 @@ private:
 	std::unordered_map<UUID, CachedResource> m_cachedResources;;
 
 	std::vector<DrawItem> m_drawItems;
+	std::vector<glm::mat4> m_drawItemBones; // final bone matrices of all animated draw items, indexed by DrawItem::boneOffset
+	std::vector<InstanceData> m_drawItemInstances; // per-instance data of all instanced draw items, pointed to by DrawItem::instancesData
+	std::vector<glm::mat4> m_drawItemModels; // per-instance world transforms of all instanced draw items, pointed to by DrawItem::models
 
 	bool m_isDirty = false;
 

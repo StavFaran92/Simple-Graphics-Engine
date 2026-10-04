@@ -1,5 +1,6 @@
 #include "render/RenderFunctions.h"
 
+#include <algorithm>
 #include <map>
 
 #include "gl/glew.h"
@@ -88,142 +89,177 @@ bool RenderFunctions::prepareEntityForRender(const Entity& entityHandler)
 }
 
 
-void RenderFunctions::drawForwardScene(Scene* scene)
+//void RenderFunctions::drawTransparentScene(Scene* scene)
+//{
+//	auto graphics = Engine::get()->getSubSystem<Graphics>();
+//
+//	graphics->renderView->bind();
+//
+//	std::map<float, Entity> transparentEntities;
+//
+//	auto& camera = graphics->renderView->getCamera();
+//	auto& camTransform = camera.getComponent<Transformation>();
+//	auto& camForward = camTransform.getForward();
+//
+//	for (auto&& [entity, mesh, transform, obj] :
+//		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+//	{
+//		Entity entityHandler{ entity, &scene->getRegistry() };
+//
+//		auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+//
+//		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+//		{
+//			float distance = glm::dot(transform.getWorldPosition(), camForward);
+//
+//			// object is behind the camera
+//			if (distance < 0)
+//			{
+//				//continue; // TODO fix
+//			}
+//
+//			// Only render transparent objects
+//			auto matIndex = mesh->getMaterialIndex();
+//			if (meshRenderer.at(matIndex)->getRenderMode() != MaterialRenderMode::Transparent)
+//			{
+//				continue;
+//			}
+//
+//			transparentEntities[distance] = entityHandler;
+//		}
+//	}
+//
+//	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+//	graphics->shader->use();
+//	graphics->shader->setViewMatrix(graphics->view);
+//	graphics->shader->setProjectionMatrix(graphics->projection);
+//	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+//	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+//	graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
+//	graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
+//	graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
+//	graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+//
+//	auto iter = transparentEntities.rbegin();
+//	while (iter != transparentEntities.rend())
+//	{
+//		Entity& entityHandler = iter->second;
+//
+//		std::string name = entityHandler.getComponent<ObjectComponent>().name;
+//		std::string captionGPU = "About to render: '" + name + "'";
+//		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
+//
+//		prepareEntityForRender(entityHandler);
+//
+//		graphics->entity = entityHandler;
+//		
+//		for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.resource()->getMeshes())
+//		{
+//			if (!prepareMeshForRender(mesh.get(), entityHandler))
+//			{
+//				continue;
+//			}
+//
+//			// draw model
+//			glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
+//			graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
+//
+//			graphics->shader->setModelMatrix(graphics->model);
+//
+//			graphics->material->use();
+//
+//			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
+//			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
+//
+//			// Draw
+//			RenderCommand::draw(graphics->mesh->getVAO());
+//
+//			glPopDebugGroup();
+//		}
+//
+//		glPopDebugGroup();
+//
+//		iter++;
+//	}
+//}
+
+void RenderFunctions::drawTransparentScene(Scene* scene, const std::vector<DrawItem>& drawItems)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-	auto shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
-	shader->use();
-
-	graphics->shader->setViewMatrix(graphics->view);
-	graphics->shader->setProjectionMatrix(graphics->projection);
-	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
-	graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
-	graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
-	graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
-	graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
-
-	glEnable(GL_DEPTH_TEST);
 	graphics->renderView->bind();
-
-	for (auto&& [entity, meshRenderer, transform, obj] :
-		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
-	{
-		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Forward)
-			continue;
-
-		Entity entityHandler{ entity, &scene->getRegistry() };
-
-		prepareEntityForRender(entityHandler);
-
-		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
-		{
-			if (!prepareMeshForRender(mesh.get(), entityHandler))
-			{
-				continue;
-			}
-
-			graphics->shader->setModelMatrix(graphics->model);
-			graphics->material->use();
-
-			// Draw
-			RenderCommand::draw(mesh->getVAO());
-		}
-	}
-}
-
-void RenderFunctions::drawTransparentScene(Scene* scene)
-{
-	auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-	graphics->renderView->bind();
-
-	std::map<float, Entity> transparentEntities;
 
 	auto& camera = graphics->renderView->getCamera();
 	auto& camTransform = camera.getComponent<Transformation>();
 	auto& camForward = camTransform.getForward();
 
-	for (auto&& [entity, mesh, transform, obj] :
-		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	struct SortedItem
 	{
-		Entity entityHandler{ entity, &scene->getRegistry() };
+		const DrawItem* item;
+		float depth;
+	};
 
-		auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+	std::vector<SortedItem> transparentItems;
 
-		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
-		{
-			float distance = glm::dot(transform.getWorldPosition(), camForward);
+	for (const auto& item : drawItems)
+	{
+		if (!(item.flags & DRAW_ITEM_TRANSPARENT))
+			continue;
 
-			// object is behind the camera
-			if (distance < 0)
-			{
-				//continue; // TODO fix
-			}
-
-			// Only render transparent objects
-			auto matIndex = mesh->getMaterialIndex();
-			if (meshRenderer.at(matIndex)->getRenderMode() != MaterialRenderMode::Transparent)
-			{
-				continue;
-			}
-
-			transparentEntities[distance] = entityHandler;
-		}
+		// Depth along the camera forward, per item so submeshes of the same model sort separately
+		float depth = glm::dot(item.worldBounds.center() - graphics->cameraPos, camForward);
+		transparentItems.push_back({ &item, depth });
 	}
 
-	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
-	graphics->shader->use();
-	graphics->shader->setViewMatrix(graphics->view);
-	graphics->shader->setProjectionMatrix(graphics->projection);
-	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
-	graphics->shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
-	graphics->shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
-	graphics->shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
-	graphics->shader->setUniformValue("cameraPos", graphics->cameraPos);
+	// Back to front
+	std::sort(transparentItems.begin(), transparentItems.end(),
+		[](const SortedItem& a, const SortedItem& b) { return a.depth > b.depth; });
 
-	auto iter = transparentEntities.rbegin();
-	while (iter != transparentEntities.rend())
+	auto shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_FORWARD_PBR);
+	shader->use();
+	shader->setViewMatrix(graphics->view);
+	shader->setProjectionMatrix(graphics->projection);
+	shader->bindUniformBlockToBindPoint("Time", 0);
+	shader->bindUniformBlockToBindPoint("Lights", 1);
+	shader->setTextureInShader(graphics->irradianceMap, "gIrradianceMap", 6);
+	shader->setTextureInShader(graphics->prefilterEnvMap, "gPrefilterEnvMap", 7);
+	shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
+	shader->setUniformValue("cameraPos", graphics->cameraPos);
+
+	const auto& bones = scene->getDrawItemBones();
+
+	for (const auto& sorted : transparentItems)
 	{
-		Entity& entityHandler = iter->second;
+		const DrawItem& item = *sorted.item;
 
-		std::string name = entityHandler.getComponent<ObjectComponent>().name;
-		std::string captionGPU = "About to render: '" + name + "'";
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
+		std::string captionSubmeshGPU = "About to render submesh: '" + item.mesh->getName() + "' using material: '" + item.material->getName() + "'";
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
 
-		prepareEntityForRender(entityHandler);
-
-		graphics->entity = entityHandler;
-		
-		for (auto& mesh : entityHandler.getComponent<MeshRendererComponent>().mesh.resource()->getMeshes())
+		if (item.flags & DRAW_ITEM_ANIMATED)
 		{
-			if (!prepareMeshForRender(mesh.get(), entityHandler))
+			for (uint32_t i = 0; i < item.boneCount; ++i)
 			{
-				continue;
+				shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", bones[item.boneOffset + i]);
 			}
 
-			// draw model
-			glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(graphics->model)));
-			graphics->shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
-
-			graphics->shader->setModelMatrix(graphics->model);
-
-			graphics->material->use();
-
-			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
-			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
-
-			// Draw
-			RenderCommand::draw(graphics->mesh->getVAO());
-
-			glPopDebugGroup();
+			shader->setUniformValue("isAnimated", true);
+		}
+		else
+		{
+			shader->setUniformValue("isAnimated", false);
 		}
 
-		glPopDebugGroup();
+		glm::mat3 transposeInverseModelMatrix = glm::mat3(glm::transpose(glm::inverse(item.transform)));
+		shader->setUniformValue("transposeInverseModelMatrix", transposeInverseModelMatrix);
 
-		iter++;
+		shader->setModelMatrix(item.transform);
+
+		item.material->use();
+
+		// Draw
+		RenderCommand::draw(item.mesh->getVAO());
+
+		glPopDebugGroup();
 	}
 }
 
@@ -321,7 +357,86 @@ void RenderFunctions::drawSceneUsingCustomShader(Scene* scene)
 	}
 }
 
-void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
+//void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
+//{
+//	auto graphics = Engine::get()->getSubSystem<Graphics>();
+//
+//	glEnable(GL_DEPTH_TEST);
+//
+//	if (graphics->renderMode == RenderMode::WIREFRAME)
+//	{
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//		glEnable(GL_POLYGON_OFFSET_LINE);
+//		glPolygonOffset(-1.0, -1.0);
+//		glLineWidth(1); // Size in pixels
+//	}
+//
+//	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM);
+//	graphics->shader->use();
+//	graphics->shader->setUniformValue("isGpuInstanced", false);
+//
+//	graphics->shader->setViewMatrix(graphics->view);
+//	graphics->shader->setProjectionMatrix(graphics->projection);
+//	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+//	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+//
+//	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
+//
+//	// Render all objects
+//	for (auto&& [entity, meshRenderer, transform, obj] :
+//		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+//	{
+//		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Deferred)
+//			continue;
+//
+//		if (meshRenderer.isInstanced)
+//			continue;
+//
+//		Entity entityHandler{ entity, &scene->getRegistry() };
+//		graphics->entity = entityHandler;
+//
+//		std::string name = entityHandler.getComponent<ObjectComponent>().name;
+//		std::string captionGPU = "About to render Entity: '" + name + "'";
+//		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
+//
+//		prepareEntityForRender(entityHandler);
+//
+//		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+//		{
+//			if (!prepareMeshForRender(mesh.get(), entityHandler))
+//			{
+//				continue;
+//			}
+//
+//			// Only render Opaque objects
+//			if (graphics->material->getRenderMode() != MaterialRenderMode::Opaque)
+//			{
+//				continue;
+//			}
+//
+//			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
+//			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
+//
+//			// draw model
+//
+//			graphics->shader->setModelMatrix(graphics->model);
+//
+//			graphics->material->use();
+//
+//			// Draw
+//			RenderCommand::draw(graphics->mesh->getVAO());
+//
+//			glPopDebugGroup();
+//		}
+//
+//		glPopDebugGroup();
+//
+//	};
+//
+//	glPopDebugGroup();
+//}
+
+void RenderFunctions::drawGeometryPass(Scene* scene, const std::vector<DrawItem>& drawItems)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
@@ -346,203 +461,238 @@ void RenderFunctions::drawGeometryToGBuffer(Scene* scene)
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer pass");
 
-	// Render all objects
-	for (auto&& [entity, meshRenderer, transform, obj] :
-		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	const auto& bones = scene->getDrawItemBones();
+
+	for (const auto& item : drawItems)
 	{
-		if (meshRenderer.renderTechnique != MeshRendererComponent::RenderTechnique::Deferred)
+		if (!(item.flags & DRAW_ITEM_DEFERRED) || (item.flags & DRAW_ITEM_INSTANCED))
 			continue;
 
-		if (meshRenderer.isInstanced)
+		// Only render Opaque objects
+		if (item.material->getRenderMode() != MaterialRenderMode::Opaque)
 			continue;
 
-		Entity entityHandler{ entity, &scene->getRegistry() };
-		graphics->entity = entityHandler;
+		std::string captionSubmeshGPU = "About to render submesh: '" + item.mesh->getName() + "' using material: '" + item.material->getName() + "'";
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
 
-		std::string name = entityHandler.getComponent<ObjectComponent>().name;
-		std::string captionGPU = "About to render Entity: '" + name + "'";
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
-
-		prepareEntityForRender(entityHandler);
-
-		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+		if (item.flags & DRAW_ITEM_ANIMATED)
 		{
-			if (!prepareMeshForRender(mesh.get(), entityHandler))
+			for (uint32_t i = 0; i < item.boneCount; ++i)
 			{
-				continue;
+				graphics->shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", bones[item.boneOffset + i]);
 			}
 
-			// Only render Opaque objects
-			if (graphics->material->getRenderMode() != MaterialRenderMode::Opaque)
-			{
-				continue;
-			}
-
-			std::string captionSubmeshGPU = "About to render submesh: '" + mesh->getName() + "' using material: '" + graphics->material->getName() + "'";
-			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
-
-			// draw model
-
-			graphics->shader->setModelMatrix(graphics->model);
-
-			graphics->material->use();
-
-			// Draw
-			RenderCommand::draw(graphics->mesh->getVAO());
-
-			glPopDebugGroup();
+			graphics->shader->setUniformValue("isAnimated", true);
+		}
+		else
+		{
+			graphics->shader->setUniformValue("isAnimated", false);
 		}
 
-		glPopDebugGroup();
+		graphics->shader->setModelMatrix(item.transform);
 
-	};
+		item.material->use();
+
+		// Draw
+		RenderCommand::draw(item.mesh->getVAO());
+
+		glPopDebugGroup();
+	}
 
 	glPopDebugGroup();
 }
 
-void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
+//void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene)
+//{
+//	auto graphics = Engine::get()->getSubSystem<Graphics>();
+//
+//	glEnable(GL_DEPTH_TEST);
+//
+//	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM); //todo change to instanced
+//	graphics->shader->use();
+//	graphics->shader->setUniformValue("isGpuInstanced", true);
+//	graphics->shader->setUniformValue("isAnimated", false);
+//
+//	graphics->shader->setViewMatrix(graphics->view);
+//	graphics->shader->setProjectionMatrix(graphics->projection);
+//	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
+//	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+//
+//	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer instanced pass");
+//
+//	struct MeshRenderData
+//	{
+//		std::shared_ptr<Mesh> mesh;
+//		MaterialResourceRef material;
+//		glm::mat4 restTransform{ 1.f };
+//		std::vector<InstanceData> instances;
+//		std::vector<glm::mat4> models;
+//	};
+//
+//	std::unordered_map<unsigned int, MeshRenderData> meshRenderData;
+//
+//	graphics->instancedAnimationBuffer.setSlot(1);
+//	graphics->instancedAnimationBuffer.bind();
+//
+//	BoneTransformSystem::beginFrame();
+//
+//	// Render all objects
+//	for (auto&& [entity, meshRenderer, transform, obj] :
+//		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+//	{
+//		if (!meshRenderer.isInstanced)
+//			continue;
+//
+//		Entity entityHandler{ entity, &scene->getRegistry() };
+//
+//		// Animation belongs to the whole model (skeleton), not to any one of its meshes - schedule it once
+//		// per entity via the GPU bone-transform router. Meshes below only record where the result will land;
+//		// BoneTransformSystem::endFrame() (called after this loop) actually fills the animation SSBO.
+//		unsigned int modelIndex = 0;
+//		unsigned int isAnimated = 0;
+//
+//		auto animator = entityHandler.tryGetComponent<Animator>();
+//		if (animator && animator->hasActiveAnimation())
+//		{
+//			modelIndex = BoneTransformSystem::addInstance(*animator, meshRenderer.mesh.resource());
+//			isAnimated = 1u;
+//		}
+//
+//		unsigned int boneCount = static_cast<unsigned int>(meshRenderer.mesh.resource()->getBoneOffsets().size());
+//
+//		// The rest transform is per mesh, not per instance, so it is passed to the shader as a
+//		// per-batch uniform - only the entity's world transform goes into the instance buffer.
+//		const glm::mat4 worldTransform = transform.getWorldTransformation();
+//
+//		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
+//		{
+//			if (!prepareMeshForRender(mesh.get(), entityHandler))
+//			{
+//				continue;
+//			}
+//
+//			auto graphics = Engine::get()->getSubSystem<Graphics>();
+//
+//			auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
+//
+//			graphics->mesh = mesh.get();
+//			graphics->model = worldTransform;
+//
+//			//AABB& aabb = mesh->getAABB();
+//			//aabb.transform(worldTransform * mesh->getRestTransform());
+//
+//			//if (!aabb.isOnFrustum(*graphics->frustum))
+//			//{
+//			//	return false;
+//			//}
+//
+//			//DebugHelper::getInstance().drawAABB(aabb);
+//
+//			auto matIndex = mesh->getMaterialIndex();
+//			graphics->material = meshRenderer.at(matIndex);
+//
+//			if (graphics->material.isEmpty())
+//			{
+//				graphics->material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
+//			}
+//
+//			if (graphics->material->getRenderMode() != MaterialRenderMode::Opaque)
+//			{
+//				continue;
+//			}
+//
+//			auto vaoID = mesh->getVAO()->getID();
+//
+//			auto it = meshRenderData.find(vaoID);
+//			if (it == meshRenderData.end())
+//			{
+//				MeshRenderData data;
+//				data.mesh = mesh;
+//				data.material = graphics->material;
+//				data.restTransform = mesh->getRestTransform();
+//				meshRenderData.emplace(vaoID, std::move(data));
+//				it = meshRenderData.find(vaoID);
+//			}
+//
+//			auto& renderData = it->second;
+//
+//			InstanceData instance;
+//			instance.modelIndex = modelIndex;
+//			instance.isAnimated = isAnimated;
+//			instance.boneCount = boneCount;
+//
+//			renderData.models.push_back(worldTransform);
+//			renderData.instances.push_back(instance);
+//		}
+//
+//	};
+//
+//	BoneTransformSystem::endFrame(graphics->instancedAnimationBuffer);
+//
+//	for(auto& [_, renderData] : meshRenderData)
+//	{
+//		graphics->instancedModelBuffer.setSlot(0);
+//		graphics->instancedModelBuffer.bind();
+//		graphics->instancedModelBuffer.setData(sizeof(glm::mat4) * renderData.models.size(), renderData.models.data());
+//
+//		graphics->instancedInstanceDataBuffer.setSlot(2);
+//		graphics->instancedInstanceDataBuffer.bind();
+//		graphics->instancedInstanceDataBuffer.setData(sizeof(InstanceData) * renderData.instances.size(), renderData.instances.data());
+//
+//		renderData.material->use();
+//		renderData.material->getActiveShader()->setUniformValue("restTransform", renderData.restTransform);
+//		RenderCommand::drawInstanced(renderData.mesh->getVAO(), renderData.models.size());
+//
+//	}
+//
+//
+//	glPopDebugGroup();
+//}
+
+void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene, const std::vector<DrawItem>& drawItems)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
 	glEnable(GL_DEPTH_TEST);
 
-	graphics->shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM); //todo change to instanced
-	graphics->shader->use();
-	graphics->shader->setUniformValue("isGpuInstanced", true);
-	graphics->shader->setUniformValue("isAnimated", false);
+	auto shader = BuiltInResources::get<Shader>(SGE_RESOURCE_SHADER_DEFFERED_PBR_GEOM); //todo change to instanced
+	shader->use();
+	shader->setUniformValue("isGpuInstanced", true);
+	shader->setUniformValue("isAnimated", false);
 
-	graphics->shader->setViewMatrix(graphics->view);
-	graphics->shader->setProjectionMatrix(graphics->projection);
-	graphics->shader->bindUniformBlockToBindPoint("Time", 0);
-	graphics->shader->bindUniformBlockToBindPoint("Lights", 1);
+	shader->setViewMatrix(graphics->view);
+	shader->setProjectionMatrix(graphics->projection);
+	shader->bindUniformBlockToBindPoint("Time", 0);
+	shader->bindUniformBlockToBindPoint("Lights", 1);
 
 	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "G-Buffer instanced pass");
 
-	struct MeshRenderData
-	{
-		std::shared_ptr<Mesh> mesh;
-		MaterialResourceRef material;
-		glm::mat4 restTransform{ 1.f };
-		std::vector<InstanceData> instances;
-		std::vector<glm::mat4> models;
-	};
-
-	std::unordered_map<unsigned int, MeshRenderData> meshRenderData;
-
+	// Filled once per frame by BoneTransformSystem in Scene::generateDrawItems
 	graphics->instancedAnimationBuffer.setSlot(1);
 	graphics->instancedAnimationBuffer.bind();
 
-	BoneTransformSystem::beginFrame();
-
-	// Render all objects
-	for (auto&& [entity, meshRenderer, transform, obj] :
-		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation, ObjectComponent>().each())
+	for (const auto& item : drawItems)
 	{
-		if (!meshRenderer.isInstanced)
+		if (!(item.flags & DRAW_ITEM_INSTANCED))
 			continue;
 
-		Entity entityHandler{ entity, &scene->getRegistry() };
+		std::string captionSubmeshGPU = "About to render instanced submesh: '" + item.mesh->getName() + "' using material: '" + item.material->getName() + "'";
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
 
-		// Animation belongs to the whole model (skeleton), not to any one of its meshes - schedule it once
-		// per entity via the GPU bone-transform router. Meshes below only record where the result will land;
-		// BoneTransformSystem::endFrame() (called after this loop) actually fills the animation SSBO.
-		unsigned int modelIndex = 0;
-		unsigned int isAnimated = 0;
-
-		auto animator = entityHandler.tryGetComponent<Animator>();
-		if (animator && animator->hasActiveAnimation())
-		{
-			modelIndex = BoneTransformSystem::addInstance(*animator, meshRenderer.mesh.resource());
-			isAnimated = 1u;
-		}
-
-		unsigned int boneCount = static_cast<unsigned int>(meshRenderer.mesh.resource()->getBoneOffsets().size());
-
-		// The rest transform is per mesh, not per instance, so it is passed to the shader as a
-		// per-batch uniform - only the entity's world transform goes into the instance buffer.
-		const glm::mat4 worldTransform = transform.getWorldTransformation();
-
-		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
-		{
-			if (!prepareMeshForRender(mesh.get(), entityHandler))
-			{
-				continue;
-			}
-
-			auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-			auto& meshRenderer = entityHandler.getComponent<MeshRendererComponent>();
-
-			graphics->mesh = mesh.get();
-			graphics->model = worldTransform;
-
-			//AABB& aabb = mesh->getAABB();
-			//aabb.transform(worldTransform * mesh->getRestTransform());
-
-			//if (!aabb.isOnFrustum(*graphics->frustum))
-			//{
-			//	return false;
-			//}
-
-			//DebugHelper::getInstance().drawAABB(aabb);
-
-			auto matIndex = mesh->getMaterialIndex();
-			graphics->material = meshRenderer.at(matIndex);
-
-			if (graphics->material.isEmpty())
-			{
-				graphics->material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
-			}
-
-			if (graphics->material->getRenderMode() != MaterialRenderMode::Opaque)
-			{
-				continue;
-			}
-
-			auto vaoID = mesh->getVAO()->getID();
-
-			auto it = meshRenderData.find(vaoID);
-			if (it == meshRenderData.end())
-			{
-				MeshRenderData data;
-				data.mesh = mesh;
-				data.material = graphics->material;
-				data.restTransform = mesh->getRestTransform();
-				meshRenderData.emplace(vaoID, std::move(data));
-				it = meshRenderData.find(vaoID);
-			}
-
-			auto& renderData = it->second;
-
-			InstanceData instance;
-			instance.modelIndex = modelIndex;
-			instance.isAnimated = isAnimated;
-			instance.boneCount = boneCount;
-
-			renderData.models.push_back(worldTransform);
-			renderData.instances.push_back(instance);
-		}
-
-	};
-
-	BoneTransformSystem::endFrame(graphics->instancedAnimationBuffer);
-
-	for(auto& [_, renderData] : meshRenderData)
-	{
 		graphics->instancedModelBuffer.setSlot(0);
 		graphics->instancedModelBuffer.bind();
-		graphics->instancedModelBuffer.setData(sizeof(glm::mat4) * renderData.models.size(), renderData.models.data());
+		graphics->instancedModelBuffer.setData(sizeof(glm::mat4) * item.instanceCount, item.models);
 
 		graphics->instancedInstanceDataBuffer.setSlot(2);
 		graphics->instancedInstanceDataBuffer.bind();
-		graphics->instancedInstanceDataBuffer.setData(sizeof(InstanceData) * renderData.instances.size(), renderData.instances.data());
+		graphics->instancedInstanceDataBuffer.setData(sizeof(InstanceData) * item.instanceCount, item.instancesData);
 
-		renderData.material->use();
-		renderData.material->getActiveShader()->setUniformValue("restTransform", renderData.restTransform);
-		RenderCommand::drawInstanced(renderData.mesh->getVAO(), renderData.models.size());
+		item.material->use();
+		item.material->getActiveShader()->setUniformValue("restTransform", item.mesh->getRestTransform());
+		RenderCommand::drawInstanced(item.mesh->getVAO(), item.instanceCount);
 
+		glPopDebugGroup();
 	}
-
 
 	glPopDebugGroup();
 }

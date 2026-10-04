@@ -32,6 +32,8 @@
 #include "core/Registry.h"
 #include "serialize/Archiver.h"
 #include "animation/Animator.h"
+#include "animation/BoneTransformSystem.h"
+#include "render/VertexArrayObject.h"
 #include "component/Terrain.h"
 #include "geometry/Frustum.h"
 #include "geometry/Model.h"
@@ -348,11 +350,14 @@ bool Scene::isReady() const
 void Scene::generateDrawItems()
 {
 	m_drawItems.clear();
+	m_drawItemBones.clear();
+	m_drawItemInstances.clear();
+	m_drawItemModels.clear();
 
 	for (auto&& [entity, meshRenderer, transform] :
 		m_registry->getRegistry().view<MeshRendererComponent, Transformation>().each())
 	{
-		// Instanced meshes are not handled by draw items yet
+		// Instanced meshes are batched separately below
 		if (meshRenderer.isInstanced)
 			continue;
 
@@ -366,10 +371,21 @@ void Scene::generateDrawItems()
 			? DRAW_ITEM_FORWARD
 			: DRAW_ITEM_DEFERRED;
 
+		// Bones belong to the whole model, store them once and share the range between its meshes
+		uint32_t boneOffset = 0;
+		uint32_t boneCount = 0;
+
 		auto animator = entityHandler.tryGetComponent<Animator>();
 		if (animator && animator->hasActiveAnimation())
 		{
 			entityFlags |= DRAW_ITEM_ANIMATED;
+
+			std::vector<glm::mat4> finalBoneMatrices;
+			animator->getFinalBoneMatrices(model, finalBoneMatrices);
+
+			boneOffset = static_cast<uint32_t>(m_drawItemBones.size());
+			boneCount = static_cast<uint32_t>(finalBoneMatrices.size());
+			m_drawItemBones.insert(m_drawItemBones.end(), finalBoneMatrices.begin(), finalBoneMatrices.end());
 		}
 
 		const glm::mat4& worldTransform = transform.getWorldTransformation();
@@ -378,9 +394,11 @@ void Scene::generateDrawItems()
 		{
 			DrawItem item;
 			item.mesh = mesh.get();
-			item.transform = worldTransform;
+			item.transform = worldTransform * mesh->getRestTransform();
 			item.entityId = static_cast<uint32_t>(entity);
 			item.flags = entityFlags;
+			item.boneOffset = boneOffset;
+			item.boneCount = boneCount;
 
 			auto material = meshRenderer.at(mesh->getMaterialIndex());
 			if (material.isEmpty())
@@ -395,10 +413,112 @@ void Scene::generateDrawItems()
 			}
 
 			item.worldBounds = mesh->getAABB();
-			item.worldBounds.transform(worldTransform);
+			item.worldBounds.transform(item.transform);
 
 			m_drawItems.push_back(item);
 		}
+	}
+
+	// Instanced meshes - batched per mesh across entities, one draw item per batch
+	struct InstancedBatch
+	{
+		Mesh* mesh = nullptr;
+		Material* material = nullptr;
+		std::vector<InstanceData> instances;
+		std::vector<glm::mat4> models;
+	};
+
+	std::unordered_map<unsigned int, InstancedBatch> instancedBatches;
+
+	BoneTransformSystem::beginFrame();
+
+	for (auto&& [entity, meshRenderer, transform] :
+		m_registry->getRegistry().view<MeshRendererComponent, Transformation>().each())
+	{
+		if (!meshRenderer.isInstanced)
+			continue;
+
+		auto model = meshRenderer.mesh.resource();
+		if (model.isEmpty())
+			continue;
+
+		Entity entityHandler{ entity, &getRegistry() };
+
+		// Animation belongs to the whole model (skeleton), not to any one of its meshes - schedule it once
+		// per entity via the GPU bone-transform router. Meshes below only record where the result will land;
+		// BoneTransformSystem::endFrame() (called after this loop) actually fills the animation SSBO.
+		unsigned int modelIndex = 0;
+		unsigned int isAnimated = 0;
+
+		auto animator = entityHandler.tryGetComponent<Animator>();
+		if (animator && animator->hasActiveAnimation())
+		{
+			modelIndex = BoneTransformSystem::addInstance(*animator, model);
+			isAnimated = 1u;
+		}
+
+		unsigned int boneCount = static_cast<unsigned int>(model->getBoneOffsets().size());
+
+		// The rest transform is per mesh, not per instance, so it is passed to the shader as a
+		// per-batch uniform - only the entity's world transform goes into the instance buffer.
+		const glm::mat4& worldTransform = transform.getWorldTransformation();
+
+		for (auto& mesh : model->getMeshes())
+		{
+			auto material = meshRenderer.at(mesh->getMaterialIndex());
+			if (material.isEmpty())
+			{
+				material = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
+			}
+
+			// Only Opaque objects are instanced
+			if (material->getRenderMode() != MaterialRenderMode::Opaque)
+				continue;
+
+			// Batched by mesh only - the first entity's material is used for the whole batch
+			auto& batch = instancedBatches[mesh->getVAO()->getID()];
+			if (!batch.mesh)
+			{
+				batch.mesh = mesh.get();
+				batch.material = material.get();
+			}
+
+			InstanceData instance;
+			instance.modelIndex = modelIndex;
+			instance.isAnimated = isAnimated;
+			instance.boneCount = boneCount;
+
+			batch.instances.push_back(instance);
+			batch.models.push_back(worldTransform);
+		}
+	}
+
+	// Compute the instanced bone transforms once per frame, results land in the instanced animation SSBO
+	BoneTransformSystem::endFrame(Engine::get()->getSubSystem<Graphics>()->instancedAnimationBuffer);
+
+	// Reserve up front so appending never reallocates and the draw items' pointers stay valid
+	size_t totalInstances = 0;
+	for (const auto& [_, batch] : instancedBatches)
+	{
+		totalInstances += batch.instances.size();
+	}
+	m_drawItemInstances.reserve(totalInstances);
+	m_drawItemModels.reserve(totalInstances);
+
+	for (const auto& [_, batch] : instancedBatches)
+	{
+		DrawItem item;
+		item.mesh = batch.mesh;
+		item.material = batch.material;
+		item.flags = DRAW_ITEM_DEFERRED | DRAW_ITEM_INSTANCED;
+		item.instancesData = m_drawItemInstances.data() + m_drawItemInstances.size();
+		item.models = m_drawItemModels.data() + m_drawItemModels.size();
+		item.instanceCount = static_cast<uint32_t>(batch.instances.size());
+
+		m_drawItemInstances.insert(m_drawItemInstances.end(), batch.instances.begin(), batch.instances.end());
+		m_drawItemModels.insert(m_drawItemModels.end(), batch.models.begin(), batch.models.end());
+
+		m_drawItems.push_back(item);
 	}
 }
 
@@ -505,6 +625,9 @@ void Scene::draw(float deltaTime)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
+	// View independent, generate once per frame for all render views and passes
+	generateDrawItems();
+
 	for (auto& [rName, renderView] : m_renderViews)
 	{
 		if (!renderView->isEnabled())
@@ -596,8 +719,8 @@ void Scene::draw(float deltaTime)
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Deferred Renderer pass");
 			graphics->gBuffer.bind();
 			RenderCommand::clear();
-			RenderFunctions::drawGeometryToGBuffer(this);
-			RenderFunctions::drawInstancedGeometryToGBuffer(this);
+			RenderFunctions::drawGeometryPass(this, m_drawItems);
+			RenderFunctions::drawInstancedGeometryToGBuffer(this, m_drawItems);
 			Engine::get()->getSubSystem<SSAOSystem>()->draw(
 				graphics->gBuffer.getTexture(GBuffer::Attachment::PositionVS), 
 				graphics->gBuffer.getTexture(GBuffer::Attachment::NormalVS));
@@ -605,13 +728,6 @@ void Scene::draw(float deltaTime)
 			unsigned int srcID = graphics->gBuffer.getID();
 			unsigned int dstID = graphics->renderView->getRenderTargetFrameBufferID();
 			RenderCommand::copyFrameBufferData(srcID, dstID, RenderCommand::BufferBit::DEPTH_BUFFER_BIT);
-			glPopDebugGroup();
-		}
-
-		if (Engine::get()->getConfig().renderConfig.renderForwardPass)
-		{
-			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Forward Renderer pass");
-			RenderFunctions::drawForwardScene(this);
 			glPopDebugGroup();
 		}
 
@@ -1108,7 +1224,7 @@ void Scene::draw(float deltaTime)
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Non Opaque render pass");
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			RenderFunctions::drawTransparentScene(this);
+			RenderFunctions::drawTransparentScene(this, m_drawItems);
 			glDisable(GL_BLEND);
 			glPopDebugGroup();
 		}
