@@ -671,6 +671,13 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene, const std::ve
 	graphics->instancedAnimationBuffer.setSlot(1);
 	graphics->instancedAnimationBuffer.bind();
 
+	// Uploaded once per frame in Scene::generateDrawItems, batches index into them with instanceOffset
+	graphics->instancedModelBuffer.setSlot(0);
+	graphics->instancedModelBuffer.bind();
+
+	graphics->instancedInstanceDataBuffer.setSlot(2);
+	graphics->instancedInstanceDataBuffer.bind();
+
 	for (const auto& item : drawItems)
 	{
 		if (!(item.flags & DRAW_ITEM_INSTANCED))
@@ -679,16 +686,9 @@ void RenderFunctions::drawInstancedGeometryToGBuffer(Scene* scene, const std::ve
 		std::string captionSubmeshGPU = "About to render instanced submesh: '" + item.mesh->getName() + "' using material: '" + item.material->getName() + "'";
 		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionSubmeshGPU.c_str());
 
-		graphics->instancedModelBuffer.setSlot(0);
-		graphics->instancedModelBuffer.bind();
-		graphics->instancedModelBuffer.setData(sizeof(glm::mat4) * item.instanceCount, item.models);
-
-		graphics->instancedInstanceDataBuffer.setSlot(2);
-		graphics->instancedInstanceDataBuffer.bind();
-		graphics->instancedInstanceDataBuffer.setData(sizeof(InstanceData) * item.instanceCount, item.instancesData);
-
 		item.material->use();
 		item.material->getActiveShader()->setUniformValue("restTransform", item.mesh->getRestTransform());
+		item.material->getActiveShader()->setUniformValue("instanceOffset", static_cast<int>(item.instanceOffset));
 		RenderCommand::drawInstanced(item.mesh->getVAO(), item.instanceCount);
 
 		glPopDebugGroup();

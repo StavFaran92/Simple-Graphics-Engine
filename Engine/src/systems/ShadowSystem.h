@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "core/Core.h"
 
 #include "render/FrameBufferObject.h"
@@ -7,6 +9,7 @@
 
 class Shader;
 class Scene;
+struct DrawItem;
 class Texture;
 class Context;
 
@@ -23,7 +26,7 @@ public:
 
 	bool init();
 
-	void renderToDepthMap();
+	void renderToDepthMap(Scene* scene, const std::vector<DrawItem>& drawItems);
 
 	TextureResourceRef getShadowMap() const;
 	glm::mat4 getLightSpaceMat() const;

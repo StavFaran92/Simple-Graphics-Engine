@@ -13,12 +13,22 @@ layout (location = 6) in vec3 boneWeights;
 #include ../../../../Engine/Resources/Engine/Shaders/include/buffers.glsl
 #include ../../../../Engine/Resources/Engine/Shaders/include/animation.glsl
 
+// Mesh rest transform, constant for a whole instanced batch (one batch == one mesh)
+uniform mat4 restTransform;
+
 void main()
 {
+    mat4 finalModel = model;
+
+    if (isGpuInstanced)
+    {
+        finalModel = transformBuffer[instanceOffset + gl_InstanceID] * restTransform;
+    }
+
     vec4 totalPosition;
     applySkinningPosition(pos, boneIDs, boneWeights, isGpuInstanced, totalPosition);
 
-    gl_Position = lightSpaceMatrix * model * totalPosition;
+    gl_Position = lightSpaceMatrix * finalModel * totalPosition;
 }
 
 #frag

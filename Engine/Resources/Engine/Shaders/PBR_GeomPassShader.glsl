@@ -51,7 +51,7 @@ void main()
 
     if (isGpuInstanced)
     {
-        finalModel = transformBuffer[gl_InstanceID] * restTransform;
+        finalModel = transformBuffer[instanceOffset + gl_InstanceID] * restTransform;
     }
 
 	vec4 totalPosition;

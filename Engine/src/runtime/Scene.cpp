@@ -351,8 +351,6 @@ void Scene::generateDrawItems()
 {
 	m_drawItems.clear();
 	m_drawItemBones.clear();
-	m_drawItemInstances.clear();
-	m_drawItemModels.clear();
 
 	for (auto&& [entity, meshRenderer, transform] :
 		m_registry->getRegistry().view<MeshRendererComponent, Transformation>().each())
@@ -496,14 +494,9 @@ void Scene::generateDrawItems()
 	// Compute the instanced bone transforms once per frame, results land in the instanced animation SSBO
 	BoneTransformSystem::endFrame(Engine::get()->getSubSystem<Graphics>()->instancedAnimationBuffer);
 
-	// Reserve up front so appending never reallocates and the draw items' pointers stay valid
-	size_t totalInstances = 0;
-	for (const auto& [_, batch] : instancedBatches)
-	{
-		totalInstances += batch.instances.size();
-	}
-	m_drawItemInstances.reserve(totalInstances);
-	m_drawItemModels.reserve(totalInstances);
+	// Flatten all batches back to back, each batch's draw item holds where its instances start
+	std::vector<InstanceData> instances;
+	std::vector<glm::mat4> models;
 
 	for (const auto& [_, batch] : instancedBatches)
 	{
@@ -511,15 +504,32 @@ void Scene::generateDrawItems()
 		item.mesh = batch.mesh;
 		item.material = batch.material;
 		item.flags = DRAW_ITEM_DEFERRED | DRAW_ITEM_INSTANCED;
-		item.instancesData = m_drawItemInstances.data() + m_drawItemInstances.size();
-		item.models = m_drawItemModels.data() + m_drawItemModels.size();
+		item.instanceOffset = static_cast<uint32_t>(models.size());
 		item.instanceCount = static_cast<uint32_t>(batch.instances.size());
 
-		m_drawItemInstances.insert(m_drawItemInstances.end(), batch.instances.begin(), batch.instances.end());
-		m_drawItemModels.insert(m_drawItemModels.end(), batch.models.begin(), batch.models.end());
+		instances.insert(instances.end(), batch.instances.begin(), batch.instances.end());
+		models.insert(models.end(), batch.models.begin(), batch.models.end());
 
 		m_drawItems.push_back(item);
 	}
+
+	if (models.empty())
+		return;
+
+	// Upload once per frame, every pass that draws instanced items only binds these
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
+
+	const int modelsSize = static_cast<int>(sizeof(glm::mat4) * models.size());
+	graphics->instancedModelBuffer.reserve(modelsSize);
+	graphics->instancedModelBuffer.setSlot(0);
+	graphics->instancedModelBuffer.bind();
+	graphics->instancedModelBuffer.setData(modelsSize, models.data());
+
+	const int instancesSize = static_cast<int>(sizeof(InstanceData) * instances.size());
+	graphics->instancedInstanceDataBuffer.reserve(instancesSize);
+	graphics->instancedInstanceDataBuffer.setSlot(2);
+	graphics->instancedInstanceDataBuffer.bind();
+	graphics->instancedInstanceDataBuffer.setData(instancesSize, instances.data());
 }
 
 void Scene::update(float deltaTime)
@@ -674,7 +684,7 @@ void Scene::draw(float deltaTime)
 		if(Engine::get()->getConfig().renderConfig.renderShadowMap && graphics->shadowSettings.enabled)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Shadow Map");
-			m_shadowSystem->renderToDepthMap();
+			m_shadowSystem->renderToDepthMap(this, m_drawItems);
 			glPopDebugGroup();
 		}
 

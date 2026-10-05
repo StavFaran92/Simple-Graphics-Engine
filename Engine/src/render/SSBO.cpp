@@ -16,6 +16,21 @@ void SSBO::allocate(int size)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+	capacity = size;
+}
+
+void SSBO::reserve(int size)
+{
+	if (size <= capacity)
+		return;
+
+	int newCapacity = capacity > 0 ? capacity : 1;
+	while (newCapacity < size)
+	{
+		newCapacity *= 2;
+	}
+
+	allocate(newCapacity);
 }
 
 void SSBO::setData(int size, const void* data)

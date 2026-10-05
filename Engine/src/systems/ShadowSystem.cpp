@@ -89,7 +89,7 @@ bool ShadowSystem::createDepthMap(int resolution)
 	return true;
 }
 
-void ShadowSystem::renderToDepthMap()
+void ShadowSystem::renderToDepthMap(Scene* scene, const std::vector<DrawItem>& drawItems)
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 	const ShadowSettings& settings = graphics->shadowSettings;
@@ -109,9 +109,7 @@ void ShadowSystem::renderToDepthMap()
 	// Clear buffer
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	auto scene = Engine::get()->getContext()->getActiveScene();
-
-	auto view = scene->getRegistry().getRegistry().view<DirectionalLight>();
+	auto view =scene->getRegistry().getRegistry().view<DirectionalLight>();
 	if (view.size() < 1)
 	{
 		// No directional light, for now simply return
@@ -151,25 +149,21 @@ void ShadowSystem::renderToDepthMap()
 	m_simpleDepthShader->use();
 	m_simpleDepthShader->setUniformValue("lightSpaceMatrix", m_lightSpaceMatrix);
 
-	// Render Scene 
-	for (auto&& [entity, mesh, transform] : 
-		scene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation>().each())
+	const auto& bones = scene->getDrawItemBones();
+
+	// Render regular items
+	m_simpleDepthShader->setUniformValue("isGpuInstanced", false);
+
+	for (const auto& item : drawItems)
 	{
-		
+		if (item.flags & DRAW_ITEM_INSTANCED)
+			continue;
 
-		Entity entityhandler{ entity, &scene->getRegistry()};
-		graphics->entity = entityhandler;
-
-		auto meshCollection = mesh.mesh;
-
-		auto animator = entityhandler.tryGetComponent<Animator>();
-		if (animator)
+		if (item.flags & DRAW_ITEM_ANIMATED)
 		{
-			std::vector<glm::mat4> finalBoneMatrices;
-			animator->getFinalBoneMatrices(meshCollection.resource(), finalBoneMatrices);
-			for (int i = 0; i < finalBoneMatrices.size(); ++i)
+			for (uint32_t i = 0; i < item.boneCount; ++i)
 			{
-				m_simpleDepthShader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", finalBoneMatrices[i]);
+				m_simpleDepthShader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", bones[item.boneOffset + i]);
 			}
 
 			m_simpleDepthShader->setUniformValue("isAnimated", true);
@@ -179,32 +173,40 @@ void ShadowSystem::renderToDepthMap()
 			m_simpleDepthShader->setUniformValue("isAnimated", false);
 		}
 
-		
-		for (auto& mesh : mesh.mesh.resource()->getMeshes())
-		{
-			graphics->mesh = mesh.get();
+		m_simpleDepthShader->setUniformValue("model", item.transform);
 
-			glm::mat4 model = transform.getWorldTransformation() * mesh->getRestTransform();
+		// TODO use a more sophisticated solution here
+		//if (!item.worldBounds.isOnFrustum(*graphics->frustum))
+		//{
+		//	continue;
+		//}
 
-			m_simpleDepthShader->setUniformValue("model", model);
+		RenderCommand::draw(item.mesh->getVAO());
+	}
 
-			// TODO use a more sophisticated solution here
-			//AABB& aabb = mesh.get()->getAABB();
-			//aabb.transform(model);
+	// Render instanced items, bone transforms were computed in Scene::generateDrawItems
+	m_simpleDepthShader->setUniformValue("isGpuInstanced", true);
 
-			//if (!aabb.isOnFrustum(*graphics->frustum))
-			//{
-			//	continue;
-			//}
+	graphics->instancedAnimationBuffer.setSlot(1);
+	graphics->instancedAnimationBuffer.bind();
 
-			// draw model
-			auto vao = mesh->getVAO();
+	// Uploaded once per frame in Scene::generateDrawItems, batches index into them with instanceOffset
+	graphics->instancedModelBuffer.setSlot(0);
+	graphics->instancedModelBuffer.bind();
 
-			// render to quad
-			RenderCommand::draw(vao);
+	graphics->instancedInstanceDataBuffer.setSlot(2);
+	graphics->instancedInstanceDataBuffer.bind();
 
-		}
-	};
+	for (const auto& item : drawItems)
+	{
+		if (!(item.flags & DRAW_ITEM_INSTANCED))
+			continue;
+
+		m_simpleDepthShader->setUniformValue("restTransform", item.mesh->getRestTransform());
+		m_simpleDepthShader->setUniformValue("instanceOffset", static_cast<int>(item.instanceOffset));
+
+		RenderCommand::drawInstanced(item.mesh->getVAO(), item.instanceCount);
+	}
 
 	// Unbind FBO
 	m_fbo.unbind();

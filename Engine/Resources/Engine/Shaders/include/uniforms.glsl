@@ -22,3 +22,4 @@ uniform mat4 view;
 uniform mat4 lightSpaceMatrix;
 uniform bool isAnimated;
 uniform bool isGpuInstanced;
+uniform int instanceOffset; // first instance of the current instanced batch in the instanced buffers

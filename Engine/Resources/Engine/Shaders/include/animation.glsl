@@ -20,7 +20,7 @@ void applySkinning(
 
     if (gpuInstanced)
     {
-        InstanceData instData = instanceDataBuffer[gl_InstanceID];
+        InstanceData instData = instanceDataBuffer[instanceOffset + gl_InstanceID];
         animated = instData.isAnimated != 0u;
         boneOffset = int(instData.modelIndex);
     }

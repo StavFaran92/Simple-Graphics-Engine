@@ -9,6 +9,8 @@ public:
 	~SSBO();
 
 	void allocate(int size);
+	// Doubles the capacity until size fits (no-op if it already does), existing contents are discarded
+	void reserve(int size);
 	void setData(int size, const void* data);
 
 	// Appends data at the current write cursor and advances it, returning the byte offset it was written at.
@@ -18,8 +20,12 @@ public:
 
 	void bind();
 	void setSlot(int index);
+
+	// Size in bytes of the last allocate() call
+	int getCapacity() const { return capacity; }
 private:
 	uint32_t id;
 	int slot = 0;
 	int cursor = 0;
+	int capacity = 0;
 };

@@ -42,7 +42,6 @@ struct DrawItem
 	uint32_t		flags = DRAW_ITEM_NONE;
 	uint32_t		entityId = 0;		// source entity, for picking/debug while migrating
 
-	InstanceData*	instancesData = nullptr;
-	glm::mat4*		models = nullptr;
+	uint32_t		instanceOffset = 0;  // first instance in the instanced model / instance data buffers
 	uint32_t		instanceCount = 1;   // 1 for regular objects
 };
