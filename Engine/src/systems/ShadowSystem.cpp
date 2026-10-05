@@ -187,12 +187,11 @@ void ShadowSystem::renderToDepthMap(Scene* scene, const std::vector<DrawItem>& d
 	// Render instanced items, bone transforms were computed in Scene::generateDrawItems
 	m_simpleDepthShader->setUniformValue("isGpuInstanced", true);
 
-	graphics->instancedAnimationBuffer.setSlot(1);
-	graphics->instancedAnimationBuffer.bind();
-
-	// Uploaded once per frame in Scene::generateDrawItems, batches index into them with instanceOffset
 	graphics->instancedModelBuffer.setSlot(0);
 	graphics->instancedModelBuffer.bind();
+
+	graphics->instancedAnimationBuffer.setSlot(1);
+	graphics->instancedAnimationBuffer.bind();
 
 	graphics->instancedInstanceDataBuffer.setSlot(2);
 	graphics->instancedInstanceDataBuffer.bind();
