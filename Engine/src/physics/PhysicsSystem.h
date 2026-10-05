@@ -24,6 +24,7 @@ public:
 	void stopScenePhysics(Scene* scene);
 	void update(Scene* scene, float deltaTime);
 
+	void applyQueryEnabled(PhysicsComponent& pc);
 	void visualizePhysicsShapeDebug(Scene* scene);
 
 	void close();
@@ -33,6 +34,7 @@ private:
 	void createActor(Scene* scene, entt::entity entity);
 	void removeActor(Scene* scene, entt::entity entity);
 	void createShape(physx::PxRigidActor* body, Entity e, bool recursive);
+	// Applies PhysicsComponent::isQueryEnabled to all shapes of its actor, no-op if the actor isn't created yet
 	physx::PxShape* createBoxShape(float x, float y, float z);
 	physx::PxShape* createSphereShape(float radius);
 	physx::PxShape* createCapsuleShape(float radius, float halfHeight);

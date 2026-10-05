@@ -1,5 +1,8 @@
 #include "PhysicsComponent.h"
 
+#include "core/Engine.h"
+#include "physics/PhysicsSystem.h"
+
 void PhysicsComponent::addForce(glm::vec3 force)
 {
 	m_force += force;
@@ -21,4 +24,10 @@ void PhysicsComponent::move(glm::vec3 position)
 void PhysicsComponent::setRigidBodyType(RigidbodyType type)
 {
 	rigidBodyType = type;
+}
+
+void PhysicsComponent::setQueryEnabled(bool enabled)
+{
+	isQueryEnabled = enabled;
+	Engine::get()->getPhysicsSystem()->applyQueryEnabled(*this);
 }

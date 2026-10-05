@@ -306,6 +306,22 @@ void PhysicsSystem::removeActor(Scene* scene, entt::entity entity)
     }
 }
 
+void PhysicsSystem::applyQueryEnabled(PhysicsComponent& pc)
+{
+    if (!pc.simulatedBody)
+        return;
+
+    auto actor = (physx::PxRigidActor*)pc.simulatedBody;
+
+    std::vector<physx::PxShape*> shapes(actor->getNbShapes());
+    actor->getShapes(shapes.data(), static_cast<physx::PxU32>(shapes.size()));
+
+    for (auto shape : shapes)
+    {
+        shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, pc.isQueryEnabled);
+    }
+}
+
 void PhysicsSystem::createActor(Scene* scene, entt::entity entity)
 {
     Entity e{ entity, &scene->getRegistry()};
@@ -644,6 +660,11 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     else if (pc.collisionType == CollisionType::QueryOnly)
     {
         shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+    }
+
+    if (!pc.isQueryEnabled)
+    {
+        shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
     }
 
     // Apply local transformation

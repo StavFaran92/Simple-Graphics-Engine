@@ -14,6 +14,9 @@ local CAPSULE_CENTER_Y = 0.7 -- collider offset above the feet
 local SEPARATION_DIST  = 1.8 -- enemies closer than this (center to center) push apart
 local SEPARATION_SPEED = 2 -- push speed at full overlap, units per second
 
+local MIN_HITS_TO_KILL = 3 -- each enemy rolls its health in this range
+local MAX_HITS_TO_KILL = 4
+
 function Script:create(entity)
     self.player         = getActiveScene():getEntityByName("player")
     self.physics        = entity.Physics
@@ -30,6 +33,8 @@ function Script:create(entity)
     self.toPlayer       = vec3.new(0, 0, 0)
     self.distToPlayer   = 0
     self.transform      = entity.Transform
+    self.health         = math.random(MIN_HITS_TO_KILL, MAX_HITS_TO_KILL) -- hits left
+    self.isDead         = false
 
     local s = self  -- capture for state closures
 
@@ -110,15 +115,36 @@ function Script:create(entity)
         end,
     }
 
+    -- Final state, never transitions out
+    local DeadState = {
+        onEnter  = function(state)
+            s.isDead = true
+            s.moveDir = nil
+            s.knockback = vec3.new(0)
+            s.animator:playAnimation("Death", false)
+            s.attack_collider:deactivate()
+
+            -- The corpse is purely visual: no collisions, and shots / separation queries pass through it
+            s.physics:deactivate()
+            s.physics:setQueryEnabled(false)
+        end,
+        onUpdate = function(state, dt) end,
+        onExit   = function(state) end,
+    }
+
     self.sm = StateMachine.new()
     self.sm:addState("Idle",   IdleState)
     self.sm:addState("Follow", FollowState)
     self.sm:addState("Attack", AttackState)
     self.sm:addState("Hurt", HurtState)
+    self.sm:addState("Dead", DeadState)
     self.sm:transitionTo("Idle")
 end
 
 function Script:update(entity, dt)
+    -- Dead: the Death animation plays on its own, nothing else runs
+    if self.isDead then return end
+
     local playerTransform = self.player.Transform
     self.toPlayer     = playerTransform:getWorldPosition() - entity.Transform:getWorldPosition()
     self.distToPlayer = length(self.toPlayer)
@@ -210,13 +236,21 @@ function Script:moveWithGravity(dt, horizontal)
 end
 
 function Script:onAnimationTrigger(name, frame)
+    if self.isDead then return end
     if name == "attack_start" then self.attack_collider:activate()   end
     if name == "attack_end"   then self.attack_collider:deactivate() end
 end
 
 -- Called by the player's shot via invoke(), and by melee hits below
 function Script:hurt()
-    self.sm:transitionTo("Hurt")
+    if self.isDead then return end
+
+    self.health = self.health - 1
+    if self.health <= 0 then
+        self.sm:transitionTo("Dead")
+    else
+        self.sm:transitionTo("Hurt")
+    end
 end
 
 function Script:onTriggerEnter(entity, other)

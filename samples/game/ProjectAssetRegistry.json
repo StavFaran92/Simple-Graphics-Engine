@@ -121,9 +121,31 @@
             "sourcePath": "",
             "uuid": 99,
             "visibility": 1
+        },
+        {
+            "aType": 3,
+            "asset": {},
+            "assetDirectory": "zombie\\",
+            "ext": ".anim",
+            "isEngineOwned": false,
+            "name": "Standing Death Left 01",
+            "sourcePath": "",
+            "uuid": 130,
+            "visibility": 1
+        },
+        {
+            "aType": 3,
+            "asset": {},
+            "assetDirectory": ".\\",
+            "ext": ".anim",
+            "isEngineOwned": false,
+            "name": "Standing Death Backward 01",
+            "sourcePath": "",
+            "uuid": 132,
+            "visibility": 1
         }
     ],
-    "counter": 130,
+    "counter": 134,
     "lua script": [
         {
             "aType": 7,
@@ -2925,17 +2947,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2961,6 +2972,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3247,17 +3269,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3283,6 +3294,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3569,17 +3591,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3605,6 +3616,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -5732,6 +5754,8 @@
         "SGE_TEXTURE_TILE_NOISE": 6,
         "SGE_TEXTURE_WHITE": 1,
         "Scene_0": 15,
+        "Standing Death Backward 01": 132,
+        "Standing Death Left 01": 130,
         "Sword And Shield Slash": 89,
         "Thriller Idle": 78,
         "V941sW7o": 28,
@@ -5770,7 +5794,7 @@
         "player_controller": 32,
         "sunflowers_puresky_4k": 26,
         "water_new_height": 129,
-        "zombie": 123,
+        "zombie": 133,
         "zombie_body_diffuse": 71,
         "zombie_diffuse": 68,
         "zombie_normal": 69
@@ -5821,6 +5845,7 @@
         "content/new folder/new material.mat": 17,
         "content/new material.mat": 124,
         "content/scene_0.scene": 15,
+        "content/standing death backward 01.anim": 132,
         "content/sunflowers_puresky_4k.texture": 26,
         "content/warrior/animationrelay.lua": 90,
         "content/warrior/warrior/gethurt.anim": 91,
@@ -5831,7 +5856,8 @@
         "content/warrior/warrior/warrior.model": 82,
         "content/warrior/warrior_prefab.prefab": 88,
         "content/water_new_height.texture": 129,
-        "content/zombie.prefab": 123,
+        "content/zombie.prefab": 133,
+        "content/zombie/standing death left 01.anim": 130,
         "content/zombie/thriller idle.anim": 78,
         "content/zombie/zombie attack.anim": 81,
         "content/zombie/zombie dying.anim": 80,
@@ -5979,7 +6005,18 @@
             "isEngineOwned": false,
             "name": "zombie",
             "sourcePath": "",
-            "uuid": 123,
+            "uuid": 131,
+            "visibility": 1
+        },
+        {
+            "aType": 5,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".prefab",
+            "isEngineOwned": false,
+            "name": "zombie",
+            "sourcePath": "",
+            "uuid": 133,
             "visibility": 1
         }
     ],

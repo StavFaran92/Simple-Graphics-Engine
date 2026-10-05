@@ -488,7 +488,8 @@ void bindComponents(sol::state& lua)
         "turnToKinematic", [](PhysicsComponent& self) { self.setRigidBodyType(RigidbodyType::Kinematic); },
         "turnToDynamic", [](PhysicsComponent& self) { self.setRigidBodyType(RigidbodyType::Dynamic); },
         "activate", &PhysicsComponent::activate,
-        "deactivate", &PhysicsComponent::deactivate
+        "deactivate", &PhysicsComponent::deactivate,
+        "setQueryEnabled", &PhysicsComponent::setQueryEnabled
     );
 
     lua.new_usertype<TagComponent>("TagComponent",

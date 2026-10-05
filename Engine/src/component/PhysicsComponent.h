@@ -17,6 +17,9 @@ struct EngineAPI PhysicsComponent : public Component
 	void move(glm::vec3 position);
 	void setRigidBodyType(RigidbodyType type);
 
+	// Whether raycasts / overlaps can hit this body, applied to the live shapes immediately
+	void setQueryEnabled(bool enabled);
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZE_COMPONENT_BASE;
@@ -46,6 +49,7 @@ struct EngineAPI PhysicsComponent : public Component
 	std::shared_ptr<Collider> collider;
 	float mass = 0;
 	bool isChanged = false;
+	bool isQueryEnabled = true;
 	glm::vec3 m_targetPisition{ 0 };
 	glm::vec3 m_force{ 0 };
 	void* simulatedBody = nullptr;

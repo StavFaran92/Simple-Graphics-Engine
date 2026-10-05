@@ -1072,6 +1072,12 @@
                                     },
                                     "refs": [
                                         {
+                                            "key": "cameraPivot",
+                                            "value": {
+                                                "m_entity": 8
+                                            }
+                                        },
+                                        {
                                             "key": "model",
                                             "value": {
                                                 "m_entity": 15
@@ -1081,12 +1087,6 @@
                                             "key": "mainCamera",
                                             "value": {
                                                 "m_entity": 1
-                                            }
-                                        },
-                                        {
-                                            "key": "cameraPivot",
-                                            "value": {
-                                                "m_entity": 8
                                             }
                                         }
                                     ]
@@ -1348,6 +1348,16 @@
                                                 }
                                             },
                                             "triggers": []
+                                        },
+                                        {
+                                            "name": "Death",
+                                            "playbackSpeed": 1.0,
+                                            "animation": {
+                                                "uuid": {
+                                                    "m_value": 132
+                                                }
+                                            },
+                                            "triggers": []
                                         }
                                     ],
                                     "m_animationGraph": {
@@ -1435,7 +1445,7 @@
                                     "isActive": true,
                                     "localTranslation": {
                                         "v.x": -0.000005245208740234375,
-                                        "v.y": -6.729124368831663e-9,
+                                        "v.y": -4.514345164352562e-8,
                                         "v.z": 0.00005841256643179804
                                     },
                                     "localRotation": {
