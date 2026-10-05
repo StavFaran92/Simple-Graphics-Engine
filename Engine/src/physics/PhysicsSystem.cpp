@@ -790,12 +790,13 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
 
             // Move using displacement in component
             static const physx::PxControllerFilters filters(nullptr, nullptr, nullptr);
-            cct->move(
+            physx::PxControllerCollisionFlags collisionFlags = cct->move(
                 physx::PxVec3(pc.m_disp.x, pc.m_disp.y, pc.m_disp.z),
                 0.0f, // min distance
                 deltaTime,
                 filters
             );
+            pc.isGrounded = collisionFlags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
             pc.reset();
         }
     }

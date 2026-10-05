@@ -21,12 +21,13 @@ function Script:create(entity)
     self.modelTransform = self.model.Transform
     self.animator = self.model.Animator
     self.velocity = -10.0
-    self.velocityV = -10.0
-    self.gravity = -10.0
+    self.velocityV = 0.0 -- units per second
+    self.gravity = -36.0 -- units per second^2
+    self.groundStick = -1.0 -- units per second; keeps pushing into the ground so the CCT keeps reporting it
     self.yaw = 0;
     self.pitch = 0;
     self.turnSpeed = 10.0;
-    self.jumpForce = 200;
+    self.jumpForce = 12.0 -- initial upward speed, units per second
     self.isGrounded = false
     self.isJumping = false
     self.graceTimer = 0 -- > 0 while invulnerable
@@ -154,20 +155,16 @@ function Script:update(entity, dt)
         self.movementV = vec3.new(0)
     end
 
-    local hitResult = HitResult.new()
-    self.isGrounded = raycast(self.modelTransform:getWorldPosition(), 
-        vec3.new(0, -1, 0), 
-        0.01, 
-        hitResult, 
-        LayerMask.Ground);  
+    -- Ground contact as reported by the character controller's last move
+    self.isGrounded = self.pc.isGrounded
 
     if self.isGrounded and self.velocityV < 0 then
-        self.velocityV = 0
+        self.velocityV = self.groundStick
         self.isJumping = false
     end
 
     if not self.isGrounded then
-        self.velocityV = self.velocityV + self.gravity
+        self.velocityV = self.velocityV + self.gravity * dt
     end
 
     self.hDir = self.movementH + self.movementV
@@ -178,7 +175,7 @@ function Script:update(entity, dt)
     self.wantJump = false
 
     -- Move player
-    local disp = vec3.new(0, self.velocityV / 1000.0, 0)
+    local disp = vec3.new(0, self.velocityV * dt, 0)
 
     if self.canMove and length(self.hDir) > 0 then
         disp = disp + self.hDir

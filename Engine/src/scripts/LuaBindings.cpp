@@ -464,7 +464,8 @@ void bindComponents(sol::state& lua)
     );
 
     lua.new_usertype<PlayerController>("PlayerController",
-        "move", &PlayerController::move
+        "move", &PlayerController::move,
+        "isGrounded", sol::readonly(&PlayerController::isGrounded)
     );
 
     lua.new_usertype<ImageComponent>("ImageComponent",

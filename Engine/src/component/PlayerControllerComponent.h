@@ -32,6 +32,7 @@ struct EngineAPI PlayerController : public Component
 	float radius = .5f;
 	glm::vec3 offset{};
 	int controllerIndex = 0;
+	bool isGrounded = false; // set by the physics step - the last move collided with something below
 
 };
 
