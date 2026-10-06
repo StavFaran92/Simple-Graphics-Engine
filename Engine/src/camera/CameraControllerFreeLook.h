@@ -41,6 +41,9 @@ private:
 	float m_turnSpeed = 10.f;
 	float m_distance = 0;
 	float m_movementSpeed = 10.f;
+	float m_minMovementSpeed = 0.1f;
+	float m_maxMovementSpeed = 500.f;
+	float m_speedScrollFactor = 1.2f; // speed multiplier per wheel notch in movement mode
 
 	ControllerState m_state = ControllerState::IDLE;
 

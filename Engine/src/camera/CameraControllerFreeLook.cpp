@@ -7,6 +7,7 @@
 #include "core/System.h"
 #include "ui/Input.h"
 #include <algorithm>
+#include <cmath>
 #include "glm/glm.hpp"
 #include "core/Window.h"
 #include "core/MouseEvents.h"
@@ -32,6 +33,10 @@ void CameraControllerFreeLook::onUpdate(float deltaTime)
 			Engine::get()->getWindow()->unlockMouse();
 		}
 	}
+
+	// WASD/EQ movement is only active while RMB is held (movement mode)
+	if (m_state != ControllerState::ROTATE)
+		return;
 
 	auto* kb = Engine::get()->getInput()->getKeyboard();
 	glm::vec3 dir(0.0f);
@@ -130,7 +135,17 @@ bool CameraControllerFreeLook::onEvent(const Event& e)
 	else if (e.type() == EventType::MouseWheel)
 	{
 		const auto& me = static_cast<const MouseWheelEvent&>(e);
-		m_cameraTransform->translate(m_cameraComponent->front * static_cast<float>(me.y));
+
+		if (m_state == ControllerState::ROTATE)
+		{
+			// In movement mode the wheel changes movement speed
+			float factor = std::pow(m_speedScrollFactor, static_cast<float>(me.y));
+			m_movementSpeed = std::clamp(m_movementSpeed * factor, m_minMovementSpeed, m_maxMovementSpeed);
+		}
+		else
+		{
+			m_cameraTransform->translate(m_cameraComponent->front * static_cast<float>(me.y));
+		}
 	}
 
 	return false;
