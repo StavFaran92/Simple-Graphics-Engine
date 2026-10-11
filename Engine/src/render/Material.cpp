@@ -277,10 +277,7 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 		if (spec.type == MaterialPropertyType::SAMPLER)
 		{
 			auto sampler = std::get<std::shared_ptr<TextureSamplerAsset>>(value);
-			TextureSampler textureSamplerResource;
-			textureSamplerResource.texture = sampler->texture.resource();
-			textureSamplerResource.state = sampler->state;
-			materialResource->m_samplers[name] = textureSamplerResource;
+			materialResource->m_samplers[name] = sampler->resolve();
 
 		}
 		else

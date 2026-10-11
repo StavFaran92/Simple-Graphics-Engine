@@ -402,7 +402,32 @@ void AssetViewWindow::display()
 						}
 						else
 						{
-							// TODO implement directory recursive delete
+							// Collect assets first so we don't erase files while iterating the folder
+							std::filesystem::path folderPath = fMetadata.filePath;
+							std::vector<UUID> folderAssetUIDs;
+							for (const auto& entry : std::filesystem::recursive_directory_iterator(folderPath))
+							{
+								if (!entry.is_regular_file())
+									continue;
+
+								std::filesystem::path relPath = std::filesystem::relative(entry.path(), folderPath.parent_path());
+								UUID uuid = getUIDFromFilename(cwd, relPath.string());
+								if (assets->hasAsset(uuid))
+									folderAssetUIDs.push_back(uuid);
+							}
+
+							// Erase through the asset system so the registry stays in sync
+							for (UUID uuid : folderAssetUIDs)
+								assets->getAsset(uuid).erase();
+
+							std::error_code ec;
+							std::filesystem::remove_all(folderPath, ec);
+							if (ec)
+								logError("Failed to delete folder {}: {}", folderPath.string(), ec.message());
+
+							// Drop the selection so nothing keeps referencing the deleted folder
+							s_assetViewSelectedIndices.clear();
+							EditorState::Instance().clearAssetSelection();
 						}
 					}
 

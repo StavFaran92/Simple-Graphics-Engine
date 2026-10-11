@@ -10,6 +10,8 @@ class EngineAPI AssetHandleImpl
 public:
 	static const AssetRecord& getInfo(UUID uuid);
 
+	static bool exists(UUID uuid);
+
 };
 
 template<typename T>
@@ -64,7 +66,17 @@ public:
 
 	bool isEmpty() const
 	{
-		return uuid == EMPTY_UUID;
+		if (uuid == EMPTY_UUID)
+			return true;
+
+		// The referenced asset was deleted, drop the stale cached asset
+		if (!AssetHandleImpl::exists(uuid))
+		{
+			m_cachedAsset.reset();
+			return true;
+		}
+
+		return false;
 	}
 
 	const AssetRecord& info() const

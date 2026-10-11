@@ -11,3 +11,8 @@ const AssetRecord& AssetHandleImpl::getInfo(UUID uuid)
 {
     return Engine::get()->getSubSystem<Assets>()->getInfo(uuid);
 }
+
+bool AssetHandleImpl::exists(UUID uuid)
+{
+    return Engine::get()->getSubSystem<Assets>()->hasAsset(uuid);
+}

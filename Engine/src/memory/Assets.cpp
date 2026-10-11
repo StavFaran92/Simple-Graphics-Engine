@@ -120,8 +120,10 @@ void Assets::loadAssetsDatabase()
 
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
+}
 
-	// Post initialize
+void Assets::initAssets()
+{
 	for (auto& [uuid, record] : m_assets)
 	{
 		// If its a scene we add it to the scene manager
@@ -210,7 +212,7 @@ bool Assets::hasAsset(UUID uuid) const
 
 bool Assets::hasAsset(const std::string& name) const
 {
-	return !getAssetFromName(name).isEmpty();
+	return hasAsset(getAssetFromName(name).getUID());
 }
 
 void Assets::updateRegistry(const AssetRecord& aInfo)

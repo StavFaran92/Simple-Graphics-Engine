@@ -15,7 +15,7 @@ namespace fs = std::filesystem;
 void ProjectManager::loadProject(const std::string& filePath, std::shared_ptr<Context>& context)
 {
     ProjectSettings::get().load(Engine::get()->getProjectDirectory());
-    Engine::get()->getSubSystem<Assets>()->loadAssetsDatabase();
+    Engine::get()->getSubSystem<Assets>()->initAssets();
     Archiver::load();
 
     //UUID uid activeSceneID = Engine::get()->getProjectSettings()->get<int>("active_scene");

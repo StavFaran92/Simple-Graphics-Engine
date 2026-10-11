@@ -190,6 +190,10 @@ void RenderFunctions::drawDebugData(Scene* scene)
 		std::string name = entityHandler.getComponent<ObjectComponent>().name;
 		logTrace("About to display debug data for {}", name);
 
+		// Mesh asset was deleted, nothing to draw
+		if (meshRenderer.mesh.isEmpty())
+			continue;
+
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{
 			if (!prepareMeshForRender(mesh.get(), entityHandler))
@@ -218,6 +222,9 @@ void RenderFunctions::drawSceneUsingCustomShader(Scene* scene)
 		Entity entityHandler{ entity, &scene->getRegistry() };
 		std::string name = entityHandler.getComponent<ObjectComponent>().name;
 		logTrace("About to render '{}' using Custom Shader pass", name);
+
+		if (meshRenderer.mesh.isEmpty())
+			continue;
 
 		for (auto& mesh : meshRenderer.mesh.resource()->getMeshes())
 		{

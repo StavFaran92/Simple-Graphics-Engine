@@ -235,6 +235,12 @@ void Engine::createSystems()
     m_memoryManagementSystem = std::make_shared<CacheSystem>(par);
     m_context = std::make_shared<Context>(par);
 
+    // Populate asset records before built-in assets check for existing ones
+    if (m_initParams.loadExistingProject)
+    {
+        getSubSystem<Assets>()->loadAssetsDatabase();
+    }
+
     m_physicsSystem = std::make_shared<PhysicsSystem>();
 
     registerSubSystem<FoliageSystem>(new FoliageSystem());

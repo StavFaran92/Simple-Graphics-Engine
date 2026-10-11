@@ -39,6 +39,8 @@ public:
 
 	void loadAssetsDatabase();
 
+	void initAssets();
+
 	void saveDirtyAssets();
 
 	void syncAllAssets();
