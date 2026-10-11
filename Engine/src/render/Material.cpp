@@ -179,15 +179,12 @@ MaterialResourceRef Material::load(const std::string& fileLocation, MaterialLoad
 {
 	desc.sourcePath = fileLocation;
 	std::string filepath = desc.sourcePath;
-	//auto projectDir = Engine::get()->getProjectDirectory();
-	//filepath = projectDir + filepath;
-	std::ifstream is(filepath);
-	cereal::JSONInputArchive iarchive(is);
-	MaterialData materialData;
-	//MaterialResourceRef material = Factory<Material>::create();
 
 	try
 	{
+		std::ifstream is(filepath);
+		cereal::JSONInputArchive iarchive(is);
+		MaterialData materialData;
 		iarchive(materialData);
 		MaterialResourceRef material = Factory<Material>::create();
 		material->m_renderMode = materialData.getMaterialRenderMode();

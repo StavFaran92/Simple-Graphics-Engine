@@ -231,7 +231,7 @@ void RenderFunctions::drawSceneUsingCustomShader(Scene* scene)
 			auto matIndex = mesh->getMaterialIndex();
 			graphics->material = meshRenderer.at(matIndex);
 
-			if (graphics->material->getRenderMode() != MaterialRenderMode::Custom)
+			if (graphics->material.isEmpty() || graphics->material->getRenderMode() != MaterialRenderMode::Custom)
 				continue;
 
 			if (!prepareMeshForRender(mesh.get(), entityHandler))

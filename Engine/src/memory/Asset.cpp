@@ -70,6 +70,11 @@ ResourceRef<Resource> Asset::resource() const
 			return loadAssetResourceInternal(record, uuid);
 		});
 
+    if (resource.isEmpty())
+    {
+        return ResourceRef<Resource>::empty;
+    }
+
     Engine::get()->getSubSystem<FrameAccessTable>()->onResourceAccessed(resource);
 
 	if (record.isResourceDirty())
