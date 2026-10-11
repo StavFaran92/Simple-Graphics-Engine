@@ -1282,21 +1282,26 @@ void Scene::draw(float deltaTime)
 		m_UIShader->setProjectionMatrix(m_defaultUIProjection);
 		auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
 
-		for (auto&& [entity, image] : m_registry->get().view<ImageComponent>().each())
+		for (auto&& [entity, imageComponent] : m_registry->get().view<ImageComponent>().each())
 		{
 			Entity entityhandler{ entity, m_registry.get() };
 			graphics->entity = entityhandler;
-			image.image.resource()->bind();
-			image.image.resource()->setSlot(0);
+			auto imageTexture = imageComponent.image.resource();
+
+			if (imageTexture.isEmpty())
+				continue;
+
+			imageTexture->bind();
+			imageTexture->setSlot(0);
 
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(image.position, 0.0f));
+			model = glm::translate(model, glm::vec3(imageComponent.position, 0.0f));
 
-			model = glm::translate(model, glm::vec3(0.5f * image.size.x, 0.5f * image.size.y, 0.0f));
-			model = glm::rotate(model, glm::radians(image.rotate), glm::vec3(0.0f, 0.0f, 1.0f));
-			model = glm::translate(model, glm::vec3(-0.5f * image.size.x, -0.5f * image.size.y, 0.0f));
+			model = glm::translate(model, glm::vec3(0.5f * imageComponent.size.x, 0.5f * imageComponent.size.y, 0.0f));
+			model = glm::rotate(model, glm::radians(imageComponent.rotate), glm::vec3(0.0f, 0.0f, 1.0f));
+			model = glm::translate(model, glm::vec3(-0.5f * imageComponent.size.x, -0.5f * imageComponent.size.y, 0.0f));
 
-			model = glm::scale(model, glm::vec3(image.size, 1.0f));
+			model = glm::scale(model, glm::vec3(imageComponent.size, 1.0f));
 
 			m_UIShader->setUniformValue("model", model);
 
