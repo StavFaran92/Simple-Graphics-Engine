@@ -23,6 +23,109 @@ ImVec2 s_assetViewMarqueeMouseDownPos;
 bool s_assetViewLmbTracking = false;
 bool s_assetViewMarqueeDrag = false;
 
+// Asset card layout (thumbnail on top, type strip, name + type label below)
+constexpr float kCardWidth = 96.0f;
+constexpr float kCardThumbPadding = 8.0f;
+constexpr float kCardTypeStripHeight = 2.0f;
+constexpr float kCardTextPadding = 4.0f;
+constexpr float kCardTextLineGap = 2.0f;
+constexpr float kCardSpacing = 8.0f;
+constexpr float kCardRounding = 4.0f;
+
+ImVec2 getCardSize()
+{
+	const float textHeight = ImGui::GetTextLineHeight() * 2.0f + kCardTextLineGap;
+	return ImVec2(kCardWidth, kCardWidth + kCardTypeStripHeight + textHeight + kCardTextPadding * 2.0f);
+}
+
+ImU32 getAssetTypeColor(AssetType aType)
+{
+	switch (aType) {
+	case AssetType::MODEL:      return IM_COL32(  0, 168, 242, 255);
+	case AssetType::TEXTURE:    return IM_COL32(192,  64,  64, 255);
+	case AssetType::ANIMATION:  return IM_COL32( 80, 200, 120, 255);
+	case AssetType::SHADER:     return IM_COL32(170,  90, 230, 255);
+	case AssetType::PREFAB:     return IM_COL32( 60, 110, 220, 255);
+	case AssetType::MATERIAL:   return IM_COL32(110, 200,  60, 255);
+	case AssetType::LUA_SCRIPT: return IM_COL32(230, 200,  60, 255);
+	case AssetType::SCENE:      return IM_COL32(230, 130,  40, 255);
+	default:                    return IM_COL32(128, 128, 128, 255);
+	}
+}
+
+// For now every asset uses its type icon; real thumbnails will plug in here
+ImTextureID getAssetThumbnail(const AssetRecord& aInfo)
+{
+	unsigned int iconID = 0;
+	switch (aInfo.aType) {
+	case AssetType::MODEL:      iconID = icons.at("model")->getID(); break;
+	case AssetType::TEXTURE:    iconID = icons.at("texture")->getID(); break;
+	case AssetType::ANIMATION:  iconID = icons.at("animation")->getID(); break;
+	case AssetType::SHADER:     iconID = icons.at("shader")->getID(); break;
+	case AssetType::PREFAB:     iconID = icons.at("prefab")->getID(); break;
+	case AssetType::MATERIAL:   iconID = icons.at("material")->getID(); break;
+	case AssetType::LUA_SCRIPT: iconID = icons.at("lua_script")->getID(); break;
+	}
+	return (ImTextureID)(intptr_t)iconID;
+}
+
+std::string ellipsizeText(const std::string& text, float maxWidth)
+{
+	if (ImGui::CalcTextSize(text.c_str()).x <= maxWidth)
+		return text;
+
+	const float ellipsisWidth = ImGui::CalcTextSize("...").x;
+	std::string result = text;
+	while (!result.empty() && ImGui::CalcTextSize(result.c_str()).x + ellipsisWidth > maxWidth)
+		result.pop_back();
+	return result + "...";
+}
+
+// Submits an invisible button the size of a card at the cursor and draws the card over it.
+// The button is the last item, so IsItemHovered()/GetItemRect*() refer to the whole card.
+void drawAssetCard(ImTextureID thumbnail, const std::string& name, const std::string& typeLabel, ImU32 stripColor, bool selected)
+{
+	const ImVec2 cardSize = getCardSize();
+	const ImVec2 p0 = ImGui::GetCursorScreenPos();
+	const ImVec2 p1(p0.x + cardSize.x, p0.y + cardSize.y);
+
+	ImGui::InvisibleButton("##card", cardSize);
+	const bool hovered = ImGui::IsItemHovered();
+
+	ImDrawList* dl = ImGui::GetWindowDrawList();
+
+	// Card body
+	ImU32 bgColor = hovered ? IM_COL32(64, 64, 64, 255) : IM_COL32(46, 46, 46, 255);
+	dl->AddRectFilled(p0, p1, bgColor, kCardRounding);
+
+	// Thumbnail area
+	const ImVec2 thumbMax(p1.x, p0.y + kCardWidth);
+	dl->AddRectFilled(p0, thumbMax, IM_COL32(26, 26, 26, 255), kCardRounding, ImDrawFlags_RoundCornersTop);
+	if (thumbnail)
+	{
+		dl->AddImage(thumbnail,
+			ImVec2(p0.x + kCardThumbPadding, p0.y + kCardThumbPadding),
+			ImVec2(thumbMax.x - kCardThumbPadding, thumbMax.y - kCardThumbPadding));
+	}
+
+	// Asset type strip
+	if (stripColor != 0)
+		dl->AddRectFilled(ImVec2(p0.x, thumbMax.y), ImVec2(p1.x, thumbMax.y + kCardTypeStripHeight), stripColor);
+
+	// Name + type label
+	const float textMaxWidth = cardSize.x - kCardTextPadding * 2.0f;
+	ImVec2 textPos(p0.x + kCardTextPadding, thumbMax.y + kCardTypeStripHeight + kCardTextPadding);
+	dl->AddText(textPos, ImGui::GetColorU32(ImGuiCol_Text), ellipsizeText(name, textMaxWidth).c_str());
+	textPos.y += ImGui::GetTextLineHeight() + kCardTextLineGap;
+	dl->AddText(textPos, ImGui::GetColorU32(ImGuiCol_TextDisabled), ellipsizeText(typeLabel, textMaxWidth).c_str());
+
+	// Selection / hover outline
+	if (selected)
+		dl->AddRect(p0, p1, ImGui::GetColorU32(ImGuiCol_ButtonActive), kCardRounding, 0, 2.0f);
+	else if (hovered)
+		dl->AddRect(p0, p1, ImGui::GetColorU32(ImGuiCol_HeaderHovered), kCardRounding, 0, 1.0f);
+}
+
 } // namespace
 
 void openInVSCode(const std::string& path)
@@ -111,8 +214,9 @@ void AssetViewWindow::display()
 	// Scrollable region
 	ImGui::BeginChild("FileBrowserScrollingRegion", ImVec2(0, 0), false);
 
-	const int columns = 6; // number of thumbnails per row
-	if (ImGui::BeginTable("FileBrowserGrid", columns))
+	// Number of cards per row adapts to the window width
+	const float availWidth = ImGui::GetContentRegionAvail().x;
+	const int columns = std::max(1, (int)((availWidth + kCardSpacing) / (kCardWidth + kCardSpacing)));
 	{
 		struct FileMetadata
 		{
@@ -142,103 +246,57 @@ void AssetViewWindow::display()
 		std::vector<std::optional<ImRect>> tileRects(fileMetadataTable.size());
 		bool earlyTableBreak = false;
 
-		ImGui::TableNextColumn();
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(kCardSpacing, kCardSpacing));
+		int visibleCardCount = 0;
 
 		for (int i=0; i<fileMetadataTable.size(); i++)
 		{
 			const FileMetadata& fMetadata = fileMetadataTable[i];
-			ImGui::PushID(i);
 
-			ImVec2 p0 = ImGui::GetCursorScreenPos();
+			ImTextureID thumbnail = nullptr;
+			std::string cardName;
+			std::string cardTypeLabel;
+			ImU32 cardStripColor = 0;
 
 			if (fMetadata.isDirectory)
 			{
-				ImGui::BeginGroup(); // Begin entry group (icon + name + extra info)
-				{
-					std::string dirName = fMetadata.filename;
-
-					unsigned int iconID = icons.at("folder")->getID();
-					ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
-					ImGui::SameLine();
-
-					ImGui::Text("%s", dirName.c_str());
-				}
-				ImGui::EndGroup();
-
-				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
-				{
-					cwd.enterFolder(fMetadata.filename);
-					s_assetViewLmbTracking = false;
-					s_assetViewMarqueeDrag = false;
-					earlyTableBreak = true;
-					break;
-				}
+				thumbnail = (ImTextureID)(intptr_t)icons.at("folder")->getID();
+				cardName = fMetadata.filename;
+				cardTypeLabel = "Folder";
 			}
 			else
 			{
-				const std::string filename = fMetadata.filename;
-
-				if (filename == "ProjectAssetRegistry")
+				if (fMetadata.filename == "ProjectAssetRegistry")
 					continue; // Skip unwanted files
 
-				UUID uuid = getUIDFromFilename(cwd, filename);
+				UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
 				if (!assets->hasAsset(uuid)) continue;
 
-				ImGui::BeginGroup();
-				{
-
-					const AssetRecord& aInfo = assets->getInfo(uuid);
-
-					int iconID = 0;
-					switch (aInfo.aType) {
-					case AssetType::MODEL:     iconID = icons.at("model")->getID(); break;
-					case AssetType::TEXTURE:  iconID = icons.at("texture")->getID(); break;
-					case AssetType::ANIMATION:iconID = icons.at("animation")->getID(); break;
-					case AssetType::SHADER:   iconID = icons.at("shader")->getID(); break;
-					case AssetType::PREFAB:   iconID = icons.at("prefab")->getID(); break;
-					case AssetType::MATERIAL: iconID = icons.at("material")->getID(); break;
-					case AssetType::LUA_SCRIPT: iconID = icons.at("lua_script")->getID(); break;
-					}
-
-					// Create a small icon
-					ImGui::Image((ImTextureID)iconID, ImVec2(32, 32));
-					ImGui::SameLine();
-
-					std::string assetName = aInfo.name;
-
-					// Draw filename and small info
-					ImGui::Text("%s", assetName.c_str());
-
-				}
-				ImGui::EndGroup();
+				const AssetRecord& aInfo = assets->getInfo(uuid);
+				thumbnail = getAssetThumbnail(aInfo);
+				cardName = aInfo.name;
+				cardTypeLabel = getAssetTypeAsStr(aInfo.aType);
+				cardStripColor = getAssetTypeColor(aInfo.aType);
 			}
 
-			ImVec2 p1 = ImGui::GetItemRectMax();
-			ImVec2 size = ImGui::GetItemRectSize();
+			if (visibleCardCount % columns != 0)
+				ImGui::SameLine();
+			visibleCardCount++;
 
-			tileRects[i] = ImRect(p0, p1);
+			ImGui::PushID(i);
 
-			ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(0, 0, 0, 0));
-			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(0, 0, 0, 0));
-			ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(0, 0, 0, 0));
+			drawAssetCard(thumbnail, cardName, cardTypeLabel, cardStripColor, s_assetViewSelectedIndices.count(i) > 0);
+			tileRects[i] = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
 
-			ImGui::SetCursorScreenPos(p0);
-			ImGui::InvisibleButton(("##tile_" + std::to_string(i)).c_str(), size);
-
-			ImGui::PopStyleColor(3);
-
-			if (ImGui::IsItemHovered() || s_assetViewSelectedIndices.count(i)) {
-				ImGui::GetWindowDrawList()->AddRect(
-					p0, p1,
-					ImGui::GetColorU32(ImGuiCol_HeaderHovered), // border color
-					0.0f,                                       // rounding
-					0,                                          // flags (0 = all corners)
-					3.0f                                        // thickness
-				);
+			if (fMetadata.isDirectory && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+			{
+				cwd.enterFolder(fMetadata.filename);
+				s_assetViewLmbTracking = false;
+				s_assetViewMarqueeDrag = false;
+				earlyTableBreak = true;
+				ImGui::PopID();
+				break;
 			}
-
-			// Restore cursor to where it would have been after the group
-			ImGui::SetCursorScreenPos(p1);
 
 			if (ImGui::IsItemHovered())
 			{
@@ -253,17 +311,20 @@ void AssetViewWindow::display()
 					ImGui::Text("Type: %s", getAssetTypeAsStr(aInfo.aType).c_str());
 					ImGui::Text("Path: %s", aInfo.getScopedPath().scoped().string().c_str());
 					ImGui::Text("UUID: %s", aInfo.uuid.str().c_str());
-					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);				
+					ImGui::Text("Size: (%.1f KB)", fMetadata.fileSize / 1024.0f);
 
+				}
+				else
+				{
+					ImGui::TextUnformatted(fMetadata.filename.c_str());
 				}
 				ImGui::EndTooltip();
 			}
 
-			ImGui::TableNextColumn();
 			ImGui::PopID();
 		}
-		
-		ImGui::EndTable();
+
+		ImGui::PopStyleVar();
 
 		if (!earlyTableBreak)
 		{
