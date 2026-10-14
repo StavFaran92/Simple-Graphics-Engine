@@ -5,7 +5,7 @@
 #include "imgui_stdlib.h"
 #include "ImSequencer.h"
 
-#include "AnimationViewRenderer.h"
+#include "PreviewRenderer.h"
 #include "animation/Animator.h"
 #include "animation/Animation.h"
 #include "component/MeshRendererComponent.h"
@@ -267,6 +267,34 @@ static void displayRightPanel(float w, float h)
     ImGui::EndChild();
 }
 
+// The entity's model and materials, posed by the animation at the given time
+static void buildPreviewDesc(AnimationAssetRef animation, float currentTime, MeshRendererComponent* meshRenderer, PreviewRenderDesc& desc)
+{
+    if (!meshRenderer || meshRenderer->mesh.isEmpty()) return;
+
+    desc.model = meshRenderer->mesh.resource();
+
+    for (const auto& mesh : desc.model->getMeshes())
+    {
+        int matIndex = mesh->getMaterialIndex();
+        desc.materials[matIndex] = meshRenderer->at(matIndex);
+    }
+
+    if (!animation.isEmpty() && !animation.resource().isEmpty())
+    {
+        std::unordered_map<std::string, glm::mat4> intermediateBones;
+        animation.resource()->calculateFinalBoneMatrices(currentTime, intermediateBones);
+
+        desc.boneMatrices = desc.model->getBoneOffsets();
+        for (auto& [boneName, animMat] : intermediateBones)
+        {
+            int id = desc.model->getBoneID(boneName);
+            if (id != -1)
+                desc.boneMatrices[id] = animMat * desc.boneMatrices[id];
+        }
+    }
+}
+
 static void displayViewport(float w, float h)
 {
     ImGui::BeginChild("##av_view", ImVec2(w, h), true);
@@ -277,12 +305,30 @@ static void displayViewport(float w, float h)
 
     if (iw > 0 && ih > 0)
     {
-        static AnimationViewRenderer s_renderer;
+        static PreviewRenderer s_renderer;
+        static TextureResourceRef s_viewTexture;
 
-        s_renderer.resize(iw, ih);
-        s_renderer.render(selectedEntry()->animation, currentTimeTicks(), s_meshRenderer);
+        // Recreate the render target when the viewport size changes
+        if (s_viewTexture.isEmpty() || s_viewTexture->getWidth() != (int)iw || s_viewTexture->getHeight() != (int)ih)
+        {
+            TextureData tData;
+            tData.width          = iw;
+            tData.height         = ih;
+            tData.channels       = 3;
+            tData.internalFormat = TextureInternalFormat::RGB;
+            tData.format         = TextureFormat::RGB;
+            tData.type           = TextureType::UNSIGNED_BYTE;
+            tData.filter         = TextureFilter::Linear;
+            tData.wrap           = TextureWrap::Clamp;
+            s_viewTexture = Texture::createTexture(tData);
+        }
 
-        uint32_t texID = s_renderer.getColorTextureID();
+        PreviewRenderDesc desc;
+        buildPreviewDesc(selectedEntry()->animation, currentTimeTicks(), s_meshRenderer, desc);
+
+        s_renderer.render(desc, s_viewTexture);
+
+        uint32_t texID = s_viewTexture.isEmpty() ? 0 : s_viewTexture->getID();
         if (texID)
             ImGui::Image(reinterpret_cast<ImTextureID>(texID), avail, ImVec2(0,1), ImVec2(1,0));
         else

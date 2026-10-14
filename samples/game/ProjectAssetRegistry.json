@@ -1365,17 +1365,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1401,6 +1390,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -1687,17 +1687,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1723,6 +1712,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -2009,17 +2009,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2045,6 +2034,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -2625,17 +2625,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2661,6 +2650,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -2947,6 +2947,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2972,17 +2983,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -3269,6 +3269,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3294,17 +3305,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -3591,6 +3591,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3616,17 +3627,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -3913,6 +3913,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3938,17 +3949,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -5711,13 +5711,13 @@
         "DefaultMaterial": 126,
         "Erika Archer (2)": 33,
         "Erika Archer (2)_PREFAB": 50,
-        "Erika_Archer_Clothes_diffuse": 35,
-        "Erika_Archer_Clothes_normal": 36,
+        "Erika_Archer_Clothes_diffuse": 45,
+        "Erika_Archer_Clothes_normal": 46,
         "EyeSpec_MAT": 40,
         "Fast Run (2)": 52,
-        "FemaleFitA_Body_diffuse": 38,
-        "FemaleFitA_StdNM": 39,
-        "FemaleFitA_eyelash_diffuse": 44,
+        "FemaleFitA_Body_diffuse": 47,
+        "FemaleFitA_StdNM": 48,
+        "FemaleFitA_eyelash_diffuse": 49,
         "GetHurt": 91,
         "Ground037_2K-PNG_AmbientOcclusion": 24,
         "Ground037_2K-PNG_Color": 21,
@@ -5734,7 +5734,7 @@
         "Mutant": 54,
         "Mutant_PREFAB": 60,
         "Mutant_diffuse": 56,
-        "Mutant_normal": 57,
+        "Mutant_normal": 59,
         "New Material": 124,
         "SGE_MATERIAL_DEFAULT": 7,
         "SGE_MATERIAL_TERRAIN_DEFAULT": 8,
@@ -5788,8 +5788,8 @@
         "fISsTyQE": 27,
         "gen_enemies": 93,
         "iHy45YLv": 29,
-        "maria_diffuse": 84,
-        "maria_normal": 85,
+        "maria_diffuse": 86,
+        "maria_normal": 87,
         "mutant_M": 55,
         "player_controller": 32,
         "sunflowers_puresky_4k": 26,
@@ -5815,14 +5815,14 @@
         "content/erika archer (2)/body_mat.mat": 37,
         "content/erika archer (2)/erika archer (2).model": 33,
         "content/erika archer (2)/erika archer (2)_prefab.prefab": 50,
-        "content/erika archer (2)/erika_archer_clothes_diffuse.texture": 35,
-        "content/erika archer (2)/erika_archer_clothes_normal.texture": 36,
+        "content/erika archer (2)/erika_archer_clothes_diffuse.texture": 45,
+        "content/erika archer (2)/erika_archer_clothes_normal.texture": 46,
         "content/erika archer (2)/eyelash_mat.mat": 43,
         "content/erika archer (2)/eyespec_mat.mat": 40,
         "content/erika archer (2)/fast run (2).anim": 52,
-        "content/erika archer (2)/femalefita_body_diffuse.texture": 38,
-        "content/erika archer (2)/femalefita_eyelash_diffuse.texture": 44,
-        "content/erika archer (2)/femalefita_stdnm.texture": 39,
+        "content/erika archer (2)/femalefita_body_diffuse.texture": 47,
+        "content/erika archer (2)/femalefita_eyelash_diffuse.texture": 49,
+        "content/erika archer (2)/femalefita_stdnm.texture": 48,
         "content/erika archer (2)/idle (1).anim": 53,
         "content/erika archer (2)/jump (2).anim": 51,
         "content/erika archer (2)/player_controller.lua": 32,
@@ -5832,7 +5832,7 @@
         "content/mutant/mutant.model": 54,
         "content/mutant/mutant_diffuse.texture": 56,
         "content/mutant/mutant_m.mat": 55,
-        "content/mutant/mutant_normal.texture": 57,
+        "content/mutant/mutant_normal.texture": 59,
         "content/mutant/mutant_prefab.prefab": 60,
         "content/new folder/ground037_2k-png_ambientocclusion.texture": 24,
         "content/new folder/ground037_2k-png_color.texture": 21,
@@ -5849,8 +5849,8 @@
         "content/sunflowers_puresky_4k.texture": 26,
         "content/warrior/animationrelay.lua": 90,
         "content/warrior/warrior/gethurt.anim": 91,
-        "content/warrior/warrior/maria_diffuse.texture": 84,
-        "content/warrior/warrior/maria_normal.texture": 85,
+        "content/warrior/warrior/maria_diffuse.texture": 86,
+        "content/warrior/warrior/maria_normal.texture": 87,
         "content/warrior/warrior/mariamat.mat": 83,
         "content/warrior/warrior/sword and shield slash.anim": 89,
         "content/warrior/warrior/warrior.model": 82,

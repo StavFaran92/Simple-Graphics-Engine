@@ -1,7 +1,5 @@
-#include "AnimationViewRenderer.h"
+#include "PreviewRenderer.h"
 
-#include "animation/Animator.h"
-#include "animation/Animation.h"
 #include "geometry/Model.h"
 #include "geometry/Mesh.h"
 #include "render/Shader.h"
@@ -9,76 +7,54 @@
 #include "texture/Texture.h"
 #include "core/Logger.h"
 #include "core/ApplicationConstants.h"
-#include "component/MeshRendererComponent.h"
 #include "memory/BuiltInAssets.h"
 #include "render/Graphics.h"
 
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-AnimationViewRenderer::AnimationViewRenderer()
+PreviewRenderer::PreviewRenderer()
 {
     m_shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/PBRShader.glsl");
 }
 
-void AnimationViewRenderer::resize(uint32_t width, uint32_t height)
+bool PreviewRenderer::render(const PreviewRenderDesc& desc, const TextureResourceRef& target)
 {
-    if (width == m_width && height == m_height) return;
-    m_width  = width;
-    m_height = height;
+    if (target.isEmpty() || !m_shader) return false;
+    if (desc.model.isEmpty()) return false;
 
-    // Color texture
-    TextureData tData;
-    tData.width          = width;
-    tData.height         = height;
-    tData.channels       = 3;
-    tData.internalFormat = TextureInternalFormat::RGB;
-    tData.format = TextureFormat::RGB;
-    tData.type = TextureType::UNSIGNED_BYTE;
-    tData.filter         = TextureFilter::Linear;
-    tData.wrap           = TextureWrap::Clamp;
-    m_colorTexture = Texture::createTexture(tData);
+    const int width  = target->getWidth();
+    const int height = target->getHeight();
+    if (width <= 0 || height <= 0) return false;
 
-    // Depth RBO
-    m_rbo = RenderBufferObject((int)width, (int)height);
+    auto graphics = Engine::get()->getSubSystem<Graphics>();
 
-    // FBO
+    const ModelResourceRef& model = desc.model;
+
+    // Depth RBO follows the target size
+    if (width != m_depthWidth || height != m_depthHeight)
+    {
+        m_rbo = RenderBufferObject(width, height);
+        m_depthWidth  = width;
+        m_depthHeight = height;
+    }
+
     m_fbo.bind();
-    m_fbo.attachTexture(m_colorTexture->getID());
+    m_fbo.attachTexture(target->getID());
     m_fbo.attachRenderBuffer(m_rbo.GetID(), FrameBufferObject::AttachmentType::Depth_Stencil);
 
     if (!m_fbo.isComplete())
     {
-        logError("AnimationViewRenderer: FBO is not complete!");
+        logError("PreviewRenderer: FBO is not complete, target texture may not be color-renderable");
         m_fbo.unbind();
-        return;
+        return false;
     }
 
-    m_fbo.unbind();        
-
-    m_view       = glm::lookAt(glm::vec3(50.f, 50.f, 0.f),
-                               glm::vec3(0.f, 1.f,  0.f),
-                               glm::vec3(0.f, 1.f,  0.f));
-    m_projection = glm::perspective(glm::radians(45.f),
-                                    (float)width / (float)height,
-                                    0.1f, 100.f);
-}
-
-void AnimationViewRenderer::render(AnimationAssetRef animation, float currentTime, MeshRendererComponent* meshRendererComponent)
-{
-    if (m_colorTexture.isEmpty() || !m_shader) return;
-    if (!meshRendererComponent) return;
-
-    auto graphics = Engine::get()->getSubSystem<Graphics>();
-
-    auto model = meshRendererComponent->mesh;
-
-    std::string captionGPU = "Animation Preview";
+    std::string captionGPU = "Preview Render";
     glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, captionGPU.c_str());
 
-    m_fbo.bind();
-    glViewport(0, 0, (int)m_width, (int)m_height);
-    glClearColor(0.15f, 0.15f, 0.15f, 1.f);
+    glViewport(0, 0, width, height);
+    glClearColor(desc.clearColor.r, desc.clearColor.g, desc.clearColor.b, desc.clearColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -88,7 +64,7 @@ void AnimationViewRenderer::render(AnimationAssetRef animation, float currentTim
     {
         glm::vec3 aabbMin( 1e9f);
         glm::vec3 aabbMax(-1e9f);
-        for (const auto& mesh : model.resource()->getMeshes())
+        for (const auto& mesh : model->getMeshes())
         {
             AABB bb = mesh->getAABB();
             aabbMin = glm::min(aabbMin, bb.getMin());
@@ -104,10 +80,19 @@ void AnimationViewRenderer::render(AnimationAssetRef animation, float currentTim
         glm::vec3 dir  = glm::normalize(glm::vec3(1.f, 0.3f, 1.f));
         glm::vec3 eye  = center + dir * dist;
         m_view         = glm::lookAt(eye, center, glm::vec3(0.f, 1.f, 0.f));
-        m_projection   = glm::perspective(fovY, (float)m_width / (float)m_height,
+        m_projection   = glm::perspective(fovY, (float)width / (float)height,
                                           radius * 0.01f, dist * 4.f);
         cameraPos = eye;
+
+        if (desc.flipY)
+            m_projection = glm::scale(glm::mat4(1.f), glm::vec3(1.f, -1.f, 1.f)) * m_projection;
     }
+
+    // Mirroring flips triangle winding; swap the front face so culling keeps working
+    GLint prevFrontFace = GL_CCW;
+    glGetIntegerv(GL_FRONT_FACE, &prevFrontFace);
+    if (desc.flipY)
+        glFrontFace(prevFrontFace == GL_CCW ? GL_CW : GL_CCW);
 
     m_shader->use();
     m_shader->setViewMatrix(m_view);
@@ -121,21 +106,10 @@ void AnimationViewRenderer::render(AnimationAssetRef animation, float currentTim
     m_shader->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 8);
     m_shader->setUniformValue("cameraPos", cameraPos);
 
-    if (!animation.isEmpty() && !animation.resource().isEmpty())
+    if (!desc.boneMatrices.empty())
     {
-        std::unordered_map<std::string, glm::mat4> intermediateBones;
-        animation.resource()->calculateFinalBoneMatrices(currentTime, intermediateBones);
-
-        auto boneMatrices = model.resource()->getBoneOffsets();
-        for (auto& [boneName, animMat] : intermediateBones)
-        {
-            int id = model.resource()->getBoneID(boneName);
-            if (id != -1)
-                boneMatrices[id] = animMat * boneMatrices[id];
-        }
-
-        for (int i = 0; i < (int)boneMatrices.size(); ++i)
-            m_shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", boneMatrices[i]);
+        for (int i = 0; i < (int)desc.boneMatrices.size(); ++i)
+            m_shader->setUniformValue("finalBonesMatrices[" + std::to_string(i) + "]", desc.boneMatrices[i]);
 
         m_shader->setUniformValue("isAnimated", true);
     }
@@ -144,10 +118,12 @@ void AnimationViewRenderer::render(AnimationAssetRef animation, float currentTim
         m_shader->setUniformValue("isAnimated", false);
     }
 
-    for (const auto& mesh : model.resource()->getMeshes())
+    for (const auto& mesh : model->getMeshes())
     {
-        auto matIndex = mesh->getMaterialIndex();
-        auto materialResource = meshRendererComponent->at(matIndex);
+        MaterialResourceRef materialResource;
+        auto iter = desc.materials.find(mesh->getMaterialIndex());
+        if (iter != desc.materials.end())
+            materialResource = iter->second;
 
         if(materialResource.isEmpty())
             materialResource = BuiltInAssets::getByName<MaterialAsset>(SGE_MATERIAL_DEFAULT).resource();
@@ -171,13 +147,10 @@ void AnimationViewRenderer::render(AnimationAssetRef animation, float currentTim
         RenderCommand::draw(mesh->getVAO());
     }
 
+    glFrontFace(prevFrontFace);
+
     glPopDebugGroup();
 
     m_fbo.unbind();
-}
-
-uint32_t AnimationViewRenderer::getColorTextureID() const
-{
-    if (m_colorTexture.isEmpty()) return 0;
-    return m_colorTexture->getID();
+    return true;
 }

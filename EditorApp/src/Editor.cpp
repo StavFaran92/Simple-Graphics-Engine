@@ -30,6 +30,9 @@
 #include "SceneHierarchyWindow.h"
 #include "SceneViewWindow.h"
 #include "menus/CreateMenu.h"
+#include "Thumbnails/ThumbnailCache.h"
+#include "Thumbnails/TextureThumbnailGenerator.h"
+#include "Thumbnails/MaterialThumbnailGenerator.h"
 
 
 #include "ImguiHandler.h"
@@ -588,6 +591,9 @@ class GUI_Helper : public GuiMenu {
             ImGui::DockBuilderFinish(dockspace_id);
 		}
 
+		// Before any window draws: evicts stale thumbnails and generates a few pending ones
+		ThumbnailCache::Instance().update();
+
 		// Render UI
 		RenderSimulationControlView();
 		SceneViewWindow::display();
@@ -769,6 +775,9 @@ public:
 		icons["prefab"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png");
 		icons["material"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-material-100.png");
 		icons["lua_script"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-file-100.png");
+
+		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::TEXTURE, std::make_unique<TextureThumbnailGenerator>());
+		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::MATERIAL, std::make_unique<MaterialThumbnailGenerator>());
 	}
 
 	void update(float deltaTime) override

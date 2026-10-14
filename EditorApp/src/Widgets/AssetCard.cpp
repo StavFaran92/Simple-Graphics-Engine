@@ -1,6 +1,7 @@
 #include "AssetCard.h"
 
 #include "Common.h"
+#include "Thumbnails/ThumbnailCache.h"
 
 #include <algorithm>
 
@@ -49,6 +50,11 @@ ImU32 AssetCard::getTypeColor(AssetType aType)
 
 ImTextureID AssetCard::getThumbnail(const AssetRecord& aInfo)
 {
+	ImTextureID thumbnail = ThumbnailCache::Instance().get(aInfo);
+	if (thumbnail)
+		return thumbnail;
+
+	// No generated thumbnail (yet), use the type icon
 	unsigned int iconID = 0;
 	switch (aInfo.aType) {
 	case AssetType::MODEL:      iconID = icons.at("model")->getID(); break;

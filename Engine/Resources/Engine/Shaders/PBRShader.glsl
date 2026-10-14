@@ -208,7 +208,7 @@ void main()
 		MRA.b, 
 		cameraPos, 
 		fs_in.fragPos,
-		1.f,
+		0.f,
 		gPrefilterEnvMap, 
 		gIrradianceMap, 
 		gBRDFIntegrationLUT);

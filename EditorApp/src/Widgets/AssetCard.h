@@ -15,7 +15,7 @@ public:
 	static ImVec2 getSize();
 	static ImU32 getTypeColor(AssetType aType);
 
-	// For now every asset uses its type icon; real thumbnails will plug in here
+	// Generated thumbnail from ThumbnailCache, or the type icon until one is ready
 	static ImTextureID getThumbnail(const AssetRecord& aInfo);
 
 	// Submits an invisible button the size of a card at the cursor and draws the card over it.

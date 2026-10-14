@@ -1,6 +1,7 @@
 #include "MaterialEditDialog.h"
 
 #include "EditorState.h"
+#include "Thumbnails/ThumbnailCache.h"
 
 MaterialEditDialog::MaterialEditDialog()
 	: DialogBase("MaterialEditDialog")
@@ -26,6 +27,7 @@ void MaterialEditDialog::drawContent()
 
 	static auto onChangedCB = [](const MaterialData&) {
 		EditorState::Instance().selectedMaterialForEdit.makeDirty();
+		ThumbnailCache::Instance().invalidate(EditorState::Instance().selectedMaterialForEdit.getUID());
 	};
 
 	m_materialData.draw(mat->data, onChangedCB);
@@ -44,5 +46,6 @@ void MaterialEditDialog::cancelContent()
 	{
 		mat->data = m_previousMaterialData;
 		mat.makeDirty();
+		ThumbnailCache::Instance().invalidate(mat.getUID());
 	}
 }

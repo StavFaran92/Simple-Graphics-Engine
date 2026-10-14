@@ -2,7 +2,7 @@
 
 #include "runtime/Entity.h"
 #include "memory/AssetAliases.h"
-#include "AnimationViewRenderer.h"
+#include "PreviewRenderer.h"
 
 class AnimationViewerWindow
 {

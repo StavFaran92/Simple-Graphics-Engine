@@ -2,6 +2,8 @@
 
 #include "EditorState.h"
 #include "Widgets.h"
+#include "Thumbnails/ThumbnailCache.h"
+#include "Widgets/AssetCard.h"
 
 #include <fstream>
 #include <sstream>
@@ -156,8 +158,14 @@ void AssetInspectorWindow::display()
 	}
 
 	const AssetRecord& info = currentAssetEdit.info();
+
+	// Thumbnail (or type icon until one is ready) beside the name and type
+	ImGui::Image(AssetCard::getThumbnail(info), ImVec2(AssetCard::Width, AssetCard::Width));
+	ImGui::SameLine();
+	ImGui::BeginGroup();
 	ImGui::Text("Name: %s", info.name.c_str());
 	ImGui::Text("Type: %s", getAssetTypeAsStr(info.aType).c_str());
+	ImGui::EndGroup();
 	ImGui::Separator();
 
 	switch (info.aType)
@@ -175,9 +183,6 @@ void AssetInspectorWindow::display()
 		if (!texRes.isEmpty())
 		{
 			const TextureData& data = texRes->getData();
-			ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(texRes->getID()));
-			ImGui::Image(texID, ImVec2(128, 128));
-			ImGui::Separator();
 			ImGui::Text("Size: %d x %d", data.width, data.height);
 			ImGui::Text("Channels: %d", data.channels);
 			ImGui::Text("Target: %s", textureTargetToString(data.target));
@@ -203,6 +208,7 @@ void AssetInspectorWindow::display()
 		static MaterialDataWidget materialWidget;
 		materialWidget.draw(material->data, [](const MaterialData&) {
 			material.makeDirty();
+			ThumbnailCache::Instance().invalidate(material.getUID());
 		});
 		break;
 	}

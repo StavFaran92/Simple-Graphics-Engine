@@ -8,6 +8,7 @@
 #include <vector>
 #include "menus/CreateMenu.h"
 #include "Widgets/AssetCard.h"
+#include "Thumbnails/ThumbnailCache.h"
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -321,6 +322,7 @@ void AssetViewWindow::display()
 						{
 							UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
 							Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
+							ThumbnailCache::Instance().invalidate(uuid);
 						}
 					}
 
@@ -349,6 +351,7 @@ void AssetViewWindow::display()
 							UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
 							auto& asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 							asset.erase();
+							ThumbnailCache::Instance().invalidate(uuid);
 
 							// Drop the selection so nothing keeps referencing the deleted asset
 							s_assetViewSelectedIndices.clear();
