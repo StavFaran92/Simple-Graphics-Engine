@@ -301,21 +301,34 @@ void LightCreatorWindow()
 
 void RenderConsoleWindow()
 {
-        ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus |
+        static bool s_consoleWasVisible = false;
+
+        // Returns false while the console tab is hidden behind another docked tab
+        const bool visible = ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus |
 											ImGuiWindowFlags_NoCollapse |
 											ImGuiWindowFlags_NoFocusOnAppearing |
 											ImGuiWindowFlags_NoTitleBar |
 											ImGuiWindowFlags_NoMove);
 
-        std::lock_guard<std::mutex> lock(g_consoleMutex);
-        for (const auto& line : g_consoleLog)
+        // Jump to the most recent message whenever the console becomes visible
+        const bool justBecameVisible = visible && !s_consoleWasVisible;
+        s_consoleWasVisible = visible;
+
+        if (visible)
         {
-            ImGui::TextColored(LogLevelToColor(line.level), line.msg.c_str());
-        }
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY() || g_scrollConsole)
-        {
-            ImGui::SetScrollHereY(1.0f);
-            g_scrollConsole = false;
+            // Stick to the bottom unless the user scrolled up; check before submitting new lines
+            const bool atBottom = ImGui::GetScrollY() >= ImGui::GetScrollMaxY() - 1.0f;
+
+            std::lock_guard<std::mutex> lock(g_consoleMutex);
+            for (const auto& line : g_consoleLog)
+            {
+                ImGui::TextColored(LogLevelToColor(line.level), "%s", line.msg.c_str());
+            }
+            if (atBottom || justBecameVisible || g_scrollConsole)
+            {
+                ImGui::SetScrollHereY(1.0f);
+                g_scrollConsole = false;
+            }
         }
 
         ImGui::End();
@@ -572,7 +585,9 @@ class GUI_Helper : public GuiMenu {
 			ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
 
 			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
+			ImGuiID dock_id_left_bottom = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.5f, nullptr, &dock_id_left);
 			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+			ImGuiID dock_id_right_bottom = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.25f, nullptr, &dock_id_right);
 			ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id);
 			ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.05f, nullptr, &dockspace_id);
 
@@ -583,7 +598,8 @@ class GUI_Helper : public GuiMenu {
 
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
 			ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-			ImGui::DockBuilderDockWindow("AssetInspector", dock_id_right);
+			ImGui::DockBuilderDockWindow("Debug Info", dock_id_right_bottom);
+			ImGui::DockBuilderDockWindow("AssetInspector", dock_id_left_bottom);
             ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
             ImGui::DockBuilderDockWindow("Console", dock_id_bottom);
             ImGui::DockBuilderDockWindow("Simulation Controls", dock_id_top);
