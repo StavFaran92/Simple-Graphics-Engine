@@ -12,7 +12,6 @@
 #include "Dialogs/SceneCreateDialog.h"
 #include "Dialogs/ScriptSelectDialog.h"
 #include "Dialogs/EntitySelectDialog.h"
-#include "Dialogs/TextureSelectDialog.h"
 #include "Dialogs/TextureCreateDialog.h"
 #include "Dialogs/ShaderCreateDialog.h"
 #include "Dialogs/LuaScriptCreateDialog.h"
@@ -38,7 +37,6 @@ public:
     SceneCreateDialog sceneCreateDialog;
     ScriptSelectDialog scriptSelectDialog;
     EntitySelectDialog entitySelectDialog;
-    TextureSelectDialog textureSelectDialog;
     TextureCreateDialog textureCreateDialog;
     ShaderCreateDialog shaderCreateDialog;
     LuaScriptCreateDialog luaScriptCreateDialog;

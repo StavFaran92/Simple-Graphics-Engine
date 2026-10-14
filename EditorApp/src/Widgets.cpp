@@ -20,8 +20,9 @@ void addTextureEditWidget(const std::string& name, TextureAssetRef texture, ImVe
 
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texID), size))
 	{
-		DialogManager::Instance().textureSelectDialog.onAcceptCB = callback;
-		DialogManager::Instance().textureSelectDialog.activate();
+		DialogManager::Instance().assetSelectDialog.assetType = AssetType::TEXTURE;
+		DialogManager::Instance().assetSelectDialog.onAccpetCB = callback;
+		DialogManager::Instance().assetSelectDialog.activate();
 	}
 
 	ImGui::PopID();

@@ -1,6 +1,7 @@
 #include "AssetSelectDialog.h"
 #include "EditorState.h"
 #include "imgui.h"
+#include "Widgets/AssetCard.h"
 
 AssetSelectDialog::AssetSelectDialog() :
 	DialogBase("AssetSelectDialog")
@@ -26,46 +27,56 @@ void AssetSelectDialog::appearContent()
 
 void AssetSelectDialog::drawContent()
 {
-	
+	// The dialog auto-resizes, so the grid gets a fixed size region instead of taking the window width
+	const int visibleColumns = 5;
+	const int visibleRows = 3;
+	const ImVec2 cardSize = AssetCard::getSize();
+	const ImGuiStyle& style = ImGui::GetStyle();
+	const ImVec2 regionSize(
+		visibleColumns * (cardSize.x + AssetCard::Spacing) - AssetCard::Spacing + style.WindowPadding.x * 2.0f + style.ScrollbarSize,
+		visibleRows * (cardSize.y + AssetCard::Spacing) - AssetCard::Spacing + style.WindowPadding.y * 2.0f);
+
+	ImGui::BeginChild("AssetSelectGrid", regionSize, true);
+
+	if (currentDisplayedAssetList.empty())
+		ImGui::TextDisabled("No %s assets found", getAssetTypeAsStr(assetType).c_str());
+
+	AssetCardGrid grid;
+	grid.begin();
 
 	for (int i = 0; i < currentDisplayedAssetList.size(); i++)
 	{
-		ImVec2 cursorStart = ImGui::GetCursorScreenPos();
-		ImVec2 totalSize = ImVec2(ImGui::GetContentRegionAvail().x, 0);
+		const AssetRecord& aInfo = currentDisplayedAssetList[i];
 
+		grid.next();
+		ImGui::PushID(i);
 
+		AssetCard::draw(aInfo, selectedAssetIndex == i);
 
-		bool isSelected = (selectedAssetIndex == i);
-
-
-		// Draw normal part
-		ImGui::TextUnformatted(currentDisplayedAssetList[i].name.c_str());
-		ImGui::SameLine();
-
-		// Draw gray part
-		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255));
-		std::string grayText = "(" + currentDisplayedAssetList[i].getScopedPath().scoped().string() + ")";
-		ImGui::TextUnformatted(grayText.c_str());
-
-		ImGui::PopStyleColor();
-
-		std::string fullText;
-		if (isSelected)
-		{
-			fullText = currentDisplayedAssetList[i].name + grayText;
-		}
-		else
-		{
-			fullText = "##select_" + std::to_string(i);
-		}
-
-		// Create invisible selectable
-		ImGui::SetCursorScreenPos(cursorStart);
-		bool selected = ImGui::Selectable(fullText.c_str(), isSelected, ImGuiSelectableFlags_DontClosePopups, totalSize);
-		if (selected) {
+		if (ImGui::IsItemClicked())
 			selectedAssetIndex = i;
+
+		// Double click picks the asset right away, same as selecting it and pressing OK
+		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+		{
+			selectedAssetIndex = i;
+			accept();
 		}
+
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::TextUnformatted(aInfo.name.c_str());
+			ImGui::TextDisabled("%s", aInfo.getScopedPath().scoped().string().c_str());
+			ImGui::EndTooltip();
+		}
+
+		ImGui::PopID();
 	}
+
+	grid.end();
+
+	ImGui::EndChild();
 }
 
 bool AssetSelectDialog::acceptContent()

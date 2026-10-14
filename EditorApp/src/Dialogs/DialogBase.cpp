@@ -21,10 +21,7 @@ void DialogBase::footer()
 
 	if (ImGui::Button("OK", ImVec2(120, 0)))
 	{
-		if (acceptContent())
-		{
-			EditorState::Instance().setState(m_label, false);
-		}
+		accept();
 	}
 	ImGui::SameLine();
 
@@ -40,6 +37,14 @@ void DialogBase::footer()
 void DialogBase::activate()
 {
 	EditorState::Instance().setState(m_label, true);
+}
+
+void DialogBase::accept()
+{
+	if (acceptContent())
+	{
+		EditorState::Instance().setState(m_label, false);
+	}
 }
 
 void DialogBase::draw()

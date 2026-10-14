@@ -15,6 +15,9 @@ public:
 	void display();
 
 protected:
+	// Same as pressing OK: closes the dialog if acceptContent() succeeds
+	void accept();
+
 	virtual void appearContent() = 0;
 	virtual void drawContent() = 0;
 	virtual bool acceptContent() = 0;
