@@ -417,15 +417,15 @@
                                     },
                                     "m_children": [
                                         {
-                                            "key": 1048578,
-                                            "value": {
-                                                "m_entity": 1048578
-                                            }
-                                        },
-                                        {
                                             "key": 2097162,
                                             "value": {
                                                 "m_entity": 2097162
+                                            }
+                                        },
+                                        {
+                                            "key": 1048578,
+                                            "value": {
+                                                "m_entity": 1048578
                                             }
                                         },
                                         {
@@ -1072,15 +1072,15 @@
                                     },
                                     "refs": [
                                         {
-                                            "key": "cameraPivot",
-                                            "value": {
-                                                "m_entity": 8
-                                            }
-                                        },
-                                        {
                                             "key": "model",
                                             "value": {
                                                 "m_entity": 15
+                                            }
+                                        },
+                                        {
+                                            "key": "cameraPivot",
+                                            "value": {
+                                                "m_entity": 8
                                             }
                                         },
                                         {
@@ -1394,7 +1394,7 @@
                                             "key": 1,
                                             "value": {
                                                 "uuid": {
-                                                    "m_value": 64
+                                                    "m_value": 67
                                                 }
                                             }
                                         },

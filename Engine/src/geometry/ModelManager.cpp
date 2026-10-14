@@ -43,11 +43,12 @@ bool ModelTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, Impor
 		textureNode.name = tData.textureName;
 		textureNode.assetDesc.aType = AssetType::TEXTURE;
 		textureNode.assetDesc.name = tData.textureName;
+		textureNode.importKey = "TEXTURE_" + tData.textureName;
 		auto textureResourceDesc = textureNode.emplaceCreateDesc<TextureCreateDescriptor>();
 		textureResourceDesc->textureData = tData;
-		
+
 		// Store texture node - we'll add it to material dependencies
-		result.dependencies["TEXTURE_" + tData.textureName] = textureNode;
+		result.dependencies[textureNode.importKey] = textureNode;
 	}
 
 	// Build texture dependency nodes (external textures)
@@ -59,10 +60,11 @@ bool ModelTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, Impor
 		textureNode.assetDesc.aType = AssetType::TEXTURE;
 		textureNode.assetDesc.name = textureNode.name;
 		textureNode.creationType = CreationType::Import;
+		textureNode.importKey = "TEXTURE_" + texturePath;
 		auto texLoadDesc = textureNode.emplaceLoadDesc<TextureLoadDescriptor>();
 		texLoadDesc->sourcePath = texturePath;
-		
-		result.dependencies["TEXTURE_" + texturePath] = textureNode;
+
+		result.dependencies[textureNode.importKey] = textureNode;
 	}
 
 	// Build material dependency nodes with texture dependencies
@@ -73,6 +75,8 @@ bool ModelTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, Impor
 		materialNode.name = mData.name;
 		materialNode.assetDesc.aType = AssetType::MATERIAL;
 		materialNode.assetDesc.name = mData.name;
+		// Several slots can use the same material; it's created once and bound to each slot
+		materialNode.importKey = "MATERIAL_" + mData.name;
 		auto materialResourceDesc = materialNode.emplaceCreateDesc<MaterialCreateDescriptor>();
 		materialResourceDesc->data = mData;
 

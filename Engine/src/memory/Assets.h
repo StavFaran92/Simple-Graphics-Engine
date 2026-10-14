@@ -69,7 +69,9 @@ private:
 
 	AssetRef<Asset> createAssetsFromImportNode(const ImportNode& node, const AssetBuildDescriptor& rootDesc);
 
-	AssetRef<Asset> createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc);
+	// createdByKey holds assets already created in this import, by ImportNode::importKey, so shared nodes are created once
+	AssetRef<Asset> createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc,
+		std::unordered_map<std::string, AssetRef<Asset>>& createdByKey);
 
 	void updateRegistry(const AssetRecord& aInfo);
 

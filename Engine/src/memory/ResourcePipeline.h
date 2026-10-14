@@ -29,6 +29,10 @@ struct ImportNode
     CreationType creationType = CreationType::Create;
     int index = 0;
 
+	// Nodes with the same non-empty key are created once per import and shared,
+	// e.g. a texture referenced by several materials
+	std::string importKey;
+
 	std::shared_ptr<ResourceBuildDescriptor> createDesc;
 	std::shared_ptr<ResourceLoadDescriptor>   loadDesc;
 

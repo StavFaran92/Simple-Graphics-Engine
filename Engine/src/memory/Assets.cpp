@@ -398,7 +398,8 @@ AssetRef<Asset> Assets::importAsset(AssetBuildDescriptor& desc, ResourceLoadDesc
 		desc.assetDirectory = desc.name;
 	}
 
-	AssetRef<Asset> handle = createAssetAndChildrenFromNodeRecursive(importNode, desc);
+	std::unordered_map<std::string, AssetRef<Asset>> createdByKey;
+	AssetRef<Asset> handle = createAssetAndChildrenFromNodeRecursive(importNode, desc, createdByKey);
 
 	if (handle.isEmpty())
 	{
@@ -491,8 +492,17 @@ AssetRef<Asset> Assets::createAssetsFromImportNode(const ImportNode& node, const
 	return created;
 }
 
-AssetRef<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc)
+AssetRef<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode& node, const AssetBuildDescriptor& rootDesc,
+	std::unordered_map<std::string, AssetRef<Asset>>& createdByKey)
 {
+	// Shared node already created in this import (e.g. a texture used by several materials), bind that one
+	if (!node.importKey.empty())
+	{
+		auto iter = createdByKey.find(node.importKey);
+		if (iter != createdByKey.end())
+			return iter->second;
+	}
+
 	// 1) Create this node
 	AssetRef<Asset> created = createAssetsFromImportNode(node, rootDesc);
 
@@ -502,10 +512,13 @@ AssetRef<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode
 		return AssetRef<Asset>::empty;
 	}
 
+	if (!node.importKey.empty())
+		createdByKey[node.importKey] = created;
+
 	// 2) Recursively create and bind dependencies
 	for (const auto& [slotName, childNode] : node.dependencies)
 	{
-		AssetRef<Asset> child = createAssetAndChildrenFromNodeRecursive(childNode, rootDesc);
+		AssetRef<Asset> child = createAssetAndChildrenFromNodeRecursive(childNode, rootDesc, createdByKey);
 
 		if (child.isEmpty())
 		{
