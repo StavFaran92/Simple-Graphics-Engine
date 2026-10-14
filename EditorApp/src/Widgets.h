@@ -17,7 +17,9 @@ void displayTextureWidget();
 
 void displayColoredLabelWidget(const char* label);
 
-bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& onAccpetCB);
+// Button-sized asset slot: thumbnail + name when set, a dashed stencil of the expected type when empty.
+// Clicking it opens the asset select dialog. Returns true when clicked.
+bool addAssetSelectWidget(const char* id, UUID current, AssetType aType, const std::function<void(UUID)>& onAccpetCB);
 void addEntitySelectWidget(const std::string& label, Entity current, const std::function<void(Entity)>& onAcceptCB);
 
 class MaterialDataWidget

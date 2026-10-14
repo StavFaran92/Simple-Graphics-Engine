@@ -7,6 +7,12 @@
 #include "DialogManager.h"
 #include "render/MaterialData.h"
 #include "render/TerrainLayer.h"
+#include "Common.h"
+#include "Widgets/AssetCard.h"
+#include "imgui_internal.h"
+
+#include <algorithm>
+#include <cmath>
 
 void addTextureEditWidget(const std::string& name, TextureAssetRef texture, ImVec2 size, std::function<void(UUID uuid)> callback)
 {
@@ -144,18 +150,153 @@ void addEntitySelectWidget(const std::string& label, Entity current, const std::
 	ImGui::PopID();
 }
 
-bool addAssetSelectWidget(const std::string& name, AssetType aType, const std::function<void(UUID)>& onAccpetCB)
-{
-	float width = ImGui::GetContentRegionAvail().x;
+namespace {
 
-	if (ImGui::Button(name.c_str(), ImVec2(width, 0)))
+ImTextureID getAssetTypeIcon(AssetType aType)
+{
+	const char* key = nullptr;
+	switch (aType) {
+	case AssetType::MODEL:      key = "model"; break;
+	case AssetType::TEXTURE:    key = "texture"; break;
+	case AssetType::ANIMATION:  key = "animation"; break;
+	case AssetType::SHADER:     key = "shader"; break;
+	case AssetType::PREFAB:     key = "prefab"; break;
+	case AssetType::MATERIAL:   key = "material"; break;
+	case AssetType::LUA_SCRIPT: key = "lua_script"; break;
+	default: return nullptr;
+	}
+	return (ImTextureID)(intptr_t)icons.at(key)->getID();
+}
+
+// Dashed outline, the "stencil" drawn for an empty asset slot
+void addDashedRect(ImDrawList* dl, ImVec2 min, ImVec2 max, ImU32 color, float dash = 4.0f, float gap = 3.0f)
+{
+	auto dashedLine = [&](ImVec2 from, ImVec2 to) {
+		const float dx = to.x - from.x;
+		const float dy = to.y - from.y;
+		const float length = std::sqrt(dx * dx + dy * dy);
+		if (length <= 0.0f)
+			return;
+
+		for (float t = 0.0f; t < length; t += dash + gap)
+		{
+			const float a = t / length;
+			const float b = std::min(t + dash, length) / length;
+			dl->AddLine(ImVec2(from.x + dx * a, from.y + dy * a), ImVec2(from.x + dx * b, from.y + dy * b), color);
+		}
+	};
+
+	dashedLine(min, ImVec2(max.x, min.y));
+	dashedLine(ImVec2(max.x, min.y), max);
+	dashedLine(max, ImVec2(min.x, max.y));
+	dashedLine(ImVec2(min.x, max.y), min);
+}
+
+} // namespace
+
+bool addAssetSelectWidget(const char* id, UUID current, AssetType aType, const std::function<void(UUID)>& onAccpetCB)
+{
+	auto assets = Engine::get()->getSubSystem<Assets>();
+	const bool isSet = !current.empty();
+	const bool isValid = isSet && assets->hasAsset(current);
+
+	ImGui::PushID(id);
+
+	const ImGuiStyle& style = ImGui::GetStyle();
+	const float height = ImGui::GetFrameHeight();
+	const float width = std::max(ImGui::GetContentRegionAvail().x, height * 4.0f);
+	const ImVec2 p0 = ImGui::GetCursorScreenPos();
+	const ImVec2 p1(p0.x + width, p0.y + height);
+
+	const bool clicked = ImGui::InvisibleButton("##assetSlot", ImVec2(width, height));
+	const bool hovered = ImGui::IsItemHovered();
+
+	ImDrawList* dl = ImGui::GetWindowDrawList();
+	const ImU32 typeColor = AssetCard::getTypeColor(aType);
+	const std::string typeLabel = getAssetTypeAsStr(aType);
+
+	// Small square on the left, the size of the frame
+	const float accentWidth = 2.0f;
+	const ImVec2 iconMin(p0.x + accentWidth + 2.0f, p0.y + 2.0f);
+	const ImVec2 iconMax(iconMin.x + height - 4.0f, p1.y - 2.0f);
+
+	std::string text;
+	ImU32 textColor;
+
+	if (isValid)
+	{
+		const AssetRecord& aInfo = assets->getInfo(current);
+
+		dl->AddRectFilled(p0, p1, ImGui::GetColorU32(hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg), style.FrameRounding);
+		dl->AddRectFilled(p0, ImVec2(p0.x + accentWidth, p1.y), typeColor, style.FrameRounding, ImDrawFlags_RoundCornersLeft);
+
+		dl->AddRectFilled(iconMin, iconMax, IM_COL32(26, 26, 26, 255), 2.0f);
+		if (ImTextureID thumbnail = AssetCard::getThumbnail(aInfo))
+			dl->AddImage(thumbnail, iconMin, iconMax);
+
+		text = aInfo.name.empty() ? typeLabel : aInfo.name;
+		textColor = ImGui::GetColorU32(ImGuiCol_Text);
+	}
+	else
+	{
+		// Empty (or missing) slot: dashed stencil in the expected type's color with a ghosted icon
+		const ImU32 stencilColor = isSet
+			? IM_COL32(220, 60, 60, 200)
+			: (typeColor & ~IM_COL32_A_MASK) | (150u << IM_COL32_A_SHIFT);
+
+		if (hovered)
+			dl->AddRectFilled(p0, p1, ImGui::GetColorU32(ImGuiCol_FrameBg), style.FrameRounding);
+		addDashedRect(dl, ImVec2(p0.x + 0.5f, p0.y + 0.5f), ImVec2(p1.x - 0.5f, p1.y - 0.5f), stencilColor);
+
+		if (ImTextureID icon = getAssetTypeIcon(aType))
+			dl->AddImage(icon, iconMin, iconMax, ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 70));
+
+		text = (isSet ? "Missing (" : "None (") + typeLabel + ")";
+		textColor = ImGui::GetColorU32(ImGuiCol_TextDisabled);
+	}
+
+	// Dropdown arrow on the right, like a combo
+	const float arrowX = p1.x - height;
+	ImGui::RenderArrow(dl, ImVec2(arrowX + style.FramePadding.y, p0.y + style.FramePadding.y), ImGui::GetColorU32(ImGuiCol_Text), ImGuiDir_Down);
+
+	// Name, clipped before the arrow
+	const ImVec2 textPos(iconMax.x + style.ItemInnerSpacing.x, p0.y + style.FramePadding.y);
+	dl->PushClipRect(ImVec2(textPos.x, p0.y), ImVec2(arrowX, p1.y), true);
+	dl->AddText(textPos, textColor, text.c_str());
+	dl->PopClipRect();
+
+	if (hovered)
+	{
+		ImGui::BeginTooltip();
+		if (isValid)
+		{
+			const AssetRecord& aInfo = assets->getInfo(current);
+			ImGui::TextUnformatted(aInfo.name.c_str());
+			ImGui::Separator();
+			ImGui::Text("Type: %s", typeLabel.c_str());
+			ImGui::Text("Path: %s", aInfo.getScopedPath().scoped().string().c_str());
+		}
+		else if (isSet)
+		{
+			ImGui::Text("Missing %s asset (%s)", typeLabel.c_str(), current.str().c_str());
+		}
+		else
+		{
+			ImGui::Text("Click to select a %s asset", typeLabel.c_str());
+		}
+		ImGui::EndTooltip();
+	}
+
+	if (clicked)
 	{
 		DialogManager::Instance().assetSelectDialog.assetType = aType;
 		DialogManager::Instance().assetSelectDialog.onAccpetCB = onAccpetCB;
 		DialogManager::Instance().assetSelectDialog.activate();
 	}
 
-	return false;
+	ImGui::PopID();
+
+	return clicked;
 }
 
 
@@ -201,13 +342,7 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 
 	if (currentMode == MaterialRenderMode::Custom)
 	{
-		std::string shaderName = "None";
-		if (!data.getCustomShader().isEmpty())
-		{
-			shaderName = data.getCustomShader().info().name;
-		}
-
-		addAssetSelectWidget(shaderName, AssetType::SHADER, [&data, onChangedCB](UUID uuid) {
+		addAssetSelectWidget("CustomShader", data.getCustomShader().getUID(), AssetType::SHADER, [&data, onChangedCB](UUID uuid) {
 			data.setCustomShader(ShaderAssetRef(uuid));
 			if (onChangedCB) 
 				onChangedCB(data);

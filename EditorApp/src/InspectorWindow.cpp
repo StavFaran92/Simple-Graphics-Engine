@@ -256,13 +256,7 @@ void InspectorWindow::display()
 
 			ImGui::Combo("Render Technique", (int*)&meshComponent.renderTechnique, renderTechniqueNames, IM_ARRAYSIZE(renderTechniqueNames));
 
-			std::string meshName = "None";
-			if (!meshComponent.mesh.isEmpty())
-			{
-				meshName = meshComponent.mesh.info().name;
-			}
-
-			addAssetSelectWidget(meshName, AssetType::MODEL, [&meshComponent](UUID uuid) {
+			addAssetSelectWidget("Mesh", meshComponent.mesh.getUID(), AssetType::MODEL, [&meshComponent](UUID uuid) {
 				meshComponent.mesh = ModelAssetRef(uuid);
 			});
 
@@ -274,17 +268,7 @@ void InspectorWindow::display()
 					ImGui::Text("Slot %d:", index);
 					ImGui::SameLine();
 					ImGui::PushID(&mat);
-					std::string matName = "None";
-					if (!mat.isEmpty())
-					{
-						matName = mat.info().name;
-						if (matName.empty())
-						{
-							matName = "Material " + std::to_string(index);
-						}
-					}
-
-					addAssetSelectWidget(matName, AssetType::MATERIAL, [&mat](UUID uuid) {
+					addAssetSelectWidget("Material", mat.getUID(), AssetType::MATERIAL, [&mat](UUID uuid) {
 						mat = MaterialAssetRef(uuid);
 					});
 
@@ -501,8 +485,7 @@ void InspectorWindow::display()
 
 					// Asset picker
 					AnimationEntry* entryPtr = animator.getAnimation(entry.name);
-					std::string animUID = entry.animation.isEmpty() ? EMPTY_UUID : entry.animation.getUID();
-					addAssetSelectWidget(animUID, AssetType::ANIMATION, [entryPtr](UUID uuid) {
+					addAssetSelectWidget("Animation", entry.animation.getUID(), AssetType::ANIMATION, [entryPtr](UUID uuid) {
 						entryPtr->animation = AnimationAssetRef(uuid);
 					});
 
@@ -561,7 +544,7 @@ void InspectorWindow::display()
 					ImGui::Checkbox("Custom Heightmap", &useCustomHeightmap);
 					if (useCustomHeightmap)
 					{
-						addAssetSelectWidget("Terrain_Heightmap", AssetType::TEXTURE, [&](UUID uuid) {
+						addAssetSelectWidget("Terrain_Heightmap", EMPTY_UUID, AssetType::TEXTURE, [&](UUID uuid) {
 							terrain.setHeightmap(TextureAssetRef(uuid));
 						});
 					}
@@ -595,18 +578,12 @@ void InspectorWindow::display()
 
 					if (ImGui::CollapsingHeader("Materials"))
 					{
-						std::string matName = "None";
-						if (!terrain.m_material.isEmpty())
+						if (!terrain.m_material.isEmpty() && terrain.m_material->getMaterialRenderMode() != MaterialRenderMode::Terrain)
 						{
-							matName = terrain.m_material.info().name;
-
-							if (terrain.m_material->getMaterialRenderMode() != MaterialRenderMode::Terrain)
-							{
-								ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Material type is not Terrain compatible!");
-							}
+							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Material type is not Terrain compatible!");
 						}
 
-						addAssetSelectWidget(matName, AssetType::MATERIAL, [&terrain](UUID uuid) {
+						addAssetSelectWidget("TerrainMaterial", terrain.m_material.getUID(), AssetType::MATERIAL, [&terrain](UUID uuid) {
 							terrain.m_material = MaterialAssetRef(uuid);
 						});
 					}
@@ -779,13 +756,7 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<ScriptComponent>("Lua Script Component", [](ScriptComponent& script) {
-			std::string scriptName = "None";
-			if (!script.getScript().isEmpty())
-			{
-				scriptName = script.getScript().info().name;
-			}
-
-			addAssetSelectWidget(scriptName, AssetType::LUA_SCRIPT, [&script](UUID uuid) {
+			addAssetSelectWidget("Script", script.getScript().getUID(), AssetType::LUA_SCRIPT, [&script](UUID uuid) {
 				script.script = LuaScriptAssetRef(uuid);
 			});
 
@@ -811,13 +782,7 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<PostProcessComponent>("Post Process Component", [](PostProcessComponent& postProcessComponent) {
-			std::string shaderName = "None";
-			if (!postProcessComponent.shader.isEmpty())
-			{
-				shaderName = postProcessComponent.shader.getUID();
-			}
-
-			addAssetSelectWidget(shaderName, AssetType::SHADER, [&postProcessComponent](UUID uuid) {
+			addAssetSelectWidget("PostProcessShader", postProcessComponent.shader.getUID(), AssetType::SHADER, [&postProcessComponent](UUID uuid) {
 				postProcessComponent.shader = ShaderAssetRef(uuid);
 			});
 				
@@ -857,27 +822,11 @@ void InspectorWindow::display()
 
 		displayComponent<VolumeComponent>("Volume Component", [](VolumeComponent& volume) {
 
-			std::string meshName = "None";
-			if (!volume.mesh.isEmpty())
-			{
-				meshName = volume.mesh.info().name;
-			}
-
-			addAssetSelectWidget(meshName, AssetType::MODEL, [&volume](UUID uuid) {
+			addAssetSelectWidget("VolumeMesh", volume.mesh.getUID(), AssetType::MODEL, [&volume](UUID uuid) {
 				volume.mesh = ModelAssetRef(uuid);
 				});
 
-			std::string matName = "None";
-			if (!volume.material.isEmpty())
-			{
-				matName = volume.material.info().name;
-				if (matName.empty())
-				{
-					matName = "Material";
-				}
-			}
-
-			addAssetSelectWidget(matName, AssetType::MATERIAL, [&volume](UUID uuid) {
+			addAssetSelectWidget("VolumeMaterial", volume.material.getUID(), AssetType::MATERIAL, [&volume](UUID uuid) {
 				volume.material = MaterialAssetRef(uuid);
 				});
 
