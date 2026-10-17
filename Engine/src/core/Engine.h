@@ -64,6 +64,11 @@ struct InitParams
     bool fullScreen = false;
     bool shipping = false;
     bool tempDir = false;
+
+    // Capture mode: after captureFrames frames, save a screenshot and/or the console log, then quit
+    int captureFrames = 0;
+    std::string capturePath;
+    std::string logPath;
 };
 
 class EngineAPI Engine

@@ -1,8 +1,11 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
-class STBIHelper
+#include "core/Core.h"
+
+class EngineAPI STBIHelper
 {
 public:
 	static unsigned char* decodeCompressedFromMemory(const unsigned char* rawBuffer, int len, int* outWidth, int* outHeight, int* outChannels);

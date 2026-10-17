@@ -349,6 +349,9 @@ bool Texture::download()
 {
 	bind();
 
+	// Buffers below are sized tightly, so rows must not be padded (RGB widths that aren't a multiple of 4 overflow otherwise)
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
 	const GLenum target = toGL(m_data.target);
 	const GLenum format = toGL(m_data.format);
 	const GLenum type   = toGL(m_data.type);

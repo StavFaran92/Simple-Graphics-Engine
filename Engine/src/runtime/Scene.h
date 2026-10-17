@@ -140,6 +140,7 @@ public:
 
 	unsigned int getRenderViewFrameBufferID(const std::string& name) const;
 	unsigned int getRenderViewTextureID(const std::string& name) const;
+	TextureResourceRef getRenderViewTexture(const std::string& name) const;
 
 	unsigned int getGameRenderViewTextureID() const;
     unsigned int getGameRenderViewFrameBufferID() const;

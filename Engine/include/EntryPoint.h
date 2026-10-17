@@ -49,7 +49,29 @@ InitParams parseArgs(int argc, char* argv[])
         {
             params.tempDir = true;
         }
+
+        else if (strcmp(argv[i], "-capture") == 0 && i + 1 < argc)
+        {
+            params.capturePath = argv[i + 1];
+            ++i;
+        }
+
+        else if (strcmp(argv[i], "-log") == 0 && i + 1 < argc)
+        {
+            params.logPath = argv[i + 1];
+            ++i;
+        }
+
+        else if (strcmp(argv[i], "-frames") == 0 && i + 1 < argc)
+        {
+            params.captureFrames = atoi(argv[i + 1]);
+            ++i;
+        }
     }
+
+    // Asking for a capture without a frame count waits long enough for the scene to load
+    if ((!params.capturePath.empty() || !params.logPath.empty()) && params.captureFrames <= 0)
+        params.captureFrames = 120;
 
     return params;
 }

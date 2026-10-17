@@ -16,8 +16,10 @@
 #include "DialogManager.h"
 
 #include "core/Logger.h"
+#include "utils/STBIHelper.h"
 #include <vector>
 #include <mutex>
+#include <fstream>
 
 #include "Common.h"
 #include "AssetViewWindow.h"
@@ -704,6 +706,69 @@ void setStyleAndColors()
 
 static bool debugTerrainFlag = false;
 
+// Capture mode (-capture / -log / -frames): lets tools and AI agents run the editor and read back what it showed
+static int g_captureFrame = 0;
+
+static void createParentDirs(const std::string& path)
+{
+	fs::path parent = fs::path(path).parent_path();
+	if (!parent.empty())
+		fs::create_directories(parent);
+}
+
+static void writeEditorViewPng(const std::string& path)
+{
+	auto texture = Engine::get()->getContext()->getActiveScene()->getRenderViewTexture("Editor View");
+	if (!texture || !texture->download())
+	{
+		logWarning("Capture: could not read the 'Editor View' texture");
+		return;
+	}
+
+	// The editor view target is RGB8 (see RenderTarget), so the bytes go to the PNG as is
+	const TextureData& data = texture->getData();
+	const int stride = data.width * 3;
+	const uint8_t* pixels = static_cast<const uint8_t*>(data.data.data());
+
+	// GL rows start at the bottom, PNG rows at the top
+	std::vector<uint8_t> flipped(static_cast<size_t>(stride) * data.height);
+	for (int row = 0; row < data.height; ++row)
+		memcpy(&flipped[static_cast<size_t>(row) * stride], pixels + static_cast<size_t>(data.height - 1 - row) * stride, stride);
+
+	createParentDirs(path);
+	STBIHelper::writeToPNG(path, data.width, data.height, 3, flipped.data(), stride);
+	logInfo("Capture: wrote " + path);
+}
+
+static void writeConsoleLog(const std::string& path)
+{
+	createParentDirs(path);
+	std::ofstream out(path);
+
+	std::lock_guard<std::mutex> lock(g_consoleMutex);
+	// Messages arrive formatted ("[time] [level] [file:line] text") with trailing newlines
+	for (const auto& line : g_consoleLog)
+	{
+		const size_t end = line.msg.find_last_not_of("\r\n");
+		if (end != std::string::npos)
+			out << line.msg.substr(0, end + 1) << "\n";
+	}
+}
+
+static void updateCaptureMode()
+{
+	const InitParams& params = Engine::get()->getInitParams();
+	if (params.captureFrames <= 0 || ++g_captureFrame != params.captureFrames)
+		return;
+
+	if (!params.capturePath.empty())
+		writeEditorViewPng(params.capturePath);
+	if (!params.logPath.empty())
+		writeConsoleLog(params.logPath);
+
+	Engine::get()->stop();
+}
+
 class EditorApp : public Application
 {
 public:
@@ -802,6 +867,9 @@ public:
 		g_editorCamera.getComponent<Transformation>().update();
 
 		EditorState::Instance().update();
+
+		// Runs after the scene is drawn this frame, so the Editor View holds the current image
+		updateCaptureMode();
 	}
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
 	

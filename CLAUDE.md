@@ -1,0 +1,33 @@
+# Simple Graphics Engine
+
+C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. Windows / MSVC only.
+
+## Layout
+- `Engine/` - core library, built as a DLL (`EngineAPI` = dllexport/dllimport; anything EditorApp calls must be exported)
+  - `include/EntryPoint.h` - `main()` and command-line parsing into `InitParams`
+  - `src/core/` Engine, Logger, project settings · `src/runtime/` Scene, Context, Entity · `src/component/` ECS components
+  - `src/render/` RenderView, RenderCommand, Graphics · `src/texture/` Texture (`download()` reads GPU data back)
+- `EditorApp/src/` - the editor. `Editor.cpp` holds the main loop hooks, menus and simulation start/stop/pause
+- `NativeScripts/` - C++ gameplay scripts loaded by the editor
+- `samples/` - sample projects (`game_2`, `sandbox`, `fps`, `feature_samples`); `*Sample/` dirs are standalone demos
+- `scripts/` - build and tooling scripts (`gen_sol_bindings.py` generates Lua bindings)
+
+## Build
+- Already configured in `build/` (Visual Studio generator). Reconfigure only if CMakeLists change: `cmake -S . -B build`
+- Build one target and get only the errors: `powershell -File scripts/build.ps1 -Target EditorApp -Config Debug`
+- Changing an Engine header rebuilds most of the tree; prefer .cpp changes when possible
+- Do not change `CMAKE_MSVC_RUNTIME_LIBRARY` or the Debug `NDEBUG` define - the prebuilt third-party libs need them
+
+## Verify a change visually
+- `powershell -File scripts/run_capture.ps1 [-Project samples/game_2] [-Frames 120]`
+- Opens the editor on the project, runs N frames, writes `build/capture/frame.png` (the Editor View) and
+  `build/capture/log.txt` (console log), then quits. Read both files to judge the result.
+- Same flags by hand: `EditorApp.exe -ec <projectDir> -frames 120 -capture out.png -log log.txt`
+  (working directory `build/EditorApp`, binary in `build/bin/<Config>/`)
+
+## Conventions
+- Components: `REGISTER_COMPONENT(...)`, serialized via `ComponentSerializer`
+- Assets: `Assets::importAsset(AssetBuildDescriptor, <type>LoadDescriptor)`; asset files are `.prefab .mat .model .texture .anim .lua`
+- Logging: `logInfo` / `logWarning` / `logError`; everything also lands in the editor Console
+- GL state touched outside the renderer must be restored (bind 0 after use)
+- Comments are short and explain why, not what

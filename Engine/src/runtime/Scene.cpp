@@ -1734,6 +1734,18 @@ unsigned int Scene::getRenderViewTextureID(const std::string& name) const
 	return renderView->getRenderTargetTextureID();
 }
 
+TextureResourceRef Scene::getRenderViewTexture(const std::string& name) const
+{
+	auto renderView = getRenderView(name);
+
+	if (!renderView)
+	{
+		return TextureResourceRef::empty;
+	}
+
+	return renderView->getRenderTargetTexture();
+}
+
 unsigned int Scene::getGameRenderViewTextureID() const
 {
 	return getRenderViewTextureID("Game View"); // todo fix
