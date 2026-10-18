@@ -17,6 +17,16 @@ void STBIHelper::writeToPNG(const std::string& filename, int x, int y, int comp,
 	stbi_write_png(filename.c_str(), x, y, comp, data, stride_bytes);
 }
 
+std::vector<uint8_t> STBIHelper::encodePNG(int x, int y, int comp, const void* data, int stride_bytes)
+{
+	std::vector<uint8_t> png;
+	stbi_write_png_to_func([](void* context, void* bytes, int size) {
+		auto* out = static_cast<std::vector<uint8_t>*>(context);
+		out->insert(out->end(), static_cast<uint8_t*>(bytes), static_cast<uint8_t*>(bytes) + size);
+	}, &png, x, y, comp, data, stride_bytes);
+	return png;
+}
+
 void STBIHelper::setFlip(bool flip)
 {
 	stbi_set_flip_vertically_on_load(flip);

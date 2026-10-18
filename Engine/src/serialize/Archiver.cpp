@@ -10,6 +10,9 @@
 #include "memory/BuiltInAssets.h"
 #include "core/Window.h"
 
+#include <sstream>
+#include <cereal/archives/json.hpp>
+
 
 Archiver* Archiver::instance = new Archiver();
 
@@ -38,6 +41,34 @@ SerializedEntity Archiver::serializeEntity(Entity e)
 	}
 
 	return serializedEntity;
+}
+
+std::string Archiver::serializeEntityToJson(Entity e)
+{
+	std::stringstream ss;
+	{
+		// The archive only completes its output when destroyed
+		cereal::JSONOutputArchive archive(ss, cereal::JSONOutputArchive::Options::NoIndent());
+		archive(cereal::make_nvp("entity", serializeEntity(e)));
+	}
+	return ss.str();
+}
+
+std::vector<std::string> Archiver::getRegisteredComponentNames()
+{
+	std::vector<std::string> names;
+	for (auto& entry : ComponentSerdes::getRegistry())
+	{
+		// entt type names on MSVC carry the "struct " / "class " keyword
+		std::string name = entry.name;
+		for (const char* prefix : { "struct ", "class " })
+		{
+			if (name.rfind(prefix, 0) == 0)
+				name = name.substr(strlen(prefix));
+		}
+		names.push_back(name);
+	}
+	return names;
 }
 
 Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, SceneResourceRef& scene)

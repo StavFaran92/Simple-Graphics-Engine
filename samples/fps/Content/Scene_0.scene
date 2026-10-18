@@ -417,15 +417,15 @@
                                     },
                                     "m_children": [
                                         {
-                                            "key": 2097162,
-                                            "value": {
-                                                "m_entity": 2097162
-                                            }
-                                        },
-                                        {
                                             "key": 1048578,
                                             "value": {
                                                 "m_entity": 1048578
+                                            }
+                                        },
+                                        {
+                                            "key": 2097162,
+                                            "value": {
+                                                "m_entity": 2097162
                                             }
                                         },
                                         {
@@ -1072,15 +1072,15 @@
                                     },
                                     "refs": [
                                         {
-                                            "key": "model",
-                                            "value": {
-                                                "m_entity": 15
-                                            }
-                                        },
-                                        {
                                             "key": "cameraPivot",
                                             "value": {
                                                 "m_entity": 8
+                                            }
+                                        },
+                                        {
+                                            "key": "model",
+                                            "value": {
+                                                "m_entity": 15
                                             }
                                         },
                                         {
@@ -1857,7 +1857,7 @@
                                         "v.z": -0.09033060073852539
                                     },
                                     "fovyRadians": 0.7853981852531433,
-                                    "aspect": 1.7138553857803345,
+                                    "aspect": 1.8699780702590943,
                                     "znear": 0.10000000149011612,
                                     "zfar": 1000.0,
                                     "type": 0,

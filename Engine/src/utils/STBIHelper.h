@@ -12,6 +12,8 @@ public:
 
 	static void writeToPNG(const std::string& filename, int x, int y, int comp, const void* data, int stride_bytes);
 
+	static std::vector<uint8_t> encodePNG(int x, int y, int comp, const void* data, int stride_bytes);
+
 	static void setFlip(bool);
 
 	static bool isHDR(const std::string& filename);

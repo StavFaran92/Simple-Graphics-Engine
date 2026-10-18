@@ -145,7 +145,7 @@
             "visibility": 1
         }
     ],
-    "counter": 134,
+    "counter": 135,
     "lua script": [
         {
             "aType": 7,
@@ -2947,17 +2947,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2983,6 +2972,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3269,17 +3269,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3305,6 +3294,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -5414,6 +5414,7 @@
         "Mutant_diffuse": 56,
         "Mutant_normal": 59,
         "New Material": 124,
+        "New Scene": 134,
         "SGE_MATERIAL_DEFAULT": 7,
         "SGE_MATERIAL_TERRAIN_DEFAULT": 8,
         "SGE_MESH_BOX": 9,
@@ -5522,6 +5523,7 @@
         "content/new folder/ground054_2k-png_roughness.texture": 20,
         "content/new folder/new material.mat": 17,
         "content/new material.mat": 124,
+        "content/new scene.scene": 134,
         "content/scene_0.scene": 15,
         "content/standing death backward 01.anim": 132,
         "content/sunflowers_puresky_4k.texture": 26,
@@ -5664,6 +5666,17 @@
             "name": "Scene_0",
             "sourcePath": "",
             "uuid": 15,
+            "visibility": 1
+        },
+        {
+            "aType": 8,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".scene",
+            "isEngineOwned": false,
+            "name": "New Scene",
+            "sourcePath": "",
+            "uuid": 134,
             "visibility": 1
         }
     ],

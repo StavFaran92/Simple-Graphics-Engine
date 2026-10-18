@@ -17,12 +17,16 @@
 
 #include "core/Logger.h"
 #include "utils/STBIHelper.h"
+#include "ViewCapture.h"
+#include "ai/McpServer.h"
+#include "ai/AgentTools.h"
 #include <vector>
 #include <mutex>
 #include <fstream>
 
 #include "Common.h"
 #include "AssetViewWindow.h"
+#include "AgentWindow.h"
 
 #include "EntityState.h"
 #include "InspectorWindow.h"
@@ -600,6 +604,7 @@ class GUI_Helper : public GuiMenu {
 
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", dock_id_left);
 			ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
+			ImGui::DockBuilderDockWindow("Agent", dock_id_right);
 			ImGui::DockBuilderDockWindow("Debug Info", dock_id_right_bottom);
 			ImGui::DockBuilderDockWindow("AssetInspector", dock_id_left_bottom);
             ImGui::DockBuilderDockWindow("Asset View", dock_id_bottom);
@@ -623,6 +628,7 @@ class GUI_Helper : public GuiMenu {
         AssetViewWindow::display();
         RenderConsoleWindow();
 		DisplayDebugInfoWindow();
+		AgentWindow::display();
 		EditorState::Instance().displayDialogs();
 
 		
@@ -718,25 +724,15 @@ static void createParentDirs(const std::string& path)
 
 static void writeEditorViewPng(const std::string& path)
 {
-	auto texture = Engine::get()->getContext()->getActiveScene()->getRenderViewTexture("Editor View");
-	if (!texture || !texture->download())
+	CapturedImage image;
+	if (!captureRenderView("Editor View", image))
 	{
 		logWarning("Capture: could not read the 'Editor View' texture");
 		return;
 	}
 
-	// The editor view target is RGB8 (see RenderTarget), so the bytes go to the PNG as is
-	const TextureData& data = texture->getData();
-	const int stride = data.width * 3;
-	const uint8_t* pixels = static_cast<const uint8_t*>(data.data.data());
-
-	// GL rows start at the bottom, PNG rows at the top
-	std::vector<uint8_t> flipped(static_cast<size_t>(stride) * data.height);
-	for (int row = 0; row < data.height; ++row)
-		memcpy(&flipped[static_cast<size_t>(row) * stride], pixels + static_cast<size_t>(data.height - 1 - row) * stride, stride);
-
 	createParentDirs(path);
-	STBIHelper::writeToPNG(path, data.width, data.height, 3, flipped.data(), stride);
+	STBIHelper::writeToPNG(path, image.width, image.height, 3, image.rgb.data(), image.width * 3);
 	logInfo("Capture: wrote " + path);
 }
 
@@ -859,6 +855,20 @@ public:
 
 		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::TEXTURE, std::make_unique<TextureThumbnailGenerator>());
 		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::MATERIAL, std::make_unique<MaterialThumbnailGenerator>());
+
+		// Capture runs are short scripted sessions; leave the port to an editor the user has open
+		if (Engine::get()->getInitParams().captureFrames <= 0)
+		{
+			registerAgentTools(m_mcpServer, [] {
+				std::lock_guard<std::mutex> lock(g_consoleMutex);
+				std::vector<ConsoleLine> lines;
+				lines.reserve(g_consoleLog.size());
+				for (const auto& line : g_consoleLog)
+					lines.push_back({ static_cast<int>(line.level), line.msg });
+				return lines;
+			});
+			m_mcpServer.start(kMcpPort);
+		}
 	}
 
 	void update(float deltaTime) override
@@ -868,9 +878,21 @@ public:
 
 		EditorState::Instance().update();
 
+		// AI tool calls run here, on the main thread, after this frame's scene was drawn
+		m_mcpServer.queue().drain();
+
 		// Runs after the scene is drawn this frame, so the Editor View holds the current image
 		updateCaptureMode();
 	}
+
+	void close() override
+	{
+		m_mcpServer.stop();
+	}
+
+	static constexpr int kMcpPort = 7777;
+	McpServer m_mcpServer;
+
 	std::shared_ptr<SGE_Regsitry> m_editorRegistry;
 	
 	EventHandler uiHandler;

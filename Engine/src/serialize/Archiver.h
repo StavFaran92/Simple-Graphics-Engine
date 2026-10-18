@@ -87,6 +87,12 @@ public:
 
 	static SerializedEntity serializeEntity(Entity e);
 
+	// The entity's components as cereal JSON, same format as in .scene files (for editor tooling)
+	static std::string serializeEntityToJson(Entity e);
+
+	// Names of every component type that can be serialized
+	static std::vector<std::string> getRegisteredComponentNames();
+
 	static Entity deserializeEntity(SerializedEntity serializedEnt, SceneResourceRef& scene);
 
 	static SerializedScene serializeScene(SceneResourceRef& scene);

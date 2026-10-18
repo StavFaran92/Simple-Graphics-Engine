@@ -25,6 +25,13 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - Same flags by hand: `EditorApp.exe -ec <projectDir> -frames 120 -capture out.png -log log.txt`
   (working directory `build/EditorApp`, binary in `build/bin/<Config>/`)
 
+## Live editor access (MCP)
+- A running editor serves MCP tools at `http://127.0.0.1:7777/mcp` (not in `-capture` runs)
+- Read-only tools: `get_scene_hierarchy`, `get_entity`, `get_component_schema`, `list_assets`, `get_asset`,
+  `get_console`, `screenshot_viewport`, `get_selection`. Entity ids are entt handle ids (same as in .scene files)
+- Code: `EditorApp/src/ai/` - `McpServer` (HTTP + JSON-RPC on its own thread), `MainThreadQueue` (tool calls run
+  in `EditorApp::update()`), `AgentTools.cpp` (the tools). New tools: add them in `registerAgentTools`
+
 ## Conventions
 - Components: `REGISTER_COMPONENT(...)`, serialized via `ComponentSerializer`
 - Assets: `Assets::importAsset(AssetBuildDescriptor, <type>LoadDescriptor)`; asset files are `.prefab .mat .model .texture .anim .lua`

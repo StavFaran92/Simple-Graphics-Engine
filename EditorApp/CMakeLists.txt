@@ -27,6 +27,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${CMAKE_SOURCE_DIR}/Engine/include
 	${CMAKE_SOURCE_DIR}/Engine/src
 	${CMAKE_SOURCE_DIR}/NativeScripts
+	${CMAKE_CURRENT_SOURCE_DIR}/extern/httplib
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE
