@@ -78,11 +78,8 @@ InitParams parseArgs(int argc, char* argv[])
 
 int sgeEntry(int argc, char* argv[])
 {
-#ifndef SGE_DEBUG
-    try
-    {
-#endif //SGE_DEBUG
-
+    // An exception that escapes is logged with its stack (see ErrorHandler::run)
+    return ErrorHandler::run([&] {
 #if SGE_SHIPPING
         InitParams initParams;
         initParams.loadExistingProject = true;
@@ -96,7 +93,7 @@ int sgeEntry(int argc, char* argv[])
         ArchiveInitializer::init();
 
         auto engine = Engine::get();
-        if (!engine->init(initParams)) 
+        if (!engine->init(initParams))
             return 1;
 
         auto app = CreateApplication();
@@ -106,17 +103,8 @@ int sgeEntry(int argc, char* argv[])
 
         app->close();
         engine->close();
-#ifndef SGE_DEBUG
-
-    }
-    catch (const std::runtime_error& e)
-    {
-        return ErrorHandler::handle(e);
-
-        Logger::get()->flush();
-    }
-#endif //SGE_DEBUG
-    return 0;
+        return 0;
+    });
 }
 
 int main(int argc, char* argv[])

@@ -165,6 +165,13 @@ json McpServer::callTool(const json& params)
 	const McpTool& tool = *it;
 	const json args = params.value("arguments", json::object());
 
+	// Logged before it runs, so a call that crashes the editor is in the console tail of the crash report
+	constexpr size_t kMaxLoggedArgs = 300;
+	std::string loggedArgs = args.dump();
+	if (loggedArgs.size() > kMaxLoggedArgs)
+		loggedArgs = loggedArgs.substr(0, kMaxLoggedArgs) + "...";
+	logInfo("[MCP] {} {}", name, loggedArgs);
+
 	auto future = m_queue.post([&tool, args] { return tool.run(args); });
 	if (future.wait_for(kToolTimeout) != std::future_status::ready)
 		return toolError("Timed out waiting for the editor main thread. It may be blocked by a modal dialog or a breakpoint.");

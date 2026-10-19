@@ -38,6 +38,13 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - `create_preset` and the Hierarchy's Create menu share one table: `EditorApp/src/EntityPresets.cpp`. A new preset
   (path like `"Environment/Water/Pool"` for nested submenus) shows up in both
 
+## Crashes
+- `ErrorHandler::run` (wraps every app's `main`) writes `build/bin/<Config>/crash/last_crash.txt` on a crash:
+  error, stack (cpptrace, vendored in `EditorApp/extern/cpptrace`), and the editor's console tail with the `[MCP]`
+  tool calls that led to it. Not active under a debugger: the debugger stops at the throw instead
+- An MCP call failing with connection refused means the editor is gone: restart it with
+  `powershell -File scripts/run_editor.ps1 -Project <dir>`, then call `get_last_crash`
+
 ## Undo (EditorApp/src/commands/)
 - Undo stores component snapshots (`ComponentSnapshot`, cereal JSON via `Archiver::saveComponent`), not whole entities
 - Change made live by a panel: snapshot before, change it, snapshot after, then

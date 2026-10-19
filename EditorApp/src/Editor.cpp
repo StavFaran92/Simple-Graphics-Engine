@@ -885,6 +885,23 @@ public:
 		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::TEXTURE, std::make_unique<TextureThumbnailGenerator>());
 		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::MATERIAL, std::make_unique<MaterialThumbnailGenerator>());
 
+		// Crash reports end with the console tail; it includes the [MCP] lines of the agent's last tool calls
+		ErrorHandler::setCrashContext([] {
+			constexpr size_t kTailLines = 50;
+			std::unique_lock<std::mutex> lock(g_consoleMutex, std::try_to_lock);
+			if (!lock.owns_lock())
+				return std::string("Console: busy while crashing\n");
+
+			std::string text = "Last console lines:\n";
+			const size_t first = g_consoleLog.size() > kTailLines ? g_consoleLog.size() - kTailLines : 0;
+			for (size_t i = first; i < g_consoleLog.size(); ++i)
+			{
+				const std::string& msg = g_consoleLog[i].msg;
+				text += "  " + msg.substr(0, msg.find_last_not_of("\r\n") + 1) + "\n";
+			}
+			return text;
+		});
+
 		// Capture runs are short scripted sessions; leave the port to an editor the user has open
 		if (Engine::get()->getInitParams().captureFrames <= 0)
 		{

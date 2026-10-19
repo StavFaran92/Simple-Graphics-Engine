@@ -1,0 +1,3 @@
+cpptrace v1.0.4 (commit 3db8da80111171c219ab5839905771386bee06b3)
+https://github.com/jeremy-rifkin/cpptrace
+Vendored: CMakeLists.txt, cmake/, include/, src/, LICENSE, README.md

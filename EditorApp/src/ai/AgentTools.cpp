@@ -10,6 +10,7 @@
 #include "sge.h"
 #include "core/Logger.h"
 #include "core/Configurations.h"
+#include "core/ErrorHandler.h"
 #include "serialize/Archiver.h"
 #include "memory/Assets.h"
 #include "memory/AssetRecord.h"
@@ -456,6 +457,17 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				text += line + "\n";
 
 			return mcpText(text.empty() ? "(no matching lines)" : text);
+		}
+	});
+
+	server.addTool({
+		"get_last_crash",
+		"If the previous editor run crashed: the error, the stack where it happened, and the console's last lines "
+		"(including the [MCP] tool calls that led to it). Call it after the editor restarts from a crash.",
+		objectSchema(),
+		[](const json&) {
+			const std::string& report = ErrorHandler::previousCrash();
+			return mcpText(report.empty() ? "The previous run didn't crash." : report);
 		}
 	});
 
