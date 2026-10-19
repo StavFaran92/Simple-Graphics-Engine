@@ -75,7 +75,7 @@ void displayEntityHelper(Entity& e)
 		{
 			if (ImGui::IsMouseDoubleClicked(0))
 			{
-				//focusOnEntity(e, g_ed); //TODO fix
+				focusOnEntity(e, g_editorCamera);
 			}
 		}
 

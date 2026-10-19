@@ -63,3 +63,13 @@ void EditorCamera::unlock()
 {
 	m_isLocked = false;
 }
+
+void EditorCamera::lookAt(const glm::vec3& position, const glm::vec3& target)
+{
+	// World values are cached until update(): refresh so lookAt sees the new position, and callers the new rotation
+	auto& transform = entity.getComponent<Transformation>();
+	transform.setWorldPosition(position);
+	transform.update();
+	m_cameraController->lookAt(target);
+	transform.update();
+}

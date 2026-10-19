@@ -1,39 +1,49 @@
 #include "Common.h"
+#include "EditorCamera.h"
+
+#include <limits>
 
 std::unordered_map<std::string, TextureResourceRef> icons;
 
 std::vector<SceneObject> sceneObjects;
 
-void focusOnEntity(Entity e, Entity cameraEntity)
+namespace
 {
-	// get camera forward
-	auto& camera = cameraEntity.getComponent<CameraComponent>();
-	auto front = camera.front;
-
-	// get entity location
-	auto& targetTransform = e.getComponent<Transformation>();
-
-	glm::vec3 targetLocation = targetTransform.getWorldPosition() - front * 5.f;
-
-	auto targetMesh = e.tryGetComponent<MeshRendererComponent>();
-	if (targetMesh)
+	// Grows the world box by the entity's mesh bounds (a 1-unit box without a mesh), then by its children's
+	void growBounds(Entity e, glm::vec3& min, glm::vec3& max)
 	{
-		auto& targetAABB = targetMesh->mesh.resource()->getPrimaryMesh()->getAABB();
+		auto& transform = e.getComponent<Transformation>();
 
-		// set destination to location + forward
-		targetLocation = targetTransform.getWorldPosition() - front * 5.f + targetAABB.extents() * .5f;
-
-		// create fake frustum
-		Frustum fakeFrustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.getFOVYInRadians(), camera.znear, camera.zfar);
-
-		// we start at the target object location and step back until the object AABB is inside the frustum.
-		while (!targetAABB.isOnFrustum(fakeFrustum))
+		AABB box = AABB::createFromMinMax(glm::vec3(-0.5f), glm::vec3(0.5f));
+		if (auto mesh = e.tryGetComponent<MeshRendererComponent>())
 		{
-			targetLocation -= front;
-			fakeFrustum = Frustum(targetLocation + front * 10.f, front, camera.up, camera.right, camera.aspect, camera.getFOVYInRadians(), camera.znear, camera.zfar);
+			if (auto model = mesh->mesh.resource(); model && model->getPrimaryMesh())
+				box = model->getPrimaryMesh()->getAABB();
 		}
-	}
 
-	auto& transform = cameraEntity.getComponent<Transformation>();
-	transform.setLocalPosition(targetLocation);
+		box.transform(transform.getWorldTransformation());
+		min = glm::min(min, box.getMin());
+		max = glm::max(max, box.getMax());
+
+		for (auto& [_, child] : transform.getChildren())
+			growBounds(child, min, max);
+	}
+}
+
+void focusOnEntity(Entity e, Entity cameraEntity, glm::vec3 direction)
+{
+	glm::vec3 min(std::numeric_limits<float>::max());
+	glm::vec3 max(std::numeric_limits<float>::lowest());
+	growBounds(e, min, max);
+
+	const glm::vec3 center = (min + max) * 0.5f;
+	const float radius = std::max(glm::length(max - min) * 0.5f, 0.1f);
+
+	// Far enough for a sphere around the box to fit the vertical field of view, plus a margin
+	auto& camera = cameraEntity.getComponent<CameraComponent>();
+	const float distance = radius / std::sin(camera.getFOVYInRadians() * 0.5f) * 1.2f;
+
+	auto* editorCamera = dynamic_cast<EditorCamera*>(cameraEntity.getComponent<NativeScriptComponent>().script.get());
+	if (editorCamera)
+		editorCamera->lookAt(center - glm::normalize(direction) * distance, center);
 }

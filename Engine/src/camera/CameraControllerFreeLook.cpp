@@ -81,19 +81,7 @@ bool CameraControllerFreeLook::onEvent(const Event& e)
 
 			m_yaw -= xChange;
 			m_pitch -= yChange;
-
-			if (m_pitch > 89.0f)
-				m_pitch = 89.0f;
-
-			if (m_pitch < -89.0f)
-				m_pitch = -89.0f;
-
-			glm::quat pitchQuat = glm::angleAxis(glm::radians(m_pitch), glm::vec3(1, 0, 0));
-			glm::quat yawQuat = glm::angleAxis(glm::radians(m_yaw), glm::vec3(0, 1, 0));
-
-			glm::quat combinedQuat = yawQuat * pitchQuat;
-
-			m_cameraTransform->setWorldRotation(combinedQuat);
+			applyYawPitch();
 		}
 
 		if (m_state == ControllerState::TRANSFORM)
@@ -149,4 +137,27 @@ bool CameraControllerFreeLook::onEvent(const Event& e)
 	}
 
 	return false;
+}
+
+void CameraControllerFreeLook::lookAt(const glm::vec3& target)
+{
+	const glm::vec3 offset = target - m_cameraTransform->getWorldPosition();
+	if (glm::length(offset) < 1e-4f)
+		return;
+
+	// Inverse of applyYawPitch: yaw turns -Z toward -X, pitch tilts it toward +Y
+	const glm::vec3 dir = glm::normalize(offset);
+	m_yaw = glm::degrees(std::atan2(-dir.x, -dir.z));
+	m_pitch = glm::degrees(std::asin(std::clamp(dir.y, -1.f, 1.f)));
+	applyYawPitch();
+}
+
+void CameraControllerFreeLook::applyYawPitch()
+{
+	m_pitch = std::clamp(m_pitch, -89.f, 89.f);
+
+	glm::quat pitchQuat = glm::angleAxis(glm::radians(m_pitch), glm::vec3(1, 0, 0));
+	glm::quat yawQuat = glm::angleAxis(glm::radians(m_yaw), glm::vec3(0, 1, 0));
+
+	m_cameraTransform->setWorldRotation(yawQuat * pitchQuat);
 }

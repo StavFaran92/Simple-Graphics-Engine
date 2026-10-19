@@ -32,6 +32,9 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - Code: `EditorApp/src/ai/` - `McpServer` (HTTP + JSON-RPC on its own thread), `MainThreadQueue` (tool calls run
   in `EditorApp::update()`), `AgentTools.cpp` (the tools). New tools: add them in `registerAgentTools`
 - Mutation tools (`create_entity`, `set_components`, `set_parent`, `undo`, ...) are refused while the simulation runs
+- `new_scene` / `open_scene` switch the active scene (clears undo history); `save_scene` writes only the active one
+- `focus_entity` / `set_view_camera` aim the editor camera before `screenshot_viewport`; they move the view, not the
+  scene, so they aren't undo steps
 - `create_preset` and the Hierarchy's Create menu share one table: `EditorApp/src/EntityPresets.cpp`. A new preset
   (path like `"Environment/Water/Pool"` for nested submenus) shows up in both
 

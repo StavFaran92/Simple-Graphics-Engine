@@ -26,14 +26,14 @@ bool SceneCreateDialog::acceptContent()
 {
 	if (m_uniqueName.isValid())
 	{
-		auto scene = StartupSceneTemplate::createStartupScene(m_uniqueName.name);
+		// Also registers the scene with the scene manager
+		StartupSceneTemplate::createStartupScene(m_uniqueName.name);
 		//AssetBuildDescriptor desc;
 		//desc.aType = AssetType::SCENE;
 		//desc.name = m_uniqueName.name;
 		//desc.targetDirectory = EditorState::Instance().getWorkingDir().path();
 		//SceneCreateDescriptor sceneDesc;
 		//auto scene = Engine::get()->getSubSystem<Assets>()->createAsset(desc, sceneDesc).as<SceneAsset>();
-		Engine::get()->getContext()->addScene(scene);
 		return true;
 	}
 	return false;

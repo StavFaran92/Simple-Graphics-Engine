@@ -24,12 +24,15 @@ public:
 
 	void lock();
 	void unlock();
+
+	// Moves the camera to position, facing target
+	void lookAt(const glm::vec3& position, const glm::vec3& target);
 private:
 	bool m_isLocked = false;
 
 	CameraState m_camState = CameraState::FreeLook;
 
-	std::shared_ptr<ICameraController> m_cameraController;
+	std::shared_ptr<CameraControllerFreeLook> m_cameraController;
 
 	CameraComponent* m_cameraComponent = nullptr;
 

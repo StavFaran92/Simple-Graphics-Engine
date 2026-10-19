@@ -5,6 +5,7 @@
 #include "EntityState.h"
 #include "Common.h"
 #include "EntityPresets.h"
+#include "EditorCamera.h"
 
 #include "sge.h"
 #include "core/Logger.h"
@@ -12,6 +13,7 @@
 #include "serialize/Archiver.h"
 #include "memory/Assets.h"
 #include "memory/AssetRecord.h"
+#include "runtime/StartupSceneTemplate.h"
 
 #include <algorithm>
 #include <fstream>
@@ -504,6 +506,67 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 		}
 	});
 
+	// ---- Editor camera: moves the view, not the scene, so these aren't undo steps ----
+
+	// "Camera at [x, y, z], looking along [x, y, z]" from the camera's current transform
+	const auto viewCameraText = []() {
+		auto vecText = [](const glm::vec3& v) {
+			char text[64];
+			snprintf(text, sizeof(text), "[%.2f, %.2f, %.2f]", v.x, v.y, v.z);
+			return std::string(text);
+		};
+		auto& transform = g_editorCamera.getComponent<Transformation>();
+		const glm::vec3 front = transform.getWorldRotation() * glm::vec3(0.f, 0.f, -1.f);
+		return "Camera at " + vecText(transform.getWorldPosition()) + ", looking along " + vecText(front) +
+			". Call screenshot_viewport to see it.";
+	};
+
+	server.addTool({
+		"set_view_camera",
+		"Moves the editor camera (what screenshot_viewport shows) to 'position', looking at 'target'; both are world [x, y, z].",
+		objectSchema({
+			{"position", { {"type", "array"}, {"items", { {"type", "number"} }} }},
+			{"target", { {"type", "array"}, {"items", { {"type", "number"} }} }},
+		}, { "position", "target" }),
+		[viewCameraText](const json& args) {
+			requireEditMode();
+			const glm::vec3 position = vec3FromArgs(args, "position");
+			const glm::vec3 target = vec3FromArgs(args, "target");
+			if (glm::length(target - position) < 1e-4f)
+				throw McpToolError("'position' and 'target' must be different points");
+
+			auto* editorCamera = dynamic_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get());
+			if (!editorCamera)
+				throw McpToolError("The editor camera isn't set up yet");
+
+			editorCamera->lookAt(position, target);
+			return mcpText(viewCameraText());
+		}
+	});
+
+	server.addTool({
+		"focus_entity",
+		"Moves the editor camera so the entity and its children fill the view, like double-clicking it in the "
+		"Hierarchy. Optional 'direction' [x, y, z] is the way the camera looks (default [-1, -0.7, -1]: from above, at an angle).",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"direction", { {"type", "array"}, {"items", { {"type", "number"} }} }},
+		}, { "id" }),
+		[viewCameraText](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+
+			glm::vec3 direction{ -1.f, -0.7f, -1.f };
+			if (args.contains("direction"))
+				direction = vec3FromArgs(args, "direction");
+			if (glm::length(direction) < 1e-4f)
+				throw McpToolError("'direction' can't be [0, 0, 0]");
+
+			focusOnEntity(e, g_editorCamera, direction);
+			return mcpText("Framed " + describe(e) + ". " + viewCameraText());
+		}
+	});
+
 	// ---- Mutations: each call is one undo step labelled "AI: ..." ----
 
 	server.addTool({
@@ -854,6 +917,63 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			requireEditMode();
 			Engine::get()->saveProject();
 			return mcpText("Saved the project");
+		}
+	});
+
+	// ---- Scenes: switching clears undo history, like opening a scene from the Asset View ----
+
+	server.addTool({
+		"new_scene",
+		"Creates a scene like the New Scene dialog (a directional light and a main camera) and opens it.",
+		objectSchema({
+			{"name", { {"type", "string"} }},
+		}, { "name" }),
+		[](const json& args) {
+			requireEditMode();
+			const std::string name = args.value("name", "");
+			if (name.empty())
+				throw McpToolError("'name' is required");
+
+			for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
+			{
+				if (record && record->aType == AssetType::SCENE && record->name == name)
+					throw McpToolError("A scene named '" + name + "' already exists; use open_scene to open it");
+			}
+
+			const std::string previous = Engine::get()->getContext()->getActiveSceneAsset().info().name;
+			openSceneInEditor(StartupSceneTemplate::createStartupScene(name));
+
+			std::string reply = "Created and opened scene '" + name + "'.";
+			if (!previous.empty())
+				reply += " '" + previous + "' may have unsaved changes.";
+			return mcpText(reply);
+		}
+	});
+
+	server.addTool({
+		"open_scene",
+		"Opens a scene by 'name' or 'uuid' (see list_assets with type 'scene'), like Open in the Asset View.",
+		objectSchema({
+			{"name", { {"type", "string"} }},
+			{"uuid", { {"type", "string"} }},
+		}),
+		[](const json& args) {
+			requireEditMode();
+			const AssetRecord& record = findAssetRecord(args);
+			if (record.aType != AssetType::SCENE)
+				throw McpToolError("'" + record.name + "' has type '" + getAssetTypeAsStr(record.aType) + "', not 'scene'. Use list_assets with type 'scene'.");
+
+			SceneAssetRef scene = Engine::get()->getSubSystem<Assets>()->getAsset(record.uuid).as<SceneAsset>();
+			if (scene.isEmpty())
+				throw McpToolError("Scene '" + record.name + "' couldn't be loaded; see get_console");
+
+			const std::string previous = Engine::get()->getContext()->getActiveSceneAsset().info().name;
+			openSceneInEditor(scene);
+
+			std::string reply = "Opened scene '" + record.name + "'.";
+			if (!previous.empty() && previous != record.name)
+				reply += " '" + previous + "' may have unsaved changes.";
+			return mcpText(reply);
 		}
 	});
 }

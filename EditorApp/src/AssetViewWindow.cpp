@@ -421,10 +421,7 @@ void AssetViewWindow::display()
 								logWarning("Failed to cast asset to scene asset.");
 							else
 							{
-								Engine::get()->getContext()->setActiveScene(scene.resource()->getID());
-								CommandStack::Instance().clear();
-								setupScene();
-								updateScene();
+								openSceneInEditor(scene);
 							}
 						}
 

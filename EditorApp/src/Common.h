@@ -102,6 +102,15 @@ static void setupScene()
 	g_primaryCamera = scene->getGameCamera();
 }
 
+// Makes the scene the active one in the editor; undo history belongs to the old scene, so it's cleared
+static void openSceneInEditor(const SceneAssetRef& scene)
+{
+	Engine::get()->getContext()->setActiveScene(scene.resource()->getID());
+	CommandStack::Instance().clear();
+	setupScene();
+	updateScene();
+}
+
 template<typename T>
 static void displayComponent(const std::string& componentName, std::function<void(T&)> func)
 {
@@ -201,4 +210,5 @@ static void displayComponent(const std::string& componentName, std::function<voi
 	ImGui::PopID();
 }
 
-void focusOnEntity(Entity e, Entity cameraEntity);
+// Moves the editor camera so the entity and its children fill the view, looking along direction
+void focusOnEntity(Entity e, Entity cameraEntity, glm::vec3 direction = { -1.f, -0.7f, -1.f });

@@ -16,6 +16,13 @@ public:
 	void onUpdate(float deltaTime) override;
 	bool onEvent(const Event& e) override;
 
+	// Turns the camera toward a world point; later mouse look continues from there
+	void lookAt(const glm::vec3& target);
+
+private:
+	// Clamps pitch and sets the camera rotation from yaw and pitch
+	void applyYawPitch();
+
 private:
 	enum class ControllerState
 	{
