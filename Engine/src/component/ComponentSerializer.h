@@ -25,7 +25,7 @@ ComponentSerializeFnRegister<T> ComponentSerializeFnRegister<T>::staticRegister;
 using SnapshotSerializeFunc = std::function<std::shared_ptr<Component>(const Entity& e)>;
 using SnapshotDeserializeFunc = std::function<void(std::shared_ptr<Component> c, Entity entityHandler, SceneResourceRef& scene)>;
 
-struct SerializerEntry
+struct ComponentSerdesEntry
 {
 	std::string name;
 	SnapshotSerializeFunc serialize;
@@ -33,21 +33,23 @@ struct SerializerEntry
 	std::function<void(Entity e, SceneResourceRef&)> init;
 	std::function<void(Entity e, SceneResourceRef&)> onInit;
 	std::function<void(Entity e, SceneResourceRef&)> postLoad;
+	std::function<void(Entity e, SceneResourceRef&)> remove;
+	std::function<std::shared_ptr<Component>()> makeDefault; // Returns null when T has no default constructor
 };
 
 class ComponentSerdes
 {
 public:
-	static std::vector<SerializerEntry>& getRegistry()
+	static std::vector<ComponentSerdesEntry>& getRegistry()
 	{
-		static std::vector<SerializerEntry> registry;
+		static std::vector<ComponentSerdesEntry> registry;
 		return registry;
 	}
 
 	template<typename T>
 	static void RegisterComponentSerializer()
 	{
-		SerializerEntry entry;
+		ComponentSerdesEntry entry;
 
 		entry.name = entt::type_name<T>().value(); // quick + dirty
 
@@ -98,6 +100,19 @@ public:
 
 				c.postLoad(scene);
 			}
+		};
+
+		// Removing needs the concrete type, so unlike save/load it can't go through shared_ptr<Component>
+		entry.remove = [](Entity e, SceneResourceRef& scene) {
+			scene->getRegistry().get().remove<T>(e.handler());
+			scene->makeDirty();
+		};
+
+		entry.makeDefault = []() -> std::shared_ptr<Component> {
+			if constexpr (std::is_default_constructible_v<T>)
+				return std::make_shared<T>();
+			else
+				return nullptr;
 		};
 
 		getRegistry().push_back(std::move(entry));

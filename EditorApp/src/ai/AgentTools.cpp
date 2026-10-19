@@ -3,6 +3,8 @@
 #include "McpServer.h"
 #include "ViewCapture.h"
 #include "EntityState.h"
+#include "Common.h"
+#include "EntityPresets.h"
 
 #include "sge.h"
 #include "core/Logger.h"
@@ -13,6 +15,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <optional>
 
 using json = nlohmann::json;
 
@@ -61,12 +64,12 @@ namespace
 		return entities;
 	}
 
-	Entity entityFromArgs(const json& args)
+	Entity entityFromArgs(const json& args, const std::string& field = "id")
 	{
-		if (!args.contains("id") || !args["id"].is_number_integer() || args["id"].get<int64_t>() < 0)
-			throw McpToolError("'id' must be a numeric entity id, as listed by get_scene_hierarchy");
+		if (!args.contains(field) || !args[field].is_number_integer() || args[field].get<int64_t>() < 0)
+			throw McpToolError("'" + field + "' must be a numeric entity id, as listed by get_scene_hierarchy");
 
-		const auto id = args["id"].get<uint32_t>();
+		const auto id = args[field].get<uint32_t>();
 		auto scene = Engine::get()->getContext()->getActiveScene();
 
 		Entity e{ static_cast<entt::entity>(id), &scene->getRegistry() };
@@ -157,6 +160,100 @@ namespace
 			{"file", record.getFilename()},
 		};
 	}
+
+	// '"Wall_N" (id 42)' for replies
+	std::string describe(Entity e)
+	{
+		return "\"" + entityName(e) + "\" (id " + std::to_string(e.handlerID()) + ")";
+	}
+
+	size_t countDescendants(Entity e)
+	{
+		size_t count = 0;
+		for (auto& child : childrenOf(e))
+			count += 1 + countDescendants(child);
+		return count;
+	}
+
+	std::string joinNames(const std::vector<std::string>& names)
+	{
+		std::string joined;
+		for (const auto& name : names)
+			joined += (joined.empty() ? "" : ", ") + name;
+		return joined;
+	}
+
+	// Edits during play would be recorded and later undone into the running game
+	void requireEditMode()
+	{
+		if (Engine::get()->getContext()->getActiveScene()->isSimulationActive())
+			throw McpToolError("The simulation is running; stop it before changing the scene");
+	}
+
+	// Inverse of componentsOf's unwrapping: fields -> the cereal JSON Archiver::loadComponent reads
+	std::string toCerealJson(const std::string& component, const json& fields)
+	{
+		// The ids cereal gives the first polymorphic pointer in an archive
+		constexpr uint32_t kFirstId = 0x80000001;
+		return json{ {"component", {
+			{"polymorphic_id", kFirstId},
+			{"polymorphic_name", component},
+			{"ptr_wrapper", { {"id", kFirstId}, {"data", fields} }},
+		}} }.dump();
+	}
+
+	// The component's fields as get_entity shows them, or null when the entity doesn't have it
+	json componentFields(Entity e, const std::string& component)
+	{
+		std::string data;
+		if (!Archiver::saveComponent(e, component, data))
+			return nullptr;
+		return json::parse(data)["component"]["ptr_wrapper"]["data"];
+	}
+
+	// The given fields over the component's current ones; a component the entity lacks needs all of them
+	std::string componentWithFields(Entity e, const std::string& component, const json& fields)
+	{
+		json merged = componentFields(e, component);
+		if (merged.is_null())
+			merged = fields;
+		else
+			merged.merge_patch(fields);
+		return toCerealJson(component, merged);
+	}
+
+	glm::vec3 vec3FromArgs(const json& args, const std::string& field)
+	{
+		const json& value = args[field];
+		if (!value.is_array() || value.size() != 3 || !value[0].is_number() || !value[1].is_number() || !value[2].is_number())
+			throw McpToolError("'" + field + "' must be [x, y, z]");
+		return { value[0].get<float>(), value[1].get<float>(), value[2].get<float>() };
+	}
+
+	const AssetRecord& findAssetRecord(const json& args)
+	{
+		std::string uuid;
+		if (args.contains("uuid"))
+			uuid = args["uuid"].is_string() ? args["uuid"].get<std::string>() : args["uuid"].dump();
+		const std::string name = args.value("name", "");
+
+		if (uuid.empty() && name.empty())
+			throw McpToolError("Pass 'uuid' or 'name' of an asset from list_assets");
+
+		for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
+		{
+			if (record && (uuid.empty() ? record->name == name : record->uuid.str() == uuid))
+				return *record;
+		}
+		throw McpToolError("No asset with " + (uuid.empty() ? "name '" + name + "'" : "uuid " + uuid) + ". Use list_assets to find one.");
+	}
+
+	void runOrThrow(std::unique_ptr<Command> command)
+	{
+		std::string error;
+		if (!CommandStack::Instance().run(std::move(command), error))
+			throw McpToolError(error);
+	}
 }
 
 void registerAgentTools(McpServer& server, ConsoleReader readConsole)
@@ -217,25 +314,45 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 	// Which components exist and what their fields look like, so the agent doesn't guess field names
 	server.addTool({
 		"get_component_schema",
-		"Lists every registered component type, plus an example of each component's fields taken from the first "
-		"entity in the active scene that has it. Components with no example are registered but unused in this scene.",
-		objectSchema(),
-		[](const json&) {
-			json examples = json::object();
+		"Without 'component': lists every registered component type. With 'component': its fields as a "
+		"default-constructed instance ('defaults'), plus 'exampleFromScene' from the first entity that has it. "
+		"Defaults show field names and types but may not be a useful setup (e.g. a physics collider is null); "
+		"prefer create_preset for things the Create menu offers.",
+		objectSchema({
+			{"component", { {"type", "string"}, {"description", "A name from the registered list"} }},
+		}),
+		[](const json& args) {
+			const auto registered = Archiver::getRegisteredComponentNames();
+			const std::string component = args.value("component", "");
+			if (component.empty())
+				return mcpText(json{ {"registered", registered} }.dump());
+
+			if (std::find(registered.begin(), registered.end(), component) == registered.end())
+				throw McpToolError("Unknown component '" + component + "'. Registered: " + joinNames(registered));
+
+			json result = { {"component", component} };
+
+			std::string data;
+			if (Archiver::defaultComponent(component, data))
+				result["defaults"] = json::parse(data)["component"]["ptr_wrapper"]["data"];
+			else
+			{
+				result["defaults"] = nullptr;
+				result["note"] = "No default constructor; copy exampleFromScene or use create_preset";
+			}
+
 			for (auto& e : sceneEntities())
 			{
-				const json components = componentsOf(e);
-				for (auto& item : components.items())
+				const json fields = componentFields(e, component);
+				if (!fields.is_null())
 				{
-					if (!examples.contains(item.key()))
-						examples[item.key()] = item.value();
+					result["exampleFromScene"] = fields;
+					result["exampleEntity"] = describe(e);
+					break;
 				}
 			}
 
-			return mcpText(json{
-				{"registered", Archiver::getRegisteredComponentNames()},
-				{"examplesFromScene", examples},
-			}.dump());
+			return mcpText(result.dump());
 		}
 	});
 
@@ -284,30 +401,12 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			{"name", { {"type", "string"}, {"description", "Asset name, used when uuid is not given"} }},
 		}),
 		[](const json& args) {
-			std::string uuid;
-			if (args.contains("uuid"))
-				uuid = args["uuid"].is_string() ? args["uuid"].get<std::string>() : args["uuid"].dump();
-			const std::string name = args.value("name", "");
+			const AssetRecord& found = findAssetRecord(args);
 
-			if (uuid.empty() && name.empty())
-				throw McpToolError("Pass 'uuid' or 'name' of an asset from list_assets");
+			json result = assetSummary(found);
+			result["path"] = found.getAbsolutePath();
 
-			const AssetRecord* found = nullptr;
-			for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
-			{
-				if (record && (uuid.empty() ? record->name == name : record->uuid.str() == uuid))
-				{
-					found = record;
-					break;
-				}
-			}
-			if (!found)
-				throw McpToolError("No asset with " + (uuid.empty() ? "name '" + name + "'" : "uuid " + uuid) + ". Use list_assets to find one.");
-
-			json result = assetSummary(*found);
-			result["path"] = found->getAbsolutePath();
-
-			std::ifstream file(found->getAbsolutePath(), std::ios::binary);
+			std::ifstream file(found.getAbsolutePath(), std::ios::binary);
 			std::string bytes((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
 			if (bytes.size() > kMaxAssetBytes)
@@ -402,6 +501,359 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				return mcpText(json{ {"selected", nullptr} }.dump());
 
 			return mcpText(json{ {"selected", { {"id", e.handlerID()}, {"name", entityName(e)} }} }.dump());
+		}
+	});
+
+	// ---- Mutations: each call is one undo step labelled "AI: ..." ----
+
+	server.addTool({
+		"create_entity",
+		"Creates an entity with a name and a Transformation. Optional 'parent' (entity id) and 'components' in "
+		"get_entity's form, e.g. {\"PointLight\": {...}}. Fields of Transformation can be partial; any other component "
+		"needs all its fields (copy them from get_component_schema).",
+		objectSchema({
+			{"name", { {"type", "string"} }},
+			{"parent", { {"type", "integer"}, {"description", "Entity id to create it under"} }},
+			{"components", { {"type", "object"}, {"description", "Component name -> fields"} }},
+		}, { "name" }),
+		[](const json& args) {
+			requireEditMode();
+			const std::string name = args.value("name", "");
+			if (name.empty())
+				throw McpToolError("'name' is required");
+
+			Entity parent = Entity::EmptyEntity;
+			if (args.contains("parent") && !args["parent"].is_null())
+				parent = entityFromArgs(args, "parent");
+
+			// Held in a local: items() only references the object, it must outlive the loop
+			const json components = args.value("components", json::object());
+
+			Entity e = Engine::get()->getContext()->getActiveScene()->createEntity(name);
+			try
+			{
+				for (auto& [component, fields] : components.items())
+					Archiver::loadComponent(e, component, componentWithFields(e, component, fields));
+			}
+			catch (...)
+			{
+				// Don't leave a half-built entity behind
+				e.remove();
+				updateScene();
+				throw;
+			}
+
+			std::vector<ComponentSnapshot> parentBefore;
+			if (parent.valid())
+			{
+				parentBefore.push_back(takeSnapshot(parent, componentTypeName<Transformation>()));
+				e.getComponent<Transformation>().setParent(parent);
+			}
+
+			CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(e, "AI: create " + name, std::move(parentBefore)));
+			updateScene();
+			return mcpText("Created " + describe(e));
+		}
+	});
+
+	// The preset names and descriptions come from the Hierarchy's Create menu table
+	json presetNames = json::array();
+	std::string presetList;
+	for (const auto& preset : entityPresets())
+	{
+		presetNames.push_back(preset.name());
+		presetList += "\n- " + preset.name() + " (" + preset.path + "): " + preset.description;
+	}
+
+	server.addTool({
+		"create_preset",
+		"Creates an entity the way the Hierarchy's Create menu does, with everything that item sets up. Optional "
+		"'name' renames it, 'parent' (entity id) creates it under that entity, 'position' [x, y, z] places it "
+		"relative to the parent (or the world without one). "
+		"The reply lists its components and children. Presets:" + presetList,
+		objectSchema({
+			{"preset", { {"type", "string"}, {"enum", presetNames} }},
+			{"name", { {"type", "string"} }},
+			{"position", { {"type", "array"}, {"items", { {"type", "number"} }} }},
+			{"parent", { {"type", "integer"}, {"description", "Entity id to create it under"} }},
+		}, { "preset" }),
+		[presetNames](const json& args) {
+			requireEditMode();
+			const std::string presetName = args.value("preset", "");
+			const EntityPreset* preset = findPreset(presetName);
+			if (!preset)
+			{
+				std::vector<std::string> names;
+				for (const auto& name : presetNames)
+					names.push_back(name.get<std::string>());
+				throw McpToolError("Unknown preset '" + presetName + "'. Presets: " + joinNames(names));
+			}
+
+			// Parse everything first so a bad value doesn't leave an entity behind
+			std::optional<glm::vec3> position;
+			if (args.contains("position"))
+				position = vec3FromArgs(args, "position");
+			Entity parent = Entity::EmptyEntity;
+			if (args.contains("parent") && !args["parent"].is_null())
+				parent = entityFromArgs(args, "parent");
+			const std::string name = args.value("name", "");
+
+			Entity e = preset->create();
+			if (!e.valid())
+				throw McpToolError("Preset '" + presetName + "' created nothing; check get_console for the reason");
+
+			if (!name.empty())
+				e.getComponent<ObjectComponent>().name = name;
+
+			std::vector<ComponentSnapshot> parentBefore;
+			if (parent.valid())
+			{
+				parentBefore.push_back(takeSnapshot(parent, componentTypeName<Transformation>()));
+				e.getComponent<Transformation>().setParent(parent);
+			}
+
+			// After parenting: setParent keeps the world position, and position is relative to the parent
+			if (position)
+				e.getComponent<Transformation>().setLocalPosition(*position);
+
+			CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(e, "AI: create " + preset->name(), std::move(parentBefore)));
+			updateScene();
+
+			// Held in a local: items() only references the object, it must outlive the loop
+			const json components = componentsOf(e);
+			std::vector<std::string> componentNames;
+			for (auto& item : components.items())
+				componentNames.push_back(item.key());
+
+			std::vector<std::string> children;
+			for (auto& child : childrenOf(e))
+				children.push_back(describe(child));
+
+			return mcpText("Created " + describe(e) + " from preset " + preset->name() + ". Components: " + joinNames(componentNames) +
+				(children.empty() ? "" : ". Children: " + joinNames(children)));
+		}
+	});
+
+	server.addTool({
+		"delete_entity",
+		"Deletes an entity and all its children.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+		}, { "id" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			const std::string description = describe(e);
+			const size_t descendants = countDescendants(e);
+
+			runOrThrow(std::make_unique<DeleteEntitiesCmd>(e, "AI: delete " + entityName(e)));
+			return mcpText("Deleted " + description + (descendants ? " and " + std::to_string(descendants) + " descendants" : ""));
+		}
+	});
+
+	server.addTool({
+		"set_components",
+		"Changes components of one entity. 'components' maps a component name to the fields to change, in get_entity's "
+		"form; fields you leave out keep their current values. A component the entity lacks is added (give all its "
+		"fields, see get_component_schema). null removes the component.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"components", { {"type", "object"}, {"description", "Component name -> fields to change, or null to remove"} }},
+		}, { "id", "components" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			if (!args["components"].is_object() || args["components"].empty())
+				throw McpToolError("'components' must map component names to fields, e.g. {\"Transformation\": {...}}");
+
+			std::vector<ComponentSnapshot> before, after;
+			std::vector<std::string> names;
+			for (auto& [component, fields] : args["components"].items())
+			{
+				before.push_back(takeSnapshot(e, component));
+
+				ComponentSnapshot target{ e.handlerID(), component };
+				if (!fields.is_null())
+				{
+					target.present = true;
+					target.data = componentWithFields(e, component, fields);
+				}
+				after.push_back(std::move(target));
+				names.push_back(component);
+			}
+
+			runOrThrow(std::make_unique<EditComponentsCmd>(std::move(before), std::move(after), "AI: set " + joinNames(names) + " on " + entityName(e)));
+			return mcpText("Updated " + joinNames(names) + " on " + describe(e));
+		}
+	});
+
+	server.addTool({
+		"set_transform",
+		"Moves, rotates or scales an entity relative to its parent. position and scale are [x, y, z]; rotation is "
+		"[x, y, z] Euler angles in degrees. Values you leave out stay as they are.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"position", { {"type", "array"}, {"items", { {"type", "number"} }} }},
+			{"rotation", { {"type", "array"}, {"items", { {"type", "number"} }} }},
+			{"scale", { {"type", "array"}, {"items", { {"type", "number"} }} }},
+		}, { "id" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			if (!args.contains("position") && !args.contains("rotation") && !args.contains("scale"))
+				throw McpToolError("Give at least one of 'position', 'rotation', 'scale'");
+
+			// Parse everything first so a bad value doesn't leave the transform half changed
+			std::optional<glm::vec3> position, rotation, scale;
+			if (args.contains("position")) position = vec3FromArgs(args, "position");
+			if (args.contains("rotation")) rotation = vec3FromArgs(args, "rotation");
+			if (args.contains("scale")) scale = vec3FromArgs(args, "scale");
+
+			const std::string component = componentTypeName<Transformation>();
+			ComponentSnapshot before = takeSnapshot(e, component);
+
+			auto& transform = e.getComponent<Transformation>();
+			if (position) transform.setLocalPosition(*position);
+			if (rotation) transform.setLocalRotation(glm::quat(glm::radians(*rotation)));
+			if (scale) transform.setLocalScale(*scale);
+
+			CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+				std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
+				"AI: transform " + entityName(e)));
+			return mcpText("Transformed " + describe(e));
+		}
+	});
+
+	server.addTool({
+		"rename_entity",
+		"Renames an entity.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"name", { {"type", "string"} }},
+		}, { "id", "name" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			const std::string name = args.value("name", "");
+			if (name.empty())
+				throw McpToolError("'name' must not be empty");
+			if (!e.HasComponent<ObjectComponent>())
+				throw McpToolError("Entity " + std::to_string(e.handlerID()) + " has no ObjectComponent to hold a name");
+
+			const std::string component = componentTypeName<ObjectComponent>();
+			const std::string oldName = entityName(e);
+			ComponentSnapshot before = takeSnapshot(e, component);
+			e.getComponent<ObjectComponent>().name = name;
+
+			CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+				std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
+				"AI: rename " + oldName + " to " + name));
+			updateScene();
+			return mcpText("Renamed id " + std::to_string(e.handlerID()) + " from \"" + oldName + "\" to \"" + name + "\"");
+		}
+	});
+
+	server.addTool({
+		"set_parent",
+		"Moves an entity under another one, keeping its world position. 'parent' null moves it to the scene root.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"parent", { {"type", {"integer", "null"}} }},
+		}, { "id", "parent" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity child = entityFromArgs(args);
+
+			Entity parent = Entity::EmptyEntity;
+			if (!args["parent"].is_null())
+				parent = entityFromArgs(args, "parent");
+
+			for (Entity p = parent; p.valid(); p = parentOf(p))
+			{
+				if (p == child)
+					throw McpToolError("Can't put an entity under itself or one of its descendants");
+			}
+
+			const std::string label = parent.valid()
+				? "AI: move " + entityName(child) + " under " + entityName(parent)
+				: "AI: move " + entityName(child) + " to root";
+
+			if (!reparentWithUndo(child, parent, label))
+				return mcpText("Nothing changed: " + describe(child) + " already has that parent");
+
+			return mcpText(describe(child) + (parent.valid() ? " is now a child of " + describe(parent) : " is now at the scene root"));
+		}
+	});
+
+	server.addTool({
+		"instantiate_prefab",
+		"Creates the entities of a prefab asset (by uuid or name from list_assets) at an optional [x, y, z] position.",
+		objectSchema({
+			{"uuid", { {"type", "string"} }},
+			{"name", { {"type", "string"} }},
+			{"position", { {"type", "array"}, {"items", { {"type", "number"} }} }},
+		}),
+		[](const json& args) {
+			requireEditMode();
+			const AssetRecord& asset = findAssetRecord(args);
+			if (asset.aType != AssetType::PREFAB)
+				throw McpToolError("\"" + asset.name + "\" is a " + getAssetTypeAsStr(asset.aType) + " asset, not a prefab");
+
+			const glm::vec3 position = args.contains("position") ? vec3FromArgs(args, "position") : glm::vec3(0.0f);
+
+			PrefabAssetRef prefab = Engine::get()->getSubSystem<Assets>()->getAsset(asset.uuid).as<PrefabAsset>();
+			if (prefab.isEmpty())
+				throw McpToolError("Couldn't load prefab \"" + asset.name + "\"");
+
+			Entity root = prefab.resource()->Instansiate(position);
+			CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(root, "AI: instantiate " + asset.name));
+			updateScene();
+			return mcpText("Instantiated \"" + asset.name + "\" as " + describe(root));
+		}
+	});
+
+	server.addTool({
+		"undo",
+		"Undoes the last editor action, yours or the user's (the same history as Ctrl+Z).",
+		objectSchema(),
+		[](const json&) {
+			requireEditMode();
+			auto& stack = CommandStack::Instance();
+			if (!stack.canUndo())
+				return mcpText("Nothing to undo");
+
+			const std::string label = stack.undoLabel();
+			if (!stack.undo())
+				throw McpToolError("Undoing \"" + label + "\" failed; see get_console");
+			return mcpText("Undid \"" + label + "\"");
+		}
+	});
+
+	server.addTool({
+		"redo",
+		"Redoes the last undone action (the same history as Ctrl+Y).",
+		objectSchema(),
+		[](const json&) {
+			requireEditMode();
+			auto& stack = CommandStack::Instance();
+			if (!stack.canRedo())
+				return mcpText("Nothing to redo");
+
+			const std::string label = stack.redoLabel();
+			if (!stack.redo())
+				throw McpToolError("Redoing \"" + label + "\" failed; see get_console");
+			return mcpText("Redid \"" + label + "\"");
+		}
+	});
+
+	server.addTool({
+		"save_scene",
+		"Saves the project, including the open scene, to disk.",
+		objectSchema(),
+		[](const json&) {
+			requireEditMode();
+			Engine::get()->saveProject();
+			return mcpText("Saved the project");
 		}
 	});
 }

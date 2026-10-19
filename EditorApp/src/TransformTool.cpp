@@ -7,8 +7,14 @@
 #include "EditorState.h"
 #include "EntityState.h"
 #include "core/MouseEvents.h"
+#include "commands/CommandStack.h"
+#include "commands/EntityCommands.h"
 
 extern Entity g_editorCamera;
+
+// Gizmo undo: Transformation before the current drag, and whether a drag was running last frame
+static ComponentSnapshot s_dragBefore;
+static bool s_wasDragging = false;
 
 void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 {
@@ -136,6 +142,11 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 			break;
 		}
 
+		// A drag can move the matrix on its first frame, so take "before" while the mouse is still only over the gizmo
+		const bool simulating = Engine::get()->getContext()->getActiveScene()->isSimulationActive();
+		if (!s_wasDragging && ImGuizmo::IsOver() && !simulating)
+			s_dragBefore = takeSnapshot(state.getSelectedEntity(), componentTypeName<Transformation>());
+
 		ImGuizmo::Manipulate(camViewPtr, projectionPtr, m_operationMode, m_currentGizmoMode, matrixPtr, NULL, m_useSnap ? &m_snapValues[0] : NULL, NULL, NULL);
 
 		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -146,6 +157,21 @@ void TransformTool::update(ImVec2 windowPos, ImVec2 viewportSize)
 		transform.setLocalPosition(glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
 		transform.setLocalRotation(glm::vec3(Constants::toRadians * matrixRotation[0], Constants::toRadians * matrixRotation[1], Constants::toRadians * matrixRotation[2]));
 		transform.setLocalScale(glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]));
+
+		// Drag released: the whole drag becomes one undo step
+		const bool dragging = ImGuizmo::IsUsing();
+		Entity selected = state.getSelectedEntity();
+		if (s_wasDragging && !dragging && !s_dragBefore.component.empty() && s_dragBefore.entity == selected.handlerID())
+		{
+			ComponentSnapshot after = takeSnapshot(selected, s_dragBefore.component);
+			if (after.data != s_dragBefore.data)
+			{
+				CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+					std::vector<ComponentSnapshot>{ s_dragBefore }, std::vector<ComponentSnapshot>{ after }, "Transformation edit"));
+			}
+			s_dragBefore = {};
+		}
+		s_wasDragging = dragging;
 	}
 }
 

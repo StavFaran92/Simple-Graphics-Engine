@@ -93,6 +93,20 @@ public:
 	// Names of every component type that can be serialized
 	static std::vector<std::string> getRegisteredComponentNames();
 
+	// "struct PhysicsComponent" (entt type name) -> "PhysicsComponent"
+	static std::string componentTypeName(const std::string& enttTypeName);
+
+	// Component as JSON; false if the entity doesn't have it
+	static bool saveComponent(Entity e, const std::string& component, std::string& outJson);
+
+	// A default-constructed component in saveComponent's format; false if it has no default constructor
+	static bool defaultComponent(const std::string& component, std::string& outJson);
+
+	// Sets the component from saveComponent's JSON
+	static void loadComponent(Entity e, const std::string& component, const std::string& json);
+
+	static void removeComponent(Entity e, const std::string& component);
+
 	static Entity deserializeEntity(SerializedEntity serializedEnt, SceneResourceRef& scene);
 
 	static SerializedScene serializeScene(SceneResourceRef& scene);

@@ -408,7 +408,8 @@ void AssetViewWindow::display()
 								logWarning("Failed to cast asset to prefab asset.");
 							else
 							{
-								prefab.resource()->Instansiate();
+								Entity root = prefab.resource()->Instansiate();
+								CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(root, "Instantiate " + aInfo.name));
 								updateScene();
 							}
 						}
@@ -421,6 +422,7 @@ void AssetViewWindow::display()
 							else
 							{
 								Engine::get()->getContext()->setActiveScene(scene.resource()->getID());
+								CommandStack::Instance().clear();
 								setupScene();
 								updateScene();
 							}

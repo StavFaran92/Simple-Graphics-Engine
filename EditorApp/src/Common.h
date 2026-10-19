@@ -5,6 +5,10 @@
 #include "imgui_internal.h"
 #include "ImGuizmo.h"
 
+#include "commands/CommandStack.h"
+#include "commands/EntityCommands.h"
+#include "commands/InspectorUndo.h"
+
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -104,7 +108,11 @@ static void displayComponent(const std::string& componentName, std::function<voi
 	if (!state.getSelectedEntity().HasComponent<T>())
 		return;
 
-	auto& component = state.getSelectedEntity().getComponent<T>();
+	Entity e = state.getSelectedEntity();
+	auto& component = e.getComponent<T>();
+
+	// State before this frame's widgets (header checkbox included) can change it
+	ComponentSnapshot before = InspectorUndo::beforeWidgets(e, componentTypeName<T>());
 
 	ImGui::PushID(componentName.c_str());
 
@@ -133,7 +141,13 @@ static void displayComponent(const std::string& componentName, std::function<voi
 		{
 			ImGui::SetCursorPos(afterHeaderCursor);
 			ImGui::PopID();
-			state.getSelectedEntity().RemoveComponent<T>();
+			e.RemoveComponent<T>();
+			if (!before.component.empty())
+			{
+				CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+					std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, before.component) },
+					"Remove " + componentName));
+			}
 			updateScene();
 			return;
 		}
@@ -181,6 +195,8 @@ static void displayComponent(const std::string& componentName, std::function<voi
 		// Gap between component boxes
 		ImGui::Dummy(ImVec2(0, 2));
 	}
+
+	InspectorUndo::afterWidgets(before, componentName + " edit");
 
 	ImGui::PopID();
 }

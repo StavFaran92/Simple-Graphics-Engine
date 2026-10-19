@@ -7,7 +7,47 @@
 #include "memory/Assets.h"
 
 #include "EntityState.h"
+#include "EntityPresets.h"
 #include <imgui_stdlib.h>
+
+// Records a just-created entity as an undo step and selects it
+static void recordCreated(Entity e, const std::string& label)
+{
+	CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(e, label));
+	updateScene();
+	state.selectEntity(e);
+}
+
+// Draws the presets and submenus directly under 'prefix' ("" = top level, "Environment/" = inside Environment)
+static void drawPresetMenu(const std::string& prefix)
+{
+	std::vector<std::string> drawn;
+	for (const auto& preset : entityPresets())
+	{
+		if (preset.path.rfind(prefix, 0) != 0)
+			continue;
+
+		const std::string rest = preset.path.substr(prefix.size());
+		const size_t slash = rest.find('/');
+		const std::string label = rest.substr(0, slash);
+
+		// Each submenu once, at its first preset
+		if (std::find(drawn.begin(), drawn.end(), label) != drawn.end())
+			continue;
+		drawn.push_back(label);
+
+		if (slash == std::string::npos)
+		{
+			if (ImGui::MenuItem(label.c_str()))
+				recordCreated(preset.create(), "Create " + label);
+		}
+		else if (ImGui::BeginMenu(label.c_str()))
+		{
+			drawPresetMenu(prefix + label + "/");
+			ImGui::EndMenu();
+		}
+	}
+}
 
 void displayEntityHelper(Entity& e)
 {
@@ -72,14 +112,14 @@ void displayEntityHelper(Entity& e)
 
 			if (ImGui::MenuItem("Remove from parent")) // todo fix this nonsense
 			{
-				e.getComponent<Transformation>().removeParent();
+				reparentWithUndo(e, Entity::EmptyEntity, "Remove " + obj.name + " from parent");
 			}
 
 			if (ImGui::MenuItem("Delete"))
 			{
-				e.remove();
-				updateScene();
-				state.selectEntity(Entity::EmptyEntity);
+				std::string error;
+				if (!CommandStack::Instance().run(std::make_unique<DeleteEntitiesCmd>(e, "Delete " + obj.name), error))
+					logError("Delete failed: " + error);
 			}
 
 			ImGui::EndPopup();
@@ -101,7 +141,7 @@ void displayEntityHelper(Entity& e)
 			Entity sourceEntity = *(const Entity*)payload->Data;
 			if (sourceEntity != e)
 			{
-				sourceEntity.getComponent<Transformation>().setParent(e);
+				reparentWithUndo(sourceEntity, e, "Move " + sourceEntity.getComponent<ObjectComponent>().name + " under " + obj.name);
 			}
 		}
 		ImGui::EndDragDropTarget();
@@ -127,7 +167,16 @@ void displayEntityHelper(Entity& e)
 
 		if (ImGui::IsItemDeactivated())
 		{
-			obj.name = renameText;
+			if (renameText != obj.name)
+			{
+				const std::string component = componentTypeName<ObjectComponent>();
+				ComponentSnapshot before = takeSnapshot(e, component);
+				const std::string oldName = obj.name;
+				obj.name = renameText;
+				CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+					std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
+					"Rename " + oldName + " to " + renameText));
+			}
 			updateScene(); // Assuming this updates any necessary scene state
 			EditorState::Instance().selectedEntityRename = false;
 		}
@@ -204,7 +253,7 @@ void displaySceneObjects()
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_ITEM"))
 		{
 			Entity sourceEntity = *(const Entity*)payload->Data;
-			sourceEntity.getComponent<Transformation>().removeParent();
+			reparentWithUndo(sourceEntity, Entity::EmptyEntity, "Move " + sourceEntity.getComponent<ObjectComponent>().name + " to root");
 		}
 		ImGui::EndDragDropTarget();
 	}
@@ -250,98 +299,7 @@ void SceneHierarchyWindow::display()
 
 	if (ImGui::BeginPopup("AddObjectToScenePopup"))
 	{
-		if (ImGui::MenuItem("Entity"))
-		{
-			Engine::get()->getContext()->getActiveScene()->createEntity();
-			updateScene();
-			state.selectEntity(sceneObjects[0].e);
-		}
-		if (ImGui::BeginMenu("Primitive"))
-		{ // Begin the submenu
-			if (ImGui::MenuItem("Cube"))
-			{
-				ShapeFactory::createBoxEntity(&Engine::get()->getContext()->getActiveScene()->getRegistry());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-			if (ImGui::MenuItem("Sphere"))
-			{
-				ShapeFactory::createSphere(&Engine::get()->getContext()->getActiveScene()->getRegistry());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-			if (ImGui::MenuItem("Quad"))
-			{
-				ShapeFactory::createQuad(&Engine::get()->getContext()->getActiveScene()->getRegistry());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-			if (ImGui::MenuItem("Cylinder"))
-			{
-				ShapeFactory::createCylinder(&Engine::get()->getContext()->getActiveScene()->getRegistry());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			ImGui::EndMenu(); // End the submenu
-		}
-
-		if (ImGui::BeginMenu("Light"))
-		{ // Begin the submenu
-			if (ImGui::MenuItem("Directional Light"))
-			{
-				static int createdDLightCount = 0;
-				auto e = Engine::get()->getContext()->getActiveScene()->createEntity("Directional_Light_" + std::to_string(createdDLightCount++));
-				e.addComponent<DirectionalLight>(glm::vec3{ 0,0,0 }, glm::vec3{ 0,-1,0 }, 1.f, 1.f);
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-			if (ImGui::MenuItem("Point Light"))
-			{
-				static int createdPLightCount = 0;
-				auto e = Engine::get()->getContext()->getActiveScene()->createEntity("Point_Light_" + std::to_string(createdPLightCount++));
-				e.addComponent<PointLight>(glm::vec3{ 0,0,0 }, 1.f, 1.f, Attenuation());
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			ImGui::EndMenu(); // End the submenu
-		}
-
-		if (ImGui::BeginMenu("Environment"))
-		{ // Begin the submenu
-			if (ImGui::MenuItem("Skybox"))
-			{
-				Entity e = Skybox::createSkybox(SGE_ROOT_DIR "Resources/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR);
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			if (ImGui::MenuItem("Terrain"))
-			{
-				Entity e = Terrain::createTerrain(1000, 1000);
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			if (ImGui::MenuItem("Pool"))
-			{
-				Entity e = WaterSystem::createPool();
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			if (ImGui::MenuItem("Clouds"))
-			{
-				Entity e = VolumetricCloudsSystem::createVolumetricClouds();
-				updateScene();
-				state.selectEntity(sceneObjects[0].e);
-			}
-
-			ImGui::EndMenu(); // End the submenu
-		}
-
-		// Add more submenus or menu items as needed
+		drawPresetMenu("");
 		ImGui::EndPopup();
 	}
 

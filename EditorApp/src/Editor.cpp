@@ -20,6 +20,8 @@
 #include "ViewCapture.h"
 #include "ai/McpServer.h"
 #include "ai/AgentTools.h"
+#include "commands/CommandStack.h"
+#include "commands/EntityCommands.h"
 #include <vector>
 #include <mutex>
 #include <fstream>
@@ -280,12 +282,13 @@ void LightCreatorWindow()
 			{
 				auto e = Engine::get()->getContext()->getActiveScene()->createEntity();
 				e.addComponent<DirectionalLight>(color, dir, ambientIntensity, diffuseIntensity);
-
+				CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(e, "Create directional light"));
 			}
 			else if (lightType == LightType::PointLight)
 			{
 				auto e = Engine::get()->getContext()->getActiveScene()->createEntity();
 				e.addComponent<PointLight>(color, ambientIntensity, diffuseIntensity, attenuation);
+				CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(e, "Create point light"));
 			}
 
 			EditorState::Instance().showLightCreatorWindow = false;
@@ -459,6 +462,7 @@ class GUI_Helper : public GuiMenu {
 					if (lTheSelectFolderName)
 					{
 						Engine::get()->loadProject(lTheSelectFolderName);
+						CommandStack::Instance().clear();
 						state.selectEntity(Entity::EmptyEntity);
 						updateScene();
 					}
@@ -560,7 +564,16 @@ class GUI_Helper : public GuiMenu {
 					ImGui::EndMenu(); // End of File dropdown
 				}
 				if (ImGui::BeginMenu("Edit")) {
-					
+					auto& commands = CommandStack::Instance();
+					const std::string undoLabel = commands.canUndo() ? "Undo " + commands.undoLabel() : "Undo";
+					const std::string redoLabel = commands.canRedo() ? "Redo " + commands.redoLabel() : "Redo";
+
+					if (ImGui::MenuItem(undoLabel.c_str(), "Ctrl+Z", false, commands.canUndo()))
+						commands.undo();
+					if (ImGui::MenuItem(redoLabel.c_str(), "Ctrl+Y", false, commands.canRedo()))
+						commands.redo();
+					ImGui::Separator();
+
 					CreateMenu::display();
 
 					ImGui::EndMenu();
@@ -835,7 +848,23 @@ public:
 				pauseSimulation();
 			return true;
 		});
-		
+
+		// Ctrl+Z / Ctrl+Y — Undo / Redo; a focused text field keeps its own Ctrl+Z
+		auto ctrlShortcut = [kb] {
+			const bool ctrl = kb->getKeyState(KeyCode::SCANCODE_LCTRL) || kb->getKeyState(KeyCode::SCANCODE_RCTRL);
+			return ctrl && !ImGui::GetIO().WantTextInput;
+		};
+		kb->onKeyPressed(uiShortucutsHandler, KeyCode::SCANCODE_Z, [ctrlShortcut](KeyPressedEvent e) {
+			if (!ctrlShortcut()) return false;
+			CommandStack::Instance().undo();
+			return true;
+		});
+		kb->onKeyPressed(uiShortucutsHandler, KeyCode::SCANCODE_Y, [ctrlShortcut](KeyPressedEvent e) {
+			if (!ctrlShortcut()) return false;
+			CommandStack::Instance().redo();
+			return true;
+		});
+
 		Engine::get()->getInput()->getKeyboard()->onKeyReleased(uiShortucutsHandler, KeyCode::SCANCODE_X, [](KeyReleasedEvent e) {
 			debugTerrainFlag = true;
 			return false;

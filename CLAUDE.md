@@ -31,6 +31,19 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
   `get_console`, `screenshot_viewport`, `get_selection`. Entity ids are entt handle ids (same as in .scene files)
 - Code: `EditorApp/src/ai/` - `McpServer` (HTTP + JSON-RPC on its own thread), `MainThreadQueue` (tool calls run
   in `EditorApp::update()`), `AgentTools.cpp` (the tools). New tools: add them in `registerAgentTools`
+- Mutation tools (`create_entity`, `set_components`, `set_parent`, `undo`, ...) are refused while the simulation runs
+- `create_preset` and the Hierarchy's Create menu share one table: `EditorApp/src/EntityPresets.cpp`. A new preset
+  (path like `"Environment/Water/Pool"` for nested submenus) shows up in both
+
+## Undo (EditorApp/src/commands/)
+- Undo stores component snapshots (`ComponentSnapshot`, cereal JSON via `Archiver::saveComponent`), not whole entities
+- Change made live by a panel: snapshot before, change it, snapshot after, then
+  `CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(before, after, label))`
+- Entity created by existing code: `record(std::make_unique<CreateEntitiesCmd>(entity, label))` after creating it
+- Delete: `CommandStack::Instance().run(std::make_unique<DeleteEntitiesCmd>(entity, label), error)`
+- Parent changes: `reparentWithUndo(child, newParent, label)`
+- Inspector sections get undo automatically through `displayComponent<T>` (Common.h); a whole drag is one step
+- History is cleared when a project or scene is opened; undo/redo do nothing while the simulation runs
 
 ## Conventions
 - Components: `REGISTER_COMPONENT(...)`, serialized via `ComponentSerializer`

@@ -9,6 +9,9 @@
 #include "component/Transformation.h"
 #include "memory/BuiltInAssets.h"
 #include "core/Window.h"
+#include "core/Engine.h"
+#include "runtime/Context.h"
+#include "core/Logger.h"
 
 #include <sstream>
 #include <cereal/archives/json.hpp>
@@ -54,21 +57,104 @@ std::string Archiver::serializeEntityToJson(Entity e)
 	return ss.str();
 }
 
+namespace
+{
+	const ComponentSerdesEntry& findEntry(const std::string& component)
+	{
+		for (auto& entry : ComponentSerdes::getRegistry())
+		{
+			if (Archiver::componentTypeName(entry.name) == component)
+				return entry;
+		}
+		throw std::invalid_argument("Unknown component '" + component + "'");
+	}
+
+	// Going through cereal copies what the component points to, so the JSON doesn't change with later edits
+	std::string componentToJson(const std::shared_ptr<Component>& c, const std::string& component)
+	{
+		std::stringstream ss;
+		try
+		{
+			cereal::JSONOutputArchive archive(ss, cereal::JSONOutputArchive::Options::NoIndent());
+			archive(cereal::make_nvp("component", c));
+		}
+		catch (const cereal::Exception& ex)
+		{
+			// Rethrown, not returned as false: false means "absent", and undo would remove the component
+			logError("Saving component {} failed: {}", component, ex.what());
+			throw std::runtime_error("Saving component " + component + " failed: " + ex.what());
+		}
+		return ss.str();
+	}
+}
+
+std::string Archiver::componentTypeName(const std::string& enttTypeName)
+{
+	// entt type names on MSVC carry the "struct " / "class " keyword
+	for (const char* prefix : { "struct ", "class " })
+	{
+		if (enttTypeName.rfind(prefix, 0) == 0)
+			return enttTypeName.substr(strlen(prefix));
+	}
+	return enttTypeName;
+}
+
 std::vector<std::string> Archiver::getRegisteredComponentNames()
 {
 	std::vector<std::string> names;
 	for (auto& entry : ComponentSerdes::getRegistry())
-	{
-		// entt type names on MSVC carry the "struct " / "class " keyword
-		std::string name = entry.name;
-		for (const char* prefix : { "struct ", "class " })
-		{
-			if (name.rfind(prefix, 0) == 0)
-				name = name.substr(strlen(prefix));
-		}
-		names.push_back(name);
-	}
+		names.push_back(componentTypeName(entry.name));
 	return names;
+}
+
+bool Archiver::saveComponent(Entity e, const std::string& component, std::string& outJson)
+{
+	std::shared_ptr<Component> copy = findEntry(component).serialize(e);
+	if (!copy)
+		return false;
+
+	outJson = componentToJson(copy, component);
+	return true;
+}
+
+bool Archiver::defaultComponent(const std::string& component, std::string& outJson)
+{
+	std::shared_ptr<Component> c = findEntry(component).makeDefault();
+	if (!c)
+		return false;
+
+	outJson = componentToJson(c, component);
+	return true;
+}
+
+void Archiver::loadComponent(Entity e, const std::string& component, const std::string& json)
+{
+	const ComponentSerdesEntry& entry = findEntry(component);
+
+	std::shared_ptr<Component> loaded;
+	try
+	{
+		std::stringstream ss(json);
+		cereal::JSONInputArchive archive(ss);
+		archive(cereal::make_nvp("component", loaded));
+	}
+	catch (const cereal::Exception& ex)
+	{
+		logError("Loading component {} failed: {}", component, ex.what());
+		throw std::runtime_error("Loading component " + component + " failed: " + ex.what());
+	}
+
+	// Same steps prefab instantiation runs after deserializing
+	auto scene = Engine::get()->getContext()->getActiveScene();
+	entry.deserialize(loaded, e, scene);
+	entry.init(e, scene);
+	entry.postLoad(e, scene);
+}
+
+void Archiver::removeComponent(Entity e, const std::string& component)
+{
+	auto scene = Engine::get()->getContext()->getActiveScene();
+	findEntry(component).remove(e, scene);
 }
 
 Entity Archiver::deserializeEntity(SerializedEntity serializedEnt, SceneResourceRef& scene)
