@@ -375,7 +375,11 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			const std::string typeFilter = args.value("type", "");
 			const std::string folderFilter = args.value("folder", "");
 			const bool includeEngine = args.value("include_engine", false);
-			const size_t limit = args.value("limit", 200);
+			// Read signed: -1 converted to size_t would mean "no limit"
+			const int64_t requestedLimit = args.value("limit", int64_t{ 200 });
+			if (requestedLimit < 0)
+				throw McpToolError("'limit' can't be negative");
+			const size_t limit = static_cast<size_t>(requestedLimit);
 
 			json assets = json::array();
 			size_t matched = 0;
@@ -399,8 +403,9 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 	// One asset's metadata plus its file content when it's small JSON (materials, prefabs)
 	server.addTool({
 		"get_asset",
-		"Returns one asset's metadata and, for text assets such as materials and prefabs, its file content as JSON. "
-		"Binary assets and files over 256 KB return metadata only. Pass uuid or name.",
+		"Returns one asset's metadata and its file content: 'content' as JSON for materials, prefabs and scenes, "
+		"'text' for other text files such as Lua scripts and shaders. Binary assets and files over 256 KB return "
+		"metadata only. Pass uuid or name.",
 		objectSchema({
 			{"uuid", { {"type", "string"}, {"description", "Asset uuid from list_assets"} }},
 			{"name", { {"type", "string"}, {"description", "Asset name, used when uuid is not given"} }},
@@ -421,13 +426,16 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			else
 			{
 				json content = json::parse(bytes, nullptr, false);
-				if (content.is_discarded())
-					result["note"] = "Binary file; content not included";
-				else
+				if (!content.is_discarded())
 					result["content"] = content;
+				else if (bytes.find('\0') == std::string::npos)
+					result["text"] = bytes;  // Lua scripts, shaders; text files never contain NUL bytes
+				else
+					result["note"] = "Binary file; content not included";
 			}
 
-			return mcpText(result.dump());
+			// Text that isn't valid UTF-8 (a Latin-1 comment) would make dump() throw; replace those bytes instead
+			return mcpText(result.dump(-1, ' ', false, json::error_handler_t::replace));
 		}
 	});
 
