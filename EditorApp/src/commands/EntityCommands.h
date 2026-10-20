@@ -3,6 +3,7 @@
 #include "Command.h"
 #include "ComponentSnapshot.h"
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -10,7 +11,9 @@
 class EditComponentsCmd : public Command
 {
 public:
-	EditComponentsCmd(std::vector<ComponentSnapshot> before, std::vector<ComponentSnapshot> after, std::string label);
+	// validate runs after "after" is applied; if it throws, "before" is restored and the command fails
+	EditComponentsCmd(std::vector<ComponentSnapshot> before, std::vector<ComponentSnapshot> after, std::string label,
+		std::function<void()> validate = {});
 
 	bool execute(std::string& error) override;
 	void undo() override;
@@ -20,6 +23,7 @@ private:
 	std::vector<ComponentSnapshot> m_before;
 	std::vector<ComponentSnapshot> m_after;
 	std::string m_label;
+	std::function<void()> m_validate;
 };
 
 // An entity and its children that can be removed and recreated with the same ids
@@ -74,3 +78,7 @@ std::vector<ComponentSnapshot> parentTransformSnapshot(Entity e);
 
 // Sets the parent (an invalid newParent detaches) and records it as one undo step; false if nothing changed
 bool reparentWithUndo(Entity child, Entity newParent, const std::string& label);
+
+// Throws if the entity's parent/children links don't agree with theirs (a parent that doesn't list it as a
+// child, a missing child, itself as parent); only setParent keeps both sides in step
+void checkHierarchyLinks(Entity e);

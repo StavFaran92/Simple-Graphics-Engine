@@ -521,7 +521,10 @@ void Scene::update(float deltaTime)
 {
 	//preloadSceneResources();
 
-	getGameCamera().getComponent<Transformation>().update();
+	// The game camera can be deleted from the editor
+	Entity gameCamera = getGameCamera();
+	if (gameCamera.valid() && gameCamera.HasComponent<Transformation>())
+		gameCamera.getComponent<Transformation>().update();
 
 	if (isSimulationActive())
 	{
@@ -626,6 +629,11 @@ void Scene::draw(float deltaTime)
 	for (auto& [rName, renderView] : m_renderViews)
 	{
 		if (!renderView->isEnabled())
+			continue;
+
+		// Its camera was deleted (e.g. the game camera from the Hierarchy); the view keeps its last image
+		Entity viewCamera = renderView->getCamera();
+		if (!viewCamera.valid() || !viewCamera.HasComponent<CameraComponent>() || !viewCamera.HasComponent<Transformation>())
 			continue;
 
 		auto viewport = renderView->getViewport();
@@ -1626,6 +1634,9 @@ void Scene::stopSimulation()
 
 	for (auto&& [entity, nsc] : m_registry->get().view<NativeScriptComponent>().each())
 	{
+		if (!nsc.script)
+			continue;
+
 		try
 		{
 			nsc.script->onDestroy();

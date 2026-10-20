@@ -79,8 +79,18 @@ void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody, Entit
 		return;
 	}
 
-	MeshRendererComponent& meshRenderer = entity.getComponentInChildren<MeshRendererComponent>(false); // todo fix this is unsafe (getComponentInChildren itself is)
-	auto& materialResource = meshRenderer.getMaterialBySlot(0).resource(); // A water body plane only has single material
+	// The water plane is a child the Pool preset creates; a WaterBodyComponent added by hand has none
+	MeshRendererComponent* meshRenderer = entity.tryGetComponentInChildren<MeshRendererComponent>(false);
+	if (!meshRenderer)
+	{
+		// Once per entity: this runs every frame
+		static std::unordered_set<entity_id> s_warned;
+		if (s_warned.insert(entity.handlerID()).second)
+			logWarning("Water body (entity {}) has no child with a MeshRendererComponent; skipping it", entity.handlerID());
+		return;
+	}
+
+	auto& materialResource = meshRenderer->getMaterialBySlot(0).resource(); // A water body plane only has single material
 
 	if (materialResource.isEmpty())
 	{
@@ -88,7 +98,8 @@ void WaterSystem::prepareWaterBodyForRender(WaterBodyComponent& waterBody, Entit
 		return;
 	}
 
-	materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal->resolve());
+	if (waterBody.waterBodyNormal)
+		materialResource->setSampler("uWaterNormalSampler", waterBody.waterBodyNormal->resolve());
 
 	materialResource->setUniformValue("uWave1Speed", waterBody.wave1Speed);
 	materialResource->setUniformValue("uWave2Speed", waterBody.wave2Speed);

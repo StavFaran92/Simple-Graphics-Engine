@@ -76,7 +76,10 @@ public:
 			return true;
 		}
 
-		return false;
+		// A uuid naming an asset of another type (a texture in a model ref) counts as empty
+		if (!m_cachedAsset)
+			m_cachedAsset = std::dynamic_pointer_cast<T>(AssetHandleImpl::getInfo(uuid).asset);
+		return !m_cachedAsset;
 	}
 
 	const AssetRecord& info() const
@@ -130,7 +133,8 @@ public:
 		{
 			m_cachedAsset = std::dynamic_pointer_cast<T>(info().asset);
 		}
-		assert(uuid == m_cachedAsset->getUID());
+		// Null when the uuid's asset isn't a T
+		assert(!m_cachedAsset || uuid == m_cachedAsset->getUID());
 		return m_cachedAsset;
 	}
 

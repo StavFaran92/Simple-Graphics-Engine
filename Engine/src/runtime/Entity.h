@@ -163,27 +163,28 @@ public:
         throw std::runtime_error("Component not found in tree hierarchy.");
     }
 
+    // The component on this entity (if includeSelf) or a direct child; null if none has it
     template<typename T>
-    T& getComponentInChildren(bool includeSelf = true)
+    T* tryGetComponentInChildren(bool includeSelf = true)
     {
         assert(valid() && "Invalid entity.");
-        if (includeSelf)
-        {
-            if (HasComponent<T>())
-            {
-                return getComponent<T>();
-            }
-        }
+        if (includeSelf && HasComponent<T>())
+            return &getComponent<T>();
 
         auto childrens = getChildren();
         for (auto [id, child] : childrens)
         {
-            T* comp = child.tryGetComponent<T>();
-            if (comp)
-            {
-                return *comp;
-            }
+            if (T* comp = child.tryGetComponent<T>())
+                return comp;
         }
+        return nullptr;
+    }
+
+    template<typename T>
+    T& getComponentInChildren(bool includeSelf = true)
+    {
+        if (T* comp = tryGetComponentInChildren<T>(includeSelf))
+            return *comp;
 
         assert(false && "Component not found in tree hierarchy.");
 

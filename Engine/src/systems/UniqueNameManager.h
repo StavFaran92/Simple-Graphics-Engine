@@ -18,6 +18,9 @@ public:
 
 	bool isNameExists(const std::string& name, const ScopedPath& folder) const;
 
+	// Why the name can't be an asset's file name ("contains '/'"), or empty if it can
+	static std::string fileNameError(const std::string& name);
+
 //	void addName(const std::string& name);
 //
 //	void removeName(const std::string& name);

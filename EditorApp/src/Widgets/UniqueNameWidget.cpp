@@ -10,31 +10,35 @@ UniqueNameWidget::UniqueNameWidget(const std::string& label)
 {
 }
 
+// Why the name can't be used, or empty if it can
+static std::string nameProblem(const std::string& name)
+{
+	const std::string error = UniqueNameManager::fileNameError(name);
+	if (!error.empty())
+		return "Name " + error;
+	if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(name, EditorState::Instance().getWorkingDir().path()))
+		return "Name is taken";
+	return "";
+}
+
 bool UniqueNameWidget::isValid() const
 {
-	if (Engine::get()->getSubSystem<UniqueNameManager>()->isNameExists(name, EditorState::Instance().getWorkingDir().path()))
-	{
-		return false;
-	}
-	else if (name.empty())
-	{
-		return false;
-	}
-	return true;
+	return nameProblem(name).empty();
 }
 
 void UniqueNameWidget::draw()
 {
 	ImGui::InputText("Name", &name);
 
-	if (!isValid())
+	const std::string problem = nameProblem(name);
+	if (!problem.empty())
 	{
 		// TODO fix, font is blurry
 
 		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 80, 80, 255)); // soft red
 		//ImGui::SetWindowFontScale(0.9f);                                 // a bit smaller
 
-		ImGui::TextUnformatted("*Name is taken or empty");
+		ImGui::TextUnformatted(("*" + problem).c_str());
 
 		//ImGui::SetWindowFontScale(1.0f);                                 // restore
 		ImGui::PopStyleColor();

@@ -24,6 +24,13 @@ void SkyboxComponent::build()
 
 	assert(!m_scene.isEmpty());
 
+	// A SkyboxComponent added without an image (not through the Skybox preset) has nothing to build
+	if (originalImage.isEmpty())
+	{
+		logWarning("Skybox has no image; set originalImage to an equirectangular texture");
+		return;
+	}
+
 	TextureResourceRef flippedImage = TextureTransformer::flipVertical(originalImage.resource());
 	TextureResourceRef flippedImageGammeCorrected = TextureTransformer::applyGammaCorrection(flippedImage);
 	auto cubemap = EquirectangularToCubemapConverter::fromEquirectangularToCubemap(flippedImageGammeCorrected);
@@ -46,7 +53,8 @@ void SkyboxComponent::build()
 void SkyboxComponent::onInit(SceneResourceRef& scene)
 {
 	build();
-	scene->setIBLData(m_irradianceMap.resource(), m_prefilterEnvMap.resource());
+	if (m_isBuilt)
+		scene->setIBLData(m_irradianceMap.resource(), m_prefilterEnvMap.resource());
 }
 
 void SkyboxComponent::postLoad(SceneResourceRef& scene)
@@ -56,7 +64,9 @@ void SkyboxComponent::postLoad(SceneResourceRef& scene)
 		build();
 	}
 
-	scene->setIBLData(m_irradianceMap.resource(), m_prefilterEnvMap.resource());
+	// Without an image there are no maps; keep the scene's current lighting
+	if (m_isBuilt)
+		scene->setIBLData(m_irradianceMap.resource(), m_prefilterEnvMap.resource());
 }
 
 std::vector<AssetRef<Asset>> SkyboxComponent::gatherDependenciesInternal() const

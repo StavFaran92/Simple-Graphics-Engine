@@ -17,6 +17,10 @@
 
 void Terrain::postLoad(SceneResourceRef& scene)
 {
+	// A Terrain added without the Terrain preset has no heightmap (it isn't drawn either)
+	if (m_heightmap.isEmpty())
+		return;
+
 	auto heightmapResource = m_heightmap.resource();
 	heightmapResource->download();
 	//float* src = static_cast<float*>(heightmapResource->getData().data);

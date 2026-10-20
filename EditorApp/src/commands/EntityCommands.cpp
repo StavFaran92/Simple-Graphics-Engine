@@ -72,10 +72,38 @@ bool reparentWithUndo(Entity child, Entity newParent, const std::string& label)
 	return changed;
 }
 
+void checkHierarchyLinks(Entity e)
+{
+	const std::string hint = "; use set_parent to change the hierarchy";
+	auto& transform = e.getComponent<Transformation>();
+
+	Entity parent = transform.getParent();
+	if (parent.handlerID() != entt::null)
+	{
+		if (parent == e)
+			throw std::runtime_error("An entity can't be its own parent" + hint);
+		if (!parent.valid() || !parent.HasComponent<Transformation>())
+			throw std::runtime_error("Parent " + std::to_string(parent.handlerID()) + " doesn't exist" + hint);
+
+		auto siblings = parent.getComponent<Transformation>().getChildren();
+		if (siblings.find(e.handlerID()) == siblings.end())
+			throw std::runtime_error("Parent " + std::to_string(parent.handlerID()) + " doesn't list it as a child" + hint);
+	}
+
+	for (auto& [id, child] : transform.getChildren())
+	{
+		if (!child.valid() || !child.HasComponent<Transformation>())
+			throw std::runtime_error("Child " + std::to_string(id) + " doesn't exist" + hint);
+		if (child.getComponent<Transformation>().getParent() != e)
+			throw std::runtime_error("Child " + std::to_string(id) + " has another parent" + hint);
+	}
+}
+
 // ---- EditComponentsCmd ----
 
-EditComponentsCmd::EditComponentsCmd(std::vector<ComponentSnapshot> before, std::vector<ComponentSnapshot> after, std::string label)
-	: m_before(std::move(before)), m_after(std::move(after)), m_label(std::move(label))
+EditComponentsCmd::EditComponentsCmd(std::vector<ComponentSnapshot> before, std::vector<ComponentSnapshot> after, std::string label,
+	std::function<void()> validate)
+	: m_before(std::move(before)), m_after(std::move(after)), m_label(std::move(label)), m_validate(std::move(validate))
 {
 }
 
@@ -84,6 +112,8 @@ bool EditComponentsCmd::execute(std::string&)
 	try
 	{
 		applyAll(m_after);
+		if (m_validate)
+			m_validate();
 	}
 	catch (...)
 	{

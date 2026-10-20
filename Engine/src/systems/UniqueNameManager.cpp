@@ -52,3 +52,19 @@ bool UniqueNameManager::isNameExists(const std::string& name, const ScopedPath& 
 
 	return false;
 }
+
+std::string UniqueNameManager::fileNameError(const std::string& name)
+{
+	if (name.find_first_not_of(" \t") == std::string::npos)
+		return "is empty";
+
+	// One plain name: no folders, no "..", no drive (filesystem splits those off)
+	if (fs::path(name).filename().string() != name)
+		return "must be a name, not a path";
+
+	// What Windows doesn't allow in file names; ':' would create a hidden stream instead of a file
+	if (name.find_first_of("<>:\"|?*") != std::string::npos)
+		return "contains one of < > : \" | ? *";
+
+	return "";
+}

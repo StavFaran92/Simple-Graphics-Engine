@@ -69,7 +69,9 @@ namespace
 
 	Entity entityFromArgs(const json& args, const std::string& field = "id")
 	{
-		if (!args.contains(field) || !args[field].is_number_integer() || args[field].get<int64_t>() < 0)
+		// Above 32 bits it would be truncated to another entity's id (2^40 -> 0)
+		if (!args.contains(field) || !args[field].is_number_integer() ||
+			args[field].get<int64_t>() < 0 || args[field].get<int64_t>() > UINT32_MAX)
 			throw McpToolError("'" + field + "' must be a numeric entity id, as listed by get_scene_hierarchy");
 
 		const auto id = args[field].get<uint32_t>();
@@ -612,6 +614,7 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				for (auto& [component, fields] : components.items())
 					Archiver::deserializeComponent(e, component, componentWithFields(e, component, fields));
 				Archiver::initializeEntities({ e }, scene);
+				checkHierarchyLinks(e);
 			}
 			catch (...)
 			{
@@ -733,7 +736,8 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 		"set_components",
 		"Changes components of one entity. 'components' maps a component name to the fields to change, in get_entity's "
 		"form; fields you leave out keep their current values. A component the entity lacks is added (give all its "
-		"fields, see get_component_schema). null removes the component.",
+		"fields, see get_component_schema). null removes the component, except Transformation and ObjectComponent, "
+		"which every entity needs (delete_entity removes the entity).",
 		objectSchema({
 			{"id", { {"type", "integer"} }},
 			{"components", { {"type", "object"}, {"description", "Component name -> fields to change, or null to remove"} }},
@@ -748,6 +752,10 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			std::vector<std::string> names;
 			for (auto& [component, fields] : args["components"].items())
 			{
+				// The editor and engine assume every entity has these (the Hierarchy, transform updates)
+				if (fields.is_null() && (component == componentTypeName<Transformation>() || component == componentTypeName<ObjectComponent>()))
+					throw McpToolError("Can't remove " + component + ": every entity needs it. Use delete_entity to remove the entity.");
+
 				before.push_back(takeSnapshot(e, component));
 
 				ComponentSnapshot target{ e.handlerID(), component };
@@ -760,7 +768,22 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				names.push_back(component);
 			}
 
-			runOrThrow(std::make_unique<EditComponentsCmd>(std::move(before), std::move(after), "AI: set " + joinNames(names) + " on " + entityName(e)));
+			// A Transformation written by hand can break the parent/child links, on this entity or on the ones
+			// linked to it before (a parent still listing a child that left); refuse it instead of keeping it
+			std::vector<entity_id> linked = { e.handlerID() };
+			if (parentOf(e).valid())
+				linked.push_back(parentOf(e).handlerID());
+			for (auto& child : childrenOf(e))
+				linked.push_back(child.handlerID());
+
+			runOrThrow(std::make_unique<EditComponentsCmd>(std::move(before), std::move(after), "AI: set " + joinNames(names) + " on " + entityName(e),
+				[linked] {
+					for (entity_id id : linked)
+					{
+						if (Entity linkedEntity = entityFromId(id); linkedEntity.valid())
+							checkHierarchyLinks(linkedEntity);
+					}
+				}));
 			return mcpText("Updated " + joinNames(names) + " on " + describe(e));
 		}
 	});
@@ -946,8 +969,9 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 		[](const json& args) {
 			requireEditMode();
 			const std::string name = args.value("name", "");
-			if (name.empty())
-				throw McpToolError("'name' is required");
+			const std::string nameError = UniqueNameManager::fileNameError(name);
+			if (!nameError.empty())
+				throw McpToolError("The scene name " + nameError + " (it becomes the .scene file name)");
 
 			for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
 			{

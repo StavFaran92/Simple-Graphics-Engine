@@ -63,7 +63,17 @@ void VolumetricCloudsSystem::prepareVolumetricCloudsForRender(VolumetricCloudsCo
 		return;
 	}
 
-	VolumeComponent& volumeComponent = entity.getComponentInChildren<VolumeComponent>();
+	// The volume is a child the Clouds preset creates; a VolumetricCloudsComponent added by hand has none
+	VolumeComponent* volume = entity.tryGetComponentInChildren<VolumeComponent>();
+	if (!volume || volume->material.isEmpty() || volume->mesh.isEmpty())
+	{
+		// Once per entity: this runs every frame
+		static std::unordered_set<entity_id> s_warned;
+		if (s_warned.insert(entity.handlerID()).second)
+			logWarning("Volumetric clouds (entity {}) need a child VolumeComponent with a material and a mesh; skipping it", entity.handlerID());
+		return;
+	}
+	VolumeComponent& volumeComponent = *volume;
 
 	auto& materialResource = volumeComponent.material.resource();
 	materialResource->setUniformValue("MARCH_SIZE", clouds.marchSize);
