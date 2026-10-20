@@ -146,11 +146,28 @@ void EntitySubtreeCmd::recreateSubtree()
 			throw std::runtime_error("Can't recreate entity " + std::to_string(id) + ": the id is in use");
 	}
 
-	// All entities first: Transformations reference their parent and children by id
+	std::vector<Entity> entities;
 	for (entity_id id : m_ids)
-		registry.create(static_cast<entt::entity>(id));
+		entities.push_back(Entity{ registry.create(static_cast<entt::entity>(id)), &scene->getRegistry() });
 
-	applyAll(m_components);
+	try
+	{
+		// All data first, then set them up together, like loading a scene or a prefab
+		for (const auto& snapshot : m_components)
+			Archiver::deserializeComponent(entityFromId(snapshot.entity), snapshot.component, snapshot.data);
+		Archiver::initializeEntities(entities, scene);
+	}
+	catch (...)
+	{
+		// Don't leave half-built entities in the scene
+		for (entity_id id : m_ids)
+		{
+			if (registry.valid(static_cast<entt::entity>(id)))
+				registry.destroy(static_cast<entt::entity>(id));
+		}
+		updateScene();
+		throw;
+	}
 	updateScene();
 }
 

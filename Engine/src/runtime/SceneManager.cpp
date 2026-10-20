@@ -95,22 +95,9 @@ void SceneManager::stopSimulation()
 
 	Archiver::deserializeScene(m_serializedScene, activeScene);
 
-	for (auto& cbWrapper : ComponentSerdes::getRegistry())
-	{
-		activeScene->getRegistry().get().each([&](entt::entity e) {
-			Entity entity(e, &activeScene->getRegistry());
-			cbWrapper.init(entity, activeScene);
-		});
-
-	}
-
-	for (auto& cbWrapper : ComponentSerdes::getRegistry())
-	{
-		activeScene->getRegistry().get().each([&](entt::entity e) {
-			Entity entity(e, &activeScene->getRegistry());
-			cbWrapper.postLoad(entity, activeScene);
-		});
-	}
+	std::vector<Entity> entities;
+	activeScene->getRegistry().get().each([&](entt::entity e) { entities.emplace_back(e, &activeScene->getRegistry()); });
+	Archiver::initializeEntities(entities, activeScene);
 }
 
 void SceneManager::close()

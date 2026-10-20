@@ -199,21 +199,7 @@ Entity Prefab::Instansiate(glm::vec3 position/*= {}*/)
 	auto activeScene = Engine::get()->getContext()->getActiveScene();
 
 	// Now that every entity and hierarchy link points at the new entities, run the component callbacks.
-	for (Entity& e : createdEntities)
-	{
-		for (auto& cbWrapper : ComponentSerdes::getRegistry())
-		{
-			cbWrapper.init(e, activeScene);
-		}
-	}
-
-	for (Entity& e : createdEntities)
-	{
-		for (auto& cbWrapper : ComponentSerdes::getRegistry())
-		{
-			cbWrapper.postLoad(e, activeScene);
-		}
-	}
+	Archiver::initializeEntities(createdEntities, activeScene);
 
 	// First entity is the root.
 	Entity& root = createdEntities.front();

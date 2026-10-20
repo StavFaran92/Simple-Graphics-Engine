@@ -91,24 +91,9 @@ SceneResourceRef Scene::load(const std::string& fileLocation, SceneLoadDescripto
 		logError("Deserialization Error occured: {}", e.what());
 	}
 
-	// Resolve
-	for (auto& cbWrapper : ComponentSerdes::getRegistry())
-	{
-		scene->getRegistry().get().each([&](entt::entity e) {
-			Entity entity(e, &scene->getRegistry());
-			cbWrapper.init(entity, scene);
-		});
-		
-	}
-
-	// Post Load
-	for (auto& cbWrapper : ComponentSerdes::getRegistry())
-	{
-		scene->getRegistry().get().each([&](entt::entity e) {
-			Entity entity(e, &scene->getRegistry());
-			cbWrapper.postLoad(entity, scene);
-		});
-	}
+	std::vector<Entity> entities;
+	scene->getRegistry().get().each([&](entt::entity e) { entities.emplace_back(e, &scene->getRegistry()); });
+	Archiver::initializeEntities(entities, scene);
 
 	return scene;
 }

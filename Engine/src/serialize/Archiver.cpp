@@ -127,7 +127,7 @@ bool Archiver::defaultComponent(const std::string& component, std::string& outJs
 	return true;
 }
 
-void Archiver::loadComponent(Entity e, const std::string& component, const std::string& json)
+void Archiver::deserializeComponent(Entity e, const std::string& component, const std::string& json)
 {
 	const ComponentSerdesEntry& entry = findEntry(component);
 
@@ -144,11 +144,33 @@ void Archiver::loadComponent(Entity e, const std::string& component, const std::
 		throw std::runtime_error("Loading component " + component + " failed: " + ex.what());
 	}
 
-	// Same steps prefab instantiation runs after deserializing
 	auto scene = Engine::get()->getContext()->getActiveScene();
 	entry.deserialize(loaded, e, scene);
+}
+
+void Archiver::loadComponent(Entity e, const std::string& component, const std::string& json)
+{
+	deserializeComponent(e, component, json);
+
+	auto scene = Engine::get()->getContext()->getActiveScene();
+	const ComponentSerdesEntry& entry = findEntry(component);
 	entry.init(e, scene);
 	entry.postLoad(e, scene);
+}
+
+void Archiver::initializeEntities(const std::vector<Entity>& entities, SceneResourceRef& scene)
+{
+	for (auto& entry : ComponentSerdes::getRegistry())
+	{
+		for (const Entity& e : entities)
+			entry.init(e, scene);
+	}
+
+	for (auto& entry : ComponentSerdes::getRegistry())
+	{
+		for (const Entity& e : entities)
+			entry.postLoad(e, scene);
+	}
 }
 
 void Archiver::removeComponent(Entity e, const std::string& component)

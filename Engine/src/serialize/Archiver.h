@@ -102,8 +102,16 @@ public:
 	// A default-constructed component in saveComponent's format; false if it has no default constructor
 	static bool defaultComponent(const std::string& component, std::string& outJson);
 
-	// Sets the component from saveComponent's JSON
+	// Puts the component's data from saveComponent's JSON on the entity, without setting it up
+	static void deserializeComponent(Entity e, const std::string& component, const std::string& json);
+
+	// deserializeComponent, then init and postLoad for this component; for entities whose neighbors exist
 	static void loadComponent(Entity e, const std::string& component, const std::string& json);
+
+	// Second half of loading, once every entity involved is deserialized: init on all of them, then postLoad
+	// on all of them. Components read other entities while they set up (a Transformation reads its parent
+	// and children), so this can't run per entity as each one loads.
+	static void initializeEntities(const std::vector<Entity>& entities, SceneResourceRef& scene);
 
 	static void removeComponent(Entity e, const std::string& component);
 

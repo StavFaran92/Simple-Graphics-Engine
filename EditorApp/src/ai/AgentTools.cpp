@@ -604,11 +604,14 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			// Held in a local: items() only references the object, it must outlive the loop
 			const json components = args.value("components", json::object());
 
-			Entity e = Engine::get()->getContext()->getActiveScene()->createEntity(name);
+			auto scene = Engine::get()->getContext()->getActiveScene();
+			Entity e = scene->createEntity(name);
 			try
 			{
+				// All data first, then set it up, like any entity that's new to the scene
 				for (auto& [component, fields] : components.items())
-					Archiver::loadComponent(e, component, componentWithFields(e, component, fields));
+					Archiver::deserializeComponent(e, component, componentWithFields(e, component, fields));
+				Archiver::initializeEntities({ e }, scene);
 			}
 			catch (...)
 			{
