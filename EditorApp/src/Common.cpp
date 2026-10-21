@@ -1,11 +1,24 @@
 #include "Common.h"
 #include "EditorCamera.h"
+#include "commands/SceneCommands.h"
 
 #include <limits>
 
 std::unordered_map<std::string, TextureResourceRef> icons;
 
 std::vector<SceneObject> sceneObjects;
+
+void openSceneInEditor(const SceneAssetRef& scene)
+{
+	UUID from = Engine::get()->getContext()->getActiveSceneAsset().getUID();
+	UUID to = scene.getUID();
+	if (from == to)
+		return;
+
+	std::string error;
+	if (!CommandStack::Instance().run(std::make_unique<OpenSceneCmd>(from, to), error))
+		logError("Opening scene '{}' failed: {}", scene.info().name, error);
+}
 
 namespace
 {

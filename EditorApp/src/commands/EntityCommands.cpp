@@ -23,6 +23,23 @@ namespace
 		for (auto& [_, child] : e.getComponent<Transformation>().getChildren())
 			collectSubtree(child, out);
 	}
+
+	UUID activeSceneId()
+	{
+		return Engine::get()->getContext()->getActiveSceneAsset().getUID();
+	}
+
+	// Refuses when another scene is open (a dropped "Open scene" step), so the edit can't hit another scene's entity
+	void requireScene(UUID scene)
+	{
+		UUID active = activeSceneId();
+		if (scene == active)
+			return;
+
+		SceneAssetRef sceneAsset(scene);
+		throw std::runtime_error(sceneAsset.isEmpty() ? std::string("its scene was deleted")
+			: "it belongs to scene '" + sceneAsset.info().name + "', which isn't open");
+	}
 }
 
 std::vector<ComponentSnapshot> parentTransformSnapshot(Entity e)
@@ -103,12 +120,14 @@ void checkHierarchyLinks(Entity e)
 
 EditComponentsCmd::EditComponentsCmd(std::vector<ComponentSnapshot> before, std::vector<ComponentSnapshot> after, std::string label,
 	std::function<void()> validate)
-	: m_before(std::move(before)), m_after(std::move(after)), m_label(std::move(label)), m_validate(std::move(validate))
+	: m_before(std::move(before)), m_after(std::move(after)), m_label(std::move(label)), m_validate(std::move(validate)),
+	  m_scene(activeSceneId())
 {
 }
 
 bool EditComponentsCmd::execute(std::string&)
 {
+	requireScene(m_scene);
 	try
 	{
 		applyAll(m_after);
@@ -127,11 +146,17 @@ bool EditComponentsCmd::execute(std::string&)
 
 void EditComponentsCmd::undo()
 {
+	requireScene(m_scene);
 	applyAll(m_before);
 	updateScene();
 }
 
 // ---- EntitySubtreeCmd ----
+
+EntitySubtreeCmd::EntitySubtreeCmd(std::string label)
+	: m_label(std::move(label)), m_scene(activeSceneId())
+{
+}
 
 void EntitySubtreeCmd::captureSubtree(Entity root)
 {
@@ -214,6 +239,7 @@ CreateEntitiesCmd::CreateEntitiesCmd(Entity root, std::string label, std::vector
 // Only reached on redo: the entity was created before this command was recorded
 bool CreateEntitiesCmd::execute(std::string&)
 {
+	requireScene(m_scene);
 	recreateSubtree();
 	applyAll(m_parentWith);
 	return true;
@@ -221,6 +247,7 @@ bool CreateEntitiesCmd::execute(std::string&)
 
 void CreateEntitiesCmd::undo()
 {
+	requireScene(m_scene);
 	removeSubtree();
 	applyAll(m_parentWithout);
 }
@@ -235,6 +262,7 @@ DeleteEntitiesCmd::DeleteEntitiesCmd(Entity root, std::string label)
 
 bool DeleteEntitiesCmd::execute(std::string& error)
 {
+	requireScene(m_scene);
 	Entity root = entityFromId(m_root);
 	if (!root.valid())
 	{
@@ -256,6 +284,7 @@ bool DeleteEntitiesCmd::execute(std::string& error)
 
 void DeleteEntitiesCmd::undo()
 {
+	requireScene(m_scene);
 	recreateSubtree();
 	applyAll(m_parentWith);
 }

@@ -32,7 +32,7 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - Code: `EditorApp/src/ai/` - `McpServer` (HTTP + JSON-RPC on its own thread), `MainThreadQueue` (tool calls run
   in `EditorApp::update()`), `AgentTools.cpp` (the tools). New tools: add them in `registerAgentTools`
 - Mutation tools (`create_entity`, `set_components`, `set_parent`, `undo`, ...) are refused while the simulation runs
-- `new_scene` / `open_scene` switch the active scene (clears undo history); `save_scene` writes only the active one
+- `new_scene` / `open_scene` switch the active scene as an undo step; `save_scene` writes only the active one
 - `focus_entity` / `set_view_camera` aim the editor camera before `screenshot_viewport`; they move the view, not the
   scene, so they aren't undo steps
 - `create_preset` and the Hierarchy's Create menu share one table: `EditorApp/src/EntityPresets.cpp`. A new preset
@@ -53,7 +53,9 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - Delete: `CommandStack::Instance().run(std::make_unique<DeleteEntitiesCmd>(entity, label), error)`
 - Parent changes: `reparentWithUndo(child, newParent, label)`
 - Inspector sections get undo automatically through `displayComponent<T>` (Common.h); a whole drag is one step
-- History is cleared when a project or scene is opened; undo/redo do nothing while the simulation runs
+- History is global: opening a scene is itself an undo step (`OpenSceneCmd`, via `openSceneInEditor`), so scene steps
+  are undone with their scene open. Scene commands store their scene and refuse to run in another one
+- History is cleared only when a project is opened; undo/redo do nothing while the simulation runs
 
 ## Conventions
 - Components: `REGISTER_COMPONENT(...)`, serialized via `ComponentSerializer`

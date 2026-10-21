@@ -2,6 +2,7 @@
 
 #include "Command.h"
 #include "ComponentSnapshot.h"
+#include "memory/UUID.h"
 
 #include <functional>
 #include <string>
@@ -24,6 +25,7 @@ private:
 	std::vector<ComponentSnapshot> m_after;
 	std::string m_label;
 	std::function<void()> m_validate;
+	UUID m_scene;  // Scene asset the entities live in; must be the open one
 };
 
 // An entity and its children that can be removed and recreated with the same ids
@@ -33,7 +35,7 @@ public:
 	std::string label() const override { return m_label; }
 
 protected:
-	explicit EntitySubtreeCmd(std::string label) : m_label(std::move(label)) {}
+	explicit EntitySubtreeCmd(std::string label);
 
 	// Snapshots every component of the root and its descendants
 	void captureSubtree(Entity root);
@@ -50,6 +52,7 @@ protected:
 	std::vector<ComponentSnapshot> m_parentWithout;
 
 	std::string m_label;
+	UUID m_scene;  // Scene asset the subtree lives in; must be the open one
 };
 
 // Records an entity that was just created by existing code; undo removes it and its children

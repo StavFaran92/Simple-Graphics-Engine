@@ -102,14 +102,8 @@ static void setupScene()
 	g_primaryCamera = scene->getGameCamera();
 }
 
-// Makes the scene the active one in the editor; undo history belongs to the old scene, so it's cleared
-static void openSceneInEditor(const SceneAssetRef& scene)
-{
-	Engine::get()->getContext()->setActiveScene(scene.resource()->getID());
-	CommandStack::Instance().clear();
-	setupScene();
-	updateScene();
-}
+// Opens the scene as an undo step (OpenSceneCmd); every editor scene switch goes through it
+void openSceneInEditor(const SceneAssetRef& scene);
 
 template<typename T>
 static void displayComponent(const std::string& componentName, std::function<void(T&)> func)

@@ -966,7 +966,7 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 		}
 	});
 
-	// ---- Scenes: switching clears undo history, like opening a scene from the Asset View ----
+	// ---- Scenes: switching is an undo step, like opening a scene from the Asset View ----
 
 	server.addTool({
 		"new_scene",
