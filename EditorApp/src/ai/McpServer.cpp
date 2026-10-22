@@ -172,6 +172,20 @@ json McpServer::callTool(const json& params)
 		loggedArgs = loggedArgs.substr(0, kMaxLoggedArgs) + "...";
 	logInfo("[MCP] {} {}", name, loggedArgs);
 
+	// Server-thread tools aren't queued: they run here, on the HTTP thread, while the main thread keeps
+	// running frames (a wait queued to the main thread would freeze the game it waits for)
+	if (tool.onServerThread)
+	{
+		try
+		{
+			return { {"content", tool.run(args)} };
+		}
+		catch (const McpToolError& e)
+		{
+			return toolError(e.what());
+		}
+	}
+
 	auto future = m_queue.post([&tool, args] { return tool.run(args); });
 	if (future.wait_for(kToolTimeout) != std::future_status::ready)
 		return toolError("Timed out waiting for the editor main thread. It may be blocked by a modal dialog or a breakpoint.");

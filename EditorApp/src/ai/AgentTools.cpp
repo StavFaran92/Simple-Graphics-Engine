@@ -6,6 +6,7 @@
 #include "Common.h"
 #include "EntityPresets.h"
 #include "EditorCamera.h"
+#include "SimulationControls.h"
 
 #include "sge.h"
 #include "core/Logger.h"
@@ -628,13 +629,15 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 	server.addTool({
 		"screenshot_viewport",
 		"Captures what a viewport currently shows as a PNG image. 'editor' is the scene view seen through the "
-		"editor camera; 'game' is the game camera's view and may only exist while the simulation runs.",
+		"editor camera; 'game' is the game camera's view. While the game plays, the capture is always the game view, "
+		"since the editor view doesn't render then.",
 		objectSchema({
-			{"view", { {"type", "string"}, {"enum", { "editor", "game" }}, {"description", "Default editor"} }},
+			{"view", { {"type", "string"}, {"enum", { "editor", "game" }}, {"description", "Default editor; ignored while the game plays"} }},
 			{"max_width", { {"type", "integer"}, {"description", "Downscale to at most this width in pixels (default 1024, 0 = full size)"} }},
 		}),
 		[](const json& args) {
-			const std::string view = args.value("view", "editor");
+			const bool playing = Engine::get()->getContext()->getActiveScene()->isSimulationActive();
+			const std::string view = playing ? "game" : args.value("view", "editor");
 			if (view != "editor" && view != "game")
 				throw McpToolError("'view' must be \"editor\" or \"game\"");
 
@@ -1107,6 +1110,76 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			Engine::get()->saveProject();
 			return mcpText("Saved the project");
 		}
+	});
+
+	// ---- Play mode: the editor's own play, pause and stop; edits stay refused while the game runs ----
+
+	server.addTool({
+		"play",
+		"Starts the game, or resumes it from pause, like the toolbar's Play. Edits and undo are refused until stop; "
+		"screenshots show the game view. 'lock_mouse' (default false) lets the game capture the mouse cursor, which "
+		"takes it from whoever is at the PC until the game stops.",
+		objectSchema({
+			{"lock_mouse", { {"type", "boolean"} }},
+		}),
+		[](const json& args) {
+			auto scene = Engine::get()->getContext()->getActiveScene();
+			if (scene->isSimulationActive() && !scene->isSimulationPaused())
+				throw McpToolError("The game is already playing");
+
+			Engine::get()->getWindow()->setMouseLockAllowed(args.value("lock_mouse", false));
+			startsimulation();
+			return mcpText("Playing. Use wait to let time pass, get_entity to read live values, stop to end.");
+		}
+	});
+
+	server.addTool({
+		"pause",
+		"Pauses the game; play resumes it, stop ends it.",
+		objectSchema(),
+		[](const json&) {
+			auto scene = Engine::get()->getContext()->getActiveScene();
+			if (!scene->isSimulationActive() || scene->isSimulationPaused())
+				throw McpToolError("The game isn't playing");
+
+			pauseSimulation();
+			return mcpText("Paused");
+		}
+	});
+
+	server.addTool({
+		"stop",
+		"Stops the game, like the toolbar's Stop. The scene returns to how it was before play.",
+		objectSchema(),
+		[](const json&) {
+			if (!Engine::get()->getContext()->getActiveScene()->isSimulationActive())
+				throw McpToolError("The game isn't playing");
+
+			stopSimulation();
+			// play may have kept the game from capturing the mouse; the editor's camera captures it again
+			Engine::get()->getWindow()->setMouseLockAllowed(true);
+			return mcpText("Stopped. The scene is back to how it was before play.");
+		}
+	});
+
+	server.addTool({
+		"wait",
+		"Lets the game run for 'seconds' (at most 30) before replying, e.g. after play so physics can settle.",
+		objectSchema({
+			{"seconds", { {"type", "number"} }},
+		}, { "seconds" }),
+		[](const json& args) {
+			if (!args.contains("seconds") || !args["seconds"].is_number())
+				throw McpToolError("'seconds' must be a number");
+
+			const double seconds = std::clamp(args["seconds"].get<double>(), 0.0, 30.0);
+			std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
+
+			char text[32];
+			snprintf(text, sizeof(text), "Waited %.1f s", seconds);
+			return mcpText(text);
+		},
+		/*onServerThread*/ true
 	});
 
 	// ---- Scenes: switching is an undo step, like opening a scene from the Asset View ----

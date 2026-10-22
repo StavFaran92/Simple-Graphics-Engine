@@ -29,6 +29,9 @@ public:
 	void unlockMouse();
 	bool isMouseLocked() const;
 
+	// While false, lockMouse() does nothing, so a game can't capture the cursor (e.g. when an agent plays it)
+	void setMouseLockAllowed(bool allowed);
+
 	SDL_Window* GetWindow() { return m_mainWindow; }
 	SDL_GLContext GetContext() { return m_glContext; }
 
@@ -51,6 +54,7 @@ private:
 	int m_mouseY = 0;
 
 	bool m_isMouseLocked = false;
+	bool m_isMouseLockAllowed = true;
 
 	bool m_mouseFirstMoved = false;
 };

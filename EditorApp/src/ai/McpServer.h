@@ -30,6 +30,9 @@ struct McpTool
 
 	// Runs on the editor main thread; returns an MCP content array (see mcpText / mcpImage)
 	std::function<nlohmann::json(const nlohmann::json& args)> run;
+
+	// Runs on the HTTP thread instead, while frames keep running (e.g. wait); must not touch the engine or the scene
+	bool onServerThread = false;
 };
 
 inline nlohmann::json mcpText(const std::string& text)

@@ -12,6 +12,7 @@
 #include "UIEntitySelectionLayer.h"
 
 #include "EditorCamera.h"
+#include "SimulationControls.h"
 #include "EditorState.h"
 #include "DialogManager.h"
 
@@ -113,7 +114,7 @@ Entity g_editorCamera;
 
 uint32_t g_previewWindowID = 0;
 
-static void stopSimulation()
+void stopSimulation()
 {
 	EditorState::Instance().startButtonPressed = false;
 	EditorState::Instance().simPaused = false;
@@ -126,7 +127,7 @@ static void stopSimulation()
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->unlock(); //TODO this should be in camera event
 }
 
-static void startsimulation()
+void startsimulation()
 {
 	EditorState::Instance().startButtonPressed = true;
 	EditorState::Instance().simPaused = false;
@@ -145,7 +146,7 @@ static void startsimulation()
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock(); //TODO this should be in camera event
 }
 
-static void pauseSimulation()
+void pauseSimulation()
 {
 	EditorState::Instance().simPaused = true;
 	Engine::get()->getContext()->pauseSimulation();

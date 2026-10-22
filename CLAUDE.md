@@ -32,6 +32,10 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - Code: `EditorApp/src/ai/` - `McpServer` (HTTP + JSON-RPC on its own thread), `MainThreadQueue` (tool calls run
   in `EditorApp::update()`), `AgentTools.cpp` (the tools). New tools: add them in `registerAgentTools`
 - Mutation tools (`create_entity`, `set_components`, `set_parent`, `undo`, ...) are refused while the simulation runs
+- `play` / `pause` / `stop` call the editor's own functions (`SimulationControls.h`); `play` keeps the game from
+  capturing the mouse unless `lock_mouse` is true (`Window::setMouseLockAllowed`). `wait` runs on the HTTP thread
+  (`McpTool::onServerThread`) so frames keep running; during play, `get_entity` shows live values and
+  `screenshot_viewport` captures the Game View
 - `new_scene` / `open_scene` switch the active scene as an undo step; `save_scene` writes only the active one
 - `focus_entity` / `set_view_camera` aim the editor camera before `screenshot_viewport`; they move the view, not the
   scene, so they aren't undo steps
