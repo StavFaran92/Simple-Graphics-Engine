@@ -15,6 +15,10 @@
 #include "memory/Assets.h"
 #include "memory/AssetRecord.h"
 #include "runtime/StartupSceneTemplate.h"
+#include "render/MaterialDataParser.h"
+#include "commands/AssetCommands.h"
+
+#include <cereal/archives/json.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -259,10 +263,149 @@ namespace
 		if (!CommandStack::Instance().run(std::move(command), error))
 			throw McpToolError(error);
 	}
+
+	MaterialAssetRef materialFromArgs(const json& args)
+	{
+		const AssetRecord& record = findAssetRecord(args);
+		if (record.aType != AssetType::MATERIAL)
+			throw McpToolError("'" + record.name + "' isn't a material. Use list_assets with type 'materials'.");
+		return MaterialAssetRef(record.uuid);
+	}
+
+	// MaterialAsset::deserialize only logs bad JSON, so it's read into a copy first and refused before the material changes
+	void validateMaterialData(const json& data)
+	{
+		MaterialData parsed;
+		try
+		{
+			std::stringstream ss(json{ {"data", data} }.dump());
+			cereal::JSONInputArchive archive(ss);
+			archive(cereal::make_nvp("data", parsed));
+		}
+		catch (const std::exception& e)
+		{
+			throw McpToolError(std::string("The data doesn't read as MaterialData: ") + e.what());
+		}
+
+		const auto& schemas = parsed.getLayout().getAllProperties();
+		for (const auto& [name, value] : parsed.getAllProperties())
+		{
+			auto schema = schemas.find(name);
+			if (schema == schemas.end())
+				throw McpToolError("Property '" + name + "' isn't in m_layout");
+			if (value.index() != schema->second.defaultValue.index())
+				throw McpToolError("Property '" + name + "' has another value type than its schema (variant index " +
+					std::to_string(schema->second.defaultValue.index()) + ")");
+		}
+	}
 }
 
 void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 {
+	// ---- Materials: the agent reads and writes MaterialData's own cereal JSON; edits apply in any scene ----
+
+	server.addTool({
+		"get_material",
+		"Returns a material's MaterialData (Engine/src/render/MaterialData.h) as cereal JSON: m_layout has each "
+		"property's schema (type, defaultValue), m_properties the values that are set. Pass uuid or name "
+		"(list_assets with type 'materials').",
+		objectSchema({
+			{"uuid", { {"type", "string"} }},
+			{"name", { {"type", "string"} }},
+		}),
+		[](const json& args) {
+			MaterialAssetRef material = materialFromArgs(args);
+			const AssetSnapshot snapshot = takeAssetSnapshot(material.getUID());
+			return mcpText(json{ {"name", material.info().name}, {"uuid", material.getUID().str()}, {"data", snapshot.data["data"]} }.dump());
+		}
+	});
+
+	server.addTool({
+		"set_material",
+		"Changes a material. 'data' has the MaterialData fields to change, in get_material's form; fields left out keep "
+		"their values, arrays (m_properties) are replaced whole. A property not in m_properties yet takes the index of its "
+		"schema's defaultValue. Every object using the material changes. One undo step.",
+		objectSchema({
+			{"uuid", { {"type", "string"} }},
+			{"name", { {"type", "string"} }},
+			{"data", { {"type", "object"} }},
+		}, { "data" }),
+		[](const json& args) {
+			requireEditMode();
+			MaterialAssetRef material = materialFromArgs(args);
+			const json changes = args.value("data", json());
+			if (!changes.is_object() || changes.empty())
+				throw McpToolError("'data' must be an object with the MaterialData fields to change, as get_material shows them");
+
+			const AssetSnapshot before = takeAssetSnapshot(material.getUID());
+			AssetSnapshot after = before;
+			after.data["data"].merge_patch(changes);
+			validateMaterialData(after.data["data"]);
+
+			runOrThrow(std::make_unique<EditAssetCmd>(before, after, "AI: edit material " + material.info().name));
+			return mcpText("Updated material '" + material.info().name + "'");
+		}
+	});
+
+	server.addTool({
+		"create_material",
+		"Creates a material like Create Material in the Asset View, with the default PBR properties; optional 'data' as in "
+		"set_material. One undo step. Assign it to an entity with set_components on MeshRendererComponent.m_material.",
+		objectSchema({
+			{"name", { {"type", "string"} }},
+			{"data", { {"type", "object"} }},
+		}, { "name" }),
+		[](const json& args) {
+			requireEditMode();
+			const std::string name = args.value("name", "");
+			const std::string nameError = UniqueNameManager::fileNameError(name);
+			if (!nameError.empty())
+				throw McpToolError("The material name " + nameError + " (it becomes the .mat file name)");
+
+			for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
+			{
+				if (record && record->aType == AssetType::MATERIAL && record->name == name)
+					throw McpToolError("A material named '" + name + "' already exists; use set_material to change it");
+			}
+
+			const json changes = args.value("data", json::object());
+			if (!changes.is_object())
+				throw McpToolError("'data' must be an object, as in set_material");
+
+			AssetBuildDescriptor desc;
+			desc.aType = AssetType::MATERIAL;
+			desc.name = name;
+			MaterialCreateDescriptor matDesc;
+			MaterialDataParser::parse(matDesc.data);
+			AssetRef<Asset> created = Engine::get()->getSubSystem<Assets>()->createAsset(desc, matDesc);
+			if (created.isEmpty())
+				throw McpToolError("Creating the material failed; see get_console");
+
+			if (!changes.empty())
+			{
+				AssetSnapshot withChanges = takeAssetSnapshot(created.getUID());
+				withChanges.data["data"].merge_patch(changes);
+				try
+				{
+					validateMaterialData(withChanges.data["data"]);
+				}
+				catch (...)
+				{
+					// Don't leave behind a material the agent didn't get
+					Engine::get()->getSubSystem<Assets>()->deleteAsset(created.getUID());
+					throw;
+				}
+				applyAssetSnapshot(withChanges);
+
+				// Redo recreates the material from this descriptor, so it carries the changes too
+				created->fillBuildDescriptor(matDesc);
+			}
+
+			CommandStack::Instance().record(std::make_unique<CreateAssetCmd>(created, std::make_unique<MaterialCreateDescriptor>(matDesc), "AI: create material " + name));
+			return mcpText("Created material '" + name + "' (uuid " + created.getUID().str() + "). get_material shows its data.");
+		}
+	});
+
 	// The tree of entities: id + name + component names + children
 	server.addTool({
 		"get_scene_hierarchy",

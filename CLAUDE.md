@@ -35,6 +35,9 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - `new_scene` / `open_scene` switch the active scene as an undo step; `save_scene` writes only the active one
 - `focus_entity` / `set_view_camera` aim the editor camera before `screenshot_viewport`; they move the view, not the
   scene, so they aren't undo steps
+- `get_material` / `set_material` / `create_material` work on `MaterialData`'s own cereal JSON (the C++ in
+  `Engine/src/render/MaterialData.h` defines it); `set_material` reads the result into a copy first, so bad data is
+  refused before the material changes. Material edits are undo steps that apply in any scene
 - `create_preset` and the Hierarchy's Create menu share one table: `EditorApp/src/EntityPresets.cpp`. A new preset
   (path like `"Environment/Water/Pool"` for nested submenus) shows up in both
 
@@ -53,6 +56,12 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - Delete: `CommandStack::Instance().run(std::make_unique<DeleteEntitiesCmd>(entity, label), error)`
 - Parent changes: `reparentWithUndo(child, newParent, label)`
 - Inspector sections get undo automatically through `displayComponent<T>` (Common.h); a whole drag is one step
+- Assets: `AssetSnapshot` (the asset's own `serialize`) and `EditAssetCmd(before, after, label)`, for any type; an asset
+  editor wraps its widgets in `InspectorUndo::trackAsset` / `commitAsset`, like components use `trackComponent` /
+  `commitComponent`. Asset steps have no scene, so they apply in whichever scene is open
+- Asset created by existing code: `record(std::make_unique<CreateAssetCmd>(asset, copyOfItsBuildDescriptor, label))`;
+  undo deletes the asset and its file, redo recreates it from the descriptor under the same uuid
+  (`AssetBuildDescriptor::hintUUID`)
 - History is global: opening a scene is itself an undo step (`OpenSceneCmd`, via `openSceneInEditor`), so scene steps
   are undone with their scene open. Scene commands store their scene and refuse to run in another one
 - History is cleared only when a project is opened; undo/redo do nothing while the simulation runs

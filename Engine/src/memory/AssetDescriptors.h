@@ -30,6 +30,7 @@ struct AssetBuildDescriptor
 	AssetVisibility visibility = AssetVisibility::Internal;
 	ScopedPath targetDirectory; // the user authored destination directory
 	std::string assetDirectory; // nested directory, relative to scope
+	UUID hintUUID = EMPTY_UUID; // optional: the uuid to give the asset (redo recreates it under its old one); empty = generate
 };
 
 struct AssetUpdateDescriptor

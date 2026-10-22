@@ -53,7 +53,7 @@ AssetRecord::AssetRecord(const AssetBuildDescriptor& assetDesc)
 	assetDirectory = (assetDesc.targetDirectory.relative() / assetDesc.assetDirectory).string();
 	visibility = assetDesc.visibility;
 
-	uuid = UUID::generate_uuid_v4();
+	uuid = assetDesc.hintUUID == EMPTY_UUID ? UUID::generate_uuid_v4() : assetDesc.hintUUID;
 }
 
 void AssetRecord::parse()

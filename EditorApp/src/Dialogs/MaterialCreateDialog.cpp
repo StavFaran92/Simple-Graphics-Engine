@@ -2,6 +2,8 @@
 #include "EditorState.h"
 #include "memory/Assets.h"
 #include "render/MaterialDataParser.h"
+#include "commands/CommandStack.h"
+#include "commands/AssetCommands.h"
 
 MaterialCreateDialog::MaterialCreateDialog()
 	: DialogBase("MaterialCreateDialog")
@@ -36,7 +38,9 @@ bool MaterialCreateDialog::acceptContent()
 		// TODO: MaterialCreateDescriptor with render mode + material data
 		MaterialCreateDescriptor matDesc;
 		matDesc.data = m_tempData;
-		Engine::get()->getSubSystem<Assets>()->createAsset(desc, matDesc);
+		AssetRef<Asset> material = Engine::get()->getSubSystem<Assets>()->createAsset(desc, matDesc);
+		if (!material.isEmpty())
+			CommandStack::Instance().record(std::make_unique<CreateAssetCmd>(material, std::make_unique<MaterialCreateDescriptor>(matDesc), "Create " + desc.name));
 		return true;
 	}
 	return false;

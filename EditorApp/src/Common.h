@@ -115,7 +115,7 @@ static void displayComponent(const std::string& componentName, std::function<voi
 	auto& component = e.getComponent<T>();
 
 	// State before this frame's widgets (header checkbox included) can change it
-	ComponentSnapshot before = InspectorUndo::beforeWidgets(e, componentTypeName<T>());
+	ComponentSnapshot before = InspectorUndo::trackComponent(e, componentTypeName<T>());
 
 	ImGui::PushID(componentName.c_str());
 
@@ -199,7 +199,7 @@ static void displayComponent(const std::string& componentName, std::function<voi
 		ImGui::Dummy(ImVec2(0, 2));
 	}
 
-	InspectorUndo::afterWidgets(before, componentName + " edit");
+	InspectorUndo::commitComponent(before, componentName + " edit");
 
 	ImGui::PopID();
 }

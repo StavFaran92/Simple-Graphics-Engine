@@ -66,7 +66,7 @@ struct PropertySchema {
 	}
 };
 
-class MaterialLayout
+class EngineAPI MaterialLayout
 {
 public:
 	const std::map<std::string, PropertySchema>& getAllProperties() const;

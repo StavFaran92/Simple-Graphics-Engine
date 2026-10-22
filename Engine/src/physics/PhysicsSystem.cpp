@@ -545,6 +545,13 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
         return;
     }
 
+    // Data from a file or a tool can disagree; skip the body instead of crashing on it
+    if (!pc.collider || pc.collider->getType() != pc.shapeType)
+    {
+        logWarning("Entity {}: its collider doesn't match shapeType; no physics shape created", e.handlerID());
+        return;
+    }
+
     if (pc.collider->getType() == CollisionShape::BOX)
     {
         auto& collider = std::dynamic_pointer_cast<CollisionBox>(pc.collider);
@@ -573,15 +580,24 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     else if (pc.collider->getType() == CollisionShape::MESH)
     {
         auto& collider = std::dynamic_pointer_cast<CollisionMesh>(pc.collider);
+        // The mesh isn't saved with the collider, so one loaded from a file has none
+        if (!collider->mesh)
+        {
+            logWarning("Entity {}: mesh collider has no mesh; no physics shape created", e.handlerID());
+            return;
+        }
         const std::vector<glm::vec3>& apos = collider->mesh.get()->getPositions();
         shape = createConvexMeshShape(apos);
     }
     else if (pc.collider->getType() == CollisionShape::TERRAIN)
     {
         auto& collider = std::static_pointer_cast<CollisionTerrain>(pc.collider);
+        if (!e.HasComponent<Terrain>() || e.getComponent<Terrain>().getHeightmap().isEmpty())
+        {
+            logWarning("Entity {}: terrain collider needs a Terrain with a heightmap; no physics shape created", e.handlerID());
+            return;
+        }
         auto& terrain = e.getComponent<Terrain>();
-
-        // todo verify all components exists
 
         transform.forceUpdate();
         auto scale = transform.getLocalScale();

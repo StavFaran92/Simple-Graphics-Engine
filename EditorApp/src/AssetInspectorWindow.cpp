@@ -205,11 +205,15 @@ void AssetInspectorWindow::display()
 			break;
 		}
 
+		const AssetSnapshot before = InspectorUndo::trackAsset(material.getUID());
+
 		static MaterialDataWidget materialWidget;
 		materialWidget.draw(material->data, [](const MaterialData&) {
 			material.makeDirty();
 			ThumbnailCache::Instance().invalidate(material.getUID());
 		});
+
+		InspectorUndo::commitAsset(before, "Edit " + material.info().name);
 		break;
 	}
 	case AssetType::SHADER:
