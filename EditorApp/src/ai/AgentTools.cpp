@@ -1112,6 +1112,144 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 		}
 	});
 
+	// ---- Scripts: Lua files the game runs; ScriptSystem reads the file again each time the game starts ----
+
+	server.addTool({
+		"create_script",
+		"Creates a Lua script asset with 'text' as its code, like Create Lua Script in the Asset View; one undo step. "
+		"A script defines Script = {} with Script:create(entity), Script:update(entity, dt) and Script:destroy(entity). "
+		"Attach it with set_components on ScriptComponent.script: {\"uuid\": {\"m_value\": <uuid>}}.",
+		objectSchema({
+			{"name", { {"type", "string"} }},
+			{"text", { {"type", "string"} }},
+		}, { "name", "text" }),
+		[](const json& args) {
+			requireEditMode();
+			const std::string name = args.value("name", "");
+			const std::string nameError = UniqueNameManager::fileNameError(name);
+			if (!nameError.empty())
+				throw McpToolError("The script name " + nameError + " (it becomes the .lua file name)");
+
+			for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
+			{
+				if (record && record->aType == AssetType::LUA_SCRIPT && record->name == name)
+					throw McpToolError("A script named '" + name + "' already exists; use set_script to change it");
+			}
+
+			const std::string text = args.value("text", "");
+			if (text.empty())
+				throw McpToolError("'text' must hold the script's code");
+
+			AssetBuildDescriptor desc;
+			desc.aType = AssetType::LUA_SCRIPT;
+			desc.name = name;
+			LuaScriptCreateDescriptor createDesc;
+			createDesc.script = text;
+			AssetRef<Asset> created = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
+			if (created.isEmpty())
+				throw McpToolError("Creating the script failed; see get_console");
+
+			CommandStack::Instance().record(std::make_unique<CreateAssetCmd>(created, std::make_unique<LuaScriptCreateDescriptor>(createDesc), "AI: create script " + name));
+			return mcpText("Created script '" + name + "' (uuid " + created.getUID().str() + ")");
+		}
+	});
+
+	server.addTool({
+		"set_script",
+		"Replaces a Lua script's code with 'text'; it takes effect the next time the game starts. Not an undo step: "
+		"get_asset shows the current text if you want to keep it first.",
+		objectSchema({
+			{"uuid", { {"type", "string"} }},
+			{"name", { {"type", "string"} }},
+			{"text", { {"type", "string"} }},
+		}, { "text" }),
+		[](const json& args) {
+			requireEditMode();
+			const AssetRecord& record = findAssetRecord(args);
+			if (record.aType != AssetType::LUA_SCRIPT)
+				throw McpToolError("'" + record.name + "' isn't a Lua script. Use list_assets with type 'lua script'.");
+
+			const std::string text = args.value("text", "");
+			if (text.empty())
+				throw McpToolError("'text' must hold the script's code");
+
+			std::ofstream file(record.getAbsolutePath(), std::ios::binary | std::ios::trunc);
+			if (!file)
+				throw McpToolError("Couldn't write the script file");
+			file << text;
+			return mcpText("Updated script '" + record.name + "'; the change runs from the next play");
+		}
+	});
+
+	// ---- Scripts: Lua files the game runs; ScriptSystem reads the file again each time the game starts ----
+
+	server.addTool({
+		"create_script",
+		"Creates a Lua script asset with 'text' as its code, like Create Lua Script in the Asset View; one undo step. "
+		"A script defines Script = {} with Script:create(entity), Script:update(entity, dt) and Script:destroy(entity). "
+		"Attach it with set_components on ScriptComponent.script: {\"uuid\": {\"m_value\": <uuid>}}.",
+		objectSchema({
+			{"name", { {"type", "string"} }},
+			{"text", { {"type", "string"} }},
+		}, { "name", "text" }),
+		[](const json& args) {
+			requireEditMode();
+			const std::string name = args.value("name", "");
+			const std::string nameError = UniqueNameManager::fileNameError(name);
+			if (!nameError.empty())
+				throw McpToolError("The script name " + nameError + " (it becomes the .lua file name)");
+
+			for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
+			{
+				if (record && record->aType == AssetType::LUA_SCRIPT && record->name == name)
+					throw McpToolError("A script named '" + name + "' already exists; use set_script to change it");
+			}
+
+			const std::string text = args.value("text", "");
+			if (text.empty())
+				throw McpToolError("'text' must hold the script's code");
+
+			AssetBuildDescriptor desc;
+			desc.aType = AssetType::LUA_SCRIPT;
+			desc.name = name;
+			LuaScriptCreateDescriptor createDesc;
+			createDesc.script = text;
+			AssetRef<Asset> created = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
+			if (created.isEmpty())
+				throw McpToolError("Creating the script failed; see get_console");
+
+			CommandStack::Instance().record(std::make_unique<CreateAssetCmd>(created, std::make_unique<LuaScriptCreateDescriptor>(createDesc), "AI: create script " + name));
+			return mcpText("Created script '" + name + "' (uuid " + created.getUID().str() + ")");
+		}
+	});
+
+	server.addTool({
+		"set_script",
+		"Replaces a Lua script's code with 'text'; it takes effect the next time the game starts. Not an undo step: "
+		"get_asset shows the current text if you want to keep it first.",
+		objectSchema({
+			{"uuid", { {"type", "string"} }},
+			{"name", { {"type", "string"} }},
+			{"text", { {"type", "string"} }},
+		}, { "text" }),
+		[](const json& args) {
+			requireEditMode();
+			const AssetRecord& record = findAssetRecord(args);
+			if (record.aType != AssetType::LUA_SCRIPT)
+				throw McpToolError("'" + record.name + "' isn't a Lua script. Use list_assets with type 'lua script'.");
+
+			const std::string text = args.value("text", "");
+			if (text.empty())
+				throw McpToolError("'text' must hold the script's code");
+
+			std::ofstream file(record.getAbsolutePath(), std::ios::binary | std::ios::trunc);
+			if (!file)
+				throw McpToolError("Couldn't write the script file");
+			file << text;
+			return mcpText("Updated script '" + record.name + "'; the change runs from the next play");
+		}
+	});
+
 	// ---- Play mode: the editor's own play, pause and stop; edits stay refused while the game runs ----
 
 	server.addTool({

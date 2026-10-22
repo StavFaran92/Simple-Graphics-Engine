@@ -88,6 +88,10 @@ void LuaScriptTypeManager::parse(ResourceBuildDescriptor& desc)
 		return;
 	}
 
+	// Only a new, empty script gets the template; a creator that gives code keeps it
+	if (!luaDesc->script.empty())
+		return;
+
 	luaDesc->script =  R"(-- Auto-generated Lua script
 
 Script = {}
