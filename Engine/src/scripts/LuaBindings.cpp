@@ -551,7 +551,7 @@ void bindAssets(sol::state& lua)
             }
         ),
         "instansiate", [](PrefabAssetRef& self, glm::vec3 position) {
-            self.resource()->Instansiate(position);
+            return self.resource()->Instansiate(position);
         }
     );
 

@@ -221,10 +221,21 @@ namespace
 		return json::parse(data)["component"]["ptr_wrapper"]["data"];
 	}
 
-	// The given fields over the component's current ones; a component the entity lacks needs all of them
+	// The fields of a default-constructed component, or null when it can't be default-constructed
+	json defaultFields(const std::string& component)
+	{
+		std::string data;
+		if (!Archiver::defaultComponent(component, data))
+			return nullptr;
+		return json::parse(data)["component"]["ptr_wrapper"]["data"];
+	}
+
+	// The given fields over the component's current ones, or over its defaults when the entity lacks it
 	std::string componentWithFields(Entity e, const std::string& component, const json& fields)
 	{
 		json merged = componentFields(e, component);
+		if (merged.is_null())
+			merged = defaultFields(component);
 		if (merged.is_null())
 			merged = fields;
 		else
@@ -481,14 +492,9 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 
 			json result = { {"component", component} };
 
-			std::string data;
-			if (Archiver::defaultComponent(component, data))
-				result["defaults"] = json::parse(data)["component"]["ptr_wrapper"]["data"];
-			else
-			{
-				result["defaults"] = nullptr;
+			result["defaults"] = defaultFields(component);
+			if (result["defaults"].is_null())
 				result["note"] = "No default constructor; copy exampleFromScene or use create_preset";
-			}
 
 			for (auto& e : sceneEntities())
 			{
@@ -740,8 +746,8 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 	server.addTool({
 		"create_entity",
 		"Creates an entity with a name and a Transformation. Optional 'parent' (entity id) and 'components' in "
-		"get_entity's form, e.g. {\"PointLight\": {...}}. Fields of Transformation can be partial; any other component "
-		"needs all its fields (copy them from get_component_schema).",
+		"get_entity's form, e.g. {\"PointLight\": {...}}. Fields you leave out get the defaults get_component_schema "
+		"shows; a component without defaults needs all its fields.",
 		objectSchema({
 			{"name", { {"type", "string"} }},
 			{"parent", { {"type", "integer"}, {"description", "Entity id to create it under"} }},
@@ -1068,6 +1074,43 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 	});
 
 	server.addTool({
+		"create_prefab",
+		"Saves an entity and its children as a prefab asset, like Create Prefab in the Hierarchy; one undo step. "
+		"'name' defaults to the entity's name. Lua spawns it with Prefab.new(name):instansiate(vec3), which returns "
+		"the new root entity.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"name", { {"type", "string"} }},
+		}, { "id" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args, "id");
+			const std::string name = args.value("name", entityName(e));
+			const std::string nameError = UniqueNameManager::fileNameError(name);
+			if (!nameError.empty())
+				throw McpToolError("The prefab name " + nameError + " (it becomes the .prefab file name)");
+
+			for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
+			{
+				if (record && record->aType == AssetType::PREFAB && record->name == name)
+					throw McpToolError("A prefab named '" + name + "' already exists");
+			}
+
+			AssetBuildDescriptor desc;
+			desc.aType = AssetType::PREFAB;
+			desc.name = name;
+			PrefabCreateDescriptor createDesc;
+			createDesc.data = Prefab::serializeEntityToPrefabData(e);
+			AssetRef<Asset> created = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
+			if (created.isEmpty())
+				throw McpToolError("Creating the prefab failed; see get_console");
+
+			CommandStack::Instance().record(std::make_unique<CreateAssetCmd>(created, std::make_unique<PrefabCreateDescriptor>(createDesc), "AI: create prefab " + name));
+			return mcpText("Created prefab '" + name + "' (uuid " + created.getUID().str() + ") from " + describe(e));
+		}
+	});
+
+	server.addTool({
 		"undo",
 		"Undoes the last editor action, yours or the user's (the same history as Ctrl+Z).",
 		objectSchema(),
@@ -1109,75 +1152,6 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			requireEditMode();
 			Engine::get()->saveProject();
 			return mcpText("Saved the project");
-		}
-	});
-
-	// ---- Scripts: Lua files the game runs; ScriptSystem reads the file again each time the game starts ----
-
-	server.addTool({
-		"create_script",
-		"Creates a Lua script asset with 'text' as its code, like Create Lua Script in the Asset View; one undo step. "
-		"A script defines Script = {} with Script:create(entity), Script:update(entity, dt) and Script:destroy(entity). "
-		"Attach it with set_components on ScriptComponent.script: {\"uuid\": {\"m_value\": <uuid>}}.",
-		objectSchema({
-			{"name", { {"type", "string"} }},
-			{"text", { {"type", "string"} }},
-		}, { "name", "text" }),
-		[](const json& args) {
-			requireEditMode();
-			const std::string name = args.value("name", "");
-			const std::string nameError = UniqueNameManager::fileNameError(name);
-			if (!nameError.empty())
-				throw McpToolError("The script name " + nameError + " (it becomes the .lua file name)");
-
-			for (const AssetRecord* record : Engine::get()->getSubSystem<Assets>()->getAllRecords())
-			{
-				if (record && record->aType == AssetType::LUA_SCRIPT && record->name == name)
-					throw McpToolError("A script named '" + name + "' already exists; use set_script to change it");
-			}
-
-			const std::string text = args.value("text", "");
-			if (text.empty())
-				throw McpToolError("'text' must hold the script's code");
-
-			AssetBuildDescriptor desc;
-			desc.aType = AssetType::LUA_SCRIPT;
-			desc.name = name;
-			LuaScriptCreateDescriptor createDesc;
-			createDesc.script = text;
-			AssetRef<Asset> created = Engine::get()->getSubSystem<Assets>()->createAsset(desc, createDesc);
-			if (created.isEmpty())
-				throw McpToolError("Creating the script failed; see get_console");
-
-			CommandStack::Instance().record(std::make_unique<CreateAssetCmd>(created, std::make_unique<LuaScriptCreateDescriptor>(createDesc), "AI: create script " + name));
-			return mcpText("Created script '" + name + "' (uuid " + created.getUID().str() + ")");
-		}
-	});
-
-	server.addTool({
-		"set_script",
-		"Replaces a Lua script's code with 'text'; it takes effect the next time the game starts. Not an undo step: "
-		"get_asset shows the current text if you want to keep it first.",
-		objectSchema({
-			{"uuid", { {"type", "string"} }},
-			{"name", { {"type", "string"} }},
-			{"text", { {"type", "string"} }},
-		}, { "text" }),
-		[](const json& args) {
-			requireEditMode();
-			const AssetRecord& record = findAssetRecord(args);
-			if (record.aType != AssetType::LUA_SCRIPT)
-				throw McpToolError("'" + record.name + "' isn't a Lua script. Use list_assets with type 'lua script'.");
-
-			const std::string text = args.value("text", "");
-			if (text.empty())
-				throw McpToolError("'text' must hold the script's code");
-
-			std::ofstream file(record.getAbsolutePath(), std::ios::binary | std::ios::trunc);
-			if (!file)
-				throw McpToolError("Couldn't write the script file");
-			file << text;
-			return mcpText("Updated script '" + record.name + "'; the change runs from the next play");
 		}
 	});
 

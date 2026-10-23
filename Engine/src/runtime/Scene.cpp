@@ -1199,8 +1199,8 @@ void Scene::draw(float deltaTime)
 			}
 		}
 
-		// Render WireframeGrid
-		if (Engine::get()->getConfig().renderConfig.renderWireframeGrid)
+		// Render WireframeGrid; editor only, so not while the game runs
+		if (Engine::get()->getConfig().renderConfig.renderWireframeGrid && !isSimulationActive())
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Wireframe Grid");
 
@@ -1240,6 +1240,7 @@ void Scene::draw(float deltaTime)
 			glPopDebugGroup();
 		}
 
+		if (!isSimulationActive())
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Orientation Gizmo");
 

@@ -27,9 +27,18 @@ public:
     void init()
     {
         lua.open_libraries(
-            sol::lib::base, 
-            sol::lib::math, 
-            sol::lib::package);
+            sol::lib::base,
+            sol::lib::math,
+            sol::lib::package,
+            sol::lib::table,
+            sol::lib::string,
+            sol::lib::utf8,
+            sol::lib::os);
+
+        // Scripts get the clock, not the shell or the file system
+        sol::table os = lua["os"];
+        for (const char* name : { "execute", "exit", "remove", "rename", "getenv", "tmpname", "setlocale" })
+            os[name] = sol::lua_nil;
 
         bindAll(lua);
     }

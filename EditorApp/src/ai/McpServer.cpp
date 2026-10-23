@@ -55,6 +55,13 @@ McpServer::~McpServer()
 
 void McpServer::addTool(McpTool tool)
 {
+	// Skip a duplicate name so it shows in the console, not twice in tools/list
+	auto same = [&](const McpTool& t) { return t.name == tool.name; };
+	if (std::any_of(m_tools.begin(), m_tools.end(), same))
+	{
+		logError("MCP server: tool '" + tool.name + "' is already registered");
+		return;
+	}
 	m_tools.push_back(std::move(tool));
 }
 

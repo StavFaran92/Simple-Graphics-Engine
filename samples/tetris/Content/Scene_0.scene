@@ -1,0 +1,718 @@
+{
+    "value0": {
+        "m_serializedScene": {
+            "serializedEntities": [
+                {
+                    "entity": 245,
+                    "components": [
+                        {
+                            "polymorphic_id": 2147483649,
+                            "polymorphic_name": "ScriptComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483649,
+                                "data": {
+                                    "isActive": true,
+                                    "script": {
+                                        "uuid": {
+                                            "m_value": 27
+                                        }
+                                    },
+                                    "entity": {
+                                        "m_entity": 245
+                                    },
+                                    "refs": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483650,
+                            "polymorphic_name": "Transformation",
+                            "ptr_wrapper": {
+                                "id": 2147483650,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 245
+                                    },
+                                    "root": {
+                                        "m_entity": 245
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483651,
+                            "polymorphic_name": "ObjectComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483651,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Tetris"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 7,
+                    "components": [
+                        {
+                            "polymorphic_id": 2147483652,
+                            "polymorphic_name": "MeshRendererComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483652,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 9
+                                        }
+                                    },
+                                    "count": 1,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 25
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 1,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483653,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 13.5,
+                                        "v.y": 16.5,
+                                        "v.z": -0.699999988079071
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 5.0,
+                                        "v.y": 5.0,
+                                        "v.z": 0.20000000298023225
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 3145730
+                                    },
+                                    "entity": {
+                                        "m_entity": 7
+                                    },
+                                    "root": {
+                                        "m_entity": 7
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483654,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Next Panel"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 6,
+                    "components": [
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483655,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 9
+                                        }
+                                    },
+                                    "count": 1,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 25
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 1,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483656,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 4.5,
+                                        "v.y": 9.5,
+                                        "v.z": -0.699999988079071
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 10.0,
+                                        "v.y": 20.0,
+                                        "v.z": 0.20000000298023225
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 3145730
+                                    },
+                                    "entity": {
+                                        "m_entity": 6
+                                    },
+                                    "root": {
+                                        "m_entity": 6
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483657,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Back Panel"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 5,
+                    "components": [
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483658,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 9
+                                        }
+                                    },
+                                    "count": 1,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 24
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 1,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483659,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 4.5,
+                                        "v.y": -1.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 12.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 3145730
+                                    },
+                                    "entity": {
+                                        "m_entity": 5
+                                    },
+                                    "root": {
+                                        "m_entity": 5
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483660,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Floor"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 4,
+                    "components": [
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483661,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 9
+                                        }
+                                    },
+                                    "count": 1,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 24
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 1,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483662,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 10.0,
+                                        "v.y": 9.5,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 22.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 3145730
+                                    },
+                                    "entity": {
+                                        "m_entity": 4
+                                    },
+                                    "root": {
+                                        "m_entity": 4
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483663,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Wall Right"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 3,
+                    "components": [
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483664,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 9
+                                        }
+                                    },
+                                    "count": 1,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 24
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 1,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483665,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": -1.0,
+                                        "v.y": 9.5,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 22.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 3145730
+                                    },
+                                    "entity": {
+                                        "m_entity": 3
+                                    },
+                                    "root": {
+                                        "m_entity": 3
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483666,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Wall Left"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 3145730,
+                    "components": [
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483667,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 3145730
+                                    },
+                                    "root": {
+                                        "m_entity": 3145730
+                                    },
+                                    "m_children": [
+                                        {
+                                            "key": 3,
+                                            "value": {
+                                                "m_entity": 3
+                                            }
+                                        },
+                                        {
+                                            "key": 4,
+                                            "value": {
+                                                "m_entity": 4
+                                            }
+                                        },
+                                        {
+                                            "key": 5,
+                                            "value": {
+                                                "m_entity": 5
+                                            }
+                                        },
+                                        {
+                                            "key": 6,
+                                            "value": {
+                                                "m_entity": 6
+                                            }
+                                        },
+                                        {
+                                            "key": 7,
+                                            "value": {
+                                                "m_entity": 7
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483668,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Board"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 1,
+                    "components": [
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483669,
+                                "data": {
+                                    "isActive": true,
+                                    "mesh": {
+                                        "uuid": {
+                                            "m_value": 14
+                                        }
+                                    },
+                                    "count": 1,
+                                    "m_material": [
+                                        {
+                                            "key": 0,
+                                            "value": {
+                                                "uuid": {
+                                                    "m_value": 7
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "renderTechnique": 1,
+                                    "isInstanced": false
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483653,
+                            "polymorphic_name": "CameraComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483670,
+                                "data": {
+                                    "isActive": true,
+                                    "center": {
+                                        "v.x": 6.5,
+                                        "v.y": 9.5,
+                                        "v.z": 30.0
+                                    },
+                                    "up": {
+                                        "v.x": 0.0,
+                                        "v.y": 1.0,
+                                        "v.z": 0.0
+                                    },
+                                    "fovyRadians": 0.7853981852531433,
+                                    "aspect": 1.8400719165802003,
+                                    "znear": 0.10000000149011612,
+                                    "zfar": 1000.0,
+                                    "type": 0,
+                                    "ortho_left": 0.0,
+                                    "ortho_right": 10.0,
+                                    "ortho_bottom": 0.0,
+                                    "ortho_top": 10.0
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483671,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 6.5,
+                                        "v.y": 9.5,
+                                        "v.z": 31.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 1
+                                    },
+                                    "root": {
+                                        "m_entity": 1
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483672,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Main Camera"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 0,
+                    "components": [
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483673,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": -0.4794255495071411,
+                                        "q.z": 0.0,
+                                        "q.w": 0.8775825500488281
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 0
+                                    },
+                                    "root": {
+                                        "m_entity": 0
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483654,
+                            "polymorphic_name": "DirectionalLight",
+                            "ptr_wrapper": {
+                                "id": 2147483674,
+                                "data": {
+                                    "color": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "intensity": 1.0
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483675,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "Directional light"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "gameCamera": 1
+        }
+    }
+}
