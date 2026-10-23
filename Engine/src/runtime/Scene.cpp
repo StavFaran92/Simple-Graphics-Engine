@@ -341,7 +341,7 @@ void Scene::generateDrawItems()
 		m_registry->getRegistry().view<MeshRendererComponent, Transformation>().each())
 	{
 		// Instanced meshes are batched separately below
-		if (meshRenderer.isInstanced)
+		if (meshRenderer.isInstanced || !meshRenderer.isActive)
 			continue;
 
 		auto model = meshRenderer.mesh.resource();
@@ -418,7 +418,7 @@ void Scene::generateDrawItems()
 	for (auto&& [entity, meshRenderer, transform] :
 		m_registry->getRegistry().view<MeshRendererComponent, Transformation>().each())
 	{
-		if (!meshRenderer.isInstanced)
+		if (!meshRenderer.isInstanced || !meshRenderer.isActive)
 			continue;
 
 		auto model = meshRenderer.mesh.resource();

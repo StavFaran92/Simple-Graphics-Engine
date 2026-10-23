@@ -350,11 +350,18 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				throw McpToolError("'data' must be an object with the MaterialData fields to change, as get_material shows them");
 
 			const AssetSnapshot before = takeAssetSnapshot(material.getUID());
-			AssetSnapshot after = before;
-			after.data["data"].merge_patch(changes);
-			validateMaterialData(after.data["data"]);
+			const MaterialRenderMode modeBefore = material->getMaterialRenderMode();
+			AssetSnapshot merged = before;
+			merged.data["data"].merge_patch(changes);
+			validateMaterialData(merged.data["data"]);
 
-			runOrThrow(std::make_unique<EditAssetCmd>(before, after, "AI: edit material " + material.info().name));
+			applyAssetSnapshot(merged);
+			// A new render mode has other shader properties; rebuild the layout like the Inspector's Render Mode does
+			if (material->getMaterialRenderMode() != modeBefore)
+				material->setMaterialRenderMode(material->getMaterialRenderMode());
+
+			// The after snapshot holds the rebuilt layout, so redo gets it too
+			CommandStack::Instance().record(std::make_unique<EditAssetCmd>(before, takeAssetSnapshot(material.getUID()), "AI: edit material " + material.info().name));
 			return mcpText("Updated material '" + material.info().name + "'");
 		}
 	});
@@ -407,7 +414,12 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 					Engine::get()->getSubSystem<Assets>()->deleteAsset(created.getUID());
 					throw;
 				}
+				MaterialAssetRef material(created.getUID());
+				const MaterialRenderMode modeBefore = material->getMaterialRenderMode();
 				applyAssetSnapshot(withChanges);
+				// A new render mode has other shader properties; rebuild the layout like the Inspector's Render Mode does
+				if (material->getMaterialRenderMode() != modeBefore)
+					material->setMaterialRenderMode(material->getMaterialRenderMode());
 
 				// Redo recreates the material from this descriptor, so it carries the changes too
 				created->fillBuildDescriptor(matDesc);
@@ -593,22 +605,26 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 	server.addTool({
 		"get_console",
 		"Returns the most recent editor console lines, oldest first, at or above min_level. "
-		"Each line reads [time] [level] [file:line] message.",
+		"Each line reads [time] [level] [file:line] message. The last line gives a cursor: pass it as 'since' "
+		"later to get only lines logged after this call, e.g. the errors of one play.",
 		objectSchema({
 			{"lines", { {"type", "integer"}, {"description", "How many lines (default 50, max 500)"} }},
 			{"min_level", { {"type", "string"}, {"enum", { "trace", "debug", "info", "warning", "error", "critical" }} }},
+			{"since", { {"type", "integer"}, {"description", "A cursor from an earlier get_console"} }},
 		}),
 		[readConsole](const json& args) {
 			const size_t maxLines = std::clamp(args.value("lines", 50), 1, 500);
 			const auto minLevel = spdlog::level::from_str(args.value("min_level", "info"));
 
+			// The log only grows, so a line's index is a stable cursor
 			const auto all = readConsole();
+			const size_t since = std::min<size_t>(std::max(args.value("since", 0), 0), all.size());
 
 			std::vector<std::string> picked;
-			for (auto it = all.rbegin(); it != all.rend() && picked.size() < maxLines; ++it)
+			for (size_t i = all.size(); i > since && picked.size() < maxLines; --i)
 			{
-				if (it->level >= minLevel)
-					picked.push_back(trimNewlines(it->text));
+				if (all[i - 1].level >= minLevel)
+					picked.push_back(trimNewlines(all[i - 1].text));
 			}
 			std::reverse(picked.begin(), picked.end());
 
@@ -616,7 +632,7 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			for (auto& line : picked)
 				text += line + "\n";
 
-			return mcpText(text.empty() ? "(no matching lines)" : text);
+			return mcpText((text.empty() ? "(no matching lines)\n" : text) + "(cursor " + std::to_string(all.size()) + ")");
 		}
 	});
 

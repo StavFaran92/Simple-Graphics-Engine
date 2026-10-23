@@ -22,6 +22,7 @@
 #include "component/PhysicsComponent.h"
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
+#include "component/MeshRendererComponent.h"
 #include "component/ScriptComponent.h"
 #include "component/TagComponent.h"
 #include "scripts/ScriptSystem.h"
@@ -122,6 +123,10 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
         
     { "Tag", [](Entity& e, sol::this_state lua) -> sol::object {
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<TagComponent>()));
+    } },
+
+    { "MeshRenderer", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<MeshRendererComponent>()));
     } }
 
 
@@ -495,6 +500,19 @@ void bindComponents(sol::state& lua)
     lua.new_usertype<TagComponent>("TagComponent",
         "tag", &TagComponent::tag,
         "getTag", &TagComponent::getTag
+    );
+
+    lua.new_usertype<MeshRendererComponent>("MeshRendererComponent",
+        "isActive", &MeshRendererComponent::isActive,
+        "setMaterial", [](MeshRendererComponent& self, int slot, const std::string& materialName) {
+            MaterialAssetRef material = Engine::get()->getSubSystem<Assets>()->getAssetFromName(materialName).as<MaterialAsset>();
+            if (material.isEmpty())
+            {
+                logWarning("setMaterial: no material named '{}'", materialName);
+                return;
+            }
+            self.setMaterial(slot, material);
+        }
     );
 }
 

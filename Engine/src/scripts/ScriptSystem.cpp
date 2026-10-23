@@ -123,7 +123,7 @@ void ScriptSystem::reloadScript(Entity e, ScriptComponent& scriptComponent)
     LuaState state;
     if (loadScriptState(impl_->lua, scriptComponent, state))
     {
-        impl_->scripts[scriptComponent.entity] = std::move(state);
+        impl_->scripts[e] = std::move(state);
     }
 }
 
