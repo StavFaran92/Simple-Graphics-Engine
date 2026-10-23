@@ -6,8 +6,6 @@ local W, H = 10, 20
 local AUTOPLAY = false -- plays by itself, for testing without a keyboard
 local NEXT_X, NEXT_Y = W + 2, H - 5
 local CUBE = 0.92
-local AWAY = vec3.new(0, -1000, 0)
-local TINY = vec3.new(0.001, 0.001, 0.001)
 
 local SHAPES = {
     I = { n = 4, cells = { {0,2}, {1,2}, {2,2}, {3,2} } },
@@ -19,14 +17,6 @@ local SHAPES = {
     L = { n = 3, cells = { {0,1}, {1,1}, {2,1}, {2,2} } },
 }
 local KINDS = { "I", "O", "T", "S", "Z", "J", "L" }
-
--- The engine opens only base and math, so no table library
-local function push(t, v) t[#t + 1] = v end
-local function pop(t)
-    local v = t[#t]
-    t[#t] = nil
-    return v
-end
 
 local function cellsOf(kind, rot)
     local s = SHAPES[kind]
@@ -40,11 +30,11 @@ local function cellsOf(kind, rot)
 end
 
 local function hide(e)
-    e.Transform:setLocalScale(TINY)
-    e.Transform:setLocalPosition(AWAY)
+    e.MeshRenderer.isActive = false
 end
 
 local function show(e, x, y)
+    e.MeshRenderer.isActive = true
     e.Transform:setLocalScale(vec3.new(CUBE, CUBE, CUBE))
     e.Transform:setLocalPosition(vec3.new(x, y, 0))
 end
@@ -58,7 +48,7 @@ function Script:create(entity)
     local ghost = Prefab.new("Block_Ghost")
     self.ghost = {}
     for i = 1, 4 do
-        self.ghost[i] = ghost:instansiate(AWAY)
+        self.ghost[i] = ghost:instansiate(vec3.new())
         hide(self.ghost[i])
     end
     self:reset()
@@ -90,19 +80,19 @@ end
 -- 7-bag randomizer: every kind once per seven pieces
 function Script:fromBag()
     if #self.bag == 0 then
-        for _, k in ipairs(KINDS) do push(self.bag, k) end
+        for _, k in ipairs(KINDS) do table.insert(self.bag, k) end
         for i = #self.bag, 2, -1 do
             local j = math.random(i)
             self.bag[i], self.bag[j] = self.bag[j], self.bag[i]
         end
     end
-    return pop(self.bag)
+    return table.remove(self.bag)
 end
 
 function Script:take(kind)
     local piece = { kind = kind, rot = 0, cubes = {} }
     for i, c in ipairs(cellsOf(kind, 0)) do
-        piece.cubes[i] = self.prefabs[kind]:instansiate(AWAY)
+        piece.cubes[i] = self.prefabs[kind]:instansiate(vec3.new())
         show(piece.cubes[i], NEXT_X + c[1], NEXT_Y + c[2])
     end
     return piece

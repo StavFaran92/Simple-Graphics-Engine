@@ -163,6 +163,13 @@ static void advanceSimulation()
 	Engine::get()->getContext()->advanceSimulation();
 }
 
+static constexpr float kSimIconSize = 20.0f;
+
+static bool simButton(const char* icon)
+{
+	return ImGui::ImageButton((ImTextureID)(intptr_t)icons.at(icon)->getID(), ImVec2(kSimIconSize, kSimIconSize));
+}
+
 void RenderSimulationControlView()
 {
 	ImGui::Begin("Simulation Controls", nullptr, windowFlags | ImGuiWindowFlags_NoResize);
@@ -170,72 +177,42 @@ void RenderSimulationControlView()
 	bool isRunning = EditorState::Instance().startButtonPressed;
 	bool isPaused  = EditorState::Instance().simPaused;
 
+	const bool isActive = Engine::get()->getContext()->getActiveScene()->isSimulationActive();
+
 	float windowWidth = ImGui::GetContentRegionAvail().x;
-	static const float btnW = 70.0f;
+	const float btnW = kSimIconSize + ImGui::GetStyle().FramePadding.x * 2.0f;
 	static const float gap  = 8.0f;
 	ImGui::SetCursorPosX((windowWidth - btnW * 3.0f - gap * 2.0f) * 0.5f);
 
 	// START — always calls context startSimulation
-	{
-		float alpha = Engine::get()->getContext()->getActiveScene()->isSimulationActive() ? 0.35f : 1.0f;
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * alpha);
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.55f, 0.15f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.70f, 0.20f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.10f, 0.45f, 0.10f, 1.0f));
-		std::string caption = Engine::get()->getContext()->getActiveScene()->isSimulationPaused() ? "RESUME" : "START";
-		if (ImGui::Button(caption.c_str(), ImVec2(btnW, 0)))
-			startsimulation();
-		ImGui::PopStyleColor(3);
-
-		ImGui::PopStyleVar();
-	}
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * (isActive ? 0.35f : 1.0f));
+	if (simButton("sim_play"))
+		startsimulation();
+	ImGui::PopStyleVar();
 
 	ImGui::SameLine(0, gap);
 
 	// STOP — always calls context stopSimulation
-	{
-		float alpha = Engine::get()->getContext()->getActiveScene()->isSimulationActive() ? 1.0f : 0.35f;
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * alpha);
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.70f, 0.15f, 0.15f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.85f, 0.20f, 0.20f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.60f, 0.10f, 0.10f, 1.0f));
-		if (ImGui::Button("STOP", ImVec2(btnW, 0)))
-			stopSimulation();
-		ImGui::PopStyleColor(3);
-
-		ImGui::PopStyleVar();
-	}
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * (isActive ? 1.0f : 0.35f));
+	if (simButton("sim_stop"))
+		stopSimulation();
+	ImGui::PopStyleVar();
 
 	ImGui::SameLine(0, gap);
 
 	// PAUSE / ADVANCE toggle — greyed out when simulation is stopped
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * (isRunning ? 1.0f : 0.35f));
+	if (isPaused)
 	{
-		float alpha = isRunning ? 1.0f : 0.35f;
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * alpha);
-
-		if (isPaused)
-		{
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.45f, 0.65f, alpha));
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.58f, 0.80f, alpha));
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.36f, 0.55f, alpha));
-			if (ImGui::Button("ADVANCE", ImVec2(btnW, 0)) && isRunning)
-				advanceSimulation();
-			ImGui::PopStyleColor(3);
-		}
-		else
-		{
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.55f, 0.45f, 0.10f, alpha));
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.70f, 0.58f, 0.15f, alpha));
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.45f, 0.35f, 0.08f, alpha));
-			if (ImGui::Button("PAUSE", ImVec2(btnW, 0)) && isRunning)
-				pauseSimulation();
-			ImGui::PopStyleColor(3);
-		}
-
-		ImGui::PopStyleVar();
+		if (simButton("sim_advance") && isRunning)
+			advanceSimulation();
 	}
+	else
+	{
+		if (simButton("sim_pause") && isRunning)
+			pauseSimulation();
+	}
+	ImGui::PopStyleVar();
 
 
 	ImGui::End();
@@ -882,6 +859,10 @@ public:
 		icons["prefab"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-blueprint-100.png");
 		icons["material"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-material-100.png");
 		icons["lua_script"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/icons8-code-file-100.png");
+		icons["sim_play"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-play-arrow-96.png");
+		icons["sim_stop"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-stop-96.png");
+		icons["sim_pause"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-pause-96.png");
+		icons["sim_advance"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-skip-next-96.png");
 
 		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::TEXTURE, std::make_unique<TextureThumbnailGenerator>());
 		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::MATERIAL, std::make_unique<MaterialThumbnailGenerator>());
