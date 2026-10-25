@@ -42,6 +42,7 @@
 #include "systems/VolumetricCloudsSystem.h"
 #include "systems/VolumetricSystem.h"
 #include "systems/SSAOSystem.h"
+#include "text/TextSystem.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/PostProcessComponent.h"
@@ -247,6 +248,7 @@ void Engine::createSystems()
     registerSubSystem<WaterSystem>(new WaterSystem());
     registerSubSystem<VolumetricSystem>(new VolumetricSystem());
     registerSubSystem<VolumetricCloudsSystem>(new VolumetricCloudsSystem());
+    registerSubSystem<TextSystem>(new TextSystem());
 
     registerSubSystem<ScriptSystem>(new ScriptSystem());
 
@@ -290,6 +292,12 @@ bool Engine::initSystems()
     if (!getSubSystem<VolumetricSystem>()->init())
     {
         logError("Volumetric System init failed!");
+        return false;
+    }
+
+    if (!getSubSystem<TextSystem>()->init())
+    {
+        logError("Text System init failed!");
         return false;
     }
 

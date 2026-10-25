@@ -219,7 +219,6 @@ private:
 	//CameraComponent* m_activeCamera = nullptr;
 
 	glm::mat4 m_defaultPerspectiveProjection;
-	glm::mat4 m_defaultUIProjection;
 
 	std::shared_ptr<UniformBufferObject> m_uboTime;
 

@@ -53,6 +53,8 @@
 #include "component/SkyboxComponent.h"
 #include "component/NativeScriptComponent.h"
 #include "component/ImageComponent.h"
+#include "component/TextComponent.h"
+#include "text/TextSystem.h"
 #include "component/PostProcessComponent.h"
 #include "component/PlayerControllerComponent.h"
 #include "component/VolumeComponent.h"
@@ -222,7 +224,6 @@ void Scene::init(Context* context, ResourceID rid)
 
 	m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)width / height, 0.1f, 1000.0f);
 
-	m_defaultUIProjection = glm::ortho(0.0f, (float)Engine::get()->getWindow()->getWidth(), (float)Engine::get()->getWindow()->getHeight(), 0.0f, -1.0f, 1.0f);
 
 	m_UIShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/UIShader.glsl");
 	m_tempOutlineShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/OutlineShader.glsl");
@@ -1269,44 +1270,6 @@ void Scene::draw(float deltaTime)
 			glPopDebugGroup();
 		}
 
-		// Render UI
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		m_UIShader->use();
-		m_UIShader->setProjectionMatrix(m_defaultUIProjection);
-		auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
-
-		for (auto&& [entity, imageComponent] : m_registry->get().view<ImageComponent>().each())
-		{
-			Entity entityhandler{ entity, m_registry.get() };
-			graphics->entity = entityhandler;
-			auto imageTexture = imageComponent.image.resource();
-
-			if (imageTexture.isEmpty())
-				continue;
-
-			imageTexture->bind();
-			imageTexture->setSlot(0);
-
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(imageComponent.position, 0.0f));
-
-			model = glm::translate(model, glm::vec3(0.5f * imageComponent.size.x, 0.5f * imageComponent.size.y, 0.0f));
-			model = glm::rotate(model, glm::radians(imageComponent.rotate), glm::vec3(0.0f, 0.0f, 1.0f));
-			model = glm::translate(model, glm::vec3(-0.5f * imageComponent.size.x, -0.5f * imageComponent.size.y, 0.0f));
-
-			model = glm::scale(model, glm::vec3(imageComponent.size, 1.0f));
-
-			m_UIShader->setUniformValue("model", model);
-
-			RenderCommand::draw(vao);
-		}
-
-		glDisable(GL_BLEND);
-
-		
-
-		
 #if 0 // TODO make use of this quite usefull camera frustum debug code
 		auto gameCameraTransform = getRenderView("Game View")->getCamera().getComponent<Transformation>();
 		auto gameCameraComponent = getRenderView("Game View")->getCamera().getComponent<CameraComponent>();
@@ -1405,6 +1368,55 @@ void Scene::draw(float deltaTime)
 				glEnable(GL_DEPTH_TEST);
 			}
 
+			glPopDebugGroup();
+		}
+
+		{
+			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "UI render pass");
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			glm::mat4 uiProjection = glm::ortho(0.0f, (float)viewport.w, (float)viewport.h, 0.0f, -1.0f, 1.0f);
+
+			m_UIShader->use();
+			m_UIShader->setProjectionMatrix(uiProjection);
+			auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_QUAD).resource()->getPrimaryMesh()->getVAO();
+
+			for (auto&& [entity, imageComponent] : m_registry->get().view<ImageComponent>().each())
+			{
+				Entity entityhandler{ entity, m_registry.get() };
+				graphics->entity = entityhandler;
+				auto imageTexture = imageComponent.image.resource();
+
+				if (imageTexture.isEmpty())
+					continue;
+
+				imageTexture->bind();
+				imageTexture->setSlot(0);
+
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, glm::vec3(imageComponent.position, 0.0f));
+
+				model = glm::translate(model, glm::vec3(0.5f * imageComponent.size.x, 0.5f * imageComponent.size.y, 0.0f));
+				model = glm::rotate(model, glm::radians(imageComponent.rotate), glm::vec3(0.0f, 0.0f, 1.0f));
+				model = glm::translate(model, glm::vec3(-0.5f * imageComponent.size.x, -0.5f * imageComponent.size.y, 0.0f));
+
+				model = glm::scale(model, glm::vec3(imageComponent.size, 1.0f));
+
+				m_UIShader->setUniformValue("model", model);
+
+				RenderCommand::draw(vao);
+			}
+
+			auto textSystem = Engine::get()->getSubSystem<TextSystem>();
+			for (auto&& [entity, textComponent] : m_registry->get().view<TextComponent>().each())
+			{
+				textSystem->drawText(textComponent, uiProjection);
+			}
+
+			glDisable(GL_BLEND);
+			glEnable(GL_DEPTH_TEST);
 			glPopDebugGroup();
 		}
 
@@ -1529,7 +1541,6 @@ void Scene::onWindowResize(int w, int h)
 	Engine::get()->getSubSystem<SSAOSystem>()->resize(w, h);
 
     m_defaultPerspectiveProjection = glm::perspective(45.0f, (float)w / h, 0.1f, 1000.0f);
-    m_defaultUIProjection = glm::ortho(0.0f, (float)w, (float)h, 0.0f, -1.0f, 1.0f);
 
     auto& reg = m_registry->getRegistry();
     auto view = reg.view<CameraComponent>();

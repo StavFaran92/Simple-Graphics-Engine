@@ -60,6 +60,15 @@ const std::vector<EntityPreset>& entityPresets()
 			[] { return WaterSystem::createPool(); } },
 		{ "Environment/Clouds", "Volumetric clouds: a parent with a VolumetricCloudsComponent and a box 'Volume' child",
 			[] { return VolumetricCloudsSystem::createVolumetricClouds(); } },
+
+		{ "UI/Text", "Screen-space text at (20, 20) in the default font",
+			[] {
+				static int count = 0;
+				Entity e = createNamed("Text_" + std::to_string(count++));
+				auto& text = e.addComponent<TextComponent>();
+				text.position = { 20, 20 };
+				return e;
+			} },
 	};
 	return presets;
 }

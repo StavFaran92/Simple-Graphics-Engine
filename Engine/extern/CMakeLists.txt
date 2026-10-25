@@ -2,6 +2,30 @@ add_subdirectory(tinyfiledialogs)
 add_subdirectory(MikkTSpace)
 add_subdirectory(tinyexr)
 
+# FreeType's cmake_minimum_required predates CMP0091, which MSVC_RUNTIME_LIBRARY needs
+set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
+set(FT_DISABLE_ZLIB ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_BZIP2 ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_PNG ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_BROTLI ON CACHE BOOL "" FORCE)
+add_subdirectory(freetype)
+add_library(Freetype::Freetype ALIAS freetype)
+
+set(MSDF_ATLAS_BUILD_STANDALONE OFF CACHE BOOL "" FORCE)
+set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "" FORCE)
+set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "" FORCE)
+set(MSDF_ATLAS_NO_ARTERY_FONT ON CACHE BOOL "" FORCE)
+set(MSDFGEN_DISABLE_PNG ON CACHE BOOL "" FORCE)
+add_subdirectory(msdf-atlas-gen)
+
+set_target_properties(freetype msdfgen-core msdfgen-ext msdf-atlas-gen PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
+foreach(TEXT_LIB freetype msdfgen-core msdfgen-ext msdf-atlas-gen)
+	target_compile_options(${TEXT_LIB} PRIVATE /MP)
+endforeach()
+
+target_link_libraries(Engine PRIVATE msdf-atlas-gen::msdf-atlas-gen)
+
 target_include_directories(Engine PUBLIC 	
 	assimp/include
 	entt

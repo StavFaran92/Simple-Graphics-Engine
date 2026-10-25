@@ -413,6 +413,14 @@ void InspectorWindow::display()
 			ImGui::DragFloat("sizeY", &image.size.y);
 			});
 
+		displayComponent<TextComponent>("Text", [](TextComponent& text) {
+			ImGui::InputTextMultiline("Text", &text.text);
+			ImGui::InputText("Font", &text.fontPath);
+			ImGui::DragFloat2("Position", &text.position.x);
+			ImGui::DragFloat("Size", &text.fontSize, 0.5f, 1.0f, 1000.0f);
+			ImGui::ColorEdit4("Color", &text.color.x);
+			});
+
 		displayComponent<Animator>("Animator", [](Animator& animator) {
 
 			EntityState& eState = state.getCurrentEntityState();
@@ -892,6 +900,11 @@ void InspectorWindow::display()
 			{
 				auto& img = state.getSelectedEntity().addComponent<ImageComponent>(BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE));
 				img.size = { 50, 50 };
+			}
+
+			if (ImGui::MenuItem("Text"))
+			{
+				state.getSelectedEntity().addComponent<TextComponent>();
 			}
 
 			if (ImGui::MenuItem("Animator"))
