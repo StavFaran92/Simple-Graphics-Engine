@@ -23,6 +23,7 @@
 #include "component/ObjectComponent.h"
 #include "component/RenderableComponent.h"
 #include "component/MeshRendererComponent.h"
+#include "component/TextComponent.h"
 #include "component/ScriptComponent.h"
 #include "component/TagComponent.h"
 #include "scripts/ScriptSystem.h"
@@ -127,6 +128,10 @@ std::unordered_map<std::string, ComponentGetter> componentGetters{
 
     { "MeshRenderer", [](Entity& e, sol::this_state lua) -> sol::object {
         return sol::object(lua, sol::in_place, std::ref(e.getComponent<MeshRendererComponent>()));
+    } },
+
+    { "Text", [](Entity& e, sol::this_state lua) -> sol::object {
+        return sol::object(lua, sol::in_place, std::ref(e.getComponent<TextComponent>()));
     } }
 
 
@@ -512,6 +517,18 @@ void bindComponents(sol::state& lua)
                 return;
             }
             self.setMaterial(slot, material);
+        }
+    );
+
+    // Screen-space text; position is in pixels from the top-left corner
+    lua.new_usertype<TextComponent>("TextComponent",
+        "isActive", &TextComponent::isActive,
+        "text", sol::property(&TextComponent::getText, &TextComponent::setText),
+        "font", sol::property(&TextComponent::getFontName, &TextComponent::setFontName),
+        "fontSize", sol::property(&TextComponent::getFontSize, &TextComponent::setFontSize),
+        "position", &TextComponent::position,
+        "setColor", [](TextComponent& self, float r, float g, float b, sol::optional<float> a) {
+            self.color = glm::vec4(r, g, b, a.value_or(1.0f));
         }
     );
 }

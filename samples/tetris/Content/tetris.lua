@@ -51,7 +51,25 @@ function Script:create(entity)
         self.ghost[i] = ghost:instansiate(vec3.new())
         hide(self.ghost[i])
     end
+    -- Entities, not their Text: spawning blocks can move component storage
+    local scene = getActiveScene()
+    self.hud = {}
+    for _, name in ipairs({ "Score", "Lines", "Level", "Message" }) do
+        self.hud[name] = scene:getEntityByName("HUD " .. name)
+    end
     self:reset()
+end
+
+function Script:updateHud()
+    self.hud.Score.Text.text = "SCORE  " .. self.score
+    self.hud.Lines.Text.text = "LINES  " .. self.lines
+    self.hud.Level.Text.text = "LEVEL  " .. math.floor(self.lines / 10)
+end
+
+function Script:gameOver()
+    self.over = true
+    self.overTimer = 0
+    self.hud.Message.Text.isActive = true
 end
 
 function Script:reset()
@@ -67,6 +85,10 @@ function Script:reset()
     self.board = {}
     self.bag = {}
     self.lines = 0
+    self.score = 0
+    self.over = false
+    self.hud.Message.Text.isActive = false
+    self:updateHud()
     self.fallTimer = 0
     self.piece = nil
     self.next = self:take(self:fromBag())
@@ -107,8 +129,8 @@ function Script:spawn()
     piece.x = math.floor((W - SHAPES[piece.kind].n) / 2)
     piece.y = H - 1 - top
     self.piece = piece
-    if not self:fits(piece.kind, piece.rot, piece.x, piece.y) then return self:reset() end
     self:draw()
+    if not self:fits(piece.kind, piece.rot, piece.x, piece.y) then return self:gameOver() end
 end
 
 function Script:fits(kind, rot, px, py)
@@ -156,18 +178,25 @@ end
 
 function Script:lock()
     local p = self.piece
-    for i, c in ipairs(cellsOf(p.kind, p.rot)) do
-        local x, y = p.x + c[1], p.y + c[2]
-        if y >= H then return self:reset() end -- locked above the top
-        self.board[y * W + x] = { kind = p.kind, e = p.cubes[i] }
+    local cells = cellsOf(p.kind, p.rot)
+    for _, c in ipairs(cells) do
+        if p.y + c[2] >= H then return self:gameOver() end -- locked above the top
+    end
+    for i, c in ipairs(cells) do
+        self.board[(p.y + c[2]) * W + p.x + c[1]] = { kind = p.kind, e = p.cubes[i] }
     end
     self.piece = nil
-    self:clearLines()
+
+    -- Classic scoring: more lines at once are worth more, and every level multiplies it
+    local cleared = self:clearLines()
+    local points = { 100, 300, 500, 800 }
+    if cleared > 0 then self.score = self.score + points[cleared] * (math.floor(self.lines / 10) + 1) end
+    self:updateHud()
     self:spawn()
 end
 
 function Script:clearLines()
-    local newBoard, row = {}, 0
+    local newBoard, row, cleared = {}, 0, 0
     for y = 0, H - 1 do
         local full = true
         for x = 0, W - 1 do
@@ -184,9 +213,11 @@ function Script:clearLines()
                 end
             end
         end
-        if full then self.lines = self.lines + 1 else row = row + 1 end
+        if full then cleared = cleared + 1 else row = row + 1 end
     end
     self.board = newBoard
+    self.lines = self.lines + cleared
+    return cleared
 end
 
 function Script:pressed(key)
@@ -260,6 +291,12 @@ function Script:bestMove()
 end
 
 function Script:update(entity, dt)
+    if self.over then
+        self.overTimer = self.overTimer + dt
+        if self:tapped(KeyCode.SCANCODE_SPACE) or (AUTOPLAY and self.overTimer > 2) then self:reset() end
+        return
+    end
+
     if not self.piece then return end
     local p = self.piece
 
@@ -278,7 +315,9 @@ function Script:update(entity, dt)
     if self:held(KeyCode.SCANCODE_LEFT, dt) then self:move(-1, 0, 0) end
     if self:held(KeyCode.SCANCODE_RIGHT, dt) then self:move(1, 0, 0) end
     if self:tapped(KeyCode.SCANCODE_SPACE) then
-        p.y = self:dropY(p)
+        local landing = self:dropY(p)
+        self.score = self.score + 2 * (p.y - landing)
+        p.y = landing
         self:draw()
         return self:lock()
     end

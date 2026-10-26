@@ -1412,7 +1412,8 @@ void Scene::draw(float deltaTime)
 			auto textSystem = Engine::get()->getSubSystem<TextSystem>();
 			for (auto&& [entity, textComponent] : m_registry->get().view<TextComponent>().each())
 			{
-				textSystem->drawText(textComponent, uiProjection);
+				if (textComponent.isActive)
+					textSystem->drawText(textComponent, uiProjection);
 			}
 
 			glDisable(GL_BLEND);

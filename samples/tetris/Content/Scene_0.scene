@@ -74,13 +74,302 @@
                     ]
                 },
                 {
+                    "entity": 244,
+                    "components": [
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483652,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 244
+                                    },
+                                    "root": {
+                                        "m_entity": 244
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483653,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "HUD Score"
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 2147483652,
+                            "polymorphic_name": "TextComponent",
+                            "ptr_wrapper": {
+                                "id": 2147483654,
+                                "data": {
+                                    "isActive": true,
+                                    "m_text": "SCORE  0",
+                                    "m_fontName": "PressStart2P-Regular",
+                                    "position": {
+                                        "v.x": 40.0,
+                                        "v.y": 40.0
+                                    },
+                                    "m_fontSize": 20.0,
+                                    "color": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0,
+                                        "v.w": 1.0
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 243,
+                    "components": [
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483655,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 243
+                                    },
+                                    "root": {
+                                        "m_entity": 243
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483656,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "HUD Lines"
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483657,
+                                "data": {
+                                    "isActive": true,
+                                    "m_text": "LINES  0",
+                                    "m_fontName": "PressStart2P-Regular",
+                                    "position": {
+                                        "v.x": 40.0,
+                                        "v.y": 80.0
+                                    },
+                                    "m_fontSize": 20.0,
+                                    "color": {
+                                        "v.x": 0.75,
+                                        "v.y": 0.800000011920929,
+                                        "v.z": 0.8999999761581421,
+                                        "v.w": 1.0
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 242,
+                    "components": [
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483658,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 242
+                                    },
+                                    "root": {
+                                        "m_entity": 242
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483659,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "HUD Level"
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483660,
+                                "data": {
+                                    "isActive": true,
+                                    "m_text": "LEVEL  0",
+                                    "m_fontName": "PressStart2P-Regular",
+                                    "position": {
+                                        "v.x": 40.0,
+                                        "v.y": 120.0
+                                    },
+                                    "m_fontSize": 20.0,
+                                    "color": {
+                                        "v.x": 0.75,
+                                        "v.y": 0.800000011920929,
+                                        "v.z": 0.8999999761581421,
+                                        "v.w": 1.0
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "entity": 241,
+                    "components": [
+                        {
+                            "polymorphic_id": 2,
+                            "ptr_wrapper": {
+                                "id": 2147483661,
+                                "data": {
+                                    "isActive": true,
+                                    "localTranslation": {
+                                        "v.x": 0.0,
+                                        "v.y": 0.0,
+                                        "v.z": 0.0
+                                    },
+                                    "localRotation": {
+                                        "q.x": 0.0,
+                                        "q.y": 0.0,
+                                        "q.z": 0.0,
+                                        "q.w": 1.0
+                                    },
+                                    "localScale": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "m_parent": {
+                                        "m_entity": 4294967295
+                                    },
+                                    "entity": {
+                                        "m_entity": 241
+                                    },
+                                    "root": {
+                                        "m_entity": 241
+                                    },
+                                    "m_children": []
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 3,
+                            "ptr_wrapper": {
+                                "id": 2147483662,
+                                "data": {
+                                    "isActive": true,
+                                    "name": "HUD Message"
+                                }
+                            }
+                        },
+                        {
+                            "polymorphic_id": 4,
+                            "ptr_wrapper": {
+                                "id": 2147483663,
+                                "data": {
+                                    "isActive": false,
+                                    "m_text": "GAME OVER - SPACE TO RESTART",
+                                    "m_fontName": "PressStart2P-Regular",
+                                    "position": {
+                                        "v.x": 40.0,
+                                        "v.y": 180.0
+                                    },
+                                    "m_fontSize": 16.0,
+                                    "color": {
+                                        "v.x": 1.0,
+                                        "v.y": 0.8500000238418579,
+                                        "v.z": 0.20000000298023225,
+                                        "v.w": 1.0
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
                     "entity": 7,
                     "components": [
                         {
-                            "polymorphic_id": 2147483652,
+                            "polymorphic_id": 2147483653,
                             "polymorphic_name": "MeshRendererComponent",
                             "ptr_wrapper": {
-                                "id": 2147483652,
+                                "id": 2147483664,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -107,7 +396,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483653,
+                                "id": 2147483665,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -142,7 +431,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483654,
+                                "id": 2147483666,
                                 "data": {
                                     "isActive": true,
                                     "name": "Next Panel"
@@ -155,9 +444,9 @@
                     "entity": 6,
                     "components": [
                         {
-                            "polymorphic_id": 4,
+                            "polymorphic_id": 5,
                             "ptr_wrapper": {
-                                "id": 2147483655,
+                                "id": 2147483667,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -184,7 +473,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483656,
+                                "id": 2147483668,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -219,7 +508,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483657,
+                                "id": 2147483669,
                                 "data": {
                                     "isActive": true,
                                     "name": "Back Panel"
@@ -232,9 +521,9 @@
                     "entity": 5,
                     "components": [
                         {
-                            "polymorphic_id": 4,
+                            "polymorphic_id": 5,
                             "ptr_wrapper": {
-                                "id": 2147483658,
+                                "id": 2147483670,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -261,7 +550,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483659,
+                                "id": 2147483671,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -296,7 +585,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483660,
+                                "id": 2147483672,
                                 "data": {
                                     "isActive": true,
                                     "name": "Floor"
@@ -309,9 +598,9 @@
                     "entity": 4,
                     "components": [
                         {
-                            "polymorphic_id": 4,
+                            "polymorphic_id": 5,
                             "ptr_wrapper": {
-                                "id": 2147483661,
+                                "id": 2147483673,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -338,7 +627,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483662,
+                                "id": 2147483674,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -373,7 +662,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483663,
+                                "id": 2147483675,
                                 "data": {
                                     "isActive": true,
                                     "name": "Wall Right"
@@ -386,9 +675,9 @@
                     "entity": 3,
                     "components": [
                         {
-                            "polymorphic_id": 4,
+                            "polymorphic_id": 5,
                             "ptr_wrapper": {
-                                "id": 2147483664,
+                                "id": 2147483676,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -415,7 +704,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483665,
+                                "id": 2147483677,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -450,7 +739,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483666,
+                                "id": 2147483678,
                                 "data": {
                                     "isActive": true,
                                     "name": "Wall Left"
@@ -465,7 +754,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483667,
+                                "id": 2147483679,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -531,7 +820,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483668,
+                                "id": 2147483680,
                                 "data": {
                                     "isActive": true,
                                     "name": "Board"
@@ -544,9 +833,9 @@
                     "entity": 1,
                     "components": [
                         {
-                            "polymorphic_id": 4,
+                            "polymorphic_id": 5,
                             "ptr_wrapper": {
-                                "id": 2147483669,
+                                "id": 2147483681,
                                 "data": {
                                     "isActive": true,
                                     "mesh": {
@@ -571,10 +860,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483653,
+                            "polymorphic_id": 2147483654,
                             "polymorphic_name": "CameraComponent",
                             "ptr_wrapper": {
-                                "id": 2147483670,
+                                "id": 2147483682,
                                 "data": {
                                     "isActive": true,
                                     "center": {
@@ -602,7 +891,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483671,
+                                "id": 2147483683,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -637,7 +926,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483672,
+                                "id": 2147483684,
                                 "data": {
                                     "isActive": true,
                                     "name": "Main Camera"
@@ -652,7 +941,7 @@
                         {
                             "polymorphic_id": 2,
                             "ptr_wrapper": {
-                                "id": 2147483673,
+                                "id": 2147483685,
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
@@ -685,10 +974,10 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483654,
+                            "polymorphic_id": 2147483655,
                             "polymorphic_name": "DirectionalLight",
                             "ptr_wrapper": {
-                                "id": 2147483674,
+                                "id": 2147483686,
                                 "data": {
                                     "color": {
                                         "v.x": 1.0,
@@ -702,7 +991,7 @@
                         {
                             "polymorphic_id": 3,
                             "ptr_wrapper": {
-                                "id": 2147483675,
+                                "id": 2147483687,
                                 "data": {
                                     "isActive": true,
                                     "name": "Directional light"
