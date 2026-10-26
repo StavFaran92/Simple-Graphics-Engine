@@ -1,3 +1,5 @@
+set(CMAKE_FOLDER extern)
+
 add_subdirectory(imgui)
 add_subdirectory(ImGuizmo)
 add_subdirectory(imgui-node-editor)

@@ -5,6 +5,8 @@ project(SGE)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 # The prebuilt third party libs (PhysX, assimp, spdlog, SDL2, ...) are all release CRT (/MT),
 # so every config - Debug included - has to use the same runtime to link against them.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")

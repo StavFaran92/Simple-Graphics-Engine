@@ -1,3 +1,5 @@
+set(CMAKE_FOLDER extern)
+
 add_subdirectory(tinyfiledialogs)
 add_subdirectory(MikkTSpace)
 add_subdirectory(tinyexr)
@@ -9,7 +11,10 @@ set(FT_DISABLE_BZIP2 ON CACHE BOOL "" FORCE)
 set(FT_DISABLE_PNG ON CACHE BOOL "" FORCE)
 set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "" FORCE)
 set(FT_DISABLE_BROTLI ON CACHE BOOL "" FORCE)
+# Only the cache variable silences FreeType's cmake_minimum_required warning; set back ON for later projects
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 add_subdirectory(freetype)
+set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
 add_library(Freetype::Freetype ALIAS freetype)
 
 set(MSDF_ATLAS_BUILD_STANDALONE OFF CACHE BOOL "" FORCE)
