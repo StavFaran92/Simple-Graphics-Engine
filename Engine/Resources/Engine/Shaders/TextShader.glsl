@@ -5,13 +5,14 @@
 layout (location = 0) in vec4 aVertex; // xy position in pixels, zw uv
 
 uniform mat4 projection;
+uniform vec2 offset;
 
 out vec2 uv;
 
 void main()
 {
     uv = aVertex.zw;
-    gl_Position = projection * vec4(aVertex.xy, 0.0, 1.0);
+    gl_Position = projection * vec4(aVertex.xy + offset, 0.0, 1.0);
 }
 
 #frag

@@ -10,6 +10,7 @@
 #include "Widgets.h"
 #include "TerrainPaintTool.h"
 #include "AnimationGraphWindow.h"
+#include "text/TextSystem.h"
 #include "AnimationViewerWindow.h"
 #include "scripts/ScriptSystem.h"
 #include "component/TagComponent.h"
@@ -414,10 +415,30 @@ void InspectorWindow::display()
 			});
 
 		displayComponent<TextComponent>("Text", [](TextComponent& text) {
-			ImGui::InputTextMultiline("Text", &text.text);
-			ImGui::InputText("Font", &text.fontPath);
+			std::string content = text.getText();
+			if (ImGui::InputTextMultiline("Text", &content))
+				text.setText(content);
+
+			const std::string& fontName = text.getFontName();
+			if (ImGui::BeginCombo("Font", fontName.empty() ? "Default" : fontName.c_str()))
+			{
+				if (ImGui::Selectable("Default", fontName.empty()))
+					text.setFontName("");
+
+				for (const std::string& name : Engine::get()->getSubSystem<TextSystem>()->getFontNames())
+				{
+					if (ImGui::Selectable(name.c_str(), name == fontName))
+						text.setFontName(name);
+				}
+				ImGui::EndCombo();
+			}
+
 			ImGui::DragFloat2("Position", &text.position.x);
-			ImGui::DragFloat("Size", &text.fontSize, 0.5f, 1.0f, 1000.0f);
+
+			float fontSize = text.getFontSize();
+			if (ImGui::DragFloat("Size", &fontSize, 0.5f, 1.0f, 1000.0f))
+				text.setFontSize(fontSize);
+
 			ImGui::ColorEdit4("Color", &text.color.x);
 			});
 

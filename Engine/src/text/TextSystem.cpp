@@ -3,15 +3,16 @@
 #include <chrono>
 
 #include "text/FontAtlasGenerator.h"
+#include "text/TextMesh.h"
 #include "component/TextComponent.h"
-#include "fileSystem/FileSystem.h"
 #include "render/Shader.h"
 #include "texture/Texture.h"
 #include "core/Logger.h"
 
 namespace
 {
-	const std::string DEFAULT_FONT = SGE_ROOT_DIR "Resources/Engine/Fonts/Play-Regular.ttf";
+	const std::string FONTS_DIR = SGE_ROOT_DIR "Resources/Engine/Fonts/";
+	const std::string DEFAULT_FONT_NAME = "Play-Regular";
 	constexpr float ATLAS_EM_SIZE = 48;
 	constexpr float ATLAS_DISTANCE_RANGE = 4;
 }
@@ -20,28 +21,36 @@ bool TextSystem::init()
 {
 	m_shader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/TextShader.glsl");
 
-	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_vbo);
-	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), nullptr);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	for (const auto& entry : std::filesystem::directory_iterator(FONTS_DIR))
+	{
+		if (entry.is_regular_file() && entry.path().extension() == ".ttf")
+			m_fontNames.push_back(entry.path().stem().string());
+	}
+	std::sort(m_fontNames.begin(), m_fontNames.end());
+
+	logInfo("Found {} built-in fonts", m_fontNames.size());
 
 	return !m_shader.isEmpty();
 }
 
-const Font* TextSystem::getFont(const std::string& fontPath)
+const Font* TextSystem::getFont(const std::string& fontName)
 {
-	auto it = m_fonts.find(fontPath);
+	std::string name = fontName.empty() ? DEFAULT_FONT_NAME : fontName;
+	if (std::find(m_fontNames.begin(), m_fontNames.end(), name) == m_fontNames.end())
+	{
+		if (m_warnedFontNames.insert(name).second)
+			logWarning("Unknown font {}, using {}", name, DEFAULT_FONT_NAME);
+		name = DEFAULT_FONT_NAME;
+	}
+
+	auto it = m_fonts.find(name);
 	if (it != m_fonts.end())
 		return it->second.get();
 
 	// A failed font stays cached as null so the error is logged once, not every frame
-	std::unique_ptr<Font>& font = m_fonts[fontPath];
+	std::unique_ptr<Font>& font = m_fonts[name];
 
-	std::string ttfPath = fontPath.empty() ? DEFAULT_FONT : FileSystem::toAbsolute(fontPath).string();
+	std::string ttfPath = FONTS_DIR + name + ".ttf";
 
 	auto start = std::chrono::steady_clock::now();
 
@@ -91,62 +100,66 @@ const Font* TextSystem::getFont(const std::string& fontPath)
 	return font.get();
 }
 
-void TextSystem::drawText(const TextComponent& text, const glm::mat4& projection)
+namespace
 {
-	const Font* font = getFont(text.fontPath);
+	std::vector<glm::vec4> layoutText(const Font& font, const std::string& text, float size)
+	{
+		std::vector<glm::vec4> vertices;
+		float penX = 0;
+		float baseline = font.ascender * size;
+
+		for (char c : text)
+		{
+			if (c == '\n')
+			{
+				penX = 0;
+				baseline += font.lineHeight * size;
+				continue;
+			}
+
+			unsigned char index = (unsigned char)c;
+			const Glyph& glyph = font.glyphs[index < font.glyphs.size() ? index : '?'];
+
+			if (glyph.visible)
+			{
+				// Metrics are y up, the UI projection is y down
+				float left = penX + glyph.plane.x * size;
+				float right = penX + glyph.plane.z * size;
+				float top = baseline - glyph.plane.w * size;
+				float bottom = baseline - glyph.plane.y * size;
+
+				glm::vec4 topLeft(left, top, glyph.uv.x, glyph.uv.w);
+				glm::vec4 topRight(right, top, glyph.uv.z, glyph.uv.w);
+				glm::vec4 bottomLeft(left, bottom, glyph.uv.x, glyph.uv.y);
+				glm::vec4 bottomRight(right, bottom, glyph.uv.z, glyph.uv.y);
+
+				vertices.insert(vertices.end(), { topLeft, bottomLeft, bottomRight, topLeft, bottomRight, topRight });
+			}
+
+			penX += glyph.advance * size;
+		}
+
+		return vertices;
+	}
+}
+
+void TextSystem::drawText(TextComponent& text, const glm::mat4& projection)
+{
+	const Font* font = getFont(text.getFontName());
 	if (!font)
 		return;
 
-	const float size = text.fontSize;
-	float penX = text.position.x;
-	float baseline = text.position.y + font->ascender * size;
+	const float size = text.getFontSize();
 
-	m_vertices.clear();
-
-	for (char c : text.text)
-	{
-		if (c == '\n')
-		{
-			penX = text.position.x;
-			baseline += font->lineHeight * size;
-			continue;
-		}
-
-		unsigned char index = (unsigned char)c;
-		const Glyph& glyph = font->glyphs[index < font->glyphs.size() ? index : '?'];
-
-		if (glyph.visible)
-		{
-			// Metrics are y up, the UI projection is y down
-			float left = penX + glyph.plane.x * size;
-			float right = penX + glyph.plane.z * size;
-			float top = baseline - glyph.plane.w * size;
-			float bottom = baseline - glyph.plane.y * size;
-
-			glm::vec4 topLeft(left, top, glyph.uv.x, glyph.uv.w);
-			glm::vec4 topRight(right, top, glyph.uv.z, glyph.uv.w);
-			glm::vec4 bottomLeft(left, bottom, glyph.uv.x, glyph.uv.y);
-			glm::vec4 bottomRight(right, bottom, glyph.uv.z, glyph.uv.y);
-
-			m_vertices.insert(m_vertices.end(), { topLeft, bottomLeft, bottomRight, topLeft, bottomRight, topRight });
-		}
-
-		penX += glyph.advance * size;
-	}
-
-	if (m_vertices.empty())
-		return;
+	if (text.isDirty())
+		text.setMesh(std::make_shared<TextMesh>(layoutText(*font, text.getText(), size)));
 
 	m_shader->use();
 	m_shader->setProjectionMatrix(projection);
+	m_shader->setUniformValue("offset", text.position);
 	m_shader->setUniformValue("color", text.color);
 	m_shader->setUniformValue("screenPxRange", glm::max(font->distanceRange * size / font->emSize, 1.0f));
 	m_shader->setTextureInShader(font->atlas, "atlas", 0);
 
-	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glm::vec4), m_vertices.data(), GL_DYNAMIC_DRAW);
-	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)m_vertices.size());
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	text.getMesh()->draw();
 }

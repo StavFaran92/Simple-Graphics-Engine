@@ -46,10 +46,12 @@
 
 #include "ImguiHandler.h"
 #include "GUIMenu.h"
+#include "render/GpuInfo.h"
 
 extern bool g_testRay;
 
 static const std::string SGE_EDITOR_APP_ROOT = "../../EditorApp/Resources";
+static GpuInfo g_gpuInfo;
 std::shared_ptr<EventLayer> uiShortcutsLayer = std::make_shared<EventLayer>("uiShortcutsLayer");
 std::shared_ptr<EventLayer> uiLayer = std::make_shared<UIEventLayer>();
 std::shared_ptr<EventLayer> uiEditorToolsLayer = std::make_shared<UIEditorToolsEventLayer>();
@@ -342,6 +344,30 @@ void DisplayDebugInfoWindow()
 	bool vsync = graphics->isVSyncEnabled();
 	if (ImGui::Checkbox("VSync", &vsync))
 		graphics->setVSync(vsync);
+
+	ImGui::Separator();
+
+	// --- GPU ---
+	static float gpuInfoTimer = 0;
+	gpuInfoTimer += Engine::get()->getSubSystem<System>()->getDeltaTime();
+	if (gpuInfoTimer >= 0.5f)
+	{
+		g_gpuInfo.update();
+		gpuInfoTimer = 0;
+	}
+
+	ImGui::Text("GPU: %s", g_gpuInfo.getRenderer().c_str());
+	ImGui::Text("OpenGL %s, GLSL %s", g_gpuInfo.getGLVersion().c_str(), g_gpuInfo.getGLSLVersion().c_str());
+	ImGui::Text("Max texture size: %d, texture units: %d", g_gpuInfo.getMaxTextureSize(), g_gpuInfo.getMaxTextureUnits());
+
+	if (g_gpuInfo.hasMemoryInfo())
+	{
+		int used = g_gpuInfo.getUsedMemoryMB();
+		int total = g_gpuInfo.getTotalMemoryMB();
+		ImGui::Text("VRAM: %d / %d MB", used, total);
+		ImGui::ProgressBar(total > 0 ? (float)used / total : 0.0f, ImVec2(-1, 0));
+		ImGui::Text("Evictions: %d (%d MB)", g_gpuInfo.getEvictionCount(), g_gpuInfo.getEvictedMemoryMB());
+	}
 
 	ImGui::Separator();
 
@@ -762,6 +788,7 @@ public:
 	void start() override
 	{
 		EditorState::Instance().init();
+		g_gpuInfo.init();
 		m_editorRegistry = std::make_shared<SGE_Regsitry>();
 		
 		auto gui = std::make_shared<ImguiHandler>();

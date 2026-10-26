@@ -6,6 +6,13 @@
 
 Application* CreateApplication();
 
+// On dual-GPU machines the drivers read these from the exe and run it on the discrete GPU instead of the integrated one
+extern "C"
+{
+    __declspec(dllexport) unsigned long NvOptimusEnablement = 1;
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 InitParams parseArgs(int argc, char* argv[])
 {
     InitParams params;

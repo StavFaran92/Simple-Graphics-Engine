@@ -36,7 +36,7 @@ bool generateFontAtlas(const std::string& ttfPath, float emSize, float distanceR
 		glyph.edgeColoring(&msdfgen::edgeColoringInkTrap, 3.0, 0);
 
 	TightAtlasPacker packer;
-	packer.setDimensionsConstraint(DimensionsConstraint::POWER_OF_TWO_SQUARE);
+	packer.setDimensionsConstraint(DimensionsConstraint::NONE);
 	packer.setScale(emSize);
 	packer.setPixelRange(distanceRange);
 	packer.setMiterLimit(1.0);
