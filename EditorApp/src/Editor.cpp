@@ -1,3 +1,6 @@
+#include "launcher/ProjectLauncher.h"
+// Started without -e / -ec, the editor opens the project launcher first
+#define SGE_PROJECT_LAUNCHER ProjectLauncher::run
 #include "EntryPoint.h"
 #include "sge.h"
 
@@ -183,8 +186,11 @@ void RenderSimulationControlView()
 
 	float windowWidth = ImGui::GetContentRegionAvail().x;
 	const float btnW = kSimIconSize + ImGui::GetStyle().FramePadding.x * 2.0f;
+	const float btnH = kSimIconSize + ImGui::GetStyle().FramePadding.y * 2.0f;
 	static const float gap  = 8.0f;
 	ImGui::SetCursorPosX((windowWidth - btnW * 3.0f - gap * 2.0f) * 0.5f);
+	// The dock strip is shorter than padding + buttons, so centre in the whole window to keep top and bottom equal
+	ImGui::SetCursorPosY((ImGui::GetWindowHeight() - btnH) * 0.5f);
 
 	// START — always calls context startSimulation
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * (isActive ? 0.35f : 1.0f));
@@ -466,6 +472,7 @@ class GUI_Helper : public GuiMenu {
 					if (lTheSelectFolderName)
 					{
 						Engine::get()->loadProject(lTheSelectFolderName);
+						ProjectLauncher::rememberProject(lTheSelectFolderName);
 						CommandStack::Instance().clear();
 						state.selectEntity(Entity::EmptyEntity);
 						updateScene();
@@ -699,6 +706,13 @@ void setStyleAndColors()
 	colors[ImGuiCol_HeaderHovered] = ImVec4(0.27f, 0.53f, 0.90f, 1.00f);
 	colors[ImGuiCol_HeaderActive] = ImVec4(0.24f, 0.48f, 0.84f, 1.00f);
 
+	// Tables
+	colors[ImGuiCol_TableHeaderBg] = ImVec4(0.16f, 0.18f, 0.22f, 1.00f);
+	colors[ImGuiCol_TableBorderStrong] = ImVec4(0.29f, 0.31f, 0.34f, 1.00f);
+	colors[ImGuiCol_TableBorderLight] = ImVec4(0.22f, 0.24f, 0.28f, 1.00f);
+	colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+	colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.03f);
+
 	// Misc
 	colors[ImGuiCol_Separator] = ImVec4(0.29f, 0.31f, 0.34f, 0.60f);
 	colors[ImGuiCol_ResizeGrip] = ImVec4(0.25f, 0.55f, 0.90f, 0.25f);
@@ -716,15 +730,10 @@ void setStyleAndColors()
 	style.ScrollbarRounding = 6.0f;
 	style.WindowBorderSize = 1.0f;
 
-	//ImGuiIO& io = ImGui::GetIO();
-	//io.Fonts->AddFontDefault();                    // normal font
-	//io.Fonts->AddFontDefault()->FontSize = 14.0f; // or specify config
-
-	//ImFont* smallFont = io.Fonts->AddFontDefault();
-	//// optionally configure
-	// ImFontConfig cfg;
-	// cfg.SizePixels = 12.0f;
-	// ImFont* smallFont = io.Fonts->AddFontDefault(&cfg);
+	// The first font added becomes the default; without the file ImGui keeps its built-in one
+	const char* uiFont = SGE_ROOT_DIR "Resources/Engine/Fonts/Inter-Regular.ttf";
+	if (fs::exists(uiFont))
+		ImGui::GetIO().Fonts->AddFontFromFileTTF(uiFont, 15.0f);
 }
 
 static bool debugTerrainFlag = false;
@@ -890,6 +899,10 @@ public:
 		icons["sim_stop"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-stop-96.png");
 		icons["sim_pause"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-pause-96.png");
 		icons["sim_advance"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-skip-next-96.png");
+
+		// Projects opened with -e / -ec show up in the launcher too; a temp dir isn't a project to come back to
+		if (!Engine::get()->getInitParams().tempDir)
+			ProjectLauncher::rememberProject(Engine::get()->getProjectDirectory());
 
 		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::TEXTURE, std::make_unique<TextureThumbnailGenerator>());
 		ThumbnailCache::Instance().getRegistry().registerGenerator(AssetType::MATERIAL, std::make_unique<MaterialThumbnailGenerator>());

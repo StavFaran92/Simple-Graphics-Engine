@@ -95,6 +95,15 @@ int sgeEntry(int argc, char* argv[])
         initParams.projectDir = "./data/";
 #else
         InitParams initParams = parseArgs(argc, argv);
+
+#ifdef SGE_PROJECT_LAUNCHER
+        // No project on the command line: the app lets the user pick one first
+        if (initParams.projectDir.empty() && !initParams.tempDir && initParams.captureFrames <= 0)
+        {
+            if (!SGE_PROJECT_LAUNCHER(initParams))
+                return 0;
+        }
+#endif
 #endif // SGE_SHIPPING
 
         ArchiveInitializer::init();

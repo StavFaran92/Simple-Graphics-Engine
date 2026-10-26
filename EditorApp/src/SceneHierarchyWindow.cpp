@@ -245,8 +245,8 @@ void displayEntity(Entity& e)
 void displaySceneObjects()
 {
 	// todo fix this shitty hack
-	auto sceneName = "Scene " + std::to_string(Engine::get()->getContext()->getActiveSceneID());
-	ImGui::Text(sceneName.c_str());
+	SceneAssetRef scene = Engine::get()->getContext()->getActiveSceneAsset();
+	ImGui::TextUnformatted(scene.isEmpty() ? "No scene" : scene.info().name.c_str());
 
 	if (ImGui::BeginDragDropTarget())
 	{

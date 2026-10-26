@@ -64,6 +64,9 @@ enum class LightType {
 
 extern std::unordered_map<std::string, TextureResourceRef> icons;
 
+// The editor's ImGui colours and spacing, applied over StyleColorsLight; the project launcher uses it too
+void setStyleAndColors();
+
 struct SceneObject 
 {
 	std::string name;

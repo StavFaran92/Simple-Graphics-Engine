@@ -9,7 +9,7 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
   - `src/render/` RenderView, RenderCommand, Graphics · `src/texture/` Texture (`download()` reads GPU data back)
 - `EditorApp/src/` - the editor. `Editor.cpp` holds the main loop hooks, menus and simulation start/stop/pause
 - `NativeScripts/` - C++ gameplay scripts loaded by the editor
-- `samples/` - sample projects (`game_2`, `sandbox`, `fps`, `feature_samples`); `*Sample/` dirs are standalone demos
+- `samples/` - sample projects (`game_2`, `sandbox`, `fps`, `feature_samples`)
 - `scripts/` - build and tooling scripts (`gen_sol_bindings.py` generates Lua bindings)
 
 ## Build
