@@ -234,20 +234,17 @@ void LightCreatorWindow()
 		ImGui::Begin("Light Creator");
 
 		static LightType lightType = LightType::DirectionalLight;
-		static float ambientIntensity = 0.2f;
-		static float diffuseIntensity = 0.5f;
+		static float intensity = 1.0f;
 		static glm::vec3 color(1.f, 1.f, 1.f);
 		static glm::vec3 dir(0.f, 0.f, 0.f);
 		static glm::vec3 pos(0.f, 0.f, 0.f);
-		static Attenuation attenuation;
 
 		// Light Type
 		ImGui::RadioButton("Directional Light", (int*)&lightType, 0);
 		ImGui::RadioButton("Point Light", (int*)&lightType, 1);
 
 		ImGui::ColorEdit3("Color", (float*)&color);
-		ImGui::SliderFloat("Ambient intensity", &ambientIntensity, 0.0f, 1.0f);
-		ImGui::SliderFloat("Diffuse intensity", &diffuseIntensity, 0.0f, 1.0f);
+		ImGui::DragFloat("Intensity", &intensity, 0.05f, 0.0f, 100.0f);
 
 		if (lightType == LightType::DirectionalLight)
 		{
@@ -256,10 +253,6 @@ void LightCreatorWindow()
 		if (lightType == LightType::PointLight)
 		{
 			ImGui::InputFloat3("Position", (float*)&pos);
-			ImGui::LabelText("", "Attenuation");
-			ImGui::SliderFloat("constant", (float*)&attenuation.constant, 0.f, 1.f);
-			ImGui::SliderFloat("linear", (float*)&attenuation.linear, 0.f, 1.f);
-			ImGui::SliderFloat("quadratic", (float*)&attenuation.quadratic, 0.f, 1.f);
 		}
 
 		if (ImGui::Button("Ok"))
@@ -267,13 +260,13 @@ void LightCreatorWindow()
 			if (lightType == LightType::DirectionalLight)
 			{
 				auto e = Engine::get()->getContext()->getActiveScene()->createEntity();
-				e.addComponent<DirectionalLight>(color, dir, ambientIntensity, diffuseIntensity);
+				e.addComponent<DirectionalLight>(color, intensity);
 				CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(e, "Create directional light"));
 			}
 			else if (lightType == LightType::PointLight)
 			{
 				auto e = Engine::get()->getContext()->getActiveScene()->createEntity();
-				e.addComponent<PointLight>(color, ambientIntensity, diffuseIntensity, attenuation);
+				e.addComponent<PointLight>(color, intensity);
 				CommandStack::Instance().record(std::make_unique<CreateEntitiesCmd>(e, "Create point light"));
 			}
 

@@ -294,14 +294,29 @@ glm::vec3 Transformation::getForward() const
 	return localRotation * glm::vec3(0, 0, -1);
 }
 
+glm::vec3 Transformation::getWorldForward() const
+{
+	return m_globalRotation * glm::vec3(0, 0, -1);
+}
+
 glm::vec3 Transformation::getUp() const
 {
 	return localRotation * glm::vec3(0, 1, 0);
 }
 
+glm::vec3 Transformation::getWorldUp() const
+{
+	return m_globalRotation * glm::vec3(0, 1, 0);
+}
+
 glm::vec3 Transformation::getRight() const
 {
 	return localRotation * glm::vec3(1,0,0);
+}
+
+glm::vec3 Transformation::getWorldRight() const
+{
+	return m_globalRotation * glm::vec3(1, 0, 0);
 }
 
 void Transformation::translate(float x, float y, float z)

@@ -458,19 +458,14 @@ void bindComponents(sol::state& lua)
     );
 
     lua.new_usertype<DirectionalLight>("DirectionalLight",
-        "SetAmbientIntensity", &DirectionalLight::SetAmbientIntensity,
-        "SetDiffuseIntensity", &DirectionalLight::SetDiffuseIntensity,
-        "SetColor", &DirectionalLight::SetColor,
-        "getColor", &DirectionalLight::getColor
+        "color", &DirectionalLight::color,
+        "intensity", &DirectionalLight::intensity
     );
 
     lua.new_usertype<PointLight>("PointLight",
-        "SetAmbientIntensity", &PointLight::SetAmbientIntensity,
-        "SetDiffuseIntensity", &PointLight::SetDiffuseIntensity,
-        "SetColor", &PointLight::SetColor,
-        "getColor", &PointLight::getColor,
-        "SetAttenuation", &PointLight::SetAttenuation,
-        "getAttenuation", &PointLight::getAttenuation
+        "color", &PointLight::color,
+        "intensity", &PointLight::intensity,
+        "radius", &PointLight::radius
     );
 
     lua.new_usertype<PlayerController>("PlayerController",

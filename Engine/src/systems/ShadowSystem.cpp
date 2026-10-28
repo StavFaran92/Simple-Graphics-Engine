@@ -133,10 +133,8 @@ void ShadowSystem::renderToDepthMap(Scene* scene, const std::vector<DrawItem>& d
 		settings.nearPlane, settings.farPlane);
 
 	auto& trans = e.getComponent<Transformation>();
-	auto& direction = trans.getLocalRotationVec3();
-
-	auto right = glm::normalize(glm::cross(direction, { 0,0,1 }));
-	auto up = glm::normalize(glm::cross(direction, right));
+	glm::vec3 direction = trans.getWorldForward();
+	glm::vec3 up = trans.getWorldUp();
 
 	// Generate lookAt light matrix 
 	glm::mat4 dirLightView = glm::lookAt(

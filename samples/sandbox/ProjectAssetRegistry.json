@@ -1,7 +1,7 @@
 {
     "N/A": [],
     "animations": [],
-    "counter": 18,
+    "counter": 17,
     "lua script": [],
     "materials": [
         {
@@ -80,7 +80,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -115,7 +115,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -150,7 +150,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -185,7 +185,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -220,7 +220,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -520,7 +520,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -555,7 +555,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -590,7 +590,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -625,7 +625,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -660,7 +660,7 @@
                                                     "state.yScale": 1.0,
                                                     "texture": {
                                                         "uuid": {
-                                                            "m_value": 1
+                                                            "m_value": 0
                                                         }
                                                     }
                                                 },
@@ -792,7 +792,6 @@
         }
     ],
     "namesToUUIDRefs": {
-        "Box_0": 17,
         "DefaultMaterial": 15,
         "SGE_MATERIAL_DEFAULT": 7,
         "SGE_MATERIAL_TERRAIN_DEFAULT": 8,
@@ -811,7 +810,6 @@
         "Scene_0": 16
     },
     "pathsToUUIDRefs": {
-        "content/box_0.prefab": 17,
         "content/scene_0.scene": 16,
         "engine/sge_material_default.mat": 7,
         "engine/sge_material_terrain_default.mat": 8,
@@ -829,19 +827,7 @@
         "engine/sge_texture_tile_noise.texture": 6,
         "engine/sge_texture_white.texture": 1
     },
-    "prefabs": [
-        {
-            "aType": 5,
-            "asset": {},
-            "assetDirectory": "",
-            "ext": ".prefab",
-            "isEngineOwned": false,
-            "name": "Box_0",
-            "sourcePath": "",
-            "uuid": 17,
-            "visibility": 1
-        }
-    ],
+    "prefabs": [],
     "scene": [
         {
             "aType": 8,

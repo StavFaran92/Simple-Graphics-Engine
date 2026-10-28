@@ -40,15 +40,15 @@ const std::vector<EntityPreset>& entityPresets()
 			[] {
 				static int count = 0;
 				Entity e = createNamed("Directional_Light_" + std::to_string(count++));
-				// The first argument is the color; black made the light do nothing
-				e.addComponent<DirectionalLight>(glm::vec3{ 1,1,1 }, glm::vec3{ 0,-1,0 }, 1.f, 1.f);
+				e.addComponent<DirectionalLight>();
+				e.getComponent<Transformation>().setLocalRotation(glm::radians(-90.0f), glm::vec3(1, 0, 0)); // forward (-Z) to down
 				return e;
 			} },
-		{ "Light/Point Light", "Entity with a PointLight and default attenuation",
+		{ "Light/Point Light", "Entity with a PointLight",
 			[] {
 				static int count = 0;
 				Entity e = createNamed("Point_Light_" + std::to_string(count++));
-				e.addComponent<PointLight>(glm::vec3{ 0,0,0 }, 1.f, 1.f, Attenuation());
+				e.addComponent<PointLight>();
 				return e;
 			} },
 

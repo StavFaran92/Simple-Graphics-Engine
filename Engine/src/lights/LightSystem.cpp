@@ -93,9 +93,9 @@ void LightSystem::setLightsInUBO()
 			auto& transform = view.get<Transformation>(*it);
 
 			PointLightUBORep pointLightUBO;
-			auto pos = /**params->view **/ glm::vec4(transform.getLocalPosition(), 1.0f);
-			pointLightUBO.position = { glm::vec3(pos.x,pos.y, pos.z), 1.f};
-			pointLightUBO.color = { pLight.getColor(), 1.f };
+			auto pos = /**params->view **/ glm::vec4(transform.getWorldPosition(), 1.0f);
+			pointLightUBO.position = { glm::vec3(pos.x,pos.y, pos.z), pLight.radius };
+			pointLightUBO.color = { pLight.color * pLight.intensity, 1.f };
 
 			m_uboLights->setData(2 * sizeof(int) + 8 + sizeof(PointLightUBORep) * i, sizeof(pointLightUBO.position), glm::value_ptr(pointLightUBO.position));
 			m_uboLights->setData(2 * sizeof(int) + 8 + sizeof(PointLightUBORep) * i + sizeof(pointLightUBO.position), sizeof(pointLightUBO.color), glm::value_ptr(pointLightUBO.color));
@@ -112,12 +112,12 @@ void LightSystem::setLightsInUBO()
 		{
 			auto& dLight = view.get<DirectionalLight>(*it);
 			Entity e(*it, &m_scene->getRegistry());
-			auto& dir = e.getComponent<Transformation>().getLocalRotationVec3();
+			glm::vec3 dir = e.getComponent<Transformation>().getWorldForward();
 
 			DirLightUBORep dirLightUBO;
 			auto dir4 = /**params->view **/ glm::vec4(dir, 1.0f);
 			dirLightUBO.direction = { glm::vec3(dir4.x, dir4.y, dir4.z) , 1.f};
-			dirLightUBO.color = { dLight.getColor() * dLight.intensity, 1.f };
+			dirLightUBO.color = { dLight.color * dLight.intensity, 1.f };
 
 			m_uboLights->setData(2 * sizeof(int) + 8 + sizeof(PointLightUBORep) * NR_POINT_LIGHTS + sizeof(DirLightUBORep) * i, sizeof(dirLightUBO.direction), glm::value_ptr(dirLightUBO.direction));
 			m_uboLights->setData(2 * sizeof(int) + 8 + sizeof(PointLightUBORep) * NR_POINT_LIGHTS + sizeof(DirLightUBORep) * i + sizeof(dirLightUBO.direction), sizeof(dirLightUBO.color), glm::value_ptr(dirLightUBO.color));

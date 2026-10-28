@@ -16,7 +16,6 @@
 #include "component/Transformation.h"
 #include "render/Material.h"
 #include "texture/Texture.h"
-#include "lights/Light.h"
 #include "lights/DirectionalLight.h"
 #include "lights/PointLight.h"
 #include "camera/ICamera.h"

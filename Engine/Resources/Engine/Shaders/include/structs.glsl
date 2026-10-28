@@ -37,11 +37,11 @@ struct PBR_Material
 
 struct PointLight 
 { 
-	vec4 position; 
-	vec4 color; 
-}; 
+	vec4 position; // w = radius
+	vec4 color; // rgb premultiplied by intensity
+};
 
-struct DirLight 
+struct DirLight
 { 
 	vec4 direction; 
 	vec4 color; 

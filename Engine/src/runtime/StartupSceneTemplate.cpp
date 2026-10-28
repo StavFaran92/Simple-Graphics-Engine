@@ -22,7 +22,7 @@ SceneAssetRef StartupSceneTemplate::createStartupScene(const std::string& name)
     // Add default dir light
     auto dLight = startupScene->createEntity("Directional light");
     dLight.addComponent<DirectionalLight>();
-    dLight.getComponent<Transformation>().setLocalRotation(glm::vec3(0, -1, 0));
+    dLight.getComponent<Transformation>().setLocalRotation(glm::radians(-90.0f), glm::vec3(1, 0, 0)); // forward (-Z) to down
 
     auto mainCamera = startupScene->createEntity("Main Camera");
     mainCamera.addComponent<CameraComponent>(CameraComponent::createPerspectiveCamera(45.0f, (float)Engine::get()->getWindow()->getWidth() / Engine::get()->getWindow()->getHeight(), 0.1f, 1000.0f));

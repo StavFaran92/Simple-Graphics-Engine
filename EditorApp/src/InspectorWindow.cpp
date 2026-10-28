@@ -357,15 +357,9 @@ void InspectorWindow::display()
 		});
 
 		displayComponent<PointLight>("Point Light", [](PointLight& pLight) {
-			//auto& color = pLight.getColor();
 			ImGui::ColorEdit3("Color", glm::value_ptr(pLight.color));
-
-			//Attenuation& attenuation = pLight.getAttenuation();
-			ImGui::LabelText("", "Attenuation");
-			ImGui::DragFloat("constant", &pLight.attenuation.constant, 0.01f);
-			ImGui::DragFloat("linear", &pLight.attenuation.linear, 0.01f);
-			ImGui::DragFloat("quadratic", &pLight.attenuation.quadratic, 0.01f);
-			//pLight.SetAttenuation(attenuation);
+			ImGui::DragFloat("Intensity", &pLight.intensity, 0.05f, 0.0f, 100.0f);
+			ImGui::DragFloat("Radius", &pLight.radius, 0.1f, 0.01f, 1000.0f);
 		});
 
 		displayComponent<InstanceBatch>("Instance Batch", [](InstanceBatch& instanceBatch) {

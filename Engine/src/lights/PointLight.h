@@ -1,48 +1,34 @@
 #pragma once
-#include "lights/Light.h"
+#include <glm/glm.hpp>
 #include "core/Core.h"
+#include "component/Component.h"
+#include "component/ComponentSerializer.h"
 #include "serialize/CerealHelpers.h"
 
-struct EngineAPI Attenuation {
-	float constant = 1;
-	float linear = .35f;
-	float quadratic = .44f;
-
-	template <class Archive>
-	void serialize(Archive& archive) {
-			SERIALIZED_MEMBER(constant); 
-			SERIALIZED_MEMBER(linear);
-			SERIALIZED_MEMBER(quadratic);
-	}
-};
-
-class EngineAPI PointLight : public Light
+class EngineAPI PointLight : public Component
 {
 public:
-	PointLight() :
-		Light(), attenuation()
+	PointLight() = default;
+
+	PointLight(glm::vec3 color, float intensity = 1.0f, float radius = 10.0f)
+		: color(color), intensity(intensity), radius(radius)
 	{
-		m_name = "pointLights";
 	}
-
-	PointLight(glm::vec3 color, float aIntensity, float dIntensity, Attenuation attenuation);
-
-	void useLight(Shader& shader, int index);
 
 	std::string getName() override { return "PointLight"; }
 
-	void SetAttenuation(Attenuation attenuation);
-	Attenuation getAttenuation() const;
-
 	template <class Archive>
 	void serialize(Archive& archive) {
-		SERIALIZED_MEMBER(attenuation);
 		SERIALIZED_MEMBER(color);
+		SERIALIZED_MEMBER_OPTIONAL2(intensity, 1.0f); // optional: scenes saved before it existed
+		SERIALIZED_MEMBER_OPTIONAL2(radius, 10.0f);
 	}
 
-public:
-	Attenuation attenuation;
-	
+	glm::vec3 color = glm::vec3(1.0f);
+	// Multiplies color before it reaches the shader, so color stays a plain [0,1] tint
+	float intensity = 1.0f;
+	// Light reaches zero at this distance
+	float radius = 10.0f;
 };
 
 REGISTER_COMPONENT(PointLight)

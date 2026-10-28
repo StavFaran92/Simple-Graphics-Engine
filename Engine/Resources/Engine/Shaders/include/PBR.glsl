@@ -78,15 +78,24 @@ vec3 calculateBRDF(Surface s)
 	return (specular + kd * s.albedo / PI);
 }
 
+// Inverse-square falloff windowed to reach 0 at radius (Karis, "Real Shading in Unreal Engine 4", 2013)
+float distanceAttenuation(float dist, float radius)
+{
+	float invSq = 1.0 / max(dist * dist, 0.01 * 0.01); // ~1cm light size, avoids infinity at the light
+	float ratio = dist / radius;
+	float window = clamp(1.0 - ratio * ratio * ratio * ratio, 0.0, 1.0);
+	return invSq * window * window;
+}
+
 vec3 PointLightRadiance(PointLight pLight, Surface s)
 {
-	s.L = normalize(pLight.position.rgb - s.fragPos); // from frag pos to light pos
+	vec3 toLight = pLight.position.rgb - s.fragPos;
+	float dist = length(toLight);
+	s.L = toLight / max(dist, 0.0001);
 	s.H = normalize(s.V + s.L);
 
 	// Calculate Li
-	float distance = length(s.L);
-	float attenuation = 1.0 / (distance * distance);
-	vec3 radiance = pLight.color.rgb * attenuation;
+	vec3 radiance = pLight.color.rgb * distanceAttenuation(dist, pLight.position.w);
 
 	// Calculate cosTheta
 	float cosTheta = max(0.0, dot(s.N, s.L));
