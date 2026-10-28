@@ -1,7 +1,8 @@
 // ----- Definitions ----- //
 
-#define NR_POINT_LIGHTS 32 
-#define NR_DIR_LIGHT 8 
+// Must match NR_POINT_LIGHTS / NR_DIR_LIGHTS in LightSystem.cpp
+#define NR_POINT_LIGHTS 256
+#define NR_DIR_LIGHT 8
 
 const float constant = 1.f;
 const float linear = .35f;

@@ -8,8 +8,11 @@
 #include "component/Transformation.h"
 #include "render/Graphics.h"
 #include "core/Engine.h"
+#include "core/Logger.h"
 
-#define NR_POINT_LIGHTS 32
+// Must match NR_POINT_LIGHTS / NR_DIR_LIGHT in Shaders/include/defines.glsl.
+// The block must stay under 16KB, the minimum GL_MAX_UNIFORM_BLOCK_SIZE (~500 point lights)
+#define NR_POINT_LIGHTS 256
 #define NR_DIR_LIGHTS 8
 
 struct PointLightUBORep
@@ -89,6 +92,15 @@ void LightSystem::setLightsInUBO()
 		int i = 0;
 		for (auto it = view.begin(); it != view.end(); ++it, ++i)
 		{
+			if (i == NR_POINT_LIGHTS)
+			{
+				static bool warned = false;
+				if (!warned)
+					logWarning("Scene has more than {} point lights; the rest are not lit.", NR_POINT_LIGHTS);
+				warned = true;
+				break;
+			}
+
 			auto& pLight = view.get<PointLight>(*it);
 			auto& transform = view.get<Transformation>(*it);
 
@@ -110,6 +122,15 @@ void LightSystem::setLightsInUBO()
 		int i = 0;
 		for (auto it = view.begin(); it != view.end(); ++it, ++i)
 		{
+			if (i == NR_DIR_LIGHTS)
+			{
+				static bool warned = false;
+				if (!warned)
+					logWarning("Scene has more than {} directional lights; the rest are not lit.", NR_DIR_LIGHTS);
+				warned = true;
+				break;
+			}
+
 			auto& dLight = view.get<DirectionalLight>(*it);
 			Entity e(*it, &m_scene->getRegistry());
 			glm::vec3 dir = e.getComponent<Transformation>().getWorldForward();
