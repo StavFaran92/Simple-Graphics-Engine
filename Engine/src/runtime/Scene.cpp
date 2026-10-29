@@ -243,10 +243,10 @@ void Scene::init(Context* context, ResourceID rid)
 	defaultCubemapData.filter = TextureFilter::Linear;
 	defaultCubemapData.wrap = TextureWrap::Clamp;
 	defaultCubemapData.genMipMap = false;
-	static unsigned char FULL_WHITE[3] = { 255, 255, 255 };
+	static unsigned char FULL_BLACK[3] = { 0, 0, 0 };
 	for (int i = 0; i < 6; i++)
 	{
-		defaultCubemapData.facesData[i] = ImageBuffer(FULL_WHITE, 3);
+		defaultCubemapData.facesData[i] = ImageBuffer(FULL_BLACK, 3);
 	}
 	m_irradianceMap = Texture::createTexture(defaultCubemapData);
 
@@ -264,7 +264,7 @@ void Scene::init(Context* context, ResourceID rid)
 	defaultCubemapData2.genMipMap = false;
 	for (int i = 0; i < 6; i++)
 	{
-		defaultCubemapData2.facesData[i] = ImageBuffer(FULL_WHITE, 3);
+		defaultCubemapData2.facesData[i] = ImageBuffer(FULL_BLACK, 3);
 	}
 	m_prefilterEnvMap = Texture::createTexture(defaultCubemapData2);
 
@@ -709,6 +709,8 @@ void Scene::draw(float deltaTime)
 		// Set time elapsed
 		auto elapsed = (float)Engine::get()->getTimeManager()->getElapsedTime(TimeManager::Duration::MilliSeconds) / 1000;
 
+		// Like the lights, each scene has its own time buffer; bind this one before rendering
+		m_uboTime->attachToBindPoint(0);
 		m_uboTime->bind();
 		m_uboTime->setData(0, sizeof(float), &elapsed);
 		m_uboTime->unbind();

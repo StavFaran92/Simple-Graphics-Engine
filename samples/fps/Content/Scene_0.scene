@@ -417,15 +417,15 @@
                                     },
                                     "m_children": [
                                         {
-                                            "key": 1048578,
-                                            "value": {
-                                                "m_entity": 1048578
-                                            }
-                                        },
-                                        {
                                             "key": 2097162,
                                             "value": {
                                                 "m_entity": 2097162
+                                            }
+                                        },
+                                        {
+                                            "key": 1048578,
+                                            "value": {
+                                                "m_entity": 1048578
                                             }
                                         },
                                         {
@@ -1623,9 +1623,9 @@
                                 "data": {
                                     "isActive": true,
                                     "localTranslation": {
-                                        "v.x": 0.0,
-                                        "v.y": 0.0,
-                                        "v.z": 0.0
+                                        "v.x": -5.184820175170898,
+                                        "v.y": 3.4195733070373537,
+                                        "v.z": 0.6199526786804199
                                     },
                                     "localRotation": {
                                         "q.x": 0.0,
@@ -1652,43 +1652,28 @@
                             }
                         },
                         {
-                            "polymorphic_id": 2147483662,
-                            "polymorphic_name": "SkyboxComponent",
+                            "polymorphic_id": 3,
                             "ptr_wrapper": {
                                 "id": 2147483714,
                                 "data": {
                                     "isActive": true,
-                                    "originalImage": {
-                                        "uuid": {
-                                            "m_value": 26
-                                        }
-                                    },
-                                    "m_irradianceMap": {
-                                        "uuid": {
-                                            "m_value": 28
-                                        }
-                                    },
-                                    "m_prefilterEnvMap": {
-                                        "uuid": {
-                                            "m_value": 29
-                                        }
-                                    },
-                                    "m_cubemap": {
-                                        "uuid": {
-                                            "m_value": 27
-                                        }
-                                    },
-                                    "m_isBuilt": true
+                                    "name": "Point_Light_0"
                                 }
                             }
                         },
                         {
-                            "polymorphic_id": 3,
+                            "polymorphic_id": 2147483662,
+                            "polymorphic_name": "PointLight",
                             "ptr_wrapper": {
                                 "id": 2147483715,
                                 "data": {
-                                    "isActive": true,
-                                    "name": "Skybox"
+                                    "color": {
+                                        "v.x": 1.0,
+                                        "v.y": 1.0,
+                                        "v.z": 1.0
+                                    },
+                                    "intensity": 29.149999618530275,
+                                    "radius": 33.79999923706055
                                 }
                             }
                         }
@@ -1910,71 +1895,6 @@
                                 "data": {
                                     "isActive": true,
                                     "name": "Main Camera"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "entity": 0,
-                    "components": [
-                        {
-                            "polymorphic_id": 2,
-                            "ptr_wrapper": {
-                                "id": 2147483725,
-                                "data": {
-                                    "isActive": true,
-                                    "localTranslation": {
-                                        "v.x": 0.0,
-                                        "v.y": 0.0,
-                                        "v.z": 0.0
-                                    },
-                                    "localRotation": {
-                                        "q.x": 0.0,
-                                        "q.y": -0.4794252812862396,
-                                        "q.z": 0.0,
-                                        "q.w": 0.8775827288627625
-                                    },
-                                    "localScale": {
-                                        "v.x": 0.9999999403953552,
-                                        "v.y": 1.0,
-                                        "v.z": 0.9999999403953552
-                                    },
-                                    "m_parent": {
-                                        "m_entity": 4294967295
-                                    },
-                                    "entity": {
-                                        "m_entity": 0
-                                    },
-                                    "root": {
-                                        "m_entity": 0
-                                    },
-                                    "m_children": []
-                                }
-                            }
-                        },
-                        {
-                            "polymorphic_id": 2147483664,
-                            "polymorphic_name": "DirectionalLight",
-                            "ptr_wrapper": {
-                                "id": 2147483726,
-                                "data": {
-                                    "color": {
-                                        "v.x": 1.0,
-                                        "v.y": 1.0,
-                                        "v.z": 1.0
-                                    },
-                                    "intensity": 4.0
-                                }
-                            }
-                        },
-                        {
-                            "polymorphic_id": 3,
-                            "ptr_wrapper": {
-                                "id": 2147483727,
-                                "data": {
-                                    "isActive": true,
-                                    "name": "Directional light"
                                 }
                             }
                         }

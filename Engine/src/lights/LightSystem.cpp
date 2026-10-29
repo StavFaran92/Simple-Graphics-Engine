@@ -83,6 +83,8 @@ void LightSystem::setLightsInUBO()
 {
 	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
+	// Every scene has its own buffer; point the shaders at this one before the scene renders
+	m_uboLights->attachToBindPoint(1);
 	m_uboLights->bind();
 
 	{
