@@ -470,6 +470,7 @@ void bindComponents(sol::state& lua)
 
     lua.new_usertype<PlayerController>("PlayerController",
         "move", &PlayerController::move,
+        "teleport", &PlayerController::teleport,
         "isGrounded", sol::readonly(&PlayerController::isGrounded)
     );
 

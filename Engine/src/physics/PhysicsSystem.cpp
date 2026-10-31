@@ -825,6 +825,14 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
 
             auto& pc = e.getComponent<PlayerController>();
 
+            if (pc.m_hasTeleport)
+            {
+                // The capsule's centre sits at the entity position plus the offset (see createController)
+                const glm::vec3 centre = pc.m_teleportTo + pc.offset;
+                cct->setPosition(physx::PxExtendedVec3(centre.x, centre.y, centre.z));
+                pc.m_hasTeleport = false;
+            }
+
             // Move using displacement in component
             static const physx::PxControllerFilters filters(nullptr, nullptr, nullptr);
             physx::PxControllerCollisionFlags collisionFlags = cct->move(

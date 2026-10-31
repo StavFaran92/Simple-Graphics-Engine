@@ -22,12 +22,21 @@ struct EngineAPI PlayerController : public Component
 		m_disp = disp;
 	}
 
+	// Puts the entity at position on the next physics step without sweeping through the level, e.g. a respawn
+	void teleport(glm::vec3 position)
+	{
+		m_teleportTo = position;
+		m_hasTeleport = true;
+	}
+
 	void reset()
 	{
 		m_disp = glm::vec3(0.f);
 	}
 
 	glm::vec3 m_disp{};
+	glm::vec3 m_teleportTo{};
+	bool m_hasTeleport = false;
 	float height = 1.f;
 	float radius = .5f;
 	glm::vec3 offset{};

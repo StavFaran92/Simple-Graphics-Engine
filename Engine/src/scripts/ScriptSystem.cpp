@@ -12,6 +12,10 @@
 #include "core/MouseEvents.h"
 #include "core/KeyboardEvents.h"
 
+// Lua gets its own copy of the entity handle, so a script can keep it after the call
+template <>
+struct sol::is_value_semantic_for_function<Entity> : std::true_type {};
+
 struct LuaState
 {
     sol::table script;
