@@ -892,6 +892,7 @@ public:
 		icons["sim_stop"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-stop-96.png");
 		icons["sim_pause"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-pause-96.png");
 		icons["sim_advance"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-skip-next-96.png");
+		icons["back"] = Texture::load(SGE_EDITOR_APP_ROOT + "/Content/Textures/material-arrow-back-96.png");
 
 		// Projects opened with -e / -ec show up in the launcher too; a temp dir isn't a project to come back to
 		if (!Engine::get()->getInitParams().tempDir)

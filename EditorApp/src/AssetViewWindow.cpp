@@ -25,6 +25,9 @@ ImVec2 s_assetViewMarqueeMouseDownPos;
 bool s_assetViewLmbTracking = false;
 bool s_assetViewMarqueeDrag = false;
 
+// Search box: shows only the entries of the open folder whose name matches
+ImGuiTextFilter s_assetViewFilter;
+
 } // namespace
 
 void openInVSCode(const std::string& path)
@@ -88,7 +91,7 @@ void AssetViewWindow::display()
 	//}
 
 	// Back button
-	bool clicked = ImGui::Button("<-", ImVec2(30, 30));
+	bool clicked = ImGui::ImageButton((ImTextureID)(intptr_t)icons.at("back")->getID(), ImVec2(18, 18));
 
 	// Restore style if it was pushed
 	//if (!canGoBack)
@@ -108,6 +111,17 @@ void AssetViewWindow::display()
 
 	// Header (fixed at top)
 	ImGui::Text("%s", cwd.string().c_str());
+
+	// Search box, right-aligned on the header line
+	const float filterWidth = 220.0f;
+	ImGui::SameLine(ImMax(ImGui::GetCursorPosX(), ImGui::GetContentRegionMax().x - filterWidth));
+	ImGui::SetNextItemWidth(filterWidth);
+	if (ImGui::InputTextWithHint("##AssetFilter", "Search", s_assetViewFilter.InputBuf, IM_ARRAYSIZE(s_assetViewFilter.InputBuf)))
+	{
+		s_assetViewFilter.Build();
+		s_assetViewSelectedIndices.clear();
+		EditorState::Instance().clearAssetSelection();
+	}
 	ImGui::Separator();
 
 	// Scrollable region
@@ -132,6 +146,9 @@ void AssetViewWindow::display()
 
 			if (fMetadata.filename == "entities.json" || fMetadata.filename == "ProjectAssetRegistry.json")
 				continue; // Skip unwanted files
+
+			if (!s_assetViewFilter.PassFilter(fMetadata.filename.c_str()))
+				continue; // Hidden by the search box
 
 			fMetadata.filePath = entry.path().string();
 			fMetadata.isDirectory = entry.is_directory();
