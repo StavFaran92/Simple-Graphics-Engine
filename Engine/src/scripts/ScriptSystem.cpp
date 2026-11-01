@@ -41,12 +41,15 @@ public:
             os[name] = sol::lua_nil;
 
         bindAll(lua);
+        lua.set_function("invoke", &Impl::invoke, this);
     }
 
     void bindDynamics()
     {
         bindDynamic(lua);
     }
+
+    void invoke(Entity target, const std::string& funcName, sol::variadic_args args);
 };
 
 ScriptSystem::ScriptSystem()
@@ -354,47 +357,18 @@ void ScriptSystem::resolveRefs(Entity entity)
     }
 }
 
-static sol::object toSol(sol::state& lua, const ScriptArg& arg)
+// Lua's invoke(target, funcName, ...): calls funcName on target's script with the caller's arguments as they are
+void ScriptSystem::Impl::invoke(Entity target, const std::string& funcName, sol::variadic_args args)
 {
-    return std::visit([&](auto&& val) -> sol::object {
-        return sol::make_object(lua, val);
-        }, arg);
-}
-
-void ScriptSystem::invokeFunction(Entity entity, const std::string& funcName, const std::vector<ScriptArg>& args)
-{
-    // If not valid script ignore
-    auto it = impl_->scripts.find(entity);
-    if (it == impl_->scripts.end())
+    auto it = scripts.find(target);
+    if (it == scripts.end())
         return;
 
-    auto target = it->second.script;
-
     sol::protected_function fn = it->second.script[funcName];
-    if (fn.valid())
-    {
-        // build sol call args
-        sol::protected_function_result result;
-        switch (args.size())
-        {
-        case 0: result = fn(target); break;
-        case 1: result = fn(target, toSol(impl_->lua, args[0])); break;
-        case 2: result = fn(target, toSol(impl_->lua, args[0]), toSol(impl_->lua, args[1])); break;
-        case 3: result = fn(target, toSol(impl_->lua, args[0]), toSol(impl_->lua, args[1]), toSol(impl_->lua, args[2])); break;
-        default:
-        {
-            // pack into table for larger arg counts
-            sol::table argsTable = impl_->lua.create_table();
-            for (size_t i = 0; i < args.size(); i++)
-                argsTable[i + 1] = toSol(impl_->lua, args[i]);
-            result = fn(target, argsTable);
-            break;
-        }
-        }
+    if (!fn.valid())
+        return;
 
-        if (!result.valid()) 
-        {
-            logLuaError(result);
-        }
-    }
+    sol::protected_function_result result = fn(it->second.script, args);
+    if (!result.valid())
+        logLuaError(result);
 }

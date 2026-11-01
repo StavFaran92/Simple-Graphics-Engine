@@ -130,6 +130,9 @@ void stopSimulation()
 	uiLayer->setEnabled(true);
 	EditorState::Instance().isMouseLocked = false;
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->unlock(); //TODO this should be in camera event
+
+	// Back to editing: restore keyboard navigation turned off by startsimulation
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 }
 
 void startsimulation()
@@ -149,6 +152,10 @@ void startsimulation()
 	Engine::get()->getContext()->getActiveScene()->setRenderViewEnabled("Editor View", false);
 	state.selectEntity(Entity::EmptyEntity);
 	static_cast<EditorCamera*>(g_editorCamera.getComponent<NativeScriptComponent>().script.get())->lock(); //TODO this should be in camera event
+
+	// Keys go to the game: no focused button for Space to press, no arrow-key navigation
+	ImGui::SetWindowFocus(nullptr);
+	ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
 }
 
 void pauseSimulation()
