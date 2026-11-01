@@ -6,11 +6,12 @@
 
 std::string normalizePath(const std::string& input)
 {
-    fs::path p = fs::weakly_canonical(input);
+    fs::path p = fs::absolute(input).lexically_normal();
     std::string s = p.generic_string();
 
 #ifdef _WIN32
-    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    std::transform(s.begin(), s.end(), s.begin(),
+        [](unsigned char c) { return (char)std::tolower(c); });
 #endif
 
     return s;

@@ -433,6 +433,44 @@ void DisplayDebugInfoWindow()
 	ImGui::End();
 }
 
+// Must be drawn before DockSpaceOverViewport so the dockspace leaves room for it
+void DisplayStatusBar()
+{
+	static double elapsed = 0.0;
+	static int frames = 0;
+	static std::string projectName;
+	static double avgFrameMs = 0.0;
+	static double avgFps = 0.0;
+
+	elapsed += Engine::get()->getSubSystem<System>()->getDeltaTime();
+	frames++;
+
+	if (elapsed >= 1.0 || projectName.empty())
+	{
+		avgFrameMs = elapsed * 1000.0 / frames;
+		avgFps = frames / elapsed;
+		elapsed = 0.0;
+		frames = 0;
+
+		// The project directory usually ends with '/', which leaves filename() empty
+		std::filesystem::path projectDir = Engine::get()->getProjectDirectory();
+		projectName = projectDir.has_filename() ? projectDir.filename().string() : projectDir.parent_path().filename().string();
+	}
+
+	const ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+	if (ImGui::BeginViewportSideBar("##StatusBar", ImGui::GetMainViewport(), ImGuiDir_Down, ImGui::GetFrameHeight(), flags))
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			ImGui::Text("Project: %s", projectName.c_str());
+			ImGui::Separator();
+			ImGui::Text("Frame: %.2f ms (%.0f FPS)", avgFrameMs, avgFps);
+			ImGui::EndMenuBar();
+		}
+	}
+	ImGui::End();
+}
+
 
 class GUI_Helper : public GuiMenu {
 	// Inherited via GuiMenu
@@ -597,6 +635,8 @@ class GUI_Helper : public GuiMenu {
 			
 			ImGui::EndMainMenuBar();
 		}
+
+		DisplayStatusBar();
 
 		ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoWindowMenuButton | ImGuiDockNodeFlags_NoCloseButton);
 		static bool dockspace_initialized = false;
