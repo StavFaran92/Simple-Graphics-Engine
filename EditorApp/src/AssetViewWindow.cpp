@@ -54,12 +54,11 @@ void showInExplorer(const std::filesystem::path& p)
 	system(command.c_str());
 }
 
-UUID getUIDFromFilename(const WorkingDirectory cwd, const std::string& filename)
+// filename comes from a directory listing (no ".."), so a lexical join matches ScopedPath::setPath without its filesystem calls
+UUID getUIDFromFilename(const std::filesystem::path& cwdScoped, const std::string& filename)
 {
-	ScopedPath considerPath = cwd.path();
-	considerPath.setPath(filename);
-	std::string considerScopedPathStr = considerPath.scoped().string();
-	UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(considerScopedPathStr).getUID();
+	std::string scopedPathStr = (cwdScoped / filename).string();
+	UUID uuid = Engine::get()->getSubSystem<Assets>()->getAssetFromPath(scopedPathStr).getUID();
 	return uuid;
 }
 
@@ -105,6 +104,8 @@ void AssetViewWindow::display()
 	{
 		cwd.back();
 	}
+
+	const std::filesystem::path cwdScoped = cwd.path().scoped();
 
 
 	ImGui::SameLine();
@@ -182,7 +183,7 @@ void AssetViewWindow::display()
 				if (fMetadata.filename == "ProjectAssetRegistry")
 					continue; // Skip unwanted files
 
-				UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
+				UUID uuid = getUIDFromFilename(cwdScoped,fMetadata.filename);
 				if (!assets->hasAsset(uuid)) continue;
 
 				const AssetRecord& aInfo = assets->getInfo(uuid);
@@ -215,7 +216,7 @@ void AssetViewWindow::display()
 				
 				if (!fMetadata.isDirectory)
 				{
-					UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
+					UUID uuid = getUIDFromFilename(cwdScoped,fMetadata.filename);
 					const AssetRecord& aInfo = assets->getInfo(uuid);
 					ImGui::TextUnformatted(aInfo.name.c_str());
 					ImGui::Separator();
@@ -253,7 +254,7 @@ void AssetViewWindow::display()
 				if (meta.isDirectory)
 					return;
 
-				UUID uid = getUIDFromFilename(cwd, meta.filename);
+				UUID uid = getUIDFromFilename(cwdScoped,meta.filename);
 				if (!assets->hasAsset(uid))
 					return;
 
@@ -313,7 +314,7 @@ void AssetViewWindow::display()
 
 					if (ImGui::Selectable("Edit"))
 					{
-						UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
+						UUID uuid = getUIDFromFilename(cwdScoped,fMetadata.filename);
 						const AssetRecord& aInfo = assets->getInfo(uuid);
 
 						if (aInfo.aType == AssetType::MATERIAL)
@@ -337,7 +338,7 @@ void AssetViewWindow::display()
 					{
 						if (!fMetadata.isDirectory)
 						{
-							UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
+							UUID uuid = getUIDFromFilename(cwdScoped,fMetadata.filename);
 							Engine::get()->getSubSystem<Assets>()->reimportAsset(uuid);
 							ThumbnailCache::Instance().invalidate(uuid);
 						}
@@ -347,7 +348,7 @@ void AssetViewWindow::display()
 					{
 						if (!fMetadata.isDirectory)
 						{
-							UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
+							UUID uuid = getUIDFromFilename(cwdScoped,fMetadata.filename);
 							Engine::get()->getSubSystem<Assets>()->renameAsset(uuid, "test");
 						}
 					}
@@ -357,7 +358,7 @@ void AssetViewWindow::display()
 						if (!fMetadata.isDirectory)
 						{
 							g_moveAssetUIDList.clear();
-							g_moveAssetUIDList.insert(getUIDFromFilename(cwd, fMetadata.filename));
+							g_moveAssetUIDList.insert(getUIDFromFilename(cwdScoped,fMetadata.filename));
 						}
 					}
 
@@ -365,7 +366,7 @@ void AssetViewWindow::display()
 					{
 						if (!fMetadata.isDirectory)
 						{
-							UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
+							UUID uuid = getUIDFromFilename(cwdScoped,fMetadata.filename);
 							auto& asset = Engine::get()->getSubSystem<Assets>()->getAsset(uuid);
 							asset.erase();
 							ThumbnailCache::Instance().invalidate(uuid);
@@ -385,7 +386,7 @@ void AssetViewWindow::display()
 									continue;
 
 								std::filesystem::path relPath = std::filesystem::relative(entry.path(), folderPath.parent_path());
-								UUID uuid = getUIDFromFilename(cwd, relPath.string());
+								UUID uuid = getUIDFromFilename(cwdScoped,relPath.string());
 								if (assets->hasAsset(uuid))
 									folderAssetUIDs.push_back(uuid);
 							}
@@ -415,7 +416,7 @@ void AssetViewWindow::display()
 
 					if (!fMetadata.isDirectory)
 					{
-						UUID uuid = getUIDFromFilename(cwd, fMetadata.filename);
+						UUID uuid = getUIDFromFilename(cwdScoped,fMetadata.filename);
 						const AssetRecord& aInfo = assets->getInfo(uuid);
 
 						if (aInfo.aType == AssetType::PREFAB && ImGui::Selectable("Instansiate"))
@@ -464,7 +465,7 @@ void AssetViewWindow::display()
 							if (meta.isDirectory)
 								continue; // or handle dirs separately
 
-							UUID uid = getUIDFromFilename(cwd, meta.filename);
+							UUID uid = getUIDFromFilename(cwdScoped,meta.filename);
 							g_moveAssetUIDList.insert(uid);
 						}
 					}
