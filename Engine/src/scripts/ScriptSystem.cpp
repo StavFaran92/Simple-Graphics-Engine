@@ -12,10 +12,6 @@
 #include "core/MouseEvents.h"
 #include "core/KeyboardEvents.h"
 
-// Lua gets its own copy of the entity handle, so a script can keep it after the call
-template <>
-struct sol::is_value_semantic_for_function<Entity> : std::true_type {};
-
 struct LuaState
 {
     sol::table script;
@@ -150,7 +146,7 @@ void ScriptSystem::callCreate(Entity entity)
     sol::protected_function fn = it->second.script["create"];
     if (fn.valid())
     {
-        sol::protected_function_result result = fn(it->second.script, entity);
+        sol::protected_function_result result = fn(it->second.script, Entity(entity));
         if (!result.valid()) {
             sol::error err = result;
             logError("Lua Error: {}", err.what());
@@ -182,7 +178,7 @@ void ScriptSystem::callUpdate(Entity entity, float dt)
     sol::protected_function fn = it->second.script["update"];
     if (fn.valid())
     {
-        sol::protected_function_result result = fn(it->second.script, entity, dt);
+        sol::protected_function_result result = fn(it->second.script, Entity(entity), dt);
         if (!result.valid()) {
             sol::error err = result;
             logError("Lua Error: {}", err.what());
@@ -266,7 +262,7 @@ void ScriptSystem::callOnCollide(CollisionType collisionType, Entity entity, Ent
         sol::protected_function fn = it->second.script[funcName];
         if (fn.valid())
         {
-            sol::protected_function_result result = fn(it->second.script, self, opponent);
+            sol::protected_function_result result = fn(it->second.script, Entity(self), Entity(opponent));
             if (!result.valid()) {
                 sol::error err = result;
                 logError("Lua Error: {}", err.what());
