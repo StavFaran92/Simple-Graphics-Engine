@@ -66,6 +66,24 @@ void ScriptSystem::bindDynamics()
     impl_->bindDynamics();
 }
 
+// A Lua error can be any value; converting a non-string one to sol::error throws
+static void logLuaError(const sol::protected_function_result& result)
+{
+    sol::object err = result.get<sol::object>();
+    if (err.is<std::string>())
+    {
+        logError("Lua Error: {}", err.as<std::string>());
+        return;
+    }
+
+    sol::protected_function tostring = sol::state_view(err.lua_state())["tostring"];
+    sol::protected_function_result str = tostring(err);
+    if (str.valid() && str.get_type() == sol::type::string)
+        logError("Lua Error: {}", str.get<std::string>());
+    else
+        logError("Lua Error: (non-string error of type {})", sol::type_name(err.lua_state(), err.get_type()));
+}
+
 // Runs the script file and extracts its Script table and Ref() fields into outState, without
 // registering anything. Returns false if the script is invalid or fails to load.
 static bool loadScriptState(sol::state& lua, ScriptComponent& scriptComponent, LuaState& outState)
@@ -82,8 +100,7 @@ static bool loadScriptState(sol::state& lua, ScriptComponent& scriptComponent, L
         std::string filepath = scriptPath.string();
         auto result = lua.safe_script_file(filepath, sol::script_pass_on_error);
         if (!result.valid()) {
-            sol::error err = result;
-            logError(err.what());
+            logLuaError(result);
             return false;
         }
         sol::table script = lua["Script"];
@@ -148,8 +165,7 @@ void ScriptSystem::callCreate(Entity entity)
     {
         sol::protected_function_result result = fn(it->second.script, Entity(entity));
         if (!result.valid()) {
-            sol::error err = result;
-            logError("Lua Error: {}", err.what());
+            logLuaError(result);
         }
     }
 }
@@ -180,8 +196,7 @@ void ScriptSystem::callUpdate(Entity entity, float dt)
     {
         sol::protected_function_result result = fn(it->second.script, Entity(entity), dt);
         if (!result.valid()) {
-            sol::error err = result;
-            logError("Lua Error: {}", err.what());
+            logLuaError(result);
         }
     }
 }
@@ -227,8 +242,7 @@ void ScriptSystem::callOnEvent(Entity entity, const Event& event)
         }
 
         if (!result.valid()) {
-            sol::error err = result;
-            logError("Lua Error: {}", err.what());
+            logLuaError(result);
         }
     }
 }
@@ -264,8 +278,7 @@ void ScriptSystem::callOnCollide(CollisionType collisionType, Entity entity, Ent
         {
             sol::protected_function_result result = fn(it->second.script, Entity(self), Entity(opponent));
             if (!result.valid()) {
-                sol::error err = result;
-                logError("Lua Error: {}", err.what());
+                logLuaError(result);
             }
         }
     };
@@ -285,8 +298,7 @@ void ScriptSystem::callOnAnimTrigger(Entity entity, const std::string& name, int
     {
         sol::protected_function_result result = fn(it->second.script, name, frameID);
         if (!result.valid()) {
-            sol::error err = result;
-            logError("Lua Error: {}", err.what());
+            logLuaError(result);
         }
     }
 }
@@ -305,9 +317,13 @@ void ScriptSystem::callDestroy(Entity entity)
     if (it == impl_->scripts.end())
         return;
 
-    sol::function fn = it->second.script["destroy"];
+    sol::protected_function fn = it->second.script["destroy"];
     if (fn.valid())
-        fn(it->second.script, entity);
+    {
+        sol::protected_function_result result = fn(it->second.script, Entity(entity));
+        if (!result.valid())
+            logLuaError(result);
+    }
 
     impl_->scripts.erase(it);
 }
@@ -378,8 +394,7 @@ void ScriptSystem::invokeFunction(Entity entity, const std::string& funcName, co
 
         if (!result.valid()) 
         {
-            sol::error err = result;
-            logError("Lua Error: {}", err.what());
+            logLuaError(result);
         }
     }
 }
