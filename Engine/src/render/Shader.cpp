@@ -336,8 +336,9 @@ bool Shader::validateCompilation(const unsigned int& shader, const unsigned int&
 
 int Shader::getUniformLocation(const std::string& name)
 {
-	if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
-		return m_uniformLocationCache[name];
+	auto it = m_uniformLocationCache.find(name);
+	if (it != m_uniformLocationCache.end())
+		return it->second;
 
 	return -1;
 }
@@ -372,71 +373,114 @@ void Shader::setUniformValue(const std::string& name, const Value& v)
 		return;
 	}
 
-	if (m_uniformLocationCache.find(name) == m_uniformLocationCache.end())
+	auto it = m_uniformLocationCache.find(name);
+	if (it == m_uniformLocationCache.end())
 	{
 		//logWarning("Could not find " + name + " in shader.");
 		return;
 	}
 
-	std::visit([this, &name](auto&& arg) {
+	const int location = it->second;
+
+	std::visit([this, location](auto&& arg) {
 		using T = std::decay_t<decltype(arg)>;
 		if constexpr (std::is_same_v<T, float>)
-			this->setFloat(name, arg);
+			this->setFloat(location, arg);
 		else if constexpr (std::is_same_v<T, glm::vec2>)
-			this->setFloat(name, arg);
+			this->setFloat(location, arg);
 		else if constexpr (std::is_same_v<T, glm::vec3>)
-			this->setFloat(name, arg);
+			this->setFloat(location, arg);
 		else if constexpr (std::is_same_v<T, glm::vec4>)
-			this->setFloat(name, arg);
+			this->setFloat(location, arg);
 		else if constexpr (std::is_same_v<T, int>)
-			this->setInt(name, arg);
+			this->setInt(location, arg);
 		else if constexpr (std::is_same_v<T, unsigned int>)
-			this->setUInt(name, arg);
+			this->setUInt(location, arg);
 		else if constexpr (std::is_same_v<T, glm::mat3>)
-			this->setMat3(name, arg);
+			this->setMat3(location, arg);
 		else if constexpr (std::is_same_v<T, glm::mat4>)
-			this->setMat4(name, arg);
+			this->setMat4(location, arg);
 		}, v);
 }
 
 void Shader::setFloat(const std::string& name, float v)
 {
-	glUniform1f(getUniformLocation(name), v);
+	setFloat(getUniformLocation(name), v);
 }
 
 void Shader::setFloat(const std::string& name, glm::vec2 v)
 {
-	glUniform2f(getUniformLocation(name), v.x, v.y);
+	setFloat(getUniformLocation(name), v);
 }
 
 void Shader::setFloat(const std::string& name, glm::vec3 v)
 {
-	glUniform3f(getUniformLocation(name), v.x, v.y, v.z);
+	setFloat(getUniformLocation(name), v);
 }
 
 void Shader::setFloat(const std::string& name, glm::vec4 v)
 {
-	glUniform4f(getUniformLocation(name), v.x, v.y, v.z, v.w);
+	setFloat(getUniformLocation(name), v);
 }
 
 void Shader::setInt(const std::string& name, int v)
 {
-	glUniform1i(getUniformLocation(name), v);
+	setInt(getUniformLocation(name), v);
 }
 
 void Shader::setUInt(const std::string& name, unsigned int v)
 {
-	glUniform1ui(getUniformLocation(name), v);
+	setUInt(getUniformLocation(name), v);
 }
 
 void Shader::setMat3(const std::string& name, const glm::mat3& v)
 {
-	glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(v));
+	setMat3(getUniformLocation(name), v);
 }
 
 void Shader::setMat4(const std::string& name, const glm::mat4& v)
 {
-	glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(v));
+	setMat4(getUniformLocation(name), v);
+}
+
+void Shader::setFloat(int location, float v)
+{
+	glUniform1f(location, v);
+}
+
+void Shader::setFloat(int location, glm::vec2 v)
+{
+	glUniform2f(location, v.x, v.y);
+}
+
+void Shader::setFloat(int location, glm::vec3 v)
+{
+	glUniform3f(location, v.x, v.y, v.z);
+}
+
+void Shader::setFloat(int location, glm::vec4 v)
+{
+	glUniform4f(location, v.x, v.y, v.z, v.w);
+}
+
+void Shader::setInt(int location, int v)
+{
+	glUniform1i(location, v);
+}
+
+void Shader::setUInt(int location, unsigned int v)
+{
+	glUniform1ui(location, v);
+}
+
+void Shader::setMat3(int location, const glm::mat3& v)
+{
+	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(v));
+}
+
+void Shader::setMat4(int location, const glm::mat4& v)
+{
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(v));
 }
 
 void Shader::setModelMatrix(glm::mat4 model)

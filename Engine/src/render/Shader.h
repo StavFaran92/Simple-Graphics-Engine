@@ -148,6 +148,15 @@ private:
 	void setMat3(const std::string& name, const glm::mat3& v);
 	void setMat4(const std::string& name, const glm::mat4& v);
 
+	void setFloat(int location, float v);
+	void setFloat(int location, glm::vec2 v);
+	void setFloat(int location, glm::vec3 v);
+	void setFloat(int location, glm::vec4 v);
+	void setInt(int location, int v);
+	void setUInt(int location, unsigned int v);
+	void setMat3(int location, const glm::mat3& v);
+	void setMat4(int location, const glm::mat4& v);
+
 	friend class CustomShaderBuilder;
 
 protected:
