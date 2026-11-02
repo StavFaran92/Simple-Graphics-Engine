@@ -366,6 +366,8 @@ void PhysicsSystem::createCCTController(Scene* scene, entt::entity entity)
 
     desc.height = pc.height;
     desc.radius = pc.radius;
+    desc.stepOffset = pc.stepOffset;
+    desc.contactOffset = pc.contactOffset;
 
     // We offset manually for CCT controllers
     desc.position = physx::PxExtendedVec3(pos.x + pc.offset.x, pos.y + pc.offset.y, pos.z + pc.offset.z);

@@ -239,6 +239,8 @@ void InspectorWindow::display()
 				ImGui::DragFloat("Radius", &controller.radius, .1f);
 				ImGui::DragFloat("Height", &controller.height, .1f);
 				ImGui::DragFloat3("Offset", &controller.offset.x, .1f);
+				ImGui::DragFloat("Step Offset", &controller.stepOffset, .01f, 0.f, FLT_MAX);
+				ImGui::DragFloat("Contact Offset", &controller.contactOffset, .005f, .001f, FLT_MAX);
 			});
 
 		displayComponent<MeshRendererComponent>("Mesh Renderer", [](MeshRendererComponent& meshComponent) {

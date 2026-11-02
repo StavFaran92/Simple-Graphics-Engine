@@ -15,6 +15,8 @@ struct EngineAPI PlayerController : public Component
 		SERIALIZED_MEMBER_OPTIONAL(height);
 		SERIALIZED_MEMBER_OPTIONAL(radius);
 		SERIALIZED_MEMBER_OPTIONAL(offset);
+		SERIALIZED_MEMBER_OPTIONAL2(stepOffset, .5f); // scenes saved before it existed get PhysX's default
+		SERIALIZED_MEMBER_OPTIONAL2(contactOffset, .1f);
 	}
 
 	void move(glm::vec3 disp)
@@ -40,6 +42,9 @@ struct EngineAPI PlayerController : public Component
 	float height = 1.f;
 	float radius = .5f;
 	glm::vec3 offset{};
+	// Defaults match PxControllerDesc. stepOffset is the tallest obstacle walked over; contactOffset is the skin
+	float stepOffset = .5f;
+	float contactOffset = .1f;
 	int controllerIndex = 0;
 	bool isGrounded = false; // set by the physics step - the last move collided with something below
 

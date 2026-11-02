@@ -1192,6 +1192,23 @@ void Scene::draw(float deltaTime)
 				m_debugVisualizeShader->setModelMatrix(cylinderModel);
 				RenderCommand::draw(cylinderVao);
 
+				// Skin: the capsule grown by contactOffset
+				float skinRadius = radius + controller.contactOffset;
+				m_debugVisualizeShader->setUniformValue("color", glm::vec3(0, .45f, 0));
+				m_debugVisualizeShader->setModelMatrix(glm::scale(glm::translate(model, glm::vec3(0.0f, height * .5f, 0.0f)), glm::vec3(skinRadius * 2)));
+				RenderCommand::draw(sphereVao);
+				m_debugVisualizeShader->setModelMatrix(glm::scale(glm::translate(model, glm::vec3(0.0f, -height * .5f, 0.0f)), glm::vec3(skinRadius * 2)));
+				RenderCommand::draw(sphereVao);
+				m_debugVisualizeShader->setModelMatrix(glm::scale(model, glm::vec3(skinRadius * 2, height, skinRadius * 2)));
+				RenderCommand::draw(cylinderVao);
+
+				// Step disc at foot + stepOffset; the foot is the skin's bottom (PxController::getFootPosition)
+				float stepY = -(height * .5f + skinRadius) + controller.stepOffset;
+				float discDiameter = skinRadius * 2 * 2.5f; // wider than the capsule so it shows where obstacles are
+				m_debugVisualizeShader->setUniformValue("color", glm::vec3(1, .6f, 0));
+				m_debugVisualizeShader->setModelMatrix(glm::scale(glm::translate(model, glm::vec3(0.0f, stepY, 0.0f)), glm::vec3(discDiameter, .001f, discDiameter)));
+				RenderCommand::draw(cylinderVao);
+
 
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				glDisable(GL_POLYGON_OFFSET_LINE);
