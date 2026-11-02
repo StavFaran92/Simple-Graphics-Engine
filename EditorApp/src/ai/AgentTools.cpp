@@ -1002,6 +1002,43 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 	});
 
 	server.addTool({
+		"set_script_ref",
+		"Points one of a Lua script's Ref() fields at another entity, like the Inspector's References section. "
+		"'field' is a Ref() field the script declares (get_entity shows them under ScriptComponent.refs); "
+		"'target' is an entity id, or null to clear the field.",
+		objectSchema({
+			{"id", { {"type", "integer"}, {"description", "Entity with the ScriptComponent"} }},
+			{"field", { {"type", "string"} }},
+			{"target", { {"type", { "integer", "null" }} }},
+		}, { "id", "field", "target" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			if (!e.HasComponent<ScriptComponent>())
+				throw McpToolError(describe(e) + " has no ScriptComponent");
+
+			auto& script = e.getComponent<ScriptComponent>();
+			const std::string field = args.value("field", "");
+			const auto slots = script.getAllRefSlots();
+			if (std::find(slots.begin(), slots.end(), field) == slots.end())
+				throw McpToolError("The script on " + describe(e) + " has no Ref() field '" + field + "'. Its fields: " +
+					(slots.empty() ? std::string("none") : joinNames(slots)));
+
+			Entity target = args["target"].is_null() ? Entity::EmptyEntity : entityFromArgs(args, "target");
+
+			const std::string component = componentTypeName<ScriptComponent>();
+			ComponentSnapshot before = takeSnapshot(e, component);
+			script.setRef(field, target);
+
+			const std::string targetText = target.valid() ? describe(target) : "nothing";
+			CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+				std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
+				"AI: set " + field + " on " + entityName(e)));
+			return mcpText("Set " + field + " on " + describe(e) + " to " + targetText);
+		}
+	});
+
+	server.addTool({
 		"rename_entity",
 		"Renames an entity.",
 		objectSchema({
