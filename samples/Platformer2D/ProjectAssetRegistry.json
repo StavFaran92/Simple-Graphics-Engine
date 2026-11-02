@@ -35,86 +35,8 @@
             "visibility": 1
         }
     ],
-    "counter": 65,
+    "counter": 66,
     "lua script": [
-        {
-            "aType": 7,
-            "asset": {
-                "filepath": ""
-            },
-            "assetDirectory": "",
-            "ext": ".lua",
-            "isEngineOwned": false,
-            "name": "pf_probe_trigger",
-            "sourcePath": "",
-            "uuid": 31,
-            "visibility": 1
-        },
-        {
-            "aType": 7,
-            "asset": {
-                "filepath": ""
-            },
-            "assetDirectory": "",
-            "ext": ".lua",
-            "isEngineOwned": false,
-            "name": "pf_probe_player",
-            "sourcePath": "",
-            "uuid": 32,
-            "visibility": 1
-        },
-        {
-            "aType": 7,
-            "asset": {
-                "filepath": ""
-            },
-            "assetDirectory": "",
-            "ext": ".lua",
-            "isEngineOwned": false,
-            "name": "pf_probe_platform",
-            "sourcePath": "",
-            "uuid": 33,
-            "visibility": 1
-        },
-        {
-            "aType": 7,
-            "asset": {
-                "filepath": ""
-            },
-            "assetDirectory": "",
-            "ext": ".lua",
-            "isEngineOwned": false,
-            "name": "pf_probe_ride",
-            "sourcePath": "",
-            "uuid": 34,
-            "visibility": 1
-        },
-        {
-            "aType": 7,
-            "asset": {
-                "filepath": ""
-            },
-            "assetDirectory": "",
-            "ext": ".lua",
-            "isEngineOwned": false,
-            "name": "pf_mover_platform_across",
-            "sourcePath": "",
-            "uuid": 48,
-            "visibility": 1
-        },
-        {
-            "aType": 7,
-            "asset": {
-                "filepath": ""
-            },
-            "assetDirectory": "",
-            "ext": ".lua",
-            "isEngineOwned": false,
-            "name": "pf_mover_platform_lift",
-            "sourcePath": "",
-            "uuid": 49,
-            "visibility": 1
-        },
         {
             "aType": 7,
             "asset": {
@@ -204,6 +126,19 @@
             "name": "pf_camera",
             "sourcePath": "",
             "uuid": 60,
+            "visibility": 1
+        },
+        {
+            "aType": 7,
+            "asset": {
+                "filepath": ""
+            },
+            "assetDirectory": "",
+            "ext": ".lua",
+            "isEngineOwned": false,
+            "name": "pf_mover",
+            "sourcePath": "",
+            "uuid": 65,
             "visibility": 1
         }
     ],
@@ -1143,17 +1078,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1179,6 +1103,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -1465,17 +1400,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1501,6 +1425,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -1787,17 +1722,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1823,6 +1747,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -5896,13 +5831,8 @@
         "pf_coin": 51,
         "pf_enemy": 52,
         "pf_goal": 54,
-        "pf_mover_platform_across": 48,
-        "pf_mover_platform_lift": 49,
+        "pf_mover": 65,
         "pf_player": 59,
-        "pf_probe_platform": 33,
-        "pf_probe_player": 32,
-        "pf_probe_ride": 34,
-        "pf_probe_trigger": 31,
         "pf_spike": 50,
         "sunflowers_puresky_4k": 61,
         "wh3dAsuh": 64
@@ -5936,15 +5866,10 @@
         "content/pf_ground.mat": 35,
         "content/pf_hill.mat": 46,
         "content/pf_lamp.mat": 45,
+        "content/pf_mover.lua": 65,
         "content/pf_mover.mat": 38,
-        "content/pf_mover_platform_across.lua": 48,
-        "content/pf_mover_platform_lift.lua": 49,
         "content/pf_player.lua": 59,
         "content/pf_pole.mat": 43,
-        "content/pf_probe_platform.lua": 33,
-        "content/pf_probe_player.lua": 32,
-        "content/pf_probe_ride.lua": 34,
-        "content/pf_probe_trigger.lua": 31,
         "content/pf_spike.lua": 50,
         "content/pf_spike.mat": 40,
         "content/pf_stone.mat": 37,

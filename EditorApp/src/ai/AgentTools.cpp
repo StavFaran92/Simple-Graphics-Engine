@@ -18,6 +18,8 @@
 #include "runtime/StartupSceneTemplate.h"
 #include "render/MaterialDataParser.h"
 #include "commands/AssetCommands.h"
+#include "EditorState.h"
+#include "Thumbnails/ThumbnailCache.h"
 
 #include <cereal/archives/json.hpp>
 
@@ -1274,6 +1276,33 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				throw McpToolError("Couldn't write the script file");
 			file << text;
 			return mcpText("Updated script '" + record.name + "'; the change runs from the next play");
+		}
+	});
+
+	server.addTool({
+		"delete_asset",
+		"Deletes a project asset and its file, like Delete in the Asset View. Not an undo step. Whatever still uses it "
+		"(a ScriptComponent's script, a mesh's material) is left pointing at nothing, so check with get_entity first. "
+		"Pass uuid or name.",
+		objectSchema({
+			{"uuid", { {"type", "string"} }},
+			{"name", { {"type", "string"} }},
+		}),
+		[](const json& args) {
+			requireEditMode();
+			const AssetRecord& record = findAssetRecord(args);
+			if (record.isEngineOwned)
+				throw McpToolError("'" + record.name + "' belongs to the engine; only project assets can be deleted");
+			if (record.uuid == Engine::get()->getContext()->getActiveSceneAsset().getUID())
+				throw McpToolError("'" + record.name + "' is the open scene; open another one first");
+
+			// The record goes away with the asset, so keep what the reply needs
+			const UUID uuid = record.uuid;
+			const std::string name = record.name;
+			Engine::get()->getSubSystem<Assets>()->deleteAsset(uuid);
+			ThumbnailCache::Instance().invalidate(uuid);
+			EditorState::Instance().clearAssetSelection();
+			return mcpText("Deleted '" + name + "' (uuid " + uuid.str() + ")");
 		}
 	});
 
