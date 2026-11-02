@@ -1160,8 +1160,8 @@ void Scene::draw(float deltaTime)
 				glPolygonOffset(-1.0, -1.0);
 				glLineWidth(1); // Size in pixels
 
-				glm::mat4 model = transform.getWorldTransformation();
-				model = model * glm::translate(glm::mat4(1.0f), controller.offset);
+				// Same placement as the CCT (createCCTController): world position plus offset, no rotation or scale
+				glm::mat4 model = glm::translate(glm::mat4(1.0f), transform.getWorldPosition() + controller.offset);
 
 				float radius = controller.radius;
 				float height = controller.height;
