@@ -6,7 +6,8 @@
 
 std::string normalizePath(const std::string& input)
 {
-    fs::path p = fs::absolute(input).lexically_normal();
+    // Lexical only: keys stay project-relative, independent of the working directory
+    fs::path p = fs::path(input).lexically_normal();
     std::string s = p.generic_string();
 
 #ifdef _WIN32
@@ -19,7 +20,12 @@ std::string normalizePath(const std::string& input)
 
 CacheSystem::CacheSystem(std::shared_ptr<ProjectAssetRegistry> par)
 {
-	m_pathToUUID = par->getPaths();
+	for (const auto& [path, uuid] : par->getPaths())
+	{
+		// Drop absolute keys an older version saved; each asset also has its relative key
+		if (!fs::path(path).is_absolute())
+			m_pathToUUID[path] = uuid;
+	}
 	m_nameToUUID = par->getNames();
 }
 
