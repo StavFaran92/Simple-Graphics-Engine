@@ -711,6 +711,15 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
 void PhysicsSystem::update(Scene* scene, float deltaTime)
 {
+    // Step order:
+    // 1. Set kinematic targets. A kinematic body reaches its target during simulate().
+    // 2. simulate() / fetchResults(). Kinematic bodies are now at this step's pose.
+    // 3. Move character controllers. move() sweeps the capsule against the scene's current poses,
+    //    so controllers collide with the kinematic bodies where step 2 put them.
+    // 4. Write transforms back. Controllers: getPosition(), which move() updates immediately
+    //    (the controller's hidden actor only reaches that position on the next simulate()).
+    //    Other bodies: getGlobalPose(), which fetchResults() updated.
+
     auto physicsScene = scene->getPhysicsScene();
 
     // Create physics objects for newly spawned entities
@@ -801,6 +810,9 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
         }
     }
 
+    physicsScene->simulate(deltaTime);
+    physicsScene->fetchResults(true);
+
     auto iter = m_CCTControllers.find(physicsScene);
     if (iter != m_CCTControllers.end())
     {
@@ -842,14 +854,18 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
                 filters
             );
             pc.isGrounded = collisionFlags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
+
+            // Identity rotation since the capsule is rotated internally, and the offset is reversed
+            const physx::PxExtendedVec3& centre = cct->getPosition();
+            physx::PxTransform pxTransform(physx::PxVec3(
+                (float)centre.x - pc.offset.x,
+                (float)centre.y - pc.offset.y,
+                (float)centre.z - pc.offset.z));
+            PhysXUtils::fromPhysXTransform(e, pxTransform, e.getComponent<Transformation>());
+
             pc.reset();
         }
     }
-
-    physicsScene->simulate(deltaTime);
-    physicsScene->fetchResults(true);
-
-
 
     // Retrieve Graphics transform from Physics transform
     physx::PxU32 nbActors = physicsScene->getNbActors(physx::PxActorTypeFlag::eRIGID_DYNAMIC);
@@ -866,21 +882,12 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().shapeType == CollisionShape::TERRAIN)
                 continue;
 
-            auto& transform = e.getComponent<Transformation>();
-
-            physx::PxTransform pxTransform = actor->getGlobalPose();
-
+            // Written from the controller right after move
             if (e.HasComponent<PlayerController>())
-            {
-                auto& pc = e.getComponent<PlayerController>();
+                continue;
 
-                // since CCT capsule is rotated 90 deg internally we want to ignore rotation
-                pxTransform.q = physx::PxQuat(PxIdentity);
-
-                // we apply reverse offset since CCT does not have an actual shape
-                pxTransform.p -= physx::PxVec3(pc.offset.x, pc.offset.y, pc.offset.z);
-            }
-
+            auto& transform = e.getComponent<Transformation>();
+            physx::PxTransform pxTransform = actor->getGlobalPose();
             PhysXUtils::fromPhysXTransform(e, pxTransform, transform);
         }
     }
