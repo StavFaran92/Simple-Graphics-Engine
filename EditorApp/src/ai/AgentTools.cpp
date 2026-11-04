@@ -253,6 +253,20 @@ namespace
 		return { value[0].get<float>(), value[1].get<float>(), value[2].get<float>() };
 	}
 
+	// args[field] looked up by name in 'values', e.g. "dynamic" -> RigidbodyType::Dynamic
+	template <class T>
+	T enumFromArgs(const json& args, const std::string& field, const std::vector<std::pair<std::string, T>>& values)
+	{
+		std::vector<std::string> names;
+		for (const auto& [name, value] : values)
+		{
+			if (args[field].is_string() && args[field].get<std::string>() == name)
+				return value;
+			names.push_back(name);
+		}
+		throw McpToolError("'" + field + "' must be one of: " + joinNames(names));
+	}
+
 	const AssetRecord& findAssetRecord(const json& args)
 	{
 		std::string uuid;
@@ -490,8 +504,8 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 		"get_component_schema",
 		"Without 'component': lists every registered component type. With 'component': its fields as a "
 		"default-constructed instance ('defaults'), plus 'exampleFromScene' from the first entity that has it. "
-		"Defaults show field names and types but may not be a useful setup (e.g. a physics collider is null); "
-		"prefer create_preset for things the Create menu offers.",
+		"Defaults show field names and types but may not be a useful setup (e.g. a physics collider is null, "
+		"set_collider adds one); prefer create_preset for things the Create menu offers.",
 		objectSchema({
 			{"component", { {"type", "string"}, {"description", "A name from the registered list"} }},
 		}),
@@ -1000,6 +1014,37 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
 				"AI: transform " + entityName(e)));
 			return mcpText("Transformed " + describe(e));
+		}
+	});
+
+	const std::vector<std::pair<std::string, CollisionShape>> colliderShapes = {
+		{ "none", CollisionShape::NONE }, { "box", CollisionShape::BOX }, { "sphere", CollisionShape::SPHERE },
+		{ "capsule", CollisionShape::CAPSULE }, { "terrain", CollisionShape::TERRAIN },
+	};
+
+	server.addTool({
+		"set_collider",
+		"Gives an entity a default collider of 'shape' (adding a PhysicsComponent if needed), like the Inspector's Shape "
+		"combo; 'none' removes it. Change its size, body type, mass etc. afterwards with set_components. One undo step.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"shape", { {"type", "string"}, {"enum", { "none", "box", "sphere", "capsule", "terrain" }} }},
+		}, { "id", "shape" }),
+		[colliderShapes](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			const CollisionShape shape = enumFromArgs(args, "shape", colliderShapes);
+
+			const std::string component = componentTypeName<PhysicsComponent>();
+			ComponentSnapshot before = takeSnapshot(e, component);
+			if (!e.HasComponent<PhysicsComponent>())
+				e.addComponent<PhysicsComponent>();
+			e.getComponent<PhysicsComponent>().createShape(shape);
+
+			CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+				std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
+				"AI: set collider on " + entityName(e)));
+			return mcpText("Set a " + args["shape"].get<std::string>() + " collider on " + describe(e));
 		}
 	});
 
