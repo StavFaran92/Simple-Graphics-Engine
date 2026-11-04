@@ -166,18 +166,13 @@ void InspectorWindow::display()
 			};
 
 			ImGui::LabelText("", "Shape");
-			if (ImGui::Combo("##Shape", (int*)&rBody.shapeType, colliderTypeNames, IM_ARRAYSIZE(colliderTypeNames))) {
-				switch (rBody.shapeType) {
-				case CollisionShape::NONE: rBody.collider = 0; break;
-				case CollisionShape::BOX: rBody.collider = std::make_shared<CollisionBox>(); break;
-				case CollisionShape::SPHERE: rBody.collider = std::make_shared<CollisionSphere>(); break;
-				case CollisionShape::TERRAIN: rBody.collider = std::make_shared<CollisionTerrain>(); break;
-				case CollisionShape::MESH: rBody.collider = std::make_shared<CollisionMesh>(); break;
-				case CollisionShape::CAPSULE: rBody.collider = std::make_shared<CollisionCapsule>(); break;
+			CollisionShape type = rBody.getShapeType();
+			if (ImGui::Combo("##Shape", (int*)&type, colliderTypeNames, IM_ARRAYSIZE(colliderTypeNames))) {
+				if (rBody.getShapeType() != type)
+				{
+					rBody.createShape(type);
 				}
 			}
-
-			CollisionShape type = rBody.shapeType;
 
 			if (type == CollisionShape::NONE)
 			{
@@ -185,19 +180,20 @@ void InspectorWindow::display()
 			}
 
 			ImGui::LabelText("", "Layer");
-			
+
 			if (ImGui::CollapsingHeader("Layer Mask")) {
+				Physics::LayerMask& layerMask = rBody.getShape()->layerMask;
 				ImGui::BeginChild("##LayerMaskScroll", ImVec2(0, 150), true);
 				for (int i = 0; i < ProjectSettings::get().m_layerNames.size(); i++) {
-					bool checked = rBody.collider->layerMask & (1 << i);
+					bool checked = layerMask & (1 << i);
 					ImGui::Text("%s", ProjectSettings::get().m_layerNames[i].c_str());
 					ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ScrollbarSize);
 					ImGui::PushID(i);
 					if (ImGui::Checkbox("##layer", &checked)) {
 						if (checked)
-							rBody.collider->layerMask |= (1 << i);
+							layerMask |= (1 << i);
 						else
-							rBody.collider->layerMask &= ~(1 << i);
+							layerMask &= ~(1 << i);
 					}
 					ImGui::PopID();
 				}
@@ -206,17 +202,17 @@ void InspectorWindow::display()
 
 			switch (type) {
 			case CollisionShape::BOX:
-				if (auto* box = dynamic_cast<CollisionBox*>(rBody.collider.get())) {
+				if (auto* box = rBody.getShape<CollisionBox>()) {
 					ImGui::DragFloat3("Extents", &box->extents.x, .1f);
 				}
 				break;
 			case CollisionShape::SPHERE:
-				if (auto* sphere = dynamic_cast<CollisionSphere*>(rBody.collider.get())) {
+				if (auto* sphere = rBody.getShape<CollisionSphere>()) {
 					ImGui::DragFloat("Radius", &sphere->radius, .1f);
 				}
 				break;
 			case CollisionShape::CAPSULE:
-				if (auto* capsule = dynamic_cast<CollisionCapsule*>(rBody.collider.get())) {
+				if (auto* capsule = rBody.getShape<CollisionCapsule>()) {
 					ImGui::DragFloat("Radius", &capsule->radius, .1f);
 					ImGui::DragFloat("Height", &capsule->halfHeight, .1f);
 				}
@@ -225,7 +221,7 @@ void InspectorWindow::display()
 				ImGui::TextDisabled("Terrain collider has no editable parameters.");
 				break;
 			case CollisionShape::MESH:
-				if (auto* mesh = dynamic_cast<CollisionMesh*>(rBody.collider.get())) {
+				if (auto* mesh = rBody.getShape<CollisionMesh>()) {
 					ImGui::Checkbox("Convex", &mesh->isConvex);
 					// Optional: display mesh ResourceWrapper name, etc.
 				}

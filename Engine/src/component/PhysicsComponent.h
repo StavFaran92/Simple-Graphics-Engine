@@ -20,6 +20,18 @@ struct EngineAPI PhysicsComponent : public Component
 	// Whether raycasts / overlaps can hit this body, applied to the live shapes immediately
 	void setQueryEnabled(bool enabled);
 
+	// The collider's shape, NONE when there is no collider
+	CollisionShape getShapeType() const;
+
+	// Replaces the collider with a default one of this shape; NONE removes it
+	void createShape(CollisionShape type);
+
+	Collider* getShape() const { return collider.get(); }
+
+	// The collider as T, null when it's another shape
+	template <class T>
+	T* getShape() const { return dynamic_cast<T*>(collider.get()); }
+
 	template <class Archive>
 	void serialize(Archive& archive) {
 		SERIALIZE_COMPONENT_BASE;
@@ -27,7 +39,6 @@ struct EngineAPI PhysicsComponent : public Component
 		SERIALIZED_MEMBER_OPTIONAL(collisionType);
 		SERIALIZED_MEMBER_OPTIONAL(mass);
 		SERIALIZED_MEMBER_OPTIONAL(collider);
-		SERIALIZED_MEMBER_OPTIONAL(shapeType);
 		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearX);
 		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearY);
 		SERIALIZED_MEMBER_OPTIONAL(isLockedLinearZ);
@@ -45,8 +56,6 @@ struct EngineAPI PhysicsComponent : public Component
 	bool isLockedAngularZ = false;
 	RigidbodyType rigidBodyType = RigidbodyType::Static;
 	CollisionType collisionType = CollisionType::Collider;
-	CollisionShape shapeType = CollisionShape::NONE;
-	std::shared_ptr<Collider> collider;
 	float mass = 0;
 	bool isChanged = false;
 	bool isQueryEnabled = true;
@@ -57,6 +66,9 @@ struct EngineAPI PhysicsComponent : public Component
 	glm::vec3 offset{};
 
 	glm::vec3 m_parentCachedPos{ 0 };
+
+private:
+	std::shared_ptr<Collider> collider;
 };
 
 REGISTER_COMPONENT(PhysicsComponent)

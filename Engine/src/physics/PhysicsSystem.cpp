@@ -542,26 +542,18 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     auto& pc = e.getComponent<PhysicsComponent>();
     auto scale = transform.getWorldScale();
 
-    if (pc.shapeType == CollisionShape::NONE)
-    {
+    const CollisionShape shapeType = pc.getShapeType();
+    if (shapeType == CollisionShape::NONE)
         return;
-    }
 
-    // Data from a file or a tool can disagree; skip the body instead of crashing on it
-    if (!pc.collider || pc.collider->getType() != pc.shapeType)
+    if (shapeType == CollisionShape::BOX)
     {
-        logWarning("Entity {}: its collider doesn't match shapeType; no physics shape created", e.handlerID());
-        return;
-    }
-
-    if (pc.collider->getType() == CollisionShape::BOX)
-    {
-        auto& collider = std::dynamic_pointer_cast<CollisionBox>(pc.collider);
+        auto* collider = pc.getShape<CollisionBox>();
         shape = createBoxShape(collider->extents.x * scale.x, collider->extents.y * scale.y, collider->extents.z * scale.z);
     }
-    else if (pc.collider->getType() == CollisionShape::SPHERE)
+    else if (shapeType == CollisionShape::SPHERE)
     {
-        auto& collider = std::dynamic_pointer_cast<CollisionSphere>(pc.collider);
+        auto* collider = pc.getShape<CollisionSphere>();
         if (collider->radius <= 0)
         {
             logWarning("Invalid collider radius: " + std::to_string(collider->radius));
@@ -569,9 +561,9 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
         }
         shape = createSphereShape(collider->radius * std::max(std::max(scale.x, scale.y), scale.z));
     }
-    else if (pc.collider->getType() == CollisionShape::CAPSULE)
+    else if (shapeType == CollisionShape::CAPSULE)
     {
-        auto& collider = std::dynamic_pointer_cast<CollisionCapsule>(pc.collider);
+        auto* collider = pc.getShape<CollisionCapsule>();
         if (collider->radius <= 0 || collider->halfHeight <= 0)
         {
             logWarning("Invalid collider params: {}, {}" , collider->radius, collider->halfHeight);
@@ -579,9 +571,9 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
         }
         shape = createCapsuleShape(collider->radius, collider->halfHeight);
     }
-    else if (pc.collider->getType() == CollisionShape::MESH)
+    else if (shapeType == CollisionShape::MESH)
     {
-        auto& collider = std::dynamic_pointer_cast<CollisionMesh>(pc.collider);
+        auto* collider = pc.getShape<CollisionMesh>();
         // The mesh isn't saved with the collider, so one loaded from a file has none
         if (!collider->mesh)
         {
@@ -591,9 +583,8 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
         const std::vector<glm::vec3>& apos = collider->mesh.get()->getPositions();
         shape = createConvexMeshShape(apos);
     }
-    else if (pc.collider->getType() == CollisionShape::TERRAIN)
+    else if (shapeType == CollisionShape::TERRAIN)
     {
-        auto& collider = std::static_pointer_cast<CollisionTerrain>(pc.collider);
         if (!e.HasComponent<Terrain>() || e.getComponent<Terrain>().getHeightmap().isEmpty())
         {
             logWarning("Entity {}: terrain collider needs a Terrain with a heightmap; no physics shape created", e.handlerID());
@@ -662,7 +653,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     }
 
     // Apply query filter data
-    Physics::LayerMask mask = pc.collider->layerMask;
+    Physics::LayerMask mask = pc.getShape()->layerMask;
 
     physx::PxFilterData filterData;
     filterData.word0 = mask;
@@ -686,7 +677,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
     }
 
     // Apply local transformation
-    if (pc.collider->getType() != CollisionShape::TERRAIN)
+    if (shapeType != CollisionShape::TERRAIN)
     {
         physx::PxVec3 pxTranslation(pc.offset.x, pc.offset.y, pc.offset.z);
         physx::PxQuat pxRotation(PxIdentity);
@@ -695,7 +686,7 @@ void PhysicsSystem::createShape(physx::PxRigidActor* body, Entity e, bool recurs
 
         // PhysX capsules are X-axis aligned; compose a 90 deg Z rotation to make them Y-axis (upright)
         // This only applies to non CCT, CCT rotation is done internally by PhysX
-        if (pc.collider->getType() == CollisionShape::CAPSULE)
+        if (shapeType == CollisionShape::CAPSULE)
             physxTransform.q = physxTransform.q * physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0.0f, 0.0f, 1.0f));
 
         shape->setLocalPose(physxTransform);
@@ -881,7 +872,7 @@ void PhysicsSystem::update(Scene* scene, float deltaTime)
             entity_id id = *(entity_id*)actor->userData;
             Entity e{ entt::entity(id),  &scene->getRegistry() };
 
-            if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().shapeType == CollisionShape::TERRAIN)
+            if (e.HasComponent<PhysicsComponent>() && e.getComponent<PhysicsComponent>().getShapeType() == CollisionShape::TERRAIN)
                 continue;
 
             // Written from the controller right after move

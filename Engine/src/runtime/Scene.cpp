@@ -1076,9 +1076,9 @@ void Scene::draw(float deltaTime)
 				glm::mat4 model = transform.getWorldTransformation();
 				model = model * glm::translate(glm::mat4(1.0f), physics.offset);
 
-				if (physics.shapeType == CollisionShape::BOX)
+				if (physics.getShapeType() == CollisionShape::BOX)
 				{
-					auto collisionBox = std::dynamic_pointer_cast<CollisionBox>(physics.collider);
+					auto* collisionBox = physics.getShape<CollisionBox>();
 					auto extents = collisionBox->extents;
 					model = glm::scale(model, glm::vec3(extents.x*2, extents.y*2, extents.z*2));
 					m_debugVisualizeShader->setModelMatrix(model);
@@ -1087,9 +1087,9 @@ void Scene::draw(float deltaTime)
 					RenderCommand::draw(vao);
 				}
 
-				if (physics.shapeType == CollisionShape::SPHERE)
+				if (physics.getShapeType() == CollisionShape::SPHERE)
 				{
-					auto collisionSphere = std::dynamic_pointer_cast<CollisionSphere>(physics.collider);
+					auto* collisionSphere = physics.getShape<CollisionSphere>();
 					auto radius = collisionSphere->radius;
 					model = glm::scale(model, glm::vec3(radius * 2));
 					m_debugVisualizeShader->setModelMatrix(model);
@@ -1098,9 +1098,9 @@ void Scene::draw(float deltaTime)
 					RenderCommand::draw(vao);
 				}
 
-				if (physics.shapeType == CollisionShape::CAPSULE)
+				if (physics.getShapeType() == CollisionShape::CAPSULE)
 				{
-					auto collisionCapsule = std::dynamic_pointer_cast<CollisionCapsule>(physics.collider);
+					auto* collisionCapsule = physics.getShape<CollisionCapsule>();
 					float radius = collisionCapsule->radius;
 					float halfHeight = collisionCapsule->halfHeight;
 					glm::mat4 topSphereModel = model;
