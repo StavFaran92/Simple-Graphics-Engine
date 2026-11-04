@@ -131,7 +131,12 @@ void AgentWindow::display()
 	}
 	const bool connecting = pending.valid();
 
-	ImGui::Begin("Agent", nullptr, windowFlags);
+	// Skip when hidden: SetNextItemWidth below would otherwise leak into the next window's first item
+	if (!ImGui::Begin("Agent", nullptr, windowFlags))
+	{
+		ImGui::End();
+		return;
+	}
 
 	ImGui::TextWrapped("Connect Claude Code to this editor so an agent can inspect the open scene. "
 		"This registers the editor's tool server once for this project.");
