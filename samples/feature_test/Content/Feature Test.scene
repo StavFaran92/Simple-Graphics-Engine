@@ -3286,87 +3286,6 @@
                     ]
                 },
                 {
-                    "entity": 14,
-                    "components": [
-                        {
-                            "polymorphic_id": 1,
-                            "ptr_wrapper": {
-                                "id": 2147483773,
-                                "data": {
-                                    "isActive": true,
-                                    "localTranslation": {
-                                        "v.x": -16.0,
-                                        "v.y": 0.0,
-                                        "v.z": -18.0
-                                    },
-                                    "localRotation": {
-                                        "q.x": 0.0,
-                                        "q.y": 0.0,
-                                        "q.z": 0.0,
-                                        "q.w": 1.0
-                                    },
-                                    "localScale": {
-                                        "v.x": 1.0,
-                                        "v.y": 1.0,
-                                        "v.z": 1.0
-                                    },
-                                    "m_parent": {
-                                        "m_entity": 13
-                                    },
-                                    "entity": {
-                                        "m_entity": 14
-                                    },
-                                    "root": {
-                                        "m_entity": 14
-                                    },
-                                    "m_children": []
-                                }
-                            }
-                        },
-                        {
-                            "polymorphic_id": 2147483661,
-                            "polymorphic_name": "SkyboxComponent",
-                            "ptr_wrapper": {
-                                "id": 2147483774,
-                                "data": {
-                                    "isActive": true,
-                                    "originalImage": {
-                                        "uuid": {
-                                            "m_value": 18
-                                        }
-                                    },
-                                    "m_irradianceMap": {
-                                        "uuid": {
-                                            "m_value": 20
-                                        }
-                                    },
-                                    "m_prefilterEnvMap": {
-                                        "uuid": {
-                                            "m_value": 21
-                                        }
-                                    },
-                                    "m_cubemap": {
-                                        "uuid": {
-                                            "m_value": 19
-                                        }
-                                    },
-                                    "m_isBuilt": true
-                                }
-                            }
-                        },
-                        {
-                            "polymorphic_id": 2,
-                            "ptr_wrapper": {
-                                "id": 2147483775,
-                                "data": {
-                                    "isActive": true,
-                                    "name": "Skybox"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
                     "entity": 13,
                     "components": [
                         {
@@ -3401,12 +3320,6 @@
                                         "m_entity": 13
                                     },
                                     "m_children": [
-                                        {
-                                            "key": 14,
-                                            "value": {
-                                                "m_entity": 14
-                                            }
-                                        },
                                         {
                                             "key": 15,
                                             "value": {

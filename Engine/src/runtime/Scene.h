@@ -19,10 +19,10 @@
 #include "memory/AssetAliases.h"
 #include "memory/ResourceRef.h"
 #include "render/DrawItem.h"
+#include "runtime/SceneEnvironment.h"
 
 
 class Model;
-class Skybox;
 class Context;
 class Object3D;
 class PointLight;
@@ -120,7 +120,9 @@ public:
 	Entity createEntity(const std::string& name);
 	void removeEntity(const Entity& e);
 
-	void setIBLData(TextureResourceRef irradianceMap, TextureResourceRef prefilterEnvMap);
+	// Takes the saved fields and rebuilds the sky and its lighting maps
+	void setEnvironment(const SceneEnvironment& environment);
+	const SceneEnvironment& getEnvironment() const { return m_environment; }
 
 	//int getRenderTarget() const;
 
@@ -184,6 +186,8 @@ private:
 
 	void preloadSceneResources();
 
+	void rebuildEnvironment();
+
 	ResourceID m_rid = 0;
 
 private:
@@ -226,8 +230,7 @@ private:
 	//std::shared_ptr<RenderBufferObject> m_renderTargetRBO;
 	//Resource<Texture> m_renderTargetTexture;
 
-	TextureResourceRef m_irradianceMap;
-	TextureResourceRef m_prefilterEnvMap;
+	SceneEnvironment m_environment;
 	TextureResourceRef m_BRDFIntegrationLUT;
 	ShaderResourceRef m_skyboxShader;
 	ShaderResourceRef m_UIShader;
@@ -281,4 +284,12 @@ public:
 
 	void serialize(nlohmann::json& j) const override;
 	void deserialize(const nlohmann::json& j) override;
+
+	// Applies the environment to the live scene, on load and after each change
+	void fillData(ResourceRef<Resource> resource) const override;
+
+	// The scene file as it is on disk, so saving a changed environment leaves the entities alone
+	void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) override;
+
+	SceneEnvironment environment;
 };

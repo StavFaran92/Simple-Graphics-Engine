@@ -50,7 +50,7 @@
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/ObjectComponent.h"
-#include "component/SkyboxComponent.h"
+#include "render/ProceduralSky.h"
 #include "component/NativeScriptComponent.h"
 #include "component/ImageComponent.h"
 #include "component/TextComponent.h"
@@ -141,10 +141,42 @@ void cameraCalculateOrientation(Transformation& transform, CameraComponent& came
 	up = glm::normalize(glm::cross(right, front));
 }
 
-void Scene::setIBLData(TextureResourceRef irradianceMap, TextureResourceRef prefilterEnvMap)
+void Scene::setEnvironment(const SceneEnvironment& environment)
 {
-	m_irradianceMap = irradianceMap;
-	m_prefilterEnvMap = prefilterEnvMap;
+	// The scene asset reapplies it on every sync, not only when it changed
+	if (environment.skyCubemap == m_environment.skyCubemap && !m_environment.sky.isEmpty())
+		return;
+
+	m_environment.skyCubemap = environment.skyCubemap;
+	rebuildEnvironment();
+}
+
+void Scene::rebuildEnvironment()
+{
+	TextureResourceRef cubemap = TextureAssetRef(m_environment.skyCubemap).resource();
+
+	if (!m_environment.skyCubemap.empty() && cubemap.isEmpty())
+	{
+		logWarning("Sky cubemap {} not found; using the procedural sky", m_environment.skyCubemap.str());
+	}
+	else if (!cubemap.isEmpty() && cubemap->getData().target != TextureTarget::TEXTURE_CUBE_MAP)
+	{
+		logWarning("Sky texture {} isn't a cubemap; using the procedural sky", m_environment.skyCubemap.str());
+		cubemap = TextureResourceRef::empty;
+	}
+
+	if (cubemap.isEmpty())
+	{
+		Engine::get()->getSubSystem<ProceduralSky>()->fill(m_environment);
+		return;
+	}
+
+	// The prefilter pass samples the mips
+	cubemap->generateMipMaps();
+
+	m_environment.sky = cubemap;
+	m_environment.irradianceMap = IBL::generateIrradianceMap(cubemap);
+	m_environment.prefilterEnvMap = IBL::generatePrefilterEnvMap(cubemap);
 }
 
 Entity Scene::getGameCamera() const
@@ -231,42 +263,8 @@ void Scene::init(Context* context, ResourceID rid)
 	m_uboTime = std::make_shared<UniformBufferObject>(sizeof(float));
 	m_uboTime->attachToBindPoint(0);
 
-	// Create irradiance map using created cubemap
-	TextureData defaultCubemapData;
-	defaultCubemapData.target = TextureTarget::TEXTURE_CUBE_MAP;
-	defaultCubemapData.width = 1;
-	defaultCubemapData.height = 1;
-	defaultCubemapData.channels = 3;
-	defaultCubemapData.internalFormat = TextureInternalFormat::RGB;
-	defaultCubemapData.format = TextureFormat::RGB;
-	defaultCubemapData.type = TextureType::UNSIGNED_BYTE;
-	defaultCubemapData.filter = TextureFilter::Linear;
-	defaultCubemapData.wrap = TextureWrap::Clamp;
-	defaultCubemapData.genMipMap = false;
-	static unsigned char FULL_BLACK[3] = { 0, 0, 0 };
-	for (int i = 0; i < 6; i++)
-	{
-		defaultCubemapData.facesData[i] = ImageBuffer(FULL_BLACK, 3);
-	}
-	m_irradianceMap = Texture::createTexture(defaultCubemapData);
-
-	// Create prefilter env map using created cubemap
-	TextureData defaultCubemapData2;
-	defaultCubemapData2.target = TextureTarget::TEXTURE_CUBE_MAP;
-	defaultCubemapData2.width = 1;
-	defaultCubemapData2.height = 1;
-	defaultCubemapData2.channels = 3;
-	defaultCubemapData2.internalFormat = TextureInternalFormat::RGB;
-	defaultCubemapData2.format = TextureFormat::RGB;
-	defaultCubemapData2.type = TextureType::UNSIGNED_BYTE;
-	defaultCubemapData2.filter = TextureFilter::Linear;
-	defaultCubemapData2.wrap = TextureWrap::Clamp;
-	defaultCubemapData2.genMipMap = false;
-	for (int i = 0; i < 6; i++)
-	{
-		defaultCubemapData2.facesData[i] = ImageBuffer(FULL_BLACK, 3);
-	}
-	m_prefilterEnvMap = Texture::createTexture(defaultCubemapData2);
+	// Until the scene asset applies its environment
+	rebuildEnvironment();
 
 	// Create BRDF look up texture
 	m_BRDFIntegrationLUT = IBL::generateBRDFIntegrationLUT();
@@ -659,8 +657,8 @@ void Scene::draw(float deltaTime)
 		graphics->view = glm::lookAt(primaryCameraTransform.getWorldPosition(), primaryCameraTransform.getWorldPosition() + primaryCamera.front, primaryCamera.up);
 		graphics->projection = primaryCamera.getProjection();
 		graphics->cameraPos = primaryCameraTransform.getWorldPosition();
-		graphics->irradianceMap = m_irradianceMap;
-		graphics->prefilterEnvMap = m_prefilterEnvMap;
+		graphics->irradianceMap = m_environment.irradianceMap;
+		graphics->prefilterEnvMap = m_environment.prefilterEnvMap;
 		graphics->brdfLUT = m_BRDFIntegrationLUT;
 		graphics->renderView = renderView;
 
@@ -864,21 +862,15 @@ void Scene::draw(float deltaTime)
 			m_skyboxShader->setViewMatrix(graphics->view);
 			m_skyboxShader->setProjectionMatrix(graphics->projection);
 
-			for (auto&& [entity, skybox, transform] :
-				m_registry->get().view<SkyboxComponent, Transformation>().each())
+			if (!m_environment.sky.isEmpty())
 			{
-				Entity entityhandler{ entity, m_registry.get() };
-				graphics->entity = entityhandler;
-				graphics->mesh = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh().get();
-				graphics->model = transform.getWorldTransformation();
+				m_environment.sky->setSlot(0);
+				m_environment.sky->bind();
 
-				if (skybox.m_cubemap.resource().isEmpty()) continue;
-
-				skybox.m_cubemap.resource().get()->bind();
-				skybox.m_cubemap.resource().get()->setSlot(0);
-
-				auto vao = graphics->mesh->getVAO();
+				auto vao = BuiltInAssets::getByName<ModelAsset>(SGE_MESH_BOX).resource()->getPrimaryMesh()->getVAO();
 				RenderCommand::draw(vao);
+
+				m_environment.sky->unbind();
 			}
 			glDepthMask(GL_TRUE);
 			glDepthFunc(GL_LESS);
@@ -1606,16 +1598,71 @@ Entity Scene::getEntityByName(const std::string& name) const
 
 void SceneAsset::serialize(nlohmann::json& j) const
 {
-	// SceneAsset itself does not currently track extra metadata
-	// beyond what is stored in the Scene resource and registry.
-	// Keep this as an explicit empty object for future extension.
 	j = nlohmann::json::object();
+
+	std::stringstream ss;
+	{
+		cereal::JSONOutputArchive archive(ss);
+		archive(cereal::make_nvp("environment", environment));
+	}
+
+	auto parsed = nlohmann::json::parse(ss.str(), nullptr, false);
+
+	if (!parsed.is_discarded() && parsed.contains("environment"))
+		j["environment"] = parsed["environment"];
+	else
+		j["environment"] = nlohmann::json::object();
 }
 
 void SceneAsset::deserialize(const nlohmann::json& j)
 {
-	// No scene-asset specific fields to restore yet.
-	(void)j;
+	// Older records are {} and keep the procedural sky
+	environment = {};
+	if (!j.contains("environment"))
+		return;
+
+	nlohmann::json wrapper;
+	wrapper["environment"] = j["environment"];
+
+	std::stringstream ss(wrapper.dump());
+
+	try
+	{
+		cereal::JSONInputArchive archive(ss);
+		archive(cereal::make_nvp("environment", environment));
+	}
+	catch (const std::exception& e)
+	{
+		logError("Failed to deserialize scene environment: {}", e.what());
+	}
+}
+
+void SceneAsset::fillData(ResourceRef<Resource> resource) const
+{
+	SceneResourceRef scene = resource.as<Scene>();
+	if (!scene.isEmpty())
+		scene->setEnvironment(environment);
+}
+
+void SceneAsset::fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc)
+{
+	auto sceneDesc = dynamic_cast<SceneCreateDescriptor*>(&resourceBuildDesc);
+	if (!sceneDesc)
+	{
+		logError("Invalid Descriptor specified.");
+		return;
+	}
+
+	std::ifstream is(info().getAbsolutePath());
+	try
+	{
+		cereal::JSONInputArchive iarchive(is);
+		iarchive(sceneDesc->data);
+	}
+	catch (const cereal::Exception& e)
+	{
+		logError("Failed to read scene file {}: {}", info().getAbsolutePath(), e.what());
+	}
 }
 
 void Scene::startSimulation()

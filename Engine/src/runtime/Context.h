@@ -11,7 +11,6 @@ class Shader;
 class IRenderer;
 class PointLight;
 class DirectionalLight;
-class Skybox;
 class Object3D;
 class SceneAsset;
 class Scene;

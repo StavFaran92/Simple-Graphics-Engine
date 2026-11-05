@@ -43,6 +43,7 @@
 #include "systems/VolumetricSystem.h"
 #include "systems/SSAOSystem.h"
 #include "text/TextSystem.h"
+#include "render/ProceduralSky.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
 #include "component/PostProcessComponent.h"
@@ -249,6 +250,7 @@ void Engine::createSystems()
     registerSubSystem<VolumetricSystem>(new VolumetricSystem());
     registerSubSystem<VolumetricCloudsSystem>(new VolumetricCloudsSystem());
     registerSubSystem<TextSystem>(new TextSystem());
+    registerSubSystem<ProceduralSky>(new ProceduralSky());
 
     registerSubSystem<ScriptSystem>(new ScriptSystem());
 
@@ -298,6 +300,13 @@ bool Engine::initSystems()
     if (!getSubSystem<TextSystem>()->init())
     {
         logError("Text System init failed!");
+        return false;
+    }
+
+    // Before the project loads: every scene without a sky cubemap uses it
+    if (!getSubSystem<ProceduralSky>()->init())
+    {
+        logError("Procedural Sky init failed!");
         return false;
     }
 

@@ -2947,6 +2947,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2972,17 +2983,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -3269,6 +3269,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3294,17 +3305,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -5415,8 +5415,6 @@
         "Mutant_normal": 59,
         "New Material": 124,
         "New Scene": 134,
-        "OSkZx0MF": 137,
-        "RErGWoqe": 138,
         "SGE_MATERIAL_DEFAULT": 7,
         "SGE_MATERIAL_TERRAIN_DEFAULT": 8,
         "SGE_MESH_BOX": 9,
@@ -5439,13 +5437,11 @@
         "Standing Death Left 01": 130,
         "Sword And Shield Slash": 89,
         "Thriller Idle": 78,
-        "V941sW7o": 28,
         "VDghiQSB": 125,
         "Warrior": 82,
         "Warrior_PREFAB": 88,
         "WaterMaterial": 128,
         "WaterShader": 127,
-        "YKurDFRW": 136,
         "Zombie Attack": 81,
         "Zombie Dying": 80,
         "Zombie Reaction Hit": 79,
@@ -5467,14 +5463,11 @@
         "crosshair_script": 119,
         "enemyController": 61,
         "eyelash_MAT": 43,
-        "fISsTyQE": 27,
         "gen_enemies": 93,
-        "iHy45YLv": 29,
         "maria_diffuse": 86,
         "maria_normal": 87,
         "mutant_M": 55,
         "player_controller": 32,
-        "sunflowers_puresky_4k": 135,
         "water_new_height": 129,
         "zombie": 133,
         "zombie_body_diffuse": 71,
@@ -5529,7 +5522,6 @@
         "content/new scene.scene": 134,
         "content/scene_0.scene": 15,
         "content/standing death backward 01.anim": 132,
-        "content/sunflowers_puresky_4k.texture": 135,
         "content/warrior/animationrelay.lua": 90,
         "content/warrior/warrior/gethurt.anim": 91,
         "content/warrior/warrior/maria_diffuse.texture": 86,
@@ -5555,10 +5547,6 @@
         "content/zombie/zombiegirl w kurniawan/zombiegirl_material.mat": 67,
         "content/zombie/zombiegirl w kurniawan_prefab.prefab": 76,
         "engine/defaultmaterial.mat": 126,
-        "engine/fisstyqe.texture": 27,
-        "engine/ihy45ylv.texture": 29,
-        "engine/oskzx0mf.texture": 137,
-        "engine/rergwoqe.texture": 138,
         "engine/sge_material_default.mat": 7,
         "engine/sge_material_terrain_default.mat": 8,
         "engine/sge_mesh_box.model": 9,
@@ -5577,11 +5565,9 @@
         "engine/sge_texture_terrain_checkerboard.texture": 5,
         "engine/sge_texture_tile_noise.texture": 6,
         "engine/sge_texture_white.texture": 1,
-        "engine/v941sw7o.texture": 28,
         "engine/vdghiqsb.model": 125,
         "engine/watermaterial.mat": 128,
-        "engine/watershader.glsl": 127,
-        "engine/ykurdfrw.texture": 136
+        "engine/watershader.glsl": 127
     },
     "prefabs": [
         {
@@ -5665,7 +5651,13 @@
     "scene": [
         {
             "aType": 8,
-            "asset": {},
+            "asset": {
+                "environment": {
+                    "skyCubemap": {
+                        "m_value": 0
+                    }
+                }
+            },
             "assetDirectory": "",
             "ext": ".scene",
             "isEngineOwned": false,
@@ -5676,7 +5668,13 @@
         },
         {
             "aType": 8,
-            "asset": {},
+            "asset": {
+                "environment": {
+                    "skyCubemap": {
+                        "m_value": 0
+                    }
+                }
+            },
             "assetDirectory": "",
             "ext": ".scene",
             "isEngineOwned": false,
@@ -5866,50 +5864,6 @@
             "name": "SGE_TERRAIN_HEIGHTMAP",
             "sourcePath": "",
             "uuid": 25,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": "",
-            "ext": ".texture",
-            "isEngineOwned": false,
-            "name": "sunflowers_puresky_4k",
-            "sourcePath": "",
-            "uuid": 26,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "fISsTyQE",
-            "sourcePath": "",
-            "uuid": 27,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "V941sW7o",
-            "sourcePath": "",
-            "uuid": 28,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "iHy45YLv",
-            "sourcePath": "",
-            "uuid": 29,
             "visibility": 1
         },
         {
@@ -6141,50 +6095,6 @@
             "name": "water_new_height",
             "sourcePath": "",
             "uuid": 129,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": "",
-            "ext": ".texture",
-            "isEngineOwned": false,
-            "name": "sunflowers_puresky_4k",
-            "sourcePath": "",
-            "uuid": 135,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "YKurDFRW",
-            "sourcePath": "",
-            "uuid": 136,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "OSkZx0MF",
-            "sourcePath": "",
-            "uuid": 137,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "RErGWoqe",
-            "sourcePath": "",
-            "uuid": 138,
             "visibility": 1
         }
     ]

@@ -35,7 +35,7 @@
             "visibility": 1
         }
     ],
-    "counter": 66,
+    "counter": 67,
     "lua script": [
         {
             "aType": 7,
@@ -5820,12 +5820,7 @@
         "SGE_TEXTURE_TILE_NOISE": 6,
         "SGE_TEXTURE_WHITE": 1,
         "Scene_0": 16,
-        "WNPKtUIc": 57,
-        "Wy0UrVCd": 62,
-        "ahnRUJxQ": 58,
-        "bpD6Cihu": 56,
         "eyelash_MAT": 25,
-        "jvXzrnu1": 63,
         "pf_camera": 60,
         "pf_checkpoint": 53,
         "pf_coin": 51,
@@ -5834,8 +5829,7 @@
         "pf_mover": 65,
         "pf_player": 59,
         "pf_spike": 50,
-        "sunflowers_puresky_4k": 61,
-        "wh3dAsuh": 64
+        "sunflowers_puresky_4k": 66
     },
     "pathsToUUIDRefs": {
         "content/erika archer (2)/akai_mat.mat": 18,
@@ -5874,10 +5868,7 @@
         "content/pf_spike.mat": 40,
         "content/pf_stone.mat": 37,
         "content/scene_0.scene": 16,
-        "content/sunflowers_puresky_4k.texture": 61,
-        "engine/ahnrujxq.texture": 58,
-        "engine/bpd6cihu.texture": 56,
-        "engine/jvxzrnu1.texture": 63,
+        "content/sunflowers_puresky_4k.texture": 66,
         "engine/sge_material_default.mat": 7,
         "engine/sge_material_terrain_default.mat": 8,
         "engine/sge_mesh_box.model": 9,
@@ -5892,10 +5883,7 @@
         "engine/sge_texture_grass.texture": 3,
         "engine/sge_texture_terrain_checkerboard.texture": 5,
         "engine/sge_texture_tile_noise.texture": 6,
-        "engine/sge_texture_white.texture": 1,
-        "engine/wh3dasuh.texture": 64,
-        "engine/wnpktuic.texture": 57,
-        "engine/wy0urvcd.texture": 62
+        "engine/sge_texture_white.texture": 1
     },
     "prefabs": [
         {
@@ -5913,7 +5901,13 @@
     "scene": [
         {
             "aType": 8,
-            "asset": {},
+            "asset": {
+                "environment": {
+                    "skyCubemap": {
+                        "m_value": 0
+                    }
+                }
+            },
             "assetDirectory": "",
             "ext": ".scene",
             "isEngineOwned": false,
@@ -6049,89 +6043,12 @@
         {
             "aType": 1,
             "asset": {},
-            "assetDirectory": "",
+            "assetDirectory": ".\\",
             "ext": ".texture",
             "isEngineOwned": false,
             "name": "sunflowers_puresky_4k",
             "sourcePath": "",
-            "uuid": 55,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "bpD6Cihu",
-            "sourcePath": "",
-            "uuid": 56,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "WNPKtUIc",
-            "sourcePath": "",
-            "uuid": 57,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "ahnRUJxQ",
-            "sourcePath": "",
-            "uuid": 58,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": "",
-            "ext": ".texture",
-            "isEngineOwned": false,
-            "name": "sunflowers_puresky_4k",
-            "sourcePath": "",
-            "uuid": 61,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "Wy0UrVCd",
-            "sourcePath": "",
-            "uuid": 62,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "jvXzrnu1",
-            "sourcePath": "",
-            "uuid": 63,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "wh3dAsuh",
-            "sourcePath": "",
-            "uuid": 64,
+            "uuid": 66,
             "visibility": 1
         }
     ]

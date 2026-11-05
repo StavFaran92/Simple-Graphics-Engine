@@ -6521,17 +6521,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 0.25,
-                                    "v.z": 0.25
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -6557,6 +6546,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 0.25,
+                                    "v.z": 0.25
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -7644,16 +7644,12 @@
         "WaterMaterial": 25,
         "WaterShader": 24,
         "cCugIXux": 22,
-        "cGaJlId1": 19,
         "erika_circle": 58,
         "erika_ghost": 61,
         "erika_idle": 60,
         "erika_probe": 62,
         "erika_sprint": 59,
         "eyelash_MAT": 49,
-        "gy3IXRk4": 20,
-        "lWLylTPb": 21,
-        "sunflowers_puresky_4k": 18,
         "water_new_height": 26
     },
     "pathsToUUIDRefs": {
@@ -7694,13 +7690,9 @@
         "content/ft_rough_1.00.mat": 32,
         "content/idle (1).anim": 53,
         "content/scene_0.scene": 16,
-        "content/sunflowers_puresky_4k.texture": 18,
         "content/water_new_height.texture": 26,
         "engine/ccugixux.model": 22,
-        "engine/cgajlid1.texture": 19,
         "engine/defaultmaterial.mat": 23,
-        "engine/gy3ixrk4.texture": 20,
-        "engine/lwlyltpb.texture": 21,
         "engine/sge_material_default.mat": 7,
         "engine/sge_material_terrain_default.mat": 8,
         "engine/sge_mesh_box.model": 9,
@@ -7736,7 +7728,13 @@
     "scene": [
         {
             "aType": 8,
-            "asset": {},
+            "asset": {
+                "environment": {
+                    "skyCubemap": {
+                        "m_value": 0
+                    }
+                }
+            },
             "assetDirectory": "",
             "ext": ".scene",
             "isEngineOwned": false,
@@ -7747,7 +7745,13 @@
         },
         {
             "aType": 8,
-            "asset": {},
+            "asset": {
+                "environment": {
+                    "skyCubemap": {
+                        "m_value": 0
+                    }
+                }
+            },
             "assetDirectory": "",
             "ext": ".scene",
             "isEngineOwned": false,
@@ -7838,50 +7842,6 @@
             "name": "SGE_TEXTURE_TILE_NOISE",
             "sourcePath": "",
             "uuid": 6,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": "",
-            "ext": ".texture",
-            "isEngineOwned": false,
-            "name": "sunflowers_puresky_4k",
-            "sourcePath": "",
-            "uuid": 18,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "cGaJlId1",
-            "sourcePath": "",
-            "uuid": 19,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "gy3IXRk4",
-            "sourcePath": "",
-            "uuid": 20,
-            "visibility": 1
-        },
-        {
-            "aType": 1,
-            "asset": {},
-            "assetDirectory": ".\\",
-            "ext": ".texture",
-            "isEngineOwned": true,
-            "name": "lWLylTPb",
-            "sourcePath": "",
-            "uuid": 21,
             "visibility": 1
         },
         {

@@ -4,6 +4,10 @@
 #include "Widgets.h"
 #include "Thumbnails/ThumbnailCache.h"
 #include "Widgets/AssetCard.h"
+#include "DialogManager.h"
+#include "dialogs/AssetSelectDialog.h"
+#include "commands/CommandStack.h"
+#include "commands/AssetCommands.h"
 
 #include <fstream>
 #include <sstream>
@@ -134,6 +138,14 @@ void displayAnimationNodeTree(const AnimationData& animData, int nodeIndex)
 		}
 		ImGui::TreePop();
 	}
+}
+
+void setSceneSky(UUID scene, UUID sky)
+{
+	std::string error;
+	const std::string label = "Set sky of " + SceneAssetRef(scene).info().name;
+	if (!CommandStack::Instance().run(std::make_unique<SetSceneSkyCmd>(scene, sky, label), error))
+		logWarning("Sky not set: {}", error);
 }
 }
 
@@ -346,6 +358,43 @@ void AssetInspectorWindow::display()
 			}
 		}
 
+		break;
+	}
+	case AssetType::SCENE:
+	{
+		SceneAssetRef scene = currentAssetEdit.as<SceneAsset>();
+		if (scene.isEmpty())
+		{
+			ImGui::TextColored(ImVec4(1.f, 0.3f, 0.3f, 1.f), "Failed to load scene.");
+			break;
+		}
+
+		ImGui::TextUnformatted("Environment");
+		ImGui::Separator();
+
+		const UUID skyUUID = scene->environment.skyCubemap;
+		TextureAssetRef sky(skyUUID);
+		if (skyUUID.empty())
+			ImGui::Text("Sky: Procedural");
+		else if (sky.isEmpty())
+			ImGui::TextColored(ImVec4(1.f, 0.6f, 0.2f, 1.f), "Sky: missing texture, using the procedural sky");
+		else
+			ImGui::Text("Sky: %s", sky.info().name.c_str());
+
+		if (ImGui::Button("Select Cubemap"))
+		{
+			const UUID sceneUUID = scene.getUID();
+			auto& dialog = DialogManager::Instance().assetSelectDialog;
+			dialog.assetType = AssetType::TEXTURE;
+			dialog.onAccpetCB = [sceneUUID](UUID picked) { setSceneSky(sceneUUID, picked); };
+			dialog.activate();
+		}
+
+		ImGui::SameLine();
+		ImGui::BeginDisabled(skyUUID.empty());
+		if (ImGui::Button("Use Procedural Sky"))
+			setSceneSky(scene.getUID(), EMPTY_UUID);
+		ImGui::EndDisabled();
 		break;
 	}
 	default:

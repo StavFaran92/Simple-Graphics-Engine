@@ -6,7 +6,6 @@
 
 class Model;
 class Shader;
-class Skybox;
 class Box;
 class Quad;
 class Sphere;
@@ -26,7 +25,6 @@ protected:
 	/** API */
 	Box* createBoxEntity();
 	Quad* createQuad();
-	void skybox(std::shared_ptr<Skybox> skybox);
 
 	Context* getContext() const;
 

@@ -52,8 +52,6 @@ const std::vector<EntityPreset>& entityPresets()
 				return e;
 			} },
 
-		{ "Environment/Skybox", "Skybox and image-based lighting from the built-in sunflowers HDR; takes a few seconds",
-			[] { return Skybox::createSkybox(SGE_ROOT_DIR "Resources/Engine/Textures/sunflowers_puresky_4k.hdr", Skybox::TexType::EQUIRECTANGULAR); } },
 		{ "Environment/Terrain", "1000x1000 flat terrain with the default checkerboard terrain material",
 			[] { return Terrain::createTerrain(1000, 1000); } },
 		{ "Environment/Pool", "Water body: a 'Pool' entity with a WaterBodyComponent and a 10x10 water plane child",

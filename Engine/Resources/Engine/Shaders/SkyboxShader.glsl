@@ -35,5 +35,6 @@ vec2 SampleSphericalMap(vec3 v)
 
 void main()
 {    
-    color = vec4(texture(skybox, TexCoords3D).rgb, 1.0);
+    // The cubemap is linear, the same one the lighting uses
+    color = vec4(pow(texture(skybox, TexCoords3D).rgb, vec3(1.0 / 2.2)), 1.0);
 }

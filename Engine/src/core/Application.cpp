@@ -4,7 +4,6 @@
 #include "core/Engine.h"
 #include "runtime/Context.h"
 #include "runtime/Scene.h"
-#include "systems/Skybox.h"
 #include "ui/Input.h"
 #include "ui/Mouse.h"
 #include "ui/Keyboard.h"
@@ -14,12 +13,6 @@
 Context* Application::getContext() const
 {
 	return Engine::get()->getContext();
-}
-
-void Application::skybox(std::shared_ptr<Skybox> skybox)
-{
-	//auto context = Engine::get()->getContext();
-	//context->getActiveScene()->setSkybox(skybox);
 }
 
 bool Application::mouse_leftButtonPressed()

@@ -43,3 +43,21 @@ private:
 	AssetSnapshot m_after;
 	std::string m_label;
 };
+
+// Sets a scene asset's sky cubemap (EMPTY_UUID for the procedural sky); works on any scene, open or not
+class SetSceneSkyCmd : public Command
+{
+public:
+	SetSceneSkyCmd(UUID scene, UUID skyCubemap, std::string label);
+
+	// Refuses a missing scene or a texture that isn't a cubemap
+	bool execute(std::string& error) override;
+	void undo() override;
+	std::string label() const override { return m_label; }
+
+private:
+	UUID m_scene;
+	UUID m_sky;
+	UUID m_previousSky;
+	std::string m_label;
+};

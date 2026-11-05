@@ -384,18 +384,6 @@ void InspectorWindow::display()
 			}
 			});
 
-		displayComponent<SkyboxComponent>("Skybox", [](SkyboxComponent& skybox) {
-			addTextureEditWidget("Skybox", skybox.originalImage, { 50, 50 }, [&](UUID uuid) {
-				skybox.setSkybox(TextureAssetRef(uuid));
-			});
-
-			// Compile Button
-			if (ImGui::Button("Build"))
-			{
-				skybox.build();
-			}
-		});
-
 		displayComponent<ImageComponent>("Image", [](ImageComponent& image) {
 			addTextureEditWidget("Image", image.image, { 50, 50 }, [&](UUID uuid) {
 				image.image = TextureAssetRef(uuid);
@@ -928,11 +916,6 @@ void InspectorWindow::display()
 			if (ImGui::MenuItem("Terrain"))
 			{
 				auto& terrain = state.getSelectedEntity().addComponent<Terrain>();
-			}
-
-			if (ImGui::MenuItem("Skybox"))
-			{
-				auto& skybox = state.getSelectedEntity().addComponent<SkyboxComponent>();
 			}
 
 			//if (ImGui::MenuItem("Foliage"))

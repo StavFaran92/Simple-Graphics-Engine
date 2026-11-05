@@ -831,7 +831,13 @@
     "scene": [
         {
             "aType": 8,
-            "asset": {},
+            "asset": {
+                "environment": {
+                    "skyCubemap": {
+                        "m_value": 0
+                    }
+                }
+            },
             "assetDirectory": "",
             "ext": ".scene",
             "isEngineOwned": false,

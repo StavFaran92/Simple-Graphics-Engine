@@ -21,7 +21,6 @@
 #include "geometry/Model.h"
 #include "component/CameraComponent.h"
 #include "component/MeshRendererComponent.h"
-#include "component/SkyboxComponent.h"
 
 #include "core/Logger.h"
 
@@ -105,8 +104,6 @@ int ObjectPicker::pickObject(int x, int y, Entity camera)
 	for (auto& [entity, meshComponent, transform] : activeScene->getRegistry().getRegistry().view<MeshRendererComponent, Transformation>().each())
 	{
 		Entity entityhandler{ entity, &activeScene->getRegistry() };
-		if (entityhandler.HasComponent<SkyboxComponent>())
-			continue;
 		m_pickingShader->setUniformValue("objectIndex", (unsigned int)entityhandler.handlerID());
 		
 

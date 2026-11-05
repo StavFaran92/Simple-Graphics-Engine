@@ -50,3 +50,52 @@ void EditAssetCmd::undo()
 {
 	applyAssetSnapshot(m_before);
 }
+
+SetSceneSkyCmd::SetSceneSkyCmd(UUID scene, UUID skyCubemap, std::string label)
+	: m_scene(scene), m_sky(skyCubemap), m_label(std::move(label))
+{
+}
+
+bool SetSceneSkyCmd::execute(std::string& error)
+{
+	SceneAssetRef scene(m_scene);
+	if (scene.isEmpty())
+	{
+		error = "Scene " + m_scene.str() + " no longer exists";
+		return false;
+	}
+
+	if (!m_sky.empty())
+	{
+		TextureAssetRef sky(m_sky);
+		if (sky.isEmpty())
+		{
+			error = "No texture asset with uuid " + m_sky.str();
+			return false;
+		}
+
+		TextureResourceRef texture = sky.resource();
+		if (texture.isEmpty() || texture->getData().target != TextureTarget::TEXTURE_CUBE_MAP)
+		{
+			error = "'" + sky.info().name + "' isn't a cubemap texture";
+			return false;
+		}
+	}
+
+	m_previousSky = scene->environment.skyCubemap;
+	scene->environment.skyCubemap = m_sky;
+
+	// The live scene picks it up through SceneAsset::fillData on the next sync
+	scene.makeDirty();
+	return true;
+}
+
+void SetSceneSkyCmd::undo()
+{
+	SceneAssetRef scene(m_scene);
+	if (scene.isEmpty())
+		return;
+
+	scene->environment.skyCubemap = m_previousSky;
+	scene.makeDirty();
+}
