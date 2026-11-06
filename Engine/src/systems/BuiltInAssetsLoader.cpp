@@ -142,10 +142,10 @@ void BuiltInAssetsLoader::loadMaterials()
 		createDesc.data.setMaterialRenderMode(MaterialRenderMode::Terrain);
 		auto materialAsset = assets()->createAsset(desc, createDesc).as<MaterialAsset>();
 
-		auto sampler = std::make_shared<TextureSamplerAsset>();
-		sampler->texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_TERRAIN_CHECKERBOARD);
-		sampler->state.isActive = true;
-		materialAsset->setProperty("samplerAlbedo", sampler);
+		PropertySchema terrainLayerProperty(MaterialPropertyType::TERRAIN_LAYER);
+		auto terrainLayerAsset = std::make_shared<TerrainLayerAsset>();
+		terrainLayerAsset->albedoTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_TERRAIN_CHECKERBOARD);
+		materialAsset->setProperty("terrainLayers[0]", terrainLayerAsset);
 	}
 }
 

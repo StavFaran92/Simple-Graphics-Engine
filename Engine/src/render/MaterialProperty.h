@@ -21,7 +21,8 @@ using Value = std::variant<
 	glm::mat3,
 	glm::mat4,
 	std::shared_ptr<TextureSamplerAsset>,
-	std::shared_ptr<TerrainLayerAsset>>;
+	std::shared_ptr<TerrainLayerAsset>,
+	bool>; // Appended last so saved variant indices stay valid
 
 enum class MaterialPropertyType
 {
@@ -36,6 +37,8 @@ enum class MaterialPropertyType
 	SAMPLER,
 
 	TERRAIN_LAYER,
+
+	BOOL,
 
 	// Must be last
 	TOTAL_SIZE

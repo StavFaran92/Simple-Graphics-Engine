@@ -1,7 +1,7 @@
 {
     "N/A": [],
     "animations": [],
-    "counter": 17,
+    "counter": 34,
     "lua script": [],
     "materials": [
         {
@@ -263,199 +263,6 @@
                     "m_layout": {
                         "m_propertySchemas": [
                             {
-                                "key": "globalUV",
-                                "value": {
-                                    "defaultValue": {
-                                        "data": {
-                                            "v.x": 100.0,
-                                            "v.y": 100.0
-                                        },
-                                        "index": 1
-                                    },
-                                    "defaultValueRaw": "100.0, 100.0",
-                                    "maxValue": 3.4028234663852886e+38,
-                                    "minValue": -3.4028234663852886e+38,
-                                    "name": "globalUV",
-                                    "type": 3
-                                }
-                            },
-                            {
-                                "key": "terrainLayers[0]",
-                                "value": {
-                                    "defaultValue": {
-                                        "data": {
-                                            "ptr_wrapper": {
-                                                "data": {
-                                                    "albedoTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "aoTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "metallicTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "name": "Layer",
-                                                    "normalTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "roughnessTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "uv": {
-                                                        "v.x": 0.0,
-                                                        "v.y": 0.0
-                                                    }
-                                                },
-                                                "id": 2147483649
-                                            }
-                                        },
-                                        "index": 9
-                                    },
-                                    "defaultValueRaw": "",
-                                    "maxValue": 3.4028234663852886e+38,
-                                    "minValue": -3.4028234663852886e+38,
-                                    "name": "",
-                                    "type": 9
-                                }
-                            },
-                            {
-                                "key": "terrainLayers[1]",
-                                "value": {
-                                    "defaultValue": {
-                                        "data": {
-                                            "ptr_wrapper": {
-                                                "data": {
-                                                    "albedoTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "aoTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "metallicTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "name": "Layer",
-                                                    "normalTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "roughnessTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "uv": {
-                                                        "v.x": 0.0,
-                                                        "v.y": 0.0
-                                                    }
-                                                },
-                                                "id": 2147483650
-                                            }
-                                        },
-                                        "index": 9
-                                    },
-                                    "defaultValueRaw": "",
-                                    "maxValue": 3.4028234663852886e+38,
-                                    "minValue": -3.4028234663852886e+38,
-                                    "name": "",
-                                    "type": 9
-                                }
-                            },
-                            {
-                                "key": "terrainLayers[2]",
-                                "value": {
-                                    "defaultValue": {
-                                        "data": {
-                                            "ptr_wrapper": {
-                                                "data": {
-                                                    "albedoTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "aoTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "metallicTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "name": "Layer",
-                                                    "normalTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "roughnessTexture": {
-                                                        "uuid": {
-                                                            "m_value": 0
-                                                        }
-                                                    },
-                                                    "uv": {
-                                                        "v.x": 0.0,
-                                                        "v.y": 0.0
-                                                    }
-                                                },
-                                                "id": 2147483651
-                                            }
-                                        },
-                                        "index": 9
-                                    },
-                                    "defaultValueRaw": "",
-                                    "maxValue": 3.4028234663852886e+38,
-                                    "minValue": -3.4028234663852886e+38,
-                                    "name": "",
-                                    "type": 9
-                                }
-                            }
-                        ]
-                    },
-                    "m_properties": [],
-                    "m_renderMode": 2,
-                    "name": ""
-                }
-            },
-            "assetDirectory": "",
-            "ext": ".mat",
-            "isEngineOwned": true,
-            "name": "SGE_MATERIAL_TERRAIN_DEFAULT",
-            "sourcePath": "",
-            "uuid": 8,
-            "visibility": 0
-        },
-        {
-            "aType": 6,
-            "asset": {
-                "data": {
-                    "m_customShader": {
-                        "uuid": {
-                            "m_value": 0
-                        }
-                    },
-                    "m_layout": {
-                        "m_propertySchemas": [
-                            {
                                 "key": "color",
                                 "value": {
                                     "defaultValue": {
@@ -702,6 +509,667 @@
             "sourcePath": "",
             "uuid": 15,
             "visibility": 1
+        },
+        {
+            "aType": 6,
+            "asset": {
+                "data": {
+                    "m_customShader": {
+                        "uuid": {
+                            "m_value": 0
+                        }
+                    },
+                    "m_layout": {
+                        "m_propertySchemas": [
+                            {
+                                "key": "globalUV",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "v.x": 100.0,
+                                            "v.y": 100.0
+                                        },
+                                        "index": 1
+                                    },
+                                    "defaultValueRaw": "100.0, 100.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "globalUV",
+                                    "type": 3
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[0]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 3
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 0.0,
+                                                        "v.y": 0.0
+                                                    }
+                                                },
+                                                "id": 2147483649
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[1]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 0.0,
+                                                        "v.y": 0.0
+                                                    }
+                                                },
+                                                "id": 2147483650
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[2]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 0.0,
+                                                        "v.y": 0.0
+                                                    }
+                                                },
+                                                "id": 2147483651
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            }
+                        ]
+                    },
+                    "m_properties": [
+                        {
+                            "key": "terrainLayers[0]",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "id": 1
+                                    }
+                                },
+                                "index": 9
+                            }
+                        }
+                    ],
+                    "m_renderMode": 2,
+                    "name": ""
+                }
+            },
+            "assetDirectory": ".\\",
+            "ext": ".mat",
+            "isEngineOwned": false,
+            "name": "New Material",
+            "sourcePath": "",
+            "uuid": 18,
+            "visibility": 1
+        },
+        {
+            "aType": 6,
+            "asset": {
+                "data": {
+                    "m_customShader": {
+                        "uuid": {
+                            "m_value": 0
+                        }
+                    },
+                    "m_layout": {
+                        "m_propertySchemas": [
+                            {
+                                "key": "globalUV",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "v.x": 100.0,
+                                            "v.y": 100.0
+                                        },
+                                        "index": 1
+                                    },
+                                    "defaultValueRaw": "100.0, 100.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "globalUV",
+                                    "type": 3
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[0]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 1.0,
+                                                        "v.y": 1.0
+                                                    }
+                                                },
+                                                "id": 2147483649
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[1]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 0.0,
+                                                        "v.y": 0.0
+                                                    }
+                                                },
+                                                "id": 2147483650
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[2]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 0.0,
+                                                        "v.y": 0.0
+                                                    }
+                                                },
+                                                "id": 2147483651
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            }
+                        ]
+                    },
+                    "m_properties": [
+                        {
+                            "key": "terrainLayers[0]",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "data": {
+                                            "albedoTexture": {
+                                                "uuid": {
+                                                    "m_value": 5
+                                                }
+                                            },
+                                            "aoTexture": {
+                                                "uuid": {
+                                                    "m_value": 0
+                                                }
+                                            },
+                                            "metallicTexture": {
+                                                "uuid": {
+                                                    "m_value": 0
+                                                }
+                                            },
+                                            "name": "Layer",
+                                            "normalTexture": {
+                                                "uuid": {
+                                                    "m_value": 0
+                                                }
+                                            },
+                                            "roughnessTexture": {
+                                                "uuid": {
+                                                    "m_value": 0
+                                                }
+                                            },
+                                            "uv": {
+                                                "v.x": 0.0,
+                                                "v.y": 0.0
+                                            }
+                                        },
+                                        "id": 2147483652
+                                    }
+                                },
+                                "index": 9
+                            }
+                        }
+                    ],
+                    "m_renderMode": 2,
+                    "name": ""
+                }
+            },
+            "assetDirectory": "",
+            "ext": ".mat",
+            "isEngineOwned": true,
+            "name": "SGE_MATERIAL_TERRAIN_DEFAULT",
+            "sourcePath": "",
+            "uuid": 25,
+            "visibility": 0
+        },
+        {
+            "aType": 6,
+            "asset": {
+                "data": {
+                    "m_customShader": {
+                        "uuid": {
+                            "m_value": 0
+                        }
+                    },
+                    "m_layout": {
+                        "m_propertySchemas": [
+                            {
+                                "key": "globalUV",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "v.x": 100.0,
+                                            "v.y": 100.0
+                                        },
+                                        "index": 1
+                                    },
+                                    "defaultValueRaw": "100.0, 100.0",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "globalUV",
+                                    "type": 3
+                                }
+                            },
+                            {
+                                "key": "noTile",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": false,
+                                        "index": 10
+                                    },
+                                    "defaultValueRaw": "false",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "noTile",
+                                    "type": 10
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[0]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 5
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 0.0,
+                                                        "v.y": 0.0
+                                                    }
+                                                },
+                                                "id": 2147483649
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[1]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 0.0,
+                                                        "v.y": 0.0
+                                                    }
+                                                },
+                                                "id": 2147483650
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            },
+                            {
+                                "key": "terrainLayers[2]",
+                                "value": {
+                                    "defaultValue": {
+                                        "data": {
+                                            "ptr_wrapper": {
+                                                "data": {
+                                                    "albedoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "aoTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "metallicTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "name": "Layer",
+                                                    "normalTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "roughnessTexture": {
+                                                        "uuid": {
+                                                            "m_value": 0
+                                                        }
+                                                    },
+                                                    "uv": {
+                                                        "v.x": 0.0,
+                                                        "v.y": 0.0
+                                                    }
+                                                },
+                                                "id": 2147483651
+                                            }
+                                        },
+                                        "index": 9
+                                    },
+                                    "defaultValueRaw": "",
+                                    "maxValue": 3.4028234663852886e+38,
+                                    "minValue": -3.4028234663852886e+38,
+                                    "name": "",
+                                    "type": 9
+                                }
+                            }
+                        ]
+                    },
+                    "m_properties": [
+                        {
+                            "key": "terrainLayers[0]",
+                            "value": {
+                                "data": {
+                                    "ptr_wrapper": {
+                                        "id": 1
+                                    }
+                                },
+                                "index": 9
+                            }
+                        }
+                    ],
+                    "m_renderMode": 2,
+                    "name": ""
+                }
+            },
+            "assetDirectory": ".\\",
+            "ext": ".mat",
+            "isEngineOwned": false,
+            "name": "New Material_0",
+            "sourcePath": "",
+            "uuid": 32,
+            "visibility": 1
         }
     ],
     "models": [
@@ -793,14 +1261,17 @@
     ],
     "namesToUUIDRefs": {
         "DefaultMaterial": 15,
+        "New Material": 18,
+        "New Material_0": 32,
         "SGE_MATERIAL_DEFAULT": 7,
-        "SGE_MATERIAL_TERRAIN_DEFAULT": 8,
+        "SGE_MATERIAL_TERRAIN_DEFAULT": 25,
         "SGE_MESH_BOX": 9,
         "SGE_MESH_CAMERA": 14,
         "SGE_MESH_CYLINDER": 12,
         "SGE_MESH_GRID": 13,
         "SGE_MESH_QUAD": 10,
         "SGE_MESH_SPHERE": 11,
+        "SGE_TERRAIN_HEIGHTMAP": 33,
         "SGE_TEXTURE_BLACK": 2,
         "SGE_TEXTURE_CHECKERBOARD": 4,
         "SGE_TEXTURE_GRASS": 3,
@@ -810,9 +1281,11 @@
         "Scene_0": 16
     },
     "pathsToUUIDRefs": {
+        "content/new material.mat": 18,
+        "content/new material_0.mat": 32,
         "content/scene_0.scene": 16,
         "engine/sge_material_default.mat": 7,
-        "engine/sge_material_terrain_default.mat": 8,
+        "engine/sge_material_terrain_default.mat": 25,
         "engine/sge_mesh_box.model": 9,
         "engine/sge_mesh_camera/defaultmaterial.mat": 15,
         "engine/sge_mesh_camera/sge_mesh_camera.model": 14,
@@ -820,6 +1293,7 @@
         "engine/sge_mesh_grid.model": 13,
         "engine/sge_mesh_quad.model": 10,
         "engine/sge_mesh_sphere.model": 11,
+        "engine/sge_terrain_heightmap.texture": 33,
         "engine/sge_texture_black.texture": 2,
         "engine/sge_texture_checkerboard.texture": 4,
         "engine/sge_texture_grass.texture": 3,
@@ -913,6 +1387,127 @@
             "name": "SGE_TEXTURE_TILE_NOISE",
             "sourcePath": "",
             "uuid": 6,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 17,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 19,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 20,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 22,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 24,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 26,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 27,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 29,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 30,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 31,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 33,
             "visibility": 1
         }
     ]

@@ -396,6 +396,8 @@ void Shader::setUniformValue(const std::string& name, const Value& v)
 			this->setInt(location, arg);
 		else if constexpr (std::is_same_v<T, unsigned int>)
 			this->setUInt(location, arg);
+		else if constexpr (std::is_same_v<T, bool>)
+			this->setInt(location, arg ? 1 : 0); // GLSL bool uniforms take glUniform1i
 		else if constexpr (std::is_same_v<T, glm::mat3>)
 			this->setMat3(location, arg);
 		else if constexpr (std::is_same_v<T, glm::mat4>)

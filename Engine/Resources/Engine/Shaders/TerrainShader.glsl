@@ -202,6 +202,9 @@ uniform TerrainLayer terrainLayers[3];
 #pragma editable (default=(100.0, 100.0))
 uniform vec2 globalUV;
 
+#pragma editable (default=(false))
+uniform bool noTile;
+
 in float height;
 in vec2 texCoord;
 in vec3 fragPos;
@@ -247,8 +250,8 @@ void sampleTerrainPBR(
     out vec3 outMRA
 )
 {
-    vec4 texPack0 = textureNoTile(terrainLayer.texturePack0.texture, uv);
-    vec4 texPack1 = textureNoTile(terrainLayer.texturePack1.texture, uv);
+    vec4 texPack0 = noTile ? textureNoTile(terrainLayer.texturePack0.texture, uv) : texture(terrainLayer.texturePack0.texture, uv);
+    vec4 texPack1 = noTile ? textureNoTile(terrainLayer.texturePack1.texture, uv) : texture(terrainLayer.texturePack1.texture, uv);
     vec3 albedo = texPack0.rgb;
     float nx = texPack0.a;
     float ny = texPack1.a;

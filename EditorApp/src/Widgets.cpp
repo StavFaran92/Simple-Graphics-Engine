@@ -473,6 +473,10 @@ void MaterialDataWidget::draw(MaterialData& data, const std::function<void(const
 					{
 						updated = ImGui::InputScalar(("##" + name).c_str(), ImGuiDataType_U32, &v);
 					}
+					else if constexpr (std::is_same_v<T, bool>)
+					{
+						updated = ImGui::Checkbox(("##" + name).c_str(), &v);
+					}
 					else if constexpr (std::is_same_v<T, glm::mat3>)
 					{
 						for (int i = 0; i < 3; ++i)

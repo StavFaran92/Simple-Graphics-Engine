@@ -147,6 +147,15 @@ void MaterialDataParser::parseUniforms(const std::string& sourceCode, MaterialDa
 				pendingMeta.defaultValue = std::make_shared<TextureSamplerAsset>();
 				layout.addProperty(name, pendingMeta);
 			}
+			else if (type == "bool")
+			{
+				// Default may be true/false or a number
+				pendingMeta.type = MaterialPropertyType::BOOL;
+				bool isOn = pendingMeta.defaultValueRaw.find("true") != std::string::npos
+					|| (defVals.size() > 0 && defVals[0] != 0.0f);
+				pendingMeta.defaultValue = isOn;
+				layout.addProperty(name, pendingMeta);
+			}
 
 
 			isNextLineEditableUniform = false;
