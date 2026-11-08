@@ -72,10 +72,8 @@ public:
     // Save resource data on disk
     virtual bool saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst) = 0;
 
-    // Load asset metadata (.asset / .meta)
-    virtual nlohmann::json serializeAsset(const Ref<Asset>& asset) { return {}; };
-
-    virtual Ref<Asset> deserializeAsset(const nlohmann::json& j) { return {}; };
+    // An empty asset of this type, for its record to load into
+    virtual Ref<Asset> makeAsset() = 0;
 
 
     // ============================================================

@@ -247,6 +247,6 @@ public:
 
 	void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) override;
 
-	void serialize(nlohmann::json& j) const override;
-	void deserialize(const nlohmann::json& j) override;
+	void save(cereal::JSONOutputArchive& archive) const override {}
+	void load(cereal::JSONInputArchive& archive) override {}
 };

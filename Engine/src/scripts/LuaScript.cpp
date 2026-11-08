@@ -1,6 +1,9 @@
 #include "scripts/LuaScript.h"
 
 #include "core/Factory.h"
+#include "serialize/CerealHelpers.h"
+
+#include <cereal/archives/json.hpp>
 
 
 LuaScriptResourceRef LuaScript::load(const std::string& fileLocation, LuaScriptLoadDescriptor desc)
@@ -30,18 +33,12 @@ LuaScriptResourceRef LuaScript::create()
 //  LuaScriptAsset (Asset wrapper)
 // ============================================================
 
-void LuaScriptAsset::serialize(nlohmann::json& j) const
+void LuaScriptAsset::save(cereal::JSONOutputArchive& archive) const
 {
-	// Persist the script filepath so the editor/runtime can restore
-	// which script file this asset points to.
-	j = nlohmann::json::object();
-	j["filepath"] = filepath;
+	SERIALIZED_MEMBER(filepath);
 }
 
-void LuaScriptAsset::deserialize(const nlohmann::json& j)
+void LuaScriptAsset::load(cereal::JSONInputArchive& archive)
 {
-	if (j.contains("filepath"))
-	{
-		filepath = j.at("filepath").get<std::string>();
-	}
+	SERIALIZED_MEMBER_OPTIONAL(filepath);
 }

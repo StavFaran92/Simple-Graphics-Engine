@@ -441,43 +441,14 @@ MaterialAssetRef MaterialAsset::clone(bool isEngineOwned) const
 	return cloned;
 }
 
-void MaterialAsset::serialize(nlohmann::json& j) const
+void MaterialAsset::save(cereal::JSONOutputArchive& archive) const
 {
-	j = nlohmann::json::object();
-
-	std::stringstream ss;
-	{
-		cereal::JSONOutputArchive archive(ss);
-		archive(cereal::make_nvp("data", data));
-	}
-
-	auto parsed = nlohmann::json::parse(ss.str(), nullptr, false);
-
-	if (!parsed.is_discarded() && parsed.contains("data"))
-		j["data"] = parsed["data"];
-	else
-		j["data"] = nlohmann::json::object();
+	SERIALIZED_MEMBER(data);
 }
 
-void MaterialAsset::deserialize(const nlohmann::json& j)
+void MaterialAsset::load(cereal::JSONInputArchive& archive)
 {
-	if (!j.contains("data"))
-		return;
-
-	nlohmann::json wrapper;
-	wrapper["data"] = j["data"];
-
-	std::stringstream ss(wrapper.dump());
-
-	try
-	{
-		cereal::JSONInputArchive archive(ss);
-		archive(cereal::make_nvp("data", data));
-	}
-	catch (const std::exception& e)
-	{
-		logError("Failed to deserialize material: {}", e.what());
-	}
+	SERIALIZED_MEMBER(data);
 }
 
 void MaterialAsset::fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc)

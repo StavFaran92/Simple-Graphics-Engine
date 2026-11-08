@@ -344,7 +344,7 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 		[](const json& args) {
 			MaterialAssetRef material = materialFromArgs(args);
 			const AssetSnapshot snapshot = takeAssetSnapshot(material.getUID());
-			return mcpText(json{ {"name", material.info().name}, {"uuid", material.getUID().str()}, {"data", snapshot.data["data"]} }.dump());
+			return mcpText(json{ {"name", material.info().name}, {"uuid", material.getUID().str()}, {"data", json::parse(snapshot.data)["data"]} }.dump());
 		}
 	});
 
@@ -367,9 +367,10 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 
 			const AssetSnapshot before = takeAssetSnapshot(material.getUID());
 			const MaterialRenderMode modeBefore = material->getMaterialRenderMode();
-			AssetSnapshot merged = before;
-			merged.data["data"].merge_patch(changes);
-			validateMaterialData(merged.data["data"]);
+			json mergedData = json::parse(before.data);
+			mergedData["data"].merge_patch(changes);
+			validateMaterialData(mergedData["data"]);
+			AssetSnapshot merged{ before.asset, mergedData.dump() };
 
 			applyAssetSnapshot(merged);
 			// A new render mode has other shader properties; rebuild the layout like the Inspector's Render Mode does
@@ -418,11 +419,11 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 
 			if (!changes.empty())
 			{
-				AssetSnapshot withChanges = takeAssetSnapshot(created.getUID());
-				withChanges.data["data"].merge_patch(changes);
+				json changedData = json::parse(takeAssetSnapshot(created.getUID()).data);
+				changedData["data"].merge_patch(changes);
 				try
 				{
-					validateMaterialData(withChanges.data["data"]);
+					validateMaterialData(changedData["data"]);
 				}
 				catch (...)
 				{
@@ -432,7 +433,7 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				}
 				MaterialAssetRef material(created.getUID());
 				const MaterialRenderMode modeBefore = material->getMaterialRenderMode();
-				applyAssetSnapshot(withChanges);
+				applyAssetSnapshot(AssetSnapshot{ created.getUID(), changedData.dump() });
 				// A new render mode has other shader properties; rebuild the layout like the Inspector's Render Mode does
 				if (material->getMaterialRenderMode() != modeBefore)
 					material->setMaterialRenderMode(material->getMaterialRenderMode());

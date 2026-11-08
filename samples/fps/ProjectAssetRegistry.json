@@ -2947,17 +2947,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -2983,6 +2972,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -3269,17 +3269,6 @@
                     },
                     "m_properties": [
                         {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
-                            }
-                        },
-                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -3305,6 +3294,17 @@
                                     }
                                 },
                                 "index": 8
+                            }
+                        },
+                        {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
                             }
                         },
                         {
@@ -5201,12 +5201,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 14
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 14
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "SGE_MESH_CAMERA",
@@ -5221,30 +5223,38 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 40
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 40
+                            }
                         }
-                    ],
-                    [
-                        1,
-                        {
-                            "uuid": 34
+                    },
+                    {
+                        "key": 1,
+                        "value": {
+                            "uuid": {
+                                "m_value": 34
+                            }
                         }
-                    ],
-                    [
-                        2,
-                        {
-                            "uuid": 43
+                    },
+                    {
+                        "key": 2,
+                        "value": {
+                            "uuid": {
+                                "m_value": 43
+                            }
                         }
-                    ],
-                    [
-                        3,
-                        {
-                            "uuid": 37
+                    },
+                    {
+                        "key": 3,
+                        "value": {
+                            "uuid": {
+                                "m_value": 37
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": ".\\Erika Archer (2)",
@@ -5259,12 +5269,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 55
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 55
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": ".\\Mutant",
@@ -5292,24 +5304,30 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 70
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 70
+                            }
                         }
-                    ],
-                    [
-                        1,
-                        {
-                            "uuid": 67
+                    },
+                    {
+                        "key": 1,
+                        "value": {
+                            "uuid": {
+                                "m_value": 67
+                            }
                         }
-                    ],
-                    [
-                        2,
-                        {
-                            "uuid": 67
+                    },
+                    {
+                        "key": 2,
+                        "value": {
+                            "uuid": {
+                                "m_value": 67
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "zombie\\Zombiegirl W Kurniawan",
@@ -5324,12 +5342,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 83
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 83
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "warrior\\Warrior",
@@ -5344,12 +5364,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 108
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 108
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "ak_latest\\ak_latest",
@@ -5364,12 +5386,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 126
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 126
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "",

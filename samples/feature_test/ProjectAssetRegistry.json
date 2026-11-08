@@ -6521,6 +6521,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 0.25,
+                                    "v.z": 0.25
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -6546,17 +6557,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 0.25,
-                                    "v.z": 0.25
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -7518,12 +7518,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 15
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 15
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "SGE_MESH_CAMERA",
@@ -7538,12 +7540,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 23
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 23
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "",
@@ -7558,30 +7562,38 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 48
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 48
+                            }
                         }
-                    ],
-                    [
-                        1,
-                        {
-                            "uuid": 42
+                    },
+                    {
+                        "key": 1,
+                        "value": {
+                            "uuid": {
+                                "m_value": 42
+                            }
                         }
-                    ],
-                    [
-                        2,
-                        {
-                            "uuid": 49
+                    },
+                    {
+                        "key": 2,
+                        "value": {
+                            "uuid": {
+                                "m_value": 49
+                            }
                         }
-                    ],
-                    [
-                        3,
-                        {
-                            "uuid": 45
+                    },
+                    {
+                        "key": 3,
+                        "value": {
+                            "uuid": {
+                                "m_value": 45
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": ".\\Erika Archer (2)",

@@ -14,11 +14,9 @@ Ref<Asset> PrefabTypeManager::createAsset(const AssetBuildDescriptor& assetDesc,
 	return createRef< PrefabAsset>();
 }
 
-Ref<Asset> PrefabTypeManager::deserializeAsset(const nlohmann::json& j)
+Ref<Asset> PrefabTypeManager::makeAsset()
 {
-	auto asset = createRef<PrefabAsset>();
-	asset->deserialize(j);
-	return asset;
+	return createRef<PrefabAsset>();
 }
 
 bool PrefabTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)

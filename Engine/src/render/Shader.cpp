@@ -19,6 +19,7 @@
 
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <cereal/archives/json.hpp>
 
 const  std::map<ShaderOverride, std::string> shaderOverrideToString
 {
@@ -660,16 +661,16 @@ Shader::~Shader() {
 //  ShaderAsset (Asset wrapper)
 // ============================================================
 
-void ShaderAsset::serialize(nlohmann::json& j) const
+void ShaderAsset::save(cereal::JSONOutputArchive& archive) const
 {
-	j["shader_override"] = m_shaderOverride;
-	j["is_shader_override"] = m_isShaderOverride;
+	archive(cereal::make_nvp("shader_override", m_shaderOverride));
+	archive(cereal::make_nvp("is_shader_override", m_isShaderOverride));
 }
 
-void ShaderAsset::deserialize(const nlohmann::json& j)
+void ShaderAsset::load(cereal::JSONInputArchive& archive)
 {
-	j.at("shader_override").get_to(m_shaderOverride);
-	j.at("is_shader_override").get_to(m_isShaderOverride);
+	archive(cereal::make_nvp("shader_override", m_shaderOverride));
+	archive(cereal::make_nvp("is_shader_override", m_isShaderOverride));
 }
 
 

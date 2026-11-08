@@ -15,11 +15,9 @@ Ref<Asset> ModelTypeManager::createAsset(const AssetBuildDescriptor& assetDesc, 
 	return createRef< ModelAsset>();
 }
 
-Ref<Asset> ModelTypeManager::deserializeAsset(const nlohmann::json& j)
+Ref<Asset> ModelTypeManager::makeAsset()
 {
-	auto asset = createRef<ModelAsset>();
-	asset->deserialize(j);
-	return asset;
+	return createRef<ModelAsset>();
 }
 
 bool ModelTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)

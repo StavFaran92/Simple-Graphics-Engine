@@ -4,6 +4,12 @@
 
 #include "memory/AssetRef.h"
 
+namespace cereal
+{
+	class JSONOutputArchive;
+	class JSONInputArchive;
+}
+
 class EngineAPI Asset
 {
 public:
@@ -19,8 +25,13 @@ public:
 	virtual void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) {};
 	virtual void fillData(ResourceRef<Resource> resource) const {};
 
-	virtual void serialize(nlohmann::json& j) const = 0;
-	virtual void deserialize(const nlohmann::json& j) = 0;
+	// Concrete archive types because a cereal serialize template can't be virtual
+	virtual void save(cereal::JSONOutputArchive& archive) const = 0;
+	virtual void load(cereal::JSONInputArchive& archive) = 0;
+
+	// The asset's data as cereal JSON; loadFromJson throws on bad data
+	std::string saveToJson() const;
+	void loadFromJson(const std::string& json);
 
 	virtual std::vector<AssetRef<Asset>> gatherDependencies() const { return {}; };
 
@@ -50,5 +61,3 @@ protected:
 	friend void from_json(const nlohmann::json& j, AssetRecord& r);
 	//AssetBuildDescriptor m_createDesc;
 };
-
-//CEREAL_REGISTER_TYPE(Asset);

@@ -2320,12 +2320,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 15
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 15
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "SGE_MESH_CAMERA",
@@ -2340,30 +2342,38 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 46
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 46
+                            }
                         }
-                    ],
-                    [
-                        1,
-                        {
-                            "uuid": 40
+                    },
+                    {
+                        "key": 1,
+                        "value": {
+                            "uuid": {
+                                "m_value": 40
+                            }
                         }
-                    ],
-                    [
-                        2,
-                        {
-                            "uuid": 49
+                    },
+                    {
+                        "key": 2,
+                        "value": {
+                            "uuid": {
+                                "m_value": 49
+                            }
                         }
-                    ],
-                    [
-                        3,
-                        {
-                            "uuid": 43
+                    },
+                    {
+                        "key": 3,
+                        "value": {
+                            "uuid": {
+                                "m_value": 43
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "animation_assets\\Erika Archer",
@@ -2472,7 +2482,13 @@
     "scene": [
         {
             "aType": 8,
-            "asset": {},
+            "asset": {
+                "environment": {
+                    "skyCubemap": {
+                        "m_value": 0
+                    }
+                }
+            },
             "assetDirectory": "scenes",
             "ext": ".scene",
             "isEngineOwned": false,
@@ -2483,7 +2499,13 @@
         },
         {
             "aType": 8,
-            "asset": {},
+            "asset": {
+                "environment": {
+                    "skyCubemap": {
+                        "m_value": 0
+                    }
+                }
+            },
             "assetDirectory": "scenes",
             "ext": ".scene",
             "isEngineOwned": false,

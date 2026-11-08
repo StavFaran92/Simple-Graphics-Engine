@@ -1596,45 +1596,15 @@ Entity Scene::getEntityByName(const std::string& name) const
 //  SceneAsset (Asset wrapper)
 // ============================================================
 
-void SceneAsset::serialize(nlohmann::json& j) const
+void SceneAsset::save(cereal::JSONOutputArchive& archive) const
 {
-	j = nlohmann::json::object();
-
-	std::stringstream ss;
-	{
-		cereal::JSONOutputArchive archive(ss);
-		archive(cereal::make_nvp("environment", environment));
-	}
-
-	auto parsed = nlohmann::json::parse(ss.str(), nullptr, false);
-
-	if (!parsed.is_discarded() && parsed.contains("environment"))
-		j["environment"] = parsed["environment"];
-	else
-		j["environment"] = nlohmann::json::object();
+	SERIALIZED_MEMBER(environment);
 }
 
-void SceneAsset::deserialize(const nlohmann::json& j)
+void SceneAsset::load(cereal::JSONInputArchive& archive)
 {
 	// Older records are {} and keep the procedural sky
-	environment = {};
-	if (!j.contains("environment"))
-		return;
-
-	nlohmann::json wrapper;
-	wrapper["environment"] = j["environment"];
-
-	std::stringstream ss(wrapper.dump());
-
-	try
-	{
-		cereal::JSONInputArchive archive(ss);
-		archive(cereal::make_nvp("environment", environment));
-	}
-	catch (const std::exception& e)
-	{
-		logError("Failed to deserialize scene environment: {}", e.what());
-	}
+	SERIALIZED_MEMBER_OPTIONAL(environment);
 }
 
 void SceneAsset::fillData(ResourceRef<Resource> resource) const

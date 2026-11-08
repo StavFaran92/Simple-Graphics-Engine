@@ -23,11 +23,9 @@ Ref<Asset> MaterialTypeManager::createAsset(const AssetBuildDescriptor& assetDes
 	return createRef< MaterialAsset>(*materialDesc);
 }
 
-Ref<Asset> MaterialTypeManager::deserializeAsset(const nlohmann::json& j)
+Ref<Asset> MaterialTypeManager::makeAsset()
 {
-	auto asset = createRef<MaterialAsset>();
-	asset->deserialize(j);
-	return asset;
+	return createRef<MaterialAsset>();
 }
 
 bool MaterialTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)

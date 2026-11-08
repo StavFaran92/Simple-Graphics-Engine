@@ -4,12 +4,11 @@
 #include "fileSystem/ScopedPath.h"
 #include "memory/AssetFactory.h"
 #include "memory/Asset.h"
+#include "core/Logger.h"
 
 nlohmann::json serializeAsset(const Ref<Asset>& asset)
 {
-	nlohmann::json j;
-	asset->serialize(j);
-	return j;
+	return nlohmann::json::parse(asset->saveToJson());
 }
 
 // Serialization (to JSON)
@@ -39,8 +38,15 @@ void from_json(const nlohmann::json& j, AssetRecord& r)
 	j.at("ext").get_to(r.ext);
 	j.at("assetDirectory").get_to(r.assetDirectory);
 
-	nlohmann::json jsonAsset = j.at("asset");
-	Ref<Asset> asset = AssetFactory::getManager(r.aType)->deserializeAsset(jsonAsset);
+	Ref<Asset> asset = AssetFactory::getManager(r.aType)->makeAsset();
+	try
+	{
+		asset->loadFromJson(j.at("asset").dump());
+	}
+	catch (const std::exception& e)
+	{
+		logError("Failed to load asset '{}' ({}): {}", r.name, r.uuid.str(), e.what());
+	}
 	asset->uuid = r.uuid;
 	r.asset = asset;
 }

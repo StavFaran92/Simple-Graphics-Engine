@@ -22,11 +22,9 @@ Ref<Asset> ShaderTypeManager::createAsset(const AssetBuildDescriptor& assetDesc,
 	return createRef< ShaderAsset>(*shaderDesc);
 }
 
-Ref<Asset> ShaderTypeManager::deserializeAsset(const nlohmann::json& j)
+Ref<Asset> ShaderTypeManager::makeAsset()
 {
-	auto asset = createRef<ShaderAsset>();
-	asset->deserialize(j);
-	return asset;
+	return createRef<ShaderAsset>();
 }
 
 bool ShaderTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)

@@ -1078,6 +1078,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 1.0,
+                                    "v.y": 1.0,
+                                    "v.z": 1.0
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1103,17 +1114,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 1.0,
-                                    "v.y": 1.0,
-                                    "v.z": 1.0
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -1400,6 +1400,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1425,17 +1436,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -1722,6 +1722,17 @@
                     },
                     "m_properties": [
                         {
+                            "key": "color",
+                            "value": {
+                                "data": {
+                                    "v.x": 0.800000011920929,
+                                    "v.y": 0.800000011920929,
+                                    "v.z": 0.800000011920929
+                                },
+                                "index": 2
+                            }
+                        },
+                        {
                             "key": "samplerNormal",
                             "value": {
                                 "data": {
@@ -1747,17 +1758,6 @@
                                     }
                                 },
                                 "index": 8
-                            }
-                        },
-                        {
-                            "key": "color",
-                            "value": {
-                                "data": {
-                                    "v.x": 0.800000011920929,
-                                    "v.y": 0.800000011920929,
-                                    "v.z": 0.800000011920929
-                                },
-                                "index": 2
                             }
                         },
                         {
@@ -5722,12 +5722,14 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 15
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 15
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": "SGE_MESH_CAMERA",
@@ -5742,30 +5744,38 @@
             "aType": 2,
             "asset": {
                 "materials": [
-                    [
-                        0,
-                        {
-                            "uuid": 24
+                    {
+                        "key": 0,
+                        "value": {
+                            "uuid": {
+                                "m_value": 24
+                            }
                         }
-                    ],
-                    [
-                        1,
-                        {
-                            "uuid": 18
+                    },
+                    {
+                        "key": 1,
+                        "value": {
+                            "uuid": {
+                                "m_value": 18
+                            }
                         }
-                    ],
-                    [
-                        2,
-                        {
-                            "uuid": 25
+                    },
+                    {
+                        "key": 2,
+                        "value": {
+                            "uuid": {
+                                "m_value": 25
+                            }
                         }
-                    ],
-                    [
-                        3,
-                        {
-                            "uuid": 21
+                    },
+                    {
+                        "key": 3,
+                        "value": {
+                            "uuid": {
+                                "m_value": 21
+                            }
                         }
-                    ]
+                    }
                 ]
             },
             "assetDirectory": ".\\Erika Archer (2)",

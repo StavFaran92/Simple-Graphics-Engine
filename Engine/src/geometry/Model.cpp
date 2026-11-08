@@ -7,6 +7,9 @@
 #include "geometry/MeshBuilder.h"
 #include "memory/Assets.h"
 
+#include <cereal/types/map.hpp>
+#include <cereal/archives/json.hpp>
+
 void Model::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
 	m_materialSlots.insert(mesh->getMaterialIndex());
@@ -131,12 +134,12 @@ void ModelAsset::bindDependency(const std::string& slot, UUID dependency)
 	m_materials[index] = material;
 }
 
-void ModelAsset::serialize(nlohmann::json& j) const
+void ModelAsset::save(cereal::JSONOutputArchive& archive) const
 {
-	j["materials"] = m_materials;
+	archive(cereal::make_nvp("materials", m_materials));
 }
 
-void ModelAsset::deserialize(const nlohmann::json& j)
+void ModelAsset::load(cereal::JSONInputArchive& archive)
 {
-	j.at("materials").get_to(m_materials);
+	archive(cereal::make_nvp("materials", m_materials));
 }

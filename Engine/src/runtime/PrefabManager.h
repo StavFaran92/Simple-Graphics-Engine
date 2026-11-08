@@ -7,7 +7,7 @@ class PrefabTypeManager : public ResourceTypeManager
 	// Inherited via ResourceTypeManager
 	Ref<Asset> createAsset(const AssetBuildDescriptor& assetDesc, const ResourceBuildDescriptor& resourceDesc) override;
 
-	Ref<Asset> deserializeAsset(const nlohmann::json& j) override;
+	Ref<Asset> makeAsset() override;
 
 	bool importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result) override;
 	bool saveResource(const ResourceBuildDescriptor& desc, const ScopedPath& dst) override;

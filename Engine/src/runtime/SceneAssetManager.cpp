@@ -12,11 +12,9 @@ Ref<Asset> SceneAssetManager::createAsset(const AssetBuildDescriptor& assetDesc,
 	return createRef<SceneAsset>();
 }
 
-Ref<Asset> SceneAssetManager::deserializeAsset(const nlohmann::json& j)
+Ref<Asset> SceneAssetManager::makeAsset()
 {
-	auto asset = createRef<SceneAsset>();
-	asset->deserialize(j);
-	return asset;
+	return createRef<SceneAsset>();
 }
 
 bool SceneAssetManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)

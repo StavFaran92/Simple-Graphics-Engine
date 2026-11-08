@@ -2,13 +2,13 @@
 
 #include "memory/UUID.h"
 
-#include <nlohmann/json.hpp>
+#include <string>
 
-// One asset's state, as its own Asset::serialize writes it
+// One asset's state, as cereal JSON from Asset::saveToJson
 struct AssetSnapshot
 {
 	UUID asset;
-	nlohmann::json data;
+	std::string data;
 };
 
 AssetSnapshot takeAssetSnapshot(UUID asset);

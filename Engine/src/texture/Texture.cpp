@@ -659,19 +659,3 @@ void TextureAsset::fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDes
 	textureDesc->textureData = data;
 }
 
-void TextureAsset::serialize(nlohmann::json& j) const
-{
-	// Texture assets currently do not have additional persistent data
-	// beyond what is stored in the resource files and asset record.
-	// Keep this as an empty object so the schema is explicit and can
-	// be extended later without breaking existing data.
-	j = nlohmann::json::object();
-}
-
-void TextureAsset::deserialize(const nlohmann::json& j)
-{
-	// No-op for now since TextureAsset has no custom serialized fields.
-	// This is a placeholder to allow future extension of texture-specific
-	// metadata without changing the persistence API.
-	(void)j;
-}

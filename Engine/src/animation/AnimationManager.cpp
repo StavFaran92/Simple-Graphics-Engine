@@ -19,11 +19,9 @@ Ref<Asset> AnimationTypeManager::createAsset(const AssetBuildDescriptor& assetDe
 	return createRef< AnimationAsset>();
 }
 
-Ref<Asset> AnimationTypeManager::deserializeAsset(const nlohmann::json& j)
+Ref<Asset> AnimationTypeManager::makeAsset()
 {
-	auto asset = createRef<AnimationAsset>();
-	asset->deserialize(j);
-	return asset;
+	return createRef<AnimationAsset>();
 }
 
 bool AnimationTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)

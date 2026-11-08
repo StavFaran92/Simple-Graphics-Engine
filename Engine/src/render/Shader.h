@@ -193,8 +193,8 @@ public:
 
 	void fillLoadDescriptor(ResourceLoadDescriptor& resourceLoadDesc) override;
 
-	void serialize(nlohmann::json& j) const override;
-	void deserialize(const nlohmann::json& j) override;
+	void save(cereal::JSONOutputArchive& archive) const override;
+	void load(cereal::JSONInputArchive& archive) override;
 
 	ShaderOverride m_shaderOverride;
 	bool m_isShaderOverride = false;

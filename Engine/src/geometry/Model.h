@@ -66,10 +66,6 @@ public:
 
 	std::map<int, MaterialAssetRef> m_materials;
 
-	// Inherited via Asset
-	void serialize(nlohmann::json& j) const override;
-	void deserialize(const nlohmann::json& j) override;
+	void save(cereal::JSONOutputArchive& archive) const override;
+	void load(cereal::JSONInputArchive& archive) override;
 };
-
-CEREAL_REGISTER_TYPE(ModelAsset);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Asset, ModelAsset)

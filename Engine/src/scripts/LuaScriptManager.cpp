@@ -15,11 +15,9 @@ Ref<Asset> LuaScriptTypeManager::createAsset(const AssetBuildDescriptor& assetDe
 	return createRef< LuaScriptAsset>();
 }
 
-Ref<Asset> LuaScriptTypeManager::deserializeAsset(const nlohmann::json& j)
+Ref<Asset> LuaScriptTypeManager::makeAsset()
 {
-	auto asset = createRef<LuaScriptAsset>();
-	asset->deserialize(j);
-	return asset;
+	return createRef<LuaScriptAsset>();
 }
 
 bool LuaScriptTypeManager::importAsset(const ResourceLoadDescriptor& loadDesc, ImportNode& result)

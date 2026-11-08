@@ -60,7 +60,7 @@ C++17 OpenGL engine with an ImGui editor, PhysX, assimp, Lua (sol2) scripting. W
 - Delete: `CommandStack::Instance().run(std::make_unique<DeleteEntitiesCmd>(entity, label), error)`
 - Parent changes: `reparentWithUndo(child, newParent, label)`
 - Inspector sections get undo automatically through `displayComponent<T>` (Common.h); a whole drag is one step
-- Assets: `AssetSnapshot` (the asset's own `serialize`) and `EditAssetCmd(before, after, label)`, for any type; an asset
+- Assets: `AssetSnapshot` (cereal JSON from `Asset::saveToJson`) and `EditAssetCmd(before, after, label)`, for any type; an asset
   editor wraps its widgets in `InspectorUndo::trackAsset` / `commitAsset`, like components use `trackComponent` /
   `commitComponent`. Asset steps have no scene, so they apply in whichever scene is open
 - Asset created by existing code: `record(std::make_unique<CreateAssetCmd>(asset, copyOfItsBuildDescriptor, label))`;

@@ -6,6 +6,9 @@
 #include "memory/ResourceManager.h"
 #include "memory/AssetFactory.h"
 #include "memory/FrameAccessTable.h"
+
+#include <sstream>
+#include <cereal/archives/json.hpp>
 //
 //Asset::Asset(const AssetBuildDescriptor& desc)
 //	:m_createDesc (desc)
@@ -89,4 +92,24 @@ ResourceRef<Resource> Asset::resource() const
 UUID Asset::getUID() const
 {
     return uuid;
+}
+
+std::string Asset::saveToJson() const
+{
+    std::stringstream ss;
+    {
+        cereal::JSONOutputArchive archive(ss);
+        save(archive);
+    }
+
+    // cereal writes nothing at all for an archive with no fields
+    std::string json = ss.str();
+    return json.empty() ? "{}" : json;
+}
+
+void Asset::loadFromJson(const std::string& json)
+{
+    std::stringstream ss(json);
+    cereal::JSONInputArchive archive(ss);
+    load(archive);
 }

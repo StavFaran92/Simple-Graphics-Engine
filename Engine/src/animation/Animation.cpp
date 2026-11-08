@@ -87,20 +87,6 @@ bool Animation::preprocess(const std::string& path)
 	return true;
 }
 
-void AnimationAsset::serialize(nlohmann::json& j) const
-{
-	// Animation assets currently do not expose additional persistent
-	// metadata beyond what is stored with the animation resource itself.
-	// Use an explicit empty object for forward-compatible extension.
-	j = nlohmann::json::object();
-}
-
-void AnimationAsset::deserialize(const nlohmann::json& j)
-{
-	// No custom fields to restore at the moment; placeholder for future
-	// animation-asset-specific metadata.
-	(void)j;
-}
 
 
 const AnimationData& Animation::getData() const
