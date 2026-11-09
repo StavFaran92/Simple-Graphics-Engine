@@ -42,6 +42,7 @@ public:
 	void initAssets();
 
 	void saveDirtyAssets();
+	bool saveAsset(UUID uuid);
 
 	void syncAllAssets();
 

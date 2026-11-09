@@ -48,7 +48,7 @@ bool MaterialTypeManager::saveResource(const ResourceBuildDescriptor& desc, cons
 
 	try
 	{
-		oarchive(materialDesc->data);
+		oarchive(cereal::make_nvp("data", materialDesc->data));
 	}
 	catch (const cereal::Exception& e)
 	{

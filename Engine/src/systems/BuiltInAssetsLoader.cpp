@@ -146,6 +146,7 @@ void BuiltInAssetsLoader::loadMaterials()
 		auto terrainLayerAsset = std::make_shared<TerrainLayerAsset>();
 		terrainLayerAsset->albedoTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_TERRAIN_CHECKERBOARD);
 		materialAsset->setProperty("terrainLayers[0]", terrainLayerAsset);
+		assets()->saveAsset(materialAsset.getUID());
 	}
 }
 

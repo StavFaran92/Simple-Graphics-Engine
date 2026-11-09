@@ -120,6 +120,12 @@ void Assets::loadAssetsDatabase()
 
 		m_assets[assetInfo.uuid] = assetInfo;
 	}
+
+	// Before any system can build a resource from the asset
+	for (auto& [uuid, record] : m_assets)
+	{
+		record.asset->loadFromFile(record.getAbsolutePath());
+	}
 }
 
 void Assets::initAssets()
@@ -143,38 +149,47 @@ void Assets::saveDirtyAssets()
 	{
 		if (assetInfo.isSerializationDirty())
 		{
-			// There is a clear design flaw here,
-			// I have to save asset file AND asset meta data
-			// What I should be doing is store everything: 
-			// metadata and asset data in the asset file and remove the projectassetregistry json entirely.
-
-			// Save asset file
-			AssetRef<Asset> asset = getAsset(uuid);
-			std::unique_ptr<ResourceBuildDescriptor> buildDesc = AssetFactory::getManager(assetInfo.aType)->makeResourceBuildDescriptor();
-			asset->fillBuildDescriptor(*buildDesc);
-
-			ResourceTypeManager* manager = AssetFactory::getManager(assetInfo.aType);
-			if (!manager)
-			{
-				logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(assetInfo.aType));
-				continue;
-			}
-
-			ScopedPath dest = assetInfo.getScopedPath();
-
-			if (!manager->saveResource(*buildDesc, dest))
-			{
-				logError("Failed to save asset type {} to: {}", static_cast<int>(assetInfo.aType), dest.absolute().string());
-				continue;
-			}
-
-			// save asset metadata
-			Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(assetInfo);
-
-			//asset->save(asset.info()); // TODO fix
-			assetInfo.m_isSerializationDirty = false;
+			saveAsset(uuid);
 		}
 	}
+}
+
+bool Assets::saveAsset(UUID uuid)
+{
+	auto iter = m_assets.find(uuid);
+	if (iter == m_assets.end())
+	{
+		logWarning("Could not locate asset: {}", uuid);
+		return false;
+	}
+
+	AssetRecord& assetInfo = iter->second;
+
+	ResourceTypeManager* manager = AssetFactory::getManager(assetInfo.aType);
+	if (!manager)
+	{
+		logError("No ResourceTypeManager registered for asset type {}", static_cast<int>(assetInfo.aType));
+		return false;
+	}
+
+	// Save asset file
+	AssetRef<Asset> asset = getAsset(uuid);
+	std::unique_ptr<ResourceBuildDescriptor> buildDesc = manager->makeResourceBuildDescriptor();
+	asset->fillBuildDescriptor(*buildDesc);
+
+	ScopedPath dest = assetInfo.getScopedPath();
+
+	if (!manager->saveResource(*buildDesc, dest))
+	{
+		logError("Failed to save asset type {} to: {}", static_cast<int>(assetInfo.aType), dest.absolute().string());
+		return false;
+	}
+
+	// save asset metadata
+	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(assetInfo);
+
+	assetInfo.m_isSerializationDirty = false;
+	return true;
 }
 
 AssetRef<Asset> Assets::getAsset(UUID uuid) const
@@ -531,7 +546,15 @@ AssetRef<Asset> Assets::createAssetAndChildrenFromNodeRecursive(const ImportNode
 		created->bindDependency(slotName, child.getUID());
 	}
 
-	Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(created.info());
+	// Binding may have changed the asset after its file was written
+	if (created.info().isSerializationDirty())
+	{
+		saveAsset(created.getUID());
+	}
+	else
+	{
+		Engine::get()->getContext()->getProjectAssetRegistry()->updateAssetRegistry(created.info());
+	}
 	
 
 	return created;

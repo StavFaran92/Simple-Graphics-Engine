@@ -175,30 +175,10 @@ MaterialRenderMode Material::getRenderMode() const
 	return m_renderMode;
 }
 
+// The asset already read the .mat; MaterialAsset::fillData fills the resource from it
 MaterialResourceRef Material::load(const std::string& fileLocation, MaterialLoadDescriptor desc)
 {
-	desc.sourcePath = fileLocation;
-	std::string filepath = desc.sourcePath;
-
-	try
-	{
-		std::ifstream is(filepath);
-		cereal::JSONInputArchive iarchive(is);
-		MaterialData materialData;
-		iarchive(materialData);
-		MaterialResourceRef material = Factory<Material>::create();
-		material->m_renderMode = materialData.getMaterialRenderMode();
-		material->m_customShader = materialData.getCustomShader().resource();
-		material->m_name = materialData.name;
-		return material;
-
-	}
-	catch (const cereal::Exception& e)
-	{
-		logError("Deserialization Error occured: {}", e.what());
-	}
-
-	return MaterialResourceRef::empty;
+	return Factory<Material>::create();
 }
 
 //////////////////////////
@@ -258,6 +238,7 @@ void MaterialAsset::bindDependency(const std::string& slot, UUID dependency)
 	sampler->state.isActive = true;
 	sampler->texture = textureAsset;
 	setProperty(shaderPropertyName, sampler);
+	makeAssetDirty();
 }
 
 void MaterialAsset::fillData(ResourceRef<Resource> resource) const
@@ -441,14 +422,35 @@ MaterialAssetRef MaterialAsset::clone(bool isEngineOwned) const
 	return cloned;
 }
 
+// The data lives in the .mat file, so the registry record gets nothing
 void MaterialAsset::save(cereal::JSONOutputArchive& archive) const
 {
-	SERIALIZED_MEMBER(data);
 }
 
 void MaterialAsset::load(cereal::JSONInputArchive& archive)
 {
-	SERIALIZED_MEMBER(data);
+}
+
+void MaterialAsset::loadFromFile(const std::string& path)
+{
+	std::ifstream is(path);
+	if (!is.is_open())
+	{
+		logError("Material file not found: {}", path);
+		return;
+	}
+
+	try
+	{
+		MaterialData fileData;
+		cereal::JSONInputArchive archive(is);
+		archive(cereal::make_nvp("data", fileData));
+		data = fileData;
+	}
+	catch (const std::exception& e)
+	{
+		logError("Failed to read material file {}: {}", path, e.what());
+	}
 }
 
 void MaterialAsset::fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc)

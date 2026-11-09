@@ -1,5 +1,5 @@
 {
-    "value0": {
+    "data": {
         "name": "",
         "m_renderMode": 0,
         "m_customShader": {
@@ -234,6 +234,17 @@
         },
         "m_properties": [
             {
+                "key": "color",
+                "value": {
+                    "index": 2,
+                    "data": {
+                        "v.x": 1.0,
+                        "v.y": 0.25,
+                        "v.z": 0.25
+                    }
+                }
+            },
+            {
                 "key": "samplerNormal",
                 "value": {
                     "index": 8,
@@ -258,17 +269,6 @@
                                 "state.yScale": 1.0
                             }
                         }
-                    }
-                }
-            },
-            {
-                "key": "color",
-                "value": {
-                    "index": 2,
-                    "data": {
-                        "v.x": 1.0,
-                        "v.y": 0.25,
-                        "v.z": 0.25
                     }
                 }
             },

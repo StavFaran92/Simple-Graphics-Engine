@@ -1,5 +1,5 @@
 {
-    "value0": {
+    "data": {
         "name": "",
         "m_renderMode": 2,
         "m_customShader": {
@@ -67,8 +67,8 @@
                                             }
                                         },
                                         "uv": {
-                                            "v.x": 0.0,
-                                            "v.y": 0.0
+                                            "v.x": 1.0,
+                                            "v.y": 1.0
                                         }
                                     }
                                 }
@@ -178,6 +178,50 @@
                 }
             ]
         },
-        "m_properties": []
+        "m_properties": [
+            {
+                "key": "terrainLayers[0]",
+                "value": {
+                    "index": 9,
+                    "data": {
+                        "ptr_wrapper": {
+                            "id": 2147483652,
+                            "data": {
+                                "name": "Layer",
+                                "albedoTexture": {
+                                    "uuid": {
+                                        "m_value": 5
+                                    }
+                                },
+                                "normalTexture": {
+                                    "uuid": {
+                                        "m_value": 0
+                                    }
+                                },
+                                "metallicTexture": {
+                                    "uuid": {
+                                        "m_value": 0
+                                    }
+                                },
+                                "roughnessTexture": {
+                                    "uuid": {
+                                        "m_value": 0
+                                    }
+                                },
+                                "aoTexture": {
+                                    "uuid": {
+                                        "m_value": 0
+                                    }
+                                },
+                                "uv": {
+                                    "v.x": 0.0,
+                                    "v.y": 0.0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ]
     }
 }

@@ -1,5 +1,5 @@
 {
-    "value0": {
+    "data": {
         "name": "",
         "m_renderMode": 0,
         "m_customShader": {
@@ -232,6 +232,32 @@
                 }
             ]
         },
-        "m_properties": []
+        "m_properties": [
+            {
+                "key": "color",
+                "value": {
+                    "index": 2,
+                    "data": {
+                        "v.x": 0.550000011920929,
+                        "v.y": 0.5600000023841858,
+                        "v.z": 0.6200000047683716
+                    }
+                }
+            },
+            {
+                "key": "metallicFactor",
+                "value": {
+                    "index": 0,
+                    "data": 0.0
+                }
+            },
+            {
+                "key": "roughnessFactor",
+                "value": {
+                    "index": 0,
+                    "data": 0.6000000238418579
+                }
+            }
+        ]
     }
 }

@@ -135,7 +135,7 @@ public:
 
 	void save(cereal::JSONOutputArchive& archive) const override;
 	void load(cereal::JSONInputArchive& archive) override;
-	
+	void loadFromFile(const std::string& path) override;
+
 	MaterialData data;
-	
 };

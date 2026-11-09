@@ -33,6 +33,9 @@ public:
 	std::string saveToJson() const;
 	void loadFromJson(const std::string& json);
 
+	// Reads what the asset needs from its own file when the project loads
+	virtual void loadFromFile(const std::string& path) {}
+
 	virtual std::vector<AssetRef<Asset>> gatherDependencies() const { return {}; };
 
 	void syncAsset() const;
