@@ -134,12 +134,12 @@ void ModelAsset::bindDependency(const std::string& slot, UUID dependency)
 	m_materials[index] = material;
 }
 
-void ModelAsset::save(cereal::JSONOutputArchive& archive) const
+void ModelAsset::saveMetadata(cereal::JSONOutputArchive& archive) const
 {
 	archive(cereal::make_nvp("materials", m_materials));
 }
 
-void ModelAsset::load(cereal::JSONInputArchive& archive)
+void ModelAsset::loadMetadata(cereal::JSONInputArchive& archive)
 {
 	archive(cereal::make_nvp("materials", m_materials));
 }

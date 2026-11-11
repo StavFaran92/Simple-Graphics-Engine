@@ -32,8 +32,8 @@ public:
 
 	using Asset::Asset;
 
-	void save(cereal::JSONOutputArchive& archive) const override;
-	void load(cereal::JSONInputArchive& archive) override;
+	void saveMetadata(cereal::JSONOutputArchive& archive) const override;
+	void loadMetadata(cereal::JSONInputArchive& archive) override;
 
 	std::string filepath;
 };

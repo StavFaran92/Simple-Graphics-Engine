@@ -282,8 +282,8 @@ public:
 
 	using Asset::Asset;
 
-	void save(cereal::JSONOutputArchive& archive) const override;
-	void load(cereal::JSONInputArchive& archive) override;
+	void saveMetadata(cereal::JSONOutputArchive& archive) const override;
+	void loadMetadata(cereal::JSONInputArchive& archive) override;
 
 	// Applies the environment to the live scene, on load and after each change
 	void fillData(ResourceRef<Resource> resource) const override;

@@ -661,13 +661,13 @@ Shader::~Shader() {
 //  ShaderAsset (Asset wrapper)
 // ============================================================
 
-void ShaderAsset::save(cereal::JSONOutputArchive& archive) const
+void ShaderAsset::saveMetadata(cereal::JSONOutputArchive& archive) const
 {
 	archive(cereal::make_nvp("shader_override", m_shaderOverride));
 	archive(cereal::make_nvp("is_shader_override", m_isShaderOverride));
 }
 
-void ShaderAsset::load(cereal::JSONInputArchive& archive)
+void ShaderAsset::loadMetadata(cereal::JSONInputArchive& archive)
 {
 	archive(cereal::make_nvp("shader_override", m_shaderOverride));
 	archive(cereal::make_nvp("is_shader_override", m_isShaderOverride));

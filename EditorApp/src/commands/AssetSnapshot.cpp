@@ -21,14 +21,17 @@ AssetSnapshot takeAssetSnapshot(UUID asset)
 {
 	AssetSnapshot snapshot;
 	snapshot.asset = asset;
-	snapshot.data = existingAsset(asset)->saveToJson();
+	AssetRef<Asset> existing = existingAsset(asset);
+	snapshot.metadata = existing->metadataToJson();
+	snapshot.data = existing->dataToJson();
 	return snapshot;
 }
 
 void applyAssetSnapshot(const AssetSnapshot& snapshot)
 {
 	AssetRef<Asset> asset = existingAsset(snapshot.asset);
-	asset->loadFromJson(snapshot.data);
+	asset->metadataFromJson(snapshot.metadata);
+	asset->dataFromJson(snapshot.data);
 	asset.makeDirty();
 	ThumbnailCache::Instance().invalidate(snapshot.asset);
 }

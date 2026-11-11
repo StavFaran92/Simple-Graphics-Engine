@@ -430,13 +430,14 @@ MaterialAssetRef MaterialAsset::clone(bool isEngineOwned) const
 	return cloned;
 }
 
-// The data lives in the .mat file, so the registry record gets nothing
-void MaterialAsset::save(cereal::JSONOutputArchive& archive) const
+void MaterialAsset::serializeData(cereal::JSONOutputArchive& archive) const
 {
+	SERIALIZED_MEMBER(data);
 }
 
-void MaterialAsset::load(cereal::JSONInputArchive& archive)
+void MaterialAsset::deserializeData(cereal::JSONInputArchive& archive)
 {
+	SERIALIZED_MEMBER(data);
 }
 
 void MaterialAsset::loadFromFile(const std::string& path)

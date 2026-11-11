@@ -247,6 +247,4 @@ public:
 
 	void fillBuildDescriptor(ResourceBuildDescriptor& resourceBuildDesc) override;
 
-	void save(cereal::JSONOutputArchive& archive) const override {}
-	void load(cereal::JSONInputArchive& archive) override {}
 };

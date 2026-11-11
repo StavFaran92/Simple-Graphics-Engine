@@ -8,7 +8,7 @@
 
 nlohmann::json serializeAsset(const Ref<Asset>& asset)
 {
-	return nlohmann::json::parse(asset->saveToJson());
+	return nlohmann::json::parse(asset->metadataToJson());
 }
 
 // Serialization (to JSON)
@@ -41,7 +41,7 @@ void from_json(const nlohmann::json& j, AssetRecord& r)
 	Ref<Asset> asset = AssetFactory::getManager(r.aType)->makeAsset();
 	try
 	{
-		asset->loadFromJson(j.at("asset").dump());
+		asset->metadataFromJson(j.at("asset").dump());
 	}
 	catch (const std::exception& e)
 	{

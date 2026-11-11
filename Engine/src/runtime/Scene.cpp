@@ -1596,12 +1596,12 @@ Entity Scene::getEntityByName(const std::string& name) const
 //  SceneAsset (Asset wrapper)
 // ============================================================
 
-void SceneAsset::save(cereal::JSONOutputArchive& archive) const
+void SceneAsset::saveMetadata(cereal::JSONOutputArchive& archive) const
 {
 	SERIALIZED_MEMBER(environment);
 }
 
-void SceneAsset::load(cereal::JSONInputArchive& archive)
+void SceneAsset::loadMetadata(cereal::JSONInputArchive& archive)
 {
 	// Older records are {} and keep the procedural sky
 	SERIALIZED_MEMBER_OPTIONAL(environment);

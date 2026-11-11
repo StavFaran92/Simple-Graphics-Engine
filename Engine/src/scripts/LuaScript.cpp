@@ -33,12 +33,12 @@ LuaScriptResourceRef LuaScript::create()
 //  LuaScriptAsset (Asset wrapper)
 // ============================================================
 
-void LuaScriptAsset::save(cereal::JSONOutputArchive& archive) const
+void LuaScriptAsset::saveMetadata(cereal::JSONOutputArchive& archive) const
 {
 	SERIALIZED_MEMBER(filepath);
 }
 
-void LuaScriptAsset::load(cereal::JSONInputArchive& archive)
+void LuaScriptAsset::loadMetadata(cereal::JSONInputArchive& archive)
 {
 	SERIALIZED_MEMBER_OPTIONAL(filepath);
 }

@@ -4,10 +4,11 @@
 
 #include <string>
 
-// One asset's state, as cereal JSON from Asset::saveToJson
+// One asset's state as cereal JSON: its registry metadata and the data it holds
 struct AssetSnapshot
 {
 	UUID asset;
+	std::string metadata;
 	std::string data;
 };
 

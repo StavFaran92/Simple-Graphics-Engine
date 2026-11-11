@@ -26,12 +26,20 @@ public:
 	virtual void fillData(ResourceRef<Resource> resource) const {};
 
 	// Concrete archive types because a cereal serialize template can't be virtual
-	virtual void save(cereal::JSONOutputArchive& archive) const = 0;
-	virtual void load(cereal::JSONInputArchive& archive) = 0;
 
-	// The asset's data as cereal JSON; loadFromJson throws on bad data
-	std::string saveToJson() const;
-	void loadFromJson(const std::string& json);
+	// Metadata: settings about the asset's file, kept in its registry record (e.g. a shader override)
+	virtual void saveMetadata(cereal::JSONOutputArchive& archive) const {}
+	virtual void loadMetadata(cereal::JSONInputArchive& archive) {}
+
+	// Data the asset holds itself and the user edits (a material's MaterialData); undo snapshots it with the metadata
+	virtual void serializeData(cereal::JSONOutputArchive& archive) const {}
+	virtual void deserializeData(cereal::JSONInputArchive& archive) {}
+
+	// As cereal JSON; the From functions throw on bad data
+	std::string metadataToJson() const;
+	void metadataFromJson(const std::string& json);
+	std::string dataToJson() const;
+	void dataFromJson(const std::string& json);
 
 	// Reads what the asset needs from its own file when the project loads
 	virtual void loadFromFile(const std::string& path) {}

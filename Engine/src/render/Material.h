@@ -133,8 +133,8 @@ public:
 		SERIALIZED_MEMBER(data);
 	}
 
-	void save(cereal::JSONOutputArchive& archive) const override;
-	void load(cereal::JSONInputArchive& archive) override;
+	void serializeData(cereal::JSONOutputArchive& archive) const override;
+	void deserializeData(cereal::JSONInputArchive& archive) override;
 	void loadFromFile(const std::string& path) override;
 
 	MaterialData data;

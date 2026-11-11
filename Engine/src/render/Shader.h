@@ -193,8 +193,8 @@ public:
 
 	void fillLoadDescriptor(ResourceLoadDescriptor& resourceLoadDesc) override;
 
-	void save(cereal::JSONOutputArchive& archive) const override;
-	void load(cereal::JSONInputArchive& archive) override;
+	void saveMetadata(cereal::JSONOutputArchive& archive) const override;
+	void loadMetadata(cereal::JSONInputArchive& archive) override;
 
 	ShaderOverride m_shaderOverride;
 	bool m_isShaderOverride = false;

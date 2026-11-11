@@ -49,6 +49,4 @@ public:
 
 	using Asset::Asset;
 
-	void save(cereal::JSONOutputArchive& archive) const override {}
-	void load(cereal::JSONInputArchive& archive) override {}
 };

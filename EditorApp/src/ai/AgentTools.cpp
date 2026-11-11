@@ -370,7 +370,7 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			json mergedData = json::parse(before.data);
 			mergedData["data"].merge_patch(changes);
 			validateMaterialData(mergedData["data"]);
-			AssetSnapshot merged{ before.asset, mergedData.dump() };
+			AssetSnapshot merged{ before.asset, before.metadata, mergedData.dump() };
 
 			applyAssetSnapshot(merged);
 			// A new render mode has other shader properties; rebuild the layout like the Inspector's Render Mode does
@@ -419,7 +419,8 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 
 			if (!changes.empty())
 			{
-				json changedData = json::parse(takeAssetSnapshot(created.getUID()).data);
+				const AssetSnapshot createdSnapshot = takeAssetSnapshot(created.getUID());
+				json changedData = json::parse(createdSnapshot.data);
 				changedData["data"].merge_patch(changes);
 				try
 				{
@@ -433,7 +434,7 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				}
 				MaterialAssetRef material(created.getUID());
 				const MaterialRenderMode modeBefore = material->getMaterialRenderMode();
-				applyAssetSnapshot(AssetSnapshot{ created.getUID(), changedData.dump() });
+				applyAssetSnapshot(AssetSnapshot{ created.getUID(), createdSnapshot.metadata, changedData.dump() });
 				// A new render mode has other shader properties; rebuild the layout like the Inspector's Render Mode does
 				if (material->getMaterialRenderMode() != modeBefore)
 					material->setMaterialRenderMode(material->getMaterialRenderMode());

@@ -94,22 +94,47 @@ UUID Asset::getUID() const
     return uuid;
 }
 
-std::string Asset::saveToJson() const
+namespace
 {
-    std::stringstream ss;
+    template<typename Write>
+    std::string writeJson(Write write)
     {
-        cereal::JSONOutputArchive archive(ss);
-        save(archive);
+        std::stringstream ss;
+        {
+            cereal::JSONOutputArchive archive(ss);
+            write(archive);
+        }
+
+        // cereal writes nothing at all for an archive with no fields
+        std::string json = ss.str();
+        return json.empty() ? "{}" : json;
     }
 
-    // cereal writes nothing at all for an archive with no fields
-    std::string json = ss.str();
-    return json.empty() ? "{}" : json;
+    template<typename Read>
+    void readJson(const std::string& json, Read read)
+    {
+        std::stringstream ss(json);
+        cereal::JSONInputArchive archive(ss);
+        read(archive);
+    }
 }
 
-void Asset::loadFromJson(const std::string& json)
+std::string Asset::metadataToJson() const
 {
-    std::stringstream ss(json);
-    cereal::JSONInputArchive archive(ss);
-    load(archive);
+    return writeJson([this](cereal::JSONOutputArchive& archive) { saveMetadata(archive); });
+}
+
+void Asset::metadataFromJson(const std::string& json)
+{
+    readJson(json, [this](cereal::JSONInputArchive& archive) { loadMetadata(archive); });
+}
+
+std::string Asset::dataToJson() const
+{
+    return writeJson([this](cereal::JSONOutputArchive& archive) { serializeData(archive); });
+}
+
+void Asset::dataFromJson(const std::string& json)
+{
+    readJson(json, [this](cereal::JSONInputArchive& archive) { deserializeData(archive); });
 }
