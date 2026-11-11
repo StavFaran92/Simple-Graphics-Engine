@@ -253,15 +253,16 @@ void sampleTerrainPBR(
     vec4 texPack0 = noTile ? textureNoTile(terrainLayer.texturePack0.texture, uv) : texture(terrainLayer.texturePack0.texture, uv);
     vec4 texPack1 = noTile ? textureNoTile(terrainLayer.texturePack1.texture, uv) : texture(terrainLayer.texturePack1.texture, uv);
     vec3 albedo = texPack0.rgb;
-    float nx = texPack0.a;
-    float ny = texPack1.a;
-    float nz = sqrt(1.0 - nx*nx - ny*ny);
+    // Only x and y are packed; z is rebuilt from them once they're in -1..1
+    float nx = texPack0.a * 2.0 - 1.0;
+    float ny = texPack1.a * 2.0 - 1.0;
+    float nz = sqrt(max(0.0, 1.0 - nx*nx - ny*ny));
     vec3 normal = vec3(nx, ny, nz);
     float metallic = texPack1.r;
     float roughness = texPack1.g;
     float ao = texPack1.b;
 
-    outNormal = (TBN * (normal * 2.0 - 1.0));
+    outNormal = TBN * normal;
                                        
 
     vec3 albedoTex = albedo;

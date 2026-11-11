@@ -123,10 +123,10 @@ layout (location = 6) out vec3 gTangent;
 #pragma editable
 uniform PBR_Sampler samplerAlbedo;
 
-#pragma editable
+#pragma editable (default=normal)
 uniform PBR_Sampler samplerNormal;
 
-#pragma editable
+#pragma editable (default=black)
 uniform PBR_Sampler samplerMetallic;
 
 #pragma editable

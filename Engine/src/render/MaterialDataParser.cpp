@@ -3,6 +3,8 @@
 #include "render/TerrainLayer.h"
 
 #include "memory/BuiltInResources.h"
+#include "memory/BuiltInAssets.h"
+#include "texture/Texture.h"
 
 #include <regex>
 
@@ -20,9 +22,16 @@ bool MaterialDataParser::parseEditablePragmaLine(const std::string& line, Proper
 	std::regex minRegex(R"(min\s*=\s*([0-9.+-eEfF]+))");
 	std::regex maxRegex(R"(max\s*=\s*([0-9.+-eEfF]+))");
 
+	// A sampler's default names a built-in texture
+	std::regex namedDefaultRegex(R"(default\s*=\s*(white|black|normal)\b)");
+
 	std::smatch m;
 
-	if (std::regex_search(line, m, defaultRegex)) {
+	// Checked first: the numeric class contains the range '+'..'e', so it would read "black" as "b"
+	if (std::regex_search(line, m, namedDefaultRegex)) {
+		editableUniform.defaultValueRaw = m[1].str();
+	}
+	else if (std::regex_search(line, m, defaultRegex)) {
 		// m[1] has parenthesized content, m[2] has scalar
 		editableUniform.defaultValueRaw = m[1].matched ? m[1].str() : m[2].str();
 	}
@@ -70,6 +79,8 @@ void MaterialDataParser::parseUniforms(const std::string& sourceCode, MaterialDa
 		line.erase(0, line.find_first_not_of(" \t"));
 
 		if (line.find("#pragma editable") == 0) {
+			// Each pragma starts clean, or the previous uniform's default/min/max would carry over
+			pendingMeta = PropertySchema();
 			isNextLineEditableUniform = parseEditablePragmaLine(line, pendingMeta);
 			continue;
 		}
@@ -144,7 +155,14 @@ void MaterialDataParser::parseUniforms(const std::string& sourceCode, MaterialDa
 			else if (type == "PBR_Sampler")
 			{
 				pendingMeta.type = MaterialPropertyType::SAMPLER;
-				pendingMeta.defaultValue = std::make_shared<TextureSamplerAsset>();
+				auto defaultSampler = std::make_shared<TextureSamplerAsset>();
+				if (pendingMeta.defaultValueRaw == "white")
+					defaultSampler->texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE);
+				else if (pendingMeta.defaultValueRaw == "black")
+					defaultSampler->texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_BLACK);
+				else if (pendingMeta.defaultValueRaw == "normal")
+					defaultSampler->texture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_FLAT_NORMAL);
+				pendingMeta.defaultValue = defaultSampler;
 				layout.addProperty(name, pendingMeta);
 			}
 			else if (type == "bool")

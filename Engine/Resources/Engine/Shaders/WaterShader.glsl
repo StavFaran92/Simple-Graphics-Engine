@@ -6,7 +6,7 @@ void vert(inout vec3 aPos, inout vec3 aNorm)
 
 #frag
 
-#pragma editable
+#pragma editable (default=normal)
 uniform PBR_Sampler uWaterNormalSampler;
 
 #pragma editable(default=(0.1, 0.01))

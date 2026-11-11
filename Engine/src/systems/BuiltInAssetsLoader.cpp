@@ -70,6 +70,31 @@ void BuiltInAssetsLoader::loadTextures()
 		assets()->createAsset(desc, createDesc);
 	}
 
+	if (!assets()->hasAsset(SGE_TEXTURE_FLAT_NORMAL))
+	{
+		// A tangent-space normal pointing straight out of the surface
+		static unsigned char flatNormal[3] = { 128, 128, 255 };
+
+		AssetBuildDescriptor desc;
+		desc.aType = AssetType::TEXTURE;
+		desc.name = SGE_TEXTURE_FLAT_NORMAL;
+		desc.isEngineOwned = true;
+		desc.visibility = AssetVisibility::Public;
+		TextureCreateDescriptor createDesc;
+		createDesc.textureData.target = TextureTarget::TEXTURE_2D;
+		createDesc.textureData.width = 1;
+		createDesc.textureData.height = 1;
+		createDesc.textureData.channels = 3;
+		createDesc.textureData.data = ImageBuffer(flatNormal, 3);
+		createDesc.textureData.internalFormat = TextureInternalFormat::RGB;
+		createDesc.textureData.format = TextureFormat::RGB;
+		createDesc.textureData.type = TextureType::UNSIGNED_BYTE;
+		createDesc.textureData.filter = TextureFilter::Linear;
+		createDesc.textureData.wrap = TextureWrap::Repeat;
+		createDesc.textureData.textureName = SGE_TEXTURE_FLAT_NORMAL;
+		assets()->createAsset(desc, createDesc);
+	}
+
 	if (!assets()->hasAsset(SGE_TEXTURE_GRASS))
 	{
 		AssetBuildDescriptor desc;

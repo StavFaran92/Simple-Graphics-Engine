@@ -255,8 +255,14 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 		if (spec.type == MaterialPropertyType::SAMPLER)
 		{
 			auto sampler = std::get<std::shared_ptr<TextureSamplerAsset>>(value);
-			materialResource->m_samplers[name] = sampler->resolve();
+			TextureSampler resolved = sampler->resolve();
 
+			// No texture: use the one the shader declared as this sampler's default
+			const TextureAssetRef& defaultTexture = std::get<std::shared_ptr<TextureSamplerAsset>>(spec.defaultValue)->texture;
+			if (sampler->texture.isEmpty() && !defaultTexture.isEmpty())
+				resolved.texture = defaultTexture.resource();
+
+			materialResource->m_samplers[name] = resolved;
 		}
 		else
 		{
@@ -273,15 +279,17 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 		auto& whiteTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_WHITE).resource();
 		auto& blackTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_BLACK).resource();
 		auto& checkerboarcTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_CHECKERBOARD).resource();
+		auto& flatNormalTexture = BuiltInAssets::getByName<TextureAsset>(SGE_TEXTURE_FLAT_NORMAL).resource();
 
 		int layerIndex = 0;
 		for (auto& [layerName, value] : data.getAllProptiesOfType(MaterialPropertyType::TERRAIN_LAYER))
 		{
 			auto layer = std::get<std::shared_ptr<TerrainLayerAsset>>(value);
 
+			// Terrain layer defaults (layers aren't declared by a pragma): flat normal, non-metal, the rest white
 			// Set Texture Pack 0
 			auto albedo = layer->albedoTexture.isEmpty() ? whiteTexture : layer->albedoTexture.resource();
-			auto normal = layer->normalTexture.isEmpty() ? whiteTexture : layer->normalTexture.resource();
+			auto normal = layer->normalTexture.isEmpty() ? flatNormalTexture : layer->normalTexture.resource();
 			
 			TextureResourceRef texturePack0 = TextureTransformer::packTextures(
 				albedo, 0,
@@ -299,7 +307,7 @@ void MaterialAsset::fillData(ResourceRef<Resource> resource) const
 			}
 
 			// Set Texture Pack 1
-			auto metalness = layer->metallicTexture.isEmpty() ? whiteTexture : layer->metallicTexture.resource();
+			auto metalness = layer->metallicTexture.isEmpty() ? blackTexture : layer->metallicTexture.resource();
 			auto roughness = layer->roughnessTexture.isEmpty() ? whiteTexture : layer->roughnessTexture.resource();
 			auto ao = layer->aoTexture.isEmpty() ? whiteTexture : layer->aoTexture.resource();
 

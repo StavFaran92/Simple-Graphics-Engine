@@ -104,10 +104,10 @@ uniform sampler2D gShadowMap;
 #pragma editable
 uniform PBR_Sampler samplerAlbedo;
 
-#pragma editable
+#pragma editable (default=normal)
 uniform PBR_Sampler samplerNormal;
 
-#pragma editable
+#pragma editable (default=black)
 uniform PBR_Sampler samplerMetallic;
 
 #pragma editable
