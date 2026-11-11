@@ -24,7 +24,19 @@ public:
         return "TerrainDeformerTool";
     }
 
+    enum class Mode { Raise, Lower };
+
+    void setBrushRadius(float r) { m_texturePainter.setBrushRadius(r); }
+    float getBrushRadius() const { return m_texturePainter.getBrushRadius(); }
+
+    void setBrushStrength(float s) { m_texturePainter.setBrushStrength(s); }
+    float getBrushStrength() const { return m_texturePainter.getBrushStrength(); }
+
+    void setMode(Mode mode);
+    Mode getMode() const { return m_mode; }
+
 private:
     RayHit m_currentResult;
     TexturePainter m_texturePainter;
+    Mode m_mode = Mode::Raise;
 };

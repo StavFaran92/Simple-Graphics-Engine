@@ -12,6 +12,7 @@ void TerrainDeformTool::onActivate()
 
 	TextureResourceRef heightmap = g_activeTerrain->getHeightmap();
 	m_texturePainter.setTexture(heightmap);
+	m_texturePainter.setValueRange(Terrain::MIN_HEIGHT, Terrain::MAX_HEIGHT);
 }
 
 void TerrainDeformTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
@@ -61,4 +62,10 @@ bool TerrainDeformTool::onEvent(const Event& e)
 	}
 
 	return false;
+}
+
+void TerrainDeformTool::setMode(Mode mode)
+{
+	m_mode = mode;
+	m_texturePainter.setDrawMode(mode == Mode::Raise ? TexturePainter::DrawMode::Add : TexturePainter::DrawMode::Subtract);
 }

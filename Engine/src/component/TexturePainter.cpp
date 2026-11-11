@@ -37,6 +37,12 @@ TexturePainter::DrawMode TexturePainter::getDrawMode() const
     return m_drawMode;
 }
 
+void TexturePainter::setValueRange(float min, float max)
+{
+    m_valueMin = min;
+    m_valueMax = max;
+}
+
 void TexturePainter::applyBrush(int pixelX, int pixelY)
 {
 
@@ -54,6 +60,8 @@ void TexturePainter::applyBrush(int pixelX, int pixelY)
     texturePaintShader->setUniformValue("brushCenter", glm::vec2((float)pixelX, (float)pixelY));
     texturePaintShader->setUniformValue("brushRadius", m_brushRadius);
     texturePaintShader->setUniformValue("brushStrength", brushStrength);
+    texturePaintShader->setUniformValue("valueMin", m_valueMin);
+    texturePaintShader->setUniformValue("valueMax", m_valueMax);
 
     glBindImageTexture(0, texID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 

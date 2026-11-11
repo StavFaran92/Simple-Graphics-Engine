@@ -8,7 +8,7 @@
 #include "NativeScriptsLoader.h"
 #include "TerrainPaintTool.h"
 #include "Widgets.h"
-#include "TerrainPaintTool.h"
+#include "TerrainDeformTool.h"
 #include "AnimationGraphWindow.h"
 #include "text/TextSystem.h"
 #include "AnimationViewerWindow.h"
@@ -547,7 +547,6 @@ void InspectorWindow::display()
 					// UI
 					ImGui::DragInt("Width", newWidth, 1, 1, 8192);
 					ImGui::DragInt("Height", newHeight, 1, 1, 8192);
-					ImGui::DragFloat("scale", &terrain.m_scale);
 
 					static bool useCustomHeightmap = false;
 					ImGui::Checkbox("Custom Heightmap", &useCustomHeightmap);
@@ -756,6 +755,31 @@ void InspectorWindow::display()
 						
 
 					} // TerrainPainter active
+
+					if (EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainDeformer)
+					{
+						auto terrainDeformer = std::static_pointer_cast<TerrainDeformTool>(
+							EditorState::Instance().getEditorTool(EditorTool::Type::TerrainDeformer));
+
+						ImGui::Spacing();
+						ImGui::Separator();
+						ImGui::Text("Brush");
+						ImGui::Spacing();
+
+						static const char* modeNames[] = { "Raise", "Lower" };
+						int mode = (int)terrainDeformer->getMode();
+						if (ImGui::Combo("Mode", &mode, modeNames, IM_ARRAYSIZE(modeNames)))
+							terrainDeformer->setMode((TerrainDeformTool::Mode)mode);
+
+						float radius = terrainDeformer->getBrushRadius();
+						if (ImGui::SliderFloat("Radius", &radius, 1.0f, 50.0f))
+							terrainDeformer->setBrushRadius(radius);
+
+						// Height added at the brush centre per dab, times the terrain's scale
+						float strength = terrainDeformer->getBrushStrength();
+						if (ImGui::SliderFloat("Strength", &strength, 0.0f, 5.0f))
+							terrainDeformer->setBrushStrength(strength);
+					} // TerrainDeformer active
 
 					ImGui::EndTabItem();
 				}

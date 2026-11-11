@@ -8,6 +8,8 @@ layout(r32f, binding = 0) uniform image2D target;
 uniform vec2 brushCenter;     // pixel coords
 uniform float brushRadius;
 uniform float brushStrength;
+uniform float valueMin;       // 0..1 for a layer mask, the terrain's height range for a heightmap
+uniform float valueMax;
 
 layout (local_size_x = 16, local_size_y = 16) in;
 
@@ -24,7 +26,7 @@ void main()
     float h = imageLoad(target, pix).r;
     h += brushStrength * falloff;
 
-    h = clamp(h, 0.0, 1.0);
+    h = clamp(h, valueMin, valueMax);
 
     imageStore(target, pix, vec4(h, 0, 0, 0));
 }

@@ -24,6 +24,9 @@ public:
     void setDrawMode(DrawMode mode);
     DrawMode getDrawMode() const;
 
+    // Values the brush clamps to; 0..1 by default, for masks
+    void setValueRange(float min, float max);
+
     // brushCenter is in pixel coordinates
     void applyBrush(int pixelX, int pixelY);
 
@@ -38,6 +41,8 @@ private:
     TextureResourceRef m_texture;
     float m_brushRadius = 10.0f;
     float m_brushStrength = .1f;
+    float m_valueMin = 0.f;
+    float m_valueMax = 1.f;
 
     DrawMode m_drawMode = DrawMode::Add;
 

@@ -46,6 +46,10 @@ class EngineAPI Terrain : public Component
 public:
 	static inline const int MAX_LAYER_COUNT = 3;
 
+	// Heightmap value range: the PhysX heightfield stores h * 256 as an int16
+	static constexpr float MIN_HEIGHT = -128.f;
+	static constexpr float MAX_HEIGHT = 127.f;
+
 	Terrain() = default;
 
 	std::string getName() override { return "Terrain"; }
