@@ -20,7 +20,7 @@ void EntityStates::selectEntity(Entity e)
 
 	m_states[e.handlerID()] = eState;
 
-	EditorState::Instance().setActiveEditorTool(EditorTool::Type::TransformTool);
+	EditorState::Instance().setActiveEditorTool(EditorTool::Type::TransformTool, e);
 }
 
 EntityState& EntityStates::getCurrentEntityState()

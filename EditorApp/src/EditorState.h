@@ -56,7 +56,7 @@ public:
     void addDialogDisplay(DialogBase* dialog);
     void displayDialogs();
 
-    void setActiveEditorTool(EditorTool::Type tool);
+    void setActiveEditorTool(EditorTool::Type tool, Entity entity = Entity::EmptyEntity);
     EditorTool::Type getActiveToolType() const;
     std::shared_ptr<EditorTool> getActiveEditorTool();
     std::shared_ptr<EditorTool> getEditorTool(EditorTool::Type type);

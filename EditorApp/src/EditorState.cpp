@@ -45,7 +45,7 @@ void EditorState::displayDialogs()
     }
 }
 
-void EditorState::setActiveEditorTool(EditorTool::Type toolType)
+void EditorState::setActiveEditorTool(EditorTool::Type toolType, Entity entity)
 {
     // Deactive currently active tool
     if (m_activeEditorToolType != EditorTool::Type::None && m_activeEditorTool)
@@ -57,7 +57,10 @@ void EditorState::setActiveEditorTool(EditorTool::Type toolType)
 
     // Activate new tool
     if (m_activeEditorTool)
+    {
+        m_activeEditorTool->setEntity(entity);
         m_activeEditorTool->onActivate();
+    }
 }
 
 EditorTool::Type EditorState::getActiveToolType() const

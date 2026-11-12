@@ -19,6 +19,8 @@ public:
 
     bool onEvent(const Event& e) override;
 
+    void display() override;
+
     const char* name() const override
     {
         return "TerrainPainterTool";
@@ -45,6 +47,9 @@ public:
     DrawMode getDrawMode() const { return m_drawMode; }
 
 private:
+    // The entity's terrain, or null when it's gone
+    Terrain* getTerrain();
+
     int m_selectedLayerIndex = 0;
     RayHit m_currentResult;
     TexturePainter m_texturePainter;

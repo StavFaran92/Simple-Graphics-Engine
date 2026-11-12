@@ -17,7 +17,6 @@
 #include "core/ProjectSettings.h"
 
 bool g_testRay = false;
-Terrain* g_activeTerrain = 0;
 
 extern Entity g_editorCamera;
 
@@ -625,9 +624,9 @@ void InspectorWindow::display()
 
 						if (ImGui::Button("Foliage Painter"))
 						{
-							g_activeTerrain = &terrain;
 							EditorState::Instance().setActiveEditorTool(
-								isActive ? EditorTool::Type::None : EditorTool::Type::FoliagePainter
+								isActive ? EditorTool::Type::None : EditorTool::Type::FoliagePainter,
+								state.getSelectedEntity()
 							);
 						}
 
@@ -638,13 +637,6 @@ void InspectorWindow::display()
 					}
 
 
-
-					//if (ImGui::Button("test"))
-					//{
-					//	g_activeTerrain = &terrain;
-					//	EditorState::Instance().setActiveEditorTool(EditorTool::Type::FoliagePainter);
-
-					//}
 
 					ImGui::EndTabItem();
 				}
@@ -672,8 +664,7 @@ void InspectorWindow::display()
 							bool isSelected = (i == currentIndex);
 							if (ImGui::Selectable(toolNames[i], isSelected))
 							{
-								g_activeTerrain = &terrain;
-								EditorState::Instance().setActiveEditorTool(toolTypes[i]);
+								EditorState::Instance().setActiveEditorTool(toolTypes[i], state.getSelectedEntity());
 							}
 							if (isSelected)
 								ImGui::SetItemDefaultFocus();
@@ -681,105 +672,9 @@ void InspectorWindow::display()
 						ImGui::EndCombo();
 					}
 
-					if (EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainPainter)
-					{
-						auto terrainPainter = std::static_pointer_cast<TerrainPaintTool>(
-							EditorState::Instance().getEditorTool(EditorTool::Type::TerrainPainter));
-						
-						
-
-						ImGui::Spacing();
-						ImGui::Separator();
-						ImGui::Text("Layers");
-						ImGui::Spacing();
-
-						int layerCount = terrain.getLayerCount();
-
-						// Clamp selection in case layers changed
-						terrainPainter->clampSelection(layerCount);
-
-						for (int i = 0; i < layerCount; i++)
-						{
-							ImGui::PushID(i);
-
-							bool isSelected = (i == terrainPainter->getSelectedLayer());
-							ImGui::Bullet();
-							ImGui::SameLine();
-
-							const LayerMask& layer = terrain.getLayer(i);
-							std::string label = layer.name;
-
-							if (ImGui::Selectable(label.c_str(), isSelected))
-								terrainPainter->selectLayer(i);
-
-							ImGui::PopID();
-						}
-
-						ImGui::Spacing();
-
-						// Add button
-						if (ImGui::Button("+"))
-						{
-							terrain.addLayer();
-						}
-
-						ImGui::SameLine();
-
-						// Remove button — disabled when only 1 layer remains
-						ImGui::BeginDisabled(layerCount <= 1);
-						if (ImGui::Button("-"))
-						{
-							terrain.removeLayer(terrainPainter->getSelectedLayer());
-							terrainPainter->clampSelection(terrain.getLayerCount());
-						}
-						ImGui::EndDisabled();
-
-						ImGui::Spacing();
-						ImGui::Separator();
-						ImGui::Text("Brush");
-						ImGui::Spacing();
-
-						static const char* drawModeNames[] = { "Draw", "Erase" };
-						int drawMode = (int)terrainPainter->getDrawMode();
-						if (ImGui::Combo("Mode", &drawMode, drawModeNames, IM_ARRAYSIZE(drawModeNames)))
-							terrainPainter->setDrawMode((TerrainPaintTool::DrawMode)drawMode);
-
-						float radius = terrainPainter->getBrushRadius();
-						if (ImGui::SliderFloat("Radius", &radius, 1.0f, 50.0f))
-							terrainPainter->setBrushRadius(radius);
-
-						float strength = terrainPainter->getBrushStrength();
-						if (ImGui::SliderFloat("Strength", &strength, 0.0f, 1.0f))
-							terrainPainter->setBrushStrength(strength);
-
-						
-
-					} // TerrainPainter active
-
-					if (EditorState::Instance().getActiveToolType() == EditorTool::Type::TerrainDeformer)
-					{
-						auto terrainDeformer = std::static_pointer_cast<TerrainDeformTool>(
-							EditorState::Instance().getEditorTool(EditorTool::Type::TerrainDeformer));
-
-						ImGui::Spacing();
-						ImGui::Separator();
-						ImGui::Text("Brush");
-						ImGui::Spacing();
-
-						static const char* modeNames[] = { "Raise", "Lower" };
-						int mode = (int)terrainDeformer->getMode();
-						if (ImGui::Combo("Mode", &mode, modeNames, IM_ARRAYSIZE(modeNames)))
-							terrainDeformer->setMode((TerrainDeformTool::Mode)mode);
-
-						float radius = terrainDeformer->getBrushRadius();
-						if (ImGui::SliderFloat("Radius", &radius, 1.0f, 50.0f))
-							terrainDeformer->setBrushRadius(radius);
-
-						// Height added at the brush centre per dab, times the terrain's scale
-						float strength = terrainDeformer->getBrushStrength();
-						if (ImGui::SliderFloat("Strength", &strength, 0.0f, 5.0f))
-							terrainDeformer->setBrushStrength(strength);
-					} // TerrainDeformer active
+					// The active tool draws its own settings
+					if (auto activeTool = EditorState::Instance().getActiveEditorTool())
+						activeTool->display();
 
 					ImGui::EndTabItem();
 				}

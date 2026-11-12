@@ -19,6 +19,8 @@ public:
 
     bool onEvent(const Event& e) override;
 
+    void display() override;
+
     const char* name() const override
     {
         return "TerrainDeformerTool";
@@ -36,6 +38,9 @@ public:
     Mode getMode() const { return m_mode; }
 
 private:
+    // The entity's terrain, or null when it's gone
+    Terrain* getTerrain();
+
     RayHit m_currentResult;
     TexturePainter m_texturePainter;
     Mode m_mode = Mode::Raise;

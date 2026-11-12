@@ -1,11 +1,16 @@
 #include "FoliagePaintTool.h"
+#include "TerrainBrush.h"
 
 #include "sge.h"
 
 #include "imgui.h"
 
 extern Entity g_editorCamera;
-extern Terrain* g_activeTerrain;
+
+Terrain* FoliagePaintTool::getTerrain()
+{
+	return m_entity.valid() ? m_entity.tryGetComponent<Terrain>() : nullptr;
+}
 
 void FoliagePaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 {
@@ -24,7 +29,11 @@ void FoliagePaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 
 	auto& [rayOrigin, rayDir] = Math3D::ScreenPointToRay(alteredX, alteredY, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), view, projection);
 
-	m_currentResult = g_activeTerrain->raycast(Ray(rayOrigin, rayDir));
+	Terrain* terrain = getTerrain();
+	if (!terrain)
+		return;
+
+	m_currentResult = TerrainBrush::raycast(m_entity, *terrain, Ray(rayOrigin, rayDir));
 	if (m_currentResult.hit)
 	{
 		Engine::get()->getSubSystem<Graphics>()->view = view;
@@ -39,12 +48,14 @@ void FoliagePaintTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 
 bool FoliagePaintTool::onEvent(const Event& e)
 {
+	Terrain* terrain = getTerrain();
+	if (!terrain)
+		return false;
+
 	if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 	{
-		glm::vec2 brushCenter = glm::vec2(m_currentResult.position.x, m_currentResult.position.z);
-		brushCenter.x += g_activeTerrain->getWidth() * .5f;
-		brushCenter.y += g_activeTerrain->getHeight() * .5f;
-		g_activeTerrain->m_foliageField.paintCircle(brushCenter.x, brushCenter.y, m_brushRadius, m_brushStrength);
+		glm::vec2 brushCenter = TerrainBrush::worldToTerrain(m_entity, *terrain, m_currentResult.position);
+		terrain->m_foliageField.paintCircle(brushCenter.x, brushCenter.y, m_brushRadius, m_brushStrength);
 
 		return true;
 	}

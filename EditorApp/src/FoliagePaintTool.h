@@ -11,6 +11,9 @@ class FoliagePaintTool : public EditorTool
 	const char* name() const override;
 
 private:
+	// The entity's terrain, or null when it's gone
+	Terrain* getTerrain();
+
 	float m_brushRadius = 3.f;
 	float m_brushStrength = .01f;
 

@@ -1,16 +1,22 @@
 #include "TerrainDeformTool.h"
+#include "TerrainBrush.h"
 
 #include "sge.h"
 
 extern Entity g_editorCamera;
-extern Terrain* g_activeTerrain;
+
+Terrain* TerrainDeformTool::getTerrain()
+{
+	return m_entity.valid() ? m_entity.tryGetComponent<Terrain>() : nullptr;
+}
 
 void TerrainDeformTool::onActivate()
 {
-	if (!g_activeTerrain)
+	Terrain* terrain = getTerrain();
+	if (!terrain)
 		return;
 
-	TextureResourceRef heightmap = g_activeTerrain->getHeightmap();
+	TextureResourceRef heightmap = terrain->getHeightmap();
 	m_texturePainter.setTexture(heightmap);
 	m_texturePainter.setValueRange(Terrain::MIN_HEIGHT, Terrain::MAX_HEIGHT);
 }
@@ -32,7 +38,11 @@ void TerrainDeformTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 
 	auto& [rayOrigin, rayDir] = Math3D::ScreenPointToRay(alteredX, alteredY, Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight(), view, projection);
 
-	m_currentResult = g_activeTerrain->raycast(Ray(rayOrigin, rayDir));
+	Terrain* terrain = getTerrain();
+	if (!terrain)
+		return;
+
+	m_currentResult = TerrainBrush::raycast(m_entity, *terrain, Ray(rayOrigin, rayDir));
 	if (m_currentResult.hit)
 	{
 		Engine::get()->getSubSystem<Graphics>()->view = view;
@@ -47,16 +57,18 @@ void TerrainDeformTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 
 bool TerrainDeformTool::onEvent(const Event& e)
 {
+	Terrain* terrain = getTerrain();
+	if (!terrain)
+		return false;
+
 	if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 	{
-		glm::vec2 offsetPos = glm::vec2(m_currentResult.position.x, m_currentResult.position.z);
-		offsetPos.x += g_activeTerrain->getWidth() * .5f;
-		offsetPos.y += g_activeTerrain->getHeight() * .5f;
+		glm::vec2 offsetPos = TerrainBrush::worldToPixel(m_entity, *terrain, m_currentResult.position, terrain->getHeightmap());
 
 		// Paint on the texture using compute
 		m_texturePainter.applyBrush(offsetPos.x, offsetPos.y);
 
-		g_activeTerrain->syncHeightmap();
+		terrain->syncHeightmap();
 
 		return true;
 	}
@@ -68,4 +80,26 @@ void TerrainDeformTool::setMode(Mode mode)
 {
 	m_mode = mode;
 	m_texturePainter.setDrawMode(mode == Mode::Raise ? TexturePainter::DrawMode::Add : TexturePainter::DrawMode::Subtract);
+}
+
+void TerrainDeformTool::display()
+{
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Brush");
+	ImGui::Spacing();
+
+	static const char* modeNames[] = { "Raise", "Lower" };
+	int mode = (int)getMode();
+	if (ImGui::Combo("Mode", &mode, modeNames, IM_ARRAYSIZE(modeNames)))
+		setMode((Mode)mode);
+
+	float radius = getBrushRadius();
+	if (ImGui::SliderFloat("Radius", &radius, 1.0f, 50.0f))
+		setBrushRadius(radius);
+
+	// Height added at the brush centre per dab, times the terrain's scale
+	float strength = getBrushStrength();
+	if (ImGui::SliderFloat("Strength", &strength, 0.0f, 5.0f))
+		setBrushStrength(strength);
 }
