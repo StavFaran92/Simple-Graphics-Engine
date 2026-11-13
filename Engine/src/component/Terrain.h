@@ -62,6 +62,8 @@ public:
 
 	void setHeightmap(TextureAssetRef heightmap);
 	TextureResourceRef getHeightmap() const;
+	// The heightmap asset; a resize replaces it with a new one
+	TextureAssetRef getHeightmapAsset() const;
 
 	bool getHeightAtPoint(float x, float y, float& outHeight) const;
 

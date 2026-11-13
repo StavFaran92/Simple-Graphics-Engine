@@ -132,6 +132,11 @@ TextureResourceRef Terrain::getHeightmap() const
 	return m_heightmap.resource();
 }
 
+TextureAssetRef Terrain::getHeightmapAsset() const
+{
+	return m_heightmap;
+}
+
 int Terrain::getWidth() const
 {
 	return m_width;

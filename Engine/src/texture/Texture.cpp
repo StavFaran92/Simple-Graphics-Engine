@@ -318,7 +318,10 @@ void Texture::setData(int xoffset, int yoffset, int width, int height, const voi
 {
 	bind();
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	// Data is tightly packed in the texture's own format, like download() reads it
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, width, height, toGL(m_data.format), toGL(m_data.type), data);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 
 void Texture::generateMipMaps()

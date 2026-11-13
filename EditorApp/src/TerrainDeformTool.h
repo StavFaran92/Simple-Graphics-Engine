@@ -7,6 +7,7 @@
 
 #include "component/Terrain.h"
 #include "sge.h"
+#include "commands/TerrainCommands.h"
 
 class TerrainDeformTool : public EditorTool
 {
@@ -14,6 +15,9 @@ public:
     TerrainDeformTool() = default;
 
     void onActivate() override;
+
+    // Records a stroke that's still open
+    void onDeactivate() override;
 
     void update(ImVec2 viewportPos, ImVec2 viewportSize) override;
 
@@ -41,7 +45,14 @@ private:
     // The entity's terrain, or null when it's gone
     Terrain* getTerrain();
 
+    // Records the open stroke as one undo step
+    void endStroke();
+
     RayHit m_currentResult;
     TexturePainter m_texturePainter;
     Mode m_mode = Mode::Raise;
+
+    bool m_stroking = false;
+    HeightmapSnapshot m_strokeStart;  // whole heightmap from before the stroke
+    HeightmapRect m_strokeRect;       // pixels the stroke touched so far
 };

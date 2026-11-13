@@ -1,5 +1,6 @@
 #include "TerrainDeformTool.h"
 #include "TerrainBrush.h"
+#include "commands/CommandStack.h"
 
 #include "sge.h"
 
@@ -57,16 +58,34 @@ void TerrainDeformTool::update(ImVec2 viewportPos, ImVec2 viewportSize)
 
 bool TerrainDeformTool::onEvent(const Event& e)
 {
+	if (e.type() == EventType::MouseButtonReleased
+		&& static_cast<const MouseButtonReleasedEvent&>(e).button == MouseButton::MOUSE_BUTTON_LEFT)
+	{
+		endStroke();
+		return false;
+	}
+
 	Terrain* terrain = getTerrain();
 	if (!terrain)
 		return false;
 
 	if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 	{
-		glm::vec2 offsetPos = TerrainBrush::worldToPixel(m_entity, *terrain, m_currentResult.position, terrain->getHeightmap());
+		TextureResourceRef heightmap = terrain->getHeightmap();
+
+		// First dab: keep the heights from before the stroke
+		if (!m_stroking)
+		{
+			m_strokeStart = takeHeightmapSnapshot(m_entity, { 0, 0, heightmap->getWidth(), heightmap->getHeight() });
+			m_strokeRect = {};
+			m_stroking = true;
+		}
+
+		glm::vec2 offsetPos = TerrainBrush::worldToPixel(m_entity, *terrain, m_currentResult.position, heightmap);
 
 		// Paint on the texture using compute
 		m_texturePainter.applyBrush(offsetPos.x, offsetPos.y);
+		m_strokeRect = unionRect(m_strokeRect, dabRect(offsetPos, getBrushRadius(), heightmap));
 
 		terrain->syncHeightmap();
 
@@ -80,6 +99,33 @@ void TerrainDeformTool::setMode(Mode mode)
 {
 	m_mode = mode;
 	m_texturePainter.setDrawMode(mode == Mode::Raise ? TexturePainter::DrawMode::Add : TexturePainter::DrawMode::Subtract);
+}
+
+void TerrainDeformTool::endStroke()
+{
+	if (!m_stroking)
+		return;
+
+	m_stroking = false;
+	HeightmapSnapshot start = std::move(m_strokeStart);
+	m_strokeStart = {};
+
+	// The copy only fits the heightmap it was taken from
+	Terrain* terrain = getTerrain();
+	if (!terrain || terrain->getHeightmapAsset().getUID() != start.heightmap)
+		return;
+
+	if (m_strokeRect.width <= 0 || m_strokeRect.height <= 0)
+		return;
+
+	HeightmapSnapshot before = cropSnapshot(start, m_strokeRect);
+	HeightmapSnapshot after = takeHeightmapSnapshot(m_entity, m_strokeRect);
+	CommandStack::Instance().record(std::make_unique<EditHeightmapCmd>(std::move(before), std::move(after), "Sculpt terrain"));
+}
+
+void TerrainDeformTool::onDeactivate()
+{
+	endStroke();
 }
 
 void TerrainDeformTool::display()
