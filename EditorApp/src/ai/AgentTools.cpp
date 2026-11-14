@@ -18,6 +18,7 @@
 #include "runtime/StartupSceneTemplate.h"
 #include "render/MaterialDataParser.h"
 #include "commands/AssetCommands.h"
+#include "TerrainDeformTool.h"
 #include "EditorState.h"
 #include "Thumbnails/ThumbnailCache.h"
 
@@ -1047,6 +1048,94 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 				std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
 				"AI: set collider on " + entityName(e)));
 			return mcpText("Set a " + args["shape"].get<std::string>() + " collider on " + describe(e));
+		}
+	});
+
+	server.addTool({
+		"sculpt_terrain",
+		"Raises or lowers a terrain with the editor's Deformer brush, one dab per [x, z] world point. 'radius' and "
+		"'height' are in terrain units (1 unit = 1 m on an unscaled terrain). 'height' is added at each dab's centre and "
+		"fades to 0 at its edge, so overlapping dabs add up; negative lowers. Points off the terrain are skipped. "
+		"One undo step.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"points", { {"type", "array"}, {"minItems", 1},
+				{"items", { {"type", "array"}, {"items", { {"type", "number"} }}, {"minItems", 2}, {"maxItems", 2} }} }},
+			{"radius", { {"type", "number"}, {"exclusiveMinimum", 0} }},
+			{"height", { {"type", "number"}, {"description", "Added per dab at its centre; negative lowers"} }},
+		}, { "id", "points", "radius", "height" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			if (!e.HasComponent<Terrain>())
+				throw McpToolError(describe(e) + " has no Terrain");
+
+			const json& points = args.value("points", json::array());
+			if (!points.is_array() || points.empty())
+				throw McpToolError("'points' must be a list of [x, z] world positions");
+			for (const json& p : points)
+				if (!p.is_array() || p.size() != 2 || !p[0].is_number() || !p[1].is_number())
+					throw McpToolError("Each point must be [x, z]");
+
+			const float radius = args.value("radius", 0.f);
+			if (radius <= 0.f)
+				throw McpToolError("'radius' must be more than 0");
+			const float height = args.value("height", 0.f);
+
+			// A tool of its own, so the editor's brush settings stay as they are
+			TerrainDeformTool tool;
+			tool.setEntity(e);
+			tool.setBrushRadius(radius);
+			tool.setBrushStrength(std::abs(height));
+			tool.setMode(height < 0.f ? TerrainDeformTool::Mode::Lower : TerrainDeformTool::Mode::Raise);
+
+			// Only x and z place a dab; y is the terrain's own height so a rotated terrain maps it right
+			const float y = e.getComponent<Transformation>().getWorldPosition().y;
+			int dabs = 0;
+			json skipped = json::array();
+			for (const json& p : points)
+			{
+				if (tool.dabAt(glm::vec3(p[0].get<float>(), y, p[1].get<float>())))
+					dabs++;
+				else
+					skipped.push_back(p);
+			}
+
+			if (dabs == 0)
+				throw McpToolError("None of the points are on " + describe(e) + "; get_entity shows its position and size");
+
+			tool.endStroke("AI: sculpt " + entityName(e));
+
+			std::string text = "Sculpted " + std::to_string(dabs) + " dab(s) on " + describe(e);
+			if (!skipped.empty())
+				text += ". Off the terrain, skipped: " + skipped.dump();
+			return mcpText(text);
+		}
+	});
+
+	server.addTool({
+		"resize_terrain",
+		"Sets a terrain's size in terrain units (one heightmap pixel each), like the Inspector's Build button. "
+		"Resets every height to 0 and isn't undoable; sculpt steps made before it can't be undone afterwards.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"width", { {"type", "integer"}, {"minimum", 1}, {"maximum", 4096} }},
+			{"depth", { {"type", "integer"}, {"minimum", 1}, {"maximum", 4096} }},
+		}, { "id", "width", "depth" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			if (!e.HasComponent<Terrain>())
+				throw McpToolError(describe(e) + " has no Terrain");
+
+			const int width = args.value("width", 0);
+			const int depth = args.value("depth", 0);
+			if (width < 1 || depth < 1 || width > 4096 || depth > 4096)
+				throw McpToolError("'width' and 'depth' must be 1 to 4096");
+
+			e.getComponent<Terrain>().resize(width, depth);
+			return mcpText("Resized " + describe(e) + " to " + std::to_string(width) + " x " + std::to_string(depth) +
+				"; every height is 0 now");
 		}
 	});
 

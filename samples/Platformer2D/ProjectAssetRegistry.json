@@ -35,7 +35,7 @@
             "visibility": 1
         }
     ],
-    "counter": 67,
+    "counter": 73,
     "lua script": [
         {
             "aType": 7,
@@ -535,8 +535,10 @@
         "SGE_MESH_GRID": 13,
         "SGE_MESH_QUAD": 10,
         "SGE_MESH_SPHERE": 11,
+        "SGE_TERRAIN_HEIGHTMAP": 72,
         "SGE_TEXTURE_BLACK": 2,
         "SGE_TEXTURE_CHECKERBOARD": 4,
+        "SGE_TEXTURE_FLAT_NORMAL": 67,
         "SGE_TEXTURE_GRASS": 3,
         "SGE_TEXTURE_TERRAIN_CHECKERBOARD": 5,
         "SGE_TEXTURE_TILE_NOISE": 6,
@@ -600,8 +602,10 @@
         "engine/sge_mesh_grid.model": 13,
         "engine/sge_mesh_quad.model": 10,
         "engine/sge_mesh_sphere.model": 11,
+        "engine/sge_terrain_heightmap.texture": 72,
         "engine/sge_texture_black.texture": 2,
         "engine/sge_texture_checkerboard.texture": 4,
+        "engine/sge_texture_flat_normal.texture": 67,
         "engine/sge_texture_grass.texture": 3,
         "engine/sge_texture_terrain_checkerboard.texture": 5,
         "engine/sge_texture_tile_noise.texture": 6,
@@ -771,6 +775,39 @@
             "name": "sunflowers_puresky_4k",
             "sourcePath": "",
             "uuid": 66,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TEXTURE_FLAT_NORMAL",
+            "sourcePath": "",
+            "uuid": 67,
+            "visibility": 0
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 70,
+            "visibility": 1
+        },
+        {
+            "aType": 1,
+            "asset": {},
+            "assetDirectory": "",
+            "ext": ".texture",
+            "isEngineOwned": true,
+            "name": "SGE_TERRAIN_HEIGHTMAP",
+            "sourcePath": "",
+            "uuid": 72,
             "visibility": 1
         }
     ]

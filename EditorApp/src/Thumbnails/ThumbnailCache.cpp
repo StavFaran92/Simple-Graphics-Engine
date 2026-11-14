@@ -1,7 +1,14 @@
 #include "ThumbnailCache.h"
 
-ImTextureID ThumbnailCache::get(const AssetRecord& aInfo)
+ImTextureID ThumbnailCache::get(UUID uuid)
 {
+	auto assets = Engine::get()->getSubSystem<Assets>();
+
+	if (!assets->hasAsset(uuid))
+		return (ImTextureID)0;
+
+	const AssetRecord& aInfo = assets->getInfo(uuid);
+
 	if (!m_registry.getGenerator(aInfo.aType))
 		return (ImTextureID)0;
 

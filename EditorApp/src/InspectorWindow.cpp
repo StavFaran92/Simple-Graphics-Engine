@@ -598,53 +598,10 @@ void InspectorWindow::display()
 					ImGui::EndTabItem();
 				}
 
-				if (ImGui::BeginTabItem("Foliage"))
+				if (ImGui::BeginTabItem("Tools"))
 				{
-					if (!terrain.m_foliageField.isActive)
-					{
-						if (ImGui::Button("build"))
-						{
-							terrain.buildFoliage();
-						}
-					}
-					else
-					{
-						ImGui::ColorEdit3("Bottom Color", (float*)&terrain.m_foliageField.colorA);
-						ImGui::ColorEdit3("Top Color", (float*)&terrain.m_foliageField.colorB);
-						ImGui::DragFloat("Density", &terrain.m_foliageField.globalDensity, 0.01f, 0.0f, 1.0f);
-
-
-
-						bool isActive = EditorState::Instance().getActiveToolType() == EditorTool::Type::FoliagePainter;
-
-						if (isActive)
-						{
-							ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
-						}
-
-						if (ImGui::Button("Foliage Painter"))
-						{
-							EditorState::Instance().setActiveEditorTool(
-								isActive ? EditorTool::Type::None : EditorTool::Type::FoliagePainter,
-								state.getSelectedEntity()
-							);
-						}
-
-						if (isActive)
-						{
-							ImGui::PopStyleColor();
-						}
-					}
-
-
-
-					ImGui::EndTabItem();
-				}
-
-				if (ImGui::BeginTabItem("Painter"))
-				{
-					static const char* toolNames[] = { "None", "Deformer", "Painter" };
-					static const EditorTool::Type toolTypes[] = { EditorTool::Type::None, EditorTool::Type::TerrainDeformer, EditorTool::Type::TerrainPainter };
+					static const char* toolNames[] = { "None", "Deformer", "Painter", "Foliage" };
+					static const EditorTool::Type toolTypes[] = { EditorTool::Type::None, EditorTool::Type::TerrainDeformer, EditorTool::Type::TerrainPainter, EditorTool::Type::FoliagePainter };
 
 					EditorTool::Type activeTool = EditorState::Instance().getActiveToolType();
 					int currentIndex = 0;
@@ -670,6 +627,22 @@ void InspectorWindow::display()
 								ImGui::SetItemDefaultFocus();
 						}
 						ImGui::EndCombo();
+					}
+
+					// Foliage field settings until FoliagePaintTool gets its own UI
+					if (EditorState::Instance().getActiveToolType() == EditorTool::Type::FoliagePainter)
+					{
+						if (!terrain.m_foliageField.isActive)
+						{
+							if (ImGui::Button("Build"))
+								terrain.buildFoliage();
+						}
+						else
+						{
+							ImGui::ColorEdit3("Bottom Color", (float*)&terrain.m_foliageField.colorA);
+							ImGui::ColorEdit3("Top Color", (float*)&terrain.m_foliageField.colorB);
+							ImGui::DragFloat("Density", &terrain.m_foliageField.globalDensity, 0.01f, 0.0f, 1.0f);
+						}
 					}
 
 					// The active tool draws its own settings

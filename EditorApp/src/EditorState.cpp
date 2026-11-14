@@ -5,7 +5,7 @@
 #include "FoliagePaintTool.h"
 #include "TransformTool.h"
 #include "TerrainDeformToolUI.h"
-#include "TerrainPaintTool.h"
+#include "TerrainPaintToolUI.h"
 
 void EditorState::init()
 {
@@ -104,7 +104,7 @@ std::shared_ptr<EditorTool> EditorState::getTool(EditorTool::Type type)
         { EditorTool::Type::TransformTool,   std::make_shared<TransformTool>() },
         { EditorTool::Type::FoliagePainter,   std::make_shared<FoliagePaintTool>() },
         { EditorTool::Type::TerrainDeformer,   std::make_shared<TerrainDeformToolUI>() },
-        { EditorTool::Type::TerrainPainter,    std::make_shared<TerrainPaintTool>() },
+        { EditorTool::Type::TerrainPainter,    std::make_shared<TerrainPaintToolUI>() },
         //{ EditorTool::Type::TerrainSculpt,  std::make_shared<TerrainSculptTool>() },
         //{ EditorTool::Type::TerrainPaint,   std::make_shared<TerrainPaintTool>() },
         //{ EditorTool::Type::Select,         std::make_shared<SelectTool>() },

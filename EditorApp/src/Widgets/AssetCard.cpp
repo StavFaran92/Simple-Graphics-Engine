@@ -50,7 +50,7 @@ ImU32 AssetCard::getTypeColor(AssetType aType)
 
 ImTextureID AssetCard::getThumbnail(const AssetRecord& aInfo)
 {
-	ImTextureID thumbnail = ThumbnailCache::Instance().get(aInfo);
+	ImTextureID thumbnail = ThumbnailCache::Instance().get(aInfo.uuid);
 	if (thumbnail)
 		return thumbnail;
 

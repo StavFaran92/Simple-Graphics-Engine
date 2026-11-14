@@ -123,6 +123,8 @@ float Terrain::getScale() const
 void Terrain::setHeightmap(TextureAssetRef heightmap)
 {
 	m_heightmap = heightmap;
+	m_width = m_heightmap.resource()->getData().width;
+	m_height = m_heightmap.resource()->getData().height;
 
 	build();
 }

@@ -26,7 +26,7 @@ public:
 	ThumbnailGeneratorRegistry& getRegistry() { return m_registry; }
 
 	// The asset's thumbnail, or 0 if there is none (yet); callers fall back to the type icon
-	ImTextureID get(const AssetRecord& aInfo);
+	ImTextureID get(UUID uuid);
 
 	// Regenerates the thumbnail into its existing texture, or drops it if the asset was deleted
 	void invalidate(UUID uuid);
