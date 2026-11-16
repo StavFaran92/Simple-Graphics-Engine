@@ -402,7 +402,7 @@ void RenderFunctions::drawLightPass(const GBuffer& gBuffer)
 	lightPassShaderResource->setTextureInShader(graphics->brdfLUT, "gBRDFIntegrationLUT", 6);
 	lightPassShaderResource->setTextureInShader(graphics->shadowMap, "gShadowMap", 7);
 	lightPassShaderResource->setTextureInShader(graphics->ssaoTexture, "gSSAOColorBuffer", 8); 
-	lightPassShaderResource->setTextureInShader(gBuffer.getTexture(GBuffer::Attachment::Tangent), "gTangnet", 9);
+	//lightPassShaderResource->setTextureInShader(gBuffer.getTexture(GBuffer::Attachment::Tangent), "gTangnet", 9);
 	lightPassShaderResource->bindUniformBlockToBindPoint("Time", 0);
 	lightPassShaderResource->bindUniformBlockToBindPoint("Lights", 1);
 	lightPassShaderResource->setUniformValue("cameraPos", graphics->cameraPos);

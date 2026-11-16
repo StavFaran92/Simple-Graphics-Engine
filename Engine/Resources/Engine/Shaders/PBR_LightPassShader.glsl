@@ -50,7 +50,7 @@ uniform sampler2D gBRDFIntegrationLUT;
 uniform sampler2D gShadowMap;
 uniform vec3 cameraPos;
 uniform sampler2D gSSAOColorBuffer;
-uniform sampler2D gTangent;
+//uniform sampler2D gTangent;
 
 uniform bool useSSAO;
 uniform bool useShadows;
@@ -107,7 +107,7 @@ void main()
 	float metallic = texture(gMRA, TexCoords).r;
 	float roughness = texture(gMRA, TexCoords).g;
 	float ao = texture(gMRA, TexCoords).b;
-	vec3 tangent = normalize(texture(gTangent, TexCoords).rgb);
+	//vec3 tangent = normalize(texture(gTangent, TexCoords).rgb);
 	float ssao = texture(gSSAOColorBuffer, TexCoords).r;
 
 	vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);

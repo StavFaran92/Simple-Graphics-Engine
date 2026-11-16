@@ -30,11 +30,16 @@ struct SamplerState
 	bool isActive = false;
 };
 
+class Shader;
+
 class EngineAPI TextureSampler
 {
 public:
 	TextureResourceRef texture;
 	SamplerState state;
+
+	// Binds the texture to the slot and sets this sampler's uniforms under name
+	void apply(Shader& shader, const std::string& name, int slot) const;
 };
 
 class EngineAPI TextureSamplerAsset

@@ -32,28 +32,7 @@
 
 void Material::useSamplerInShader(const std::string& name, const TextureSampler& sampler, ShaderResourceRef& shader, int slot)
 {
-	// if texture is empty use dummy texture
-	TextureResourceRef texture = sampler.texture;
-	texture->setSlot(slot);
-	texture->bind();
-
-	// set sampler2D (e.g. material.diffuse3 to the currently active texture unit)
-	shader->setUniformValue(name + ".texture", slot);
-
-	shader->setUniformValue(name + ".isActive", sampler.state.isActive);
-	shader->setUniformValue(name + ".xOffset", sampler.state.xOffset);
-	shader->setUniformValue(name + ".yOffset", sampler.state.yOffset);
-	shader->setUniformValue(name + ".xScale", sampler.state.xScale);
-	shader->setUniformValue(name + ".yScale", sampler.state.yScale);
-	shader->setUniformValue(name + ".channelMaskR", sampler.state.channelMaskR);
-	shader->setUniformValue(name + ".channelMaskG", sampler.state.channelCount > 1 ? sampler.state.channelMaskG : 0);
-	shader->setUniformValue(name + ".channelMaskB", sampler.state.channelCount > 2 ? sampler.state.channelMaskB : 0);
-	shader->setUniformValue(name + ".channelMaskA", sampler.state.channelCount > 3 ? sampler.state.channelMaskA : 0);
-
-	//shader->setUniformValue(name + ".channelMaskR", sampler ? sampler->state.channelMaskR : 1);
-	//shader->setUniformValue(name + ".channelMaskG", sampler ? (sampler->state.channelCount > 1 ? sampler->state.channelMaskG : 0) : 0);
-	//shader->setUniformValue(name + ".channelMaskB", sampler ? (sampler->state.channelCount > 2 ? sampler->state.channelMaskB : 0) : 0);
-	//shader->setUniformValue(name + ".channelMaskA", sampler ? (sampler->state.channelCount > 3 ? sampler->state.channelMaskA : 0) : 0);
+	sampler.apply(*shader.get(), name, slot);
 }
 
 const std::unordered_map<std::string, TextureSampler>& Material::getAllSamplers() const

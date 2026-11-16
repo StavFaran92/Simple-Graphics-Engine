@@ -161,7 +161,7 @@ void SSAOSystem::draw(TextureResourceRef positionVS, TextureResourceRef normalVS
 		m_passShader->setUniformValue("ssaoKernel[" + std::to_string(i) + "]", m_kernel[i]);
 	}
 
-	m_passShader->setUniformValue("view", graphics->view);
+	//m_passShader->setUniformValue("view", graphics->view);
 	m_passShader->setUniformValue("projection", graphics->projection);
 
 	{
