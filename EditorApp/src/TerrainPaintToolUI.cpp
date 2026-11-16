@@ -14,6 +14,11 @@ void TerrainPaintToolUI::onActivate()
 	m_tool.onActivate();
 }
 
+void TerrainPaintToolUI::onDeactivate()
+{
+	m_tool.endStroke();
+}
+
 void TerrainPaintToolUI::update(ImVec2 viewportPos, ImVec2 viewportSize)
 {
 	ImVec2 mousePos = ImGui::GetMousePos();
@@ -49,7 +54,14 @@ void TerrainPaintToolUI::update(ImVec2 viewportPos, ImVec2 viewportSize)
 
 bool TerrainPaintToolUI::onEvent(const Event& e)
 {
-	// Holding the button paints under the cursor
+	if (e.type() == EventType::MouseButtonReleased
+		&& static_cast<const MouseButtonReleasedEvent&>(e).button == MouseButton::MOUSE_BUTTON_LEFT)
+	{
+		m_tool.endStroke();
+		return false;
+	}
+
+	// Holding the button paints under the cursor; the first dab starts the stroke
 	if (Engine::get()->getInput()->getMouse()->getButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && m_currentResult.hit)
 		return m_tool.dabAt(m_currentResult.position);
 
@@ -107,8 +119,10 @@ void TerrainPaintToolUI::display()
 
 	ImGui::Spacing();
 
+	// An open stroke is recorded before the layer list changes, so history keeps the order
 	if (ImGui::Button("+"))
 	{
+		m_tool.endStroke();
 		terrain->addLayer();
 		m_tool.selectLayer(terrain->getLayerCount() - 1);
 	}
@@ -119,6 +133,7 @@ void TerrainPaintToolUI::display()
 	ImGui::BeginDisabled(layerCount <= 1);
 	if (ImGui::Button("-"))
 	{
+		m_tool.endStroke();
 		terrain->removeLayer(m_tool.getSelectedLayer());
 		m_tool.clampSelection(terrain->getLayerCount());
 	}

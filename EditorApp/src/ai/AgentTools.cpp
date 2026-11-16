@@ -19,6 +19,7 @@
 #include "render/MaterialDataParser.h"
 #include "commands/AssetCommands.h"
 #include "TerrainDeformTool.h"
+#include "TerrainPaintTool.h"
 #include "EditorState.h"
 #include "Thumbnails/ThumbnailCache.h"
 
@@ -1109,6 +1110,222 @@ void registerAgentTools(McpServer& server, ConsoleReader readConsole)
 			std::string text = "Sculpted " + std::to_string(dabs) + " dab(s) on " + describe(e);
 			if (!skipped.empty())
 				text += ". Off the terrain, skipped: " + skipped.dump();
+			return mcpText(text);
+		}
+	});
+
+	server.addTool({
+		"paint_terrain",
+		"Paints a terrain layer's mask with the editor's Painter brush, one dab per [x, z] world point. 'layer' is 1 or 2 "
+		"(0 is the base and has no mask; add_terrain_layer adds one). 'radius' is in terrain units; 'strength' (0 to 1) is "
+		"added to the mask at each dab's centre and fades to 0 at its edge, so overlapping dabs add up; 'erase' subtracts. "
+		"The colour comes from the terrain material's terrainLayers[layer], so a layer with no texture looks no different. "
+		"Points off the terrain are skipped. One undo step.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"layer", { {"type", "integer"}, {"minimum", 1}, {"maximum", Terrain::MAX_LAYER_COUNT - 1} }},
+			{"points", { {"type", "array"}, {"minItems", 1},
+				{"items", { {"type", "array"}, {"items", { {"type", "number"} }}, {"minItems", 2}, {"maxItems", 2} }} }},
+			{"radius", { {"type", "number"}, {"exclusiveMinimum", 0} }},
+			{"strength", { {"type", "number"}, {"minimum", 0}, {"maximum", 1} }},
+			{"erase", { {"type", "boolean"} }},
+		}, { "id", "layer", "points", "radius", "strength" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			Terrain* terrain = e.tryGetComponent<Terrain>();
+			if (!terrain)
+				throw McpToolError(describe(e) + " has no Terrain");
+
+			const json& points = args.value("points", json::array());
+			if (!points.is_array() || points.empty())
+				throw McpToolError("'points' must be a list of [x, z] world positions");
+			for (const json& p : points)
+				if (!p.is_array() || p.size() != 2 || !p[0].is_number() || !p[1].is_number())
+					throw McpToolError("Each point must be [x, z]");
+
+			const float radius = args.value("radius", 0.f);
+			if (radius <= 0.f)
+				throw McpToolError("'radius' must be more than 0");
+			const float strength = args.value("strength", 0.f);
+			if (strength < 0.f || strength > 1.f)
+				throw McpToolError("'strength' must be 0 to 1");
+
+			// A tool of its own, so the editor's brush settings stay as they are
+			const int layer = args.value("layer", 0);
+			TerrainPaintTool tool;
+			tool.setEntity(e);
+			if (!tool.selectLayer(layer))
+				throw McpToolError(describe(e) + " has no paintable layer " + std::to_string(layer) + "; it has " +
+					std::to_string(terrain->getLayerCount()) + " layer(s), 0 being the base. add_terrain_layer adds one");
+
+			// Masks keep the size they were made at, so a terrain resized since then has a different pixels-per-unit
+			TextureResourceRef mask = terrain->getLayer(layer).mask.resource();
+			if (mask.isEmpty())
+				throw McpToolError("Layer " + std::to_string(layer) + " of " + describe(e) + " has no mask texture");
+			tool.setBrushRadius(radius * float(mask->getWidth()) / float(terrain->getWidth()));
+			tool.setBrushStrength(strength);
+			tool.setDrawMode(args.value("erase", false) ? TerrainPaintTool::DrawMode::Erase : TerrainPaintTool::DrawMode::Draw);
+
+			// Only x and z place a dab; y is the terrain's own height so a rotated terrain maps it right
+			const float y = e.getComponent<Transformation>().getWorldPosition().y;
+			int dabs = 0;
+			json skipped = json::array();
+			for (const json& p : points)
+			{
+				if (tool.dabAt(glm::vec3(p[0].get<float>(), y, p[1].get<float>())))
+					dabs++;
+				else
+					skipped.push_back(p);
+			}
+
+			if (dabs == 0)
+				throw McpToolError("None of the points are on " + describe(e) + "; get_entity shows its position and size");
+
+			tool.endStroke("AI: paint layer " + std::to_string(layer) + " on " + entityName(e));
+
+			std::string text = "Painted " + std::to_string(dabs) + " dab(s) on layer " + std::to_string(layer) + " of " + describe(e);
+			if (!skipped.empty())
+				text += ". Off the terrain, skipped: " + skipped.dump();
+			return mcpText(text);
+		}
+	});
+
+	server.addTool({
+		"get_terrain_heightmap",
+		"Shows a terrain's heights as a top-down grey image: black is its lowest point, white its highest. The top row is "
+		"the terrain's far edge (lowest world z). The caption gives the height range and how image pixels map to world "
+		"x and z, for picking points for sculpt_terrain and paint_terrain.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+		}, { "id" }),
+		[](const json& args) {
+			Entity e = entityFromArgs(args);
+			Terrain* terrain = e.tryGetComponent<Terrain>();
+			if (!terrain)
+				throw McpToolError(describe(e) + " has no Terrain");
+
+			TextureResourceRef heightmap = terrain->getHeightmap();
+			if (heightmap.isEmpty())
+				throw McpToolError(describe(e) + " has no heightmap");
+
+			const int texW = heightmap->getWidth();
+			const int texH = heightmap->getHeight();
+			if (heightmap->getData().data.size() < size_t(texW) * texH * sizeof(float))
+				heightmap->download();
+			const float* heights = heightmap->getData().data.getFloatData();
+
+			float minH = std::numeric_limits<float>::max();
+			float maxH = std::numeric_limits<float>::lowest();
+			for (size_t i = 0; i < size_t(texW) * texH; i++)
+			{
+				minH = std::min(minH, heights[i]);
+				maxH = std::max(maxH, heights[i]);
+			}
+			const float range = maxH > minH ? maxH - minH : 1.f;
+
+			// Big enough to read, small enough to send: long side at most 1024, short side about 256 when the map is small
+			float scale = std::min(1024.f / float(std::max(texW, texH)), std::max(1.f, 256.f / float(std::min(texW, texH))));
+			if (scale >= 1.f)
+				scale = std::floor(scale);
+			CapturedImage image;
+			image.width = std::max(1, int(std::round(texW * scale)));
+			image.height = std::max(1, int(std::round(texH * scale)));
+			image.rgb.resize(size_t(image.width) * image.height * 3);
+			for (int py = 0; py < image.height; py++)
+			{
+				const int ty = std::min(texH - 1, int(py / scale));
+				for (int px = 0; px < image.width; px++)
+				{
+					const int tx = std::min(texW - 1, int(px / scale));
+					const uint8_t grey = uint8_t(std::round((heights[size_t(ty) * texW + tx] - minH) / range * 255.f));
+					uint8_t* out = &image.rgb[(size_t(py) * image.width + px) * 3];
+					out[0] = out[1] = out[2] = grey;
+				}
+			}
+
+			// Corners of the terrain in the world give the pixel -> world mapping
+			const auto& transform = e.getComponent<Transformation>();
+			const glm::mat4 model = transform.getWorldTransformation();
+			const float width = float(terrain->getWidth());
+			const float depth = float(terrain->getHeight());
+			const glm::vec3 c0 = glm::vec3(model * glm::vec4(-width * .5f, minH * terrain->getScale(), -depth * .5f, 1.f));
+			const glm::vec3 c1 = glm::vec3(model * glm::vec4(width * .5f, maxH * terrain->getScale(), depth * .5f, 1.f));
+			const float kx = (c1.x - c0.x) / image.width;
+			const float kz = (c1.z - c0.z) / image.height;
+
+			auto num = [](float v) { char buf[32]; snprintf(buf, sizeof(buf), "%.3f", v); return std::string(buf); };
+			std::string caption = "Heightmap of " + describe(e) + ", " + std::to_string(image.width) + "x" + std::to_string(image.height) +
+				" (from " + std::to_string(texW) + "x" + std::to_string(texH) + "). World height: black " + num(c0.y) + ", white " + num(c1.y) +
+				". Pixel (px, py) is at world x = " + num(c0.x) + " + (px + 0.5) * " + num(kx) +
+				", z = " + num(c0.z) + " + (py + 0.5) * " + num(kz) + ".";
+			if (transform.getWorldRotation() != glm::quat(1.f, 0.f, 0.f, 0.f))
+				caption += " The terrain is rotated, so this mapping is only along its own axes.";
+
+			json content = mcpImage(encodePng(image));
+			content.push_back({ {"type", "text"}, {"text", caption} });
+			return content;
+		}
+	});
+
+	server.addTool({
+		"add_terrain_layer",
+		"Adds a paintable layer to a terrain, with an empty mask, up to 3 layers in all (0 is the base). Returns the new "
+		"layer's index for paint_terrain. Its colour comes from the terrain material's terrainLayers[index]. One undo step.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+		}, { "id" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			Terrain* terrain = e.tryGetComponent<Terrain>();
+			if (!terrain)
+				throw McpToolError(describe(e) + " has no Terrain");
+			if (terrain->getLayerCount() >= Terrain::MAX_LAYER_COUNT)
+				throw McpToolError(describe(e) + " already has " + std::to_string(Terrain::MAX_LAYER_COUNT) + " layers, the most a terrain can have");
+
+			const std::string component = componentTypeName<Terrain>();
+			ComponentSnapshot before = takeSnapshot(e, component);
+			terrain->addLayer();
+
+			CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+				std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
+				"AI: add terrain layer to " + entityName(e)));
+			return mcpText("Added layer " + std::to_string(terrain->getLayerCount() - 1) + " to " + describe(e));
+		}
+	});
+
+	server.addTool({
+		"remove_terrain_layer",
+		"Removes a terrain layer and its mask from the terrain; the layers after it move down one index. The base layer 0 "
+		"can't be removed. One undo step.",
+		objectSchema({
+			{"id", { {"type", "integer"} }},
+			{"layer", { {"type", "integer"}, {"minimum", 1} }},
+		}, { "id", "layer" }),
+		[](const json& args) {
+			requireEditMode();
+			Entity e = entityFromArgs(args);
+			Terrain* terrain = e.tryGetComponent<Terrain>();
+			if (!terrain)
+				throw McpToolError(describe(e) + " has no Terrain");
+
+			const int layer = args.value("layer", 0);
+			if (layer < 1 || layer >= terrain->getLayerCount())
+				throw McpToolError(describe(e) + " has no removable layer " + std::to_string(layer) + "; it has " +
+					std::to_string(terrain->getLayerCount()) + " layer(s), 0 being the base");
+
+			const std::string component = componentTypeName<Terrain>();
+			ComponentSnapshot before = takeSnapshot(e, component);
+			terrain->removeLayer(layer);
+
+			CommandStack::Instance().record(std::make_unique<EditComponentsCmd>(
+				std::vector<ComponentSnapshot>{ before }, std::vector<ComponentSnapshot>{ takeSnapshot(e, component) },
+				"AI: remove terrain layer " + std::to_string(layer) + " from " + entityName(e)));
+
+			std::string text = "Removed layer " + std::to_string(layer) + " from " + describe(e);
+			if (layer < terrain->getLayerCount())
+				text += "; the layers after it moved down one index";
 			return mcpText(text);
 		}
 	});

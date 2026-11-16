@@ -502,7 +502,7 @@ void Terrain::addLayer()
 	tData.textureName = "SGE_TERRAIN_LAYER_" + std::to_string(m_layerMasks.size());
 	tData.filter = TextureFilter::Linear;
 	tData.wrap = TextureWrap::Clamp;
-	tData.fillEmpty = false;
+	tData.fillEmpty = true;
 
 	AssetBuildDescriptor desc;
 	desc.aType = AssetType::TEXTURE;

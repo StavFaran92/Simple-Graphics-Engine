@@ -45,7 +45,5 @@ private:
     TexturePainter m_texturePainter;
     Mode m_mode = Mode::Raise;
 
-    bool m_stroking = false;
-    HeightmapSnapshot m_strokeStart;  // whole heightmap from before the stroke
-    HeightmapRect m_strokeRect;       // pixels the stroke touched so far
+    TextureStroke m_stroke;
 };

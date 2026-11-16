@@ -725,7 +725,7 @@
                                     "m_scale": 1.0,
                                     "m_material": {
                                         "uuid": {
-                                            "m_value": 8
+                                            "m_value": 85
                                         }
                                     },
                                     "m_foliageField": {
@@ -751,6 +751,22 @@
                                             "mask": {
                                                 "uuid": {
                                                     "m_value": 1
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "name": "Layer 1",
+                                            "mask": {
+                                                "uuid": {
+                                                    "m_value": 86
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "name": "Layer 2",
+                                            "mask": {
+                                                "uuid": {
+                                                    "m_value": 87
                                                 }
                                             }
                                         }
@@ -6776,7 +6792,7 @@
                                         "v.z": -0.06975647062063217
                                     },
                                     "fovyRadians": 0.7853981852531433,
-                                    "aspect": 1.8400719165802003,
+                                    "aspect": 1.9028741121292115,
                                     "znear": 0.10000000149011612,
                                     "zfar": 1000.0,
                                     "type": 0,

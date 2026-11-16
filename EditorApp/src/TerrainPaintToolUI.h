@@ -9,6 +9,9 @@ class TerrainPaintToolUI : public EditorTool
 public:
     void onActivate() override;
 
+    // Records a stroke that's still open
+    void onDeactivate() override;
+
     void update(ImVec2 viewportPos, ImVec2 viewportSize) override;
 
     bool onEvent(const Event& e) override;

@@ -8,6 +8,12 @@ Terrain* TerrainPaintTool::getTerrain()
     return m_entity.valid() ? m_entity.tryGetComponent<Terrain>() : nullptr;
 }
 
+void TerrainPaintTool::setEntity(Entity entity)
+{
+    endStroke();
+    m_entity = entity;
+}
+
 void TerrainPaintTool::onActivate()
 {
     m_selectedLayerIndex = 1;
@@ -37,12 +43,23 @@ bool TerrainPaintTool::dabAt(const glm::vec3& worldPoint)
         return false;
     m_texturePainter.setTexture(maskTexture);
 
+    // Another layer selected, or the layers shifted: the open stroke belongs to another mask
+    if (m_stroke.isOpen() && m_stroke.texture() != mask.getUID())
+        endStroke();
+    m_stroke.begin(mask);
+
     glm::vec2 pixel = TerrainBrush::worldToPixel(m_entity, *terrain, worldPoint, maskTexture);
     m_texturePainter.applyBrush(pixel.x, pixel.y);
+    m_stroke.addDab(pixel, getBrushRadius());
 
     maskTexture->download();
     mask.makeDirty();
     return true;
+}
+
+void TerrainPaintTool::endStroke(const std::string& label)
+{
+    m_stroke.end(label);
 }
 
 bool TerrainPaintTool::selectLayer(int index)

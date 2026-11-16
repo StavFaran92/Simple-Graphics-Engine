@@ -2,13 +2,14 @@
 
 #include "component/Terrain.h"
 #include "sge.h"
+#include "commands/TerrainCommands.h"
 
 // Paints a terrain's layer masks; no UI, so the editor and MCP both drive it
 class TerrainPaintTool
 {
 public:
-    // The terrain to paint
-    void setEntity(Entity entity) { m_entity = entity; }
+    // The terrain to paint; closes an open stroke first
+    void setEntity(Entity entity);
     void onActivate();
 
     // False for the base layer 0 or a layer that doesn't exist
@@ -35,6 +36,9 @@ public:
     // One dab on the selected layer at a world point; false when off the terrain or no paintable layer
     bool dabAt(const glm::vec3& worldPoint);
 
+    // Records the open stroke as one undo step; dabAt opens one when needed
+    void endStroke(const std::string& label = "Paint terrain");
+
 private:
     // The entity's terrain, or null when it's gone
     Terrain* getTerrain();
@@ -43,4 +47,5 @@ private:
     int m_selectedLayerIndex = 0;
     TexturePainter m_texturePainter;
     DrawMode m_drawMode = DrawMode::Draw;
+    TextureStroke m_stroke;
 };
