@@ -78,7 +78,7 @@ void Texture::fillTextureBufferIfNeeded(TextureData& tData)
 				tData.format,
 				tData.type);
 		}
-		else if (tData.target == TextureTarget::TEXTURE_3D)
+		else if (tData.target == TextureTarget::TEXTURE_3D || tData.target == TextureTarget::TEXTURE_2D_ARRAY)
 		{
 			tData.data = TextureUtils::createBlankTextureBuffer3D(
 				tData.width,
@@ -275,7 +275,7 @@ void Texture::build(const TextureData& textureData)
 				textureData.facesData[i].data());
 		}
 	}
-	else if (textureData.target == TextureTarget::TEXTURE_3D)
+	else if (textureData.target == TextureTarget::TEXTURE_3D || textureData.target == TextureTarget::TEXTURE_2D_ARRAY)
 	{
 		glTexImage3D(toGL(textureData.target), 
 			0, 
@@ -314,14 +314,41 @@ int Texture::getChannels() const
 	return m_data.channels;
 }
 
-void Texture::setData(int xoffset, int yoffset, int width, int height, const void* data)
+void Texture::setData(int xoffset, int yoffset, int width, int height, const void* data, int layer)
 {
+	const GLenum target = toGL(m_data.target);
+	const GLenum format = toGL(m_data.format);
+	const GLenum type   = toGL(m_data.type);
+
 	bind();
 
 	// Data is tightly packed in the texture's own format, like download() reads it
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, width, height, toGL(m_data.format), toGL(m_data.type), data);
+
+	if (m_data.target == TextureTarget::TEXTURE_2D)
+	{
+		glTexSubImage2D(target, 0, xoffset, yoffset, width, height, format, type, data);
+	}
+	else if (m_data.target == TextureTarget::TEXTURE_3D || m_data.target == TextureTarget::TEXTURE_2D_ARRAY)
+	{
+		glTexSubImage3D(target, 0, xoffset, yoffset, layer, width, height, 1, format, type, data);
+	}
+	else if (m_data.target == TextureTarget::TEXTURE_CUBE_MAP)
+	{
+		glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, 0, xoffset, yoffset, width, height, format, type, data);
+	}
+	else
+	{
+		logError("Texture::setData unsupported texture target");
+	}
+
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+	// Level 0 changed, so the lower levels are stale
+	if (m_data.genMipMap)
+	{
+		glGenerateMipmap(target);
+	}
 }
 
 void Texture::generateMipMaps()
@@ -375,8 +402,9 @@ bool Texture::download()
 
 		return true;
 	}
-	else if (m_data.target == TextureTarget::TEXTURE_3D)
+	else if (m_data.target == TextureTarget::TEXTURE_3D || m_data.target == TextureTarget::TEXTURE_2D_ARRAY)
 	{
+		// Arrays come back layer after layer, same layout as 3D slices
 		const size_t size =
 			static_cast<size_t>(m_data.width) *
 			static_cast<size_t>(m_data.height) *
@@ -439,9 +467,9 @@ TextureResourceRef Texture::load(const std::string& fileLocation, TextureLoadDes
 
 TextureResourceRef Texture::clone() const
 {
-	if (m_data.target == TextureTarget::TEXTURE_3D)
+	if (m_data.target == TextureTarget::TEXTURE_3D || m_data.target == TextureTarget::TEXTURE_2D_ARRAY)
 	{
-		logError("Clone is not supported for 3D textures");
+		logError("Clone is not supported for 3D textures or texture arrays");
 		return TextureResourceRef::empty;
 	}
 

@@ -51,7 +51,6 @@ public:
 	static MaterialResourceRef load(const std::string& fileLocation, MaterialLoadDescriptor desc = {});
 
 	void use();
-	void release();
 
 	std::string getName() const;
 	MaterialRenderMode getRenderMode() const;

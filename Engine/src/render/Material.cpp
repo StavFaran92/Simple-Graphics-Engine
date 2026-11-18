@@ -73,15 +73,6 @@ void Material::use()
 	}
 }
 
-void Material::release()
-{
-	for (auto i = 0; i < 3; i++)
-	{
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-}
-
 TextureSampler Material::getSampler(const std::string& name)
 {
 	auto it = m_samplers.find(name);

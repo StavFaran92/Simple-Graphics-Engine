@@ -100,7 +100,8 @@ enum class TextureTarget : int
 {
 	TEXTURE_2D = 0x0DE1,
 	TEXTURE_3D = 0x806F,
-	TEXTURE_CUBE_MAP = 0x8513
+	TEXTURE_CUBE_MAP = 0x8513,
+	TEXTURE_2D_ARRAY = 0x8C1A
 };
 
 struct TextureData
@@ -119,7 +120,7 @@ struct TextureData
 	bool flip = false;
 	bool fillEmpty = false;
 
-	int depth = 0; // Only apply to texture3D
+	int depth = 0; // Texture3D depth, or layer count for 2D arrays
 
 	ImageBuffer data;
 	ImageBuffer facesData[6]; //only apply to Cubemap
@@ -182,7 +183,8 @@ public:
 	int getHeight() const;
 	int getChannels() const;
 
-	void setData(int xoffset, int yoffset, int width, int height, const void* data);
+	// layer: array layer / 3D slice / cubemap face; ignored for 2D
+	void setData(int xoffset, int yoffset, int width, int height, const void* data, int layer = 0);
 
 	void generateMipMaps();
 
