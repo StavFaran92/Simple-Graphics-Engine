@@ -21,6 +21,7 @@
 #include "utils/DebugHelper.h"
 #include "component/MeshRendererComponent.h"
 #include "component/RenderableComponent.h"
+#include "component/CameraComponent.h"
 
 
 ShadowSystem::ShadowSystem()
@@ -33,27 +34,28 @@ bool ShadowSystem::init()
 	//	renderToDepthMap(params);
 	//});
 
-	auto graphics = Engine::get()->getSubSystem<Graphics>();
-	if (!createDepthMap(graphics->shadowSettings.resolution))
+	if (!createDepthMap())
 		return false;
 
 	m_simpleDepthShader = Shader::load(SGE_ROOT_DIR "Resources/Engine/Shaders/SimpleDepthShader.glsl");
 
-	//m_bufferDisplay = std::make_shared<ScreenBufferDisplay>(m_scene);
-	//m_bufferDisplay->init(Engine::get()->getWindow()->getWidth(), Engine::get()->getWindow()->getHeight());
-
 	return true;
 }
 
-bool ShadowSystem::createDepthMap(int resolution)
+bool ShadowSystem::createDepthMap()
 {
+	const ShadowSettings& settings = Engine::get()->getSubSystem<Graphics>()->shadowSettings;
+	const int resolution = settings.resolution;
+	const int cascadeCount = glm::clamp(settings.cascadeCount, 1, MAX_SHADOW_CASCADES);
+
 	m_fbo.bind();
 
-	// Generate 2D texture
+	// One layer per cascade
 	TextureData textureData;
-	textureData.target = TextureTarget::TEXTURE_2D;
+	textureData.target = TextureTarget::TEXTURE_2D_ARRAY;
 	textureData.width = resolution;
 	textureData.height = resolution;
+	textureData.depth = cascadeCount;
 	textureData.channels = 1;
 	textureData.internalFormat = TextureInternalFormat::DEPTH_COMPONENT;
 	textureData.format = TextureFormat::DEPTH_COMPONENT;
@@ -62,13 +64,15 @@ bool ShadowSystem::createDepthMap(int resolution)
 	textureData.wrap = TextureWrap::Clamp;
 	m_depthMapTexture = Texture::createTexture(textureData);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	// Outside the map counts as lit
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-	// Attach texture to FBO
-	m_fbo.attachTexture(m_depthMapTexture.get()->getID(), GL_DEPTH_ATTACHMENT);
+	// Layer 0 only validates the FBO; renderToDepthMap attaches each layer in turn
+	glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthMapTexture->getID(), 0, 0);
 
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
@@ -83,69 +87,133 @@ bool ShadowSystem::createDepthMap(int resolution)
 	m_fbo.unbind();
 
 	m_resolution = resolution;
-
-	DebugHelper::getInstance().registerTextureForDebug("Depth map", m_depthMapTexture);
+	m_cascades.count = cascadeCount;
 
 	return true;
 }
 
-void ShadowSystem::renderToDepthMap(Scene* scene, const std::vector<DrawItem>& drawItems)
+void ShadowSystem::computeSplits(float znear)
 {
-	auto graphics = Engine::get()->getSubSystem<Graphics>();
-	const ShadowSettings& settings = graphics->shadowSettings;
+	const ShadowSettings& settings = Engine::get()->getSubSystem<Graphics>()->shadowSettings;
 
-	if (settings.resolution > 0 && settings.resolution != m_resolution)
-		createDepthMap(settings.resolution);
+	const float n = std::max(znear, 0.001f);
+	const float f = std::max(settings.shadowDistance, n + 0.01f);
+	const int count = m_cascades.count;
+
+	// Practical split scheme: blend between uniform and logarithmic splits
+	for (int i = 0; i < count; i++)
+	{
+		const float p = float(i + 1) / float(count);
+		const float logSplit = n * std::pow(f / n, p);
+		const float uniformSplit = n + (f - n) * p;
+		m_cascades.splits[i] = glm::mix(uniformSplit, logSplit, settings.splitLambda);
+	}
+}
+
+void ShadowSystem::computeCascade(int i, float sliceNear, float sliceFar, const glm::mat4& view,
+	const CameraComponent& camera, const glm::vec3& lightDir, const glm::vec3& lightUp)
+{
+	const ShadowSettings& settings = Engine::get()->getSubSystem<Graphics>()->shadowSettings;
+
+	// Slice corners in world space
+	const glm::mat4 sliceProj = glm::perspective(camera.getFOVYInRadians(), camera.aspect, sliceNear, sliceFar);
+	const glm::mat4 invViewProj = glm::inverse(sliceProj * view);
+
+	glm::vec3 corners[8];
+	int c = 0;
+	for (int x = -1; x <= 1; x += 2)
+		for (int y = -1; y <= 1; y += 2)
+			for (int z = -1; z <= 1; z += 2)
+			{
+				const glm::vec4 p = invViewProj * glm::vec4(float(x), float(y), float(z), 1.0f);
+				corners[c++] = glm::vec3(p) / p.w;
+			}
+
+	// Bounding sphere: its radius doesn't change when the camera turns, so the texel size stays constant
+	glm::vec3 center(0.0f);
+	for (const glm::vec3& p : corners)
+		center += p;
+	center /= 8.0f;
+
+	float radius = 0.0f;
+	for (const glm::vec3& p : corners)
+		radius = std::max(radius, glm::length(p - center));
+	radius = std::ceil(radius * 16.0f) / 16.0f; // float noise would otherwise change it every frame
+
+	const float depthRange = 2.0f * radius + settings.casterMargin;
+	const glm::mat4 lightView = glm::lookAt(center - lightDir * (radius + settings.casterMargin), center, lightUp);
+	glm::mat4 lightProj = glm::ortho(-radius, radius, -radius, radius, 0.0f, depthRange);
+
+	// Snap to whole texels so the texel grid stays fixed in the world while the camera moves
+	const float halfRes = m_resolution * 0.5f;
+	const glm::vec4 origin = lightProj * lightView * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	const glm::vec2 originTexels = glm::vec2(origin) * halfRes;
+	const glm::vec2 offset = (glm::round(originTexels) - originTexels) / halfRes;
+	lightProj[3].x += offset.x;
+	lightProj[3].y += offset.y;
+
+	m_cascades.lightSpaceMatrices[i] = lightProj * lightView;
+
+	// biasScale texels of world size, in the [0, 1] depth the map stores
+	const float texelWorld = 2.0f * radius / float(m_resolution);
+	m_cascades.bias[i] = settings.biasScale * texelWorld / depthRange;
+}
+
+void ShadowSystem::renderToDepthMap(Scene* scene, const std::vector<DrawItem>& drawItems,
+	const glm::mat4& view, const CameraComponent& camera)
+{
+	const ShadowSettings& settings = Engine::get()->getSubSystem<Graphics>()->shadowSettings;
+
+	const int wantedCount = glm::clamp(settings.cascadeCount, 1, MAX_SHADOW_CASCADES);
+	if (settings.resolution > 0 && (settings.resolution != m_resolution || wantedCount != m_cascades.count))
+		createDepthMap();
+
+	auto lights = scene->getRegistry().getRegistry().view<DirectionalLight>();
+	const bool hasLight = lights.size() > 0;
+
+	if (hasLight)
+	{
+		Entity e{ lights.front(), &scene->getRegistry() };
+		auto& trans = e.getComponent<Transformation>();
+
+		computeSplits(camera.znear);
+
+		float sliceNear = camera.znear;
+		for (int i = 0; i < m_cascades.count; i++)
+		{
+			computeCascade(i, sliceNear, m_cascades.splits[i], view, camera, trans.getWorldForward(), trans.getWorldUp());
+			sliceNear = m_cascades.splits[i];
+		}
+	}
 
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-
-	// Set shadow map viewport
 	glViewport(0, 0, m_resolution, m_resolution);
 
-	// Bind FBO
 	m_fbo.bind();
+	m_simpleDepthShader->use();
 
-	// Clear buffer
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	auto view =scene->getRegistry().getRegistry().view<DirectionalLight>();
-	if (view.size() < 1)
+	for (int i = 0; i < m_cascades.count; i++)
 	{
-		// No directional light, for now simply return
-		m_fbo.unbind();
-		glDisable(GL_DEPTH_TEST);
-		glCullFace(GL_BACK);
-		return;
+		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthMapTexture->getID(), 0, i);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		// Without a light the cleared layers leave everything lit
+		if (!hasLight)
+			continue;
+
+		m_simpleDepthShader->setUniformValue("lightSpaceMatrix", m_cascades.lightSpaceMatrices[i]);
+		drawCasters(scene, drawItems);
 	}
 
-	// Configure Shadow pass matrices
-	auto entt = view.front();
-	Entity e{ entt, &scene->getRegistry() };
-	auto& dirLight = e.getComponent<DirectionalLight>();
+	m_fbo.unbind();
+	glDisable(GL_DEPTH_TEST);
+	glCullFace(GL_BACK);
+}
 
-	//todo verify exists
-
-	// Generate Orthogonal projection
-	glm::mat4 lightProjection = glm::ortho(
-		settings.left, settings.right,
-		settings.bottom, settings.top,
-		settings.nearPlane, settings.farPlane);
-
-	auto& trans = e.getComponent<Transformation>();
-	glm::vec3 direction = trans.getWorldForward();
-	glm::vec3 up = trans.getWorldUp();
-
-	// Generate lookAt light matrix 
-	glm::mat4 dirLightView = glm::lookAt(
-		settings.lightOrigin,
-		settings.lightOrigin + direction,
-		up);
-
-	m_lightSpaceMatrix = lightProjection * dirLightView;
-
-	m_simpleDepthShader->use();
-	m_simpleDepthShader->setUniformValue("lightSpaceMatrix", m_lightSpaceMatrix);
+void ShadowSystem::drawCasters(Scene* scene, const std::vector<DrawItem>& drawItems)
+{
+	auto graphics = Engine::get()->getSubSystem<Graphics>();
 
 	const auto& bones = scene->getDrawItemBones();
 
@@ -204,29 +272,6 @@ void ShadowSystem::renderToDepthMap(Scene* scene, const std::vector<DrawItem>& d
 
 		RenderCommand::drawInstanced(item.mesh->getVAO(), item.instanceCount);
 	}
-
-	// Unbind FBO
-	m_fbo.unbind();
-
-	// Set viewport back to normal
-	//auto width = Engine::get()->getWindow()->getWidth();
-	//auto height = Engine::get()->getWindow()->getHeight();
-	//glViewport(0, 0, width, height);
-
-	//auto phongShader = m_context->getStandardShader();
-
-	//// set lightSpaceMatrix in shader
-	//phongShader->setValue("lightSpaceMatrix", lightSpaceMatrix);
-
-	////TODO Fix
-	//// set Depth map texture in shader
-	//phongShader->setValue("shadowMap", 2);
-	//m_depthMapTexture->setSlot(2);
-	//m_depthMapTexture->bind();
-
-	//m_bufferDisplay->draw(m_depthMapTexture);
-	glDisable(GL_DEPTH_TEST);
-	glCullFace(GL_BACK);
 }
 
 TextureResourceRef ShadowSystem::getShadowMap() const
@@ -234,7 +279,21 @@ TextureResourceRef ShadowSystem::getShadowMap() const
 	return m_depthMapTexture;
 }
 
-glm::mat4 ShadowSystem::getLightSpaceMat() const
+const ShadowCascades& ShadowSystem::getCascades() const
 {
-	return m_lightSpaceMatrix;
+	return m_cascades;
+}
+
+void ShadowSystem::setCascadeUniforms(Shader& shader)
+{
+	const ShadowCascades& cascades = Engine::get()->getSubSystem<Graphics>()->shadowCascades;
+
+	shader.setUniformValue("cascadeCount", cascades.count);
+	for (int i = 0; i < cascades.count; i++)
+	{
+		const std::string index = "[" + std::to_string(i) + "]";
+		shader.setUniformValue("lightSpaceMatrices" + index, cascades.lightSpaceMatrices[i]);
+		shader.setUniformValue("cascadeSplits" + index, cascades.splits[i]);
+		shader.setUniformValue("cascadeBias" + index, cascades.bias[i]);
+	}
 }

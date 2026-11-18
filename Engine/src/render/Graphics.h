@@ -9,6 +9,7 @@
 #include "render/GBuffer.h"
 #include "render/SSBO.h"
 #include "render/DrawItem.h"
+#include "render/ShadowSettings.h"
 
 class Scene;
 class Context;
@@ -25,26 +26,6 @@ enum class RenderMode
 {
 	SHADED = 0,
 	WIREFRAME = 1
-};
-
-// Global directional-light shadow settings, consumed by ShadowSystem and the lighting shaders.
-struct ShadowSettings
-{
-	bool enabled = true;
-
-	// Shadow map resolution (square), changing it reallocates the depth texture
-	int resolution = 2048;
-
-	// Orthographic light projection
-	float left = -10.0f;
-	float right = 10.0f;
-	float bottom = -10.0f;
-	float top = 10.0f;
-	float nearPlane = 1.0f;
-	float farPlane = 200.0f;
-
-	// Position the light view is rendered from (looks along the directional light's direction)
-	glm::vec3 lightOrigin = { 0.0f, 100.0f, 0.0f };
 };
 
 class EngineAPI Graphics : public SubSystem
@@ -80,7 +61,7 @@ public:
 	TextureResourceRef brdfLUT = nullptr;
 	TextureResourceRef shadowMap = nullptr;
 	TextureResourceRef ssaoTexture = nullptr;
-	glm::mat4 lightSpaceMatrix;
+	ShadowCascades shadowCascades;
 	Frustum* frustum = nullptr;
 	std::shared_ptr<RenderView> renderView;
 

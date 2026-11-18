@@ -47,7 +47,7 @@ uniform sampler2D gMRA;
 uniform samplerCube gIrradianceMap;
 uniform samplerCube gPrefilterEnvMap;
 uniform sampler2D gBRDFIntegrationLUT;
-uniform sampler2D gShadowMap;
+uniform sampler2DArray gShadowMap;
 uniform vec3 cameraPos;
 uniform sampler2D gSSAOColorBuffer;
 //uniform sampler2D gTangent;
@@ -110,8 +110,8 @@ void main()
 	//vec3 tangent = normalize(texture(gTangent, TexCoords).rgb);
 	float ssao = texture(gSSAOColorBuffer, TexCoords).r;
 
-	vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
-	float shadow = useShadows ? calculateShadows(fragPosInLightSpace, gShadowMap) : 0.0;
+	float viewDepth = -(view * vec4(fragPos, 1.f)).z;
+	float shadow = useShadows ? calculateShadows(fragPos, viewDepth, gShadowMap) : 0.0;
 
 	float ssaoFinal = useSSAO ? ao * ssao : 1.0;
 

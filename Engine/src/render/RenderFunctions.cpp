@@ -26,6 +26,7 @@
 #include "geometry/Mesh.h"
 #include "animation/Animator.h"
 #include "animation/BoneTransformSystem.h"
+#include "systems/ShadowSystem.h"
 
 bool RenderFunctions::prepareMeshForRender(Mesh* mesh, const Entity& entityHandler)
 {
@@ -406,7 +407,8 @@ void RenderFunctions::drawLightPass(const GBuffer& gBuffer)
 	lightPassShaderResource->bindUniformBlockToBindPoint("Time", 0);
 	lightPassShaderResource->bindUniformBlockToBindPoint("Lights", 1);
 	lightPassShaderResource->setUniformValue("cameraPos", graphics->cameraPos);
-	lightPassShaderResource->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
+	lightPassShaderResource->setUniformValue("view", graphics->view);
+	ShadowSystem::setCascadeUniforms(*lightPassShaderResource.get());
 	lightPassShaderResource->setUniformValue("useSSAO", graphics->useSSAO);
 	lightPassShaderResource->setUniformValue("useShadows", graphics->shadowSettings.enabled);
 	graphics->renderView->bind();

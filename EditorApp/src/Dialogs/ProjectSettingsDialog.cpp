@@ -43,19 +43,13 @@ void ProjectSettingsDialog::drawContent()
 		if (ImGui::Combo("Resolution", &resolutionIndex, resolutionNames, IM_ARRAYSIZE(resolutionNames)))
 			shadows.resolution = resolutions[resolutionIndex];
 
-		if (ImGui::CollapsingHeader("Projection", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Cascades", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			ImGui::DragFloat("Left", &shadows.left, 0.5f);
-			ImGui::DragFloat("Right", &shadows.right, 0.5f);
-			ImGui::DragFloat("Bottom", &shadows.bottom, 0.5f);
-			ImGui::DragFloat("Top", &shadows.top, 0.5f);
-			ImGui::DragFloat("Near", &shadows.nearPlane, 0.1f);
-			ImGui::DragFloat("Far", &shadows.farPlane, 1.0f);
-		}
-
-		if (ImGui::CollapsingHeader("Light View", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::DragFloat3("Origin", &shadows.lightOrigin.x, 0.5f);
+			ImGui::SliderInt("Count", &shadows.cascadeCount, 1, MAX_SHADOW_CASCADES);
+			ImGui::SliderFloat("Split Lambda", &shadows.splitLambda, 0.0f, 1.0f);
+			ImGui::DragFloat("Distance", &shadows.shadowDistance, 1.0f, 1.0f, 10000.0f);
+			ImGui::DragFloat("Caster Margin", &shadows.casterMargin, 1.0f, 0.0f, 10000.0f);
+			ImGui::DragFloat("Bias", &shadows.biasScale, 0.05f, 0.0f, 20.0f);
 		}
 
 		ImGui::EndTabItem();

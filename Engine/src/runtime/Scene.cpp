@@ -676,11 +676,11 @@ void Scene::draw(float deltaTime)
 		if(Engine::get()->getConfig().renderConfig.renderShadowMap && graphics->shadowSettings.enabled)
 		{
 			glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Generate Shadow Map");
-			m_shadowSystem->renderToDepthMap(this, m_drawItems);
+			m_shadowSystem->renderToDepthMap(this, m_drawItems, graphics->view, primaryCamera);
 			glPopDebugGroup();
 		}
 
-		graphics->lightSpaceMatrix = m_shadowSystem->getLightSpaceMat();
+		graphics->shadowCascades = m_shadowSystem->getCascades();
 		graphics->shadowMap = m_shadowSystem->getShadowMap();
 
 		for (auto&& [entity, waterBody, transform] : m_registry->get().view<WaterBodyComponent, Transformation>().each())
@@ -797,7 +797,7 @@ void Scene::draw(float deltaTime)
 				terrainShader->setUniformValue("model", transform.getWorldTransformation());
 				terrainShader->setUniformValue("width", terrain.getWidth());
 				terrainShader->setUniformValue("height", terrain.getHeight());
-				terrainShader->setUniformValue("lightSpaceMatrix", graphics->lightSpaceMatrix);
+				ShadowSystem::setCascadeUniforms(*terrainShader.get());
 				terrainShader->setUniformValue("useShadows", graphics->shadowSettings.enabled);				
 				terrainShader->setUniformValue("cameraPos", graphics->cameraPos);
 				terrainShader->setUniformValue("layerCount", terrain.getLayerCount());

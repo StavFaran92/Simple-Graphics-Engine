@@ -182,7 +182,7 @@ uniform vec3 cameraPos;
 uniform samplerCube gIrradianceMap;
 uniform samplerCube gPrefilterEnvMap;
 uniform sampler2D gBRDFIntegrationLUT;
-uniform sampler2D gShadowMap;
+uniform sampler2DArray gShadowMap;
 uniform bool useShadows;
 layout(binding = 5) uniform sampler2D noise;
 
@@ -328,8 +328,8 @@ void main()
     }
 
 
-    vec4 fragPosInLightSpace = lightSpaceMatrix * vec4(fragPos, 1.f);
-    float shadow = useShadows ? calculateShadows(fragPosInLightSpace, gShadowMap) : 0.0;
+    float viewDepth = -(view * vec4(fragPos, 1.f)).z;
+    float shadow = useShadows ? calculateShadows(fragPos, viewDepth, gShadowMap) : 0.0;
 
     vec3 color = calculatePBR(
                 totalAlbedo,
